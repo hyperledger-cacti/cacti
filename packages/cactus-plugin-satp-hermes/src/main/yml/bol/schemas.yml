@@ -217,6 +217,7 @@ Asset:
     - networkId
     - tokenType
     - referenceId
+    - ercTokenStandard
   properties:
     id:
       type: string
@@ -238,7 +239,9 @@ Asset:
       $ref: ./schemas.yml#/TokenType
     referenceId:
       type: string
-    
+    ercTokenStandard:
+      $ref: ./schemas.yml#/ERCTokenStandard
+
 TransactRequest:
   description: "Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks."
   type: object
@@ -1199,12 +1202,17 @@ NetworkId:
 TokenType:
   type: string
   enum:
-    - ERC20
-    - ERC721
-    - ERC1155
     - NONSTANDARD_FUNGIBLE
     - NONSTANDARD_NONFUNGIBLE
   description: The type of token.
+ERCTokenStandard:
+  type: string
+  enum:
+    - UNSPECIFIED
+    - ERC20
+    - ERC721
+    - ERC1155
+  description: The ERC token standard.
 DraftVersions:
   type: object
   description: The draft versions supported by the gateway.

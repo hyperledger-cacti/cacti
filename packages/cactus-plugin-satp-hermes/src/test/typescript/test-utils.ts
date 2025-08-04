@@ -20,6 +20,7 @@ import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript
 import { EventEmitter } from "events";
 import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { createMigrationSource } from "../../main/typescript/database/knex-migration-source";
+import { TokenType as TransactAssetType } from "../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
@@ -234,12 +235,32 @@ export function getTransactRequest(
   to: BesuTestEnvironment | EthereumTestEnvironment | FabricTestEnvironment,
   fromAmount: string,
   toAmount: string,
+  assetType?: TransactAssetType,
 ): TransactRequest {
-  return {
-    contextID,
-    sourceAsset: { ...from.defaultAsset, amount: fromAmount },
-    receiverAsset: { ...to.defaultAsset, amount: toAmount },
-  };
+  if (assetType === undefined) {
+    return {
+      contextID,
+      sourceAsset: { ...from.defaultAsset, amount: fromAmount },
+      receiverAsset: { ...to.defaultAsset, amount: toAmount },
+    };
+  } else {
+    switch (assetType) {
+      case TransactAssetType.NONSTANDARD_FUNGIBLE:
+        return {
+          contextID,
+          sourceAsset: { ...from.defaultAsset, amount: fromAmount },
+          receiverAsset: { ...to.defaultAsset, amount: toAmount },
+        };
+      case TransactAssetType.NONSTANDARD_NONFUNGIBLE:
+        return {
+          contextID,
+          sourceAsset: { ...from.nonFungibleDefaultAsset, amount: fromAmount },
+          receiverAsset: { ...to.nonFungibleDefaultAsset, amount: toAmount },
+        };
+      default:
+        throw new Error(`Unsupported asset type: ${assetType}`);
+    }
+  }
 }
 
 export interface PGDatabaseConfig {
