@@ -1,5 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import { TokenType } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
+import {
+  ERCTokenStandard,
+  TokenType,
+} from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { NetworkId } from "../../../../public-api";
 
 export interface Asset {
@@ -9,10 +12,19 @@ export interface Asset {
   owner: string;
   contractName: string;
   network: NetworkId;
+  ercTokenStandard: ERCTokenStandard;
 }
 
+export type Brand<K, T> = K & { __brand: T };
+export type Amount = Brand<number, "Amount">;
+export type UniqueTokenID = Brand<null, "UniqueTokenID">;
+
 export interface FungibleAsset extends Asset {
-  amount: string;
+  amount: Amount;
+}
+
+export interface NonFungibleAsset extends Asset {
+  uniqueDescriptor: UniqueTokenID;
 }
 
 export function getTokenType(stringType: string) {
@@ -29,4 +41,8 @@ export function createAssetId(
 
 export function instanceOfFungibleAsset(asset: Asset) {
   return "amount" in asset;
+}
+
+export function instanceOfNonFungibleAsset(asset: Asset) {
+  return "uniqueDescriptor" in asset;
 }

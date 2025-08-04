@@ -426,7 +426,7 @@ export class BesuEnvironment {
       id: BesuEnvironment.BESU_ASSET_ID,
       referenceId: BesuEnvironment.BESU_ASSET_REFERENCE_ID,
       amount,
-      tokenType: TokenType.NonstandardFungible,
+      tokenType: TokenType.Fungible,
       networkId: {
         id: BesuEnvironment.BESU_NETWORK_ID,
         ledgerType: NetworkIdLedgerTypeEnum.Besu2X,

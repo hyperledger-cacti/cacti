@@ -314,7 +314,7 @@ describe("SATP Services Testing", () => {
 
     sessionData.senderAsset = create(AssetSchema, {
       tokenId: "MOCK_TOKEN_ID",
-      tokenType: TokenType.ERC20,
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(0),
       owner: "MOCK_SENDER_ASSET_OWNER",
       contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
@@ -325,7 +325,7 @@ describe("SATP Services Testing", () => {
       }),
     });
     sessionData.receiverAsset = create(AssetSchema, {
-      tokenType: TokenType.ERC20,
+      tokenType: TokenType.NONSTANDARD_FUNGIBLE,
       amount: BigInt(0),
       owner: "MOCK_RECEIVER_ASSET_OWNER",
       contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
