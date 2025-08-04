@@ -48,6 +48,7 @@ export interface tokenContractName {
 }
 export class BesuTestEnvironment {
   public static readonly BESU_ASSET_ID: string = "BesuExampleAsset";
+  public static readonly BESU_ASSET_ID2: string = "BesuExampleAsset2";
   public static readonly BESU_REFERENCE_ID: Record<TokenType, string> = {
     [TokenType.ERC20]: ExampleOntologyERC20.id,
     [TokenType.ERC721]: ExampleOntologyERC721.id,
@@ -152,6 +153,9 @@ export class BesuTestEnvironment {
 
     tokenType.forEach((element) => {
       this.tokenContracts.set(element.assetType, element.contractName);
+      this.log.info(
+        `Listing contract for type ${element.assetType} on Besu Test Environment`,
+      );
     });
 
     // Keychain Plugins setup
@@ -670,7 +674,7 @@ export class BesuTestEnvironment {
   }
   public get nonFungibleDefaultAsset(): Asset {
     return {
-      id: BesuTestEnvironment.BESU_ASSET_ID,
+      id: BesuTestEnvironment.BESU_ASSET_ID2,
       referenceId:
         BesuTestEnvironment.BESU_REFERENCE_ID[
           TokenType.NONSTANDARD_NONFUNGIBLE

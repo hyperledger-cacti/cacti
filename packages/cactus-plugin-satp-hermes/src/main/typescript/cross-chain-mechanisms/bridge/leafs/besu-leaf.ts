@@ -534,7 +534,7 @@ export class BesuLeaf
     }
 
     const response = (await this.connector.invokeContract({
-      contractName: this.wrapperContractAddress,
+      contractName: this.wrapperContractName,
       contractAbi: SATPWrapperContract.abi,
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
@@ -543,7 +543,9 @@ export class BesuLeaf
       signingCredential: this.signingCredential,
       gas: this.gas,
     })) as BesuResponse;
+    this.log.debug("\n\n\n" + response);
     if (!response.success) {
+      this.log.debug("\n\n\nERROR\n\n\n");
       throw new TransactionError(fnTag);
     }
 
@@ -577,7 +579,7 @@ export class BesuLeaf
     }
 
     const response = (await this.connector.invokeContract({
-      contractName: this.wrapperContractAddress,
+      contractName: this.wrapperContractName,
       contractAbi: SATPWrapperContract.abi,
       contractAddress: this.wrapperContractAddress,
       invocationType: EthContractInvocationType.Send,
@@ -789,7 +791,7 @@ export class BesuLeaf
 
     const token = response.callOutput as TokenResponse;
     this.log.info(`${fnTag}, Retrieved Asset:`);
-    console.log(token);
+    this.log.info(token);
 
     switch (Number(token.tokenType)) {
       case TokenType.ERC20:

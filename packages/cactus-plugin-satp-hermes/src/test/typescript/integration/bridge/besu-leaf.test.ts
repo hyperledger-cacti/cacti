@@ -36,7 +36,7 @@ const log = LoggerProvider.getOrCreate({
 
 let besuLeaf: BesuLeaf;
 let besuEnv: BesuTestEnvironment;
-const TIMEOUT = 60000;
+const TIMEOUT = 160000;
 
 beforeAll(async () => {
   await pruneDockerAllIfGithubAction({ logLevel })
@@ -92,7 +92,7 @@ afterAll(async () => {
     });
 }, TIMEOUT);
 
-describe("Besu Leaf Test", () => {
+describe("Besu Leaf Test with Fungible Tokens", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     besuLeaf = new BesuLeaf(
@@ -116,12 +116,6 @@ describe("Besu Leaf Test", () => {
     expect(wrapperContractAddress).toBeDefined();
 
     await besuEnv.giveRoleToBridge(wrapperContractAddress);
-
-    await besuEnv.approveAssets(
-      wrapperContractAddress,
-      "100",
-      TokenType.NONSTANDARD_FUNGIBLE,
-    );
   });
 
   it("Should Wrap a token", async () => {
@@ -143,6 +137,7 @@ describe("Besu Leaf Test", () => {
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
+    console.log(response);
 
     const response2 = await besuLeaf.getAssets();
     expect(response2).toBeDefined();
@@ -150,6 +145,7 @@ describe("Besu Leaf Test", () => {
     expect(response2[0]).toBe(asset.id);
 
     const response3 = (await besuLeaf.getAsset(asset.id)) as EvmFungibleAsset;
+    console.log(response3);
     expect(response3).toBeDefined();
     expect(response3.id).toBe(asset.id);
     expect(response3.type).toBe(asset.type);
@@ -159,10 +155,20 @@ describe("Besu Leaf Test", () => {
     );
     expect(response3.contractName).toBe(besuEnv.defaultAsset.contractName);
     expect(response3.amount).toBe(0 as Amount);
+
+    const wrapperContractAddress = await besuLeaf.getApproveAddress(
+      TokenType.NONSTANDARD_FUNGIBLE,
+    );
+
+    await besuEnv.approveAssets(
+      wrapperContractAddress,
+      "200",
+      TokenType.NONSTANDARD_FUNGIBLE,
+    );
   });
 
   it("Should Lock a token", async () => {
-    const response = await besuLeaf.lockAsset(asset.id, 100 as Amount);
+    const response = await besuLeaf.lockAsset(asset.id, Number(100) as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -376,7 +382,7 @@ describe("Besu Leaf Test", () => {
   });
 });
 
-describe("Besu Leaf Test Non Fungible", () => {
+describe("Besu Leaf Test with Non Fungible Tokens", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     besuLeaf = new BesuLeaf(

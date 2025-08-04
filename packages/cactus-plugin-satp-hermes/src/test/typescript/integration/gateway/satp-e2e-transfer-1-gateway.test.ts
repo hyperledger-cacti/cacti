@@ -22,7 +22,7 @@ import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/s
 import {
   BesuTestEnvironment,
   EthereumTestEnvironment,
-  //FabricTestEnvironment,
+  FabricTestEnvironment,
   getTransactRequest,
 } from "../../test-utils";
 import {
@@ -49,7 +49,7 @@ const log = LoggerProvider.getOrCreate({
 
 let knexSourceRemoteClient: Knex;
 let knexLocalClient: Knex;
-//let fabricEnv: FabricTestEnvironment;
+let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
 let gateway: SATPGateway;
@@ -59,7 +59,7 @@ const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
   await gateway.shutdown();
   await besuEnv.tearDown();
-  //await fabricEnv.tearDown();
+  await fabricEnv.tearDown();
 
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
@@ -93,7 +93,7 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
 
-  /*{
+  {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: satpContractName,
@@ -103,7 +103,7 @@ beforeAll(async () => {
     log.info("Fabric Ledger started successfully");
 
     await fabricEnv.deployAndSetupContracts();
-  }*/
+  }
 
   {
     const erc20TokenContract = "SATPContract";
@@ -150,7 +150,7 @@ beforeAll(async () => {
   }
 }, TIMEOUT);
 
-/*describe("SATPGateway sending a token from Besu to Fabric", () => {
+describe("SATPGateway sending a token from Besu to Fabric", () => {
   jest.setTimeout(TIMEOUT);
   it("should mint 100 tokens to the owner account", async () => {
     await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
@@ -636,7 +636,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     await gateway.shutdown();
   });
-});*/
+});
 
 describe("SATPGateway sending a non fungible token from Ethereum to Besu", () => {
   jest.setTimeout(TIMEOUT);

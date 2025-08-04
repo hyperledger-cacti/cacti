@@ -232,8 +232,6 @@ Asset:
       type: string
     amount:
       type: string
-    uniqueDescriptor:
-      type: string
     networkId:
       $ref: ./schemas.yml#/NetworkId
     tokenType:

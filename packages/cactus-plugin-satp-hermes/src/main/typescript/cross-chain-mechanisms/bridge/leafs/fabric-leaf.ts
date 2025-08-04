@@ -46,7 +46,11 @@ import {
   WrapperContractError,
 } from "../../common/errors";
 import { INetworkOptions, TransactionResponse } from "../bridge-types";
-import { FabricAsset } from "../ontology/assets/fabric-asset";
+import {
+  FabricAsset,
+  FabricFungibleAsset,
+  FabricNonFungibleAsset,
+} from "../ontology/assets/fabric-asset";
 import { Asset } from "../ontology/assets/asset";
 import { X509Identity } from "fabric-network";
 import { NetworkId } from "../../../public-api";
@@ -949,7 +953,7 @@ export class FabricLeaf
 
     const token = JSON.parse(response.functionOutput);
 
-    switch (token.tokenType) {
+    switch (Number(token.tokenType)) {
       case TokenType.ERC20:
       case TokenType.NONSTANDARD_FUNGIBLE:
         return {
@@ -960,9 +964,9 @@ export class FabricLeaf
           mspId: token.mspId,
           channelName: token.channelName,
           contractName: token.contractName,
-          amount: token.assetAttribute.toString(),
+          amount: token.amount.toString(),
           network: this.networkIdentification,
-        } as FabricAsset;
+        } as FabricFungibleAsset;
       case TokenType.ERC721:
       case TokenType.NONSTANDARD_NONFUNGIBLE:
         return {
@@ -973,9 +977,9 @@ export class FabricLeaf
           mspId: token.mspId,
           channelName: token.channelName,
           contractName: token.contractName,
-          uniqueDescriptor: token.assetAttribute.toString(),
+          uniqueDescriptor: token.uniqueDescriptor.toString(),
           network: this.networkIdentification,
-        } as FabricAsset;
+        } as FabricNonFungibleAsset;
       default:
         throw new Error("Unsupported Token Type");
     }
