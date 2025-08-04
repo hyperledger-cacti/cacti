@@ -208,7 +208,7 @@ export abstract class BridgeLeaf {
    * @returns {unknown} The wrapper contract.
    */
 
-  public abstract getWrapperContract(type: string): unknown;
+  public abstract getWrapperContract(type: TokenType): unknown;
 
   /**
    * Retrieves the approval address for a specific asset type.
