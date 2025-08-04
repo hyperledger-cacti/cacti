@@ -826,6 +826,19 @@ export class FabricTestEnvironment {
     };
   }
 
+  public get nonFungibleDefaultAsset(): Asset {
+    return {
+      id: FabricTestEnvironment.FABRIC_ASSET_ID,
+      referenceId: FabricTestEnvironment.FABRIC_REFERENCE_ID,
+      owner: this.clientId,
+      contractName: this.satpContractName,
+      mspId: this.userIdentity.mspId,
+      channelName: this.fabricChannelName,
+      networkId: this.network,
+      tokenType: AssetTokenTypeEnum.NonstandardNonfungible,
+    };
+  }
+
   // Returns the user identity certificate used for testing transactions
   get transactRequestPubKey(): string {
     return this.userIdentity.credentials.certificate;

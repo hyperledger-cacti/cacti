@@ -1,4 +1,4 @@
-import { Asset, FungibleAsset } from "./asset";
+import { Asset, FungibleAsset, NonFungibleAsset } from "./asset";
 import {
   getInteractionType,
   InteractionData,
@@ -11,6 +11,7 @@ export interface FabricAsset extends Asset {
 }
 
 export interface FabricFungibleAsset extends FabricAsset, FungibleAsset {}
+export interface FabricNonFungibleAsset extends FabricAsset, NonFungibleAsset {}
 
 export enum VarType {
   CONTRACTNAME = 0,
@@ -23,6 +24,7 @@ export enum VarType {
   BRIDGEMSPID = 7,
   RECEIVER = 8,
   MSPID = 9,
+  UNIQUEDESCRIPTOR = 10,
 }
 
 export function getVarTypes(stringType: string) {

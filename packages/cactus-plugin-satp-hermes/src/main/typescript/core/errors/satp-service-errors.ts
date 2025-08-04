@@ -402,6 +402,12 @@ export class AmountMissingError extends SATPInternalError {
     this.errorType = SATPErrorType.MISSING_PARAMETER;
   }
 }
+export class UniqueTokenDescriptorMissingError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(`${tag}, Unique Descriptor missing`, cause ?? null, 400);
+    this.errorType = SATPErrorType.MISSING_PARAMETER;
+  }
+}
 export class MissingRecipientError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
     super(`${tag}, Recipient is missing`, cause ?? null, 400);

@@ -4,6 +4,7 @@ import {
   ClaimFormat,
   CommonSatpSchema,
   MessageType,
+  TokenType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATP_VERSION } from "../../constants";
 import {
@@ -46,13 +47,17 @@ import {
   MissingBridgeManagerError,
   SessionError,
   TokenIdMissingError,
+  UniqueTokenDescriptorMissingError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
+import {
+  FungibleAsset,
+  NonFungibleAsset,
+} from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { protoToAsset } from "../service-utils";
 import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -806,22 +811,48 @@ export class Stage3ClientService extends SATPService {
             ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
           } as NetworkId;
 
-          const token: FungibleAsset = protoToAsset(
-            sessionData.senderAsset,
-            networkId,
-          ) as FungibleAsset;
+          let token: FungibleAsset | NonFungibleAsset;
+          let amount: number | undefined;
 
-          if (token.id == undefined) {
-            throw new TokenIdMissingError(fnTag);
+          switch (sessionData.senderAsset.tokenType) {
+            case TokenType.ERC20:
+            case TokenType.NONSTANDARD_FUNGIBLE:
+              token = protoToAsset(
+                sessionData.senderAsset,
+                networkId,
+              ) as FungibleAsset;
+              if (token.id == undefined) {
+                throw new TokenIdMissingError(fnTag);
+              }
+              if (token.amount == undefined) {
+                throw new AmountMissingError(fnTag);
+              }
+              this.Log.debug(
+                `${fnTag}, Burn Asset ID: ${token.id} amount: ${token.amount}`,
+              );
+              amount = Number(token.amount);
+              break;
+            case TokenType.ERC721:
+            case TokenType.NONSTANDARD_NONFUNGIBLE:
+              token = protoToAsset(
+                sessionData.senderAsset,
+                networkId,
+              ) as NonFungibleAsset;
+              if (token.id == undefined) {
+                throw new TokenIdMissingError(fnTag);
+              }
+              if (token.uniqueDescriptor == undefined) {
+                throw new UniqueTokenDescriptorMissingError(fnTag);
+              }
+              this.Log.debug(
+                `${fnTag}, Burn Asset ID: ${token.id} uniqueDescriptor: ${token.uniqueDescriptor}`,
+              );
+              break;
+            default:
+              throw new Error(
+                `Unsupported asset type ${sessionData.senderAsset.tokenType}`,
+              );
           }
-
-          if (token.amount == undefined) {
-            throw new AmountMissingError(fnTag);
-          }
-
-          this.Log.debug(
-            `${fnTag}, Burn Asset ID: ${token.id} amount: ${token.amount}`,
-          );
 
           const bridge = this.bridgeManager.getSATPExecutionLayer(
             networkId,
@@ -832,10 +863,9 @@ export class Stage3ClientService extends SATPService {
 
           const res = await bridge.burnAsset(token);
 
-          this.monitorService.incrementCounter(
-            "burned_asset_amount",
-            Number(token.amount),
-          );
+          if (amount != undefined) {
+            this.monitorService.incrementCounter("burned_asset_amount", amount);
+          }
 
           sessionData.burnAssertionClaim.receipt = res.receipt;
 

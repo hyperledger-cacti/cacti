@@ -11,8 +11,16 @@ export interface Asset {
   network: NetworkId;
 }
 
+export type Brand<K, T> = K & { __brand: T };
+export type Amount = Brand<number, "Amount">;
+export type UniqueTokenID = Brand<null, "UniqueTokenID">;
+
 export interface FungibleAsset extends Asset {
-  amount: string;
+  amount: Amount;
+}
+
+export interface NonFungibleAsset extends Asset {
+  uniqueDescriptor: UniqueTokenID;
 }
 
 export function getTokenType(stringType: string) {
@@ -29,4 +37,8 @@ export function createAssetId(
 
 export function instanceOfFungibleAsset(asset: Asset) {
   return "amount" in asset;
+}
+
+export function instanceOfNonFungibleAsset(asset: Asset) {
+  return "uniqueDescriptor" in asset;
 }

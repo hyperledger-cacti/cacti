@@ -2,37 +2,97 @@ import { create } from "@bufbuild/protobuf";
 import {
   AssetSchema as ProtoAssetSchema,
   type Asset as ProtoAsset,
+  TokenType,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { EvmFungibleAsset } from "../../cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
+import {
+  EvmFungibleAsset,
+  EvmNonFungibleAsset,
+} from "../../cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { FabricFungibleAsset } from "../../cross-chain-mechanisms/bridge/ontology/assets/fabric-asset";
 import {
   Asset,
   FungibleAsset,
+  NonFungibleAsset,
+  Amount,
+  UniqueTokenID,
 } from "../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { NetworkId } from "../../public-api";
 
-export function assetToProto(
-  asset: FungibleAsset,
-  networkId: NetworkId,
-): ProtoAsset {
+export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
   const protoAsset = create(ProtoAssetSchema, {
     tokenId: asset.id,
     tokenType: asset.type,
     referenceId: asset.referenceId,
     owner: asset.owner,
-    amount: BigInt(asset.amount),
   });
 
   switch (networkId.ledgerType) {
     case LedgerType.Besu1X:
-      protoAsset.contractAddress = (asset as EvmFungibleAsset).contractAddress;
+      switch (asset.type) {
+        case TokenType.ERC20:
+        case TokenType.NONSTANDARD_FUNGIBLE:
+          protoAsset.amount = BigInt((asset as EvmFungibleAsset).amount);
+          protoAsset.contractAddress = (
+            asset as EvmFungibleAsset
+          ).contractAddress;
+          break;
+        case TokenType.ERC721:
+        case TokenType.NONSTANDARD_NONFUNGIBLE:
+          protoAsset.amount = BigInt(
+            (asset as EvmNonFungibleAsset).uniqueDescriptor,
+          );
+          protoAsset.contractAddress = (
+            asset as EvmNonFungibleAsset
+          ).contractAddress;
+          break;
+        default:
+          throw new Error(`Unsupported asset type ${asset.type}`);
+      }
       break;
     case LedgerType.Besu2X:
-      protoAsset.contractAddress = (asset as EvmFungibleAsset).contractAddress;
+      switch (asset.type) {
+        case TokenType.ERC20:
+        case TokenType.NONSTANDARD_FUNGIBLE:
+          protoAsset.amount = BigInt((asset as EvmFungibleAsset).amount);
+          protoAsset.contractAddress = (
+            asset as EvmFungibleAsset
+          ).contractAddress;
+          break;
+        case TokenType.ERC721:
+        case TokenType.NONSTANDARD_NONFUNGIBLE:
+          protoAsset.amount = BigInt(
+            (asset as EvmNonFungibleAsset).uniqueDescriptor,
+          );
+          protoAsset.contractAddress = (
+            asset as EvmNonFungibleAsset
+          ).contractAddress;
+          break;
+        default:
+          throw new Error(`Unsupported asset type ${asset.type}`);
+      }
       break;
     case LedgerType.Ethereum:
-      protoAsset.contractAddress = (asset as EvmFungibleAsset).contractAddress;
+      switch (asset.type) {
+        case TokenType.ERC20:
+        case TokenType.NONSTANDARD_FUNGIBLE:
+          protoAsset.amount = BigInt((asset as EvmFungibleAsset).amount);
+          protoAsset.contractAddress = (
+            asset as EvmFungibleAsset
+          ).contractAddress;
+          break;
+        case TokenType.ERC721:
+        case TokenType.NONSTANDARD_NONFUNGIBLE:
+          protoAsset.amount = BigInt(
+            (asset as EvmNonFungibleAsset).uniqueDescriptor,
+          );
+          protoAsset.contractAddress = (
+            asset as EvmNonFungibleAsset
+          ).contractAddress;
+          break;
+        default:
+          throw new Error(`Unsupported asset type ${asset.type}`);
+      }
       break;
     case LedgerType.Fabric2:
       protoAsset.mspId = (asset as FabricFungibleAsset).mspId;
@@ -46,15 +106,27 @@ export function assetToProto(
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function protoToAsset(asset: ProtoAsset, networkId: NetworkId): Asset {
-  const assetObj: FungibleAsset = {
+  const assetObj: Asset = {
     id: asset.tokenId,
     referenceId: asset.referenceId,
     type: asset.tokenType.valueOf(),
     owner: asset.owner,
-    amount: String(asset.amount),
     contractName: asset.contractName,
     network: networkId,
   };
+  if (
+    asset.tokenType == TokenType.ERC20 ||
+    asset.tokenType == TokenType.NONSTANDARD_FUNGIBLE
+  ) {
+    (assetObj as FungibleAsset).amount = Number(asset.amount) as Amount;
+  } else if (
+    asset.tokenType == TokenType.ERC721 ||
+    asset.tokenType == TokenType.NONSTANDARD_NONFUNGIBLE
+  ) {
+    (assetObj as NonFungibleAsset).uniqueDescriptor = Number(
+      asset.amount,
+    ) as UniqueTokenID;
+  }
   if (asset.mspId) {
     (assetObj as FabricFungibleAsset).mspId = asset.mspId;
     (assetObj as FabricFungibleAsset).channelName = asset.channelName;
