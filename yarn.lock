@@ -9891,6 +9891,7 @@ __metadata:
     webpack-cli: "npm:4.10.0"
     wget-improved: "npm:3.4.0"
     yargs: "npm:17.7.2"
+    zokrates-js: "npm:^1.1.9"
   dependenciesMeta:
     "@2060.io/ffi-napi":
       built: false
@@ -42228,7 +42229,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pako@npm:^2.0.4":
+"pako@npm:^2.0.4, pako@npm:^2.1.0":
   version: 2.1.0
   resolution: "pako@npm:2.1.0"
   checksum: 10/38a04991d0ec4f4b92794a68b8c92bf7340692c5d980255c92148da96eb3e550df7a86a7128b5ac0c65ecddfe5ef3bbe9c6dab13e1bc315086e759b18f7c1401
@@ -56743,6 +56744,15 @@ __metadata:
   version: 3.25.3
   resolution: "zod@npm:3.25.3"
   checksum: 10/161ff4ef84e2041639366e4dce10ea40888d59e2c23c71669161bfe6ece28e48fbb0865e75640ac5050cd6f2ea1785aece9d54f3b1d1d7555374157008ca3de4
+  languageName: node
+  linkType: hard
+
+"zokrates-js@npm:^1.1.9":
+  version: 1.1.9
+  resolution: "zokrates-js@npm:1.1.9"
+  dependencies:
+    pako: "npm:^2.1.0"
+  checksum: 10/89c1e3a27172b61a8e746ca04df7320022ecc6459e5651d2f6b8d757953456c072fb44858590454a89872240b6a4f4d25536704eb843b9c5fccb64e69f2b3695
   languageName: node
   linkType: hard
 
