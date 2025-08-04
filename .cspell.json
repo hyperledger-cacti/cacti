@@ -255,6 +255,8 @@
   ,"overriden"
   ,"Certificat"
   ,"adress"
+  ,"NFToken"
+  ,"NFT"
   ],
   "dictionaries": [
     "typescript,node,npm,go,rust"

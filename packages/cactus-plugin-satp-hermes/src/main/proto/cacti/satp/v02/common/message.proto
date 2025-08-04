@@ -277,11 +277,8 @@ message WrapAssertionClaim {
 
 enum TokenType {
     TOKEN_TYPE_UNSPECIFIED = 0;
-    TOKEN_TYPE_ERC20 = 1;
-    TOKEN_TYPE_ERC721 = 2;
-    TOKEN_TYPE_ERC1155 = 3;
-    TOKEN_TYPE_NONSTANDARD_FUNGIBLE = 4;
-    TOKEN_TYPE_NONSTANDARD_NONFUNGIBLE = 5;
+    TOKEN_TYPE_NONSTANDARD_FUNGIBLE = 1;
+    TOKEN_TYPE_NONSTANDARD_NONFUNGIBLE = 2;
 }
 
 message Asset {
@@ -297,10 +294,18 @@ message Asset {
   string msp_id = 8;
   string channel_name = 9;
   NetworkId network_id = 10;
+  ERCTokenStandard erc_token_standard = 11;
 }
 
 message NetworkId {
   string id = 1;
   string type = 2;
+}
+
+enum ERCTokenStandard {
+    ERC_TOKEN_STANDARD_UNSPECIFIED = 0;
+    ERC_TOKEN_STANDARD_ERC20 = 1;
+    ERC_TOKEN_STANDARD_ERC721 = 2;
+    ERC_TOKEN_STANDARD_ERC1155 = 3;
 }
 

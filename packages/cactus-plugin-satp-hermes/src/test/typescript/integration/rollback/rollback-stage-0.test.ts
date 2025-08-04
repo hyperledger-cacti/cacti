@@ -14,6 +14,7 @@ import { BesuTestEnvironment, FabricTestEnvironment } from "../../test-utils";
 import {
   AssetSchema,
   ClaimFormat,
+  ERCTokenStandard,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { v4 as uuidv4 } from "uuid";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
@@ -52,6 +53,8 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let fabricEnv: FabricTestEnvironment;
 let besuEnv: BesuTestEnvironment;
@@ -190,10 +193,17 @@ beforeAll(async () => {
   {
     const erc20TokenContract = "SATPContract";
 
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        logLevel,
+      },
+      [
+        {
+          assetType: SupportedBesuContractTypes.FUNGIBLE,
+          contractName: erc20TokenContract,
+        },
+      ],
+    );
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
@@ -206,7 +216,7 @@ beforeAll(async () => {
   );
 
   besuLeaf = new BesuLeaf(
-    besuEnv.createBesuLeafConfig("DEBUG"),
+    besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
     ontologyManager,
     monitorService,
   );
@@ -258,11 +268,12 @@ describe.skip("Rollback Test stage 0", () => {
       id: besuEnv.defaultAsset.id,
       referenceId: besuEnv.defaultAsset.referenceId,
       type: TokenType.NONSTANDARD_FUNGIBLE,
-      amount: "100",
+      amount: 100 as Amount,
       owner: besuEnv.firstHighNetWorthAccount,
-      contractName: besuEnv.erc20TokenContract,
-      contractAddress: besuEnv.assetContractAddress!,
+      contractName: besuEnv.getTestFungibleContractName(),
+      contractAddress: besuEnv.getTestFungibleContractAddress(),
       network: besuEnv.network,
+      ercTokenStandard: ERCTokenStandard.ERC_TOKEN_STANDARD_ERC20,
     };
     const besuReceipt = await besuLeaf.wrapAsset(besuAsset);
     expect(besuReceipt).toBeDefined();
@@ -273,11 +284,12 @@ describe.skip("Rollback Test stage 0", () => {
       id: fabricEnv.defaultAsset.id,
       referenceId: fabricEnv.defaultAsset.referenceId,
       type: TokenType.NONSTANDARD_FUNGIBLE,
-      amount: "100",
+      amount: 100 as Amount,
       owner: fabricEnv.clientId,
       mspId: "Org1MSP",
       channelName: fabricEnv.fabricChannelName,
       contractName: fabricEnv.satpContractName,
+      ercTokenStandard: ERCTokenStandard.ERC_TOKEN_STANDARD_ERC20,
     };
 
     const fabricReceipt = await fabricLeaf.wrapAsset(fabricAsset);

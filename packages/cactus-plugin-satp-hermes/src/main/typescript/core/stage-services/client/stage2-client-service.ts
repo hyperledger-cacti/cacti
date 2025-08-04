@@ -35,18 +35,12 @@ import {
   LockAssertionClaimError,
   LockAssertionClaimFormatError,
   SessionError,
-  TokenIdMissingError,
-  LedgerAssetError,
-  AmountMissingError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import { create } from "@bufbuild/protobuf";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
-import { type FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
-import { protoToAsset } from "../service-utils";
-import { LedgerType } from "@hyperledger/cactus-core-api";
-import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { buildAndCheckAsset, SessionSide } from "../../satp-utils";
 
 export class Stage2ClientService extends SATPService {
   public static readonly SATP_STAGE = "2";
@@ -311,43 +305,23 @@ export class Stage2ClientService extends SATPService {
             sequenceNumber: Number(sessionData.lastSequenceNumber),
           });
           this.Log.info(`${fnTag}, Locking Asset...`);
-          const assetId = sessionData.senderAsset?.tokenId;
-          const amount = sessionData.senderAsset?.amount;
 
-          if (sessionData.senderAsset == undefined) {
-            throw new LedgerAssetError(fnTag);
-          }
-
-          const networkId = {
-            id: sessionData.senderAsset.networkId?.id,
-            ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
-          } as NetworkId;
-
-          const token: FungibleAsset = protoToAsset(
-            sessionData.senderAsset,
-            networkId,
-          ) as FungibleAsset;
-
-          if (token.id == undefined) {
-            throw new TokenIdMissingError(fnTag);
-          }
-
-          if (token.amount == undefined) {
-            throw new AmountMissingError(fnTag);
-          }
-
-          this.Log.debug(
-            `${fnTag}, Lock Asset ID: ${assetId} amount: ${amount}`,
+          const tokenBuildData = buildAndCheckAsset(
+            fnTag,
+            stepTag,
+            this.Log,
+            sessionData,
+            SessionSide.CLIENT,
           );
 
           const bridge = this.bridgeManager.getSATPExecutionLayer(
-            networkId,
+            tokenBuildData.networkId,
             this.claimFormat,
           );
 
           sessionData.lockAssertionClaim = create(LockAssertionClaimSchema, {});
 
-          const res = await bridge.lockAsset(token);
+          const res = await bridge.lockAsset(tokenBuildData.token);
 
           sessionData.lockAssertionClaim.receipt = res.receipt;
 

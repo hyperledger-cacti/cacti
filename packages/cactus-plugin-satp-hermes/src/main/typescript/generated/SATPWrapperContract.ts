@@ -60,6 +60,7 @@ export type ContractContext = Web3ContractContext<
   SATPWrapperContractEvents
 >;
 export type SATPWrapperContractEvents =
+  | 'Approve'
   | 'Assign'
   | 'Burn'
   | 'Changed'
@@ -70,6 +71,15 @@ export type SATPWrapperContractEvents =
   | 'Unwrap'
   | 'Wrap';
 export interface SATPWrapperContractEventsContext {
+  Approve(
+    parameters: {
+      filter?: { tokenId?: string | string[] };
+      fromBlock?: number;
+      toBlock?: 'latest' | number;
+      topics?: string[];
+    },
+    callback?: (error: Error, event: EventData) => void
+  ): EventResponse;
   Assign(
     parameters: {
       filter?: { tokenId?: string | string[] };
@@ -157,13 +167,16 @@ export interface SATPWrapperContractEventsContext {
 }
 export type SATPWrapperContractMethodNames =
   | 'new'
+  | 'NFT_IDs'
   | 'assign'
   | 'bridge_address'
   | 'burn'
   | 'getAllAssetsIDs'
   | 'getToken'
+  | 'getToken'
   | 'lock'
   | 'mint'
+  | 'onERC721Received'
   | 'owner'
   | 'renounceOwnership'
   | 'tokens'
@@ -181,6 +194,7 @@ export interface TokenResponse {
   referenceId: string;
   owner: string;
   amount: string;
+  ercTokenStandard: string;
 }
 export interface TokensResponse {
   contractName: string;
@@ -190,6 +204,7 @@ export interface TokensResponse {
   referenceId: string;
   owner: string;
   amount: string;
+  ercTokenStandard: string;
 }
 export interface TokensInteractionsResponse {
   interactionType: string;
@@ -200,6 +215,11 @@ export interface InteractionsRequest {
   functionsSignature: string[];
   variables: string | number[][];
   available: boolean;
+}
+export interface ApproveEventEmittedResponse {
+  tokenId: string;
+  spender: string;
+  amount: string;
 }
 export interface AssignEventEmittedResponse {
   tokenId: string;
@@ -251,17 +271,29 @@ export interface SATPWrapperContract {
   'new'(_bridge_address: string): MethodReturnContext;
   /**
    * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param parameter0 Type: string, Indexed: false
+   * @param parameter1 Type: uint256, Indexed: false
+   */
+  NFT_IDs(
+    parameter0: string,
+    parameter1: string
+  ): MethodConstantReturnContext<boolean>;
+  /**
+   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
    * @param tokenId Type: string, Indexed: false
    * @param receiver_account Type: address, Indexed: false
-   * @param amount Type: uint256, Indexed: false
+   * @param assetAttribute Type: uint256, Indexed: false
    */
   assign(
     tokenId: string,
     receiver_account: string,
-    amount: string
+    assetAttribute: string
   ): MethodReturnContext;
   /**
    * Payable: false
@@ -276,9 +308,9 @@ export interface SATPWrapperContract {
    * StateMutability: nonpayable
    * Type: function
    * @param tokenId Type: string, Indexed: false
-   * @param amount Type: uint256, Indexed: false
+   * @param assetAttribute Type: uint256, Indexed: false
    */
-  burn(tokenId: string, amount: string): MethodReturnContext;
+  burn(tokenId: string, assetAttribute: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: true
@@ -286,6 +318,18 @@ export interface SATPWrapperContract {
    * Type: function
    */
   getAllAssetsIDs(): MethodConstantReturnContext<string[]>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param tokenId Type: string, Indexed: false
+   * @param assetAttribute Type: uint256, Indexed: false
+   */
+  getToken(
+    tokenId: string,
+    assetAttribute: string
+  ): MethodConstantReturnContext<TokenResponse>;
   /**
    * Payable: false
    * Constant: true
@@ -300,18 +344,34 @@ export interface SATPWrapperContract {
    * StateMutability: nonpayable
    * Type: function
    * @param tokenId Type: string, Indexed: false
-   * @param amount Type: uint256, Indexed: false
+   * @param assetAttribute Type: uint256, Indexed: false
    */
-  lock(tokenId: string, amount: string): MethodReturnContext;
+  lock(tokenId: string, assetAttribute: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
    * @param tokenId Type: string, Indexed: false
-   * @param amount Type: uint256, Indexed: false
+   * @param assetAttribute Type: uint256, Indexed: false
    */
-  mint(tokenId: string, amount: string): MethodReturnContext;
+  mint(tokenId: string, assetAttribute: string): MethodReturnContext;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: pure
+   * Type: function
+   * @param parameter0 Type: address, Indexed: false
+   * @param parameter1 Type: address, Indexed: false
+   * @param parameter2 Type: uint256, Indexed: false
+   * @param parameter3 Type: bytes, Indexed: false
+   */
+  onERC721Received(
+    parameter0: string,
+    parameter1: string,
+    parameter2: string,
+    parameter3: string | number[]
+  ): MethodConstantReturnContext<string>;
   /**
    * Payable: false
    * Constant: true
@@ -360,9 +420,9 @@ export interface SATPWrapperContract {
    * StateMutability: nonpayable
    * Type: function
    * @param tokenId Type: string, Indexed: false
-   * @param amount Type: uint256, Indexed: false
+   * @param assetAttribute Type: uint256, Indexed: false
    */
-  unlock(tokenId: string, amount: string): MethodReturnContext;
+  unlock(tokenId: string, assetAttribute: string): MethodReturnContext;
   /**
    * Payable: false
    * Constant: false
@@ -382,6 +442,8 @@ export interface SATPWrapperContract {
    * @param tokenId Type: string, Indexed: false
    * @param referenceId Type: string, Indexed: false
    * @param owner Type: address, Indexed: false
+   * @param interactions Type: tuple[], Indexed: false
+   * @param ercTokenStandard Type: uint8, Indexed: false
    */
   wrap(
     contractName: string,
@@ -389,7 +451,9 @@ export interface SATPWrapperContract {
     tokenType: string | number,
     tokenId: string,
     referenceId: string,
-    owner: string
+    owner: string,
+    interactions: InteractionsRequest[],
+    ercTokenStandard: string | number
   ): MethodReturnContext;
   /**
    * Payable: false
@@ -402,7 +466,7 @@ export interface SATPWrapperContract {
    * @param tokenId Type: string, Indexed: false
    * @param referenceId Type: string, Indexed: false
    * @param owner Type: address, Indexed: false
-   * @param interactions Type: tuple[], Indexed: false
+   * @param ercTokenStandard Type: uint8, Indexed: false
    */
   wrap(
     contractName: string,
@@ -411,6 +475,6 @@ export interface SATPWrapperContract {
     tokenId: string,
     referenceId: string,
     owner: string,
-    interactions: InteractionsRequest[]
+    ercTokenStandard: string | number
   ): MethodReturnContext;
 }

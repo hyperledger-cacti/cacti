@@ -87,7 +87,8 @@
                       "contractName",
                       "networkId",
                       "tokenType",
-                      "referenceId"
+                      "referenceId",
+                      "ercTokenStandard"
                     ],
                     "properties": {
                       "id": {
@@ -141,9 +142,6 @@
                       "tokenType": {
                         "type": "string",
                         "enum": [
-                          "ERC20",
-                          "ERC721",
-                          "ERC1155",
                           "NONSTANDARD_FUNGIBLE",
                           "NONSTANDARD_NONFUNGIBLE"
                         ],
@@ -151,6 +149,16 @@
                       },
                       "referenceId": {
                         "type": "string"
+                      },
+                      "ercTokenStandard": {
+                        "type": "string",
+                        "enum": [
+                          "UNSPECIFIED",
+                          "ERC20",
+                          "ERC721",
+                          "ERC1155"
+                        ],
+                        "description": "The ERC token standard."
                       }
                     }
                   },
@@ -163,7 +171,8 @@
                       "contractName",
                       "networkId",
                       "tokenType",
-                      "referenceId"
+                      "referenceId",
+                      "ercTokenStandard"
                     ],
                     "properties": {
                       "id": {
@@ -217,9 +226,6 @@
                       "tokenType": {
                         "type": "string",
                         "enum": [
-                          "ERC20",
-                          "ERC721",
-                          "ERC1155",
                           "NONSTANDARD_FUNGIBLE",
                           "NONSTANDARD_NONFUNGIBLE"
                         ],
@@ -227,6 +233,16 @@
                       },
                       "referenceId": {
                         "type": "string"
+                      },
+                      "ercTokenStandard": {
+                        "type": "string",
+                        "enum": [
+                          "UNSPECIFIED",
+                          "ERC20",
+                          "ERC721",
+                          "ERC1155"
+                        ],
+                        "description": "The ERC token standard."
                       }
                     }
                   }
@@ -2641,9 +2657,6 @@
             "schema": {
               "type": "string",
               "enum": [
-                "ERC20",
-                "ERC721",
-                "ERC1155",
                 "NONSTANDARD_FUNGIBLE",
                 "NONSTANDARD_NONFUNGIBLE"
               ],
@@ -4533,7 +4546,8 @@
           "contractName",
           "networkId",
           "tokenType",
-          "referenceId"
+          "referenceId",
+          "ercTokenStandard"
         ],
         "properties": {
           "id": {
@@ -4587,9 +4601,6 @@
           "tokenType": {
             "type": "string",
             "enum": [
-              "ERC20",
-              "ERC721",
-              "ERC1155",
               "NONSTANDARD_FUNGIBLE",
               "NONSTANDARD_NONFUNGIBLE"
             ],
@@ -4597,6 +4608,16 @@
           },
           "referenceId": {
             "type": "string"
+          },
+          "ercTokenStandard": {
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "ERC20",
+              "ERC721",
+              "ERC1155"
+            ],
+            "description": "The ERC token standard."
           }
         }
       },
@@ -4627,7 +4648,8 @@
               "contractName",
               "networkId",
               "tokenType",
-              "referenceId"
+              "referenceId",
+              "ercTokenStandard"
             ],
             "properties": {
               "id": {
@@ -4681,9 +4703,6 @@
               "tokenType": {
                 "type": "string",
                 "enum": [
-                  "ERC20",
-                  "ERC721",
-                  "ERC1155",
                   "NONSTANDARD_FUNGIBLE",
                   "NONSTANDARD_NONFUNGIBLE"
                 ],
@@ -4691,6 +4710,16 @@
               },
               "referenceId": {
                 "type": "string"
+              },
+              "ercTokenStandard": {
+                "type": "string",
+                "enum": [
+                  "UNSPECIFIED",
+                  "ERC20",
+                  "ERC721",
+                  "ERC1155"
+                ],
+                "description": "The ERC token standard."
               }
             }
           },
@@ -4703,7 +4732,8 @@
               "contractName",
               "networkId",
               "tokenType",
-              "referenceId"
+              "referenceId",
+              "ercTokenStandard"
             ],
             "properties": {
               "id": {
@@ -4757,9 +4787,6 @@
               "tokenType": {
                 "type": "string",
                 "enum": [
-                  "ERC20",
-                  "ERC721",
-                  "ERC1155",
                   "NONSTANDARD_FUNGIBLE",
                   "NONSTANDARD_NONFUNGIBLE"
                 ],
@@ -4767,6 +4794,16 @@
               },
               "referenceId": {
                 "type": "string"
+              },
+              "ercTokenStandard": {
+                "type": "string",
+                "enum": [
+                  "UNSPECIFIED",
+                  "ERC20",
+                  "ERC721",
+                  "ERC1155"
+                ],
+                "description": "The ERC token standard."
               }
             }
           }
@@ -8261,9 +8298,6 @@
           "tokenType": {
             "type": "string",
             "enum": [
-              "ERC20",
-              "ERC721",
-              "ERC1155",
               "NONSTANDARD_FUNGIBLE",
               "NONSTANDARD_NONFUNGIBLE"
             ],
@@ -10024,13 +10058,20 @@
       "TokenType": {
         "type": "string",
         "enum": [
-          "ERC20",
-          "ERC721",
-          "ERC1155",
           "NONSTANDARD_FUNGIBLE",
           "NONSTANDARD_NONFUNGIBLE"
         ],
         "description": "The type of token."
+      },
+      "ERCTokenStandard": {
+        "type": "string",
+        "enum": [
+          "UNSPECIFIED",
+          "ERC20",
+          "ERC721",
+          "ERC1155"
+        ],
+        "description": "The ERC token standard."
       },
       "DraftVersions": {
         "type": "object",

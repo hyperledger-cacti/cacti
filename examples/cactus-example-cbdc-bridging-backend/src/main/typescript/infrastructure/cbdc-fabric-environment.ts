@@ -475,7 +475,7 @@ export class FabricEnvironment {
       id: FabricEnvironment.FABRIC_ASSET_ID,
       referenceId: FabricEnvironment.FABRIC_ASSET_REFERENCE_ID,
       amount,
-      tokenType: TokenType.NonstandardFungible,
+      tokenType: TokenType.Fungible,
       networkId: {
         id: FabricEnvironment.FABRIC_NETWORK_ID,
         ledgerType: NetworkIdLedgerTypeEnum.Fabric2,

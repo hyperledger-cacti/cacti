@@ -6,6 +6,7 @@ import {
 import {
   AssetTokenTypeEnum,
   Configuration,
+  AssetErcTokenStandardEnum,
 } from "../../../main/typescript/generated/gateway-client/typescript-axios";
 import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
@@ -1017,7 +1018,22 @@ export class FabricTestEnvironment {
       mspId: this.userIdentity.mspId,
       channelName: this.fabricChannelName,
       networkId: this.network,
-      tokenType: AssetTokenTypeEnum.NonstandardFungible,
+      tokenType: AssetTokenTypeEnum.Fungible,
+      ercTokenStandard: AssetErcTokenStandardEnum.Erc20,
+    };
+  }
+
+  public get nonFungibleDefaultAsset(): Asset {
+    return {
+      id: FabricTestEnvironment.FABRIC_ASSET_ID,
+      referenceId: FabricTestEnvironment.FABRIC_REFERENCE_ID,
+      owner: this.clientId,
+      contractName: this.satpContractName,
+      mspId: this.userIdentity.mspId,
+      channelName: this.fabricChannelName,
+      networkId: this.network,
+      tokenType: AssetTokenTypeEnum.Nonfungible,
+      ercTokenStandard: AssetErcTokenStandardEnum.Erc721,
     };
   }
 
