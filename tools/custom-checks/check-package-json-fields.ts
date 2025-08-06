@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
 import { isStdLibRecord } from "./is-std-lib-record";
-import lernaCfg from "../../lerna.json" assert { type: "json" };
+import lernaCfg from "../../lerna.json" with { type: "json" };
 
 const CACTI_VERSION = lernaCfg.version;
 const CACTI_HOMEPAGE = "https://github.com/hyperledger-cacti/cacti#readme";
@@ -17,8 +17,14 @@ const CACTI_BUGS = "https://github.com/hyperledger-cacti/cacti/issues";
 const CACTI_REPO = "git+https://github.com/hyperledger-cacti/cacti.git";
 const CACTI_MAIL_LIST = "cacti@lists.lfdecentralizedtrust.org";
 const CACTI_PROJECT_URI = "https://www.lfdecentralizedtrust.org/projects/cacti";
-// const CACTI_NODE_REQ = ">=18";
-// const CACTI_NPM_REQ = ">=8";
+
+// Node and NPM versions are hardcoded here to ensure all projects in the monorepo
+// will work on the same setup.
+// In the future, this could be extracted from the main package.json or similar file.
+// IMPORTANT: when needed, use tools/bump-package-engines.ts script to update all the packages
+// first, then change the required version here.
+const CACTI_NODE_REQ = ">=22";
+const CACTI_NPM_REQ = ">=10";
 
 /**
  * Common schema for all cacti packages.
@@ -57,12 +63,12 @@ const schema = Joi.object({
     })
     .required(),
   files: Joi.array().items(Joi.string()),
-  // engines: Joi.object()
-  //   .valid({
-  //     node: CACTI_NODE_REQ,
-  //     npm: CACTI_NPM_REQ,
-  //   })
-  //   .required(),
+  engines: Joi.object()
+    .valid({
+      node: CACTI_NODE_REQ,
+      npm: CACTI_NPM_REQ,
+    })
+    .required(),
   publishConfig: Joi.object({ access: Joi.string().valid("public") })
     .unknown()
     .required(),

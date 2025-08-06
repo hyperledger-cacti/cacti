@@ -11,7 +11,7 @@
 # ctp - cactus-test-plugin
 ---
 env:
-  NODEJS_VERSION: v18.18.2
+  NODEJS_VERSION: v22.18.0
   RUN_TRIVY_SCAN: true
   RUN_CODE_COVERAGE: true
 jobs:

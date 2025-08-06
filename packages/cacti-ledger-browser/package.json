@@ -82,8 +82,8 @@
     "vite": "6.2.6"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=22",
+    "npm": ">=10"
   },
   "publishConfig": {
     "access": "public"

@@ -5,7 +5,7 @@ import { globby, Options as GlobbyOptions } from "globby";
 import { RuntimeError } from "run-time-error";
 import { isStdLibRecord } from "./is-std-lib-record";
 import { sortPackageJson } from "sort-package-json";
-import lernaCfg from "../../lerna.json" assert { type: "json" };
+import lernaCfg from "../../lerna.json" with { type: "json" };
 export interface ICheckPackageJsonSort {
   readonly argv: string[];
   readonly env: NodeJS.ProcessEnv;
