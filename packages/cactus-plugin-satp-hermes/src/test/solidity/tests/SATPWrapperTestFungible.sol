@@ -47,34 +47,34 @@ contract SATPWrapperTest is Test{
         unlockInteractions.push("lock(address,address,uint256)");
         
         unlockVariables.push([VarType.BRIDGE, VarType.OWNER, VarType.AMOUNT]);
-        InteractionSignature memory unlock = InteractionSignature(InteractionType.UNLOCK,unlockInteractions,lockVariables, true);
+        InteractionSignature memory unlock = InteractionSignature(InteractionType.UNLOCK,unlockInteractions,unlockVariables, true);
         signatures.push(unlock);
 
         
         mintInteractions.push("mint(address,uint256)");
         
         mintVariables.push([VarType.BRIDGE, VarType.AMOUNT]);
-        InteractionSignature memory mint = InteractionSignature(InteractionType.MINT,mintInteractions,lockVariables, true);
+        InteractionSignature memory mint = InteractionSignature(InteractionType.MINT,mintInteractions,mintVariables, true);
         signatures.push(mint);
 
         
         burnInteractions.push("burn(address,uint256)");
         
         burnVariables.push([VarType.BRIDGE, VarType.AMOUNT]);
-        InteractionSignature memory burn = InteractionSignature(InteractionType.BURN,burnInteractions,lockVariables, true);
+        InteractionSignature memory burn = InteractionSignature(InteractionType.BURN,burnInteractions,burnVariables, true);
         signatures.push(burn);
 
         
         assignInteractions.push("assign(address,address,uint256)");
         
         assignVariables.push([VarType.BRIDGE, VarType.RECEIVER, VarType.AMOUNT]);
-        InteractionSignature memory assign = InteractionSignature(InteractionType.ASSIGN,assignInteractions,lockVariables, true);
+        InteractionSignature memory assign = InteractionSignature(InteractionType.ASSIGN,assignInteractions,assignVariables, true);
         signatures.push(assign);
 
         checkPermissionInteractions.push("hasPermission(address)");
         
         checkPermissionVariables.push([VarType.BRIDGE]);
-        InteractionSignature memory checkPermition = InteractionSignature(InteractionType.CHECKPERMITION,checkPermissionInteractions,lockVariables, true);
+        InteractionSignature memory checkPermition = InteractionSignature(InteractionType.CHECKPERMITION,checkPermissionInteractions,checkPermissionVariables, true);
         signatures.push(checkPermition);
     }
 
@@ -116,12 +116,12 @@ contract SATPWrapperTest is Test{
         assertNotEq(tokenReceived.contractAddress, address(contract1), "Tokens don't match");
     }
 
-    //function testMint() public {
-        //wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(this), signatures);
-        //wrapperContract.mint(contract1.name(), 10);
+    function testMint() public {
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_FUNGIBLE, contract1.name(), "refID", address(user), signatures);
+        wrapperContract.mint(contract1.name(), 10);
         
-        //assertEq(contract1.balanceOf(address(this)), 10, "Token not minted");
-    //}
+        assertEq(contract1.balanceOf(address(wrapperContract)), 10, "Token not minted");
+    }
 
     function testMintATokenNotWrapped() public {
         try wrapperContract.mint(contract1.name(), 10) returns (bool s) {
