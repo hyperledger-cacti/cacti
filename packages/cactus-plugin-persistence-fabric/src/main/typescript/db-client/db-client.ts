@@ -18,6 +18,10 @@ import {
   FullBlockTransactionActionV1,
   FullBlockTransactionEndorsementV1,
   FullBlockTransactionEventV1,
+  GetDiscoveryResultsResponseV1,
+  GetDiscoveryResultsResponseV1MspsValue,
+  GetDiscoveryResultsResponseV1OrderersValueEndpointsInner,
+  GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric/src/main/typescript/generated/openapi/typescript-axios/api";
 import { Database as DatabaseSchemaType } from "./database.types";
 
@@ -499,5 +503,146 @@ export default class PostgresDatabaseClient {
     );
 
     return queryResponse.rows;
+  }
+
+  /**
+   * Insert discovered MSP to the database.
+   */
+  private async insertDiscoveryMsp(
+    msp: GetDiscoveryResultsResponseV1MspsValue,
+  ): Promise<string> {
+    this.log.debug(`Insert to fabric.discovery_msp MspID ${msp.id})`);
+
+    const txInsertResponse = await this.client.query(
+      `INSERT INTO
+          fabric.discovery_msp("mspid", "name", "organizational_unit_identifiers", "admins")
+         VALUES ($1, $2, $3, $4)
+         RETURNING id;`,
+      [
+        msp.id,
+        msp.name,
+        JSON.stringify(msp.organizationalUnitIdentifiers),
+        msp.admins,
+      ],
+    );
+    if (txInsertResponse.rowCount !== 1) {
+      throw new Error(`MSP ${msp.id} was not inserted into the DB`);
+    }
+
+    return txInsertResponse.rows[0].id;
+  }
+
+  /**
+   * Insert discovered orderer to the database.
+   */
+  private async insertDiscoveryOrderer(
+    discoveryMSPId: string,
+    orderer: GetDiscoveryResultsResponseV1OrderersValueEndpointsInner,
+  ): Promise<string> {
+    this.log.debug(
+      `Insert to fabric.discovery_orderers orderer ${orderer.name})`,
+    );
+
+    const txInsertResponse = await this.client.query(
+      `INSERT INTO
+          fabric.discovery_orderers("name", "host", "port", "discovery_msp_id")
+         VALUES ($1, $2, $3, $4)
+         RETURNING id;`,
+      [orderer.name, orderer.host, orderer.port, discoveryMSPId],
+    );
+    if (txInsertResponse.rowCount !== 1) {
+      throw new Error(`Orderer ${orderer.name} was not inserted into the DB`);
+    }
+
+    return txInsertResponse.rows[0].id;
+  }
+
+  /**
+   * Insert discovered peer to the database.
+   */
+  private async insertDiscoveryPeer(
+    discoveryMSPId: string,
+    peer: GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner,
+  ): Promise<string> {
+    this.log.debug(`Insert to fabric.discovery_peers peer ${peer.name})`);
+
+    const txInsertResponse = await this.client.query(
+      `INSERT INTO
+          fabric.discovery_peers("name", "endpoint", "ledger_height", "chaincodes", "discovery_msp_id")
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id;`,
+      [
+        peer.name,
+        peer.endpoint,
+        peer.ledgerHeight,
+        JSON.stringify(peer.chaincodes),
+        discoveryMSPId,
+      ],
+    );
+    if (txInsertResponse.rowCount !== 1) {
+      throw new Error(`Peer ${peer.name} was not inserted into the DB`);
+    }
+
+    return txInsertResponse.rows[0].id;
+  }
+
+  /**
+   * Insert fabric discovery results to the database.
+   * @param discoveryResults response from getDiscoveryResults endpoint of fabric connector.
+   */
+  public async insertDiscoveryResults(
+    discoveryResults: GetDiscoveryResultsResponseV1,
+  ): Promise<void> {
+    this.assertConnected();
+
+    this.log.debug("Insert discovery results started");
+
+    try {
+      await this.client.query("BEGIN");
+
+      const discoveryMSPIds = new Map<string, string>();
+
+      // Insert MSPs
+      for (const msp of Object.values(discoveryResults.msps)) {
+        const discoveryMSPId = await this.insertDiscoveryMsp(msp);
+        discoveryMSPIds.set(msp.id, discoveryMSPId);
+      }
+
+      // Insert Orderers
+      for (const mspId of Object.keys(discoveryResults.orderers)) {
+        for (const orderer of discoveryResults.orderers[mspId].endpoints) {
+          const discoveryMSPId = discoveryMSPIds.get(mspId);
+          if (!discoveryMSPId) {
+            this.log.warn(
+              `Unexpected Error! Could not find ${discoveryMSPId} in MSP inserted to the database`,
+            );
+            continue;
+          }
+          await this.insertDiscoveryOrderer(discoveryMSPId, orderer);
+        }
+      }
+
+      // Insert Peers
+      for (const mspId of Object.keys(discoveryResults.peersByMSP)) {
+        for (const peer of discoveryResults.peersByMSP[mspId].peers) {
+          const discoveryMSPId = discoveryMSPIds.get(mspId);
+          if (!discoveryMSPId) {
+            this.log.warn(
+              `Unexpected Error! Could not find ${discoveryMSPId} in MSP inserted to the database`,
+            );
+            continue;
+          }
+          await this.insertDiscoveryPeer(discoveryMSPId, peer);
+        }
+      }
+
+      await this.client.query("COMMIT");
+    } catch (err: unknown) {
+      await this.client.query("ROLLBACK");
+      this.log.warn("insertDiscoveryResults() exception:", err);
+      throw new Error(
+        "Could not insert discovery results into the database - transaction reverted",
+      );
+    }
   }
 }
