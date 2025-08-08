@@ -195,18 +195,15 @@ test("Test optional hash function", async () => {
 });
 
 test("Test missing required constructor field", async () => {
-  try {
-    const pkey: unknown = undefined;
-    const jsObjectSignerOptions: IJsObjectSignerOptions = {
-      privateKey: pkey as Uint8Array,
-    };
-    new JsObjectSigner(jsObjectSignerOptions);
-  } catch (e: unknown) {
-    expect(e).toBeInstanceOf(Error);
-    expect(e).toContainEntry([
-      "message",
-
-      "JsObjectSigner#ctor options.privateKey falsy.",
-    ]);
-  }
+  await expect(
+    new Promise(() => {
+      const pkey: unknown = undefined;
+      const jsObjectSignerOptions: IJsObjectSignerOptions = {
+        privateKey: pkey as Uint8Array,
+      };
+      new JsObjectSigner(jsObjectSignerOptions);
+    }),
+  ).rejects.toMatchObject({
+    message: "JsObjectSigner#ctor options.privateKey falsy.",
+  });
 });
