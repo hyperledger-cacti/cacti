@@ -43,8 +43,12 @@ import {
   WrapperContractError,
 } from "../../common/errors";
 import { INetworkOptions, TransactionResponse } from "../bridge-types";
-import { FabricAsset } from "../ontology/assets/fabric-asset";
-import { Asset } from "../ontology/assets/asset";
+import {
+  FabricAsset,
+  FabricFungibleAsset,
+  //FabricNonFungibleAsset,
+} from "../ontology/assets/fabric-asset";
+import { Amount, Asset } from "../ontology/assets/asset";
 import { X509Identity } from "fabric-network";
 import { NetworkId } from "../../../public-api";
 import { getEnumKeyByValue } from "../../../services/utils";
@@ -158,7 +162,7 @@ export class FabricLeaf
     "../fabric-contracts/satp-wrapper/chaincode-typescript",
   );
 
-  private wrapperFungibleDeployReceipt: DeployContractV1Response | undefined;
+  private wrapperDeployReceipt: DeployContractV1Response | undefined;
 
   private contractChannel: string | undefined;
 
@@ -376,53 +380,9 @@ export class FabricLeaf
     await context.with(ctx, async () => {
       try {
         await Promise.all([
-          this.deployFungibleWrapperContract(),
+          this.deployWrapperContract(),
           // this.deployNonFungibleWrapperContract(),
         ]);
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
-      } finally {
-        span.end();
-      }
-    });
-  }
-
-  /**
-   * Retrieves the deployment receipt of the non-fungible wrapper contract.
-   *
-   * @returns
-   * @throws
-   */
-  public getDeployNonFungibleWrapperContractReceipt(): unknown {
-    const fnTag = `${FabricLeaf.CLASS_NAME}#getDeployNonFungibleWrapperContractReceipt`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        //TODO implement
-        throw new Error("Method not implemented.");
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
-      } finally {
-        span.end();
-      }
-    });
-  }
-
-  /**
-   * Deploys a non-fungible wrapper contract.
-   *
-   **/
-  public deployNonFungibleWrapperContract(): Promise<void> {
-    const fnTag = `${FabricLeaf.CLASS_NAME}#deployNonFungibleWrapperContract`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        //TODO implement
-        throw new Error("Method not implemented.");
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
@@ -439,17 +399,17 @@ export class FabricLeaf
    * @returns {DeployContractV1Response} The deployment receipt of the fungible wrapper contract.
    * @throws {ReceiptError} If the fungible wrapper contract has not been deployed.
    */
-  public getDeployFungibleWrapperContractReceipt(): DeployContractV1Response {
+  public getDeployWrapperContractReceipt(): DeployContractV1Response {
     const fnTag = `${FabricLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, () => {
       try {
-        if (!this.wrapperFungibleDeployReceipt) {
+        if (!this.wrapperDeployReceipt) {
           throw new ReceiptError(
             `${FabricLeaf.CLASS_NAME}#getDeployFungibleWrapperContractReceipt() Fungible Wrapper Contract Not deployed`,
           );
         }
-        return this.wrapperFungibleDeployReceipt;
+        return this.wrapperDeployReceipt;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
@@ -468,9 +428,7 @@ export class FabricLeaf
    * @throws {WrapperContractAlreadyCreatedError} If the wrapper contract is already created or if there are missing variables for contract creation.
    * @throws {TransactionReceiptError} If the wrapper contract deployment fails.
    */
-  public async deployFungibleWrapperContract(
-    contractName?: string,
-  ): Promise<void> {
+  public async deployWrapperContract(contractName?: string): Promise<void> {
     const fnTag = `${FabricLeaf.CLASS_NAME}#deployWrapperContract`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     await context.with(ctx, async () => {
@@ -640,7 +598,7 @@ export class FabricLeaf
           );
         }
 
-        this.wrapperFungibleDeployReceipt = deployOutWrapperContract;
+        this.wrapperDeployReceipt = deployOutWrapperContract;
 
         this.log.debug(
           `${fnTag}, Wrapper Contract deployed receipt: ${safeStableStringify(deployOutWrapperContract)}`,
@@ -737,7 +695,7 @@ export class FabricLeaf
             }
             return this.wrapperContractName;
           case "NONFUNGIBLE":
-            //TODO implement
+            //TODO implement: can be the same wrapper of fungible assets
             throw new InvalidWrapperContract(
               `${fnTag}, Non-fungible wrapper contract not implemented`,
             );
@@ -778,10 +736,20 @@ export class FabricLeaf
           asset.referenceId,
         );
 
-        if (!this.contractChannel || !this.wrapperContractName) {
-          throw new WrapperContractError(
-            `${fnTag}, Wrapper Contract not deployed`,
-          );
+        switch (asset.type) {
+          case TokenType.ERC20:
+          case TokenType.NONSTANDARD_FUNGIBLE:
+            if (!this.contractChannel || !this.wrapperContractName) {
+              throw new WrapperContractError(
+                `${fnTag}, Wrapper Contract not deployed`,
+              );
+            }
+            break;
+          case TokenType.ERC721:
+          case TokenType.NONSTANDARD_NONFUNGIBLE:
+            throw new Error("Fabric does not support non fungible tokens yet");
+          default:
+            throw new Error("Asset if unsupported type");
         }
 
         const response = await this.connector.transact({
@@ -879,7 +847,7 @@ export class FabricLeaf
    */
   public async lockAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#lockAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -924,14 +892,14 @@ export class FabricLeaf
    * Unlocks an asset.
    *
    * @param {string} assetId - The ID of the asset to be unlocked.
-   * @param {number} amount - The amount of the asset to be unlocked.
+   * @param {Amount} amount - The amount of the asset to be unlocked.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async unlockAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#unlockAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -978,14 +946,14 @@ export class FabricLeaf
    * Mints an asset.
    *
    * @param {string} assetId - The ID of the asset to be minted.
-   * @param {number} amount - The amount of the asset to be minted.
+   * @param {Amount} amount - The amount of the asset to be minted.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async mintAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#mintAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1030,14 +998,14 @@ export class FabricLeaf
    * Burns an asset.
    *
    * @param {string} assetId - The ID of the asset to be burned.
-   * @param {number} amount - The amount of the asset to be burned.
+   * @param {Amount} amount - The amount of the asset to be burned.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
   public async burnAsset(
     assetId: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#burnAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1083,7 +1051,7 @@ export class FabricLeaf
    *
    * @param {string} assetId - The ID of the asset to be assigned.
    * @param {string} to - The new owner of the asset.
-   * @param {number} amount - The amount of the asset to be assigned.
+   * @param {Amount} amount - The amount of the asset to be assigned.
    * @returns {Promise<TransactionResponse>} A promise that resolves to the transaction response.
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
@@ -1091,7 +1059,7 @@ export class FabricLeaf
   public async assignAsset(
     assetId: string,
     to: string,
-    amount: number,
+    amount: Amount,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#assignAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1168,17 +1136,38 @@ export class FabricLeaf
 
         const token = JSON.parse(response.functionOutput);
 
-        return {
-          type: Number(token.tokenType),
-          id: token.tokenId,
-          referenceId: token.referenceId,
-          owner: token.owner,
-          mspId: token.mspId,
-          channelName: token.channelName,
-          contractName: token.contractName,
-          amount: token.amount.toString(),
-          network: this.networkIdentification,
-        } as FabricAsset;
+        switch (Number(token.tokenType)) {
+          case TokenType.ERC20:
+          case TokenType.NONSTANDARD_FUNGIBLE:
+            return {
+              type: Number(token.tokenType),
+              id: token.tokenId,
+              referenceId: token.referenceId,
+              owner: token.owner,
+              mspId: token.mspId,
+              channelName: token.channelName,
+              contractName: token.contractName,
+              amount: token.amount.toString(),
+              network: this.networkIdentification,
+            } as FabricFungibleAsset;
+          case TokenType.ERC721:
+          case TokenType.NONSTANDARD_NONFUNGIBLE:
+            throw new Error("Fabric does not support non fungible tokens yet");
+          //Uncomment following snippet to allow non fungible tokens to be returned
+          /*return {
+              type: Number(token.tokenType),
+              id: token.tokenId,
+              referenceId: token.referenceId,
+              owner: token.owner,
+              mspId: token.mspId,
+              channelName: token.channelName,
+              contractName: token.contractName,
+              uniqueDescriptor: token.amount.toString(),
+              network: this.networkIdentification,
+            } as FabricNonFungibleAsset;*/
+          default:
+            throw new Error("Unsupported Token Type");
+        }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

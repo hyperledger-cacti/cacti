@@ -8,14 +8,26 @@ import { TokenType } from "../../../../main/typescript/generated/proto/cacti/sat
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { BesuTestEnvironment } from "../../test-utils";
-import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
+import {
+  EvmFungibleAsset,
+  EvmNonFungibleAsset,
+} from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import {
+  Amount,
+  UniqueTokenID,
+} from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
+import { SupportedContractTypes } from "../../environments/besu-test-environment";
 
 let ontologyManager: OntologyManager;
 
 let asset: EvmFungibleAsset;
+let nonFungibleAsset: EvmNonFungibleAsset;
+
+const uniqueTokenId1: string = "1001";
+const uniqueTokenId2: string = "1002";
 
 const monitorService = MonitorService.createOrGetMonitorService({
   enabled: false,
@@ -42,8 +54,6 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
   {
-    const erc20TokenContract = "SATPContract";
-
     const ontologiesPath = path.join(__dirname, "../../../ontologies");
 
     ontologyManager = new OntologyManager(
@@ -54,15 +64,27 @@ beforeAll(async () => {
       monitorService,
     );
 
-    besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-      contractName: erc20TokenContract,
-      logLevel,
-    });
+    besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+      {
+        logLevel,
+      },
+      [
+        {
+          assetType: SupportedContractTypes.FUNGIBLE,
+          contractName: "SATPContract",
+        },
+        {
+          assetType: SupportedContractTypes.NONFUNGIBLE,
+          contractName: "SATPContract2",
+        },
+      ],
+    );
     log.info("Besu Ledger started successfully");
 
     await besuEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
 
-    await besuEnv.mintTokens("100");
+    await besuEnv.mintTokens("100", TokenType.NONSTANDARD_FUNGIBLE);
+    await besuEnv.mintTokens(uniqueTokenId1, TokenType.NONSTANDARD_NONFUNGIBLE);
   }
 }, TIMEOUT);
 
@@ -81,11 +103,11 @@ afterAll(async () => {
     });
 }, TIMEOUT);
 
-describe("Besu Leaf Test", () => {
+describe("Besu Leaf Test with Fungible Tokens", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     besuLeaf = new BesuLeaf(
-      besuEnv.createBesuLeafConfig("DEBUG"),
+      besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
       ontologyManager,
       monitorService,
     );
@@ -97,7 +119,7 @@ describe("Besu Leaf Test", () => {
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await besuLeaf.deployContracts();
-    expect(besuLeaf.getDeployFungibleWrapperContractReceipt()).toBeDefined();
+    expect(besuLeaf.getDeployWrapperContractReceipt()).toBeDefined();
   });
 
   it("Should return the wrapper contract address", async () => {
@@ -108,7 +130,11 @@ describe("Besu Leaf Test", () => {
 
     await besuEnv.giveRoleToBridge(wrapperContractAddress);
 
-    await besuEnv.approveAmount(wrapperContractAddress, "100");
+    await besuEnv.approveAssets(
+      wrapperContractAddress,
+      "100",
+      TokenType.NONSTANDARD_FUNGIBLE,
+    );
   });
 
   it("Should Wrap a token", async () => {
@@ -119,7 +145,7 @@ describe("Besu Leaf Test", () => {
       owner: besuEnv.defaultAsset.owner,
       contractName: besuEnv.defaultAsset.contractName,
       contractAddress: besuEnv.defaultAsset.contractAddress!,
-      amount: "100",
+      amount: Number(100) as Amount,
       network: {
         id: BesuTestEnvironment.BESU_NETWORK_ID,
         ledgerType: LedgerType.Besu2X,
@@ -141,13 +167,15 @@ describe("Besu Leaf Test", () => {
     expect(response3.id).toBe(asset.id);
     expect(response3.type).toBe(asset.type);
     expect(response3.owner).toBe(asset.owner);
-    expect(response3.contractAddress).toBe(besuEnv.assetContractAddress);
+    expect(response3.contractAddress).toBe(
+      besuEnv.getTestFungibleContractAddress(),
+    );
     expect(response3.contractName).toBe(besuEnv.defaultAsset.contractName);
-    expect(response3.amount).toBe("0");
+    expect(response3.amount).toBe(0 as Amount);
   });
 
   it("Should Lock a token", async () => {
-    const response = await besuLeaf.lockAsset(asset.id, 100);
+    const response = await besuLeaf.lockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -159,13 +187,13 @@ describe("Besu Leaf Test", () => {
     expect(response2.owner).toBe(asset.owner);
     expect(response2.contractAddress).toBe(asset.contractAddress);
     expect(response2.contractName).toBe(besuEnv.defaultAsset.contractName);
-    expect(response2.amount).toBe("100");
+    expect(response2.amount).toBe(100 as Amount);
     log.info("Locked 100 tokens successfully");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuLeaf.getWrapperContract("FUNGIBLE"),
       "100",
       besuEnv.getTestOwnerSigningCredential(),
@@ -173,9 +201,9 @@ describe("Besu Leaf Test", () => {
     log.info("Amount was transfer correctly to the Wrapper account");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -184,7 +212,7 @@ describe("Besu Leaf Test", () => {
   });
 
   it("Should Unlock a token", async () => {
-    const response = await besuLeaf.unlockAsset(asset.id, 100);
+    const response = await besuLeaf.unlockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -194,15 +222,17 @@ describe("Besu Leaf Test", () => {
     expect(response2.id).toBe(asset.id);
     expect(response2.type).toBe(asset.type);
     expect(response2.owner).toBe(asset.owner);
-    expect(response2.contractAddress).toBe(besuEnv.getTestContractAddress());
+    expect(response2.contractAddress).toBe(
+      besuEnv.getTestFungibleContractAddress(),
+    );
     expect(response2.contractName).toBe(besuEnv.defaultAsset.contractName);
-    expect(response2.amount).toBe("0");
+    expect(response2.amount).toBe(0 as Amount);
     log.info("Unlocked 100 tokens successfully");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuLeaf.getWrapperContract("FUNGIBLE"),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -210,9 +240,9 @@ describe("Besu Leaf Test", () => {
     log.info("Amount was transfer correctly from the Wrapper account");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "100",
       besuEnv.getTestOwnerSigningCredential(),
@@ -224,15 +254,19 @@ describe("Besu Leaf Test", () => {
     const wrapperContractAddress =
       await besuLeaf.getWrapperContract("FUNGIBLE");
 
-    await besuEnv.approveAmount(wrapperContractAddress, "100");
+    await besuEnv.approveAssets(
+      wrapperContractAddress,
+      "100",
+      TokenType.NONSTANDARD_FUNGIBLE,
+    );
 
-    const response = await besuLeaf.lockAsset(asset.id, 100);
+    const response = await besuLeaf.lockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
     log.info("Locked 100 tokens successfully");
 
-    const response2 = await besuLeaf.burnAsset(asset.id, 100);
+    const response2 = await besuLeaf.burnAsset(asset.id, 100 as Amount);
     expect(response2).toBeDefined();
     expect(response2.transactionId).toBeDefined();
     expect(response2.transactionReceipt).toBeDefined();
@@ -243,23 +277,25 @@ describe("Besu Leaf Test", () => {
     expect(response3.id).toBe(asset.id);
     expect(response3.type).toBe(asset.type);
     expect(response3.owner).toBe(asset.owner);
-    expect(response3.contractAddress).toBe(besuEnv.getTestContractAddress());
+    expect(response3.contractAddress).toBe(
+      besuEnv.getTestFungibleContractAddress(),
+    );
     expect(response3.contractName).toBe(besuEnv.defaultAsset.contractName);
-    expect(response3.amount).toBe("0");
+    expect(response3.amount).toBe(0 as Amount);
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuLeaf.getWrapperContract("FUNGIBLE"),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
     );
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -269,7 +305,7 @@ describe("Besu Leaf Test", () => {
   });
 
   it("Should Mint a token", async () => {
-    const response = await besuLeaf.mintAsset(asset.id, 100);
+    const response = await besuLeaf.mintAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -280,14 +316,16 @@ describe("Besu Leaf Test", () => {
     expect(response2.id).toBe(asset.id);
     expect(response2.type).toBe(asset.type);
     expect(response2.owner).toBe(asset.owner);
-    expect(response2.contractAddress).toBe(besuEnv.getTestContractAddress());
-    expect(response2.amount).toBe("100");
+    expect(response2.contractAddress).toBe(
+      besuEnv.getTestFungibleContractAddress(),
+    );
+    expect(response2.amount).toBe(100 as Amount);
     log.info("Minted 100 tokens successfully");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuLeaf.getWrapperContract("FUNGIBLE"),
       "100",
       besuEnv.getTestOwnerSigningCredential(),
@@ -296,7 +334,11 @@ describe("Besu Leaf Test", () => {
   });
 
   it("Should Assign a token", async () => {
-    const response = await besuLeaf.assignAsset(asset.id, asset.owner, 100);
+    const response = await besuLeaf.assignAsset(
+      asset.id,
+      asset.owner,
+      100 as Amount,
+    );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
@@ -307,14 +349,16 @@ describe("Besu Leaf Test", () => {
     expect(response2.id).toBe(asset.id);
     expect(response2.type).toBe(asset.type);
     expect(response2.owner).toBe(asset.owner);
-    expect(response2.contractAddress).toBe(besuEnv.getTestContractAddress());
-    expect(response2.amount).toBe("0");
+    expect(response2.contractAddress).toBe(
+      besuEnv.getTestFungibleContractAddress(),
+    );
+    expect(response2.amount).toBe(0 as Amount);
     log.info("Assigned 100 tokens successfully");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuLeaf.getWrapperContract("FUNGIBLE"),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
@@ -322,9 +366,9 @@ describe("Besu Leaf Test", () => {
     log.info("Amount was removed correctly form the Wrapper account");
 
     await besuEnv.checkBalance(
-      besuEnv.getTestContractName(),
-      besuEnv.getTestContractAddress(),
-      besuEnv.getTestContractAbi(),
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
       "100",
       besuEnv.getTestOwnerSigningCredential(),
@@ -342,5 +386,339 @@ describe("Besu Leaf Test", () => {
     expect(response2).toBeDefined();
     expect(response2.length).toBe(0);
     log.info("Unwrapped 100 tokens successfully");
+  });
+});
+
+describe("Besu Leaf Test with Non Fungible Tokens", () => {
+  jest.setTimeout(20000);
+  it("Should Initialize the Leaf", async () => {
+    besuLeaf = new BesuLeaf(
+      besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
+      ontologyManager,
+      monitorService,
+    );
+    expect(besuLeaf.getNetworkIdentification()).toStrictEqual({
+      id: BesuTestEnvironment.BESU_NETWORK_ID,
+      ledgerType: LedgerType.Besu2X,
+    });
+    expect(besuLeaf).toBeDefined();
+  });
+  it("Should deploy the Wrapper Smart Contract", async () => {
+    await besuLeaf.deployContracts();
+    expect(besuLeaf.getDeployWrapperContractReceipt()).toBeDefined();
+  });
+
+  it("Should return the wrapper contract address", async () => {
+    const wrapperContractAddress = await besuLeaf.getApproveAddress(
+      TokenType.NONSTANDARD_NONFUNGIBLE,
+    );
+    expect(wrapperContractAddress).toBeDefined();
+
+    await besuEnv.giveRoleToBridge(wrapperContractAddress);
+  });
+  it("Should Wrap a token", async () => {
+    nonFungibleAsset = {
+      id: besuEnv.nonFungibleDefaultAsset.id,
+      referenceId: besuEnv.nonFungibleDefaultAsset.referenceId,
+      type: TokenType.NONSTANDARD_NONFUNGIBLE,
+      owner: besuEnv.nonFungibleDefaultAsset.owner,
+      contractName: besuEnv.nonFungibleDefaultAsset.contractName,
+      contractAddress: besuEnv.nonFungibleDefaultAsset.contractAddress!,
+      uniqueDescriptor: Number(uniqueTokenId1) as UniqueTokenID,
+      network: {
+        id: BesuTestEnvironment.BESU_NETWORK_ID,
+        ledgerType: LedgerType.Besu2X,
+      },
+    } as EvmNonFungibleAsset;
+
+    const response = await besuLeaf.wrapAsset(nonFungibleAsset);
+    expect(response).toBeDefined();
+    expect(response.transactionId).toBeDefined();
+    expect(response.transactionReceipt).toBeDefined();
+
+    const response2 = await besuLeaf.getAssets();
+    expect(response2).toBeDefined();
+    expect(response2.length).toBe(1);
+    expect(response2[0]).toBe(nonFungibleAsset.id);
+
+    const response3 = (await besuLeaf.getAsset(
+      nonFungibleAsset.id,
+    )) as EvmNonFungibleAsset;
+    expect(response3).toBeDefined();
+    expect(response3.id).toBe(nonFungibleAsset.id);
+    expect(response3.type).toBe(nonFungibleAsset.type);
+    expect(response3.owner).toBe(nonFungibleAsset.owner);
+    expect(response3.contractAddress).toBe(
+      besuEnv.getTestNonFungibleContractAddress(),
+    );
+    expect(response3.contractName).toBe(
+      besuEnv.nonFungibleDefaultAsset.contractName,
+    );
+
+    log.info(`Non Fungible Asset Token contract wrapped successfully`);
+  });
+
+  it("Should Lock a token", async () => {
+    const response = await besuLeaf.lockAsset(
+      nonFungibleAsset.id,
+      Number(uniqueTokenId1) as UniqueTokenID,
+    );
+    expect(response).toBeDefined();
+    expect(response.transactionId).toBeDefined();
+    expect(response.transactionReceipt).toBeDefined();
+
+    const response2 = (await besuLeaf.getAsset(
+      nonFungibleAsset.id,
+    )) as EvmNonFungibleAsset;
+    expect(response2).toBeDefined();
+    expect(response2.id).toBe(nonFungibleAsset.id);
+    expect(response2.type).toBe(nonFungibleAsset.type);
+    expect(response2.owner).toBe(nonFungibleAsset.owner);
+    expect(response2.contractAddress).toBe(nonFungibleAsset.contractAddress);
+    expect(response2.contractName).toBe(
+      besuEnv.nonFungibleDefaultAsset.contractName,
+    );
+    expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
+      Number(uniqueTokenId1) as UniqueTokenID,
+    );
+    log.info(`Locked token ${uniqueTokenId1} successfully`);
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuLeaf.getWrapperContract("NONFUNGIBLE"),
+      "1",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non Fungible Token was transferred correctly to the Wrapper account",
+    );
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non Fungible Token was transferred correctly from the Owner account",
+    );
+  });
+
+  it("Should Unlock a token", async () => {
+    const response = await besuLeaf.unlockAsset(
+      nonFungibleAsset.id,
+      Number(uniqueTokenId1) as UniqueTokenID,
+    );
+    expect(response).toBeDefined();
+    expect(response.transactionId).toBeDefined();
+    expect(response.transactionReceipt).toBeDefined();
+
+    const response2 = (await besuLeaf.getAsset(
+      nonFungibleAsset.id,
+    )) as EvmNonFungibleAsset;
+    expect(response2).toBeDefined();
+    expect(response2.id).toBe(nonFungibleAsset.id);
+    expect(response2.type).toBe(nonFungibleAsset.type);
+    expect(response2.owner).toBe(nonFungibleAsset.owner);
+    expect(response2.contractAddress).toBe(
+      besuEnv.getTestNonFungibleContractAddress(),
+    );
+    expect(response2.contractName).toBe(
+      besuEnv.nonFungibleDefaultAsset.contractName,
+    );
+    expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
+      0 as UniqueTokenID,
+    );
+    log.info(`Unlocked token ${uniqueTokenId1} successfully`);
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuLeaf.getWrapperContract("NONFUNGIBLE"),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non Fungible Token was transferred correctly from the Wrapper account",
+    );
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "1",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "Non Fungible Token was transferred correctly to the Owner account",
+    );
+  });
+
+  it("Should Burn a token", async () => {
+    const response = await besuLeaf.lockAsset(
+      nonFungibleAsset.id,
+      Number(uniqueTokenId1) as UniqueTokenID,
+    );
+    expect(response).toBeDefined();
+    expect(response.transactionId).toBeDefined();
+    expect(response.transactionReceipt).toBeDefined();
+    log.info(`Locked token ${uniqueTokenId1} successfully`);
+
+    const response2 = await besuLeaf.burnAsset(
+      nonFungibleAsset.id,
+      Number(uniqueTokenId1) as UniqueTokenID,
+    );
+    expect(response2).toBeDefined();
+    expect(response2.transactionId).toBeDefined();
+    expect(response2.transactionReceipt).toBeDefined();
+    log.info(`Burned token ${uniqueTokenId1} successfully`);
+
+    const response3 = (await besuLeaf.getAsset(
+      nonFungibleAsset.id,
+    )) as EvmNonFungibleAsset;
+    expect(response3).toBeDefined();
+    expect(response3.id).toBe(nonFungibleAsset.id);
+    expect(response3.type).toBe(nonFungibleAsset.type);
+    expect(response3.owner).toBe(nonFungibleAsset.owner);
+    expect(response3.contractAddress).toBe(
+      besuEnv.getTestNonFungibleContractAddress(),
+    );
+    expect(response3.contractName).toBe(
+      besuEnv.nonFungibleDefaultAsset.contractName,
+    );
+    expect(response3.uniqueDescriptor as UniqueTokenID).toBe(
+      0 as UniqueTokenID,
+    );
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuLeaf.getWrapperContract("NONFUNGIBLE"),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+
+    log.info(
+      `Token ${uniqueTokenId1} was burned correctly from the Wrapper account`,
+    );
+  });
+
+  it("Should Mint a token", async () => {
+    const response = await besuLeaf.mintAsset(
+      nonFungibleAsset.id,
+      Number(uniqueTokenId2) as UniqueTokenID,
+    );
+    expect(response).toBeDefined();
+    expect(response.transactionId).toBeDefined();
+    expect(response.transactionReceipt).toBeDefined();
+    log.info(`Minted token ${uniqueTokenId2} successfully`);
+
+    const response2 = (await besuLeaf.getAsset(
+      nonFungibleAsset.id,
+    )) as EvmNonFungibleAsset;
+    expect(response2).toBeDefined();
+    expect(response2.id).toBe(nonFungibleAsset.id);
+    expect(response2.type).toBe(nonFungibleAsset.type);
+    expect(response2.owner).toBe(nonFungibleAsset.owner);
+    expect(response2.contractAddress).toBe(
+      besuEnv.getTestNonFungibleContractAddress(),
+    );
+    expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
+      Number(uniqueTokenId2) as UniqueTokenID,
+    );
+    log.info(`Minted token ${uniqueTokenId2} successfully`);
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuLeaf.getWrapperContract("NONFUNGIBLE"),
+      "1",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      `Token ${uniqueTokenId2} was minted correctly to the Wrapper account`,
+    );
+  });
+
+  it("Should Assign a token", async () => {
+    const response = await besuLeaf.assignAsset(
+      nonFungibleAsset.id,
+      nonFungibleAsset.owner,
+      Number(uniqueTokenId2) as UniqueTokenID,
+    );
+    expect(response).toBeDefined();
+    expect(response.transactionId).toBeDefined();
+    expect(response.transactionReceipt).toBeDefined();
+    log.info(`Assigned token ${uniqueTokenId2} successfully to default owner`);
+
+    const response2 = (await besuLeaf.getAsset(
+      nonFungibleAsset.id,
+    )) as EvmNonFungibleAsset;
+    expect(response2).toBeDefined();
+    expect(response2.id).toBe(nonFungibleAsset.id);
+    expect(response2.type).toBe(nonFungibleAsset.type);
+    expect(response2.owner).toBe(nonFungibleAsset.owner);
+    expect(response2.contractAddress).toBe(
+      besuEnv.getTestNonFungibleContractAddress(),
+    );
+    expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
+      0 as UniqueTokenID,
+    );
+    log.info(
+      `Assigned token ${uniqueTokenId2} successfully from wrapper account`,
+    );
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuLeaf.getWrapperContract("NONFUNGIBLE"),
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      `Token ${uniqueTokenId2} was removed correctly form the Wrapper account`,
+    );
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestNonFungibleContractName(),
+      besuEnv.getTestNonFungibleContractAddress(),
+      besuEnv.getTestNonFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "1",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      `Token ${uniqueTokenId2} was assigned correctly to the owner account`,
+    );
+  });
+
+  it("Should Unwrap a token", async () => {
+    const response = await besuLeaf.unwrapAsset(nonFungibleAsset.id);
+    expect(response).toBeDefined();
+    expect(response.transactionId).toBeDefined();
+    expect(response.transactionReceipt).toBeDefined();
+
+    const response2 = await besuLeaf.getAssets();
+    expect(response2).toBeDefined();
+    expect(response2.length).toBe(0);
+    log.info("Unwrapped Non Fungible Token successfully");
   });
 });

@@ -42,7 +42,7 @@ import {
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import { create } from "@bufbuild/protobuf";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
-import { type FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
+import { type Asset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { protoToAsset } from "../service-utils";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { NetworkId } from "../../../public-api";
@@ -312,7 +312,6 @@ export class Stage2ClientService extends SATPService {
           });
           this.Log.info(`${fnTag}, Locking Asset...`);
           const assetId = sessionData.senderAsset?.tokenId;
-          const amount = sessionData.senderAsset?.amount;
 
           if (sessionData.senderAsset == undefined) {
             throw new LedgerAssetError(fnTag);
@@ -323,22 +322,27 @@ export class Stage2ClientService extends SATPService {
             ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
           } as NetworkId;
 
-          const token: FungibleAsset = protoToAsset(
+          const token: Asset = protoToAsset(
             sessionData.senderAsset,
             networkId,
-          ) as FungibleAsset;
+          ) as Asset;
 
           if (token.id == undefined) {
             throw new TokenIdMissingError(fnTag);
           }
 
-          if (token.amount == undefined) {
-            throw new AmountMissingError(fnTag);
+          if (!("amount" in token) && !("uniqueDescriptor" in token)) {
+            throw new LedgerAssetError(fnTag);
           }
 
-          this.Log.debug(
-            `${fnTag}, Lock Asset ID: ${assetId} amount: ${amount}`,
-          );
+          if ("amount" in token && token.amount == undefined) {
+            throw new AmountMissingError(fnTag);
+          } else {
+            const amount = sessionData.senderAsset?.amount;
+            this.Log.debug(
+              `${fnTag}, Lock Asset ID: ${assetId} amount: ${amount}`,
+            );
+          }
 
           const bridge = this.bridgeManager.getSATPExecutionLayer(
             networkId,

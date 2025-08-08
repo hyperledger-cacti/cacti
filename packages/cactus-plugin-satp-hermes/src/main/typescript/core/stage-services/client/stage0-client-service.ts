@@ -3,6 +3,7 @@ import {
   ClaimFormat,
   MessageType,
   WrapAssertionClaimSchema,
+  TokenType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   NewSessionRequest,
@@ -28,6 +29,7 @@ import {
   SignatureVerificationError,
   TokenIdMissingError,
   TransferContextIdError,
+  UniqueTokenDescriptorMissingError,
 } from "../../errors/satp-service-errors";
 import { SATPSession } from "../../satp-session";
 import {
@@ -40,7 +42,10 @@ import {
   TimestampType,
 } from "../../session-utils";
 import { signatureVerifier } from "../data-verifier";
-import { type FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
+import {
+  type FungibleAsset,
+  type NonFungibleAsset,
+} from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import {
   SATPService,
   SATPServiceType,
@@ -453,24 +458,50 @@ export class Stage0ClientService extends SATPService {
             ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
           } as NetworkId;
 
-          const token: FungibleAsset = protoToAsset(
-            sessionData.senderAsset,
-            networkId,
-          ) as FungibleAsset;
+          let token: FungibleAsset | NonFungibleAsset;
 
-          if (token.id == undefined) {
-            throw new TokenIdMissingError(fnTag);
+          switch (sessionData.senderAsset.tokenType) {
+            case TokenType.ERC20:
+            case TokenType.NONSTANDARD_FUNGIBLE:
+              this.Log.debug(`${fnTag}, Sender Asset is a fungible token`);
+              token = protoToAsset(
+                sessionData.senderAsset,
+                networkId,
+              ) as FungibleAsset;
+              if (token.id == undefined) {
+                throw new TokenIdMissingError(fnTag);
+              }
+              if (token.amount == undefined) {
+                throw new AmountMissingError(fnTag);
+              }
+
+              this.Log.debug(`${fnTag}, Wrap: ${safeStableStringify(token)}`);
+              this.Log.debug(
+                `${fnTag}, Wrap Asset ID: ${token.id} amount: ${(token as FungibleAsset).amount.toString()}`,
+              );
+              break;
+            case TokenType.ERC721:
+            case TokenType.NONSTANDARD_NONFUNGIBLE:
+              this.Log.debug(`${fnTag}, Sender Asset is a non fungible token`);
+              token = protoToAsset(
+                sessionData.senderAsset,
+                networkId,
+              ) as NonFungibleAsset;
+              if (token.id == undefined) {
+                throw new TokenIdMissingError(fnTag);
+              }
+              if (token.uniqueDescriptor == undefined) {
+                throw new UniqueTokenDescriptorMissingError(fnTag);
+              }
+
+              this.Log.debug(`${fnTag}, Wrap: ${safeStableStringify(token)}`);
+              this.Log.debug(
+                `${fnTag}, Wrap Asset ID: ${token.id} amount: ${String((token as NonFungibleAsset).uniqueDescriptor)}`,
+              );
+              break;
+            default:
+              throw new Error("Unsupported asset type");
           }
-
-          if (token.amount == undefined) {
-            throw new AmountMissingError(fnTag);
-          }
-
-          this.Log.debug(`${fnTag}, Wrap: ${safeStableStringify(token)}`);
-
-          this.Log.debug(
-            `${fnTag}, Wrap Asset ID: ${token.id} amount: ${(token as FungibleAsset).amount.toString()}`,
-          );
 
           const bridge = this.bridgeManager.getSATPExecutionLayer(
             networkId,
