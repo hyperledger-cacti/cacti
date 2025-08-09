@@ -110,8 +110,8 @@
     "web3-eth-accounts": "patch:web3-eth-accounts@npm%3A1.6.1#~/.yarn/patches/web3-eth-accounts-npm-1.6.1-c95f31ca81.patch"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=22",
+    "npm": ">=10"
   },
   "publishConfig": {
     "access": "public"

@@ -101,8 +101,8 @@
     "ts-node": "7.0.1"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=22",
+    "npm": ">=10"
   },
   "publishConfig": {
     "access": "public"

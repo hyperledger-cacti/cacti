@@ -69,8 +69,8 @@
     "web3-eth-accounts": "4.0.3"
   },
   "engines": {
-    "node": ">=18",
-    "npm": ">=8"
+    "node": ">=22",
+    "npm": ">=10"
   },
   "publishConfig": {
     "access": "public"
