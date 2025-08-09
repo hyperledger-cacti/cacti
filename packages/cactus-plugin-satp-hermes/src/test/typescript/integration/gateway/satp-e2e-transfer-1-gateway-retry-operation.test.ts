@@ -255,7 +255,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
         // Force a smaller number of retries and timeout for testing purposes
         // Will cause the transfer to fail
         typedSession.getClientSessionData().maxRetries = "3";
-        typedSession.getClientSessionData().maxTimeout = "100" // Reduced timeout
+        typedSession.getClientSessionData().maxTimeout = "50"; // Reduced timeout
         return originalTransfer(session);
       });
 
@@ -410,7 +410,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
         // Force a smaller number of retries and timeout for testing purposes
         // Will cause the transfer to fail
         typedSession.getClientSessionData().maxRetries = "3";
-        typedSession.getClientSessionData().maxTimeout = "100" // Reduced timeout
+        typedSession.getClientSessionData().maxTimeout = "50"; // Reduced timeout
         return originalTransfer(session);
       });
 
@@ -566,7 +566,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
         // Force a smaller number of retries and timeout for testing purposes
         // Will cause the transfer to fail
         typedSession.getClientSessionData().maxRetries = "3";
-        typedSession.getClientSessionData().maxTimeout = "100" // Reduced timeout
+        typedSession.getClientSessionData().maxTimeout = "50"; // Reduced timeout
         return originalTransfer(session);
       });
 
