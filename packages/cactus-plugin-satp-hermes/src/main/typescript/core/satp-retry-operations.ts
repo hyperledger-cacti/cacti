@@ -1,4 +1,3 @@
-import { Logger } from "@hyperledger/cactus-common";
 import {
   GatewayRetryOperationFailedError,
   InvalidParameterError,
