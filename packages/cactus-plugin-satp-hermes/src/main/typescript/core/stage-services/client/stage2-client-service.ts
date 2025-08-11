@@ -101,6 +101,8 @@ export class Stage2ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
     try {
       this.Log.info(`exec-${messageType}`);
@@ -270,6 +272,8 @@ export class Stage2ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
     try {
       this.Log.info(`exec-${stepTag}`);

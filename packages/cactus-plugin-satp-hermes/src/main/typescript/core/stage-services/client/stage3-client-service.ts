@@ -110,6 +110,8 @@ export class Stage3ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
     try {
       this.Log.info(`exec-${messageType}`);
@@ -222,6 +224,8 @@ export class Stage3ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
     try {
       this.Log.info(`exec-${messageType}`);
@@ -353,6 +357,8 @@ export class Stage3ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
     try {
       this.Log.info(`exec-${messageType}`);
@@ -686,6 +692,8 @@ export class Stage3ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
     this.Log.debug(`${fnTag}, Burning Asset...`);
     try {

@@ -26,6 +26,9 @@ export interface IGatewayLoggerConfig {
   logLevel?: LogLevelDesc;
 }
 
+// Alias for backward compatibility
+export interface ISATPLoggerConfig extends IGatewayLoggerConfig {}
+
 export class GatewayLogger {
   private defaultRepository: boolean = true;
   public localRepository: ILocalLogRepository;
@@ -49,7 +52,22 @@ export class GatewayLogger {
   }
 
   public async storeProof(
-    logEntry: SATPLocalLog | OracleLocalLog,
+    logEntry:
+      | (Partial<SATPLocalLog> & {
+          sessionID: string;
+          type: string;
+          operation: string;
+          data: string;
+          sequenceNumber?: number;
+          key?: string;
+        })
+      | (Partial<OracleLocalLog> & {
+          taskID: string;
+          type: string;
+          operation: string;
+          data: string;
+          key?: string;
+        }),
   ): Promise<void> {
     const fnTag = `GatewayLogger#storeProof()`;
 
@@ -78,7 +96,7 @@ export class GatewayLogger {
         timestamp: Date.now().toString(),
         operation: logEntry.operation,
         data: logEntry.data,
-        sequenceNumber: logEntry.sequenceNumber,
+        sequenceNumber: logEntry.sequenceNumber ?? 0,
       };
 
       hash = this.getSATPLocalLogHash(localLog);
@@ -94,8 +112,8 @@ export class GatewayLogger {
 
       const key = getOracleLogKey(
         logEntry.taskID,
-        logEntry.oracleOperationId,
-        logEntry.timestamp,
+        logEntry.oracleOperationId ?? "",
+        logEntry.timestamp ?? Date.now().toString(),
       );
       localLog = {
         taskID: logEntry.taskID,
@@ -103,7 +121,7 @@ export class GatewayLogger {
         key: key,
         timestamp: Date.now().toString(),
         operation: logEntry.operation,
-        oracleOperationId: logEntry.oracleOperationId,
+        oracleOperationId: logEntry.oracleOperationId ?? "",
         data: logEntry.data,
       };
       hash = this.getOracleLocalLogHash(localLog);
@@ -116,7 +134,22 @@ export class GatewayLogger {
   }
 
   public async persistLogEntry(
-    logEntry: SATPLocalLog | OracleLocalLog,
+    logEntry:
+      | (Partial<SATPLocalLog> & {
+          sessionID: string;
+          type: string;
+          operation: string;
+          data: string;
+          sequenceNumber?: number;
+          key?: string;
+        })
+      | (Partial<OracleLocalLog> & {
+          taskID: string;
+          type: string;
+          operation: string;
+          data: string;
+          key?: string;
+        }),
   ): Promise<void> {
     const fnTag = `GatewayLogger#persistLogEntry()`;
 
@@ -140,7 +173,7 @@ export class GatewayLogger {
         timestamp: Date.now().toString(),
         operation: logEntry.operation,
         data: logEntry.data,
-        sequenceNumber: logEntry.sequenceNumber,
+        sequenceNumber: logEntry.sequenceNumber ?? 0,
       };
 
       hash = this.getSATPLocalLogHash(localLog);
@@ -151,8 +184,8 @@ export class GatewayLogger {
 
       const key = getOracleLogKey(
         logEntry.taskID,
-        logEntry.oracleOperationId,
-        logEntry.timestamp,
+        logEntry.oracleOperationId ?? "",
+        logEntry.timestamp ?? Date.now().toString(),
       );
       localLog = {
         taskID: logEntry.taskID,
@@ -160,7 +193,7 @@ export class GatewayLogger {
         type: logEntry.type,
         timestamp: Date.now().toString(),
         operation: logEntry.operation,
-        oracleOperationId: logEntry.oracleOperationId,
+        oracleOperationId: logEntry.oracleOperationId ?? "",
         data: logEntry.data,
       };
 

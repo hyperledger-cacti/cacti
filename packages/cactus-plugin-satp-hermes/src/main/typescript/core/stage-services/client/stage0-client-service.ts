@@ -52,6 +52,7 @@ import { getMessageTypeName } from "../../satp-utils";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { NetworkId } from "../../../public-api";
+import { SATPLocalLog } from "../../types";
 
 export class Stage0ClientService extends SATPService {
   public static readonly SATP_STAGE = "0";
@@ -103,7 +104,7 @@ export class Stage0ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
-    });
+    } as SATPLocalLog);
 
     try {
       this.Log.info(`exec-${messageType}`);
@@ -113,7 +114,9 @@ export class Stage0ClientService extends SATPService {
         operation: "exec",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
 
       const newSessionRequestMessage = create(NewSessionRequestSchema, {
         sessionId: sessionData.id,
@@ -152,7 +155,9 @@ export class Stage0ClientService extends SATPService {
         operation: "done",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
 
       this.Log.info(`${fnTag}, sending NewSessionRequest...`);
 
@@ -165,7 +170,9 @@ export class Stage0ClientService extends SATPService {
         operation: "fail",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
       throw error;
     }
   }
@@ -274,7 +281,7 @@ export class Stage0ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
-    });
+    } as SATPLocalLog);
     try {
       this.Log.info(`exec-${messageType}`);
       await this.dbLogger.persistLogEntry({
@@ -283,7 +290,9 @@ export class Stage0ClientService extends SATPService {
         operation: "exec",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
 
       if (sessionData.senderAsset?.tokenId == "") {
         throw new LedgerAssetIdError(fnTag);
@@ -359,7 +368,9 @@ export class Stage0ClientService extends SATPService {
         operation: "done",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
 
       this.Log.info(`${fnTag}, sending PreSATPTransferRequest...`);
 
@@ -372,7 +383,9 @@ export class Stage0ClientService extends SATPService {
         operation: "fail",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
       throw error;
     }
   }
@@ -394,7 +407,7 @@ export class Stage0ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
-    });
+    } as SATPLocalLog);
     try {
       this.Log.info(`exec-${stepTag}`);
       this.dbLogger.persistLogEntry({
@@ -403,7 +416,9 @@ export class Stage0ClientService extends SATPService {
         operation: "exec",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
       this.Log.info(`${fnTag}, Wrapping Asset...`);
 
       if (sessionData.senderAsset == undefined) {
@@ -464,7 +479,9 @@ export class Stage0ClientService extends SATPService {
         operation: "done",
         data: safeStableStringify(sessionData.senderWrapAssertionClaim.proof),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
       this.Log.info(`${fnTag}, done-${fnTag}`);
     } catch (error) {
       this.logger.debug(`Crash in ${fnTag}`, error);
@@ -474,7 +491,9 @@ export class Stage0ClientService extends SATPService {
         operation: "fail",
         data: safeStableStringify(sessionData),
         sequenceNumber: Number(sessionData.lastSequenceNumber),
-      });
+        key: " ",
+        timestamp: Date.now().toString(),
+      } as SATPLocalLog);
       throw new FailedToProcessError(fnTag, "WrapToken");
     }
   }

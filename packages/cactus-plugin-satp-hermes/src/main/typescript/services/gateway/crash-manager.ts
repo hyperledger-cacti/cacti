@@ -151,7 +151,7 @@ export class CrashManager {
     const fnTag = `${this.className}#recoverSessions()`;
 
     try {
-      const allLogs = await this.localRepository.readLogsNotProofs();
+      const allLogs = await this.localRepository!.readLogsNotProofs();
 
       if (allLogs.length === 0) {
         this.log.info(`${fnTag} No logs available for recovery.`);
@@ -159,7 +159,7 @@ export class CrashManager {
       }
 
       const log = allLogs[0];
-      const sessionId = log.sessionId;
+      const sessionId = log.sessionID;
       this.log.info(`${fnTag} Recovering session from database: ${sessionId}`);
 
       if (!log || !log.data) {
@@ -520,13 +520,11 @@ export class CrashManager {
 
       for (const logEntry of recoveredLogs) {
         await this.localRepository.create({
-          sessionId: logEntry.sessionId,
-          operation: logEntry.operation,
-          data: logEntry.data,
-          timestamp: logEntry.timestamp,
-          type: logEntry.type,
           key: logEntry.key,
-          sequenceNumber: logEntry.sequenceNumber,
+          type: logEntry.type,
+          operation: logEntry.operation,
+          timestamp: logEntry.timestamp,
+          data: logEntry.data,
         });
       }
 

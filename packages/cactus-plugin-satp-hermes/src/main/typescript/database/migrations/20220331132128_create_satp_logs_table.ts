@@ -13,7 +13,7 @@ export function up(knex: Knex): Knex.SchemaBuilder {
 }
 
 export function down(knex: Knex): Knex.SchemaBuilder {
-  return knex.schema.dropTable("logs");
+  return knex.schema.dropTable("sapt_logs");
 }
 
 export function getId(): Readonly<string> {

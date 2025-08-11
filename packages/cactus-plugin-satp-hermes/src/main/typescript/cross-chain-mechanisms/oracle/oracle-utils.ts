@@ -12,3 +12,11 @@ export function updateOracleOperation(
   operation.status = newStatus;
   operation.output = output;
 }
+
+export function getOracleLogKey(
+  taskID: string,
+  operationID: string,
+  timestamp: string,
+): string {
+  return `${taskID}-${operationID}-${timestamp}`;
+}

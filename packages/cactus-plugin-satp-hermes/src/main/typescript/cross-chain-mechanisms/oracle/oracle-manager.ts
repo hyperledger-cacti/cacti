@@ -42,7 +42,7 @@ import {
   OracleTaskTypeEnum,
 } from "../../public-api";
 import { OracleExecutionLayer } from "./oracle-execution-layer";
-import { updateOracleOperation, getOracleLogKey } from "./oracle-utils";
+import { updateOracleOperation } from "./oracle-utils";
 import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
 import { OracleSchedulerManager } from "./oracle-scheduler-manager";
 import {
@@ -51,22 +51,23 @@ import {
 } from "../../database/repository/interfaces/repository";
 import { GatewayLogger, IGatewayLoggerConfig } from "../../logging";
 import { OracleLocalLog } from "../../core/types";
+import { getOracleLogKey } from "../../gateway-utils";
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;
   bungee: IPluginBungeeHermesOptions | undefined;
   initialTasks?: OracleTask[];
-  localRepository: ILocalLogRepository;
+  localRepository?: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
-  signer: JsObjectSigner;
-  pubKey: string;
+  signer?: JsObjectSigner;
+  pubKey?: string;
 }
 
 export enum logOperation {
   INIT = "init",
   EXEC = "exec",
   DONE = "done",
-  FAIL = "fail"
+  FAIL = "fail",
 }
 
 export class OracleManager {
@@ -74,7 +75,7 @@ export class OracleManager {
   private readonly logger: Logger;
   private readonly logLevel: LogLevelDesc = "INFO";
 
-  private readonly dbLogger: GatewayLogger; //TODO: Uncomment
+  private readonly dbLogger: GatewayLogger;
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
   private _pubKey: string;
@@ -105,9 +106,18 @@ export class OracleManager {
 
     // TODO: setup this.dbLogger similar to what is done in the SATPManager
 
+    if (!options.localRepository) {
+      throw new Error(`${fnTag}: localRepository is required`);
+    }
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
+    if (!options.signer) {
+      throw new Error(`${fnTag}: signer is required`);
+    }
     this.signer = options.signer;
+    if (!options.pubKey) {
+      throw new Error(`${fnTag}: pubKey is required`);
+    }
     this._pubKey = options.pubKey;
     const level = this.options.logLevel || "DEBUG";
 
@@ -607,7 +617,6 @@ export class OracleManager {
         data: safeStableStringify(operation),
         taskID: task.taskID,
         oracleOperationId: operation.id,
-        
       };
       await this.dbLogger.persistLogEntry(logEntryExec);
 

@@ -20,16 +20,28 @@ export async function seed(knex: Knex): Promise<void> {
   }
 
   // Clear existing entries if tables exist
-  await clearTableIfExists("logs");
+  // await clearTableIfExists("logs");
+  await clearTableIfExists("satp_logs");
+  await clearTableIfExists("oracle_logs");
   await clearTableIfExists("remote-logs");
 
   // Insert a single deterministic log entry
-  await knex("logs").insert({
+  await knex("satp_logs").insert({
     sessionID: "test-session-001",
     type: "info",
     key: "test-log-001",
     operation: "create",
     timestamp: "2024-08-21T12:00:00Z",
     data: JSON.stringify({ message: "This is a test log entry" }),
+  });
+
+  await knex("oracle_logs").insert({
+    taskID: "test-task-001",
+    type: "info",
+    key: "test-oracle-log-001",
+    operation: "create",
+    timestamp: "2024-08-21T12:00:00Z",
+    data: JSON.stringify({ message: "This is a test log entry" }),
+    oracleOperationId: "oracle-op-001",
   });
 }

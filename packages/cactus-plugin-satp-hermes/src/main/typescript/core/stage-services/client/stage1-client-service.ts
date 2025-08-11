@@ -85,6 +85,8 @@ export class Stage1ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
 
     try {
@@ -281,6 +283,8 @@ export class Stage1ClientService extends SATPService {
       operation: "init",
       data: safeStableStringify(sessionData),
       sequenceNumber: Number(sessionData.lastSequenceNumber),
+      key: "",
+      timestamp: "",
     });
 
     try {
