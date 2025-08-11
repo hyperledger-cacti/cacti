@@ -98,6 +98,7 @@ import {
 } from "../../gateway-persistence";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { executeOperationWithRetriesAndTimeout } from "../../core/satp-retry-operations";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -506,7 +507,7 @@ export class SATPManager {
         if (serviceClasses.length !== serviceOptions.length) {
           throw new Error(
             `Number of services classes and options do not match. Each service class needs an options object.\n \
-                  Classes: ${serviceClasses.length}, Options: ${serviceOptions.length}`,
+                 Classes: ${serviceClasses.length}, Options: ${serviceOptions.length}`,
           );
         }
 
@@ -617,7 +618,7 @@ export class SATPManager {
         if (handlersClasses.length !== handlersOptions.length) {
           throw new Error(
             `Number of handler classes and options do not match. Each handler class needs an options object.\n \
-                  Classes: ${handlersClasses.length}, Options: ${handlersOptions.length}`,
+                 Classes: ${handlersClasses.length}, Options: ${handlersOptions.length}`,
           );
         }
 
@@ -701,6 +702,8 @@ export class SATPManager {
           }
 
           const sessionData: SessionData = clientSessionData;
+          const maxRetries = sessionData.maxRetries;
+          const maxTimeout = sessionData.maxTimeout;
 
           sessionData.receiverGatewayOwnerId = channel.toGatewayID;
 
@@ -768,16 +771,22 @@ export class SATPManager {
             case undefined:
             case MessageType.NEW_SESSION_REQUEST:
               this.logger.debug(`${fnTag}, Initiating Stage 0`);
-              newSessionRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE0) as Stage0SATPHandler
-              ).NewSessionRequest(session.getSessionId());
-
-              if (!newSessionRequest) {
-                throw new CreateSATPRequestError(
+              newSessionRequest = await executeOperationWithRetriesAndTimeout(
+                async () => {
+                  return await (
+                    this.getSATPHandler(
+                      SATPHandlerType.STAGE0,
+                    ) as Stage0SATPHandler
+                  ).NewSessionRequest(session.getSessionId());
+                },
+                maxRetries,
+                maxTimeout,
+                new CreateSATPRequestError(
                   fnTag,
                   getMessageTypeName(MessageType.NEW_SESSION_REQUEST),
-                );
-              }
+                ),
+                this.logger,
+              );
 
             case MessageType.NEW_SESSION_RESPONSE:
               if (!newSessionRequest) {
@@ -798,19 +807,22 @@ export class SATPManager {
                 }
               }
 
-              newSessionResponse =
-                await clientSatpStage0.newSession(newSessionRequest);
+              newSessionResponse = await executeOperationWithRetriesAndTimeout(
+                async () => {
+                  return await clientSatpStage0.newSession(newSessionRequest!);
+                },
+                maxRetries,
+                maxTimeout,
+                new RetrieveSATPMessageError(
+                  fnTag,
+                  getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+                ),
+                this.logger,
+              );
 
               this.logger.debug(
                 `${fnTag}, newSessionResponse: ${safeStableStringify(newSessionResponse)}`,
               );
-
-              if (!newSessionResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
-                );
-              }
 
             case MessageType.PRE_SATP_TRANSFER_REQUEST:
               if (!newSessionResponse) {
@@ -831,19 +843,25 @@ export class SATPManager {
                 }
               }
 
-              preSATPTransferRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE0) as Stage0SATPHandler
-              ).PreSATPTransferRequest(
-                newSessionResponse,
-                session.getSessionId(),
-              );
-
-              if (!preSATPTransferRequest) {
-                throw new CreateSATPRequestError(
-                  fnTag,
-                  getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
+              preSATPTransferRequest =
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await (
+                      this.getSATPHandler(
+                        SATPHandlerType.STAGE0,
+                      ) as Stage0SATPHandler
+                    ).PreSATPTransferRequest(
+                      newSessionResponse!,
+                      session.getSessionId(),
+                    ),
+                  maxRetries,
+                  maxTimeout,
+                  new CreateSATPRequestError(
+                    fnTag,
+                    getMessageTypeName(MessageType.PRE_SATP_TRANSFER_REQUEST),
+                  ),
+                  this.logger,
                 );
-              }
 
             case MessageType.PRE_SATP_TRANSFER_RESPONSE:
               if (!preSATPTransferRequest) {
@@ -864,20 +882,25 @@ export class SATPManager {
                 }
               }
 
-              preSATPTransferResponse = await clientSatpStage0.preSATPTransfer(
-                preSATPTransferRequest,
-              );
+              preSATPTransferResponse =
+                await executeOperationWithRetriesAndTimeout(
+                  async () => {
+                    return await clientSatpStage0.preSATPTransfer(
+                      preSATPTransferRequest!,
+                    );
+                  },
+                  maxRetries,
+                  maxTimeout,
+                  new RetrieveSATPMessageError(
+                    fnTag,
+                    getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
+                  ),
+                  this.logger,
+                );
 
               this.logger.debug(
                 `${fnTag}, preSATPTransferResponse: ${safeStableStringify(preSATPTransferResponse)}`,
               );
-
-              if (!preSATPTransferResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
-                );
-              }
 
             case MessageType.INIT_PROPOSAL:
               if (!preSATPTransferResponse) {
@@ -900,19 +923,26 @@ export class SATPManager {
 
               this.logger.debug(`${fnTag}, Initiating Stage 1`);
 
-              transferProposalRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
-              ).TransferProposalRequest(
-                session.getSessionId(),
-                preSATPTransferResponse,
-              );
-
-              if (!transferProposalRequest) {
-                throw new CreateSATPRequestError(
-                  fnTag,
-                  getMessageTypeName(MessageType.INIT_PROPOSAL),
+              transferProposalRequest =
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await (
+                      this.getSATPHandler(
+                        SATPHandlerType.STAGE1,
+                      ) as Stage1SATPHandler
+                    ).TransferProposalRequest(
+                      session.getSessionId(),
+                      preSATPTransferResponse!,
+                    ),
+                  maxRetries,
+                  maxTimeout,
+                  new CreateSATPRequestError(
+                    fnTag,
+                    getMessageTypeName(MessageType.INIT_PROPOSAL),
+                  ),
+                  this.logger,
                 );
-              }
+
             case MessageType.INIT_RECEIPT:
             case MessageType.INIT_REJECT:
               if (!transferProposalRequest) {
@@ -934,20 +964,24 @@ export class SATPManager {
               }
 
               transferProposalResponse =
-                await clientSatpStage1.transferProposal(
-                  transferProposalRequest,
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await clientSatpStage1.transferProposal(
+                      transferProposalRequest!,
+                    ),
+                  maxRetries,
+                  maxTimeout,
+                  new RetrieveSATPMessageError(
+                    fnTag,
+                    getMessageTypeName(MessageType.INIT_RECEIPT),
+                  ),
+                  this.logger,
                 );
 
               this.logger.debug(
                 `${fnTag}, transferProposalResponse: ${safeStableStringify(transferProposalResponse)}`,
               );
 
-              if (!transferProposalResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(MessageType.INIT_RECEIPT),
-                );
-              }
             case MessageType.TRANSFER_COMMENCE_REQUEST:
               if (!transferProposalResponse) {
                 this.logger.debug(
@@ -967,16 +1001,23 @@ export class SATPManager {
                 }
               }
 
-              transferCommenceRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
-              ).TransferCommenceRequest(transferProposalResponse);
-
-              if (!transferCommenceRequest) {
-                throw new CreateSATPRequestError(
-                  fnTag,
-                  getMessageTypeName(MessageType.TRANSFER_COMMENCE_REQUEST),
+              transferCommenceRequest =
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await (
+                      this.getSATPHandler(
+                        SATPHandlerType.STAGE1,
+                      ) as Stage1SATPHandler
+                    ).TransferCommenceRequest(transferProposalResponse!),
+                  maxRetries,
+                  maxTimeout,
+                  new CreateSATPRequestError(
+                    fnTag,
+                    getMessageTypeName(MessageType.TRANSFER_COMMENCE_REQUEST),
+                  ),
+                  this.logger,
                 );
-              }
+
             case MessageType.TRANSFER_COMMENCE_RESPONSE:
               if (!transferCommenceRequest) {
                 this.logger.debug(
@@ -997,20 +1038,24 @@ export class SATPManager {
               }
 
               transferCommenceResponse =
-                await clientSatpStage1.transferCommence(
-                  transferCommenceRequest,
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await clientSatpStage1.transferCommence(
+                      transferCommenceRequest!,
+                    ),
+                  maxRetries,
+                  maxTimeout,
+                  new RetrieveSATPMessageError(
+                    fnTag,
+                    getMessageTypeName(MessageType.TRANSFER_COMMENCE_RESPONSE),
+                  ),
+                  this.logger,
                 );
 
               this.logger.debug(
                 `${fnTag}, transferCommenceResponse: ${safeStableStringify(transferCommenceResponse)}`,
               );
 
-              if (!transferCommenceResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(MessageType.TRANSFER_COMMENCE_RESPONSE),
-                );
-              }
             case MessageType.LOCK_ASSERT:
               if (!transferCommenceResponse) {
                 this.logger.debug(
@@ -1032,16 +1077,23 @@ export class SATPManager {
 
               this.logger.debug(`${fnTag}, Initiating Stage 2`);
 
-              lockAssertionRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE2) as Stage2SATPHandler
-              ).LockAssertionRequest(transferCommenceResponse);
-
-              if (!lockAssertionRequest) {
-                throw new CreateSATPRequestError(
-                  fnTag,
-                  getMessageTypeName(MessageType.LOCK_ASSERT),
+              lockAssertionRequest =
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await (
+                      this.getSATPHandler(
+                        SATPHandlerType.STAGE2,
+                      ) as Stage2SATPHandler
+                    ).LockAssertionRequest(transferCommenceResponse!),
+                  maxRetries,
+                  maxTimeout,
+                  new CreateSATPRequestError(
+                    fnTag,
+                    getMessageTypeName(MessageType.LOCK_ASSERT),
+                  ),
+                  this.logger,
                 );
-              }
+
             case MessageType.ASSERTION_RECEIPT:
               if (!lockAssertionRequest) {
                 this.logger.debug(
@@ -1062,18 +1114,22 @@ export class SATPManager {
               }
 
               lockAssertionResponse =
-                await clientSatpStage2.lockAssertion(lockAssertionRequest);
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await clientSatpStage2.lockAssertion(lockAssertionRequest!),
+                  maxRetries,
+                  maxTimeout,
+                  new RetrieveSATPMessageError(
+                    fnTag,
+                    getMessageTypeName(MessageType.ASSERTION_RECEIPT),
+                  ),
+                  this.logger,
+                );
 
               this.logger.debug(
                 `${fnTag}, lockAssertionResponse: ${safeStableStringify(lockAssertionResponse)}`,
               );
 
-              if (!lockAssertionResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(MessageType.ASSERTION_RECEIPT),
-                );
-              }
             case MessageType.COMMIT_PREPARE:
               if (!lockAssertionResponse) {
                 this.logger.debug(
@@ -1095,16 +1151,23 @@ export class SATPManager {
 
               this.logger.debug(`${fnTag}, Initiating Stage 3`);
 
-              commitPreparationRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
-              ).CommitPreparationRequest(lockAssertionResponse);
-
-              if (!commitPreparationRequest) {
-                throw new CreateSATPRequestError(
-                  fnTag,
-                  getMessageTypeName(MessageType.COMMIT_PREPARE),
+              commitPreparationRequest =
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await (
+                      this.getSATPHandler(
+                        SATPHandlerType.STAGE3,
+                      ) as Stage3SATPHandler
+                    ).CommitPreparationRequest(lockAssertionResponse!),
+                  maxRetries,
+                  maxTimeout,
+                  new CreateSATPRequestError(
+                    fnTag,
+                    getMessageTypeName(MessageType.COMMIT_PREPARE),
+                  ),
+                  this.logger,
                 );
-              }
+
             case MessageType.COMMIT_READY:
               if (!commitPreparationRequest) {
                 this.logger.debug(
@@ -1124,20 +1187,24 @@ export class SATPManager {
                 }
               }
 
-              commitReadyResponse = await clientSatpStage3.commitPreparation(
-                commitPreparationRequest,
+              commitReadyResponse = await executeOperationWithRetriesAndTimeout(
+                async () =>
+                  await clientSatpStage3.commitPreparation(
+                    commitPreparationRequest!,
+                  ),
+                maxRetries,
+                maxTimeout,
+                new RetrieveSATPMessageError(
+                  fnTag,
+                  getMessageTypeName(MessageType.COMMIT_READY),
+                ),
+                this.logger,
               );
 
               this.logger.debug(
                 `${fnTag}, commitReadyResponse: ${safeStableStringify(commitReadyResponse)}`,
               );
 
-              if (!commitReadyResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(MessageType.COMMIT_READY),
-                );
-              }
             case MessageType.COMMIT_FINAL:
               if (!commitReadyResponse) {
                 this.logger.debug(
@@ -1157,16 +1224,22 @@ export class SATPManager {
                 }
               }
 
-              commitFinalAssertionRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
-              ).CommitFinalAssertionRequest(commitReadyResponse);
-
-              if (!commitFinalAssertionRequest) {
-                throw new CreateSATPRequestError(
-                  fnTag,
-                  getMessageTypeName(MessageType.COMMIT_FINAL),
+              commitFinalAssertionRequest =
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await (
+                      this.getSATPHandler(
+                        SATPHandlerType.STAGE3,
+                      ) as Stage3SATPHandler
+                    ).CommitFinalAssertionRequest(commitReadyResponse!),
+                  maxRetries,
+                  maxTimeout,
+                  new CreateSATPRequestError(
+                    fnTag,
+                    getMessageTypeName(MessageType.COMMIT_FINAL),
+                  ),
+                  this.logger,
                 );
-              }
 
             case MessageType.ACK_COMMIT_FINAL:
               if (!commitFinalAssertionRequest) {
@@ -1188,20 +1261,24 @@ export class SATPManager {
               }
 
               commitFinalAcknowledgementReceiptResponse =
-                await clientSatpStage3.commitFinalAssertion(
-                  commitFinalAssertionRequest,
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await clientSatpStage3.commitFinalAssertion(
+                      commitFinalAssertionRequest!,
+                    ),
+                  maxRetries,
+                  maxTimeout,
+                  new RetrieveSATPMessageError(
+                    fnTag,
+                    getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+                  ),
+                  this.logger,
                 );
 
               this.logger.debug(
                 `${fnTag}, commitFinalAcknowledgementReceiptResponse: ${safeStableStringify(commitFinalAcknowledgementReceiptResponse)}`,
               );
 
-              if (!commitFinalAcknowledgementReceiptResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-                );
-              }
             case MessageType.COMMIT_TRANSFER_COMPLETE:
               if (!commitFinalAcknowledgementReceiptResponse) {
                 this.logger.debug(
@@ -1222,18 +1299,25 @@ export class SATPManager {
                 }
               }
 
-              transferCompleteRequest = await (
-                this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
-              ).TransferCompleteRequest(
-                commitFinalAcknowledgementReceiptResponse,
-              );
-
-              if (!transferCompleteRequest) {
-                throw new CreateSATPRequestError(
-                  fnTag,
-                  getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE),
+              transferCompleteRequest =
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await (
+                      this.getSATPHandler(
+                        SATPHandlerType.STAGE3,
+                      ) as Stage3SATPHandler
+                    ).TransferCompleteRequest(
+                      commitFinalAcknowledgementReceiptResponse!,
+                    ),
+                  maxRetries,
+                  maxTimeout,
+                  new CreateSATPRequestError(
+                    fnTag,
+                    getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE),
+                  ),
+                  this.logger,
                 );
-              }
+
             case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
               if (!transferCompleteRequest) {
                 this.logger.debug(
@@ -1254,26 +1338,29 @@ export class SATPManager {
               }
 
               transferCompleteResponse =
-                await clientSatpStage3.transferComplete(
-                  transferCompleteRequest,
+                await executeOperationWithRetriesAndTimeout(
+                  async () =>
+                    await clientSatpStage3.transferComplete(
+                      transferCompleteRequest!,
+                    ),
+                  maxRetries,
+                  maxTimeout,
+                  new RetrieveSATPMessageError(
+                    fnTag,
+                    getMessageTypeName(
+                      MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+                    ),
+                  ),
+                  this.logger,
                 );
 
               this.logger.debug(
                 `${fnTag}, transferCompleteResponse: ${safeStableStringify(transferCompleteResponse)}`,
               );
 
-              if (!transferCompleteResponse) {
-                throw new RetrieveSATPMessageError(
-                  fnTag,
-                  getMessageTypeName(
-                    MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-                  ),
-                );
-              }
-
               (
                 this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
-              ).CheckTransferCompleteResponse(transferCompleteResponse);
+              ).CheckTransferCompleteResponse(transferCompleteResponse!);
               break;
             default:
               throw new Error("Invalid stage");
