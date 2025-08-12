@@ -11,8 +11,8 @@ import { SSHExecCommandResponse } from "node-ssh";
 import { streamLogs } from "./containers";
 
 export const CC_COMPILER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageVersion: "123",
-  containerImageName: "kubaya/cc-fabric", //TODO PUBLISH IMAGE IN HYPERLEDGER CACTI REGISTRY
+  containerImageVersion: "2025-08-12-d5365bf",
+  containerImageName: "ghcr.io/hyperledger-cacti/cactus-connector-fabric-cli",
   dockerNetworkName: "bridge",
 });
 
