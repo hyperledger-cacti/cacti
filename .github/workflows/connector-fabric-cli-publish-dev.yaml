@@ -1,0 +1,52 @@
+name: connector-fabric-cli-publish-dev
+
+on:
+  workflow_call:
+    inputs:
+      run_all:
+        required: true
+        type: string
+  workflow_dispatch:
+
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: cactus-connector-fabric-cli
+
+jobs:      
+  pr-build-container:
+    runs-on: ubuntu-22.04
+    env:
+      DOCKER_BUILDKIT: 1
+      DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-fabric/cli.Dockerfile
+      DOCKER_BUILD_DIR: ./packages/cactus-plugin-ledger-connector-fabric/
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Build image (PR)
+        run: docker build "$DOCKER_BUILD_DIR" --file "$DOCKERFILE_PATH" --tag "$IMAGE_NAME" --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Log in to registry
+        # This is where you will update the PAT to GITHUB_TOKEN
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        run: |
+          # Get short commit hash and date
+          SHORTHASH=$(git rev-parse --short "$GITHUB_SHA")
+          TODAYS_DATE="$(date +%F)"
+          VERSION="$TODAYS_DATE-$SHORTHASH"
+
+          # Build image ID
+          IMAGE_ID="ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME"
+          IMAGE_ID=$(echo "$IMAGE_ID" | tr '[:upper:]' '[:lower:]')
+
+          echo IMAGE_ID="$IMAGE_ID"
+          echo VERSION="$VERSION"
+
+          docker tag "$IMAGE_NAME" "$IMAGE_ID:$VERSION"
+          docker push "$IMAGE_ID:$VERSION"
+
