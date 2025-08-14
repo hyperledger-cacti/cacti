@@ -1,7 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import { globby, Options as GlobbyOptions } from "globby";
-import lernaCfg from "../../lerna.json" assert { type: "json" };
+import lernaCfg from "../../lerna.json" with { type: "json" };
 
 /**
  * Interface for the response of the getAllPkgDirs function.
