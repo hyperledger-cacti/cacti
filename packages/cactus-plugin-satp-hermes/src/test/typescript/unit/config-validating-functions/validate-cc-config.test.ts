@@ -255,7 +255,7 @@ describe("Validate CC Config", () => {
         claimFormats: [2],
       },
     ];
-    const result = validateCCConfig(
+    const result = await validateCCConfig(
       {
         configValue: {
           oracleConfig,
@@ -268,7 +268,7 @@ describe("Validate CC Config", () => {
 
   it("should pass with a valid cc config (FabricConfig)", async () => {
     const bridgeConfig = [fabricConfig];
-    const result = validateCCConfig(
+    const result = await validateCCConfig(
       {
         configValue: {
           bridgeConfig,
@@ -283,7 +283,7 @@ describe("Validate CC Config", () => {
 
   it("should pass with a valid cc config  (EthereumConfig)", async () => {
     const bridgeConfig = [ethereumConfig];
-    const result = validateCCConfig(
+    const result = await validateCCConfig(
       {
         configValue: {
           bridgeConfig,
@@ -298,7 +298,7 @@ describe("Validate CC Config", () => {
 
   it("should pass with a valid cc config (BesuConfig)", async () => {
     const bridgeConfig = [besuConfig];
-    const result = validateCCConfig(
+    const result = await validateCCConfig(
       {
         configValue: {
           bridgeConfig,
@@ -312,64 +312,67 @@ describe("Validate CC Config", () => {
   });
 
   it("should throw when instantiate SATP Gateway Runner without bridgesConfig nor oracleConfig", async () => {
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            notConfig: [
-              {
-                networkIdentification: {
-                  id: "EthereumLedgerTestNetwork",
-                  ledgerType: "ETHEREUM",
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              notConfig: [
+                {
+                  networkIdentification: {
+                    id: "EthereumLedgerTestNetwork",
+                    ledgerType: "ETHEREUM",
+                  },
+                  signingCredential: {
+                    ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
+                    secret:
+                      "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
+                    type: "GETH_KEYCHAIN_PASSWORD",
+                  },
+                  gasConfig: {
+                    gas: "6721975",
+                    gasPrice: "20000000000",
+                  },
+                  connectorOptions: {
+                    rpcApiHttpHost: "http://127.0.0.1:7545",
+                    rpcApiWsHost: "ws://127.0.0.1:7545",
+                  },
+                  claimFormats: [2],
                 },
-                signingCredential: {
-                  ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
-                  secret:
-                    "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
-                  type: "GETH_KEYCHAIN_PASSWORD",
-                },
-                gasConfig: {
-                  gas: "6721975",
-                  gasPrice: "20000000000",
-                },
-                connectorOptions: {
-                  rpcApiHttpHost: "http://127.0.0.1:7545",
-                  rpcApiWsHost: "ws://127.0.0.1:7545",
-                },
-                claimFormats: [2],
-              },
-            ],
+              ],
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
   it("should throw when instantiate SATP Gateway Runner with a null oracleConfig", async () => {
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            oracleConfig: null,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              oracleConfig: null,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
   it("should throw when bridgeConfig is not a array", async () => {
     const bridgeConfig = ethereumConfig;
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -398,16 +401,17 @@ describe("Validate CC Config", () => {
         claimFormats: [2],
       },
     ];
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            oracleConfig,
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              oracleConfig,
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig && config\.oracleConfig/);
   });
 
@@ -474,15 +478,16 @@ describe("Validate CC Config", () => {
       claimFormats: [2],
     };
     const bridgeConfig = [badFabricConfig];
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -549,15 +554,16 @@ describe("Validate CC Config", () => {
       claimFormats: [2],
     };
     const bridgeConfig = [badFabricConfig];
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -592,15 +598,16 @@ describe("Validate CC Config", () => {
       },
     };
     const bridgeConfig = [badEthereumConfig];
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -635,15 +642,16 @@ describe("Validate CC Config", () => {
       },
     };
     const bridgeConfig = [badEthereumConfig];
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -676,15 +684,16 @@ describe("Validate CC Config", () => {
       gas: 999999999999999,
     };
     const bridgeConfig = [badBesuConfig];
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 
@@ -717,15 +726,16 @@ describe("Validate CC Config", () => {
       gas: 999999999999999,
     };
     const bridgeConfig = [badBesuConfig];
-    expect(() =>
-      validateCCConfig(
-        {
-          configValue: {
-            bridgeConfig,
+    await expect(
+      async () =>
+        await validateCCConfig(
+          {
+            configValue: {
+              bridgeConfig,
+            },
           },
-        },
-        logger,
-      ),
+          logger,
+        ),
     ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
   });
 });

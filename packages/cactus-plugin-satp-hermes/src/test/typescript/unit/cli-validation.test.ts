@@ -5,7 +5,7 @@ import { Logger } from "@hyperledger/cactus-common";
 describe("Instantiate SATP Gateway Runner", () => {
   const logger = new Logger({ level: "INFO", label: "SATP - Hermes" });
   test("Instantiate SATP Gateway Runner", async () => {
-    const response = validateCCConfig(
+    const response = await validateCCConfig(
       {
         configValue: {
           oracleConfig: [

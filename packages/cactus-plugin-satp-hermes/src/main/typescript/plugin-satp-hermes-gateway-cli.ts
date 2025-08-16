@@ -105,7 +105,7 @@ export async function launchGateway(): Promise<void> {
   logger.debug("SATP KeyPair is valid.");
 
   logger.debug("Validating Cross Chain Config...");
-  const ccConfig = validateCCConfig(
+  const ccConfig = await validateCCConfig(
     {
       configValue: config.ccConfig,
     },

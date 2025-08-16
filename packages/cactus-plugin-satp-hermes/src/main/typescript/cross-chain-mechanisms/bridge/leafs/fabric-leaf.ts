@@ -212,9 +212,10 @@ export class FabricLeaf
       );
     }
 
-    this.connector = new PluginLedgerConnectorFabric(
-      options.connectorOptions as IPluginLedgerConnectorFabricOptions,
-    );
+    this.connector = new PluginLedgerConnectorFabric({
+      ...options.connectorOptions,
+      dockerNetworkName: options.connectorOptions.dockerNetworkName ?? "host",
+    } as IPluginLedgerConnectorFabricOptions);
 
     this.ontologyManager = options.ontologyManager;
 

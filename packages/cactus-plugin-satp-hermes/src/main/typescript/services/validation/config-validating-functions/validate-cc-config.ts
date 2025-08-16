@@ -79,13 +79,13 @@ function isCCConfigJSON(
   );
 }
 
-function createBridgeConfig(
+async function createBridgeConfig(
   configs: NetworkOptionsJSON[] | undefined = [],
   log: Logger,
-): INetworkOptions[] {
+): Promise<INetworkOptions[]> {
   const bridgesConfigParsed: INetworkOptions[] = [];
 
-  configs.forEach((config) => {
+  await configs.forEach(async (config) => {
     if (isFabricConfigJSON(config, log)) {
       const fabricOptions = createFabricOptions(config.connectorOptions);
 
@@ -97,7 +97,7 @@ function createBridgeConfig(
 
       const caFile =
         config.caFilePath !== undefined
-          ? fs.readFileSync(config.caFilePath).toString("base64")
+          ? fs.readFileSync(config.caFilePath).toString()
           : undefined;
 
       if (config.coreYamlFilePath && !fs.existsSync(config.coreYamlFilePath)) {
@@ -105,10 +105,14 @@ function createBridgeConfig(
           `Core YAML file not found at path: ${config.coreYamlFilePath}`,
         );
       }
-      const coreYamlFile =
-        config.coreYamlFilePath !== undefined
-          ? fs.readFileSync(config.coreYamlFilePath).toString("base64")
-          : undefined;
+      const coreYamlFile = {
+        filename: "core.yaml",
+        body:
+          config.coreYamlFilePath !== undefined &&
+          fs.existsSync(config.coreYamlFilePath)
+            ? fs.readFileSync(config.coreYamlFilePath).toString("base64")
+            : undefined,
+      } as FileBase64;
 
       const targetOrganizations: DeploymentTargetOrganization[] = [];
 
@@ -136,9 +140,7 @@ function createBridgeConfig(
 
           const peertlsRootCert =
             org.CORE_PEER_TLS_ROOTCERT_PATH !== undefined
-              ? fs
-                  .readFileSync(org.CORE_PEER_TLS_ROOTCERT_PATH)
-                  .toString("base64")
+              ? fs.readFileSync(org.CORE_PEER_TLS_ROOTCERT_PATH).toString()
               : undefined;
 
           if (
@@ -152,9 +154,7 @@ function createBridgeConfig(
 
           const ordererTlsRootCert =
             org.ORDERER_TLS_ROOTCERT_PATH !== undefined
-              ? fs
-                  .readFileSync(org.ORDERER_TLS_ROOTCERT_PATH)
-                  .toString("base64")
+              ? fs.readFileSync(org.ORDERER_TLS_ROOTCERT_PATH).toString()
               : undefined;
 
           if (!fs.existsSync(org.CORE_PEER_MSPCONFIG_PATH)) {
@@ -164,7 +164,7 @@ function createBridgeConfig(
           }
 
           // Recursively collect all files in the MSP config directory, preserving relative paths
-          const mspConfigFiles: FileBase64[] = collectFilesSync(
+          const mspConfigFiles: FileBase64[] = await collectFiles(
             org.CORE_PEER_MSPCONFIG_PATH,
           );
 
@@ -268,22 +268,30 @@ function createBridgeConfig(
   return bridgesConfigParsed;
 }
 
-function collectFilesSync(dir: string, relativePath = ""): FileBase64[] {
+async function collectFiles(
+  dir: string,
+  relativePath = "",
+): Promise<FileBase64[]> {
+  const fnTag = `validate-cc-config#collectFiles()`;
+  console.debug(`${fnTag} ENTER - dir=%s, relativePath=%s`, dir, relativePath);
   const files: FileBase64[] = [];
-  const entries = fs.readdirSync(dir, {
+  const entries = await fs.promises.readdir(dir, {
     withFileTypes: true,
   });
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     const relPath = path.join(relativePath, entry.name);
+
     if (entry.isDirectory()) {
-      files.push(...collectFilesSync(fullPath, relPath));
+      files.push(...(await collectFiles(fullPath, relPath)));
     } else if (entry.isFile()) {
-      const fileBuffer = fs.readFileSync(fullPath);
+      const fileBuffer = await fs.promises.readFile(fullPath);
       const parts = relPath.split(path.sep);
       const filename = parts.pop()!;
       const filepath = parts.length ? parts.join("/") : undefined;
-
+      console.debug(
+        `Collecting file: ${filename} from path: ${fullPath} with relative path: ${relPath}`,
+      );
       files.push({
         filename,
         body: fileBuffer.toString("base64"),
@@ -294,12 +302,12 @@ function collectFilesSync(dir: string, relativePath = ""): FileBase64[] {
   return files;
 }
 
-export function validateCCConfig(
+export async function validateCCConfig(
   opts: {
     readonly configValue: unknown;
   },
   log: Logger,
-): ICrossChainMechanismsOptions {
+): Promise<ICrossChainMechanismsOptions> {
   if (!opts || !opts.configValue) {
     return {
       bridgeConfig: [],
@@ -335,7 +343,7 @@ export function validateCCConfig(
   }
 
   return {
-    bridgeConfig: createBridgeConfig(opts.configValue.bridgeConfig, log),
-    oracleConfig: createBridgeConfig(opts.configValue.oracleConfig, log),
+    bridgeConfig: await createBridgeConfig(opts.configValue.bridgeConfig, log),
+    oracleConfig: await createBridgeConfig(opts.configValue.oracleConfig, log),
   };
 }

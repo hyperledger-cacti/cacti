@@ -404,7 +404,7 @@ export class FabricTestEnvironment {
           fs.mkdirSync(destDir, { recursive: true });
         }
         // Ensure fileContent is a string or Buffer
-        await fs.writeFile(destPath, file.body);
+        await fs.writeFile(destPath, Buffer.from(file.body, "base64"));
       }
     }
 
