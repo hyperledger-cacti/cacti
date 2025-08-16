@@ -1,58 +1,70 @@
+# ========= BUILDER =========
 ARG BASE_IMAGE=debian:bullseye-slim
 FROM --platform=$BUILDPLATFORM ${BASE_IMAGE} AS builder
 
-# Install required tools and dependencies
-RUN apt-get update && apt-get install -y \
+ARG DEBIAN_FRONTEND=noninteractive
+
+# Install dependencies in one layer
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     wget \
-    build-essential \
     curl \
-    openjdk-17-jdk \
     ca-certificates \
+    build-essential \
+    openjdk-17-jdk-headless \
     tar \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Go
 ARG GO_VERSION=1.23.11
 RUN ARCH=$(dpkg --print-architecture) && \
-    if [ "$ARCH" = "amd64" ]; then GOARCH=amd64; \
-    elif [ "$ARCH" = "arm64" ]; then GOARCH=arm64; \
-    else echo "Unsupported architecture: $ARCH" && exit 1; fi && \
-    wget https://go.dev/dl/go${GO_VERSION}.linux-${GOARCH}.tar.gz && \
+    case "$ARCH" in \
+      amd64) GOARCH=amd64 ;; \
+      arm64) GOARCH=arm64 ;; \
+      *) echo "Unsupported arch: $ARCH" && exit 1 ;; \
+    esac && \
+    wget -q https://go.dev/dl/go${GO_VERSION}.linux-${GOARCH}.tar.gz && \
     tar -C /usr/local -xzf go${GO_VERSION}.linux-${GOARCH}.tar.gz && \
     rm go${GO_VERSION}.linux-${GOARCH}.tar.gz
+ENV PATH="/usr/local/go/bin:${PATH}"
 
-ENV PATH="/usr/local/go/bin:/go/bin:${PATH}"
-
-# Install Node.js using NVM
-ENV NODE_VERSION=18.19.0
-RUN apt install -y curl
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-ENV NVM_DIR=/root/.nvm
-RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
-ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-RUN node --version
-RUN npm --version
+# Install Node.js (direct tarball, no NVM overhead)
+ARG NODE_VERSION=18.19.0
+RUN ARCH=$(dpkg --print-architecture) && \
+    case "$ARCH" in \
+      amd64) NODE_ARCH=x64 ;; \
+      arm64) NODE_ARCH=arm64 ;; \
+      *) echo "Unsupported arch: $ARCH" && exit 1 ;; \
+    esac && \
+    wget -qO- https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${NODE_ARCH}.tar.xz | tar -xJ -C /usr/local --strip-components=1
 RUN npm install -g typescript
 
-# Set up environment variables
+# Install Hyperledger Fabric binaries and move them into /usr/local/bin
 ENV FABRIC_VERSION=2.5.6
-
-# Set architecture variables for downloading Fabric binaries
-ARG TARGETARCH
-ENV ARCH=$TARGETARCH
-
-# Map Docker arch to Fabric arch and download Fabric binaries
-RUN curl -sSLO https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh && chmod +x install-fabric.sh
-
-RUN ./install-fabric.sh --fabric-version ${FABRIC_VERSION} binary
-
-
+RUN curl -sSLO https://raw.githubusercontent.com/hyperledger/fabric/main/scripts/install-fabric.sh && \
+    chmod +x install-fabric.sh && \
+    ./install-fabric.sh --fabric-version ${FABRIC_VERSION} binary && \
+    mv bin/* /usr/local/bin && \
+    rm -rf bin install-fabric.sh
 
 WORKDIR /chaincode
 
+# ========= RUNTIME =========
+FROM debian:bullseye-slim
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openjdk-17-jre-headless \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy tools from builder (includes peer now)
+COPY --from=builder /usr/local /usr/local
+COPY --from=builder /chaincode /chaincode
+
+ENV PATH="/usr/local/go/bin:/usr/local/bin:${PATH}"
+
+WORKDIR /chaincode
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-    CMD go version && node --version && npm --version && tsc --version && java -version || exit 1
+    CMD go version && node --version && npm --version && tsc --version && java -version && peer version || exit 1
