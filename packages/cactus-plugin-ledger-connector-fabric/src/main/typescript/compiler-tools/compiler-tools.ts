@@ -1,20 +1,36 @@
 import {
   Bools,
+  ILoggerOptions,
   Logger,
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import Joi from "joi";
 import Docker, { Container, ContainerInfo } from "dockerode";
+import Dockerode from "dockerode";
 import EventEmitter from "events";
 import { SSHExecCommandResponse } from "node-ssh";
 import { streamLogs } from "./containers";
+import pRetry from "p-retry";
+import throttle from "lodash/throttle";
 
 export const CC_COMPILER_DEFAULT_OPTIONS = Object.freeze({
   containerImageVersion: "2025-08-12-d5365bf",
   containerImageName: "ghcr.io/hyperledger-cacti/cactus-connector-fabric-cli",
   dockerNetworkName: "bridge",
 });
+
+export interface IDockerPullProgressDetail {
+  readonly current: number;
+  readonly total: number;
+}
+
+export interface IDockerPullProgress {
+  readonly status: "Downloading";
+  readonly progressDetail: IDockerPullProgressDetail;
+  readonly progress: string;
+  readonly id: string;
+}
 
 export interface ICompilerToolsOptions {
   containerImageVersion?: string;
@@ -43,6 +59,7 @@ export class CompilerTools {
   public readonly emitContainerLogs: boolean;
 
   private readonly log: Logger;
+  private readonly level: LogLevelDesc;
   private container: Container | undefined;
   private containerId: string | undefined;
 
@@ -71,8 +88,8 @@ export class CompilerTools {
     }
 
     const label = "fabric-cc-compiler";
-    const level = options.logLevel || "INFO";
-    this.log = LoggerProvider.getOrCreate({ level, label });
+    this.level = options.logLevel || "INFO";
+    this.log = LoggerProvider.getOrCreate({ level: this.level, label });
   }
 
   public getContainerImageName(): string {
@@ -160,7 +177,7 @@ export class CompilerTools {
 
     if (!omitPull) {
       this.log.debug(`Pulling container image ${imageFqn} ...`);
-      await this.pullContainerImage(imageFqn);
+      await CompilerTools.pullImage(imageFqn, undefined, this.level);
       this.log.debug(`Pulled ${imageFqn} OK. Starting container...`);
     }
 
@@ -299,25 +316,70 @@ export class CompilerTools {
     };
   }
 
-  private pullContainerImage(containerNameAndTag: string): Promise<unknown[]> {
+  public static pullImage(
+    imageFqn: string,
+    options: Record<string, unknown> = {},
+    logLevel?: LogLevelDesc,
+  ): Promise<unknown[]> {
+    const defaultLoggerOptions: ILoggerOptions = {
+      label: "containers#pullImage()",
+      level: logLevel || "INFO",
+    };
+    const log = LoggerProvider.getOrCreate(defaultLoggerOptions);
+    const task = () => CompilerTools.tryPullImage(imageFqn, options, logLevel);
+    const retryOptions: pRetry.Options & { retries: number } = {
+      retries: 6,
+      onFailedAttempt: async (ex) => {
+        log.debug(`Failed attempt at pulling container image ${imageFqn}`, ex);
+      },
+    };
+    return pRetry(task, retryOptions);
+  }
+
+  public static tryPullImage(
+    imageFqn: string,
+    options: Record<string, unknown> = {},
+    logLevel?: LogLevelDesc,
+  ): Promise<unknown[]> {
     return new Promise((resolve, reject) => {
-      const docker = new Docker();
-      docker.pull(containerNameAndTag, (pullError: unknown, stream: never) => {
+      const loggerOptions: ILoggerOptions = {
+        label: "containers#tryPullImage()",
+        level: logLevel || "INFO",
+      };
+      const log = LoggerProvider.getOrCreate(loggerOptions);
+
+      const docker = new Dockerode();
+
+      const progressPrinter = throttle((msg: IDockerPullProgress): void => {
+        log.debug(JSON.stringify(msg.progress || msg.status));
+      }, 1000);
+
+      const pullStreamStartedHandler = (
+        pullError: unknown,
+        stream: NodeJS.ReadableStream,
+      ) => {
         if (pullError) {
+          log.error(`Could not even start ${imageFqn} pull:`, pullError);
           reject(pullError);
         } else {
+          log.debug(`Started ${imageFqn} pull progress stream OK`);
           docker.modem.followProgress(
             stream,
             (progressError: unknown, output: unknown[]) => {
               if (progressError) {
+                log.error(`Failed to finish ${imageFqn} pull:`, progressError);
                 reject(progressError);
               } else {
+                log.debug(`Finished ${imageFqn} pull completely OK`);
                 resolve(output);
               }
             },
+            (msg: IDockerPullProgress): void => progressPrinter(msg),
           );
         }
-      });
+      };
+
+      docker.pull(imageFqn, options, pullStreamStartedHandler);
     });
   }
 }
