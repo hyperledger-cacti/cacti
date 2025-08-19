@@ -14,6 +14,7 @@ import {
   FabricContractInvocationType,
   FabricSigningCredential,
   FileBase64,
+  IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import {
@@ -39,6 +40,11 @@ import fs from "fs-extra";
 import { getUserFromPseudonim } from "./utils";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
 import ExampleOntology from "../../json/ontologies/ontology-satp-erc20-interact-fabric.json";
+import { PeerCerts } from "@hyperledger/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
+import {
+  TargetOrganization,
+  FabricConfigJSON,
+} from "@hyperledger/cactus-plugin-satp-hermes";
 
 export class FabricEnvironment {
   public static readonly FABRIC_NETWORK_ID: string = "FabricLedgerNetwork";
@@ -71,6 +77,10 @@ export class FabricEnvironment {
   private bridgeFabricSigningCredential?: FabricSigningCredential;
   private fabricKeychainPlugin?: PluginKeychainMemory;
   private approveAddress?: string;
+
+  private peer0Org1Certs: PeerCerts | undefined;
+  private peer0Org2Certs: PeerCerts | undefined;
+  private coreFile: FileBase64 | undefined;
 
   private readonly logLevel: LogLevelDesc;
 
@@ -178,14 +188,9 @@ export class FabricEnvironment {
       asLocalhost: true,
     };
 
-    const connectorOptions = {
+    const connectorOptions: IPluginLedgerConnectorFabricOptions = {
       instanceId: uuidv4(),
-      dockerBinary: "/usr/local/bin/docker",
-      peerBinary: "/fabric-samples/bin/peer",
-      goBinary: "/usr/local/go/bin/go",
       pluginRegistry,
-      cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-      sshConfig: this.sshConfig,
       logLevel: this.logLevel,
       connectionProfile: this.connectionProfileOrg1,
       discoveryOptions: this.discoveryOptions,
@@ -193,6 +198,7 @@ export class FabricEnvironment {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: this.dockerNetwork,
     };
 
     this.connector = new PluginLedgerConnectorFabric(connectorOptions);
@@ -200,6 +206,22 @@ export class FabricEnvironment {
     this.fabricSigningCredential = {
       keychainId: keychainId,
       keychainRef: keychainEntryKey4,
+    };
+
+    this.peer0Org1Certs = await this.ledger.getPeerOrgCertsAndConfig(
+      "org1",
+      "peer0",
+    );
+    this.peer0Org2Certs = await this.ledger.getPeerOrgCertsAndConfig(
+      "org2",
+      "peer0",
+    );
+
+    const filePath = path.join(__dirname, "../../yml/resources/core.yml");
+    const buffer = await fs.readFile(filePath);
+    this.coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
     };
   }
 
@@ -298,23 +320,43 @@ export class FabricEnvironment {
       });
     }
 
+    if (!this.peer0Org1Certs || !this.peer0Org2Certs || !this.coreFile) {
+      throw new Error("Peer certificates are not defined");
+    }
+
     const res = await this.connector?.deployContract({
       channelId: this.fabricChannelName,
       ccVersion: "1.0.0",
       sourceFiles: satpSourceFiles,
       ccName: FabricEnvironment.SATP_CONTRACT_NAME,
       targetOrganizations: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: this.peer0Org1Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: this.peer0Org1Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: this.peer0Org1Certs.ordererTlsRootCert,
+        },
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: this.peer0Org2Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: this.peer0Org2Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: this.peer0Org2Certs.ordererTlsRootCert,
+        },
       ],
-      caFile:
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.ORDERER_TLS_ROOTCERT_FILE,
+      caFile: this.peer0Org1Certs.ordererTlsRootCert,
       ccLabel: "satp-contract",
       ccLang: ChainCodeProgrammingLanguage.Typescript,
       ccSequence: 1,
       orderer: "orderer.example.com:7050",
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
+      coreYamlFile: this.coreFile,
     });
 
     if (!res) {
@@ -556,28 +598,133 @@ export class FabricEnvironment {
 
     return parseInt(response.functionOutput);
   }
-  public async createFabricDockerConfig(): Promise<INetworkOptions> {
+
+  public async createFabricDockerConfig(
+    testFilesDirectory: string,
+  ): Promise<FabricConfigJSON & INetworkOptions> {
+    if (!this.peer0Org1Certs || !this.peer0Org2Certs || !this.coreFile) {
+      throw new Error("Peer certificates are not defined");
+    }
+
+    const testFileCerts = path.join(testFilesDirectory, "certs");
+
+    if (!fs.existsSync(testFileCerts)) {
+      fs.mkdirSync(testFileCerts, { recursive: true });
+    }
+
+    for (const org of ["org1", "org2"]) {
+      if (!fs.existsSync(path.join(testFileCerts, "certs", org))) {
+        fs.mkdirSync(path.join(testFileCerts, org), {
+          recursive: true,
+        });
+      } else {
+        // Clear the directory if it already exists
+        fs.emptyDirSync(path.join(testFileCerts, org));
+      }
+    }
+
+    // Write peer certs and core.yaml to files in the testFilesDirectory
+    const org1Dir = path.join(testFileCerts, "org1");
+    const org2Dir = path.join(testFileCerts, "org2");
+    const coreYamlPath = path.join(testFileCerts, "core.yaml");
+
+    // Org1 certs
+    const org1MspConfigPath = path.join(org1Dir, "msp");
+    const org1PeerTlsCertPath = path.join(org1Dir, "peerTlsCert.pem");
+    const org1OrdererTlsRootCertPath = path.join(
+      org1Dir,
+      "ordererTlsRootCert.pem",
+    );
+
+    // Org2 certs
+    const org2MspConfigPath = path.join(org2Dir, "msp");
+    const org2PeerTlsCertPath = path.join(org2Dir, "peerTlsCert.pem");
+    const org2OrdererTlsRootCertPath = path.join(
+      org2Dir,
+      "ordererTlsRootCert.pem",
+    );
+
+    // mspConfig is a folder of files with relative paths, so we need to write each file
+    for (const peerCerts of [
+      { certs: this.peer0Org1Certs, mspPath: org1MspConfigPath },
+      { certs: this.peer0Org2Certs, mspPath: org2MspConfigPath },
+    ]) {
+      for (const file of peerCerts.certs.mspConfig) {
+        const destPath = path.join(
+          peerCerts.mspPath,
+          file.filepath || "",
+          file.filename,
+        );
+        const destDir = path.dirname(destPath);
+        if (!fs.existsSync(destDir)) {
+          fs.mkdirSync(destDir, { recursive: true });
+        }
+        // Ensure fileContent is a string or Buffer
+        await fs.writeFile(destPath, Buffer.from(file.body, "base64"));
+      }
+    }
+
+    await fs.writeFile(org1PeerTlsCertPath, this.peer0Org1Certs.peerTlsCert);
+    await fs.writeFile(
+      org1OrdererTlsRootCertPath,
+      this.peer0Org1Certs.ordererTlsRootCert,
+    );
+
+    await fs.writeFile(org2PeerTlsCertPath, this.peer0Org2Certs.peerTlsCert);
+    await fs.writeFile(
+      org2OrdererTlsRootCertPath,
+      this.peer0Org2Certs.ordererTlsRootCert,
+    );
+
+    // core.yaml
+    await fs.writeFile(coreYamlPath, Buffer.from(this.coreFile.body, "base64"));
+
+    // targetOrganizations array
+    const basePath = path.join("/opt/cacti/satp-hermes/config", "certs");
+    const targetOrganizations: TargetOrganization[] = [
+      {
+        CORE_PEER_LOCALMSPID:
+          FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+        CORE_PEER_ADDRESS:
+          FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+        CORE_PEER_MSPCONFIG_PATH: path.join(basePath, "org1/msp"),
+        CORE_PEER_TLS_ROOTCERT_PATH: path.join(
+          basePath,
+          "/org1/peerTlsCert.pem",
+        ),
+        ORDERER_TLS_ROOTCERT_PATH: path.join(
+          basePath,
+          "/org1/ordererTlsRootCert.pem",
+        ),
+      },
+      {
+        CORE_PEER_LOCALMSPID:
+          FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+        CORE_PEER_ADDRESS:
+          FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+        CORE_PEER_MSPCONFIG_PATH: path.join(basePath, "org2/msp"),
+        CORE_PEER_TLS_ROOTCERT_PATH: path.join(
+          basePath,
+          "/org2/peerTlsCert.pem",
+        ),
+        ORDERER_TLS_ROOTCERT_PATH: path.join(
+          basePath,
+          "/org2/ordererTlsRootCert.pem",
+        ),
+      },
+    ];
+    this.peer0Org2Certs;
     return {
       networkIdentification: this.network,
       userIdentity: this.bridgeIdentity,
       channelName: this.fabricChannelName,
-      targetOrganizations: [
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
-      ],
-      caFile:
-        FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.ORDERER_TLS_ROOTCERT_FILE,
-      ccSequence: 1,
+      targetOrganizations: targetOrganizations,
+      caFilePath: path.join(basePath, "/org2/ordererTlsRootCert.pem"),
       orderer: "orderer.example.com:7050",
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
       mspId: this.bridgeMSPID,
       connectorOptions: {
-        dockerBinary: "/usr/local/bin/docker",
-        peerBinary: "/fabric-samples/bin/peer",
-        goBinary: "/usr/local/go/bin/go",
-        cliContainerEnv: FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
-        sshConfig: await this.ledger.getSshConfig(false),
         connectionProfile: await this.ledger.getConnectionProfileOrgX(
           "org2",
           false,
@@ -592,7 +739,8 @@ export class FabricEnvironment {
         },
       },
       claimFormats: [ClaimFormat.DEFAULT],
-    } as INetworkOptions;
+      coreYamlFilePath: path.join(basePath, "core.yaml"),
+    };
   }
 
   public async giveRoleToBridge(mspID: string): Promise<void> {

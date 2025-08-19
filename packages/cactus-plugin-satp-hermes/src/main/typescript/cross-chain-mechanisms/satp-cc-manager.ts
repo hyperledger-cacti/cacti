@@ -120,6 +120,10 @@ export class SATPCrossChainManager {
     const fnTag = `${SATPCrossChainManager.CLASS_NAME}#deployBridgeFromConfig()`;
     this.log.debug(`${fnTag}, Deploying Bridge...`);
 
+    this.log.debug(
+      `${fnTag}, Deploying Bridges with the following configuration: ${JSON.stringify(bridgesNetworkConfig)}`,
+    );
+
     //const deploymentPromises = [];
     for (const config of bridgesNetworkConfig) {
       //deploymentPromises.push(this.bridgeManager.deployLeaf(config));

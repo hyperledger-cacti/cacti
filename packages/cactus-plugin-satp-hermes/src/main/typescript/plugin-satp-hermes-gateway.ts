@@ -479,8 +479,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     await Promise.all([
       this.createDBRepository(),
       this.SATPCCManager.deployCCMechanisms(this.options.ccConfig!),
-      this.startupGOLServer(),
     ]);
+
+    // start everything before starting the GOL server
+    await this.startupGOLServer();
   }
 
   public async getOrCreateHttpServer(): Promise<ApiServer> {

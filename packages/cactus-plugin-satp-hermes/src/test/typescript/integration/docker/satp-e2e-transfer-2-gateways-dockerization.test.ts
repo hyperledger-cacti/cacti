@@ -153,7 +153,7 @@ beforeAll(async () => {
       contractName: satpContractName,
       logLevel,
       network: testNetwork,
-      claimFormat: ClaimFormat.BUNGEE,
+      claimFormat: ClaimFormat.DEFAULT,
     });
     log.info("Fabric Ledger started successfully");
 
@@ -253,7 +253,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     // fabricConfig Json object setup:
     const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
-      getTestConfigFilesDirectory(gatewayIdentity2.id),
+      getTestConfigFilesDirectory(`gateway-info-${gatewayIdentity2.id}`),
     );
 
     const files1 = setupGatewayDockerFiles({
@@ -264,7 +264,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       ccConfig: { bridgeConfig: [besuConfigJSON] },
       localRepository: db_local_config1,
       remoteRepository: db_remote_config1,
-      gatewayId: "gateway-1",
       gatewayKeyPair: {
         privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
@@ -279,7 +278,6 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
       ccConfig: { bridgeConfig: [fabricConfigJSON] },
       localRepository: db_local_config2,
       remoteRepository: db_remote_config2,
-      gatewayId: "gateway-2",
       gatewayKeyPair: {
         privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
@@ -492,7 +490,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     // fabricConfig Json object setup:
     const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
-      getTestConfigFilesDirectory(gatewayIdentity1.id),
+      getTestConfigFilesDirectory(`gateway-info-${gatewayIdentity1.id}`),
     );
 
     // besuConfig Json object setup:

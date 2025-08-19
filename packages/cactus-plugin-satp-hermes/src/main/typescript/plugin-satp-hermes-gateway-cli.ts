@@ -42,6 +42,8 @@ export async function launchGateway(): Promise<void> {
   const config = await fs.readJson(path.join(workDir, "/config/config.json"));
   logger.debug("Configuration read OK");
 
+  logger.debug(`Config: ${JSON.stringify(config, null, 2)}`);
+
   // validating gateway-config.json
 
   logger.debug("Validating SATP Gateway instanceId...");

@@ -85,7 +85,7 @@ async function createBridgeConfig(
 ): Promise<INetworkOptions[]> {
   const bridgesConfigParsed: INetworkOptions[] = [];
 
-  await configs.forEach(async (config) => {
+  for (const config of configs) {
     if (isFabricConfigJSON(config, log)) {
       const fabricOptions = createFabricOptions(config.connectorOptions);
 
@@ -264,7 +264,7 @@ async function createBridgeConfig(
 
       bridgesConfigParsed.push(ethereumConfig);
     }
-  });
+  }
   return bridgesConfigParsed;
 }
 
