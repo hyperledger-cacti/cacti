@@ -81,6 +81,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**GetBlockV1**](docs/DefaultApi.md#getblockv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block | Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
 *DefaultApi* | [**GetChainInfoV1**](docs/DefaultApi.md#getchaininfov1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info | Get fabric ledger chain info.
 *DefaultApi* | [**GetDiscoveryResultsV1**](docs/DefaultApi.md#getdiscoveryresultsv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results | Get fabric ledger node structure (from the discovery service).
+*DefaultApi* | [**GetLatestBlockNumberV1**](docs/DefaultApi.md#getlatestblocknumberv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number | Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
 *DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 *DefaultApi* | [**GetTransactionReceiptByTxIDV1**](docs/DefaultApi.md#gettransactionreceiptbytxidv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid | get a transaction receipt by tx id on a Fabric ledger.
 *DefaultApi* | [**RunDelegatedSignTransactionV1**](docs/DefaultApi.md#rundelegatedsigntransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction | Runs a transaction on a Fabric ledger using user-provided signing callback.
@@ -105,11 +106,15 @@ Class | Method | HTTP request | Description
  - [DeployContractV1Response](docs/DeployContractV1Response.md)
  - [DeploymentTargetOrgFabric2x](docs/DeploymentTargetOrgFabric2x.md)
  - [DeploymentTargetOrganization](docs/DeploymentTargetOrganization.md)
+ - [EndorsedProposalResponse](docs/EndorsedProposalResponse.md)
+ - [Endorsement](docs/Endorsement.md)
  - [ErrorExceptionResponseV1](docs/ErrorExceptionResponseV1.md)
+ - [EventType](docs/EventType.md)
  - [FabricCertificateIdentityV1](docs/FabricCertificateIdentityV1.md)
  - [FabricContractInvocationType](docs/FabricContractInvocationType.md)
  - [FabricSigningCredential](docs/FabricSigningCredential.md)
  - [FabricSigningCredentialType](docs/FabricSigningCredentialType.md)
+ - [FabricView](docs/FabricView.md)
  - [FabricX509CertificateV1](docs/FabricX509CertificateV1.md)
  - [FileBase64](docs/FileBase64.md)
  - [FullBlockTransactionActionV1](docs/FullBlockTransactionActionV1.md)
@@ -136,8 +141,13 @@ Class | Method | HTTP request | Description
  - [GetDiscoveryResultsResponseV1PeersByMSPValue](docs/GetDiscoveryResultsResponseV1PeersByMSPValue.md)
  - [GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner](docs/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner.md)
  - [GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner](docs/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner.md)
+ - [GetLatestBlockNumberRequestV1](docs/GetLatestBlockNumberRequestV1.md)
+ - [GetLatestBlockNumberResponseV1](docs/GetLatestBlockNumberResponseV1.md)
  - [GetTransactionReceiptResponse](docs/GetTransactionReceiptResponse.md)
+ - [ProposalResponsePayload](docs/ProposalResponsePayload.md)
  - [RunDelegatedSignTransactionRequest](docs/RunDelegatedSignTransactionRequest.md)
+ - [RunInvokeRequest](docs/RunInvokeRequest.md)
+ - [RunInvokeResponse](docs/RunInvokeResponse.md)
  - [RunTransactionRequest](docs/RunTransactionRequest.md)
  - [RunTransactionResponse](docs/RunTransactionResponse.md)
  - [RunTransactionResponseType](docs/RunTransactionResponseType.md)
