@@ -1,0 +1,32 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package relay.events;
+
+import "common/ack.proto";
+import "common/events.proto";
+import "common/state.proto";
+
+option java_package = "org.hyperledger.cacti.weaver.protos.relay.events";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/relay";
+
+service EventSubscribe {
+  // the dest-relay forwards the request from client as EventSubscription to the src-relay
+  rpc SubscribeEvent(common.events.EventSubscription) returns (common.ack.Ack) {}
+  // Src-relay based upon query (EventSubscription) forwards the same response (Ack) 
+  // from driver to the dest-relay by calling a new endpoint in dest-relay
+  rpc SendSubscriptionStatus(common.ack.Ack) returns (common.ack.Ack) {}
+  // Src-driver status of event subscription (Ack) 
+  // to the src-relay by calling a new endpoint in src-relay
+  rpc SendDriverSubscriptionStatus(common.ack.Ack) returns (common.ack.Ack) {}
+}
+
+service EventPublish {
+  // src-driver forwards the state as part of event subscription to src-relay
+  rpc SendDriverState(common.state.ViewPayload) returns (common.ack.Ack) {}
+  // src-relay will forward the state as part of event subscription to dest-relay
+  rpc SendState(common.state.ViewPayload) returns (common.ack.Ack) {}
+}

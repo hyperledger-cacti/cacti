@@ -1,0 +1,21 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package corda;
+
+option java_package = "org.hyperledger.cacti.weaver.protos.corda";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/corda";
+
+message ViewData {
+    message NotarizedPayload {
+        string signature = 1;
+        string certificate = 2;
+        string id = 3;
+        // Bytes of InteropPayload
+        bytes payload = 4;
+    }
+    repeated NotarizedPayload notarized_payloads = 1;
+}

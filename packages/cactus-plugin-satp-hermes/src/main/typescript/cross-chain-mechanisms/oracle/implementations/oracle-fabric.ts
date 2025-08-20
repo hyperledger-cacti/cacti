@@ -1,5 +1,6 @@
 import {
   DeploymentTargetOrganization,
+  EventType,
   FabricContractInvocationType,
   type FabricSigningCredential,
   FileBase64,
@@ -25,7 +26,7 @@ import {
   OracleResponse,
 } from "../../../public-api";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { X509Identity } from "fabric-network";
+import { ContractEvent, X509Identity } from "fabric-network";
 import { getUint8Key } from "../../bridge/leafs/leafs-utils";
 import {
   UnsupportedNetworkError,
@@ -36,12 +37,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
-
-interface ContractEvent {
-  chaincodeId: string;
-  eventName: string;
-  payload?: Buffer;
-}
+import { FabricEvent } from "@hyperledger/cactus-plugin-ledger-connector-fabric/dist/lib/main/typescript/plugin-ledger-connector-fabric";
 
 export interface IFabricOracleEntry extends IOracleEntryBase {
   channelName: string;
@@ -268,11 +264,14 @@ export class OracleFabric extends OracleAbstract {
             channelName: this.channelName,
             contractName: args.contractName,
             signingCredential: this.signingCredential,
+            eventType: EventType.Contract,
           },
-          async (event: ContractEvent) => {
+          async (event: FabricEvent) => {
             this.log.debug(
               `${fnTag}: Received event log: ${safeStableStringify(event)}`,
             );
+
+            event = event as ContractEvent;
 
             if (event) {
               if (event.eventName === args.eventSignature && event.payload) {

@@ -1,5 +1,5 @@
 import { AddressInfo } from "net";
-import http, { Server } from "http";
+import https, { Server } from "https";
 import fs from "fs-extra";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
@@ -116,7 +116,7 @@ describe("OpenApi Validation Test", () => {
 
     const expressApp = express();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
-    server = http.createServer(expressApp);
+    server = https.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "127.0.0.1",
       port: 0,

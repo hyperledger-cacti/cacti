@@ -5,7 +5,7 @@ import path from "node:path";
 import "jest-extended";
 import fs from "fs-extra";
 import { v4 as uuidv4 } from "uuid";
-import { DiscoveryOptions, ContractEvent } from "fabric-network";
+import { DiscoveryOptions, ContractEvent, BlockEvent } from "fabric-network";
 import express from "express";
 import bodyParser from "body-parser";
 
@@ -42,8 +42,14 @@ import {
   FabricContractInvocationType,
 } from "../../../../main/typescript/public-api";
 
-import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
-import { GatewayOptions } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
+import {
+  IPluginLedgerConnectorFabricOptions,
+  FabricEvent,
+} from "../../../../main/typescript/plugin-ledger-connector-fabric";
+import {
+  EventType,
+  GatewayOptions,
+} from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { CreateListenerRequest } from "../../../../main/typescript/common/utils";
 import { PeerCerts } from "@hyperledger/cactus-test-tooling/src/main/typescript/fabric/fabric-test-ledger-v1";
 
@@ -180,7 +186,7 @@ describe("PluginLedgerConnectorFabric", () => {
     await Servers.shutdown(server);
   });
 
-  it("setup log subscriber, issue tx, and capture event emitted", async () => {
+  it("setup log subscriber, issue tx, and capture contract event emitted", async () => {
     const channelName = "mychannel";
     const contractName = "basic-asset-transfer";
     const deployedContractName = `${contractName}-${(Math.random() + 1).toString(36).substring(7)}`;
@@ -334,11 +340,14 @@ describe("PluginLedgerConnectorFabric", () => {
         channelName,
         contractName: deployedContractName,
         gatewayOptions,
+        eventType: EventType.Contract,
       } as CreateListenerRequest,
-      async (event: ContractEvent) => {
+      async (event: FabricEvent) => {
         log.info("Event received by listener");
 
         event_emitted = true;
+
+        event = event as ContractEvent;
 
         if (event) {
           expect(event).toBeTruthy();
@@ -382,6 +391,174 @@ describe("PluginLedgerConnectorFabric", () => {
 
     if (!event_emitted) {
       fail("Event not emitted");
+    }
+
+    removeListener();
+  });
+  it("setup block event listener, issue tx, and capture block event emitted", async () => {
+    const channelName = "mychannel";
+    const contractName = "basic-asset-transfer";
+    const deployedContractName = `${contractName}-${(Math.random() + 1).toString(36).substring(7)}`;
+
+    const channelId = "mychannel";
+
+    const contractRelPath = "../../fixtures/go/lock-asset/chaincode-typescript";
+    const contractDir = path.join(__dirname, contractRelPath);
+
+    const sourceFiles: FileBase64[] = [];
+    {
+      const filename = "./tsconfig.json";
+      const relativePath = "./";
+      const filePath = path.join(contractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      sourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./package.json";
+      const relativePath = "./";
+      const filePath = path.join(contractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      sourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./index.ts";
+      const relativePath = "./src/";
+      const filePath = path.join(contractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      sourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./asset.ts";
+      const relativePath = "./src/";
+      const filePath = path.join(contractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      sourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+    {
+      const filename = "./assetTransfer.ts";
+      const relativePath = "./src/";
+      const filePath = path.join(contractDir, relativePath, filename);
+      const buffer = await fs.readFile(filePath);
+      sourceFiles.push({
+        body: buffer.toString("base64"),
+        filepath: relativePath,
+        filename,
+      });
+    }
+
+    const filePath = path.join(
+      __dirname,
+      "../../../resources/fixtures/addOrgX/core.yaml",
+    );
+    const buffer = await fs.readFile(filePath);
+    const coreFile = {
+      body: buffer.toString("base64"),
+      filename: "core.yaml",
+    };
+
+    const res = await apiClient.deployContractV1({
+      channelId,
+      ccVersion: "1.0.0",
+      sourceFiles,
+      ccName: deployedContractName,
+      targetOrganizations: [
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org1Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org1Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org1Certs.ordererTlsRootCert,
+        },
+        {
+          CORE_PEER_LOCALMSPID:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_LOCALMSPID,
+          CORE_PEER_ADDRESS:
+            FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2.CORE_PEER_ADDRESS,
+          CORE_PEER_MSPCONFIG: peer0Org2Certs.mspConfig,
+          CORE_PEER_TLS_ROOTCERT: peer0Org2Certs.peerTlsCert,
+          ORDERER_TLS_ROOTCERT: peer0Org2Certs.ordererTlsRootCert,
+        },
+      ],
+      caFile: peer0Org1Certs.ordererTlsRootCert,
+      ccLabel: "basic-asset-transfer-2",
+      ccLang: ChainCodeProgrammingLanguage.Typescript,
+      ccSequence: 1,
+      orderer: "orderer.example.com:7050",
+      ordererTLSHostnameOverride: "orderer.example.com",
+      connTimeout: 60,
+      coreYamlFile: coreFile,
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.data.success).toBe(true);
+
+    const assetId = uuidv4();
+
+    let block_event_emitted = false;
+
+    const { listener, removeListener } = await plugin.createFabricListener(
+      {
+        channelName,
+        contractName: deployedContractName,
+        gatewayOptions,
+        eventType: EventType.Block,
+      } as CreateListenerRequest,
+      async (event: FabricEvent) => {
+        log.info("Block event received by listener");
+
+        block_event_emitted = true;
+
+        event = event as BlockEvent;
+
+        // Basic checks for block event structure
+        expect(event).toBeTruthy();
+        expect(event.blockNumber).toBeDefined();
+        expect(event.blockData).toBeDefined();
+      },
+    );
+
+    expect(listener).toBeTruthy();
+    expect(removeListener).toBeTruthy();
+
+    log.info("Waiting for block events to be emitted...");
+
+    log.info("Issuing tx to create asset...");
+
+    const createRes = await apiClient.runTransactionV1({
+      contractName: deployedContractName,
+      channelName,
+      params: [assetId, "19"],
+      methodName: "CreateAsset",
+      invocationType: FabricContractInvocationType.Send,
+      signingCredential: {
+        keychainId,
+        keychainRef: keychainEntryKey,
+      },
+    });
+    expect(createRes).toBeTruthy();
+    expect(createRes.status).toBeGreaterThan(199);
+    expect(createRes.status).toBeLessThan(300);
+
+    if (!block_event_emitted) {
+      fail("Block event not emitted");
     }
 
     removeListener();

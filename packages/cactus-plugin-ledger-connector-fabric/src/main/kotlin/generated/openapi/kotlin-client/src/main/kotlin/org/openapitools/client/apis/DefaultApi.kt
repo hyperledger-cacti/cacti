@@ -29,6 +29,8 @@ import org.openapitools.client.models.GetChainInfoRequestV1
 import org.openapitools.client.models.GetChainInfoResponseV1
 import org.openapitools.client.models.GetDiscoveryResultsRequestV1
 import org.openapitools.client.models.GetDiscoveryResultsResponseV1
+import org.openapitools.client.models.GetLatestBlockNumberRequestV1
+import org.openapitools.client.models.GetLatestBlockNumberResponseV1
 import org.openapitools.client.models.GetTransactionReceiptResponse
 import org.openapitools.client.models.RunDelegatedSignTransactionRequest
 import org.openapitools.client.models.RunTransactionRequest
@@ -339,6 +341,78 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            requiresAuthentication = false,
+            body = localVariableBody
+        )
+    }
+
+    /**
+     * Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
+     * 
+     * @param getLatestBlockNumberRequestV1  (optional)
+     * @return GetLatestBlockNumberResponseV1
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     * @throws UnsupportedOperationException If the API returns an informational or redirection response
+     * @throws ClientException If the API returns a client error response
+     * @throws ServerException If the API returns a server error response
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class, UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun getLatestBlockNumberV1(getLatestBlockNumberRequestV1: GetLatestBlockNumberRequestV1? = null) : GetLatestBlockNumberResponseV1 {
+        val localVarResponse = getLatestBlockNumberV1WithHttpInfo(getLatestBlockNumberRequestV1 = getLatestBlockNumberRequestV1)
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as GetLatestBlockNumberResponseV1
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+     * Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
+     * 
+     * @param getLatestBlockNumberRequestV1  (optional)
+     * @return ApiResponse<GetLatestBlockNumberResponseV1?>
+     * @throws IllegalStateException If the request is not correctly configured
+     * @throws IOException Rethrows the OkHttp execute method exception
+     */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(IllegalStateException::class, IOException::class)
+    fun getLatestBlockNumberV1WithHttpInfo(getLatestBlockNumberRequestV1: GetLatestBlockNumberRequestV1?) : ApiResponse<GetLatestBlockNumberResponseV1?> {
+        val localVariableConfig = getLatestBlockNumberV1RequestConfig(getLatestBlockNumberRequestV1 = getLatestBlockNumberRequestV1)
+
+        return request<GetLatestBlockNumberRequestV1, GetLatestBlockNumberResponseV1>(
+            localVariableConfig
+        )
+    }
+
+    /**
+     * To obtain the request config of the operation getLatestBlockNumberV1
+     *
+     * @param getLatestBlockNumberRequestV1  (optional)
+     * @return RequestConfig
+     */
+    fun getLatestBlockNumberV1RequestConfig(getLatestBlockNumberRequestV1: GetLatestBlockNumberRequestV1?) : RequestConfig<GetLatestBlockNumberRequestV1> {
+        val localVariableBody = getLatestBlockNumberRequestV1
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+        localVariableHeaders["Content-Type"] = "application/json"
+        localVariableHeaders["Accept"] = "application/json"
+
+        return RequestConfig(
+            method = RequestMethod.POST,
+            path = "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

@@ -149,6 +149,34 @@ paths:
         http:
           verbLowerCase: post
           path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block
+  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number:
+    post:
+      operationId: getLatestBlockNumberV1
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetLatestBlockNumberRequestV1'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLatestBlockNumberResponseV1'
+          description: OK
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+          description: Internal Server Error
+      summary: Get block number from the channel using one of selectors from the input.
+        Works only on Fabric 2.x.
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number
   /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info:
     post:
       operationId: getChainInfoV1
@@ -441,6 +469,13 @@ components:
       - node
       - java
       type: string
+    EventType:
+      description: Type of event to listen supported by Hyperledger Fabric
+      enum:
+      - Contract
+      - Block
+      - Commit
+      type: string
     ConnectionProfile:
       additionalProperties: true
       example:
@@ -655,6 +690,99 @@ components:
       - stderr
       - stdout
       type: object
+    FabricView:
+      properties:
+        endorsedProposalResponses:
+          items:
+            $ref: '#/components/schemas/EndorsedProposalResponse'
+          minItems: 1
+          nullable: false
+          type: array
+      required:
+      - EndorsedProposalResponses
+      type: object
+    EndorsedProposalResponse:
+      properties:
+        payload:
+          $ref: '#/components/schemas/ProposalResponsePayload'
+        endorsement:
+          $ref: '#/components/schemas/endorsement'
+      type: object
+    ProposalResponsePayload:
+      properties:
+        proposalHash:
+          format: byte
+          nullable: false
+          type: string
+        extension:
+          format: byte
+          nullable: false
+          type: string
+      type: object
+    endorsement:
+      properties:
+        endorser:
+          format: byte
+          nullable: false
+          type: string
+        signature:
+          format: byte
+          nullable: false
+          type: string
+      type: object
+    RunInvokeResponse:
+      properties:
+        view:
+          $ref: '#/components/schemas/FabricView'
+      required:
+      - view
+      type: object
+    RunInvokeRequest:
+      additionalProperties: false
+      properties:
+        transientData:
+          nullable: true
+          type: object
+        gatewayOptions:
+          $ref: '#/components/schemas/GatewayOptions'
+        signingCredential:
+          $ref: '#/components/schemas/FabricSigningCredential'
+        channelName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        contractName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        methodName:
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        params:
+          default: []
+          items:
+            nullable: true
+            type: string
+          nullable: false
+          type: array
+        policies:
+          default: []
+          description: List of endorsers
+          items:
+            nullable: true
+            type: string
+          nullable: true
+          type: array
+      required:
+      - channelName
+      - contractName
+      - methodName
+      - params
+      type: object
     RunTransactionResponseType:
       description: Response format from transaction / query execution
       enum:
@@ -787,7 +915,6 @@ components:
       - invocationType
       - methodName
       - params
-      - signingCredential
       type: object
     RunTransactionResponse:
       example:
@@ -1404,6 +1531,75 @@ components:
       - channelName
       - gatewayOptions
       - query
+      type: object
+    GetLatestBlockNumberRequestV1:
+      description: Request for GetBlockNumber endpoint.
+      example:
+        gatewayOptions:
+          wallet:
+            keychain:
+              vaultTransitKey:
+                keyName: keyName
+                token: token
+              keychainId: keychainId
+              keychainRef: keychainRef
+              webSocketKey:
+                signature: signature
+                sessionId: sessionId
+              type: null
+            json: json
+          connectionProfile:
+            channels:
+              key: ""
+            certificateAuthorities:
+              key: ""
+            name: basic-network
+            organizations:
+              key: ""
+            peers:
+              key: ""
+            x-type: hlfv1
+            description: The basic network
+            client:
+              organization: Org1
+            orderers:
+              key: ""
+            version: "1.0"
+          discovery:
+            asLocalhost: true
+            enabled: true
+          identity: identity
+          eventHandlerOptions:
+            commitTimeout: 0.8008281904610115
+            strategy: null
+            endorseTimeout: 6.027456183070403
+        channelName: channelName
+      properties:
+        channelName:
+          description: Fabric channel which we want to query.
+          maxLength: 100
+          minLength: 1
+          nullable: false
+          type: string
+        gatewayOptions:
+          $ref: '#/components/schemas/GatewayOptions'
+      required:
+      - channelName
+      - contractName
+      - gatewayOptions
+      - methodName
+      type: object
+    GetLatestBlockNumberResponseV1:
+      description: Response from GetBlockNumber endpoint.
+      example:
+        blockNumber: 0.8008281904610115
+      properties:
+        blockNumber:
+          description: Number of the block that was queried.
+          nullable: false
+          type: number
+      required:
+      - blockNumber
       type: object
     GetChainInfoRequestV1:
       description: Request for GetChainInfo endpoint.

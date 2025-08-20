@@ -2,6 +2,7 @@ import Long from "long";
 import {
   FabricSigningCredential,
   GatewayOptions,
+  EventType,
 } from "../generated/openapi/typescript-axios/api";
 
 /**
@@ -83,4 +84,11 @@ export interface CreateListenerRequest {
    * @memberof CreateListenerRequest
    */
   signingCredential?: FabricSigningCredential;
+
+  /**
+   *
+   * @type {EnventType}
+   * @memberof CreateListenerRequest
+   */
+  eventType: EventType;
 }

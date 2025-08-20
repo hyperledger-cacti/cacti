@@ -6,7 +6,8 @@
     "declarationDir": "dist/lib",
     "resolveJsonModule": true,
     "rootDir": "./src",
-    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-fabric.tsbuildinfo"
+    "tsBuildInfoFile": "../../.build-cache/cactus-plugin-ledger-connector-fabric.tsbuildinfo",
+    "allowJs": true
   },
   "include": [
     "./src",

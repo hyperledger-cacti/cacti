@@ -33,6 +33,11 @@
       "name": "Peter Somogyvari",
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
+    },
+     {
+      "name": "Carlos Amaro",
+      "email": "carlosrscamaro@tecnico.ulisboa.pt",
+      "url": "https://accenture.com"
     }
   ],
   "main": "dist/lib/main/typescript/index.js",
@@ -43,8 +48,10 @@
     "dist/*"
   ],
   "scripts": {
+    "start-fabric-weaver-driver": "node ./dist/lib/main/typescript/plugin-ledger-connector-fabric-cli.js",
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
+    "codegen:proto": "buf generate --verbose",
     "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
@@ -56,7 +63,13 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "2.2.2",
+    "@connectrpc/connect": "2.0.0",
+    "@connectrpc/connect-express": "2.0.0",
+    "@connectrpc/connect-node": "2.0.0",
+    "@connectrpc/protoc-gen-connect-es": "1.6.1",
     "@fidm/x509": "1.2.1",
+    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
@@ -64,6 +77,7 @@
     "bl": "6.1.0",
     "bn.js": "4.12.0",
     "dockerode": "3.3.0",
+    "dotenv": "17.2.3",
     "elliptic": "6.6.1",
     "express": "5.1.0",
     "fabric-ca-client": "2.5.0-snapshot.23",
@@ -72,11 +86,14 @@
     "fabric-protos": "2.5.0-snapshot.23",
     "fast-safe-stringify": "2.1.1",
     "form-data": "4.0.0",
+    "google-protobuf": "3.21.2",
     "http-errors": "2.0.0",
     "http-status-codes": "2.1.4",
+    "http2": "^3.3.7",
     "joi": "17.13.3",
     "json5": "2.2.3",
     "jsrsasign": "11.0.0",
+    "level": "8.0.0",
     "lodash": "4.17.21",
     "long": "5.2.3",
     "multer": "1.4.5-lts.1",
@@ -99,6 +116,10 @@
     "ws-identity-client": "1.0.2"
   },
   "devDependencies": {
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protoc-gen-es": "2.2.2",
+    "@grpc/grpc-js": "1.13.3",
+    "@grpc/proto-loader": "0.7.13",
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/bn.js": "5.1.0",
@@ -107,6 +128,7 @@
     "@types/elliptic": "6.4.16",
     "@types/express": "5.0.1",
     "@types/fs-extra": "11.0.4",
+    "@types/google-protobuf": "3.15.12",
     "@types/http-errors": "2.0.4",
     "@types/jsrsasign": "8.0.13",
     "@types/lodash": "4.14.172",
@@ -118,7 +140,9 @@
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
     "fs-extra": "11.2.0",
+    "grpc_tools_node_protoc_ts": "5.3.3",
     "internal-ip": "6.2.0",
+    "protobufjs": "7.2.5",
     "socket.io": "4.6.2",
     "ws-wallet": "1.1.5"
   },

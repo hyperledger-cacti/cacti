@@ -534,6 +534,44 @@ export interface DeploymentTargetOrganization {
 /**
  * 
  * @export
+ * @interface EndorsedProposalResponse
+ */
+export interface EndorsedProposalResponse {
+    /**
+     * 
+     * @type {ProposalResponsePayload}
+     * @memberof EndorsedProposalResponse
+     */
+    'payload'?: ProposalResponsePayload;
+    /**
+     * 
+     * @type {Endorsement}
+     * @memberof EndorsedProposalResponse
+     */
+    'endorsement'?: Endorsement;
+}
+/**
+ * 
+ * @export
+ * @interface Endorsement
+ */
+export interface Endorsement {
+    /**
+     * 
+     * @type {string}
+     * @memberof Endorsement
+     */
+    'endorser'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Endorsement
+     */
+    'signature'?: string;
+}
+/**
+ * 
+ * @export
  * @interface ErrorExceptionResponseV1
  */
 export interface ErrorExceptionResponseV1 {
@@ -550,6 +588,21 @@ export interface ErrorExceptionResponseV1 {
      */
     'error': string;
 }
+/**
+ * Type of event to listen supported by Hyperledger Fabric
+ * @export
+ * @enum {string}
+ */
+
+export const EventType = {
+    Contract: 'Contract',
+    Block: 'Block',
+    Commit: 'Commit'
+} as const;
+
+export type EventType = typeof EventType[keyof typeof EventType];
+
+
 /**
  * Combination of certificate and it\'s MSP ID used to identify fabric actors.
  * @export
@@ -638,6 +691,19 @@ export const FabricSigningCredentialType = {
 export type FabricSigningCredentialType = typeof FabricSigningCredentialType[keyof typeof FabricSigningCredentialType];
 
 
+/**
+ * 
+ * @export
+ * @interface FabricView
+ */
+export interface FabricView {
+    /**
+     * 
+     * @type {Array<EndorsedProposalResponse>}
+     * @memberof FabricView
+     */
+    'endorsedProposalResponses'?: Array<EndorsedProposalResponse>;
+}
 /**
  * Transaction endorser certificate object
  * @export
@@ -1314,6 +1380,38 @@ export interface GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincode
     'version': string;
 }
 /**
+ * Request for GetBlockNumber endpoint.
+ * @export
+ * @interface GetLatestBlockNumberRequestV1
+ */
+export interface GetLatestBlockNumberRequestV1 {
+    /**
+     * Fabric channel which we want to query.
+     * @type {string}
+     * @memberof GetLatestBlockNumberRequestV1
+     */
+    'channelName': string;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof GetLatestBlockNumberRequestV1
+     */
+    'gatewayOptions': GatewayOptions;
+}
+/**
+ * Response from GetBlockNumber endpoint.
+ * @export
+ * @interface GetLatestBlockNumberResponseV1
+ */
+export interface GetLatestBlockNumberResponseV1 {
+    /**
+     * Number of the block that was queried.
+     * @type {number}
+     * @memberof GetLatestBlockNumberResponseV1
+     */
+    'blockNumber': number;
+}
+/**
  * 
  * @export
  * @interface GetTransactionReceiptResponse
@@ -1379,6 +1477,25 @@ export interface GetTransactionReceiptResponse {
      * @memberof GetTransactionReceiptResponse
      */
     'rwsetWriteData'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface ProposalResponsePayload
+ */
+export interface ProposalResponsePayload {
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalResponsePayload
+     */
+    'proposalHash'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalResponsePayload
+     */
+    'extension'?: string;
 }
 /**
  * 
@@ -1464,6 +1581,74 @@ export interface RunDelegatedSignTransactionRequest {
 /**
  * 
  * @export
+ * @interface RunInvokeRequest
+ */
+export interface RunInvokeRequest {
+    /**
+     * 
+     * @type {object}
+     * @memberof RunInvokeRequest
+     */
+    'transientData'?: object | null;
+    /**
+     * 
+     * @type {GatewayOptions}
+     * @memberof RunInvokeRequest
+     */
+    'gatewayOptions'?: GatewayOptions;
+    /**
+     * 
+     * @type {FabricSigningCredential}
+     * @memberof RunInvokeRequest
+     */
+    'signingCredential'?: FabricSigningCredential;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunInvokeRequest
+     */
+    'channelName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunInvokeRequest
+     */
+    'contractName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RunInvokeRequest
+     */
+    'methodName': string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof RunInvokeRequest
+     */
+    'params': Array<string>;
+    /**
+     * List of endorsers
+     * @type {Array<string>}
+     * @memberof RunInvokeRequest
+     */
+    'policies'?: Array<string> | null;
+}
+/**
+ * 
+ * @export
+ * @interface RunInvokeResponse
+ */
+export interface RunInvokeResponse {
+    /**
+     * 
+     * @type {FabricView}
+     * @memberof RunInvokeResponse
+     */
+    'view': FabricView;
+}
+/**
+ * 
+ * @export
  * @interface RunTransactionRequest
  */
 export interface RunTransactionRequest {
@@ -1496,7 +1681,7 @@ export interface RunTransactionRequest {
      * @type {FabricSigningCredential}
      * @memberof RunTransactionRequest
      */
-    'signingCredential': FabricSigningCredential;
+    'signingCredential'?: FabricSigningCredential;
     /**
      * 
      * @type {string}
@@ -2030,6 +2215,40 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         },
         /**
          * 
+         * @summary Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
+         * @param {GetLatestBlockNumberRequestV1} [getLatestBlockNumberRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLatestBlockNumberV1: async (getLatestBlockNumberRequestV1?: GetLatestBlockNumberRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getLatestBlockNumberRequestV1, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2222,6 +2441,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
+         * @param {GetLatestBlockNumberRequestV1} [getLatestBlockNumberRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLatestBlockNumberV1(getLatestBlockNumberRequestV1?: GetLatestBlockNumberRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetLatestBlockNumberResponseV1>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLatestBlockNumberV1(getLatestBlockNumberRequestV1, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * 
          * @summary Get the Prometheus Metrics
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -2312,6 +2542,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          */
         getDiscoveryResultsV1(getDiscoveryResultsRequestV1?: GetDiscoveryResultsRequestV1, options?: any): AxiosPromise<GetDiscoveryResultsResponseV1> {
             return localVarFp.getDiscoveryResultsV1(getDiscoveryResultsRequestV1, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
+         * @param {GetLatestBlockNumberRequestV1} [getLatestBlockNumberRequestV1] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLatestBlockNumberV1(getLatestBlockNumberRequestV1?: GetLatestBlockNumberRequestV1, options?: any): AxiosPromise<GetLatestBlockNumberResponseV1> {
+            return localVarFp.getLatestBlockNumberV1(getLatestBlockNumberRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -2408,6 +2648,18 @@ export class DefaultApi extends BaseAPI {
      */
     public getDiscoveryResultsV1(getDiscoveryResultsRequestV1?: GetDiscoveryResultsRequestV1, options?: AxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getDiscoveryResultsV1(getDiscoveryResultsRequestV1, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
+     * @param {GetLatestBlockNumberRequestV1} [getLatestBlockNumberRequestV1] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof DefaultApi
+     */
+    public getLatestBlockNumberV1(getLatestBlockNumberRequestV1?: GetLatestBlockNumberRequestV1, options?: AxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).getLatestBlockNumberV1(getLatestBlockNumberRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
