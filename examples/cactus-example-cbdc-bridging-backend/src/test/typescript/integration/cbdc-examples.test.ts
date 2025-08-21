@@ -657,10 +657,8 @@ describe("CBDC E2E API Scenarios", () => {
       expect(lockResult.success).toBe(true);
 
       let transactionCompleted = false;
-      let attempts = 0;
       while (!transactionCompleted) {
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        attempts++;
 
         try {
           const aliceBalance = await getBalanceApi.getBalance(

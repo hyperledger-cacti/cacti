@@ -83,7 +83,6 @@
     "codegen:openapi": "npm run generate-sdk",
     "generate-sdk": "run-p 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/openapi-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/yml/openapi.yml -g go -o ./src/main/go/generated/openapi --additional-properties=packageName=generated,generateInterfaces=true,packageVersion=v0.0.1,moduleName=github.com/hyperledger/cacti/examples/cactus-example-cbdc-bridging-backend/src/main/go/generated --git-user-id hyperledger  --git-repo-id cacti/examples/cactus-example-cbdc-bridging-backend/src/main/go/generated",
     "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/openapi.yml -o ./src/main/yml/openapi-bundled.yml -r -t yaml",
     "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/openapi.yml -o ./src/main/json/openapi-bundled.json -r -t json",
     "lint:oapi": "vacuum lint -d -e ./src/main/yml/openapi-bundled.yml",
@@ -132,6 +131,7 @@
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0",
     "web3": "1.6.1",
+    "web3-core": "1.6.1",
     "web3-utils": "1.6.1",
     "webpack": "5.94.0"
   },
