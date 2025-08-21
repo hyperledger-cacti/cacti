@@ -1,5 +1,4 @@
 .gitignore
-.openapi-generator-ignore
 .travis.yml
 README.md
 api/openapi.yaml
@@ -43,11 +42,4 @@ model_transact_request.go
 model_transact_response.go
 model_transfer_request.go
 response.go
-test/api_approve_test.go
-test/api_get_amount_approved_test.go
-test/api_get_balance_test.go
-test/api_get_sessions_references_test.go
-test/api_mint_test.go
-test/api_transact_test.go
-test/api_transfer_test.go
 utils.go
