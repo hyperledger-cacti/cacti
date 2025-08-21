@@ -640,7 +640,7 @@ export class FabricLeaf
           ccName: this.wrapperContractName,
           targetOrganizations: this.targetOrganizations,
           caFile: this.caFile,
-          ccLabel: "fungible-wrapper-contract",
+          ccLabel: this.wrapperContractName,
           ccLang: ChainCodeProgrammingLanguage.Typescript,
           ccSequence: 1,
           orderer: this.orderer,

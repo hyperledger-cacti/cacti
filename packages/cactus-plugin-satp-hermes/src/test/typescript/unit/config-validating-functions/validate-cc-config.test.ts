@@ -312,68 +312,71 @@ describe("Validate CC Config", () => {
   });
 
   it("should throw when instantiate SATP Gateway Runner without bridgesConfig nor oracleConfig", async () => {
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              notConfig: [
-                {
-                  networkIdentification: {
-                    id: "EthereumLedgerTestNetwork",
-                    ledgerType: "ETHEREUM",
-                  },
-                  signingCredential: {
-                    ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
-                    secret:
-                      "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
-                    type: "GETH_KEYCHAIN_PASSWORD",
-                  },
-                  gasConfig: {
-                    gas: "6721975",
-                    gasPrice: "20000000000",
-                  },
-                  connectorOptions: {
-                    rpcApiHttpHost: "http://127.0.0.1:7545",
-                    rpcApiWsHost: "ws://127.0.0.1:7545",
-                  },
-                  claimFormats: [2],
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            notConfig: [
+              {
+                networkIdentification: {
+                  id: "EthereumLedgerTestNetwork",
+                  ledgerType: "ETHEREUM",
                 },
-              ],
-            },
+                signingCredential: {
+                  ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
+                  secret:
+                    "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
+                  type: "GETH_KEYCHAIN_PASSWORD",
+                },
+                gasConfig: {
+                  gas: "6721975",
+                  gasPrice: "20000000000",
+                },
+                connectorOptions: {
+                  rpcApiHttpHost: "http://127.0.0.1:7545",
+                  rpcApiWsHost: "ws://127.0.0.1:7545",
+                },
+                claimFormats: [2],
+              },
+            ],
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when instantiate SATP Gateway Runner with a null oracleConfig", async () => {
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              oracleConfig: null,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            oracleConfig: null,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when bridgeConfig is not a array", async () => {
     const bridgeConfig = ethereumConfig;
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when bridgeConfig is not a array and is a valid oracleConfig", async () => {
@@ -401,18 +404,19 @@ describe("Validate CC Config", () => {
         claimFormats: [2],
       },
     ];
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              oracleConfig,
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            oracleConfig,
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig && config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig && config\.oracleConfig/,
+    );
   });
 
   it("should throw when is an invalid FabricConfig (the connTimeout should be a number)", async () => {
@@ -478,17 +482,18 @@ describe("Validate CC Config", () => {
       claimFormats: [2],
     };
     const bridgeConfig = [badFabricConfig];
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when is an invalid FabricOptionsJSON (the connectorOptions->peerBinary should be a string)", async () => {
@@ -554,17 +559,18 @@ describe("Validate CC Config", () => {
       claimFormats: [2],
     };
     const bridgeConfig = [badFabricConfig];
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when is an invalid EthereumConfig (the wrapperContractName should be a string)", async () => {
@@ -598,17 +604,18 @@ describe("Validate CC Config", () => {
       },
     };
     const bridgeConfig = [badEthereumConfig];
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when is an invalid EthereumOptionsJSON (the connectorOptions->rpcApiWsHost should be a string)", async () => {
@@ -642,17 +649,18 @@ describe("Validate CC Config", () => {
       },
     };
     const bridgeConfig = [badEthereumConfig];
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when is an invalid BesuConfig (the wrapperContractName should be a string)", async () => {
@@ -684,17 +692,18 @@ describe("Validate CC Config", () => {
       gas: 999999999999999,
     };
     const bridgeConfig = [badBesuConfig];
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 
   it("should throw when is an invalid BesuOptionsJSON (the connectorOptions->rpcApiHttpHost should be a string)", async () => {
@@ -726,16 +735,17 @@ describe("Validate CC Config", () => {
       gas: 999999999999999,
     };
     const bridgeConfig = [badBesuConfig];
-    await expect(
-      async () =>
-        await validateCCConfig(
-          {
-            configValue: {
-              bridgeConfig,
-            },
+    expect(
+      validateCCConfig(
+        {
+          configValue: {
+            bridgeConfig,
           },
-          logger,
-        ),
-    ).toThrowError(/Invalid config\.bridgesConfig \|\| config\.oracleConfig/);
+        },
+        logger,
+      ),
+    ).rejects.toThrowError(
+      /Invalid config\.bridgesConfig \|\| config\.oracleConfig/,
+    );
   });
 });
