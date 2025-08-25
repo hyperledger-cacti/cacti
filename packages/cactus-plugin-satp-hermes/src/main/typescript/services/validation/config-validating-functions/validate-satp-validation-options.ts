@@ -41,7 +41,7 @@ function isValidatorOptions(obj: unknown): obj is ValidatorOptions {
       typeof objRecord.skipNullProperties === "boolean") &&
     (!("skipMissingProperties" in obj) ||
       typeof objRecord.skipMissingProperties === "boolean") &&
-    (!("whitelist" in obj) || typeof objRecord.whitelist === "boolean") &&
+    (!("allowlist" in obj) || typeof objRecord.allowlist === "boolean") &&
     (!("forbidNonWhitelisted" in obj) ||
       typeof objRecord.forbidNonWhitelisted === "boolean") &&
     (!("groups" in obj) || isStringArray(objRecord.groups)) &&
