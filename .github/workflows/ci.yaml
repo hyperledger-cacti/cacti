@@ -18,19 +18,39 @@ jobs:
   ActionLint:
     needs: check-ci-skip
     uses: ./.github/workflows/actionlint.yaml
-  DCI-Lint:
-    name: DCI-Lint
-    needs: check-ci-skip
-    runs-on: ubuntu-22.04
-    steps:
-      - id: lint-git-repo
-        name: Lint Git Repo
-        uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
-        with:
-          lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
-      - name: Get the output response
-        run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
-
+    DCI-Lint:
+      name: DCI-Lint
+      needs: check-ci-skip
+      runs-on: ubuntu-22.04
+      steps:
+        - id: lint-git-repo
+          name: Lint Git Repo
+          uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
+          with:
+            lint-git-repo-request: >-
+              {
+                "cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git",
+                "fetchArgs": [
+                  "--update-head-ok",
+                  "--no-tags",
+                  "--prune",
+                  "--progress",
+                  "--no-recurse-submodules",
+                  "--depth=1",
+                  "origin",
+                  "+${{ github.sha }}:${{ github.ref }}"
+                ],
+                "checkoutArgs": [
+                  "${{ github.ref }}"
+                ],
+                "targetPhrasePatterns": [],
+                "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json",
+                "excludePatterns": [
+                  "packages/**/generated/**"
+                ]
+              }
+        - name: Get the output response
+          run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
   check-ci-skip:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-22.04
