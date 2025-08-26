@@ -19,7 +19,7 @@ import { globby, Options as GlobbyOptions } from "globby";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 import { sortPackageJson } from "sort-package-json";
-import lernaCfg from "../lerna.json" assert { type: "json" };
+import lernaCfg from "../lerna.json" with { type: "json" };
 
 // Constants
 const NODE_PATH = path.resolve(process.argv[1]);
