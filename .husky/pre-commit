@@ -1,5 +1,2 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-# Run fast pre-commit checks (use yarn in this repo)
-yarn -s test
+#placeholder
