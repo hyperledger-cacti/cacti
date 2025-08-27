@@ -128,5 +128,19 @@ export class BLODispatcherErraneousError extends SATPInternalError {
     );
   }
 }
+export class InvalidStageError extends SATPInternalError {
+  constructor(
+    fnTag: string,
+    stage: string,
+    sessionID: string,
+    cause?: string | Error | null,
+  ) {
+    super(
+      `${fnTag}, Invalid stage: ${stage} for session: ${sessionID}`,
+      cause ?? null,
+      400,
+    );
+  }
+}
 // TODO client-facing error logic, maps SATPInternalErrors to user friendly errors
 export class SATPError extends Error {}
