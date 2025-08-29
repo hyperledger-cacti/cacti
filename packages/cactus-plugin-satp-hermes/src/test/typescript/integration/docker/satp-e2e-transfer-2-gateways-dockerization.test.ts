@@ -90,15 +90,6 @@ afterAll(async () => {
   await fabricEnv.tearDown();
 
   monitorService.shutdown();
-
-  await pruneDockerAllIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
 }, TIMEOUT);
 
 afterEach(async () => {
@@ -113,10 +104,7 @@ afterEach(async () => {
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
-}, TIMEOUT);
-
-beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -124,7 +112,9 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
+}, TIMEOUT);
 
+beforeAll(async () => {
   ({ config: db_local_config1, container: db_local1 } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",

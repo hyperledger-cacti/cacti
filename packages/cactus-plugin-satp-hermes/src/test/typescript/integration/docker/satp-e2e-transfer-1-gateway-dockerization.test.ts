@@ -67,6 +67,15 @@ afterEach(async () => {
     await gatewayRunner.stop();
     await gatewayRunner.destroy();
   }
+
+  await pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
 }, TIMEOUT);
 
 afterAll(async () => {
@@ -78,15 +87,6 @@ afterAll(async () => {
   await besuEnv.tearDown();
   await ethereumEnv.tearDown();
   await fabricEnv.tearDown();
-
-  await pruneDockerAllIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
 }, TIMEOUT);
 
 beforeAll(async () => {
