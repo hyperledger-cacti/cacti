@@ -1,5 +1,5 @@
 import { TransactRequest, TransactResponse } from "../../public-api";
-import { SATPManager } from "../../services/gateway/satp-manager";
+import { SATPManager, SATPSession } from "../../services/gateway/satp-manager";
 import { populateClientSessionData } from "../../core/session-utils";
 import {
   CredentialProfile,
@@ -12,19 +12,31 @@ import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";
 
-export async function executeTransact(
+/**
+ * Populates a new or existing session with all necessary
+ * client-side transaction data from the request and gateway configuration.
+ * This function encapsulates all data setup logic, making the main execution
+ * function cleaner.
+ *
+ * @param {LogLevelDesc} logLevel The desired log level for the function.
+ * @param {TransactRequest} req The incoming transaction request.
+ * @param {SATPManager} manager The SATP manager instance.
+ * @param {GatewayOrchestrator} orchestrator The Gateway Orchestrator instance.
+ * @returns {Promise<SATPSession>} A promise that resolves with the fully populated session object.
+ */
+export async function populateSession(
   logLevel: LogLevelDesc,
   req: TransactRequest,
   manager: SATPManager,
   orchestrator: GatewayOrchestrator,
-): Promise<TransactResponse> {
-  const fnTag = `executeTransact()`;
+): Promise<SATPSession> {
+  const fnTag = `populateSession()`;
   const logger = LoggerProvider.getOrCreate({
     label: fnTag,
     level: logLevel,
   });
 
-  logger.info(`${fnTag}, executing transaction endpoint`);
+  logger.info(`${fnTag}, populating session data`);
 
   //TODO check input for valid strings...
   const ourGateway: GatewayIdentity = orchestrator.ourGateway;
@@ -49,6 +61,8 @@ export async function executeTransact(
   //todo verify ontologies signatures, validation, etc.
 
   let session = manager.getOrCreateSession(undefined, req.contextID);
+
+  // Populate the session with all required parameters
   session = populateClientSessionData(
     session,
     SATP_VERSION,
@@ -62,7 +76,7 @@ export async function executeTransact(
     lockType,
     lockExpirationTime,
     credentialProfile,
-    loggingProfile ? loggingProfile : "",
+    loggingProfile,
     accessControlProfile,
     req.sourceAsset.amount,
     req.receiverAsset.amount,
@@ -83,16 +97,80 @@ export async function executeTransact(
     req.receiverAsset.networkId.ledgerType,
     req.receiverAsset.tokenType,
   );
+
+  return session;
+}
+
+/**
+ * Executes the core transaction logic and retrieves the final status.
+ * This part handles the business operations after the session has been
+ * fully initialized and populated.
+ *
+ * @param {LogLevelDesc} logLevel The desired log level.
+ * @param {TransactRequest} req The original transaction request.
+ * @param {SATPManager} manager The SATP manager instance.
+ * @param {SATPSession} session The previously initialized and populated session.
+ * @returns {Promise<TransactResponse>} A promise that resolves with the final transaction response.
+ */
+export async function executeTransactCore(
+  logLevel: LogLevelDesc,
+  req: TransactRequest,
+  manager: SATPManager,
+  session: SATPSession,
+): Promise<TransactResponse> {
+  const fnTag = `executeTransactCore()`;
+  const logger = LoggerProvider.getOrCreate({
+    label: fnTag,
+    level: logLevel,
+  });
+
+  logger.info(`${fnTag}, executing transaction and retrieving status`);
+
+  // Execute the transfer operation
   await manager.transfer(session);
+
+  // Retrieve the status of the transaction
+  const statusResponse = await getStatusService(
+    logLevel,
+    { sessionID: session.getSessionId() },
+    manager,
+  );
 
   logger.info(`${fnTag}, ${req}`);
 
   return {
     sessionID: session.getSessionId(),
-    statusResponse: await getStatusService(
-      logLevel,
-      { sessionID: session.getSessionId() },
-      manager,
-    ),
+    statusResponse: statusResponse,
   };
+}
+
+/**
+ * The main orchestrator function for the `Transact` endpoint.
+ * It coordinates the data population and the core execution logic.
+ *
+ * @param {LogLevelDesc} logLevel The desired log level.
+ * @param {TransactRequest} req The incoming transaction request.
+ * @param {SATPManager} manager The SATP manager instance.
+ * @param {GatewayOrchestrator} orchestrator The Gateway Orchestrator instance.
+ * @returns {Promise<TransactResponse>} A promise that resolves with the final transaction response.
+ */
+export async function executeTransact(
+  logLevel: LogLevelDesc,
+  req: TransactRequest,
+  manager: SATPManager,
+  orchestrator: GatewayOrchestrator,
+): Promise<TransactResponse> {
+  const fnTag = `executeTransact()`;
+  const logger = LoggerProvider.getOrCreate({
+    label: fnTag,
+    level: logLevel,
+  });
+
+  logger.info(`${fnTag}, starting transact orchestration`);
+
+  // Step 1: Initialize and populate the session data
+  const session = await populateSession(logLevel, req, manager, orchestrator);
+
+  // Step 2: Execute the core transaction logic
+  return executeTransactCore(logLevel, req, manager, session);
 }

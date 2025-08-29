@@ -3,17 +3,10 @@ import {
   type LogLevelDesc,
   type JsObjectSigner,
 } from "@hyperledger/cactus-common";
-
 import { SatpLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../core/satp-logger";
-
 import { type IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
-
-//import { GatewayIdentity, GatewayChannel } from "../core/types";
-//import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
 import { GetStatusEndpointV1 } from "./admin/status-endpoint";
-
-//import { GetAuditRequest, GetAuditResponse } from "../generated/gateway-client/typescript-axios";
 import type {
   AddCounterpartyGatewayRequest,
   AddCounterpartyGatewayResponse,
@@ -47,7 +40,10 @@ import { HealthCheckEndpointV1 } from "./admin/healthcheck-endpoint";
 import { IntegrationsEndpointV1 } from "./admin/integrations-endpoint";
 import { executeGetHealthCheck } from "./admin/get-healthcheck-handler-service";
 import { executeGetStatus } from "./admin/get-status-handler-service";
-import { executeTransact } from "./transaction/transact-handler-service";
+import {
+  executeTransact,
+  populateSession,
+} from "./transaction/transact-handler-service";
 import { AddCounterpartyGatewayEndpointV1 } from "./admin/add-counterparty-gateway-endpoint";
 import type {
   ILocalLogRepository,
@@ -76,7 +72,8 @@ import { executeAudit } from "./admin/get-audit-handler-service";
 import { AuditEndpointV1 } from "./admin/audit-endpoint";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
-
+import { executeOperationWithRetriesAndTimeout } from "../core/satp-retry-operations";
+import { GatewayRetryOperationFailedError } from "../api1/gateway-errors";
 export interface BLODispatcherOptions {
   logger: Logger;
   logLevel?: LogLevelDesc;
@@ -336,11 +333,23 @@ export class BLODispatcher {
         if (!this.manager) {
           throw new Error("SATPManager is not defined");
         }
-        const res = await executeTransact(
+        const session = await populateSession(
           this.level,
           req,
           this.manager,
           this.orchestrator,
+        );
+        const res = await executeOperationWithRetriesAndTimeout(
+          () =>
+            executeTransact(this.level, req, this.manager!, this.orchestrator),
+          session.getClientSessionData().maxRetries,
+          session.getClientSessionData().maxTimeout,
+          new GatewayRetryOperationFailedError(
+            "Transact operation failed after all retries",
+            null,
+          ),
+          this.logger,
+          fnTag,
         );
         return res;
       } catch (err) {
