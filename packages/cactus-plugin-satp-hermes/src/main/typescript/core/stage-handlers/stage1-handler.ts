@@ -15,7 +15,7 @@ import {
   SATPHandlerType,
   Stage,
 } from "../../types/satp-protocol";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   FailedToCreateMessageError,
@@ -31,6 +31,7 @@ import { saveMessageInSessionData, setError } from "../session-utils";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { SATPStage } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 
 export class Stage1SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE1;
@@ -149,6 +150,10 @@ export class Stage1SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
@@ -159,6 +164,31 @@ export class Stage1SATPHandler implements SATPHandler {
           if (!session) {
             throw new SessionNotFoundError(fnTag);
           }
+
+          attributes.senderNetworkId =
+            session?.getClientSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+
+          this.monitorService.incrementCounter(
+            "initiated_transfers",
+            1,
+            attributes,
+          );
 
           await this.serverService.checkTransferCommenceRequestMessage(
             req,
@@ -195,6 +225,32 @@ export class Stage1SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.TRANSFER_COMMENCE_RESPONSE, error);
+
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = SATPStage.SATP_STAGE_1;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           return await this.serverService.transferCommenceErrorResponse(
             error,
             session,
@@ -313,6 +369,10 @@ export class Stage1SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
@@ -360,6 +420,32 @@ export class Stage1SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.TRANSFER_COMMENCE_REQUEST, error);
+
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = SATPStage.SATP_STAGE_1;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           throw new FailedToProcessError(
             fnTag,
             getMessageTypeName(MessageType.TRANSFER_COMMENCE_REQUEST),

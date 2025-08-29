@@ -5,7 +5,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { SATPLogger as Logger } from "../../core/satp-logger";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import {
   GatewayIdentity,
   GatewayChannel,
@@ -140,6 +140,11 @@ export class GatewayOrchestrator {
       connectedDLTs: connectedDLTs,
     };
     this.channels.set(this.localGateway.id, this.createChannel(id));
+    this.monitorService.createGauge(
+      "connected_DLTs",
+      () => connectedDLTs.length,
+      "Number of connected DLTs",
+    );
   }
 
   public addGOLServer(server: Express): void {
@@ -687,6 +692,7 @@ export class GatewayOrchestrator {
     }
     this.channels.set(gateway.id, this.createChannel(gateway));
     this.counterPartyGateways.set(gateway.id, gateway);
+    this.monitorService.incrementCounter("gateways");
   }
 
   alreadyConnected(ID: string): boolean {

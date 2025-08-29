@@ -1,4 +1,4 @@
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { SATPSession } from "../satp-session";
 import { Stage0ServerService } from "../stage-services/server/stage0-server-service";
@@ -31,6 +31,7 @@ import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message
 import { getMessageTypeName } from "../satp-utils";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { SATPStage } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 
 export class Stage0SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE0;
@@ -78,11 +79,14 @@ export class Stage0SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
           this.Log.debug(`${fnTag}, New Session...`);
-          //console.log("aii: ", stringify(req));
           this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
 
           session = this.sessions.get(req.sessionId);
@@ -131,6 +135,32 @@ export class Stage0SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.NEW_SESSION_RESPONSE, error);
+
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = SATPStage.SATP_STAGE_0;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           return await this.serverService.newSessionErrorResponse(error);
         }
       } catch (err) {
@@ -151,6 +181,10 @@ export class Stage0SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
@@ -195,6 +229,31 @@ export class Stage0SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.PRE_SATP_TRANSFER_RESPONSE, error);
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = SATPStage.SATP_STAGE_0;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           return await this.serverService.preSATPTransferErrorResponse(
             error,
             session,

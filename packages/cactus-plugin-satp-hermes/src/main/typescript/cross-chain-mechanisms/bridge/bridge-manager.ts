@@ -1,5 +1,5 @@
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { BridgeLeaf } from "./bridge-leaf";
 import { LedgerType } from "@hyperledger/cactus-core-api";
