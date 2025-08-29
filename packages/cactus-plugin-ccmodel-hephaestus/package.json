@@ -51,7 +51,7 @@
   ],
   "scripts": {
     "build": "npm run tsc",
-    "postinstall": "pip3 install pm4py",
+    "postinstall": "[ -d .venv ] || python3 -m venv .venv; .venv/bin/pip install pm4py",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
