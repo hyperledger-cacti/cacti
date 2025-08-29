@@ -18,7 +18,7 @@ import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
 import { EvmAsset } from "../ontology/assets/evm-asset";
 import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { v4 as uuidv4 } from "uuid";
 import {

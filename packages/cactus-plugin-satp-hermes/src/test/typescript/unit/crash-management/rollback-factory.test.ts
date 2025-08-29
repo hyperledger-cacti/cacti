@@ -24,7 +24,7 @@ import {
   type LogLevelDesc,
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import {
   Address,
   GatewayIdentity,

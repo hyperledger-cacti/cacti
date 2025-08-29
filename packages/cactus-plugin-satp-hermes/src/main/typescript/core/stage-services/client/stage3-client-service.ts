@@ -832,11 +832,6 @@ export class Stage3ClientService extends SATPService {
 
           const res = await bridge.burnAsset(token);
 
-          this.monitorService.incrementCounter(
-            "burned_asset_amount",
-            Number(token.amount),
-          );
-
           sessionData.burnAssertionClaim.receipt = res.receipt;
 
           this.Log.debug(

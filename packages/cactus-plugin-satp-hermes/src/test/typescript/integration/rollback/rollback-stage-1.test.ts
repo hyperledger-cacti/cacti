@@ -30,7 +30,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import { Knex, knex } from "knex";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";

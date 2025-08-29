@@ -4,7 +4,7 @@ import {
   type JsObjectSigner,
 } from "@hyperledger/cactus-common";
 
-import { SatpLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../core/satp-logger";
 
 import { type IWebServiceEndpoint } from "@hyperledger/cactus-core-api";

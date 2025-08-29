@@ -1,6 +1,6 @@
 import { type LogLevelDesc } from "@hyperledger/cactus-common";
 import type { SATPLogger as Logger } from "../core/satp-logger";
-import { SatpLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import { BridgeManager } from "./bridge/bridge-manager";
 import { BridgeManagerClientInterface } from "./bridge/interfaces/bridge-manager-client-interface";
 import { IOntologyManagerOptions } from "./bridge/ontology/ontology-manager";

@@ -3,7 +3,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
 
-import { SatpLoggerProvider as LoggerProvider } from "./satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "./satp-logger-provider";
 import { SATPLogger as Logger } from "./satp-logger";
 
 import {
@@ -180,7 +180,7 @@ export class SATPSession {
         sessionData.satpMessages.stage3 = create(Stage3MessagesSchema, {});
         sessionData.state = State.ONGOING;
 
-        this.monitorService.incrementCounter("created_sessions", 2);
+        this.monitorService.incrementCounter("created_sessions");
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

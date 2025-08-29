@@ -1,5 +1,5 @@
 import { LogLevelDesc, ILoggerOptions } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { OracleAbstract } from "./oracle-abstract";
 import { IOracleListenerBase } from "./oracle-types";
