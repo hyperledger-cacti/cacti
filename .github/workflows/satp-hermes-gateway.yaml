@@ -9,7 +9,7 @@ name: SATP CI - tests and docker deployments
 # 4. Tags images appropriately (version-specific and latest)
 #
 env:
-  NODEJS_VERSION: v18.18.2
+  NODEJS_VERSION: v22.18.0
 on:
   # Run tests on PR
   pull_request:
@@ -339,6 +339,12 @@ jobs:
 
       - name: Run SATP unit tests
         run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit 
+
+      - name: Upload SATP unit test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-unit-junit-report
+          path: packages/cactus-plugin-satp-hermes/reports/junit/*.xml
       
   run-satp-tests-integration-bridge:
     needs: build-satp-dev
@@ -381,6 +387,12 @@ jobs:
 
       - name: Run SATP integration tests
         run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:bridge
+
+      - name: Upload SATP integration test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-integration-junit-report
+          path: packages/cactus-plugin-satp-hermes/reports/junit/*.xml
 
   run-satp-tests-integration-oracle:
     needs: build-satp-dev
