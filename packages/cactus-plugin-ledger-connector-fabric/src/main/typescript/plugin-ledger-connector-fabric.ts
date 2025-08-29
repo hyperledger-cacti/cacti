@@ -7,7 +7,6 @@ import createHttpError from "http-errors";
 import { RuntimeError } from "run-time-error-cjs";
 import "multer";
 import temp from "temp";
-import { Config as SshConfig } from "node-ssh";
 import type {
   Server as SocketIoServer,
   Socket as SocketIoSocket,
@@ -157,6 +156,7 @@ import { findAndReplaceFabricLoggingSpecArray } from "./common/find-and-replace-
 import { Observable, ReplaySubject } from "rxjs";
 import { CompilerTools } from "./compiler-tools/compiler-tools";
 import tar from "tar-fs";
+import { stringify } from "json5";
 
 const { loadFromConfig } = require("fabric-network/lib/impl/ccp/networkconfig");
 assertFabricFunctionIsAvailable(loadFromConfig, "loadFromConfig");
@@ -176,7 +176,6 @@ export interface IPluginLedgerConnectorFabricOptions
   extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
   pluginRegistry: PluginRegistry;
-  readonly sshDebugOn?: boolean;
   connectionProfile?: ConnectionProfile;
   connectionProfileB64?: string;
   prometheusExporter?: PrometheusExporter;
@@ -191,6 +190,12 @@ export interface IPluginLedgerConnectorFabricOptions
    * This is especially relevant when testing with the fabricAIO image.
    */
   dockerNetworkName?: string;
+
+  //cc-tx-viz
+  collectTransactionReceipts?: boolean;
+  persistMessages?: boolean;
+  queueId?: string;
+  eventProvider?: string;
 }
 
 export class PluginLedgerConnectorFabric
@@ -320,15 +325,6 @@ export class PluginLedgerConnectorFabric
     return consensusHasTransactionFinality(currentConsensusAlgorithmFamily);
   }
 
-  private enableSshDebugLogs(cfg: SshConfig): SshConfig {
-    const fnTag = `${this.className}#decorateSshConfigWithLogger()`;
-    Checks.truthy(cfg, `${fnTag} cfg must be truthy.`);
-    return {
-      ...cfg,
-      debug: (msg: unknown) => this.log.debug(`[NodeSSH] %o`, msg),
-    };
-  }
-
   /**
    * @param req The object containing all the necessary metadata and parameters
    * in order to have the contract deployed.
@@ -347,8 +343,6 @@ export class PluginLedgerConnectorFabric
     this.log.debug(`${fnTag} Starting CC Compiler container...`);
     await ccCompiler.start();
     this.log.debug(`${fnTag} CC Compiler container started OK.`);
-
-    this.log.debug(`${fnTag} SSH connection to the peer OK.`);
 
     if (req.collectionsConfigFile) {
       log.debug(`Has private data collection definition`);
@@ -499,7 +493,11 @@ export class PluginLedgerConnectorFabric
       log.debug(`${fnTag}: Copying core.yaml file to CLI container...`);
       const tmpDirCoreFile = `hyperledger-cacti-core-yaml`;
       const tmpDirCorePath = temp.mkdirSync(tmpDirCoreFile);
+      this.log.debug(
+        `${fnTag}: Creating temporary directory for core.yaml: ${tmpDirCorePath}`,
+      );
       const { body } = req.coreYamlFile;
+      log.debug(`${fnTag}: Writing core.yaml file: ${stringify(body)}`);
       fs.writeFileSync(path.join(tmpDirCorePath, "core.yaml"), body, "base64");
 
       const pack = tar.pack(tmpDirCorePath);

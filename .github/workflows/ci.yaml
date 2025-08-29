@@ -18,19 +18,39 @@ jobs:
   ActionLint:
     needs: check-ci-skip
     uses: ./.github/workflows/actionlint.yaml
-  DCI-Lint:
-    name: DCI-Lint
-    needs: check-ci-skip
-    runs-on: ubuntu-22.04
-    steps:
-      - id: lint-git-repo
-        name: Lint Git Repo
-        uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
-        with:
-          lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
-      - name: Get the output response
-        run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
-
+    DCI-Lint:
+      name: DCI-Lint
+      needs: check-ci-skip
+      runs-on: ubuntu-22.04
+      steps:
+        - id: lint-git-repo
+          name: Lint Git Repo
+          uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
+          with:
+            lint-git-repo-request: >-
+              {
+                "cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git",
+                "fetchArgs": [
+                  "--update-head-ok",
+                  "--no-tags",
+                  "--prune",
+                  "--progress",
+                  "--no-recurse-submodules",
+                  "--depth=1",
+                  "origin",
+                  "+${{ github.sha }}:${{ github.ref }}"
+                ],
+                "checkoutArgs": [
+                  "${{ github.ref }}"
+                ],
+                "targetPhrasePatterns": [],
+                "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json",
+                "excludePatterns": [
+                  "packages/**/generated/**"
+                ]
+              }
+        - name: Get the output response
+          run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
   check-ci-skip:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-22.04
@@ -551,7 +571,9 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common-example-server
       JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true,
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -588,6 +610,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -623,6 +647,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -657,6 +683,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core-api
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -693,6 +721,8 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: ./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts
       TAPE_TEST_RUNNER_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -832,6 +862,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-supply-chain-business-logic-plugin
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -901,6 +933,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-manual
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -937,6 +971,8 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/counterparty-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/own-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/refund.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/withdraw-counterparty-endpoint.test.ts}
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -971,6 +1007,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1005,6 +1043,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu-erc20
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1142,6 +1182,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpk-memory
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1176,6 +1218,8 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/unit/plugin-keychain-memory-wasm.test.ts
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1210,6 +1254,8 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/cactus-keychain-vault-server.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/plugin-keychain-vault.test.ts}'
       TAPE_TEST_RUNNER_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1247,6 +1293,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-aries
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1285,6 +1333,8 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1384,6 +1434,7 @@ jobs:
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
     env:
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-corda/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
@@ -1448,6 +1499,8 @@ jobs:
       TAPE_TEST_RUNNER_DISABLED: true
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-stellar
       JEST_TEST_CODE_COVERAGE_ENABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1794,8 +1847,8 @@ jobs:
       # Free space left: 26 MB
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-      JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-bungee-hermes
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
@@ -1815,7 +1868,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+            ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
@@ -1823,6 +1876,31 @@ jobs:
         with:
           name: coverage-reports-36
           path: ./code-coverage-ts/**/
+  cactus-plugin-bungee-hermes:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v3.6.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@v3.5.2
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@v3.3.1
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci.sh
   ct-api-client:
     continue-on-error: false
     env:
@@ -2047,6 +2125,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-besu
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -2079,6 +2159,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-ethereum
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -2117,6 +2199,8 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -2149,6 +2233,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-verifier-client
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -2182,6 +2268,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-static
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:

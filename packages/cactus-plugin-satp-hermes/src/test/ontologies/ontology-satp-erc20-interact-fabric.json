@@ -1,0 +1,39 @@
+{
+    "name": "SATP-ERC20",
+    "id": "SATP-ERC20-FABRIC",
+    "type": "FABRIC_2",
+    "ontology": {
+        "lock": [{
+            "functionSignature": "transferFrom",
+            "variables": ["owner", "bridge", "amount"]
+            }
+        ],
+        "unlock": [{
+            "functionSignature": "transfer",
+            "variables": ["owner", "amount"]
+            }
+        ],
+        "mint": [{
+            "functionSignature": "mint",
+            "variables": ["amount"]
+            }
+        ],
+        "burn": [{
+            "functionSignature": "burn",
+            "variables": ["amount"]
+            }
+        ],
+        "assign": [{
+            "functionSignature": "assign",
+            "variables": ["bridge", "receiver", "amount"]
+            }
+        ],
+        "checkPermission": [{
+            "functionSignature": "hasPermission",
+            "variables": ["bridgeMSPID"]
+            } 
+        ]
+    },
+    "ownerSignature": "",
+    "bridgeSignature": ""
+}

@@ -75,6 +75,7 @@
     "http-errors": "2.0.0",
     "http-status-codes": "2.1.4",
     "joi": "17.13.3",
+    "json5": "2.2.3",
     "jsrsasign": "11.0.0",
     "lodash": "4.17.21",
     "long": "5.2.3",
