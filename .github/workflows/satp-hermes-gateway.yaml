@@ -9,7 +9,7 @@ name: SATP CI - tests and docker deployments
 # 4. Tags images appropriately (version-specific and latest)
 #
 env:
-  NODEJS_VERSION: v18.18.2
+  NODEJS_VERSION: v22.18.0
 on:
   # Run tests on PR
   pull_request:
@@ -23,7 +23,6 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: false
     env:
-      NODEJS_VERSION: v18.19.0
       FULL_BUILD_DISABLED: true
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: true
@@ -75,12 +74,12 @@ jobs:
             echo "No build log found."
           fi
 
+# We could cache the artefacts but we found out it is quicker to re-run install and configure
   yarn-code-gen: 
     needs: build-satp-dev
     runs-on: ubuntu-22.04
     continue-on-error: false
     env:
-      NODEJS_VERSION: v18.19.0
       FULL_BUILD_DISABLED: true
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: true
@@ -103,8 +102,6 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-
-     
 
       - name: Set working directory
         run: cd packages/cactus-plugin-satp-hermes && pwd
@@ -160,14 +157,12 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: false
     env:
-      NODEJS_VERSION: v18.19.0
       FULL_BUILD_DISABLED: true
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
     steps:
-      # Install Cacti pre-requisites
       - name: Use Node.js
         uses: actions/setup-node@v4.0.3
         with:
@@ -234,7 +229,7 @@ jobs:
 
       - name: Check Lint Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         with:
           script: |
             const failMsg = "yarn lint script produced version control " +
@@ -250,21 +245,17 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: false
     env:
-      NODEJS_VERSION: v18.19.0
       FULL_BUILD_DISABLED: true
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
     steps:
-      # Install Cacti pre-requisites
       - name: Use Node.js
         uses: actions/setup-node@v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@v4.1.7
-
-      # Install Cacti dependencies
       - id: yarn-cache
         name: Initialize Yarn Cache
         uses: actions/cache@v4
@@ -273,8 +264,6 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-
-     
 
       - name: Set working directory
         run: cd packages/cactus-plugin-satp-hermes && pwd
@@ -301,12 +290,8 @@ jobs:
     needs: build-satp-dev
     runs-on: ubuntu-22.04
     env:
-      NODEJS_VERSION: v18.18.2
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-
-      # SATP specific configuration
       SATP_ENABLE_CRASH_RECOVERY: false
       SATP_LOG_LEVEL: DEBUG
       SATP_ENABLE_LOCAL_REPOSITORY: true
@@ -326,7 +311,6 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-
      
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
@@ -339,17 +323,20 @@ jobs:
 
       - name: Run SATP unit tests
         run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit 
+
+      - name: Upload SATP unit test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-unit-junit-report
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml
       
   run-satp-tests-integration-bridge:
     needs: build-satp-dev
     runs-on: ubuntu-22.04
     env:
-      NODEJS_VERSION: v18.18.2
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
 
-      # SATP specific configuration
       SATP_ENABLE_CRASH_RECOVERY: false
       SATP_LOG_LEVEL: DEBUG
       SATP_ENABLE_LOCAL_REPOSITORY: true
@@ -382,13 +369,17 @@ jobs:
       - name: Run SATP integration tests
         run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:bridge
 
+      - name: Upload SATP integration test report - bridge
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-integration-junit-report-bridge
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-bridge.xml
+
   run-satp-tests-integration-oracle:
     needs: build-satp-dev
     runs-on: ubuntu-22.04
     env:
-      NODEJS_VERSION: v18.18.2
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
 
       # SATP specific configuration
@@ -423,14 +414,18 @@ jobs:
 
       - name: Run SATP integration tests
         run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:oracle
-  
+ 
+      - name: Upload SATP integration test report - oracle
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-integration-junit-report-oracle
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-oracle.xml
+ 
   run-satp-tests-integration-gateway:
     needs: build-satp-dev
     runs-on: ubuntu-22.04
     env:
-      NODEJS_VERSION: v18.18.2
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
 
       # SATP specific configuration
@@ -466,13 +461,65 @@ jobs:
       - name: Run SATP integration tests
         run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:gateway
 
+      - name: Upload SATP integration test report - gateway
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-integration-junit-report-gateway
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-gateway.xml
+
+  run-satp-tests-integration-docker:
+    needs: [build-bundle, set-docker-tags]
+    runs-on: ubuntu-22.04
+    continue-on-error: true # Allow this job to fail due to known issues with Fabric
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: false
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+      - run: ./tools/ci-env-clean-up.sh
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install dependencies
+        run: yarn install
+      - name: Configure
+        run: yarn configure
+
+      - name: Run SATP integration tests
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:docker
+    
+      - name: Upload SATP integration test report - docker
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-integration-junit-report-docker
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-docker.xml
+
+
   run-satp-tests-integration-cbdc:
     needs: build-satp-dev
     runs-on: ubuntu-22.04
     env:
-      NODEJS_VERSION: v18.18.2
       FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
 
       # SATP specific configuration
@@ -512,8 +559,6 @@ jobs:
   run-all-tests:
     needs: [run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc]
     runs-on: ubuntu-22.04
-    env:
-      NODEJS_VERSION: v18.18.2
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Test Summary
@@ -529,11 +574,7 @@ jobs:
         (github.event_name == 'push' && 
         (github.ref == 'refs/heads/main' || 
         github.ref == 'refs/heads/satp-dev' || 
-        github.ref == 'refs/heads/satp-stg')) || 
-        (github.event_name == 'pull_request' && 
-        (github.base_ref == 'main' || 
-        github.base_ref == 'satp-dev' || 
-        github.base_ref == 'satp-stg'))
+        github.ref == 'refs/heads/satp-stg'))
     runs-on: ubuntu-22.04
     outputs:
       tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
@@ -579,14 +620,8 @@ jobs:
         (github.event_name == 'push' && 
         (github.ref == 'refs/heads/main' || 
         github.ref == 'refs/heads/satp-dev' || 
-        github.ref == 'refs/heads/satp-stg')) || 
-        (github.event_name == 'pull_request' && 
-        (github.base_ref == 'main' || 
-        github.base_ref == 'satp-dev' || 
-        github.base_ref == 'satp-stg'))
+        github.ref == 'refs/heads/satp-stg'))
     runs-on: ubuntu-22.04
-    env:
-      NODEJS_VERSION: v18.18.2
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Debug Build Info
@@ -668,14 +703,8 @@ jobs:
         (github.event_name == 'push' && 
         (github.ref == 'refs/heads/main' || 
         github.ref == 'refs/heads/satp-dev' || 
-        github.ref == 'refs/heads/satp-stg')) || 
-        (github.event_name == 'pull_request' && 
-        (github.base_ref == 'main' || 
-        github.base_ref == 'satp-dev' || 
-        github.base_ref == 'satp-stg'))
+        github.ref == 'refs/heads/satp-stg'))
     runs-on: ubuntu-22.04
-    env:
-      NODEJS_VERSION: v18.18.2
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Debug Build Info
@@ -751,47 +780,3 @@ jobs:
           docker tag "${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}" "${{ needs.set-docker-tags.outputs.ghcr_image }}:latest"
           docker push "${{ needs.set-docker-tags.outputs.ghcr_image }}:latest"
   
-  run-satp-tests-integration-docker:
-    needs: [build-bundle, set-docker-tags]
-    runs-on: ubuntu-22.04
-    continue-on-error: true # Allow this job to fail due to known issues with Fabric
-    env:
-      NODEJS_VERSION: v18.18.2
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_RUNNER_DISABLED: false
-
-      # SATP specific configuration
-      SATP_ENABLE_CRASH_RECOVERY: false
-      SATP_LOG_LEVEL: DEBUG
-      SATP_ENABLE_LOCAL_REPOSITORY: true
-      SATP_ENABLE_REMOTE_REPOSITORY: false
-
-    steps:
-      - uses: actions/checkout@v4.1.7
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.2
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - id: yarn-cache
-        name: Initialize Yarn Cache
-        uses: actions/cache@v4
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-      - run: ./tools/ci-env-clean-up.sh
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: stable
-      - name: Install dependencies
-        run: yarn install
-      - name: Configure
-        run: yarn configure
-
-      - name: Run SATP integration tests
-        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:docker
-    
-

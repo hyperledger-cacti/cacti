@@ -6,3 +6,6 @@ src/test/typescript/gateway-info
 cache/
 src/test/solidity/generated/build-info/
 src/main/solidity/generated/build-info/
+src/main/typescript/database/*
+reports/junit/satp-hermes-tests-unit.xml
+reports/junit/satp-hermes-tests-integration.xml
