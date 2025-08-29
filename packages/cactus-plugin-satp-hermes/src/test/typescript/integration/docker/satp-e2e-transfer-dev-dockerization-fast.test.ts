@@ -82,6 +82,14 @@ afterEach(async () => {
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
+  await pruneDockerAllIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
 }, TIMEOUT);
 
 afterAll(async () => {
@@ -96,27 +104,9 @@ afterAll(async () => {
 
   await besuEnv.tearDown();
   await ethereumEnv.tearDown();
-
-  await pruneDockerAllIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
 }, TIMEOUT);
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
-
   ({ config: db_local_config1, container: db_local1 } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
