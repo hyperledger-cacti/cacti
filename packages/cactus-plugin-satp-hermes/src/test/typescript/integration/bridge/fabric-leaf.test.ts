@@ -8,7 +8,10 @@ import {
   pruneDockerAllIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
-import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import {
+  TokenType,
+  ERCTokenStandard,
+} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import { FabricTestEnvironment } from "../../test-utils";
@@ -16,6 +19,7 @@ import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mec
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { FabricLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let ontologyManager: OntologyManager;
 
@@ -102,16 +106,18 @@ describe("Fabric Bridge Test", () => {
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await fabricLeaf.deployContracts();
-    expect(fabricLeaf.getDeployFungibleWrapperContractReceipt()).toBeDefined();
+    expect(fabricLeaf.getDeployWrapperContractReceipt()).toBeDefined();
   });
   it("Should return the wrapper contract name", async () => {
-    const wrapperContractName = fabricLeaf.getWrapperContract("FUNGIBLE");
+    const wrapperContractName = fabricLeaf.getWrapperContract(
+      TokenType.FUNGIBLE,
+    );
     expect(wrapperContractName).toBeDefined();
 
     await fabricEnv.giveRoleToBridge(fabricEnv.getBridgeMSPID());
 
     await fabricEnv.approveAmount(
-      await fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+      await fabricLeaf.getApproveAddress(TokenType.FUNGIBLE),
       "100",
     );
   });
@@ -119,16 +125,17 @@ describe("Fabric Bridge Test", () => {
     asset = {
       id: fabricEnv.defaultAsset.id,
       referenceId: fabricEnv.defaultAsset.referenceId,
-      type: TokenType.NONSTANDARD_FUNGIBLE,
+      type: TokenType.FUNGIBLE,
       owner: fabricEnv.clientId,
       contractName: fabricEnv.satpContractName,
       channelName: fabricEnv.fabricChannelName,
       mspId: fabricEnv.userIdentity.mspId,
-      amount: "100",
+      amount: 100 as Amount,
       network: {
         id: FabricTestEnvironment.FABRIC_NETWORK_ID,
         ledgerType: LedgerType.Fabric2,
       },
+      ercTokenStandard: ERCTokenStandard.ERC20,
     } as FabricFungibleAsset;
 
     const response = await fabricLeaf.wrapAsset(asset);
@@ -161,7 +168,7 @@ describe("Fabric Bridge Test", () => {
   });
 
   it("Should Lock a token", async () => {
-    const responseLock = await fabricLeaf.lockAsset(asset.id, 100);
+    const responseLock = await fabricLeaf.lockAsset(asset.id, 100 as Amount);
     expect(responseLock).toBeDefined();
     expect(responseLock.transactionId).toBeDefined();
     expect(responseLock.output).toBeDefined();
@@ -186,7 +193,7 @@ describe("Fabric Bridge Test", () => {
     await fabricEnv.checkBalance(
       fabricEnv.getTestContractName(),
       fabricEnv.getTestChannelName(),
-      fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+      fabricLeaf.getApproveAddress(TokenType.FUNGIBLE),
       "100",
       fabricEnv.getTestOwnerSigningCredential(),
     );
@@ -203,7 +210,10 @@ describe("Fabric Bridge Test", () => {
   });
 
   it("Should Unlock a token", async () => {
-    const responseUnlock = await fabricLeaf.unlockAsset(asset.id, 100);
+    const responseUnlock = await fabricLeaf.unlockAsset(
+      asset.id,
+      100 as Amount,
+    );
 
     expect(responseUnlock).toBeDefined();
     expect(responseUnlock.transactionId).toBeDefined();
@@ -228,7 +238,7 @@ describe("Fabric Bridge Test", () => {
     await fabricEnv.checkBalance(
       fabricEnv.getTestContractName(),
       fabricEnv.getTestChannelName(),
-      fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+      fabricLeaf.getApproveAddress(TokenType.FUNGIBLE),
       "0",
       fabricEnv.getTestOwnerSigningCredential(),
     );
@@ -246,18 +256,18 @@ describe("Fabric Bridge Test", () => {
 
   it("Should Burn a token", async () => {
     await fabricEnv.approveAmount(
-      fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+      fabricLeaf.getApproveAddress(TokenType.FUNGIBLE),
       "100",
     );
 
-    const responseLock = await fabricLeaf.lockAsset(asset.id, 100);
+    const responseLock = await fabricLeaf.lockAsset(asset.id, 100 as Amount);
 
     expect(responseLock).toBeDefined();
     expect(responseLock.transactionId).toBeDefined();
     expect(responseLock.output).toBeDefined();
     log.info("Locked 100 tokens successfully");
 
-    const responseBurn = await fabricLeaf.burnAsset(asset.id, 100);
+    const responseBurn = await fabricLeaf.burnAsset(asset.id, 100 as Amount);
     expect(responseBurn).toBeDefined();
     expect(responseBurn.transactionId).toBeDefined();
     expect(responseBurn.output).toBeDefined();
@@ -280,7 +290,7 @@ describe("Fabric Bridge Test", () => {
     await fabricEnv.checkBalance(
       fabricEnv.getTestContractName(),
       fabricEnv.getTestChannelName(),
-      fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+      fabricLeaf.getApproveAddress(TokenType.FUNGIBLE),
       "0",
       fabricEnv.getTestOwnerSigningCredential(),
     );
@@ -296,7 +306,7 @@ describe("Fabric Bridge Test", () => {
   });
 
   it("Should Mint a token", async () => {
-    const responseMint = await fabricLeaf.mintAsset(asset.id, 100);
+    const responseMint = await fabricLeaf.mintAsset(asset.id, 100 as Amount);
     expect(responseMint).toBeDefined();
     expect(responseMint.transactionId).toBeDefined();
     expect(responseMint.output).toBeDefined();
@@ -319,7 +329,7 @@ describe("Fabric Bridge Test", () => {
     await fabricEnv.checkBalance(
       fabricEnv.getTestContractName(),
       fabricEnv.getTestChannelName(),
-      fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+      fabricLeaf.getApproveAddress(TokenType.FUNGIBLE),
       "100",
       fabricEnv.getTestOwnerSigningCredential(),
     );
@@ -330,7 +340,7 @@ describe("Fabric Bridge Test", () => {
     const responseAssign = await fabricLeaf.assignAsset(
       asset.id,
       asset.owner,
-      100,
+      100 as Amount,
     );
     expect(responseAssign).toBeDefined();
     expect(responseAssign.transactionId).toBeDefined();
@@ -353,7 +363,7 @@ describe("Fabric Bridge Test", () => {
     await fabricEnv.checkBalance(
       fabricEnv.getTestContractName(),
       fabricEnv.getTestChannelName(),
-      fabricLeaf.getApproveAddress(TokenType.NONSTANDARD_FUNGIBLE),
+      fabricLeaf.getApproveAddress(TokenType.FUNGIBLE),
       "0",
       fabricEnv.getTestOwnerSigningCredential(),
     );

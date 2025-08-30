@@ -41,6 +41,9 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
 
 const PROMETHEUS_URL = "http://localhost:9090";
 const LOKI_URL = "http://localhost:3100";
@@ -124,11 +127,11 @@ async function waitForMetric(metric: string, maxRetries = 5) {
 }
 
 async function executeTransfer() {
-  await besuEnv.mintTokens("100");
+  await besuEnv.mintTokens("100", TokenTypeMain.FUNGIBLE);
   await besuEnv.checkBalance(
-    besuEnv.getTestContractName(),
-    besuEnv.getTestContractAddress(),
-    besuEnv.getTestContractAbi(),
+    besuEnv.getTestFungibleContractName(),
+    besuEnv.getTestFungibleContractAddress(),
+    besuEnv.getTestFungibleContractAbi(),
     besuEnv.getTestOwnerAccount(),
     "100",
     besuEnv.getTestOwnerSigningCredential(),
@@ -201,7 +204,7 @@ async function executeTransfer() {
   expect(dispatcher).toBeTruthy();
   const reqApproveBesuAddress = await dispatcher?.GetApproveAddress({
     networkId: besuEnv.network,
-    tokenType: TokenType.NonstandardFungible,
+    tokenType: TokenType.Fungible,
   });
 
   if (!reqApproveBesuAddress?.approveAddress) {
@@ -213,7 +216,11 @@ async function executeTransfer() {
   await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.approveAddress);
 
   if (reqApproveBesuAddress?.approveAddress) {
-    await besuEnv.approveAmount(reqApproveBesuAddress.approveAddress, "100");
+    await besuEnv.approveAssets(
+      reqApproveBesuAddress.approveAddress,
+      "100",
+      TokenTypeMain.FUNGIBLE,
+    );
   } else {
     throw new Error("Approve address is undefined");
   }
@@ -222,7 +229,7 @@ async function executeTransfer() {
 
   const reqApproveEthereumAddress = await dispatcher?.GetApproveAddress({
     networkId: ethereumEnv.network,
-    tokenType: TokenType.NonstandardFungible,
+    tokenType: TokenType.Fungible,
   });
 
   expect(reqApproveEthereumAddress?.approveAddress).toBeDefined();
@@ -257,17 +264,31 @@ beforeAll(async () => {
 
   // Start environments
   const erc20TokenContract = "SATPContract";
-  ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-    contractName: erc20TokenContract,
-    logLevel,
-  });
+  ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
+    {
+      logLevel,
+    },
+    [
+      {
+        assetType: SupportedEthereumContractTypes.FUNGIBLE,
+        contractName: erc20TokenContract,
+      },
+    ],
+  );
   log.info("Ethereum Ledger started successfully");
   await ethereumEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
 
-  besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-    contractName: erc20TokenContract,
-    logLevel,
-  });
+  besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+    {
+      logLevel,
+    },
+    [
+      {
+        assetType: SupportedBesuContractTypes.FUNGIBLE,
+        contractName: erc20TokenContract,
+      },
+    ],
+  );
   console.info("Besu Ledger started successfully");
   await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   // Start monitoring system
