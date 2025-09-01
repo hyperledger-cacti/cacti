@@ -32,6 +32,8 @@
     "Cbdc",
     "cbor",
     "cccg",
+    "oracledb",
+    "ISATPCC",
     "cccs",
     "ccep",
     "ccid",
@@ -227,6 +229,32 @@
     "Xdai",
     "xeipuuv",
     "XUIDH"
+  ,"OAPI"
+  ,"ISATP"
+  ,"CDBC"
+  ,"DLTs"
+  ,"Oapi"
+  ,"oapi"
+  ,"SATPCC"
+  ,"Nework"
+  ,"TOKENID"
+  ,"OWNERMSPID"
+  ,"BRIDGEMSPID"
+  ,"IEVM"
+  ,"readonlyf"
+  ,"Unregisters"
+  ,"orquestrator"
+  ,"intitialized"
+  ,"unknow"
+  ,"amout"
+  ,"recepient"
+  ,"receipient"
+  ,"Enpoint"
+  ,"unregistration"
+  ,"Erraneous"
+  ,"overriden"
+  ,"Certificat"
+  ,"adress"
   ],
   "dictionaries": [
     "typescript,node,npm,go,rust"

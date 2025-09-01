@@ -141,7 +141,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       await this.createSATPGateways();
       this.log.debug("creating api server...");
       await this.createApiServer();
-      this.log.debug("api server created sucessfully");
+      this.log.debug("api server created successfully");
     } catch (ex) {
       this.log.error(`Starting of dummy infrastructure crashed: `, ex);
       throw ex;
@@ -386,14 +386,14 @@ export class CbdcBridgingAppDummyInfrastructure {
     this.besuGatewayRunner = new SATPGatewayRunner(besuGatewayRunnerOptions);
     this.log.debug("starting gatewayRunner...");
     await this.besuGatewayRunner.start();
-    this.log.debug("gatewayRunner started sucessfully");
+    this.log.debug("gatewayRunner started successfully");
 
     this.fabricGatewayRunner = new SATPGatewayRunner(
       fabricGatewayRunnerOptions,
     );
     this.log.debug("starting gatewayRunner...");
     await this.fabricGatewayRunner.start();
-    this.log.debug("gatewayRunner started sucessfully");
+    this.log.debug("gatewayRunner started successfully");
 
     const besuGatewayApproveAddressApi = new GetApproveAddressApi(
       new Configuration({

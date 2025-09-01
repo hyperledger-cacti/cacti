@@ -326,12 +326,12 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
     log.debug("starting gatewayRunner...");
     await gatewayRunner1.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
     log.debug("starting gatewayRunner...");
     await gatewayRunner2.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi1 = new GetApproveAddressApi(
       new Configuration({
@@ -569,12 +569,12 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
     log.debug("starting gatewayRunner...");
     await gatewayRunner1.start();
-    console.log("gatewayRunner started sucessfully");
+    console.log("gatewayRunner started successfully");
 
     gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
     log.debug("starting gatewayRunner...");
     await gatewayRunner2.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi1 = new GetApproveAddressApi(
       new Configuration({
@@ -831,12 +831,12 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
     log.debug("starting gatewayRunner...");
     await gatewayRunner1.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
     log.debug("starting gatewayRunner...");
     await gatewayRunner2.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi1 = new GetApproveAddressApi(
       new Configuration({

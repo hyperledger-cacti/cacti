@@ -3,7 +3,7 @@ module.exports = {
   rules: {
     "footer-max-line-length": [1, "always", 80],
     "header-max-length": [2, "always", 72],
-    "body-max-line-length": [2, "always", 80]
+    "body-max-line-length": [2, "always", 80],
   },
   parserPreset: {
     parserOpts: {
