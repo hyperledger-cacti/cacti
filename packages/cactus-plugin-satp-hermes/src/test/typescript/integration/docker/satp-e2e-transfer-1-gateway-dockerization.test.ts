@@ -217,7 +217,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
     log.debug("starting gatewayRunner...");
     await gatewayRunner.start(false);
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi = new GetApproveAddressApi(
       new Configuration({
@@ -374,7 +374,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
     log.debug("starting gatewayRunner...");
     await gatewayRunner.start(true);
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi = new GetApproveAddressApi(
       new Configuration({
@@ -532,7 +532,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
     log.debug("starting gatewayRunner...");
     await gatewayRunner.start(true);
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi = new GetApproveAddressApi(
       new Configuration({

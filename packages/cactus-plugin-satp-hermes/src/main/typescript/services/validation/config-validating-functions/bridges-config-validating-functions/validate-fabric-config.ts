@@ -13,7 +13,7 @@ import { isClaimFormat } from "./validate-bungee-options";
 import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { NetworkOptionsJSON } from "../validate-cc-config";
 import { isNetworkId } from "../validate-satp-gateway-identity";
-import { iskeyPairJSON, KeyPairJSON } from "../validate-key-pair-json";
+import { isKeyPairJSON, KeyPairJSON } from "../validate-key-pair-json";
 import { X509Identity } from "fabric-network";
 import { Logger } from "@hyperledger/cactus-common";
 
@@ -269,7 +269,7 @@ export function isFabricConfigJSON(
     log.error("isFabricConfigJSON: leafId present but not a string");
     return false;
   }
-  if ("keyPair" in obj && !iskeyPairJSON(obj.keyPair)) {
+  if ("keyPair" in obj && !isKeyPairJSON(obj.keyPair)) {
     log.error("isFabricConfigJSON: keyPair present but invalid");
     return false;
   }
