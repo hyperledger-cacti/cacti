@@ -125,7 +125,7 @@ An adversary in this configuration might seek to:
 
 A suitable deployment configuration that addresses the threat assumptions:
 
-* Nodes (clients) of the public ledger will be deployed and operated by multiple organizations in the private network (a sufficient distribution to accomodate 'f' faulty nodes)
+* Nodes (clients) of the public ledger will be deployed and operated by multiple organizations in the private network (a sufficient distribution to accommodate 'f' faulty nodes)
     * Nodes modified to sign responses with a valid identity certificate (e.g. Hyperledger Besu as Ethereum mainnet client).
 * Relays to private and public nodes will be deployed and operated by organizations within the network.
 * The inclusion of a nonce in the proof enables replays of past messages to be detected.

@@ -234,7 +234,7 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions);
     log.debug("starting gatewayRunner...");
     await gatewayRunner1.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     log.debug(`http://${await gatewayRunner1.getOApiHost()}`);
 
@@ -470,12 +470,12 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
     log.debug("starting gatewayRunner...");
     await gatewayRunner1.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
     log.debug("starting gatewayRunner...");
     await gatewayRunner2.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi1 = new GetApproveAddressApi(
       new Configuration({
@@ -729,12 +729,12 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
     log.debug("starting gatewayRunner...");
     await gatewayRunner1.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
     log.debug("starting gatewayRunner...");
     await gatewayRunner2.start();
-    log.debug("gatewayRunner started sucessfully");
+    log.debug("gatewayRunner started successfully");
 
     const approveAddressApi1 = new GetApproveAddressApi(
       new Configuration({
