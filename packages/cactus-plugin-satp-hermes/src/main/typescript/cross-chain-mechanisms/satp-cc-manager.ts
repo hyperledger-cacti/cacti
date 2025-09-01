@@ -21,7 +21,7 @@ export interface ICrossChainMechanismsOptions {
   oracleConfig?: INetworkOptions[];
 }
 
-// TODO extend to accomodate oracle
+// TODO extend to accommodate oracle
 // does specific on-chain operations by calling bridge manager or oracle manager
 
 /**

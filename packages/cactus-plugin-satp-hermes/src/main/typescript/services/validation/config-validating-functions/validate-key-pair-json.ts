@@ -4,7 +4,7 @@ export interface KeyPairJSON {
 }
 
 // Type guard for the keyPairJSON
-export function iskeyPairJSON(obj: unknown): obj is KeyPairJSON {
+export function isKeyPairJSON(obj: unknown): obj is KeyPairJSON {
   return (
     typeof obj === "object" &&
     obj !== null &&
@@ -22,7 +22,7 @@ export function validateSatpKeyPairJSON(opts: {
     return;
   }
 
-  if (!iskeyPairJSON(opts.configValue)) {
+  if (!isKeyPairJSON(opts.configValue)) {
     throw new TypeError(
       `Invalid config.keyPair: ${JSON.stringify(opts.configValue)}. Expected a keyPair object with 'publicKey' and 'privateKey' string fields.`,
     );

@@ -211,7 +211,7 @@ beforeAll(async () => {
   gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
   log.debug("starting gatewayRunner...");
   await gatewayRunner.start(false);
-  log.debug("gatewayRunner started sucessfully");
+  log.debug("gatewayRunner started successfully");
 
   oracleApi = new OracleApi(
     new Configuration({
