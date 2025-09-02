@@ -25,6 +25,7 @@ export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
 
+export const CI_TEST_TIMEOUT = 900000;
 const testFilesDirectory = `${__dirname}/../../../cache/`;
 
 export function getTestConfigFilesDirectory(basePath: string): string {
