@@ -388,9 +388,6 @@ export class Stage1ServerService extends SATPService {
 
           this.Log.info(`${fnTag}, sending TransferCommenceResponseMessage...`);
 
-          this.monitorService.incrementCounter("initiated_transfers");
-          this.monitorService.incrementCounter("created_sessions", -1);
-
           return transferCommenceResponseMessage;
         } catch (error) {
           this.Log.error(`fail-${messageType}`, error);
