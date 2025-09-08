@@ -5,7 +5,7 @@ import {
 } from "./database/repository/interfaces/repository";
 import { JsObjectSigner, LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPLogger as Logger } from "./core/satp-logger";
-import { SatpLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
 import { SHA256 } from "crypto-js";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, getSatpLogKey, sign } from "./gateway-utils";

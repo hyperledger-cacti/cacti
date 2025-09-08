@@ -4,7 +4,7 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { SATPLogger as Logger } from "../../core/satp-logger";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { Stage0SATPHandler } from "../../core/stage-handlers/stage0-handler";
@@ -305,10 +305,6 @@ export class SATPManager {
     return context.with(ctx, () => {
       try {
         const activeSessionsCount = this.sessions.size;
-        void this.monitorService.incrementCounter(
-          "satp.active_sessions",
-          activeSessionsCount,
-        );
         this.logger.debug(`${fnTag} active sessions: ${activeSessionsCount}`);
         return this.sessions;
       } catch (error) {
@@ -784,7 +780,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, NewSessionRequest`,
                 );
-                this.monitorService.incrementCounter("Stage0 - Recovery");
                 newSessionRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.NEW_SESSION_REQUEST,
@@ -817,7 +812,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, NewSessionResponse`,
                 );
-                this.monitorService.incrementCounter("Stage0 - Recovery");
                 newSessionResponse = getMessageInSessionData(
                   sessionData,
                   MessageType.NEW_SESSION_RESPONSE,
@@ -850,7 +844,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, PreSATPTransferRequest`,
                 );
-                this.monitorService.incrementCounter("Stage0 - Recovery");
                 preSATPTransferRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.PRE_SATP_TRANSFER_REQUEST,
@@ -884,7 +877,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, PreSATPTransferResponse`,
                 );
-                this.monitorService.incrementCounter("Stage0 - Recovery");
                 preSATPTransferResponse = getMessageInSessionData(
                   sessionData,
                   MessageType.PRE_SATP_TRANSFER_RESPONSE,
@@ -919,7 +911,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferProposalRequest`,
                 );
-                this.monitorService.incrementCounter("Stage1 - Recovery");
                 transferProposalRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.INIT_PROPOSAL,
@@ -953,7 +944,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferProposalResponse`,
                 );
-                this.monitorService.incrementCounter("Stage1 - Recovery");
                 transferProposalResponse = getMessageInSessionData(
                   sessionData,
                   MessageType.INIT_RECEIPT,
@@ -982,7 +972,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferCommenceRequest`,
                 );
-                this.monitorService.incrementCounter("Stage1 - Recovery");
                 transferCommenceRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.TRANSFER_COMMENCE_REQUEST,
@@ -1016,7 +1005,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferCommenceResponse`,
                 );
-                this.monitorService.incrementCounter("Stage1 - Recovery");
                 transferCommenceResponse = getMessageInSessionData(
                   sessionData,
                   MessageType.TRANSFER_COMMENCE_RESPONSE,
@@ -1047,7 +1035,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 2, LockAssertionRequest`,
                 );
-                this.monitorService.incrementCounter("Stage2 - Recovery");
                 lockAssertionRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.LOCK_ASSERT,
@@ -1079,7 +1066,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 2, LockAssertionResponse`,
                 );
-                this.monitorService.incrementCounter("Stage2 - Recovery");
                 lockAssertionResponse = getMessageInSessionData(
                   sessionData,
                   MessageType.ASSERTION_RECEIPT,
@@ -1110,7 +1096,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitPreparationRequest`,
                 );
-                this.monitorService.incrementCounter("Stage3 - Recovery");
                 commitPreparationRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.COMMIT_PREPARE,
@@ -1143,7 +1128,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitReadyResponse`,
                 );
-                this.monitorService.incrementCounter("Stage3 - Recovery");
                 commitReadyResponse = getMessageInSessionData(
                   sessionData,
                   MessageType.COMMIT_READY,
@@ -1173,7 +1157,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitFinalAssertionRequest`,
                 );
-                this.monitorService.incrementCounter("Stage3 - Recovery");
                 commitFinalAssertionRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.COMMIT_FINAL,
@@ -1207,7 +1190,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitFinalAcknowledgementReceiptResponse`,
                 );
-                this.monitorService.incrementCounter("Stage3 - Recovery");
                 commitFinalAcknowledgementReceiptResponse =
                   getMessageInSessionData(
                     sessionData,
@@ -1239,7 +1221,6 @@ export class SATPManager {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, TransferCompleteRequest`,
                 );
-                this.monitorService.incrementCounter("Stage3 - Recovery");
                 transferCompleteRequest = getMessageInSessionData(
                   sessionData,
                   MessageType.COMMIT_TRANSFER_COMPLETE,

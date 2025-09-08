@@ -349,7 +349,7 @@ jobs:
         if: steps.check_unit_coverage.outputs.found == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports-satp-hermes
+          name: coverage-reports-satp-hermes-unit
           path: |
             packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
       
@@ -492,7 +492,7 @@ jobs:
         if: steps.check_oracle_coverage.outputs.found == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports-satp-hermes
+          name: coverage-reports-satp-hermes-oracle
           path: |
             packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
             packages/cactus-plugin-satp-hermes/coverage/**/
@@ -566,7 +566,7 @@ jobs:
         if: steps.check_gateway_coverage.outputs.found == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports-satp-hermes
+          name: coverage-reports-satp-hermes-gateway
           path: |
             packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
 
@@ -653,7 +653,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports-satp-hermes
+          name: coverage-reports-satp-hermes-docker
           path: ./coverage-upload/
 
   run-satp-tests-integration-cbdc:
@@ -724,7 +724,7 @@ jobs:
         if: steps.check_cbdc_coverage.outputs.found == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-reports-satp-hermes
+          name: coverage-reports-satp-hermes-cbdc
           path: |
             packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
 
