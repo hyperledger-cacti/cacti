@@ -9,9 +9,15 @@ import { InteractionsRequest as EvmInteractionSignature } from "../../../generat
 import {
   fabricInteractionList,
   FabricInteractionSignature,
+  VarType as FabricVarTypes,
 } from "./assets/fabric-asset";
-import { evmInteractionList } from "./assets/evm-asset";
-import { LedgerNotSupported, OntologyNotFoundError } from "./ontology-errors";
+import { evmInteractionList, VarType as EvmVarTypes } from "./assets/evm-asset";
+import {
+  InvalidSignatureError,
+  LedgerNotSupported,
+  OntologyNotFoundError,
+  HashNotMatchingError,
+} from "./ontology-errors";
 import * as fs from "fs";
 import * as path from "path";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -19,6 +25,14 @@ import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-
 import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { Secp256k1Keys, JsObjectSigner } from "@hyperledger/cactus-common";
+import { InteractionType } from "./assets/interact-types";
+import {
+  validateOntologyJsonFormat,
+  validateOntologyFormat,
+  validateOntologyHash,
+  validateOntologySignature,
+} from "./ontology-validation-functions";
 
 /**
  * Options for configuring the OntologyManager.
@@ -31,6 +45,19 @@ export interface IOntologyManagerOptions {
   ontologiesPath?: string;
 }
 
+export interface OntologyJsonFormat {
+  name: string;
+  id: string;
+  type: string;
+  contract: string;
+  ontology: object;
+  bytecode: string;
+  signature: string;
+  hash: string;
+}
+
+export type InteractionElements = Record<keyof typeof InteractionType, number>;
+
 /**
  * Manages ontologies for different ledger types.
  * @class OntologyManager
@@ -40,6 +67,11 @@ export class OntologyManager {
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
   private readonly monitorService: MonitorService;
+  private publicKeyArray: Uint8Array[] = [];
+  private managerKeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+  private managerJsObjectSigner = new JsObjectSigner({
+    privateKey: this.managerKeyPair.privateKey,
+  });
 
   private ontologies: Map<LedgerType, Map<string, string>> = new Map<
     LedgerType,
@@ -54,6 +86,7 @@ export class OntologyManager {
   constructor(
     options: IOntologyManagerOptions,
     monitorService: MonitorService,
+    pubKeyArray?: Uint8Array[],
   ) {
     const fnTag = `${OntologyManager.CLASS_NAME}#constructor()`;
     const label = OntologyManager.CLASS_NAME;
@@ -63,6 +96,9 @@ export class OntologyManager {
       { label, level: this.logLevel },
       monitorService,
     );
+    if (pubKeyArray != undefined) {
+      this.publicKeyArray = pubKeyArray;
+    }
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 
     context.with(ctx, () => {
@@ -209,7 +245,66 @@ export class OntologyManager {
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, () => {
       try {
-        //TODO: implement
+        const ontologyJson = validateOntologyJsonFormat(
+          JSON.stringify(ontology),
+        );
+        const ontologyID = ontologyJson.id;
+        const ontologyType = ontologyJson.type as LedgerType;
+        const ontologyOntology = ontologyJson.ontology as InteractionElements;
+        const ontologySignature = ontologyJson.signature;
+        const ontologyHash = ontologyJson.hash;
+        switch (ontologyType) {
+          case LedgerType.Besu1X:
+          case LedgerType.Besu2X:
+          case LedgerType.Ethereum:
+            validateOntologyFormat(
+              ontologyOntology as InteractionElements,
+              Object.values(EvmVarTypes) as string[],
+              ontologyID,
+              ontologyType,
+            );
+            break;
+          case LedgerType.Fabric2:
+            validateOntologyFormat(
+              ontologyOntology,
+              Object.values(FabricVarTypes) as string[],
+              ontologyID,
+              ontologyType,
+            );
+            break;
+          default:
+            console.log(ontologyType);
+        }
+
+        if (this.publicKeyArray.length !== 0 && ontologySignature !== "") {
+          let validSignature = false;
+          for (const pubKey of this.publicKeyArray) {
+            validSignature = validateOntologySignature(
+              ontologyOntology,
+              pubKey,
+              ontologySignature,
+              this.managerJsObjectSigner,
+            );
+          }
+          if (!validSignature) {
+            throw new InvalidSignatureError(
+              `${fnTag}, Ontology of ledger: ${ontologyType} with id: ${ontologyID} with an invalid signature`,
+            );
+          }
+        }
+
+        if (
+          ontologyHash !== "" &&
+          !validateOntologyHash(
+            ontologyOntology,
+            ontologyHash,
+            this.managerJsObjectSigner,
+          )
+        ) {
+          throw new HashNotMatchingError(
+            `${fnTag}, Ontology of ledger: ${ontologyType} with id: ${ontologyID} has an invalid hash`,
+          );
+        }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
