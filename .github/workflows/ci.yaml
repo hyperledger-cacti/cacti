@@ -18,7 +18,7 @@ jobs:
   ActionLint:
     needs: check-ci-skip
     uses: ./.github/workflows/actionlint.yaml
-    DCI-Lint:
+  DCI-Lint:
       name: DCI-Lint
       needs: check-ci-skip
       runs-on: ubuntu-22.04
@@ -1890,11 +1890,11 @@ jobs:
         uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v3.5.2
+      - uses: actions/checkout@v4.1.7
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v3.3.1
+        uses: actions/cache@v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
