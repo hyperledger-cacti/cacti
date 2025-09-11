@@ -204,7 +204,7 @@ export class GatewayPersistence {
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     await context.with(ctx, async () => {
       try {
-        if (!!this.remoteRepository) {
+        if (this.remoteRepository) {
           this.log.info(
             `${fnTag} - Storing remote log with key: ${key} and hash: ${hash}`,
           );

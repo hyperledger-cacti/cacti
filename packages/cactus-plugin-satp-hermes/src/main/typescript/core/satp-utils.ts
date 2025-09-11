@@ -5,7 +5,7 @@ export function getMessageTypeName(
   messageType: MessageType | undefined,
 ): string {
   return (
-    (!!messageType
+    (messageType
       ? getEnumKeyByValue(MessageType, messageType)
       : getEnumKeyByValue(MessageType, MessageType.UNSPECIFIED)) ||
     "UNSPECIFIED"

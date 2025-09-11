@@ -107,7 +107,7 @@ export class OracleEVM extends OracleAbstract {
     this.id = this.options.leafId || this.createId(EthereumLeaf.CLASS_NAME);
     this.keyPair = options.keyPair || Secp256k1Keys.generateKeyPairsBuffer();
 
-    this.claimFormats = !!options.claimFormats
+    this.claimFormats = options.claimFormats
       ? options.claimFormats.concat(ClaimFormat.DEFAULT)
       : [ClaimFormat.DEFAULT];
 
