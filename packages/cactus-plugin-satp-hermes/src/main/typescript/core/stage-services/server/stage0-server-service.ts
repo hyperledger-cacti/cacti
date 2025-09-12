@@ -376,19 +376,19 @@ export class Stage0ServerService extends SATPService {
 
           saveSignature(
             sessionData,
-            MessageType.NEW_SESSION_REQUEST,
+            MessageType.NEW_SESSION_RESPONSE,
             messageSignature,
           );
 
           saveHash(
             sessionData,
-            MessageType.NEW_SESSION_REQUEST,
-            getHash(request),
+            MessageType.NEW_SESSION_RESPONSE,
+            getHash(newSessionResponse),
           );
 
           saveTimestamp(
             sessionData,
-            MessageType.NEW_SESSION_REQUEST,
+            MessageType.NEW_SESSION_RESPONSE,
             TimestampType.PROCESSED,
           );
 
@@ -504,8 +504,7 @@ export class Stage0ServerService extends SATPService {
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
       try {
-        const messageType =
-          MessageType[MessageType.PRE_TRANSFER_COMMENCE_RESPONSE];
+        const messageType = MessageType[MessageType.PRE_SATP_TRANSFER_RESPONSE];
         if (session == undefined) {
           throw new SessionError(fnTag);
         }
@@ -578,19 +577,19 @@ export class Stage0ServerService extends SATPService {
 
           saveSignature(
             sessionData,
-            MessageType.PRE_SATP_TRANSFER_REQUEST,
+            MessageType.PRE_SATP_TRANSFER_RESPONSE,
             messageSignature,
           );
 
           saveHash(
             sessionData,
-            MessageType.PRE_SATP_TRANSFER_REQUEST,
-            getHash(request),
+            MessageType.PRE_SATP_TRANSFER_RESPONSE,
+            getHash(preSATPTransferResponse),
           );
 
           saveTimestamp(
             sessionData,
-            MessageType.PRE_SATP_TRANSFER_REQUEST,
+            MessageType.PRE_SATP_TRANSFER_RESPONSE,
             TimestampType.PROCESSED,
           );
 

@@ -2,7 +2,7 @@ import {
   type JsObjectSigner,
   type ILoggerOptions,
 } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../satp-logger-provider";
 import type { SATPLogger as Logger } from "../satp-logger";
 import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";

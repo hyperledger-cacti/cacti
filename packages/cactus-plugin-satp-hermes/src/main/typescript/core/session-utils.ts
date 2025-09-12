@@ -520,7 +520,7 @@ export function getPreviousMessageType(
     case MessageType.PRE_SATP_TRANSFER_RESPONSE:
       return MessageType.PRE_SATP_TRANSFER_REQUEST;
     case MessageType.INIT_PROPOSAL:
-      MessageType.PRE_SATP_TRANSFER_RESPONSE;
+      return MessageType.PRE_SATP_TRANSFER_RESPONSE;
     case MessageType.INIT_RECEIPT:
       return MessageType.INIT_PROPOSAL;
     case MessageType.INIT_REJECT:

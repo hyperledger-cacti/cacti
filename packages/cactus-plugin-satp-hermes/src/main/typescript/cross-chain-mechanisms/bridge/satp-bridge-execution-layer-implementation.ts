@@ -1,7 +1,7 @@
 // this file contains a class that encapsulates the logic for managing the SATP bridge (lock, unlock, etc).
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   Asset,
@@ -87,6 +87,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#wrapAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         if (instanceOfFungibleAsset(asset)) {
           const fungibleBridgeEndPoint = this
@@ -106,6 +110,20 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           const proof = await this.bridgeEndPoint.getProof(
             asset,
             this.claimType,
+          );
+
+          const parsedReceipt = JSON.parse(receipt);
+
+          attributes.senderAddress = parsedReceipt.from;
+          attributes.receiverAddress = parsedReceipt.to;
+          attributes.internalNetworkTransactionId = response.transactionId;
+          attributes.assetId = asset.id;
+          attributes.operation = "wrapAsset";
+
+          this.monitorService.incrementCounter(
+            "gas_used",
+            parsedReceipt.gas,
+            attributes,
           );
 
           return {
@@ -140,6 +158,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#unwrapAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         if (instanceOfFungibleAsset(asset)) {
           const fungibleBridgeEndPoint = this
@@ -155,6 +177,20 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           );
 
           this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const parsedReceipt = JSON.parse(receipt);
+
+          attributes.senderAddress = parsedReceipt.from;
+          attributes.receiverAddress = parsedReceipt.to;
+          attributes.internalNetworkTransactionId = response.transactionId;
+          attributes.assetId = asset.id;
+          attributes.operation = "unwrapAsset";
+
+          this.monitorService.incrementCounter(
+            "gas_used",
+            parsedReceipt.gas,
+            attributes,
+          );
 
           const proof = await this.bridgeEndPoint.getProof(
             asset,
@@ -193,6 +229,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#lockAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         if (instanceOfFungibleAsset(asset)) {
           const fungibleBridgeEndPoint = this
@@ -211,6 +251,20 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           );
 
           this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const parsedReceipt = JSON.parse(receipt);
+
+          attributes.senderAddress = parsedReceipt.from;
+          attributes.receiverAddress = parsedReceipt.to;
+          attributes.internalNetworkTransactionId = response.transactionId;
+          attributes.assetId = asset.id;
+          attributes.operation = "lockAsset";
+
+          this.monitorService.incrementCounter(
+            "gas_used",
+            parsedReceipt.gas,
+            attributes,
+          );
 
           const proof = await this.bridgeEndPoint.getProof(
             asset,
@@ -246,6 +300,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#unlockAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         if (instanceOfFungibleAsset(asset)) {
           const fungibleBridgeEndPoint = this
@@ -264,6 +322,20 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           );
 
           this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const parsedReceipt = JSON.parse(receipt);
+
+          attributes.senderAddress = parsedReceipt.from;
+          attributes.receiverAddress = parsedReceipt.to;
+          attributes.internalNetworkTransactionId = response.transactionId;
+          attributes.assetId = asset.id;
+          attributes.operation = "unlockAsset";
+
+          this.monitorService.incrementCounter(
+            "gas_used",
+            parsedReceipt.gas,
+            attributes,
+          );
 
           const proof = await this.bridgeEndPoint.getProof(
             asset,
@@ -299,6 +371,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#mintAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         if (instanceOfFungibleAsset(asset)) {
           const fungibleBridgeEndPoint = this
@@ -317,6 +393,20 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           );
 
           this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const parsedReceipt = JSON.parse(receipt);
+
+          attributes.senderAddress = parsedReceipt.from;
+          attributes.receiverAddress = parsedReceipt.to;
+          attributes.internalNetworkTransactionId = response.transactionId;
+          attributes.assetId = asset.id;
+          attributes.operation = "mintAsset";
+
+          this.monitorService.incrementCounter(
+            "gas_used",
+            parsedReceipt.gas,
+            attributes,
+          );
 
           const proof = await this.bridgeEndPoint.getProof(
             asset,
@@ -352,6 +442,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#burnAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         if (instanceOfFungibleAsset(asset)) {
           const fungibleBridgeEndPoint = this
@@ -370,6 +464,20 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           );
 
           this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const parsedReceipt = JSON.parse(receipt);
+
+          attributes.senderAddress = parsedReceipt.from;
+          attributes.receiverAddress = parsedReceipt.to;
+          attributes.internalNetworkTransactionId = response.transactionId;
+          attributes.assetId = asset.id;
+          attributes.operation = "burnAsset";
+
+          this.monitorService.incrementCounter(
+            "gas_used",
+            parsedReceipt.gas,
+            attributes,
+          );
 
           const proof = await this.bridgeEndPoint.getProof(
             asset,
@@ -406,6 +514,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#assignAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         if (instanceOfFungibleAsset(asset)) {
           const fungibleBridgeEndPoint = this
@@ -425,6 +537,20 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           );
 
           this.log.info(`${fnTag}, proof of the asset wrapping: ${receipt}`);
+
+          const parsedReceipt = JSON.parse(receipt);
+
+          attributes.senderAddress = parsedReceipt.from;
+          attributes.receiverAddress = parsedReceipt.to;
+          attributes.internalNetworkTransactionId = response.transactionId;
+          attributes.assetId = asset.id;
+          attributes.operation = "assignAsset";
+
+          this.monitorService.incrementCounter(
+            "gas_used",
+            parsedReceipt.gas,
+            attributes,
+          );
 
           const proof = await this.bridgeEndPoint.getProof(
             asset,

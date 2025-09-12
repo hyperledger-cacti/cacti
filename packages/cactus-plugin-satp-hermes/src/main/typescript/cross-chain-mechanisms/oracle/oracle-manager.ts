@@ -2,7 +2,7 @@ import {
   type ILoggerOptions,
   type LogLevelDesc,
 } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../core/satp-logger";
 // import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
 
