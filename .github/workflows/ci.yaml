@@ -601,6 +601,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   cactus-common:
+    if: github.repository == 'hyperledger-cacti/cacti'
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -613,7 +614,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: cacti-large
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -639,6 +640,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   cactus-core:
+    if: github.repository == 'hyperledger-cacti/cacti'
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -650,7 +652,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: cacti-large
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
