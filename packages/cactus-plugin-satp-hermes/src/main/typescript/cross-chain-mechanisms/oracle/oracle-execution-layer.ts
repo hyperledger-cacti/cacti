@@ -2,7 +2,7 @@
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { ClaimFormatError, TransactionError } from "../common/errors";

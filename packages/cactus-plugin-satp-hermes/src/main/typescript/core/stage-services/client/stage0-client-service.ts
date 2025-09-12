@@ -241,6 +241,12 @@ export class Stage0ClientService extends SATPService {
 
         signatureVerifier(fnTag, this.Signer, response, sessionData);
 
+        saveHash(
+          sessionData,
+          MessageType.NEW_SESSION_RESPONSE,
+          getHash(response),
+        );
+
         saveTimestamp(
           sessionData,
           MessageType.NEW_SESSION_RESPONSE,

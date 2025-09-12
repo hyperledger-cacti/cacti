@@ -1,4 +1,4 @@
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { SATPSession } from "../satp-session";
 import { Stage0ServerService } from "../stage-services/server/stage0-server-service";
@@ -78,11 +78,14 @@ export class Stage0SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
           this.Log.debug(`${fnTag}, New Session...`);
-          //console.log("aii: ", stringify(req));
           this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
 
           session = this.sessions.get(req.sessionId);
@@ -121,6 +124,43 @@ export class Stage0SATPHandler implements SATPHandler {
 
           saveMessageInSessionData(session.getServerSessionData(), message);
 
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = 0;
+          attributes.operation = "newSession";
+
+          const startTimestamp =
+            session.getClientSessionData().processedTimestamps?.stage0
+              ?.newSessionRequestMessageTimestamp;
+          const endTimestamp =
+            session.getServerSessionData().processedTimestamps?.stage0
+              ?.newSessionResponseMessageTimestamp;
+
+          if (startTimestamp && endTimestamp) {
+            const duration = Number(endTimestamp) - Number(startTimestamp);
+            await this.monitorService.recordHistogram(
+              "operation_duration",
+              duration,
+              attributes,
+            );
+          }
+
           return message;
         } catch (error) {
           this.Log.error(
@@ -131,6 +171,32 @@ export class Stage0SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.NEW_SESSION_RESPONSE, error);
+
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = 0;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           return await this.serverService.newSessionErrorResponse(error);
         }
       } catch (err) {
@@ -151,6 +217,10 @@ export class Stage0SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
@@ -162,6 +232,8 @@ export class Stage0SATPHandler implements SATPHandler {
           if (!session) {
             throw new SessionNotFoundError(fnTag);
           }
+
+          span.setAttribute("sessionId", session.getSessionId() || "");
 
           await this.serverService.checkPreSATPTransferRequest(req, session);
 
@@ -185,6 +257,43 @@ export class Stage0SATPHandler implements SATPHandler {
 
           saveMessageInSessionData(session.getServerSessionData(), message);
 
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = 0;
+          attributes.operation = "preSATPTransfer";
+
+          const startTimestamp =
+            session.getClientSessionData().processedTimestamps?.stage0
+              ?.preSatpTransferRequestMessageTimestamp;
+          const endTimestamp =
+            session.getServerSessionData().processedTimestamps?.stage0
+              ?.preSatpTransferResponseMessageTimestamp;
+
+          if (startTimestamp && endTimestamp) {
+            const duration = Number(endTimestamp) - Number(startTimestamp);
+            await this.monitorService.recordHistogram(
+              "operation_duration",
+              duration,
+              attributes,
+            );
+          }
+
           return message;
         } catch (error) {
           this.Log.error(
@@ -195,6 +304,31 @@ export class Stage0SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.PRE_SATP_TRANSFER_RESPONSE, error);
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = 0;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           return await this.serverService.preSATPTransferErrorResponse(
             error,
             session,
@@ -255,6 +389,8 @@ export class Stage0SATPHandler implements SATPHandler {
             throw new SessionNotFoundError(fnTag);
           }
 
+          span.setAttribute("sessionId", session.getSessionId() || "");
+
           const message = await this.clientService.newSessionRequest(
             session,
             this.gatewayId,
@@ -313,6 +449,8 @@ export class Stage0SATPHandler implements SATPHandler {
           if (!session) {
             throw new SessionNotFoundError(fnTag);
           }
+
+          span.setAttribute("sessionId", session.getSessionId() || "");
 
           const newSession = await this.clientService.checkNewSessionResponse(
             response,
