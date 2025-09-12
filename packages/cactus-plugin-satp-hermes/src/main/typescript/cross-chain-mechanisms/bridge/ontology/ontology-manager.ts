@@ -15,7 +15,7 @@ import { LedgerNotSupported, OntologyNotFoundError } from "./ontology-errors";
 import * as fs from "fs";
 import * as path from "path";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -93,6 +93,12 @@ export class OntologyManager {
               }
             }
           });
+          monitorService.createGauge(
+            "number_of_supported_assets",
+            () => this.ontologies.size,
+            "Number of supported assets currently loaded in the ontology manager",
+          );
+
           this.log.info(`Ontologies loaded: ${this.ontologies.size}`);
         } else {
           this.log.warn(

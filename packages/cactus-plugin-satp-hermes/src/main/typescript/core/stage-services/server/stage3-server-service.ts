@@ -186,7 +186,7 @@ export class Stage3ServerService extends SATPService {
 
           saveTimestamp(
             sessionData,
-            MessageType.LOCK_ASSERT,
+            MessageType.COMMIT_READY,
             TimestampType.PROCESSED,
           );
 
@@ -619,8 +619,6 @@ export class Stage3ServerService extends SATPService {
         this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
 
         sessionData.state = State.COMPLETED;
-
-        this.monitorService.incrementCounter("successful_transactions");
 
         saveHash(
           sessionData,

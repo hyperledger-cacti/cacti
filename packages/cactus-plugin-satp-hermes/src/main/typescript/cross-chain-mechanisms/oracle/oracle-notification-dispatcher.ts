@@ -2,7 +2,7 @@
 // tasks provide callback urls for notifications, this service calls those callbacks
 
 import { type LogLevelDesc } from "@hyperledger/cactus-common";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   OracleTask,

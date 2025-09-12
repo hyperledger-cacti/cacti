@@ -9,7 +9,7 @@ import {
 } from "@hyperledger/cactus-common";
 
 import { type SATPLogger as Logger } from "./core/satp-logger";
-import { SatpLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
 import { v4 as uuidv4 } from "uuid";
 
 import { ValidatorOptions } from "class-validator";
@@ -161,7 +161,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         logLevel: this.config.logLevel,
         enabled: true,
       });
-    void this.initializeMonitorService();
+    this.initializeMonitorService();
     this.logger = LoggerProvider.getOrCreate(logOptions, this.monitorService);
 
     this.logger.info("Initializing Gateway Coordinator");
@@ -222,6 +222,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     );
 
     this.connectedDLTs = this.config.gid.connectedDLTs || [];
+
     this.OAS = OAS;
 
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
