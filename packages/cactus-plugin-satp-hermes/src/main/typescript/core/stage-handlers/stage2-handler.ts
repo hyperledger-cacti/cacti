@@ -8,7 +8,7 @@ import {
   SATPHandlerType,
   Stage,
 } from "../../types/satp-protocol";
-import { SatpLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
+import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   LockAssertionResponse,
@@ -71,6 +71,10 @@ export class Stage2SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
@@ -81,6 +85,8 @@ export class Stage2SATPHandler implements SATPHandler {
           if (!session) {
             throw new SessionNotFoundError(fnTag);
           }
+
+          span.setAttribute("sessionId", session.getSessionId() || "");
 
           await this.serverService.checkLockAssertionRequest(req, session);
 
@@ -100,6 +106,43 @@ export class Stage2SATPHandler implements SATPHandler {
             );
           }
 
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = 2;
+          attributes.operation = "lockAssertion";
+
+          const startTimestamp =
+            session.getClientSessionData().processedTimestamps?.stage2
+              ?.lockAssertionRequestMessageTimestamp;
+          const endTimestamp =
+            session.getServerSessionData().processedTimestamps?.stage2
+              ?.lockAssertionReceiptMessageTimestamp;
+
+          if (startTimestamp && endTimestamp) {
+            const duration = Number(endTimestamp) - Number(startTimestamp);
+            await this.monitorService.recordHistogram(
+              "operation_duration",
+              duration,
+              attributes,
+            );
+          }
+
           saveMessageInSessionData(session.getServerSessionData(), message);
 
           return message;
@@ -112,6 +155,32 @@ export class Stage2SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.ASSERTION_RECEIPT, error);
+
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = 2;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           return await this.serverService.lockAssertionErrorResponse(
             error,
             session,
@@ -135,7 +204,7 @@ export class Stage2SATPHandler implements SATPHandler {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         router.service(SatpStage2Service, {
-          async lockAssertion(req) {
+          async lockAssertion(req): Promise<LockAssertionResponse> {
             return await that.LockAssertionImplementation(req);
           },
         });
@@ -157,6 +226,10 @@ export class Stage2SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
+      const attributes: Record<
+        string,
+        undefined | string | number | boolean | string[] | number[] | boolean[]
+      > = {};
       try {
         let session: SATPSession | undefined;
         try {
@@ -167,6 +240,8 @@ export class Stage2SATPHandler implements SATPHandler {
           if (!session) {
             throw new SessionNotFoundError(fnTag);
           }
+
+          span.setAttribute("sessionId", session.getSessionId() || "");
 
           await this.clientService.checkTransferCommenceResponse(
             response,
@@ -201,6 +276,32 @@ export class Stage2SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.LOCK_ASSERT, error);
+
+          attributes.senderNetworkId =
+            session?.getServerSessionData().senderAsset?.networkId?.id ||
+            undefined;
+          attributes.receiverNetworkId =
+            session?.getServerSessionData().receiverAsset?.networkId?.id ||
+            undefined;
+          attributes.senderGatewayNetworkId =
+            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+          attributes.receiverGatewayNetworkId =
+            session?.getServerSessionData().recipientGatewayNetworkId ||
+            undefined;
+          attributes.assetProfileId =
+            session?.getServerSessionData().assetProfileId || undefined;
+          attributes.sessionId = session?.getSessionId() || undefined;
+          attributes.sourceLedgerAssetId =
+            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+          attributes.recipientLedgerAssetId =
+            session?.getServerSessionData().recipientLedgerAssetId || undefined;
+          attributes.satp_phase = 2;
+
+          this.monitorService.incrementCounter(
+            "failed_transactions",
+            1,
+            attributes,
+          );
           throw new FailedToProcessError(
             fnTag,
             getMessageTypeName(MessageType.LOCK_ASSERT),

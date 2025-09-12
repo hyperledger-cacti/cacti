@@ -13,13 +13,16 @@ services:
       - 3010:3010/tcp # SERVER_PORT
       - 3011:3011/tcp # CLIENT_PORT
       - 3012:4010/tcp # API_PORT
+    depends_on:
+      - otel-lgtm
+
   #https://grafana.com/blog/2024/03/13/an-opentelemetry-backend-in-a-docker-image-introducing-grafana/otel-lgtm/
   otel-lgtm:
     image: grafana/otel-lgtm:latest
     container_name: otel-lgtm
     environment:
-      ENABLE_LOGS_ALL: true
-      OTEL_METRIC_EXPORT_INTERVAL: "500"
+      OTEL_METRIC_EXPORT_INTERVAL: "100"
+      OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: explicit_bucket_histogram
     ports:
       - "4000:3000" # Grafana 
       - "4317:4317" # OpenTelemetry gRPC endpoint

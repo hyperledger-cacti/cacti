@@ -123,14 +123,26 @@ async function waitForMetric(metric: string, maxRetries = 5) {
   throw new Error(`Metric ${metric} not found after retries`);
 }
 
-async function executeTransfer() {
-  await besuEnv.mintTokens("100");
+/**
+ * Executes a transfer of tokens.
+ *
+ * @param amount - The total amount to transfer.
+ * @param transfers - The number of transfers to make.
+ * @param amountPerTransfer - The amount to transfer in each individual transfer.
+ * @returns {Promise<void>} A promise that resolves when the transfer is complete.
+ */
+async function executeTransfer(
+  amount = "100",
+  transfers = 1,
+  amountPerTransfer = "100",
+) {
+  await besuEnv.mintTokens(amount);
   await besuEnv.checkBalance(
     besuEnv.getTestContractName(),
     besuEnv.getTestContractAddress(),
     besuEnv.getTestContractAbi(),
     besuEnv.getTestOwnerAccount(),
-    "100",
+    amount,
     besuEnv.getTestOwnerSigningCredential(),
   );
 
@@ -213,12 +225,12 @@ async function executeTransfer() {
   await besuEnv.giveRoleToBridge(reqApproveBesuAddress?.approveAddress);
 
   if (reqApproveBesuAddress?.approveAddress) {
-    await besuEnv.approveAmount(reqApproveBesuAddress.approveAddress, "100");
+    await besuEnv.approveAmount(reqApproveBesuAddress.approveAddress, amount);
   } else {
     throw new Error("Approve address is undefined");
   }
 
-  log.debug("Approved 100 amount to the Besu Bridge Address");
+  log.debug(`Approved ${amount} amount to the Besu Bridge Address`);
 
   const reqApproveEthereumAddress = await dispatcher?.GetApproveAddress({
     networkId: ethereumEnv.network,
@@ -237,12 +249,14 @@ async function executeTransfer() {
     "mockContext",
     besuEnv,
     ethereumEnv,
-    "100",
-    "100",
+    amountPerTransfer,
+    amountPerTransfer,
   );
 
-  const res = await dispatcher?.Transact(req);
-  log.info(res?.statusResponse);
+  for (let i = 0; i < transfers; i++) {
+    const res = await dispatcher?.Transact(req);
+    log.info(res?.statusResponse);
+  }
 }
 
 beforeAll(async () => {
@@ -272,7 +286,7 @@ beforeAll(async () => {
   await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   // Start monitoring system
   startDockerComposeService("otel-lgtm");
-  await executeTransfer();
+  await executeTransfer("100", 1, "100");
 }, TIMEOUT);
 
 afterEach(async () => {
@@ -288,6 +302,9 @@ afterAll(async () => {
   await besuEnv.tearDown();
   await ethereumEnv.tearDown();
 
+  if (gateway) {
+    await gateway.shutdown();
+  }
   await pruneDockerAllIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
@@ -296,9 +313,6 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-  if (gateway) {
-    await gateway.shutdown();
-  }
   stopDockerComposeService("otel-lgtm");
 }, TIMEOUT);
 
@@ -317,18 +331,18 @@ describe("otel-lgtm captures information when a transaction occurs", () => {
     // Wait for metrics to be captured
     await new Promise((res) => setTimeout(res, 15000));
 
-    const result = await waitForMetric("initiated_transfers");
+    const result = await waitForMetric("initiated_transactions");
 
-    const initiatedTransfersMetric = result.data.result.find(
+    const initiatedTransactionsMetric = result.data.result.find(
       (metric: { metric: { __name__: string } }) =>
-        metric.metric.__name__ === "initiated_transfers",
+        metric.metric.__name__ === "initiated_transactions",
     );
 
     // Make sure the metric exists
-    expect(initiatedTransfersMetric).toBeDefined();
+    expect(initiatedTransactionsMetric).toBeDefined();
 
     // Check if it has at least one value equal to "1"
-    const hasValueOne = initiatedTransfersMetric.values.some(
+    const hasValueOne = initiatedTransactionsMetric.values.some(
       ([, value]: [number, string]) => value === "1",
     );
 
@@ -342,7 +356,7 @@ describe("otel-lgtm captures information when a transaction occurs", () => {
     const end = Math.floor(Date.now() / 1000); // now in seconds
     const start = end - 60 * 60; // 1 hour ago
     const params = {
-      query: '{deployment_environment="development"}',
+      query: '{service_name="Satp-Hermes-Gateway"}',
       start: start,
       end: end,
       limit: 1000,

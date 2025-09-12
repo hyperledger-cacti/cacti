@@ -130,7 +130,10 @@ export class Stage1ClientService extends SATPService {
             resourceUrl: sessionData.resourceUrl,
             clientGatewayPubkey: sessionData.clientGatewayPubkey,
             serverGatewayPubkey: sessionData.serverGatewayPubkey,
-            hashPreviousMessage: "",
+            hashPreviousMessage: getMessageHash(
+              sessionData,
+              MessageType.PRE_SATP_TRANSFER_RESPONSE,
+            ),
           });
 
           if (sessionData.transferContextId != undefined) {
@@ -249,7 +252,7 @@ export class Stage1ClientService extends SATPService {
 
           saveTimestamp(
             sessionData,
-            MessageType.PRE_SATP_TRANSFER_REQUEST,
+            MessageType.INIT_PROPOSAL,
             TimestampType.PROCESSED,
           );
 
