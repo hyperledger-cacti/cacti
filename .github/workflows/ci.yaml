@@ -1814,33 +1814,6 @@ jobs:
         with:
           name: coverage-reports-35
           path: ./code-coverage-ts/**/
-  # cactus-plugin-satp-hermes:
-  #   continue-on-error: false
-  #   env:
-  #     FULL_BUILD_DISABLED: true
-  #     JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-  #     JEST_TEST_RUNNER_DISABLED: false
-  #     TAPE_TEST_RUNNER_DISABLED: true
-  #   needs: build-dev
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
-  #       uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
-  #       with:
-  #         node-version: ${{ env.NODEJS_VERSION }}
-  #     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-  #     - id: yarn-cache-dir-path
-  #       name: Get yarn cache directory path
-  #       run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
-  #     - id: yarn-cache
-  #       name: Restore Yarn Cache
-  #       uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
-  #       with:
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-  #         path: ./.yarn/
-  #         restore-keys: |
-  #           ${{ runner.os }}-yarn-
-  #     - run: ./tools/ci.sh
   cp-bungee-hermes:
     continue-on-error: false
     env:
