@@ -66,6 +66,9 @@ COPY ./satp-hermes-gateway.Dockerfile.healthcheck.mjs ${APP_DIR}/
 COPY ./supervisord.conf /etc/supervisord.conf
 #COPY ./start-satp.sh ${APP_DIR}/start-satp.sh
 
+COPY ./gateway_log_controller.sh ${APP_DIR}/gateway_log_controller.sh
+RUN chmod +x ${APP_DIR}/gateway_log_controller.sh
+
 # Install required npm packages
 RUN npm install fabric-common bufferutil
 
