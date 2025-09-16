@@ -9590,7 +9590,7 @@ __metadata:
     web3-core: "npm:4.1.1"
     web3-eth: "npm:4.1.1"
     web3-utils: "npm:4.3.0"
-    webpack: "npm:5.99.3"
+    webpack: "npm:5.99.4"
     webpack-cli: "npm:4.10.0"
     wget-improved: "npm:3.4.0"
     yargs: "npm:17.7.2"
@@ -53139,9 +53139,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.99.3":
-  version: 5.99.3
-  resolution: "webpack@npm:5.99.3"
+"webpack@npm:5.99.4":
+  version: 5.99.4
+  resolution: "webpack@npm:5.99.4"
   dependencies:
     "@types/eslint-scope": "npm:^3.7.7"
     "@types/estree": "npm:^1.0.6"
@@ -53171,7 +53171,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/07fb3e9b0fe1b3858945b62eac7aac75013f8486709a71dd97cdd4d299f47a372365be6ccbaf8af632c4bf9d8b3cc1ad96e0c8866f7f1c38af590cdf1f5b67a1
+  checksum: 10/0b8445b86aceec0dfb560e235eafc06e4c8f54b4501907142d75bdd832872371b636553ac26a86a9fc34db8defc2015fc6424e36d1b4860a771d76d826f925d1
   languageName: node
   linkType: hard
 
