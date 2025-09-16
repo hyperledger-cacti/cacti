@@ -1,7 +1,7 @@
 name: SATP-Hermes Gateway CI/CD
 
 # -----------------------------------------------------------------------------
-# PROCESS OVERVIEW (FULL PIPELINE DOCUMENTATION)
+# PROCESS OVERVIEW
 #
 # Purpose:
 #   CI/CD pipeline for the SATP (Secure Asset Transfer Protocol) Hermes Gateway plugin.
@@ -40,40 +40,61 @@ name: SATP-Hermes Gateway CI/CD
  #      - These jobs run on both push and pull_request events (trigger-level control).
  #      - IMPORTANT: Test jobs are configured to upload JUnit reports and coverage artifacts
  #        even if the test runner fails; the uploads are guarded with `if: always()` so
- #        artifacts are available to `test-aggregator` and for debugging.
+ #        artifacts are available for debugging. Each test job also runs individual test 
+ #        reporting with fail-on-error: true, so the job will fail if any tests fail.
 #
- #   5) test-aggregator
- #      - Collects JUnit reports from all test jobs and renders a combined report summary.
- #      - NOTE: `test-aggregator` is marked `continue-on-error: true` to allow maintainers
- #        to bypass test-aggregator failures and merge PRs even when aggregated test results
- #        indicate failures. This preserves the ability to merge for emergency fixes while
- #        still publishing test artifacts for auditing.
-#
-#   6) set-docker-tags
+ #   5) set-docker-tags
 #      - Computes image tags and version strings (tag_suffix, tag_version, dockerhub/ghcr image names).
+#      - SATP Tag Generation Process:
+#        * Default Development Mode: Creates date-based dev tags for all branches
+#          - Format: YYYY-MM-DD-dev-{git_short_hash} (e.g., "2025-09-16-dev-abc1234")
+#          - All branches (main, satp-dev, satp-stg) use same dev tag format
+#          - No 'latest' tag in development mode to avoid overriding stable releases
+#        * Release Mode: Activated via workflow_dispatch with is_release=true
+#          - Uses package.json version as the main tag (e.g., "0.0.1-beta")
+#          - Includes 'latest' tag to mark as the current stable release
+#          - Intended for official releases and deployments
+#        * Creates standardized image names:
+#          - Docker Hub: hyperledger/satp-hermes-gateway
+#          - GHCR: ghcr.io/hyperledger/satp-hermes-gateway
+#        * Outputs tag variables for consumption by downstream publish jobs
+#      - Manual Release Creation: Use 'create-release-version.yaml' workflow for official releases
+#        * Provides a GitHub UI button for creating releases
+#        * Validates version format and runs comprehensive tests
+#        * Creates GitHub releases with proper tagging and Docker image publishing
 #      - NOTE: in this workflow this job is conditional and will only run on push events
 #        to the release branches (main, satp-dev, satp-stg). Because of that, any jobs that
 #        `needs` set-docker-tags will be skipped when the job is not eligible.
+#      - Tag Propagation: The generated tags flow to Docker images through job outputs:
+#        set-docker-tags.outputs.tag_version → publish jobs → Docker image tags
 #
-#   7) build-satp-docker
+#   6) build-satp-docker
 #      - Builds a docker image (cacheable) for the SATP gateway using Buildx.
-#      - In this workflow this job is restricted to run only on push events to the release branches.
-#      - It logs into GHCR and pushes cache/tags when running on push.
-#      - If you want PR builds to also produce images for CI validation (but not push), consider
-#        changing the job-level `if` to allow pull_request and setting the build-push action's
-#        `push:` flag to conditional on event type.
+#      - This job builds the image for both push and PR events but does not push to registries.
+#      - Uses GitHub Actions cache (type=gha) for efficient builds across workflow runs.
+#      - The cache-from: type=gha leverages GitHub's Actions cache service to import build cache layers,
+#        significantly speeding up builds by reusing previously built layers and dependencies.
 #
-#   8) push-satp-image-dockerhub / push-satp-image-ghcr
-#      - These jobs retag the built image as `:latest` and push to Docker Hub and GHCR respectively.
-#      - Both are strictly gated to push-only events to release branches (they depend on push-only jobs
-#        and have `if:` filters restricting them to `github.event_name == 'push'` on release branches).
+#   7) publish-satp-images (sub-jobs running in parallel)
+#      - publish-satp-image-ghcr: Publishes Docker image to GitHub Container Registry (GHCR)
+#        using the built-in GITHUB_TOKEN for authentication.
+#      - publish-satp-image-dockerhub: Publishes Docker image to Docker Hub
+#        using repository secrets DOCKERHUB_USERNAME and DOCKERHUB_PAT.
+#      - Both sub-jobs run in parallel on push events to release branches for faster deployment.
+#      - Each sub-job builds and pushes directly with cache-from: type=gha for efficiency.
+#
+#   8) create-github-release (release mode only, manually triggered)
+#      - Creates official GitHub releases when workflow is triggered manually with is_release=true
+#      - Validates version format and generates comprehensive release notes
+#      - Includes Docker image pull commands and release metadata
+#      - Automatically determines if release is prerelease based on version (alpha/beta/rc)
 #
 # Conditions and secrets required for registry pushes:
-#   - push jobs require the following repository secrets to be set (used by login steps):
-#       * GHCR_USERNAME, GHCR_TOKEN
-#       * DOCKERHUB_USERNAME, DOCKERHUB_PAT
-#   - When running on pull_request events (especially from forks), these secrets are not available.
-#     The workflow currently avoids attempting registry logins/pushes on PRs by gating jobs/steps.
+#   - Docker Hub publish job requires repository secrets: DOCKERHUB_USERNAME, DOCKERHUB_PAT
+#   - GitHub Container Registry jobs use the built-in GITHUB_TOKEN (no custom secrets needed)
+#   - When running on pull_request events (especially from forks), custom secrets are not available.
+#     The workflow avoids attempting registry logins/pushes on PRs by gating jobs/steps.
+#   - Both publish jobs (GHCR and Docker Hub) run in parallel on push events for faster deployment.
 #
 # Artifacts published by jobs (names to reference):
 #   - satp-hermes-build-output: build outputs (dist)
@@ -93,17 +114,15 @@ name: SATP-Hermes Gateway CI/CD
 #     `${{ github.event_name == 'push' }}` so that images are built but not pushed when
 #     `github.event_name == 'pull_request'`.
 #   - Keep secrets out of PR logs and avoid login steps for PRs from forks.
-#
-# Quick mapping of job -> run condition summary (accurate to the YAML below):
+# Mapping of job -> run condition summary:
 #   - build-satp: runs on push and pull_request (trigger-level)
 #   - lint-satp: runs after build-satp (both events)
 #   - codegen-satp: needs [build-satp, lint-satp] (both events)
-#   - run-*-tests: run on both events (depend on build+codegen)
-#   - test-aggregator: runs after all tests
+#   - run-*-tests: run on both events (depend on build+codegen), fail if any tests fail
 #   - set-docker-tags: runs only on push to release branches (job-level `if`)
-#   - build-satp-docker: runs only on push to release branches (job-level `if`)
-#   - push-satp-image-dockerhub: runs only on push to release branches (job-level `if`)
-#   - push-satp-image-ghcr: runs only on push to release branches (job-level `if`)
+#   - build-satp-docker: runs on both push and PR events (builds only, no push)
+#   - publish-satp-image-ghcr: runs only on push to release branches (stage 7a - GHCR publishing)
+#   - publish-satp-image-dockerhub: runs only on push to release branches (stage 7b - Docker Hub publishing)
 #
 # Change log for maintainers:
 #   - Keep this documentation in sync with any future conditional changes to `if:` expressions
@@ -112,8 +131,21 @@ name: SATP-Hermes Gateway CI/CD
 # -----------------------------------------------------------------------------
 
 # Continuous Integration pipeline for the SATP (Secure Asset Transfer Protocol) Hermes Gateway.
-# This workflow orchestrates a comprehensive build, test, and deployment process:
+# This workflow orchestrates a comprehensive build, test, and deployment process with dual tagging modes:
 # 
+# DEVELOPMENT MODE (Default):
+# - Triggered by push/PR events on release branches
+# - Creates date-based development tags (YYYY-MM-DD-{env}-{hash})
+# - Builds, tests, and publishes development images without affecting 'latest' tag
+#
+# RELEASE MODE:
+# - Triggered manually via workflow_dispatch with is_release=true
+# - Uses package.json version for release tags (e.g., 0.0.1-beta)
+# - Updates 'latest' tag to point to new release
+# - Additional options: custom version, branch selection, test skipping
+# - Creates GitHub release with changelog and Docker image information
+#
+# Core Pipeline Features:
 # - Builds all monorepo dependencies and generates protocol artifacts (protobuf, OpenAPI, Solidity)
 # - Runs comprehensive test suites including unit tests and integration tests across multiple scenarios
 # - Validates code quality through linting and static analysis
@@ -123,6 +155,7 @@ name: SATP-Hermes Gateway CI/CD
 permissions:
   contents: write  # Required for test result publishing
   checks: write    # Required for test result reports
+  packages: write  # Required for publishing to GitHub Container Registry
 
 env:
   NODEJS_VERSION: v22.18.0
@@ -132,6 +165,31 @@ on:
     branches: [main, satp-dev, satp-stg]
   push:
     branches: [main, satp-dev, satp-stg]
+  workflow_dispatch:
+    inputs:
+      is_release:
+        description: 'Create release version using package.json version'
+        required: false
+        default: false
+        type: boolean
+      release_branch:
+        description: 'Branch to create release from (for manual releases)'
+        required: false
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - satp-stg
+          - satp-dev
+      custom_version:
+        description: 'Custom version tag (leave empty to use package.json version)'
+        required: false
+        type: string
+      skip_tests:
+        description: 'Skip test execution (for emergency releases only)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build-satp:
@@ -404,6 +462,7 @@ jobs:
   # Test execution jobs: run unit and integration tests in parallel
   run-satp-tests-unit:
     needs: [build-satp, codegen-satp]
+    if: github.event.inputs.skip_tests != 'true'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
@@ -472,7 +531,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: false
+          fail-on-error: true
 
       - name: Check for SATP unit coverage artifacts
         id: check_unit_coverage
@@ -493,6 +552,7 @@ jobs:
       
   run-satp-tests-integration-bridge:
     needs: [build-satp, codegen-satp]
+    if: github.event.inputs.skip_tests != 'true'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
@@ -564,7 +624,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-bridge.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: false
+          fail-on-error: true
 
       - name: Check for SATP bridge integration coverage artifacts
         id: check_bridge_coverage
@@ -584,6 +644,7 @@ jobs:
 
   run-satp-tests-integration-oracle:
     needs: [build-satp, codegen-satp]
+    if: github.event.inputs.skip_tests != 'true'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
@@ -657,7 +718,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-oracle.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: false
+          fail-on-error: true
 
       - name: Check for SATP oracle integration coverage artifacts
         id: check_oracle_coverage
@@ -680,6 +741,7 @@ jobs:
 
   run-satp-tests-integration-gateway:
     needs: [build-satp, codegen-satp]
+    if: github.event.inputs.skip_tests != 'true'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
@@ -753,7 +815,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-gateway.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: false
+          fail-on-error: true
 
       - name: Check for SATP gateway integration coverage artifacts
         id: check_gateway_coverage
@@ -776,6 +838,7 @@ jobs:
   # this can be achieved by allowing the docker tests to receive an ENV variable with docker tag (uses defaults)
   run-satp-tests-integration-docker:
     needs: [build-satp, codegen-satp]
+    if: github.event.inputs.skip_tests != 'true'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
@@ -849,7 +912,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-docker.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: false
+          fail-on-error: true
 
       - name: Check for SATP docker integration coverage artifacts
         id: check_docker_coverage
@@ -882,6 +945,7 @@ jobs:
 
   run-satp-tests-integration-cbdc:
     needs: [build-satp, codegen-satp]
+    if: github.event.inputs.skip_tests != 'true'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
@@ -955,7 +1019,7 @@ jobs:
           path: examples/cactus-example-cbdc-bridging-backend/reports/junit/cbdc-bridging-tests-integration.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: false
+          fail-on-error: true
 
       - name: Check for CBDC integration coverage artifacts
         id: check_cbdc_coverage
@@ -974,94 +1038,73 @@ jobs:
           path: |
             packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
 
-  # Run after all tests, collect reports, render summary and aggregate coverage
-  test-aggregator:
-    needs: [run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc, run-satp-tests-integration-docker]
-    runs-on:
-      group: cacti-default
-      labels: [cacti-large]
-    # Allow this job to fail without blocking downstream jobs; maintainers can bypass test-aggregator failures.
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@v4.1.7
-
-      # Download JUnit test reports uploaded by test jobs
-      - name: Download SATP unit test report artifacts
-        if: always()
-        uses: actions/download-artifact@v4
-        with:
-          path: ./test-reports/
-
-      - name: Download SATP integration test report - bridge artifacts
-        if: always()
-        uses: actions/download-artifact@v4
-        with:
-          path: ./test-reports/
-
-      - name: Download SATP integration test report - oracle artifacts
-        if: always()
-        uses: actions/download-artifact@v4
-        with:
-          path: ./test-reports/
-
-      - name: Download SATP integration test report - gateway artifacts
-        if: always()
-        uses: actions/download-artifact@v4
-        with:
-          path: ./test-reports/
-
-      - name: Download CBDC integration test report artifacts
-        if: always()
-        uses: actions/download-artifact@v4
-        with:
-          path: ./test-reports/
-
-      - name: Download SATP integration test report - docker artifacts
-        if: always()
-        uses: actions/download-artifact@v4
-        with:
-          path: ./test-reports/
-
-      # Render combined test report summary (always run)
-      - name: Render All Test Reports Summary
-        uses: dorny/test-reporter@v1.9.1
-        if: always()
-        with:
-          name: 🎯 Complete Test Suite Results
-          path: './test-reports/*.xml'
-          # reporter/list-tests are not valid inputs for actions/upload-artifact@v4
-          list-suites: all
-          max-annotations: 10
-          fail-on-error: false
-
   # Set Docker tags based on branch and commit information
   set-docker-tags:
-    needs: [build-satp, test-aggregator]
-    # Run on pushes to the release branches, and on PRs targeting those branches.
-    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg'))
+    needs: [build-satp, run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc, run-satp-tests-integration-docker]
+    # Handle conditional test dependencies - run if tests pass OR if tests are skipped in release mode
+    if: |
+      always() && (
+        (github.event.inputs.skip_tests == 'true' && github.event.inputs.is_release == 'true') ||
+        (needs.run-satp-tests-unit.result == 'success' && 
+         needs.run-satp-tests-integration-bridge.result == 'success' && 
+         needs.run-satp-tests-integration-oracle.result == 'success' && 
+         needs.run-satp-tests-integration-gateway.result == 'success' && 
+         needs.run-satp-tests-integration-cbdc.result == 'success' && 
+         needs.run-satp-tests-integration-docker.result == 'success') ||
+        (github.event.inputs.skip_tests != 'true' && 
+         (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) ||
+         (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) ||
+         github.event_name == 'workflow_dispatch')
+      )
     runs-on:
       group: cacti-default
       labels: [cacti-large]
     outputs:
+      package_version: ${{ steps.set_tags.outputs.package_version }}
       tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
       tag_version: ${{ steps.set_tags.outputs.tag_version }}
       dockerhub_image: ${{ steps.set_tags.outputs.dockerhub_image }}
       ghcr_image: ${{ steps.set_tags.outputs.ghcr_image }}
+      is_release: ${{ steps.set_tags.outputs.is_release }}
     steps:
       - uses: actions/checkout@v4.1.7  
       - name: Set image tags
         id: set_tags
         run: |
-          TAG_SUFFIX=$(if [ "${{ github.ref }}" = "refs/heads/main" ]; then echo "prod"; else echo "dev"; fi)
-          TAG_VERSION="$(date -u +"%Y-%m-%d")-${TAG_SUFFIX}-$(git rev-parse --short HEAD)"
-          DOCKERHUB_IMAGE="hyperledger/satp-hermes-gateway"
-          GHCR_IMAGE="ghcr.io/hyperledger-cacti/satp-hermes-gateway"
+          # Extract SATP package version from package.json
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
+          
+          # Check if this is a release build (manual trigger with is_release=true)
+          IS_RELEASE="${{ github.event.inputs.is_release }}"
+          if [ "$IS_RELEASE" = "true" ]; then
+            # Release mode: Use package.json version or custom version as the main tag
+            if [ -n "${{ github.event.inputs.custom_version }}" ]; then
+              TAG_VERSION="${{ github.event.inputs.custom_version }}"
+              echo "Building release version with custom version: ${{ github.event.inputs.custom_version }}"
+            else
+              TAG_VERSION="${PACKAGE_VERSION}"
+              echo "Building release version with package.json version: ${PACKAGE_VERSION}"
+            fi
+            TAG_SUFFIX="release"
+          else
+            # Development mode: Use date-based development tags for all branches
+            TAG_SUFFIX="dev"
+            TAG_VERSION="$(date -u +"%Y-%m-%d")-${TAG_SUFFIX}-$(git rev-parse --short HEAD)"
+            echo "Building development version: ${TAG_VERSION}"
+          fi
+          
+          # Standardized image names for both registries
+          BASE_IMAGE_NAME="hyperledger/satp-hermes-gateway"
+          DOCKERHUB_IMAGE="${BASE_IMAGE_NAME}"
+          GHCR_IMAGE="${BASE_IMAGE_NAME}"
           
           {
+            echo "package_version=${PACKAGE_VERSION}"
             echo "tag_suffix=${TAG_SUFFIX}"
             echo "tag_version=${TAG_VERSION}"
             echo "dockerhub_image=${DOCKERHUB_IMAGE}"
             echo "ghcr_image=${GHCR_IMAGE}"
+            echo "is_release=${IS_RELEASE:-false}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Debug Build Info
@@ -1081,10 +1124,10 @@ jobs:
 
   # Build Docker image once for caching and reuse by push jobs
   build-satp-docker:
-    needs: [build-satp, set-docker-tags, test-aggregator]
-    # Build Docker images for pushes and for PRs targeting the release branches.
-    # Registry login and pushes below are conditional on push events only.
-    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg'))
+    needs: [build-satp, set-docker-tags, run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc, run-satp-tests-integration-docker]
+    # Build Docker images for pushes, PRs targeting the release branches, and manual workflow dispatch.
+    # This job only builds, it does not push to registries.
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
@@ -1096,106 +1139,224 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
+      # Download build artifacts using reusable action
+      - name: Download SATP build artifacts
+        uses: ./.github/actions/satp-download-build-artifacts
+
       - name: Configure and ensure build artifacts
         run: |
-          yarn configure
           yarn install
+          yarn configure
           yarn lerna run build --scope=@hyperledger/cactus-plugin-satp-hermes
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to registries (GHCR)
-        if: ${{ github.event_name == 'push' }}
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.GHCR_USERNAME }}
-          password: ${{ secrets.GHCR_TOKEN }}
-
-      - name: Build and push/cache image (tagged)
+      - name: Build Docker image (no push)
         uses: docker/build-push-action@v5
         with:
           context: ./packages/cactus-plugin-satp-hermes/
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
-          # Only push to registries on actual push events. For PRs we still build and use cache, but do not push.
-          push: ${{ github.event_name == 'push' }}
+          # Build only, no push to registries
+          push: false
           tags: |
             ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }},
             ${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
-          cache-from: type=registry,ref=${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }},type=registry,ref=${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
-          cache-to: type=registry,ref=${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }},mode=max
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-  push-satp-image-dockerhub:
-    needs: [build-satp, build-satp-docker, set-docker-tags, test-aggregator]
-    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg'))
+  # =============================================================================
+  # STAGE 7: PUBLISH DOCKER IMAGES
+  # =============================================================================
+  # The following two jobs run in parallel on push events to release branches
+  # for faster deployment. Both jobs build and push Docker images directly with
+  # GitHub Actions cache (type=gha) for maximum efficiency.
+  #
+# TAGGING STRATEGY:
+# This workflow supports two distinct tagging modes:
+#
+# 1. DEVELOPMENT MODE (Default):
+#    - Triggered by: push events and pull requests
+#    - All Branches: Date-based format YYYY-MM-DD-dev-{git_hash}
+#    - Examples: "2025-09-16-dev-abc1234" (all branches use same format)
+#    - Latest Tag: NOT applied (preserves stable release as latest)
+#    - Use Case: Continuous integration, testing, development builds
+#
+# 2. RELEASE MODE:
+#    - Triggered by: workflow_dispatch with is_release=true
+#    - Tag Format: Uses package.json version (e.g., "0.0.1-beta", "1.2.3")
+#    - Latest Tag: APPLIED (marks as current stable release)
+#    - Use Case: Official releases, stable deployments
+#    - Alternative: Use dedicated 'create-release-version.yaml' workflow for full release process
+#
+# - Both registries use the same base image name: hyperledger/satp-hermes-gateway
+# - Each image gets appropriate tags based on the mode:
+#   * Development: Only version tag (no latest override)
+#   * Release: Both version tag AND latest tag
+# - Tag propagation flow:
+#   Git commit → set-docker-tags → job outputs → publish jobs → Docker registries
+# - Registries:
+#   * Docker Hub: hyperledger/satp-hermes-gateway:{version|latest}
+#   * GHCR: ghcr.io/hyperledger/satp-hermes-gateway:{version|latest}
+#
+# MANUAL RELEASE WORKFLOW:
+# The workflow includes integrated release functionality accessible via GitHub Actions UI:
+# 1. Navigate to GitHub Actions → "SATP-Hermes Gateway CI/CD"
+# 2. Click "Run workflow" and configure release options:
+#    - Set is_release=true for release mode
+#    - Select branch (main/satp-stg/satp-dev)  
+#    - Optionally specify custom version or use package.json version
+#    - Optionally skip tests for emergency releases
+# 3. Workflow creates GitHub release with proper tags and Docker image publishing
+# 4. Stage 8 job handles GitHub release creation with comprehensive release notes  # Stage 7a: Publish Docker image to GitHub Container Registry (GHCR)
+  publish-satp-image-ghcr:
+    needs: [build-satp, build-satp-docker, set-docker-tags, run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc, run-satp-tests-integration-docker]
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
     steps:
       - uses: actions/checkout@v4.1.7
-      - name: Debug Build Info
-        run: |
-          {
-            echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
-            echo "Debug: Building for dockerhub image = ${{ needs.set-docker-tags.outputs.dockerhub_image }}"
-            echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
-            echo "Debug: Working directory content:"
-            ls -la
-            echo "Debug: SATP plugin directory content:"
-            ls -la packages/cactus-plugin-satp-hermes/ || echo "Plugin directory not found"
-          }
-          
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          node-version: ${{ env.NODEJS_VERSION }}
-          
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push to GHCR (Release)
+        if: needs.set-docker-tags.outputs.is_release == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/cactus-plugin-satp-hermes/
+          file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+            ghcr.io/${{ needs.set-docker-tags.outputs.ghcr_image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push to GHCR (Development)
+        if: needs.set-docker-tags.outputs.is_release != 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/cactus-plugin-satp-hermes/
+          file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # Stage 7b: Publish Docker image to Docker Hub
+  publish-satp-image-dockerhub:
+    needs: [build-satp, build-satp-docker, set-docker-tags, run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc, run-satp-tests-integration-docker]
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
-        if: ${{ github.event_name == 'push' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
 
-      - name: Pull cached image and retag as latest
-        run: |
-          docker pull "${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}"
-          docker tag "${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}" "${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest"
-          docker push "${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest"
+      - name: Build and push to Docker Hub (Release)
+        if: needs.set-docker-tags.outputs.is_release == 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/cactus-plugin-satp-hermes/
+          file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
+          push: true
+          tags: |
+            ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+            ${{ needs.set-docker-tags.outputs.dockerhub_image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-  # Build and push Docker image to GitHub Container Registry
-  push-satp-image-ghcr:
-    needs: [build-satp, build-satp-docker, set-docker-tags, test-aggregator]
-    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg'))
+      - name: Build and push to Docker Hub (Development)
+        if: needs.set-docker-tags.outputs.is_release != 'true'
+        uses: docker/build-push-action@v5
+        with:
+          context: ./packages/cactus-plugin-satp-hermes/
+          file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
+          push: true
+          tags: |
+            ${{ needs.set-docker-tags.outputs.dockerhub_image }}:${{ needs.set-docker-tags.outputs.tag_version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # =============================================================================
+  # STAGE 8: CREATE GITHUB RELEASE (MANUAL RELEASE MODE ONLY)
+  # =============================================================================
+  # This job runs only when the workflow is manually triggered with is_release=true
+  # It creates a proper GitHub release with changelog and Docker image information
+
+  create-github-release:
+    needs: [set-docker-tags, publish-satp-image-ghcr, publish-satp-image-dockerhub]
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.is_release == 'true'
     runs-on:
       group: cacti-default
       labels: [cacti-large]
     steps:
       - uses: actions/checkout@v4.1.7
-      - name: Debug Build Info
-        run: |
-          {
-            echo "Debug: Building for tag version = ${{ needs.set-docker-tags.outputs.tag_version }}"
-            echo "Debug: Building for GHCR image = ${{ needs.set-docker-tags.outputs.ghcr_image }}"
-            echo "Debug: Node.js version = ${{ env.NODEJS_VERSION }}"
-            echo "Debug: Working directory content:"
-            ls -la
-            echo "Debug: SATP plugin directory content:"
-            ls -la packages/cactus-plugin-satp-hermes/ || echo "Plugin directory not found"
-          }
-          
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v4.0.3
         with:
-          node-version: ${{ env.NODEJS_VERSION }}
-          
-      - name: Pull cached image and retag as latest (GHCR)
-        if: ${{ github.event_name == 'push' }}
+          ref: ${{ github.event.inputs.release_branch || github.ref }}
+
+      - name: Validate version format
         run: |
-          echo "Logging in to GHCR"
-          echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
-          docker pull "${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}"
-          docker tag "${{ needs.set-docker-tags.outputs.ghcr_image }}:${{ needs.set-docker-tags.outputs.tag_version }}" "${{ needs.set-docker-tags.outputs.ghcr_image }}:latest"
-          docker push "${{ needs.set-docker-tags.outputs.ghcr_image }}:latest"
-  
+          VERSION="${{ needs.set-docker-tags.outputs.tag_version }}"
+          if ! echo "$VERSION" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+.*$'; then
+            echo "Error: Version '$VERSION' does not follow semantic versioning format (x.y.z)"
+            exit 1
+          fi
+          echo "Version format validated: $VERSION"
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: satp-v${{ needs.set-docker-tags.outputs.tag_version }}
+          release_name: SATP Hermes Gateway v${{ needs.set-docker-tags.outputs.tag_version }}
+          body: |
+            # SATP Hermes Gateway Release v${{ needs.set-docker-tags.outputs.tag_version }}
+            
+            This release was created from branch `${{ github.event.inputs.release_branch || github.ref }}`.
+            
+            ## Docker Images
+            
+            **Docker Hub:**
+            ```bash
+            docker pull hyperledger/satp-hermes-gateway:${{ needs.set-docker-tags.outputs.tag_version }}
+            docker pull hyperledger/satp-hermes-gateway:latest
+            ```
+            
+            **GitHub Container Registry:**
+            ```bash
+            docker pull ghcr.io/hyperledger/satp-hermes-gateway:${{ needs.set-docker-tags.outputs.tag_version }}
+            docker pull ghcr.io/hyperledger/satp-hermes-gateway:latest
+            ```
+            
+            ## Release Information
+            - Package Version: ${{ needs.set-docker-tags.outputs.package_version }}
+            - Release Version: ${{ needs.set-docker-tags.outputs.tag_version }}
+            - Custom Version: ${{ github.event.inputs.custom_version || 'None (using package.json)' }}
+            - Source Branch: ${{ github.event.inputs.release_branch || github.ref }}
+            - Tests Skipped: ${{ github.event.inputs.skip_tests }}
+            - Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            Released on: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          draft: false
+          prerelease: ${{ contains(needs.set-docker-tags.outputs.tag_version, 'alpha') || contains(needs.set-docker-tags.outputs.tag_version, 'beta') || contains(needs.set-docker-tags.outputs.tag_version, 'rc') }}
