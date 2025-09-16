@@ -135,7 +135,9 @@ on:
 
 jobs:
   build-satp:
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     continue-on-error: false
     env:
       # Disable full build to focus on SATP-specific components
@@ -233,7 +235,9 @@ jobs:
   # Code generation job: generates protobuf, OpenAPI SDKs, and Solidity artifacts
   codegen-satp: 
     needs: [build-satp, lint-satp]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -317,7 +321,9 @@ jobs:
   # Code quality validation: runs ESLint, OpenAPI validation, and protobuf linting
   lint-satp:
     needs: build-satp
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -398,7 +404,9 @@ jobs:
   # Test execution jobs: run unit and integration tests in parallel
   run-satp-tests-unit:
     needs: [build-satp, codegen-satp]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -485,7 +493,9 @@ jobs:
       
   run-satp-tests-integration-bridge:
     needs: [build-satp, codegen-satp]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -574,7 +584,9 @@ jobs:
 
   run-satp-tests-integration-oracle:
     needs: [build-satp, codegen-satp]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -668,7 +680,9 @@ jobs:
 
   run-satp-tests-integration-gateway:
     needs: [build-satp, codegen-satp]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -762,7 +776,9 @@ jobs:
   # this can be achieved by allowing the docker tests to receive an ENV variable with docker tag (uses defaults)
   run-satp-tests-integration-docker:
     needs: [build-satp, codegen-satp]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -866,7 +882,9 @@ jobs:
 
   run-satp-tests-integration-cbdc:
     needs: [build-satp, codegen-satp]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -959,7 +977,9 @@ jobs:
   # Run after all tests, collect reports, render summary and aggregate coverage
   test-aggregator:
     needs: [run-satp-tests-unit, run-satp-tests-integration-bridge, run-satp-tests-integration-oracle, run-satp-tests-integration-gateway, run-satp-tests-integration-cbdc, run-satp-tests-integration-docker]
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     # Allow this job to fail without blocking downstream jobs; maintainers can bypass test-aggregator failures.
     continue-on-error: true
     steps:
@@ -1019,7 +1039,9 @@ jobs:
     needs: [build-satp, test-aggregator]
     # Run on pushes to the release branches, and on PRs targeting those branches.
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg'))
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     outputs:
       tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
       tag_version: ${{ steps.set_tags.outputs.tag_version }}
@@ -1063,7 +1085,9 @@ jobs:
     # Build Docker images for pushes and for PRs targeting the release branches.
     # Registry login and pushes below are conditional on push events only.
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg'))
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     steps:
       - uses: actions/checkout@v4.1.7
 
@@ -1105,7 +1129,9 @@ jobs:
   push-satp-image-dockerhub:
     needs: [build-satp, build-satp-docker, set-docker-tags, test-aggregator]
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg'))
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Debug Build Info
@@ -1142,7 +1168,9 @@ jobs:
   push-satp-image-ghcr:
     needs: [build-satp, build-satp-docker, set-docker-tags, test-aggregator]
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg'))
-    runs-on: cacti-large
+    runs-on:
+      group: cacti-default
+      labels: [cacti-large]
     steps:
       - uses: actions/checkout@v4.1.7
       - name: Debug Build Info
