@@ -50,7 +50,6 @@ export interface MonitorServiceOptions {
   enabled?: boolean;
 }
 
-
 type MetricEntry =
   | { type: "counter"; metric: Counter }
   | { type: "updown"; metric: UpDownCounter };
@@ -195,7 +194,11 @@ export class MonitorService {
 
       this.sdk.start();
 
-      this.createCounter("gateways", "Total number of gateways connected", "updown");
+      this.createCounter(
+        "gateways",
+        "Total number of gateways connected",
+        "updown",
+      );
       this.createCounter(
         "created_sessions",
         "Total number of sessions created",
@@ -229,9 +232,13 @@ export class MonitorService {
       this.createCounter(
         "transaction_duration",
         "Transaction duration in milliseconds",
-        "updown"
+        "updown",
       );
-      this.createCounter("transaction_gas_used", "Transaction gas used", "updown");
+      this.createCounter(
+        "transaction_gas_used",
+        "Transaction gas used",
+        "updown",
+      );
       this.createCounter("operation_gas_used", "Operation gas used", "updown");
       this.createLog(
         "info",
@@ -282,7 +289,10 @@ export class MonitorService {
         counters.set(metricName, { type: "updown", metric: upDownCounter });
       }
       this.logger.debug(`${fnTag} - Created ${type} metric: ${metricName}`);
-      this.createLog("debug", `${fnTag} - Created ${type} metric: ${metricName}`);
+      this.createLog(
+        "debug",
+        `${fnTag} - Created ${type} metric: ${metricName}`,
+      );
     } else {
       this.logger.warn(
         `${fnTag} - Metric ${metricName} already exists. Skipping creation.`,
@@ -415,7 +425,9 @@ export class MonitorService {
       );
     }
     if (counter.type === "counter" && amount < 1) {
-      throw new Error(`${fnTag} - Amount must be a positive number for Counter.`);
+      throw new Error(
+        `${fnTag} - Amount must be a positive number for Counter.`,
+      );
     }
 
     counter.metric.add(amount, attributes, ctx);
