@@ -1,0 +1,85 @@
+name: SATP Hermes Gateway Release
+
+on:
+  workflow_call:
+    inputs:
+      is_release:
+        description: 'Create release version using package.json version'
+        required: false
+        default: false
+        type: boolean
+      release_branch:
+        description: 'Branch to create release from (for manual releases)'
+        required: false
+        default: 'main'
+        type: string
+      custom_version:
+        description: 'Custom version tag (leave empty to use package.json version)'
+        required: false
+        type: string
+      tag_version:
+        description: 'Tag version from docker stage'
+        required: true
+        type: string
+
+jobs:
+  # =============================================================================
+  # STAGE 8: CREATE GITHUB RELEASE (MANUAL RELEASE MODE ONLY)
+  # =============================================================================
+  # This job runs only when the workflow is manually triggered with is_release=true
+  # It creates a proper GitHub release with changelog and Docker image information
+
+  create-github-release:
+    if: inputs.is_release == 'true'
+    runs-on:
+      group: cacti-default
+      labels: [ubuntu-latest-16-cores]
+    steps:
+      - uses: actions/checkout@v4.1.7
+        with:
+          ref: ${{ inputs.release_branch || github.ref }}
+
+      - name: Validate version format
+        run: |
+          VERSION="${{ inputs.tag_version }}"
+          if ! echo "$VERSION" | grep -E '^[0-9]+\.[0-9]+\.[0-9]+.*$'; then
+            echo "Error: Version '$VERSION' does not follow semantic versioning format (x.y.z)"
+            exit 1
+          fi
+          echo "Version format validated: $VERSION"
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: satp-v${{ inputs.tag_version }}
+          release_name: SATP Hermes Gateway v${{ inputs.tag_version }}
+          body: |
+            # SATP Hermes Gateway Release v${{ inputs.tag_version }}
+            
+            This release was created from branch `${{ inputs.release_branch || github.ref }}`.
+            
+            ## Docker Images
+            
+            **Docker Hub:**
+            ```bash
+            docker pull hyperledger/satp-hermes-gateway:${{ inputs.tag_version }}
+            docker pull hyperledger/satp-hermes-gateway:latest
+            ```
+            
+            **GitHub Container Registry:**
+            ```bash
+            docker pull ghcr.io/hyperledger/satp-hermes-gateway:${{ inputs.tag_version }}
+            docker pull ghcr.io/hyperledger/satp-hermes-gateway:latest
+            ```
+            
+            ## Release Information
+            - Release Version: ${{ inputs.tag_version }}
+            - Custom Version: ${{ inputs.custom_version || 'None (using package.json)' }}
+            - Source Branch: ${{ inputs.release_branch || github.ref }}
+            - Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            Released on: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          draft: false
+          prerelease: ${{ contains(inputs.tag_version, 'alpha') || contains(inputs.tag_version, 'beta') || contains(inputs.tag_version, 'rc') }}

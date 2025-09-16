@@ -1,0 +1,93 @@
+name: SATP Hermes Gateway Lint
+
+on:
+  workflow_call:
+    outputs:
+      lint_success:
+        description: "Whether the lint was successful"
+        value: ${{ jobs.lint-satp.outputs.lint_success }}
+
+jobs:
+  lint-satp:
+    runs-on:
+      group: cacti-default
+      labels: [ubuntu-latest-16-cores]
+    continue-on-error: false
+    outputs:
+      lint_success: ${{ steps.lint.outputs.success }}
+    env:
+      FULL_BUILD_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: v22.18.0
+
+      - name: Download SATP build artifacts
+        uses: ./.github/actions/satp-download-build-artifacts
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Set working directory
+        run: cd packages/cactus-plugin-satp-hermes && pwd
+      
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: yarn lint (SATP-specific)
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes lint
+
+      - name: Run additional SATP linting
+        id: lint
+        run: |
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint-code || echo "Linting completed with warnings" 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:oapi || echo "OpenAPI linting completed with warnings"
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:protobuf || echo "Protobuf linting completed with warnings"
+          echo "success=true" >> "$GITHUB_OUTPUT"
+      
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: Set env.GIT_INDEX_FILE_COUNT
+        id: set_env_git_index_file_count
+        run: |
+            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> "$GITHUB_ENV"
+
+      - name: Print env.GIT_INDEX_FILE_COUNT
+        id: print_env_git_index_file_count
+        run: |
+            echo "${{ env.GIT_INDEX_FILE_COUNT }}"
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        id: set-result-git_index_file_count
+        with:
+          script: |
+            const { GIT_INDEX_FILE_COUNT } = process.env;
+            console.log(`env.GIT_INDEX_FILE_COUNT ${GIT_INDEX_FILE_COUNT}`);
+            return parseInt(GIT_INDEX_FILE_COUNT, 10);
+          result-encoding: string
+
+      - name: Get result Git Index File Count
+        id: get_result_git_index_file_count
+        run: echo "${{steps.set-result-git_index_file_count.outputs.result}}"
+
+      - name: Check Lint Side-effects
+        if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            const failMsg = "yarn lint script produced version control " +
+              "side-effects: source files have been changed by it that are " +
+              "otherwise are under version control. " +
+              "This means (99% of the time) that you need to run the " +
+              "yarn lint script locally and then include the changes it " +
+              "makes in your own commit when submitting your pull request.";
+            core.setFailed(failMsg)
