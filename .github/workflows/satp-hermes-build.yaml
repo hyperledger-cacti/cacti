@@ -1,0 +1,110 @@
+name: SATP Hermes Gateway Build
+
+on:
+  workflow_call:
+    outputs:
+      build_success:
+        description: "Whether the build was successful"
+        value: ${{ jobs.build-satp.outputs.build_success }}
+
+jobs:
+  build-satp:
+    runs-on: ubuntu-latest-16-cores
+    continue-on-error: false
+    outputs:
+      build_success: ${{ steps.build.outputs.success }}
+    env:
+      # Disable full build to focus on SATP-specific components
+      FULL_BUILD_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    steps:
+      # Install Cacti pre-requisites
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: v22.18.0
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+  
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Set working directory
+        run: cd packages/cactus-plugin-satp-hermes && pwd            
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Configure
+        run: yarn configure
+
+      - name: Build bundle
+        id: build
+        run: |
+          yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+          echo "success=true" >> "$GITHUB_OUTPUT"
+
+      # Upload build artifacts for reuse in other jobs
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-hermes-build-output
+          path: packages/cactus-plugin-satp-hermes/dist/
+
+      - name: Upload .yarn cache
+        id: upload_yarn_cache
+        if: always()
+        run: |
+          echo "Listing .yarn/ content (root):"
+          ls -la ./.yarn/ || echo "no .yarn directory"
+          if [ -d ./.yarn ] && [ "$(ls -A ./.yarn 2>/dev/null)" != "" ]; then
+            echo "Uploading .yarn cache artifact"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No yarn cache found, skipping upload"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload .yarn cache artifact
+        if: steps.upload_yarn_cache.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-hermes-yarn-cache
+          path: ./.yarn/
+
+      - name: Upload package .yarn cache as fallback
+        id: upload_yarn_cache_package
+        if: steps.upload_yarn_cache.outputs.found == 'false'
+        run: |
+          echo "Listing packages/cactus-plugin-satp-hermes/.yarn/ content:"
+          ls -la packages/cactus-plugin-satp-hermes/.yarn/ || echo "no package .yarn directory"
+          if [ -d packages/cactus-plugin-satp-hermes/.yarn ] && [ "$(ls -A packages/cactus-plugin-satp-hermes/.yarn 2>/dev/null)" != "" ]; then
+            echo "Uploading package .yarn cache as fallback"
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No package .yarn found, skipping upload"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload package .yarn cache artifact (fallback)
+        if: steps.upload_yarn_cache_package.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-hermes-yarn-cache
+          path: packages/cactus-plugin-satp-hermes/.yarn/

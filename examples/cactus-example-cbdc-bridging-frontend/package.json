@@ -9,7 +9,7 @@
     "Blockchain",
     "Distributed Ledger Technology"
   ],
-  "homepage": "",
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
   "bugs": {
     "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
@@ -23,6 +23,20 @@
     "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
+  "contributors": [
+    {
+      "name": "Eduardo Vasques",
+      "email": "eduardovasques10@tecnico.ulisboa.pt"
+    },
+    {
+      "name": "André Augusto",
+      "email": "andre.augusto@tecnico.ulisboa.pt"
+    },
+    {
+      "name": "Carlos Amaro",
+      "email": "carlosrscamaro@tecnico.ulisboa.pt"
+    }
+  ],
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
@@ -47,20 +61,6 @@
       "last 1 safari version"
     ]
   },
-  "contributors": [
-    {
-      "name": "Eduardo Vasques",
-      "email": "eduardovasques10@tecnico.ulisboa.pt"
-    },
-    {
-      "name": "André Augusto",
-      "email": "andre.augusto@tecnico.ulisboa.pt"
-    },
-    {
-      "name": "Carlos Amaro",
-      "email": "carlosrscamaro@tecnico.ulisboa.pt"
-    }
-  ],
   "dependencies": {
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",

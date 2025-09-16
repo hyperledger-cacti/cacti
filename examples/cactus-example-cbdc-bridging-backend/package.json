@@ -45,13 +45,31 @@
   "files": [
     "dist/*"
   ],
+  "scripts": {
+    "build:dev:backend:postbuild": "",
+    "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/openapi.yml -o ./src/main/json/openapi-bundled.json -r -t json",
+    "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/openapi.yml -o ./src/main/yml/openapi-bundled.yml -r -t yaml",
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "forge:all": "run-s 'forge:build'",
+    "forge:build": "forge build ./src/main/solidity/contracts/*.sol --out ./src/main/solidity/generated",
+    "format:eslint": "eslint '**/*.{js,ts}' --quiet --fix",
+    "format:prettier": "prettier --write --config ../../.prettierrc.js \"**/{openapi.json,*.ts,*.js}\"",
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:typescript-axios": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/openapi-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
+    "lint": "run-p 'lint:*'",
+    "lint-code": "run-s format:eslint format:prettier",
+    "lint:oapi": "vacuum lint -d -e ./src/main/yml/openapi-bundled.yml",
+    "start": "npx ts-node ./src/main/typescript/cbdc-bridging-app-cli.ts dotenv_config_path=./process.env",
+    "test": "nyc cucumber-js ./src/test/typescript/cucumber/features/*.feature --require-module ts-node/register --require './src/test/typescript/cucumber/*/*.ts'",
+    "test:integration": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration --runInBand --forceExit",
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+  },
   "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "moduleFileExtensions": [
       "ts",
       "tsx",
@@ -65,31 +83,13 @@
     },
     "modulePathIgnorePatterns": [
       "<rootDir>/dist/"
-    ]
-  },
-  "scripts": {
-    "build:dev:backend:postbuild": "",
-    "forge:all": "run-s 'forge:build'",
-    "forge:build": "forge build ./src/main/solidity/contracts/*.sol --out ./src/main/solidity/generated",
-    "start": "npx ts-node ./src/main/typescript/cbdc-bridging-app-cli.ts dotenv_config_path=./process.env",
-    "test": "nyc cucumber-js ./src/test/typescript/cucumber/features/*.feature --require-module ts-node/register --require './src/test/typescript/cucumber/*/*.ts'",
-    "test:integration": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration --runInBand --forceExit",
-    "watch": "npm-watch",
-    "webpack": "npm-run-all webpack:dev",
-    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
-    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
-    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js",
-    "codegen": "run-p 'codegen:*'",
-    "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:typescript-axios": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/openapi-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
-    "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/openapi.yml -o ./src/main/yml/openapi-bundled.yml -r -t yaml",
-    "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/openapi.yml -o ./src/main/json/openapi-bundled.json -r -t json",
-    "lint:oapi": "vacuum lint -d -e ./src/main/yml/openapi-bundled.yml",
-    "lint": "run-p 'lint:*'",
-    "lint-code": "run-s format:eslint format:prettier",
-    "format:eslint": "eslint '**/*.{js,ts}' --quiet --fix",
-    "format:prettier": "prettier --write --config ../../.prettierrc.js \"**/{openapi.json,*.ts,*.js}\""
+    ],
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    }
   },
   "dependencies": {
     "@hyperledger/cactus-api-client": "2.1.0",
