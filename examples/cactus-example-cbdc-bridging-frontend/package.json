@@ -1,39 +1,8 @@
 {
-  "name": "@hyperledger/cacti-example-cbdc-bridging-frontend",
-  "version": "2.1.0",
-  "description": "Frontend for CBDC sample application.",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Distributed Ledger Technology"
-  ],
-  "homepage": "",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cacti Contributors",
     "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
-  },
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "build": "react-app-rewired build",
-    "eject": "react-app-rewired eject",
-    "start": "react-app-rewired start",
-    "test": "react-app-rewired test"
   },
   "browserslist": {
     "production": [
@@ -46,6 +15,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "contributors": [
     {
@@ -91,6 +63,7 @@
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "5.1.0"
   },
+  "description": "Frontend for CBDC sample application.",
   "devDependencies": {
     "@types/customize-cra": "^1",
     "@types/uuid": "10.0.0",
@@ -102,7 +75,34 @@
     "node": ">=18",
     "npm": ">=8"
   },
+  "files": [
+    "dist/*"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Distributed Ledger Technology"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "name": "@hyperledger/cacti-example-cbdc-bridging-frontend",
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "scripts": {
+    "build": "react-app-rewired build",
+    "eject": "react-app-rewired eject",
+    "start": "react-app-rewired start",
+    "test": "react-app-rewired test"
+  },
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "version": "2.1.0"
 }

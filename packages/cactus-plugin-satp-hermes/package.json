@@ -1,31 +1,11 @@
 {
-  "name": "@hyperledger/cactus-plugin-satp-hermes",
-  "version": "2.1.0",
-  "description": "SATP implementation, based on the papers 1) HERMES: Fault-Tolerant Middleware for Blockchain Interoperability and 2) CBDC bridging between Hyperledger Fabric and permissioned EVM-based blockchains",
-  "keywords": [
-    "Hyperledger",
-    "Cacti",
-    "Integration",
-    "Blockchain",
-    "Interoperability",
-    "Distributed Ledger Technology",
-    "IETF",
-    "Hyperledger Cacti",
-    "Secure Asset Transfer Protocol"
-  ],
-  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
-  "bugs": {
-    "url": "https://github.com/hyperledger-cacti/cacti/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
-  },
-  "license": "Apache-2.0",
   "author": {
     "name": "Hyperledger Cacti Contributors",
     "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
   },
   "contributors": [
     {
@@ -58,89 +38,13 @@
       "url": "https://github.com/USERNAME1"
     }
   ],
-  "main": "dist/lib/main/typescript/index.js",
-  "module": "dist/lib/main/typescript/index.js",
-  "types": "dist/lib/main/typescript/index.d.ts",
-  "files": [
-    "dist/*"
-  ],
-  "scripts": {
-    "build:bundle": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil --external=pg-cloudflare",
-    "build:bundle:prod": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --minify --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil, --external=pg-cloudflare",
-    "build": "run-s codegen tsc",
-    "build:dev:backend:postbuild": "",
-    "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/json/openapi-blo-bundled.json -r -t json",
-    "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r -t yaml",
-    "codegen": "run-p 'codegen:*'",
-    "codegen:openapi": "npm run generate-sdk",
-    "codegen:proto": "buf build --verbose",
-    "db:init": "run-s db:init:local db:init:remote",
-    "db:init:local": "knex migrate:latest --knexfile src/knex/knexfile.ts",
-    "db:init:remote": "knex migrate:latest --knexfile src/knex/knexfile-remote.ts",
-    "db:rollback": "run-s db:rollback:local db:rollback:remote",
-    "db:rollback:local": "knex migrate:rollback --knexfile src/knex/knexfile.ts",
-    "db:rollback:remote": "knex migrate:rollback --knexfile src/knex/knexfile-remote.ts",
-    "forge:all": "run-s 'forge:build' 'forge:build:test' 'forge:test'",
-    "forge:build:all": "run-s forge:build:contracts forge:build:test",
-    "forge:build:contracts": "forge build ./src/main/solidity/contracts/*.sol --out ./src/main/solidity/generated",
-    "forge:build:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
-    "forge:test": "forge test --out ./src/test/solidity/generated",
-    "generate-sdk": "run-p 'generate-sdk:*'",
-    "generate-sdk:typescript-axios-bol": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/gateway-client/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
-    "lint": "run-s 'lint:*' 'lint-code'",
-    "lint-code": "run-s format:eslint format:prettier",
-    "format:eslint": "eslint --config ./.eslint.config.mjs '**/*.{js,ts}' --quiet --fix || true",
-    "format:prettier": "prettier --write --config ../../.prettierrc.js --ignore-path .prettierignore \"**/{openapi.json,*.ts,*.js}\"",
-    "lint:oapi": "vacuum lint -d -e ./src/main/yml/bol/openapi-blo-bundled.yml",
-    "lint:protobuf": "buf lint --verbose",
-    "pretsc": "npm run generate-sdk",
-    "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
-    "test:integration:gateway": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/gateway --runInBand --forceExit --config=jest.config-integration-gateway.ts",
-    "test:integration:bridge": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/bridge --runInBand --forceExit --config=jest.config-integration-bridge.ts",
-    "test:integration:oracle": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/oracle --runInBand --forceExit --config=jest.config-integration-oracle.ts",
-    "test:integration:docker": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/docker --runInBand --forceExit  --config=jest.config-integration-docker.ts",
-    "test:unit": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/unit --runInBand --forceExit --config=jest.config-unit.ts",
-    "test:integration": "NODE_OPTIONS=--max-old-space-size=8192 npx jest ./src/test/typescript/integration --runInBand --forceExit --config=jest.config-integration.ts",
-    "test": "run-s test:unit test:integration",
-    "tsc": "tsc --project ./tsconfig.json",
-    "watch": "tsc --build --watch",
-    "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
-    "db:destroy": "docker-compose down -v && npm run db:cleanup",
-    "db:start": "docker-compose up -d",
-    "db:stop": "docker-compose down",
-    "db:reset": "run-s db:destroy db:start db:migrate db:seed",
-    "db:migrate": "knex migrate:latest --knexfile src/knex/knexfile.js",
-    "db:migrate:production": "knex migrate:latest --env production --knexfile src/knex/knexfile.ts",
-    "db:seed": "knex seed:run --knexfile src/knex/knexfile.ts",
-    "db:cleanup": "find src/knex/ -name '.dev.local-*.sqlite3' -delete",
-    "docker:build:stable": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag hyperledger/cacti-satp-hermes-gateway:$(node -e \"console.log(require('./package.json').version)\")",
-    "docker:build:dev": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag kubaya/cacti-satp-hermes-gateway:$(git rev-parse --short HEAD)-$(date +\"%Y-%m-%d\")",
-    "docker:build:latest": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag hyperledger/cacti-satp-hermes-gateway:latest",
-    "docker:run:stable": "docker run -it hyperledger/cacti-satp-hermes-gateway:$(node -e \"console.log(require('./package.json').version)\")",
-    "docker:run:dev": "docker run -it hyperledger/cacti-satp-hermes-gateway:$(git rev-parse --short HEAD)-$(date +\"%Y-%m-%d\")",
-    "docker:compose": "docker compose --project-directory ./ -f ./docker-compose.yml up --build"
-  },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+  "customMetadata": {
+    "satp-draft-versions": {
+      "satp-core": "02",
+      "satp-architecture": "02",
+      "satp-crash": "02"
     },
-    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "moduleNameMapper": {
-      "^(\\.?\\.?/.*)\\.js$": "$1"
-    },
-    "modulePathIgnorePatterns": [
-      "<rootDir>/dist/"
-    ]
+    "satp-package-version": "0.0.1-beta"
   },
   "dependencies": {
     "@bufbuild/protobuf": "2.2.2",
@@ -211,10 +115,12 @@
     "web3": "4.4.0",
     "web3-utils": "1.6.1"
   },
+  "description": "SATP implementation, based on the papers 1) HERMES: Fault-Tolerant Middleware for Blockchain Interoperability and 2) CBDC bridging between Hyperledger Fabric and permissioned EVM-based blockchains",
   "devDependencies": {
     "@bufbuild/buf": "1.47.2",
     "@bufbuild/protoc-gen-es": "2.2.2",
     "@eslint/eslintrc": "3.3.1",
+    "@eslint/js": "9.35.0",
     "@grpc/proto-loader": "0.7.13",
     "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-test-geth-ledger": "2.1.0",
@@ -263,24 +169,119 @@
     "ts-node": "10.9.1",
     "typescript": "5.5.2"
   },
-  "resolutions": {
-    "form-data@>=4.0.0 <4.0.4": "4.0.4"
-  },
   "engines": {
     "node": ">=18",
     "npm": ">=8"
   },
+  "files": [
+    "dist/*"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json",
+      "node"
+    ],
+    "moduleNameMapping": {
+      "^(\\.?\\.?/.*)\\.js$": "$1"
+    },
+    "modulePathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ]
+  },
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Integration",
+    "Blockchain",
+    "Interoperability",
+    "Distributed Ledger Technology",
+    "IETF",
+    "Hyperledger Cacti",
+    "Secure Asset Transfer Protocol"
+  ],
+  "license": "Apache-2.0",
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "name": "@hyperledger/cactus-plugin-satp-hermes",
   "publishConfig": {
     "access": "public"
   },
-  "customMetadata": {
-    "satp-draft-versions": {
-      "satp-core": "02",
-      "satp-architecture": "02",
-      "satp-crash": "02"
-    },
-    "satp-package-version": "0.0.1-beta"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
   },
+  "resolutions": {
+    "form-data@>=4.0.0 <4.0.4": "4.0.4"
+  },
+  "scripts": {
+    "build": "run-s codegen tsc",
+    "build:bundle": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil --external=pg-cloudflare",
+    "build:bundle:prod": "ncc build ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js --minify --out=./dist/bundle/ncc/ --external=fabric-common --external=bufferutil, --external=pg-cloudflare",
+    "build:dev:backend:postbuild": "",
+    "bundle-openapi-json": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/json/openapi-blo-bundled.json -r -t json",
+    "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r -t yaml",
+    "codegen": "run-p 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "codegen:proto": "buf build --verbose",
+    "db:cleanup": "find src/knex/ -name '.dev.local-*.sqlite3' -delete",
+    "db:destroy": "docker-compose down -v && npm run db:cleanup",
+    "db:init": "run-s db:init:local db:init:remote",
+    "db:init:local": "knex migrate:latest --knexfile src/knex/knexfile.ts",
+    "db:init:remote": "knex migrate:latest --knexfile src/knex/knexfile-remote.ts",
+    "db:migrate": "knex migrate:latest --knexfile src/knex/knexfile.js",
+    "db:migrate:production": "knex migrate:latest --env production --knexfile src/knex/knexfile.ts",
+    "db:reset": "run-s db:destroy db:start db:migrate db:seed",
+    "db:rollback": "run-s db:rollback:local db:rollback:remote",
+    "db:rollback:local": "knex migrate:rollback --knexfile src/knex/knexfile.ts",
+    "db:rollback:remote": "knex migrate:rollback --knexfile src/knex/knexfile-remote.ts",
+    "db:seed": "knex seed:run --knexfile src/knex/knexfile.ts",
+    "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
+    "db:start": "docker-compose up -d",
+    "db:stop": "docker-compose down",
+    "docker:build:dev": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag kubaya/cacti-satp-hermes-gateway:$(git rev-parse --short HEAD)-$(date +\"%Y-%m-%d\")",
+    "docker:build:latest": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag hyperledger/cacti-satp-hermes-gateway:latest",
+    "docker:build:stable": "docker build --file ./satp-hermes-gateway.Dockerfile ./ --tag hyperledger/cacti-satp-hermes-gateway:$(node -e \"console.log(require('./package.json').version)\")",
+    "docker:compose": "docker compose --project-directory ./ -f ./docker-compose.yml up --build",
+    "docker:run:dev": "docker run -it hyperledger/cacti-satp-hermes-gateway:$(git rev-parse --short HEAD)-$(date +\"%Y-%m-%d\")",
+    "docker:run:stable": "docker run -it hyperledger/cacti-satp-hermes-gateway:$(node -e \"console.log(require('./package.json').version)\")",
+    "forge:all": "run-s 'forge:build' 'forge:build:test' 'forge:test'",
+    "forge:build:all": "run-s forge:build:contracts forge:build:test",
+    "forge:build:contracts": "forge build ./src/main/solidity/contracts/*.sol --out ./src/main/solidity/generated",
+    "forge:build:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
+    "forge:test": "forge test --out ./src/test/solidity/generated",
+    "format:eslint": "eslint --config ./.eslint.config.mjs '**/*.{js,ts}' --quiet --fix || true",
+    "format:prettier": "prettier --write --config ../../.prettierrc.js --ignore-path .prettierignore \"**/{openapi.json,*.ts,*.js}\"",
+    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk:typescript-axios-bol": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/bol/openapi-blo-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/gateway-client/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
+    "lint": "run-s 'lint:*' 'lint-code'",
+    "lint-code": "run-s format:eslint format:prettier",
+    "lint:oapi": "vacuum lint -d -e ./src/main/yml/bol/openapi-blo-bundled.yml",
+    "lint:protobuf": "buf lint --verbose",
+    "pretsc": "npm run generate-sdk",
+    "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
+    "test": "run-s test:unit test:integration",
+    "test:integration": "NODE_OPTIONS=--max-old-space-size=8192 npx jest ./src/test/typescript/integration --runInBand --forceExit --config=jest.config-integration.ts",
+    "test:integration:bridge": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/bridge --runInBand --forceExit --config=jest.config-integration-bridge.ts",
+    "test:integration:docker": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/docker --runInBand --forceExit  --config=jest.config-integration-docker.ts",
+    "test:integration:gateway": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/gateway --runInBand --forceExit --config=jest.config-integration-gateway.ts",
+    "test:integration:oracle": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/oracle --runInBand --forceExit --config=jest.config-integration-oracle.ts",
+    "test:unit": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/unit --runInBand --forceExit --config=jest.config-unit.ts",
+    "tsc": "tsc --project ./tsconfig.json",
+    "watch": "tsc --build --watch"
+  },
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "version": "2.1.0",
   "watch": {
     "tsc": {
       "patterns": [

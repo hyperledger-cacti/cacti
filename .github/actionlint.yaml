@@ -1,0 +1,8 @@
+# Configuration for actionlint
+# Documentation: https://github.com/rhysd/actionlint/blob/v1.7.7/docs/config.md
+
+# Configure labels for organization-level shared runners
+# cacti-large is a shared runner available to this organization
+self-hosted-runner:
+  labels:
+    - cacti-large

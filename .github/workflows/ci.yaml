@@ -226,6 +226,11 @@ jobs:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc g++ make pkg-config libsqlite3-dev
+
       - id: yarn-cache
         name: Initialize Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -234,6 +239,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean Yarn caches
+        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
+        run: yarn cache clean && rm -rf node_modules
 
       - if : ${{ (steps.yarn-cache.outputs.cache-hit != 'true') }}
         name: tools_ci_sh
@@ -256,6 +265,12 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc g++ make pkg-config libsqlite3-dev
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -264,6 +279,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
@@ -325,6 +344,11 @@ jobs:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc g++ make pkg-config libsqlite3-dev
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -333,6 +357,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
@@ -395,6 +423,12 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc g++ make pkg-config libsqlite3-dev
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -403,6 +437,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
   yarn_tools_validate_bundle_names:
     continue-on-error: false
@@ -422,6 +460,12 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc g++ make pkg-config libsqlite3-dev
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -430,6 +474,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
   cactus-api-client:
     continue-on-error: false
@@ -1304,6 +1352,12 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc g++ make pkg-config libsqlite3-dev
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -1312,6 +1366,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
@@ -1862,19 +1920,28 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 gcc g++ make pkg-config libsqlite3-dev
 
       - id: yarn-cache
         name: Restore Yarn Cache
-        uses: actions/cache@v4.2.2
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
   ct-api-client:
     continue-on-error: false

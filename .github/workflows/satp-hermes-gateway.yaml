@@ -17,9 +17,6 @@ name: SATP-Hermes Gateway CI/CD
 #   - .github/workflows/satp-hermes-docker.yaml - Docker image building and publishing
 #   - .github/workflows/satp-hermes-release.yaml - GitHub release creation
 #
-# NOTE: Currently using ubuntu-latest-16-cores runners while waiting for fix on runs-on: cacti-large
-#       These workflow files should be reverted to use cacti-large runners once the issue is resolved.
-#
 # Triggers:
 #   - push: branches [main, satp-dev, satp-stg]
 #   - pull_request: branches [main, satp-dev, satp-stg]
