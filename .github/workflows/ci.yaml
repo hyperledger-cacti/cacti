@@ -14,6 +14,7 @@ env:
   NODEJS_VERSION: v18.18.2
   RUN_TRIVY_SCAN: true
   RUN_CODE_COVERAGE: true
+  NODE_OPTIONS: --max-old-space-size=8192
 jobs:
   ActionLint:
     needs: check-ci-skip

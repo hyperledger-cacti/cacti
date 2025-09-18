@@ -627,8 +627,43 @@ export class Containers {
     const imageIds = existingImages.map((it) => it.Id);
     log.debug(`Clearing ${imageIds.length} images.... %o`, imageIds);
 
+    // Before removing images, stop and remove all containers that might be using them
+    try {
+      const allContainers = await docker.listContainers({ all: true });
+      log.debug(
+        `Found ${allContainers.length} containers to check for cleanup`,
+      );
+
+      for (const containerInfo of allContainers) {
+        try {
+          const container = docker.getContainer(containerInfo.Id);
+
+          // Stop container if running
+          if (containerInfo.State === "running") {
+            log.debug(`Stopping running container ${containerInfo.Id}`);
+            await container.stop({ t: 30 }); // 30 second timeout
+          }
+
+          // Remove container
+          log.debug(`Removing container ${containerInfo.Id}`);
+          await container.remove({ force: true });
+        } catch (containerEx) {
+          // Continue with other containers even if one fails
+          log.info(
+            `Ignoring failure to stop/remove container ${containerInfo.Id}:`,
+            containerEx,
+          );
+        }
+      }
+    } catch (ex) {
+      log.info(
+        `Ignoring failure to cleanup containers before image removal:`,
+        ex,
+      );
+    }
+
     const cleanUpCommands = [
-      { binary: "docker", args: ["rmi", ...imageIds] },
+      { binary: "docker", args: ["rmi", "--force", ...imageIds] },
       { binary: "docker", args: ["volume", "prune", "--force"] },
     ];
     for (const { binary, args } of cleanUpCommands) {
