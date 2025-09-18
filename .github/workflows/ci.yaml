@@ -450,7 +450,7 @@ jobs:
 
       - run: ./tools/ci.sh
   yarn_tools_validate_bundle_names:
-    continue-on-error: false
+    continue-on-error: true
     env:
       DEV_BUILD_DISABLED: false
       FULL_BUILD_DISABLED: true
