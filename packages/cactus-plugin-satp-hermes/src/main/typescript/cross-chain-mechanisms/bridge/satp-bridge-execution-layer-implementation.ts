@@ -120,8 +120,8 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           attributes.assetId = asset.id;
           attributes.operation = "wrapAsset";
 
-          this.monitorService.incrementCounter(
-            "gas_used",
+          this.monitorService.updateCounter(
+            "operation_gas_used",
             parsedReceipt.gas,
             attributes,
           );
@@ -186,8 +186,8 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           attributes.assetId = asset.id;
           attributes.operation = "unwrapAsset";
 
-          this.monitorService.incrementCounter(
-            "gas_used",
+          this.monitorService.updateCounter(
+            "operation_gas_used",
             parsedReceipt.gas,
             attributes,
           );
@@ -260,8 +260,8 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           attributes.assetId = asset.id;
           attributes.operation = "lockAsset";
 
-          this.monitorService.incrementCounter(
-            "gas_used",
+          this.monitorService.updateCounter(
+            "operation_gas_used",
             parsedReceipt.gas,
             attributes,
           );
@@ -331,8 +331,8 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           attributes.assetId = asset.id;
           attributes.operation = "unlockAsset";
 
-          this.monitorService.incrementCounter(
-            "gas_used",
+          this.monitorService.updateCounter(
+            "operation_gas_used",
             parsedReceipt.gas,
             attributes,
           );
@@ -402,8 +402,8 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           attributes.assetId = asset.id;
           attributes.operation = "mintAsset";
 
-          this.monitorService.incrementCounter(
-            "gas_used",
+          this.monitorService.updateCounter(
+            "operation_gas_used",
             parsedReceipt.gas,
             attributes,
           );
@@ -473,8 +473,8 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           attributes.assetId = asset.id;
           attributes.operation = "burnAsset";
 
-          this.monitorService.incrementCounter(
-            "gas_used",
+          this.monitorService.updateCounter(
+            "operation_gas_used",
             parsedReceipt.gas,
             attributes,
           );
@@ -546,8 +546,8 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           attributes.assetId = asset.id;
           attributes.operation = "assignAsset";
 
-          this.monitorService.incrementCounter(
-            "gas_used",
+          this.monitorService.updateCounter(
+            "operation_gas_used",
             parsedReceipt.gas,
             attributes,
           );

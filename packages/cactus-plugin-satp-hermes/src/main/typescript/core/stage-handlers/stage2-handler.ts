@@ -176,7 +176,13 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().recipientLedgerAssetId || undefined;
           attributes.satp_phase = 2;
 
-          this.monitorService.incrementCounter(
+          this.monitorService.updateCounter(
+            "ongoing_transactions",
+            -1,
+            attributes,
+          );
+
+          this.monitorService.updateCounter(
             "failed_transactions",
             1,
             attributes,
@@ -297,7 +303,13 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().recipientLedgerAssetId || undefined;
           attributes.satp_phase = 2;
 
-          this.monitorService.incrementCounter(
+          this.monitorService.updateCounter(
+            "ongoing_transactions",
+            -1,
+            attributes,
+          );
+
+          this.monitorService.updateCounter(
             "failed_transactions",
             1,
             attributes,

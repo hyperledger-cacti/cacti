@@ -180,7 +180,7 @@ export class SATPSession {
         sessionData.satpMessages.stage3 = create(Stage3MessagesSchema, {});
         sessionData.state = State.ONGOING;
 
-        this.monitorService.incrementCounter("created_sessions");
+        this.monitorService.updateCounter("created_sessions");
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
