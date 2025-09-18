@@ -657,7 +657,7 @@ export class GatewayOrchestrator {
           addedIDs.push(gateway.id);
         }
         this.logger.debug(`Added ${addedIDs.length} gateways: ${addedIDs}`);
-        this.monitorService.incrementCounter("gateways", addedIDs.length);
+        this.monitorService.updateCounter("gateways", addedIDs.length);
         return addedIDs;
       } catch (error) {
         span.setStatus({
@@ -692,7 +692,7 @@ export class GatewayOrchestrator {
     }
     this.channels.set(gateway.id, this.createChannel(gateway));
     this.counterPartyGateways.set(gateway.id, gateway);
-    this.monitorService.incrementCounter("gateways");
+    this.monitorService.updateCounter("gateways");
   }
 
   alreadyConnected(ID: string): boolean {

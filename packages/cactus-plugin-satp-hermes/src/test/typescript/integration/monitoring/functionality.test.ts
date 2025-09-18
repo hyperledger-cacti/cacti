@@ -331,11 +331,11 @@ describe("otel-lgtm captures information when a transaction occurs", () => {
     // Wait for metrics to be captured
     await new Promise((res) => setTimeout(res, 15000));
 
-    const result = await waitForMetric("initiated_transactions");
+    const result = await waitForMetric("initiated_transactions_total");
 
     const initiatedTransactionsMetric = result.data.result.find(
       (metric: { metric: { __name__: string } }) =>
-        metric.metric.__name__ === "initiated_transactions",
+        metric.metric.__name__ === "initiated_transactions_total",
     );
 
     // Make sure the metric exists

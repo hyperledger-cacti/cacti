@@ -1,6 +1,7 @@
 import {
   metrics,
   UpDownCounter,
+  Counter,
   Histogram,
   ObservableResult,
   Context,
@@ -49,11 +50,16 @@ export interface MonitorServiceOptions {
   enabled?: boolean;
 }
 
+
+type MetricEntry =
+  | { type: "counter"; metric: Counter }
+  | { type: "updown"; metric: UpDownCounter };
+
 /**
  * A map to hold counters for metrics.
- * The key is the metric name, and the value is the UpDownCounter instance.
+ * The key is the metric name, and the value is a MetricEntry (either Counter or UpDownCounter) instance.
  */
-export const counters: Map<string, UpDownCounter> = new Map();
+export const counters: Map<string, MetricEntry> = new Map();
 
 /**
  * A map to hold histograms for metrics.
@@ -108,11 +114,23 @@ export class MonitorService {
       label: this.label,
     });
     this.otelMetricsExporterUrl =
-      options.otelMetricsExporterUrl || "http://localhost:4318/v1/metrics";
+      options.otelMetricsExporterUrl ??
+      (process.env.OTEL_EXPORTER_OTLP_ENDPOINT
+        ? `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
+        : "http://localhost:4318/v1/metrics");
+
     this.otelTracesExporterUrl =
-      options.otelTracesExporterUrl || "http://localhost:4318/v1/traces";
+      options.otelTracesExporterUrl ??
+      (process.env.OTEL_EXPORTER_OTLP_ENDPOINT
+        ? `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
+        : "http://localhost:4318/v1/traces");
+
     this.otelLogsExporterUrl =
-      options.otelLogsExporterUrl || "http://localhost:4318/v1/logs";
+      options.otelLogsExporterUrl ??
+      (process.env.OTEL_EXPORTER_OTLP_ENDPOINT
+        ? `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs`
+        : "http://localhost:4318/v1/logs");
+
     this.isEnabled = options.enabled ?? process.env.NODE_ENV !== "test";
   }
 
@@ -177,37 +195,44 @@ export class MonitorService {
 
       this.sdk.start();
 
-      this.createUpDownCounter("gateways", "number of gateways");
-      this.createUpDownCounter(
+      this.createCounter("gateways", "Total number of gateways connected", "updown");
+      this.createCounter(
         "created_sessions",
-        "total number of sessions created",
+        "Total number of sessions created",
       );
-      this.createUpDownCounter(
+      this.createCounter(
         "total_value_exchanged",
-        "total value exchanged",
+        "Total token value exchanged",
       );
-      this.createUpDownCounter(
+      this.createCounter(
         "initiated_transactions",
-        "total number of initiated transactions",
+        "Total number of initiated transactions",
       );
-      this.createUpDownCounter(
+      this.createCounter(
         "successful_transactions",
-        "total number of successful transactions",
+        "Total number of successful transactions",
       );
-      this.createUpDownCounter(
+      this.createCounter(
+        "ongoing_transactions",
+        "Total number of ongoing transactions",
+        "updown",
+      );
+      this.createCounter(
         "failed_transactions",
-        "total number of failed transactions",
-      );
-      this.createUpDownCounter(
-        "transfer_duration",
-        "Transfer duration in milliseconds",
+        "Total number of failed transactions",
       );
       this.createHistogram(
         "operation_duration",
-        "total duration of operations",
+        "Operation duration in milliseconds",
         "ms",
       );
-      this.createUpDownCounter("gas_used", "total gas used");
+      this.createCounter(
+        "transaction_duration",
+        "Transaction duration in milliseconds",
+        "updown"
+      );
+      this.createCounter("transaction_gas_used", "Transaction gas used", "updown");
+      this.createCounter("operation_gas_used", "Operation gas used", "updown");
       this.createLog(
         "info",
         `${fnTag} - MonitorService initialization complete`,
@@ -225,14 +250,16 @@ export class MonitorService {
    *
    * @param metricName - The name of the metric to create.
    * @param description - A description of the metric.
+   * @param type - The type of metric to create ("counter" or "updown", default is "counter").
    * @throws {UninitializedMonitorServiceError} If the NodeSDK is not initialized.
    * @returns {Promise<void>} A promise that resolves when the metric is created.
    */
-  public async createUpDownCounter(
+  public async createCounter(
     metricName: string,
     description: string = "",
+    type: "counter" | "updown" = "counter",
   ): Promise<void> {
-    const fnTag = `${this.label}#createUpDownCounter()`;
+    const fnTag = `${this.label}#createCounter()`;
     if (!this.isEnabled) return;
     if (!this.sdk) {
       throw new UninitializedMonitorServiceError(
@@ -243,12 +270,19 @@ export class MonitorService {
     const meter = metrics.getMeterProvider().getMeter("satp-hermes-meter");
 
     if (!counters.has(metricName)) {
-      const counter = meter.createUpDownCounter(metricName, {
-        description: description,
-      });
-      counters.set(metricName, counter);
-      this.logger.debug(`${fnTag} - Created metric: ${metricName}`);
-      this.createLog("debug", `${fnTag} - Created metric: ${metricName}`);
+      if (type === "counter") {
+        const counter = meter.createCounter(metricName, {
+          description: description,
+        });
+        counters.set(metricName, { type: "counter", metric: counter });
+      } else if (type === "updown") {
+        const upDownCounter = meter.createUpDownCounter(metricName, {
+          description: description,
+        });
+        counters.set(metricName, { type: "updown", metric: upDownCounter });
+      }
+      this.logger.debug(`${fnTag} - Created ${type} metric: ${metricName}`);
+      this.createLog("debug", `${fnTag} - Created ${type} metric: ${metricName}`);
     } else {
       this.logger.warn(
         `${fnTag} - Metric ${metricName} already exists. Skipping creation.`,
@@ -262,6 +296,7 @@ export class MonitorService {
    *
    * @param metricName - The name of the histogram to create.
    * @param description - A description of the histogram.
+   * @param unit - The unit of measurement for the histogram (default is "ms").
    * @throws {UninitializedMonitorServiceError} If the NodeSDK is not initialized.
    * @returns {Promise<void>} A promise that resolves when the histogram is created.
    */
@@ -282,13 +317,9 @@ export class MonitorService {
 
     if (!histograms.has(metricName)) {
       const histogram = meter.createHistogram(metricName, {
-        advice: {
-          explicitBucketBoundaries: [
-            10, 50, 100, 500, 1000, 5000, 10000, 60000,
-          ],
-        },
         description,
         unit,
+        valueType: 1,
       });
       histograms.set(metricName, histogram);
       this.logger.debug(`${fnTag} - Created histogram: ${metricName}`);
@@ -358,9 +389,10 @@ export class MonitorService {
    * @param ctx - The context in which to increment the counter (default is the current context).
    * @throws {UninitializedMonitorServiceError} If the NodeSDK is not initialized.
    * @throws {Error} If the counter for the given metric does not exist.
+   * @throws {Error} If the amount to increment is less than 1.
    * @returns {Promise<void>} A promise that resolves when the counter is incremented.
    */
-  public async incrementCounter(
+  public async updateCounter(
     metricName: string,
     amount: number = 1,
     attributes: Record<
@@ -369,7 +401,7 @@ export class MonitorService {
     > = {},
     ctx: Context = context.active(),
   ): Promise<void> {
-    const fnTag = `${this.label}#incrementCounter()`;
+    const fnTag = `${this.label}#updateCounter()`;
     if (!this.isEnabled) return;
     if (!this.sdk) {
       throw new UninitializedMonitorServiceError(
@@ -379,10 +411,14 @@ export class MonitorService {
     const counter = counters.get(metricName);
     if (!counter) {
       throw new Error(
-        `${fnTag} - Counter ${metricName} not found. Did you call createUpDownCounter()?`,
+        `${fnTag} - Counter ${metricName} not found. Did you call createCounter()?`,
       );
     }
-    counter.add(amount, attributes, ctx);
+    if (counter.type === "counter" && amount < 1) {
+      throw new Error(`${fnTag} - Amount must be a positive number for Counter.`);
+    }
+
+    counter.metric.add(amount, attributes, ctx);
     this.logger.debug(
       `${fnTag} - Incremented counter: ${metricName} by ${amount} with attributes ${JSON.stringify(attributes)}`,
     );
