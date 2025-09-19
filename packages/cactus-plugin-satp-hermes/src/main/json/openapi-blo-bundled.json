@@ -2610,11 +2610,11 @@
               "type": "object",
               "description": "The network of the DLT being interacted with.",
               "properties": {
-                "id": {
+                "networkId.id": {
                   "type": "string",
                   "description": "The network of the DLT being interacted with."
                 },
-                "ledgerType": {
+                "networkId.ledgerType": {
                   "description": "Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.",
                   "type": "string",
                   "enum": [
@@ -2629,8 +2629,8 @@
                 }
               },
               "required": [
-                "id",
-                "ledgerType"
+                "networkId.id",
+                "networkId.ledgerType"
               ]
             },
             "required": true
