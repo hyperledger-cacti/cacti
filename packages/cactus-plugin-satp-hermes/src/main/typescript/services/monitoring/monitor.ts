@@ -147,7 +147,7 @@ export class MonitorService {
     }
 
     const resource = new Resource({
-      "service.name": "Satp-Hermes-Gateway",
+      "service.name": process.env.OTEL_SERVICE_NAME || "Satp-Hermes-Gateway",
     });
 
     if (!this.sdk) {
