@@ -1,4 +1,4 @@
-version: v2
+version: v1
 modules:
   - path: src/main/proto
 lint:

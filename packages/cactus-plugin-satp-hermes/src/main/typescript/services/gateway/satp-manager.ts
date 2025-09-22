@@ -112,6 +112,7 @@ export interface ISATPManagerOptions {
   claimFormat?: ClaimFormat;
   monitorService: MonitorService;
 }
+export { SATPSession };
 export class SATPManager {
   public static readonly CLASS_NAME = "SATPManager";
   private readonly logger: Logger;
@@ -502,7 +503,7 @@ export class SATPManager {
         if (serviceClasses.length !== serviceOptions.length) {
           throw new Error(
             `Number of services classes and options do not match. Each service class needs an options object.\n \
-                  Classes: ${serviceClasses.length}, Options: ${serviceOptions.length}`,
+                 Classes: ${serviceClasses.length}, Options: ${serviceOptions.length}`,
           );
         }
 
@@ -613,7 +614,7 @@ export class SATPManager {
         if (handlersClasses.length !== handlersOptions.length) {
           throw new Error(
             `Number of handler classes and options do not match. Each handler class needs an options object.\n \
-                  Classes: ${handlersClasses.length}, Options: ${handlersOptions.length}`,
+                 Classes: ${handlersClasses.length}, Options: ${handlersOptions.length}`,
           );
         }
 
@@ -655,6 +656,8 @@ export class SATPManager {
   ): Promise<void> {
     const fnTag = `${SATPManager.CLASS_NAME}#transfer()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    let currentStage: number;
+    let currentMessageType: MessageType;
     await context.with(ctx, async () => {
       try {
         try {
@@ -759,10 +762,11 @@ export class SATPManager {
             MessageType.NEW_SESSION_REQUEST,
             TimestampType.RECEIVED,
           );
-
           switch (stage) {
             case undefined:
             case MessageType.NEW_SESSION_REQUEST:
+              currentStage = 0;
+              currentMessageType = MessageType.NEW_SESSION_REQUEST;
               this.logger.debug(`${fnTag}, Initiating Stage 0`);
               newSessionRequest = await (
                 this.getSATPHandler(SATPHandlerType.STAGE0) as Stage0SATPHandler
@@ -776,6 +780,7 @@ export class SATPManager {
               }
 
             case MessageType.NEW_SESSION_RESPONSE:
+              currentMessageType = MessageType.NEW_SESSION_RESPONSE;
               if (!newSessionRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, NewSessionRequest`,
@@ -808,6 +813,7 @@ export class SATPManager {
               }
 
             case MessageType.PRE_SATP_TRANSFER_REQUEST:
+              currentMessageType = MessageType.PRE_SATP_TRANSFER_REQUEST;
               if (!newSessionResponse) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, NewSessionResponse`,
@@ -840,6 +846,7 @@ export class SATPManager {
               }
 
             case MessageType.PRE_SATP_TRANSFER_RESPONSE:
+              currentMessageType = MessageType.PRE_SATP_TRANSFER_RESPONSE;
               if (!preSATPTransferRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, PreSATPTransferRequest`,
@@ -873,6 +880,7 @@ export class SATPManager {
               }
 
             case MessageType.INIT_PROPOSAL:
+              currentMessageType = MessageType.INIT_PROPOSAL;
               if (!preSATPTransferResponse) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 0, PreSATPTransferResponse`,
@@ -891,6 +899,7 @@ export class SATPManager {
               }
 
               this.logger.debug(`${fnTag}, Initiating Stage 1`);
+              currentStage = 1;
 
               transferProposalRequest = await (
                 this.getSATPHandler(SATPHandlerType.STAGE1) as Stage1SATPHandler
@@ -907,6 +916,7 @@ export class SATPManager {
               }
             case MessageType.INIT_RECEIPT:
             case MessageType.INIT_REJECT:
+              currentMessageType = MessageType.INIT_RECEIPT;
               if (!transferProposalRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferProposalRequest`,
@@ -940,6 +950,7 @@ export class SATPManager {
                 );
               }
             case MessageType.TRANSFER_COMMENCE_REQUEST:
+              currentMessageType = MessageType.TRANSFER_COMMENCE_REQUEST;
               if (!transferProposalResponse) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferProposalResponse`,
@@ -968,6 +979,7 @@ export class SATPManager {
                 );
               }
             case MessageType.TRANSFER_COMMENCE_RESPONSE:
+              currentMessageType = MessageType.TRANSFER_COMMENCE_RESPONSE;
               if (!transferCommenceRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferCommenceRequest`,
@@ -1001,6 +1013,7 @@ export class SATPManager {
                 );
               }
             case MessageType.LOCK_ASSERT:
+              currentMessageType = MessageType.LOCK_ASSERT;
               if (!transferCommenceResponse) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 1, TransferCommenceResponse`,
@@ -1019,6 +1032,7 @@ export class SATPManager {
               }
 
               this.logger.debug(`${fnTag}, Initiating Stage 2`);
+              currentStage = 2;
 
               lockAssertionRequest = await (
                 this.getSATPHandler(SATPHandlerType.STAGE2) as Stage2SATPHandler
@@ -1031,6 +1045,7 @@ export class SATPManager {
                 );
               }
             case MessageType.ASSERTION_RECEIPT:
+              currentMessageType = MessageType.ASSERTION_RECEIPT;
               if (!lockAssertionRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 2, LockAssertionRequest`,
@@ -1062,6 +1077,7 @@ export class SATPManager {
                 );
               }
             case MessageType.COMMIT_PREPARE:
+              currentMessageType = MessageType.COMMIT_PREPARE;
               if (!lockAssertionResponse) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 2, LockAssertionResponse`,
@@ -1080,6 +1096,7 @@ export class SATPManager {
               }
 
               this.logger.debug(`${fnTag}, Initiating Stage 3`);
+              currentStage = 3;
 
               commitPreparationRequest = await (
                 this.getSATPHandler(SATPHandlerType.STAGE3) as Stage3SATPHandler
@@ -1092,6 +1109,7 @@ export class SATPManager {
                 );
               }
             case MessageType.COMMIT_READY:
+              currentMessageType = MessageType.COMMIT_READY;
               if (!commitPreparationRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitPreparationRequest`,
@@ -1124,6 +1142,7 @@ export class SATPManager {
                 );
               }
             case MessageType.COMMIT_FINAL:
+              currentMessageType = MessageType.COMMIT_FINAL;
               if (!commitReadyResponse) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitReadyResponse`,
@@ -1153,6 +1172,7 @@ export class SATPManager {
               }
 
             case MessageType.ACK_COMMIT_FINAL:
+              currentMessageType = MessageType.ACK_COMMIT_FINAL;
               if (!commitFinalAssertionRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitFinalAssertionRequest`,
@@ -1186,6 +1206,7 @@ export class SATPManager {
                 );
               }
             case MessageType.COMMIT_TRANSFER_COMPLETE:
+              currentMessageType = MessageType.COMMIT_TRANSFER_COMPLETE;
               if (!commitFinalAcknowledgementReceiptResponse) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, CommitFinalAcknowledgementReceiptResponse`,
@@ -1217,6 +1238,8 @@ export class SATPManager {
                 );
               }
             case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+              currentMessageType =
+                MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE;
               if (!transferCompleteRequest) {
                 this.logger.debug(
                   `${fnTag}, Recovering from Stage 3, TransferCompleteRequest`,
@@ -1263,7 +1286,15 @@ export class SATPManager {
             `${fnTag}, Transfer Completed for session: ${session.getSessionId()}`,
           );
         } catch (error) {
-          this.logger.error(`${fnTag}, Failed to transact\nError: ${error}`);
+          this.logger.error(
+            `${fnTag}, Failed to transact\nError: ${error.message}`,
+          );
+          error.message =
+            `\n ERROR for Session ID: ${session.getSessionId()}` +
+            `\nError during Stage: ${currentStage}, Message Type: ${getMessageTypeName(currentMessageType)}` +
+            `\nError message: ` +
+            `${error.message}`;
+
           throw new TransactError(fnTag, error);
         }
       } catch (error) {
