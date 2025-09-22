@@ -3,6 +3,7 @@
 - [PR Checklist - Maintainer/Reviewer](#pr-checklist---maintainerreviewer)
 - [Create local branch](#create-local-branch)
   - [Directory structure](#directory-structure)
+- [Create a new package](#create-a-new-package)
 - [Test Automation](#test-automation)
   - [Summary](#summary)
   - [Test Case Core Principles](#test-case-core-principles)
@@ -23,6 +24,7 @@
   - [On Reproducible Builds](#on-reproducible-builds)
 
 Thank you for your interest to contribute to Hyperledger Cacti! :tada:
+
 
 First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
 
@@ -191,7 +193,7 @@ NOTE: You can refer original tutorial ['GitHub Standard Fork & Pull Request Work
 
 ### Directory structure
 
-Whenever you begin to use your codes on Hyperledger Cacti, you should follow the directory strecture on Hyperledger Cacti.
+Whenever you begin to use your codes on Hyperledger Cacti, you should follow the directory structure on Hyperledger Cacti.
 The current directory structure is described as the following:
 
 > - contrib/ : Contributions from each participants, which are not directly dependent on Cacti code.
@@ -222,6 +224,76 @@ The current directory structure is described as the following:
 > - test/
 >   - docker-env/
 >   - kubernetes-env/
+
+## Create a new package
+
+To create a new package in Hyperledger Cacti:
+1. Create a new subfolder under the `/packages` folder;
+2. Name the folder according to the convention: `cacti-$PLUGIN_TYPE-$PLUGIN_FLAVOR`. Example: `cacti-plugin-satp-hermes`;
+3. Inside the new package folder, follow the base directory structure of the current packages (NOTE: the `dist` and `node_modules` are generated folders. As such, there is no need to create them previously):
+> - CHANGELOG.md
+> -  README.md
+> -  package.json
+> -  src
+>     - main
+>        - $language
+>        - $language
+>     - test
+>        - $language
+>        - $language
+> - tsconfig.json
+
+Example:
+> - CHANGELOG.md
+> -  README.md
+> -  package.json
+> -  src
+>     - main
+>        - typescript
+>        - yml
+>     - test
+>        - typescript
+>        - solidity
+> - tsconfig.json
+
+4. In the `package.json` file, change the name to `@hyperledger/<your-package-name>`. Example: `@hyperledger/cacti-plugin-satp-hermes`;
+5. In the `tsconfig.json` file, ensure it extends the Hyperledger Cacti base `tsconfig.ts` file. You can do it by following this example:
+   ``` 
+   { 
+      "extends": "../../tsconfig.base.json", 
+      "compilerOptions": 
+      { 
+         "composite": true, 
+         "outDir": "./dist/lib/", 
+         "declarationDir": "dist/lib", 
+         "rootDir": "./src", 
+         "tsBuildInfoFile": "../../.build-cache/cacti-plugin-satp-hermes.tsbuildinfo" 
+      }, 
+      "include": [ "./src" ], 
+      "references": [] 
+   } 
+   ```
+6. Add your new package to Hyperledger Cacti's base `tsconfig.json` file:
+```
+{ 
+   "references": [ 
+      { 
+         "path": "./packages/cacti-api-client/tsconfig.json" 
+      }, 
+      { 
+         "path": "./packages/cacti-plugin-my-new-package/tsconfig.json" 
+      }, 
+      { 
+      "path": "./packages/cacti-plugin-satp-hermes/tsconfig.json" 
+      }
+   ] 
+} 
+```
+NOTE: Sequence order matters. The packages are built sequentially which can raise some issues if there are dependencies between packages. More specialized packages (i.e. with more dependencies) should be inserted down the list.
+
+7. At base Hyperledger Cacti scope, run `yarn configure`. If it runs successfully, the new package was added!
+8. When testing, make sure to have a separate test package which is able to depend on the api-server package without causing circular dependencies. The name `cacti-test-$PLUGIN_TYPE-$PLUGIN_FLAVOR`, is recommended. Example: `cacti-test-plugin-satp-hermes`.
+
 
 ## Test Automation
 
