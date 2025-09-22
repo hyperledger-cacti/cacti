@@ -889,12 +889,40 @@ export class Stage3SATPHandler implements SATPHandler {
           }
           this.monitorService.updateCounter(
             "transaction_gas_used",
-            Number(JSON.parse(session.getClientSessionData().senderWrapAssertionClaim?.receipt ?? "{}").gas ?? 0) + Number(JSON.parse(session.getClientSessionData().lockAssertionClaim?.receipt ?? "{}").gas ?? 0) + Number(JSON.parse(session.getClientSessionData().burnAssertionClaim?.receipt ?? "{}").gas ?? 0),
+            Number(
+              JSON.parse(
+                session.getClientSessionData().senderWrapAssertionClaim
+                  ?.receipt ?? "{}",
+              ).gas ?? 0,
+            ) +
+              Number(
+                JSON.parse(
+                  session.getClientSessionData().lockAssertionClaim?.receipt ??
+                    "{}",
+                ).gas ?? 0,
+              ) +
+              Number(
+                JSON.parse(
+                  session.getClientSessionData().burnAssertionClaim?.receipt ??
+                    "{}",
+                ).gas ?? 0,
+              ),
             { ...attributes, side: "client" },
           );
           this.monitorService.updateCounter(
             "transaction_gas_used",
-            Number(JSON.parse(session.getServerSessionData().receiverWrapAssertionClaim?.receipt ?? "{}").gas ?? 0) + Number(JSON.parse(session.getServerSessionData().mintAssertionClaim?.receipt ?? "{}").gas ?? 0),
+            Number(
+              JSON.parse(
+                session.getServerSessionData().receiverWrapAssertionClaim
+                  ?.receipt ?? "{}",
+              ).gas ?? 0,
+            ) +
+              Number(
+                JSON.parse(
+                  session.getServerSessionData().mintAssertionClaim?.receipt ??
+                    "{}",
+                ).gas ?? 0,
+              ),
             { ...attributes, side: "server" },
           );
           this.monitorService.updateCounter(
