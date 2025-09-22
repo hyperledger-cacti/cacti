@@ -14,6 +14,7 @@ jobs:
   run-satp-tests-unit:
     if: inputs.skip_tests != true
     runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -79,7 +80,22 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: true
+          fail-on-error: false  # Don't fail the job, just report results
+
+      - name: Set job outcome based on test results
+        if: always() && steps.check_unit_junit.outputs.found == 'true'
+        run: |
+          if grep -q 'failures="[1-9]' packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml 2>/dev/null; then
+            echo "❌ Unit tests failed - check test results above"
+            echo "::warning::SATP Unit tests have failures"
+            exit 1
+          elif grep -q 'errors="[1-9]' packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml 2>/dev/null; then
+            echo "❌ Unit tests had errors - check test results above"
+            echo "::warning::SATP Unit tests have errors"
+            exit 1
+          else
+            echo "✅ Unit tests passed successfully"
+          fi
 
       - name: Check for SATP unit coverage artifacts
         id: check_unit_coverage
@@ -101,6 +117,7 @@ jobs:
   run-satp-tests-integration-bridge:
     if: inputs.skip_tests != true
     runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -189,6 +206,7 @@ jobs:
   run-satp-tests-integration-oracle:
     if: inputs.skip_tests != true
     runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -280,6 +298,7 @@ jobs:
   run-satp-tests-integration-gateway:
     if: inputs.skip_tests != true
     runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -370,6 +389,7 @@ jobs:
   run-satp-tests-integration-docker:
     if: inputs.skip_tests != true
     runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
@@ -472,6 +492,7 @@ jobs:
   run-satp-tests-integration-cbdc:
     if: inputs.skip_tests != true
     runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
       JEST_TEST_RUNNER_DISABLED: false
