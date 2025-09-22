@@ -230,10 +230,13 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
 
       - name: Install Python dependencies for ccmodel-hephaestus
         run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
           if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
             pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
           fi
@@ -254,7 +257,7 @@ jobs:
       - if : ${{ (steps.yarn-cache.outputs.cache-hit != 'true') }}
         name: tools_ci_sh
         run: ./tools/ci.sh
-
+  
   yarn_lint:
     continue-on-error: false
     env:
@@ -276,7 +279,16 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
+
+      - name: Install Python dependencies for ccmodel-hephaestus
+        run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
+          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
+            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
+          fi
 
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -354,7 +366,16 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
+
+      - name: Install Python dependencies for ccmodel-hephaestus
+        run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
+          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
+            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
+          fi
 
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -434,7 +455,7 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
 
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -449,6 +470,7 @@ jobs:
         run: yarn cache clean && rm -rf node_modules && yarn install --immutable
 
       - run: ./tools/ci.sh
+      
   yarn_tools_validate_bundle_names:
     continue-on-error: true
     env:
@@ -471,7 +493,7 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
 
       - id: yarn-cache
         name: Restore Yarn Cache
