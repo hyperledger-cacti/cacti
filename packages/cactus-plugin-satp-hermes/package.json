@@ -215,7 +215,7 @@
     "web3-utils": "1.6.1"
   },
   "devDependencies": {
-    "@bufbuild/buf": "1.30.0",
+    "@bufbuild/buf": "1.47.2",
     "@bufbuild/protoc-gen-es": "2.2.2",
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.35.0",

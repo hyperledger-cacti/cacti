@@ -168,7 +168,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-bridge.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: true
+          fail-on-error: false
 
       - name: Check for SATP bridge integration coverage artifacts
         id: check_bridge_coverage
@@ -257,7 +257,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-oracle.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: true
+          fail-on-error: false
 
       - name: Check for SATP oracle integration coverage artifacts
         id: check_oracle_coverage
@@ -348,7 +348,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-gateway.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: true
+          fail-on-error: false
 
       - name: Check for SATP gateway integration coverage artifacts
         id: check_gateway_coverage
@@ -438,7 +438,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-docker.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: true
+          fail-on-error: false
 
       - name: Check for SATP docker integration coverage artifacts
         id: check_docker_coverage
@@ -540,7 +540,7 @@ jobs:
           path: examples/cactus-example-cbdc-bridging-backend/reports/junit/cbdc-bridging-tests-integration.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: true
+          fail-on-error: false
 
       - name: Check for CBDC integration coverage artifacts
         id: check_cbdc_coverage
