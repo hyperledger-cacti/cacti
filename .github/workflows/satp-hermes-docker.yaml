@@ -17,6 +17,10 @@ on:
         description: 'Custom version tag (leave empty to use package.json version)'
         required: false
         type: string
+      build_run_id:
+        description: 'Build workflow run ID to download artifacts from'
+        required: true
+        type: string
     outputs:
       package_version:
         description: "Package version from package.json"
@@ -84,7 +88,7 @@ jobs:
           fi
           
           # Standardized image names for both registries
-          BASE_IMAGE_NAME="hyperledger/satp-hermes-gateway"
+          BASE_IMAGE_NAME="hyperledger/cacti-satp-hermes-gateway"
           DOCKERHUB_IMAGE="${BASE_IMAGE_NAME}"
           GHCR_IMAGE="${BASE_IMAGE_NAME}"
           
@@ -127,15 +131,38 @@ jobs:
         with:
           node-version: v22.18.0
 
-      # Download build artifacts using reusable action
+      # Download build artifacts from the build workflow
       - name: Download SATP build artifacts
-        uses: ./.github/actions/satp-download-build-artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: satp-hermes-build-output
+          path: packages/cactus-plugin-satp-hermes/dist/
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Configure and ensure build artifacts
+      - name: Download yarn cache (optional)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: satp-hermes-yarn-cache
+          path: ./.yarn/
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies (using cache if available)
         run: |
-          yarn install
+          yarn install --immutable
           yarn configure
-          yarn lerna run build --scope=@hyperledger/cactus-plugin-satp-hermes
+
+      - name: Build SATP Hermes bundle for Docker
+        working-directory: ./packages/cactus-plugin-satp-hermes/
+        run: |
+          # Ensure the output directory exists
+          mkdir -p dist/bundle/ncc
+          # Build the ncc bundle
+          npx ncc build src/main/typescript/satp-hermes.ts -o dist/bundle/ncc
+          # Verify the bundle was created
+          ls -la dist/bundle/ncc/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -167,6 +194,32 @@ jobs:
     runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@v4.1.7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: v22.18.0
+
+      # Download build artifacts from the build workflow
+      - name: Download SATP build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: satp-hermes-build-output
+          path: packages/cactus-plugin-satp-hermes/dist/
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies for bundle creation
+        working-directory: ./packages/cactus-plugin-satp-hermes/
+        run: |
+          # Only install what's needed for ncc bundling
+          yarn install --immutable
+          # Ensure the output directory exists
+          mkdir -p dist/bundle/ncc
+          # Build the ncc bundle using pre-built dist
+          npx ncc build dist/lib/main/typescript/satp-hermes.js -o dist/bundle/ncc
+          # Verify the bundle was created
+          ls -la dist/bundle/ncc/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -208,17 +261,48 @@ jobs:
     needs: [build-satp-docker, set-docker-tags]
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest-16-cores
+    continue-on-error: true  # Don't fail the workflow if Docker Hub push fails
     steps:
       - uses: actions/checkout@v4.1.7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: v22.18.0
+
+      # Download build artifacts from the build workflow
+      - name: Download SATP build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: satp-hermes-build-output
+          path: packages/cactus-plugin-satp-hermes/dist/
+          run-id: ${{ inputs.build_run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install dependencies for bundle creation
+        working-directory: ./packages/cactus-plugin-satp-hermes/
+        run: |
+          # Only install what's needed for ncc bundling
+          yarn install --immutable
+          # Ensure the output directory exists
+          mkdir -p dist/bundle/ncc
+          # Build the ncc bundle using pre-built dist
+          npx ncc build dist/lib/main/typescript/satp-hermes.js -o dist/bundle/ncc
+          # Verify the bundle was created
+          ls -la dist/bundle/ncc/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PAT }}
+        run: |
+          echo "🔍 Attempting Docker Hub login..."
+          echo "Username: ${DOCKERHUB_USERNAME:0:3}***"
+          echo "PAT configured: $([ -n "$DOCKERHUB_PAT" ] && echo 'yes' || echo 'no')"
+          docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PAT"
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_PAT: ${{ secrets.DOCKERHUB_PAT }}
 
       - name: Build and push to Docker Hub (Release)
         if: needs.set-docker-tags.outputs.is_release == 'true'

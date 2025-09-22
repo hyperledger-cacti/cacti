@@ -136,6 +136,7 @@ jobs:
       skip_tests: ${{ github.event.inputs.skip_tests == 'true' }}
       is_release: ${{ github.event.inputs.is_release == 'true' }}
       custom_version: ${{ github.event.inputs.custom_version }}
+      build_run_id: ${{ github.run_id }}
     secrets: inherit
 
   # Stage 6: Release Creation (Release Mode Only)

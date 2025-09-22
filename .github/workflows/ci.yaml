@@ -230,10 +230,13 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake openjdk-11-jdk wget
 
       - name: Install Python dependencies for ccmodel-hephaestus
         run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
           if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
             pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
           fi
@@ -254,7 +257,7 @@ jobs:
       - if : ${{ (steps.yarn-cache.outputs.cache-hit != 'true') }}
         name: tools_ci_sh
         run: ./tools/ci.sh
-
+  
   yarn_lint:
     continue-on-error: false
     env:
@@ -276,7 +279,16 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
+
+      - name: Install Python dependencies for ccmodel-hephaestus
+        run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
+          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
+            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
+          fi
 
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -354,7 +366,16 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake openjdk-11-jdk wget
+
+      - name: Install Python dependencies for ccmodel-hephaestus
+        run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
+          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
+            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
+          fi
 
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -366,12 +387,37 @@ jobs:
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
 
       - name: Clean and install dependencies
-        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+        run: yarn cache clean && rm -rf node_modules && yarn install --force
+
+      - name: Download OpenAPI Generator JAR
+        run: |
+          # Set Java environment
+          export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
+          java -version
+          # Ensure the OpenAPI generator CLI JAR is properly downloaded
+          echo "Downloading OpenAPI generator JAR..."
+          yarn codegen:install-cli || echo "CLI already installed"
+          yarn codegen:warmup-mkdir || echo "Directory already exists"
+          yarn codegen:warmup-v6.6.0 || echo "JAR download completed"
+          # Set the specific version
+          npx openapi-generator-cli version-manager set 6.6.0 || echo "Version set completed"
+          # Verify the JAR exists
+          if [ ! -f "./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar" ]; then
+            echo "JAR not found, attempting direct download..."
+            mkdir -p ./node_modules/@openapitools/openapi-generator-cli/versions/
+            wget -O ./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar
+          fi
+          echo "OpenAPI generator setup completed"
 
       - run: ./tools/ci.sh
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
-      - run: yarn codegen
+      - name: Run codegen with proper Java environment
+        run: |
+          export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
+          yarn codegen
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
 
@@ -434,7 +480,7 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
 
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -449,6 +495,7 @@ jobs:
         run: yarn cache clean && rm -rf node_modules && yarn install --immutable
 
       - run: ./tools/ci.sh
+      
   yarn_tools_validate_bundle_names:
     continue-on-error: true
     env:
@@ -471,7 +518,7 @@ jobs:
       - name: Install native build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
 
       - id: yarn-cache
         name: Restore Yarn Cache
