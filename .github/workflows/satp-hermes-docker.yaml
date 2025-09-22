@@ -149,18 +149,15 @@ jobs:
           run-id: ${{ inputs.build_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies (using cache if available)
-        run: |
-          yarn install --immutable
-          yarn configure
-
       - name: Build SATP Hermes bundle for Docker
         working-directory: ./packages/cactus-plugin-satp-hermes/
         run: |
+          # Only install what's needed for ncc bundling
+          yarn install --immutable
           # Ensure the output directory exists
           mkdir -p dist/bundle/ncc
-          # Build the ncc bundle
-          npx ncc build src/main/typescript/satp-hermes.ts -o dist/bundle/ncc
+          # Build the ncc bundle using pre-built dist
+          npx ncc build dist/lib/main/typescript/satp-hermes.js -o dist/bundle/ncc
           # Verify the bundle was created
           ls -la dist/bundle/ncc/
 
