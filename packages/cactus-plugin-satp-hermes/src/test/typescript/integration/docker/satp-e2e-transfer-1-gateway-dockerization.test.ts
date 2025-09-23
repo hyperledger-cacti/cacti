@@ -37,7 +37,10 @@ import {
   TokenType,
   TransactionApi,
 } from "../../../../main/typescript";
-import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
+import {
+  SATP_DOCKER_IMAGE_NAME,
+  SATP_DOCKER_IMAGE_VERSION,
+} from "../../constants";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -203,8 +206,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
       configPath: files.configPath,
@@ -360,8 +363,8 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
       configPath: files.configPath,
@@ -518,8 +521,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       logLevel,
       emitContainerLogs: true,
       configPath: files.configPath,

@@ -40,7 +40,10 @@ import {
   OracleTaskStatusEnum,
 } from "../../../../main/typescript";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
-import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
+import {
+  SATP_DOCKER_IMAGE_NAME,
+  SATP_DOCKER_IMAGE_VERSION,
+} from "../../constants";
 import { keccak256 } from "web3-utils";
 
 const logLevel: LogLevelDesc = "TRACE";
@@ -197,8 +200,8 @@ beforeAll(async () => {
 
   // gatewayRunner setup:
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-    containerImageVersion: DOCKER_IMAGE_VERSION,
-    containerImageName: DOCKER_IMAGE_NAME,
+    containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+    containerImageName: SATP_DOCKER_IMAGE_NAME,
     logLevel,
     emitContainerLogs: true,
     configPath: files.configPath,

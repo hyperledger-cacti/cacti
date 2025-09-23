@@ -40,7 +40,10 @@ import {
   TokenType,
   TransactionApi,
 } from "../../../../main/typescript";
-import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../../constants";
+import {
+  SATP_DOCKER_IMAGE_VERSION,
+  SATP_DOCKER_IMAGE_NAME,
+} from "../../constants";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
@@ -207,8 +210,8 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -427,8 +430,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -443,8 +446,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
@@ -686,8 +689,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -702,8 +705,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,

@@ -15,7 +15,10 @@ import {
 } from "../../../main/typescript/core/constants";
 import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
 import { setupGatewayDockerFiles } from "../test-utils";
-import { DOCKER_IMAGE_VERSION, DOCKER_IMAGE_NAME } from "../constants";
+import {
+  SATP_DOCKER_IMAGE_VERSION,
+  SATP_DOCKER_IMAGE_NAME,
+} from "../constants";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -49,8 +52,8 @@ describe("Instantiate SATP Gateway Runner", () => {
   });
 
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-    containerImageVersion: DOCKER_IMAGE_VERSION,
-    containerImageName: DOCKER_IMAGE_NAME,
+    containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+    containerImageName: SATP_DOCKER_IMAGE_NAME,
     serverPort: DEFAULT_PORT_GATEWAY_SERVER,
     clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
     oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
