@@ -54,12 +54,15 @@ ARG APP_DIR=/opt/cacti/satp-hermes
 WORKDIR /workspace
 
 # Copy workspace root files for yarn workspaces
-COPY ../../package.json ../../yarn.lock ../../lerna.json ./
+COPY ../../package.json ../../yarn.lock ../../lerna.json ../../.yarnrc.yml ./
 COPY ../../packages ./packages
 COPY ../../tsconfig.base.json ./
+COPY ../../.yarn ./.yarn
+# Enable Corepack and use the correct Yarn version specified in package.json
+RUN corepack enable
+RUN corepack prepare yarn@4.3.1 --activate
 
-# Install all workspace dependencies
-RUN yarn install
+RUN yarn install --immutable
 
 # Configure the workspace (required for monorepo setup)
 RUN yarn run configure
