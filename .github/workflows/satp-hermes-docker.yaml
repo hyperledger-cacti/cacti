@@ -17,10 +17,6 @@ on:
         description: 'Custom version tag (leave empty to use package.json version)'
         required: false
         type: string
-      build_run_id:
-        description: 'Build workflow run ID to download artifacts from'
-        required: true
-        type: string
     outputs:
       package_version:
         description: "Package version from package.json"
@@ -65,19 +61,19 @@ jobs:
       - name: Set image tags
         id: set_tags
         run: |
-          # Extract SATP package version from package.json
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
+          # Extract SATP package version from package.json customMetadata
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
           
           # Check if this is a release build (manual trigger with is_release=true)
           IS_RELEASE="${{ inputs.is_release }}"
           if [ "$IS_RELEASE" = "true" ]; then
-            # Release mode: Use package.json version or custom version as the main tag
+            # Release mode: Use package.json satp-package-version or custom version as the main tag
             if [ -n "${{ inputs.custom_version }}" ]; then
               TAG_VERSION="${{ inputs.custom_version }}"
               echo "Building release version with custom version: ${{ inputs.custom_version }}"
             else
               TAG_VERSION="${PACKAGE_VERSION}"
-              echo "Building release version with package.json version: ${PACKAGE_VERSION}"
+              echo "Building release version with satp-package-version: ${PACKAGE_VERSION}"
             fi
             TAG_SUFFIX="release"
           else
@@ -103,7 +99,7 @@ jobs:
 
       - name: Debug Build Info
         run: |
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
           {
             echo "Debug: Current ref = ${{ github.ref }}"
             echo "Debug: Event name = ${{ github.event_name }}"
@@ -112,7 +108,7 @@ jobs:
             echo "Debug: Building for tag version = ${{ steps.set_tags.outputs.tag_version }}"
             echo "Debug: Building for dockerhub image = ${{ steps.set_tags.outputs.dockerhub_image }}"
             echo "Debug: Node.js version = v22.18.0"
-            echo "Debug: Package version = ${PACKAGE_VERSION}"
+            echo "Debug: SATP package version = ${PACKAGE_VERSION}"
             echo "Debug: Commit hash = $(git rev-parse --short HEAD)"
           }
 
@@ -126,48 +122,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.7
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4.0.3
-        with:
-          node-version: v22.18.0
-
-      # Download build artifacts from the build workflow
-      - name: Download SATP build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: satp-hermes-build-output
-          path: packages/cactus-plugin-satp-hermes/dist/
-          run-id: ${{ inputs.build_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Download yarn cache (optional)
-        uses: actions/download-artifact@v4
-        continue-on-error: true
-        with:
-          name: satp-hermes-yarn-cache
-          path: ./.yarn/
-          run-id: ${{ inputs.build_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build SATP Hermes bundle for Docker
-        working-directory: ./packages/cactus-plugin-satp-hermes/
-        run: |
-          # Only install what's needed for ncc bundling
-          yarn install --immutable
-          # Ensure the output directory exists
-          mkdir -p dist/bundle/ncc
-          # Build the ncc bundle using pre-built dist
-          npx ncc build dist/lib/main/typescript/satp-hermes.js -o dist/bundle/ncc
-          # Verify the bundle was created
-          ls -la dist/bundle/ncc/
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image (no push)
         uses: docker/build-push-action@v5
         with:
-          context: ./packages/cactus-plugin-satp-hermes/
+          context: ./
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           # Build only, no push to registries
           push: false
@@ -192,32 +153,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.7
 
-      - name: Use Node.js
-        uses: actions/setup-node@v4.0.3
-        with:
-          node-version: v22.18.0
-
-      # Download build artifacts from the build workflow
-      - name: Download SATP build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: satp-hermes-build-output
-          path: packages/cactus-plugin-satp-hermes/dist/
-          run-id: ${{ inputs.build_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install dependencies for bundle creation
-        working-directory: ./packages/cactus-plugin-satp-hermes/
-        run: |
-          # Only install what's needed for ncc bundling
-          yarn install --immutable
-          # Ensure the output directory exists
-          mkdir -p dist/bundle/ncc
-          # Build the ncc bundle using pre-built dist
-          npx ncc build dist/lib/main/typescript/satp-hermes.js -o dist/bundle/ncc
-          # Verify the bundle was created
-          ls -la dist/bundle/ncc/
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -232,7 +167,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release == 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./packages/cactus-plugin-satp-hermes/
+          context: ./
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |
@@ -245,7 +180,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release != 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./packages/cactus-plugin-satp-hermes/
+          context: ./
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |
@@ -261,32 +196,6 @@ jobs:
     continue-on-error: true  # Don't fail the workflow if Docker Hub push fails
     steps:
       - uses: actions/checkout@v4.1.7
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4.0.3
-        with:
-          node-version: v22.18.0
-
-      # Download build artifacts from the build workflow
-      - name: Download SATP build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: satp-hermes-build-output
-          path: packages/cactus-plugin-satp-hermes/dist/
-          run-id: ${{ inputs.build_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install dependencies for bundle creation
-        working-directory: ./packages/cactus-plugin-satp-hermes/
-        run: |
-          # Only install what's needed for ncc bundling
-          yarn install --immutable
-          # Ensure the output directory exists
-          mkdir -p dist/bundle/ncc
-          # Build the ncc bundle using pre-built dist
-          npx ncc build dist/lib/main/typescript/satp-hermes.js -o dist/bundle/ncc
-          # Verify the bundle was created
-          ls -la dist/bundle/ncc/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -305,7 +214,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release == 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./packages/cactus-plugin-satp-hermes/
+          context: ./
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |
@@ -318,7 +227,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release != 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./packages/cactus-plugin-satp-hermes/
+          context: ./
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |

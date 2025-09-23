@@ -387,7 +387,7 @@ jobs:
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
 
       - name: Clean and install dependencies
-        run: yarn cache clean && rm -rf node_modules && yarn install --force
+        run: yarn cache clean && rm -rf node_modules && yarn install
 
       - name: Download OpenAPI Generator JAR
         run: |
