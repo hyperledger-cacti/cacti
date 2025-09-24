@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import type { Server } from "http";
 import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
@@ -1143,8 +1142,7 @@ export abstract class PluginSatpGateway
     sessionID: string,
     request: Promise<AxiosResponse>,
     message: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
+  ): Promise<AxiosResponse | void> {
     const fnTag = `${this.className}#makeRequest()`;
 
     const sessionData = this.sessions.get(sessionID);

@@ -1,13 +1,13 @@
 import { ILocalLog } from "../plugin-satp-gateway";
 import { ILocalLogRepository } from "./interfaces/repository";
 import knex, { Knex } from "knex";
+import * as knexfileConfig from "../../../knex/knexfile";
 
 export class KnexLocalLogRepository implements ILocalLogRepository {
   readonly database: Knex;
 
   public constructor(config: Knex.Config | undefined) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const configFile = require("../../../knex/knexfile.ts")[
+    const configFile = (knexfileConfig as Record<string, Knex.Config>)[
       process.env.ENVIRONMENT || "development"
     ];
 
