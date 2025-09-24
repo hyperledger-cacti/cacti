@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Configuration } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as FabricApi,

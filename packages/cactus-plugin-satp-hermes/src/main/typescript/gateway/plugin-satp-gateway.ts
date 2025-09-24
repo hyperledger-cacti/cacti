@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import type { Server } from "http";
 import type { Server as SecureServer } from "https";
 import { Optional } from "typescript-optional";
@@ -397,8 +396,7 @@ export abstract class PluginSatpGateway
     return this.objectSigner.sign(msg);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  verifySignature(obj: any, pubKey: string): boolean {
+  verifySignature(obj: IRemoteLog, pubKey: string): boolean {
     const sourceSignature = new Uint8Array(Buffer.from(obj.signature, "hex"));
     const sourcePubkey = new Uint8Array(Buffer.from(pubKey, "hex"));
 
@@ -1143,8 +1141,7 @@ export abstract class PluginSatpGateway
     sessionID: string,
     request: Promise<AxiosResponse>,
     message: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ): Promise<any> {
+  ): Promise<AxiosResponse | void> {
     const fnTag = `${this.className}#makeRequest()`;
 
     const sessionData = this.sessions.get(sessionID);
