@@ -7473,6 +7473,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@grpc/grpc-js@npm:1.11.3":
+  version: 1.11.3
+  resolution: "@grpc/grpc-js@npm:1.11.3"
+  dependencies:
+    "@grpc/proto-loader": "npm:^0.7.13"
+    "@js-sdsl/ordered-map": "npm:^4.4.2"
+  checksum: 10/b4662cd357296ff279e6f4ff4039fb5379d1087f9f7758102eae85a0d093cd8ec4054f27a62e27862efe67d8b25ad7b6733dcb0ffb0ecbc2bd9e3dcb9450d978
+  languageName: node
+  linkType: hard
+
 "@grpc/grpc-js@npm:1.12.4":
   version: 1.12.4
   resolution: "@grpc/grpc-js@npm:1.12.4"
@@ -8313,6 +8323,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hyperledger/cactus-common@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@hyperledger/cactus-common@npm:2.0.0"
+  dependencies:
+    fast-safe-stringify: "npm:2.1.1"
+    json-stable-stringify: "npm:1.0.1"
+    key-encoder: "npm:2.0.3"
+    loglevel: "npm:1.7.1"
+    loglevel-plugin-prefix: "npm:0.8.4"
+    run-time-error-cjs: "npm:1.4.0"
+    sanitize-html: "npm:2.12.1"
+    secp256k1: "npm:4.0.3"
+    sha3: "npm:2.1.4"
+  checksum: 10/8911016a7918b571eb7e4f1342bcb430f0f74dcdde08785407947588fef8c220589c566fc38dc343d3a30a22361fbd92c89acabcae626c6a67e8ae5de2fcfbde
+  languageName: node
+  linkType: hard
+
 "@hyperledger/cactus-common@npm:2.1.0, @hyperledger/cactus-common@workspace:packages/cactus-common":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-common@workspace:packages/cactus-common"
@@ -8334,6 +8361,21 @@ __metadata:
     uuid: "npm:10.0.0"
   languageName: unknown
   linkType: soft
+
+"@hyperledger/cactus-core-api@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@hyperledger/cactus-core-api@npm:2.0.0"
+  dependencies:
+    "@grpc/grpc-js": "npm:1.11.3"
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    ajv: "npm:8.17.1"
+    ajv-draft-04: "npm:1.0.0"
+    ajv-formats: "npm:3.0.1"
+    axios: "npm:1.7.7"
+    google-protobuf: "npm:3.21.4"
+  checksum: 10/c58b377ec94e5d1475cae1bbe08286ad2795abc89f17225af38db40a40db93b401754d5d82aa50fd57fd0759754de1cf1712866cb1393af2368f2fdb82a78c75
+  languageName: node
+  linkType: hard
 
 "@hyperledger/cactus-core-api@npm:2.1.0, @hyperledger/cactus-core-api@workspace:packages/cactus-core-api":
   version: 0.0.0-use.local
@@ -8360,6 +8402,25 @@ __metadata:
     typescript-optional: "npm:2.0.1"
   languageName: unknown
   linkType: soft
+
+"@hyperledger/cactus-core@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@hyperledger/cactus-core@npm:2.0.0"
+  dependencies:
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    "@hyperledger/cactus-core-api": "npm:2.0.0"
+    body-parser: "npm:1.20.3"
+    express: "npm:4.21.0"
+    express-jwt-authz: "npm:2.4.1"
+    express-openapi-validator: "npm:5.2.0"
+    http-errors: "npm:2.0.0"
+    http-errors-enhanced-cjs: "npm:2.0.1"
+    run-time-error-cjs: "npm:1.4.0"
+    safe-stable-stringify: "npm:2.4.3"
+    typescript-optional: "npm:2.0.1"
+  checksum: 10/4540a9e8bdbc1603a43d493c90c79e27ceb7d6d048eb8ab60c9ecba291feef0640c3df338266b84846250f3be793fa4003a20ef75f0a94a628d43f11b7cf34ca
+  languageName: node
+  linkType: hard
 
 "@hyperledger/cactus-core@npm:2.1.0, @hyperledger/cactus-core@workspace:packages/cactus-core":
   version: 0.0.0-use.local
@@ -9463,6 +9524,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@hyperledger/cactus-plugin-object-store-ipfs@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@hyperledger/cactus-plugin-object-store-ipfs@npm:2.0.0"
+  dependencies:
+    "@hyperledger/cactus-common": "npm:2.0.0"
+    "@hyperledger/cactus-core": "npm:2.0.0"
+    "@hyperledger/cactus-core-api": "npm:2.0.0"
+    axios: "npm:1.7.7"
+    run-time-error-cjs: "npm:1.4.0"
+    typescript-optional: "npm:2.0.1"
+    uuid: "npm:10.0.0"
+  checksum: 10/fe60471f20a034dc5374c0990bed8bd7c80da0675011c48fe4563a7f476a6971b19547342fa0c72169249710a209cc5c17a7cd3dcd8b162066b645d21f84e80c
+  languageName: node
+  linkType: hard
+
 "@hyperledger/cactus-plugin-object-store-ipfs@npm:2.1.0, @hyperledger/cactus-plugin-object-store-ipfs@workspace:extensions/cactus-plugin-object-store-ipfs":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-object-store-ipfs@workspace:extensions/cactus-plugin-object-store-ipfs"
@@ -9576,7 +9652,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger/cactus-plugin-object-store-ipfs": "npm:2.1.0"
+    "@hyperledger/cactus-plugin-object-store-ipfs": "npm:2.0.0"
     "@hyperledger/cactus-test-geth-ledger": "npm:2.1.0"
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
@@ -47853,6 +47929,13 @@ __metadata:
   dependencies:
     ret: "npm:~0.1.10"
   checksum: 10/5405b5a3effed649e6133d51d45cecbbbb02a1dd8d5b78a5e7979a69035870c817a5d2682d0ebb62188d3a840f7b24ea00ebbad2e418d5afabed151e8db96d04
+  languageName: node
+  linkType: hard
+
+"safe-stable-stringify@npm:2.4.3":
+  version: 2.4.3
+  resolution: "safe-stable-stringify@npm:2.4.3"
+  checksum: 10/a6c192bbefe47770a11072b51b500ed29be7b1c15095371c1ee1dc13e45ce48ee3c80330214c56764d006c485b88bd0b24940d868948170dddc16eed312582d8
   languageName: node
   linkType: hard
 

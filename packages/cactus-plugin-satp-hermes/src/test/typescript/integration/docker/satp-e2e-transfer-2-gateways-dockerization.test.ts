@@ -39,7 +39,10 @@ import {
   TokenType,
   TransactionApi,
 } from "../../../../main/typescript";
-import { DOCKER_IMAGE_NAME, DOCKER_IMAGE_VERSION } from "../../constants";
+import {
+  SATP_DOCKER_IMAGE_NAME,
+  SATP_DOCKER_IMAGE_VERSION,
+} from "../../constants";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const monitorService = MonitorService.createOrGetMonitorService({
@@ -283,8 +286,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -299,8 +302,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
@@ -526,8 +529,8 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -542,8 +545,8 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
@@ -788,8 +791,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -804,8 +807,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: DOCKER_IMAGE_VERSION,
-      containerImageName: DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,

@@ -51,37 +51,6 @@ RUN node -v && npm -v && dockerd --version && docker --version
 
 # Set workdir and prepare app directories
 ARG APP_DIR=/opt/cacti/satp-hermes
-WORKDIR /workspace
-
-# Copy workspace root files for yarn workspaces
-COPY ../../package.json ../../yarn.lock ../../lerna.json ../../.yarnrc.yml ./
-COPY ../../packages ./packages
-COPY ../../tsconfig.base.json ./
-COPY ../../.yarn ./.yarn
-# Enable Corepack and use the correct Yarn version specified in package.json
-RUN corepack enable
-RUN corepack prepare yarn@4.3.1 --activate
-
-RUN yarn install --immutable
-
-# Configure the workspace (required for monorepo setup)
-RUN yarn run configure
-
-# Build workspace dependencies that SATP depends on
-RUN yarn workspace @hyperledger/cactus-common build || true
-RUN yarn workspace @hyperledger/cactus-core build || true
-RUN yarn workspace @hyperledger/cactus-core-api build || true
-RUN yarn workspace @hyperledger/cactus-api-client build || true
-RUN yarn workspace @hyperledger/cactus-cmd-api-server build || true
-RUN yarn workspace @hyperledger/cactus-plugin-keychain-memory build || true
-RUN yarn workspace @hyperledger/cactus-plugin-ledger-connector-besu build || true
-RUN yarn workspace @hyperledger/cactus-plugin-ledger-connector-ethereum build || true
-RUN yarn workspace @hyperledger/cactus-plugin-ledger-connector-fabric build || true
-RUN yarn workspace @hyperledger/cactus-plugin-object-store-ipfs build || true
-RUN yarn workspace @hyperledger/cactus-plugin-bungee-hermes build || true
-RUN yarn workspace @hyperledger/cactus-test-tooling build || true
-
-# Set final workdir
 WORKDIR ${APP_DIR}
 
 RUN mkdir -p \
@@ -90,22 +59,14 @@ RUN mkdir -p \
     ${APP_DIR}/ontologies \
     ${APP_DIR}/database/migrations
 
-# Build the SATP Hermes plugin
-RUN yarn workspace @hyperledger/cactus-plugin-satp-hermes build
+# Copy application files
+COPY ./dist/bundle/ncc/ ${APP_DIR}
+COPY ./src/main/typescript/cross-chain-mechanisms/bridge/fabric-contracts ${APP_DIR}/../fabric-contracts
+COPY ./satp-hermes-gateway.Dockerfile.healthcheck.mjs ${APP_DIR}/
+COPY ./supervisord.conf /etc/supervisord.conf
+#COPY ./start-satp.sh ${APP_DIR}/start-satp.sh
 
-# Create ncc bundle
-RUN cd packages/cactus-plugin-satp-hermes && \
-    mkdir -p dist/bundle/ncc && \
-    npx ncc build dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js -o dist/bundle/ncc --external=fabric-common --external=bufferutil --external=pg-cloudflare
-
-# Copy the built bundle to the app directory
-RUN cp -r packages/cactus-plugin-satp-hermes/dist/bundle/ncc/* ${APP_DIR}/
-
-# Copy other necessary files from the SATP package
-RUN cp -r packages/cactus-plugin-satp-hermes/src/main/typescript/cross-chain-mechanisms/bridge/fabric-contracts ${APP_DIR}/../fabric-contracts
-RUN cp packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile.healthcheck.mjs ${APP_DIR}/
-RUN cp packages/cactus-plugin-satp-hermes/supervisord.conf /etc/supervisord.conf
-RUN cp packages/cactus-plugin-satp-hermes/gateway_log_controller.sh ${APP_DIR}/gateway_log_controller.sh
+COPY ./gateway_log_controller.sh ${APP_DIR}/gateway_log_controller.sh
 RUN chmod +x ${APP_DIR}/gateway_log_controller.sh
 
 # Install required npm packages
