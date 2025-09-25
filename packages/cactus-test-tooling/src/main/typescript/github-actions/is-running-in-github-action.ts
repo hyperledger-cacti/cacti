@@ -28,6 +28,6 @@ export function isRunningInGithubAction(
   // pull requests because it has to do with the stability of the CI/build/tests
   // and therefore the hacky workaround here instead of just deleteing the whole
   // mechanism completely.
-  //return false;
-  return env.GITHUB_ACTIONS === "true";
+  return false;
+  //return env.GITHUB_ACTIONS === "true";
 }

@@ -400,7 +400,7 @@ export class Stage0ServerService extends SATPService {
             sequenceNumber: Number(sessionData.lastSequenceNumber),
           });
 
-          this.Log.info(`${fnTag}, sending NewSessionRequest...`);
+          this.Log.info(`${fnTag}, sending NewSessionResponse...`);
 
           return newSessionResponse;
         } catch (error) {
