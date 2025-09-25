@@ -109,7 +109,7 @@ monitorService.init();
 const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
 
 const signer = new JsObjectSigner({
-  privateKey: keyPairs.privateKey,
+  privateKey: new Uint8Array(keyPairs.privateKey),
 });
 
 const connectedDLTs = [
