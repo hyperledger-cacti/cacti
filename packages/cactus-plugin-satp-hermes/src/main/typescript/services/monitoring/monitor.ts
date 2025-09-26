@@ -159,7 +159,7 @@ export class MonitorService {
           exporter: new OTLPMetricExporter({
             url: this.otelMetricsExporterUrl,
           }),
-          exportIntervalMillis: 100,
+          exportIntervalMillis: 1000,
         }),
         instrumentations: [getNodeAutoInstrumentations()],
         views: [
@@ -253,13 +253,13 @@ export class MonitorService {
   }
 
   /**
-   * Creates a metric with the given name and description.
+   * Creates a counter with the given name and description.
    *
-   * @param metricName - The name of the metric to create.
-   * @param description - A description of the metric.
-   * @param type - The type of metric to create ("counter" or "updown", default is "counter").
+   * @param metricName - The name of the counter to create.
+   * @param description - A description of the counter.
+   * @param type - The type of counter to create ("counter" or "updown", default is "counter").
    * @throws {UninitializedMonitorServiceError} If the NodeSDK is not initialized.
-   * @returns {Promise<void>} A promise that resolves when the metric is created.
+   * @returns {Promise<void>} A promise that resolves when the counter is created.
    */
   public async createCounter(
     metricName: string,
