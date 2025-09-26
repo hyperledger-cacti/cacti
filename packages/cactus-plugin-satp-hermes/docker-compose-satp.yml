@@ -21,7 +21,7 @@ services:
     image: grafana/otel-lgtm:latest
     container_name: otel-lgtm
     environment:
-      OTEL_METRIC_EXPORT_INTERVAL: "100"
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
       OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: explicit_bucket_histogram
     ports:
       - "4000:3000" # Grafana 

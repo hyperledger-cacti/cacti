@@ -113,7 +113,7 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().receiverAsset?.networkId?.id ||
             undefined;
           attributes.senderGatewayNetworkId =
-            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+            session?.getServerSessionData().senderGatewayNetworkId || undefined;
           attributes.receiverGatewayNetworkId =
             session?.getServerSessionData().recipientGatewayNetworkId ||
             undefined;
@@ -121,14 +121,14 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().assetProfileId || undefined;
           attributes.sessionId = session?.getSessionId() || undefined;
           attributes.sourceLedgerAssetId =
-            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+            session?.getServerSessionData().sourceLedgerAssetId || undefined;
           attributes.recipientLedgerAssetId =
             session?.getServerSessionData().recipientLedgerAssetId || undefined;
           attributes.satp_phase = 2;
           attributes.operation = "lockAssertion";
 
           const startTimestamp =
-            session.getClientSessionData().processedTimestamps?.stage2
+            session.getServerSessionData().receivedTimestamps?.stage2
               ?.lockAssertionRequestMessageTimestamp;
           const endTimestamp =
             session.getServerSessionData().processedTimestamps?.stage2
@@ -163,7 +163,7 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().receiverAsset?.networkId?.id ||
             undefined;
           attributes.senderGatewayNetworkId =
-            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+            session?.getServerSessionData().senderGatewayNetworkId || undefined;
           attributes.receiverGatewayNetworkId =
             session?.getServerSessionData().recipientGatewayNetworkId ||
             undefined;
@@ -171,7 +171,7 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().assetProfileId || undefined;
           attributes.sessionId = session?.getSessionId() || undefined;
           attributes.sourceLedgerAssetId =
-            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+            session?.getServerSessionData().sourceLedgerAssetId || undefined;
           attributes.recipientLedgerAssetId =
             session?.getServerSessionData().recipientLedgerAssetId || undefined;
           attributes.satp_phase = 2;
@@ -290,7 +290,7 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().receiverAsset?.networkId?.id ||
             undefined;
           attributes.senderGatewayNetworkId =
-            session?.getClientSessionData().senderGatewayNetworkId || undefined;
+            session?.getServerSessionData().senderGatewayNetworkId || undefined;
           attributes.receiverGatewayNetworkId =
             session?.getServerSessionData().recipientGatewayNetworkId ||
             undefined;
@@ -298,7 +298,7 @@ export class Stage2SATPHandler implements SATPHandler {
             session?.getServerSessionData().assetProfileId || undefined;
           attributes.sessionId = session?.getSessionId() || undefined;
           attributes.sourceLedgerAssetId =
-            session?.getClientSessionData().sourceLedgerAssetId || undefined;
+            session?.getServerSessionData().sourceLedgerAssetId || undefined;
           attributes.recipientLedgerAssetId =
             session?.getServerSessionData().recipientLedgerAssetId || undefined;
           attributes.satp_phase = 2;
