@@ -120,13 +120,14 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest-16-cores
     steps:
+      - uses: actions/checkout@v4.1.7
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'yarn'
-
-      - uses: actions/checkout@v4.1.7
+          cache-dependency-path: yarn.lock
       
       - id: yarn-cache
         name: Initialize Yarn Cache
@@ -163,7 +164,7 @@ jobs:
       - name: Build Docker image (no push)
         uses: docker/build-push-action@v5
         with:
-          context: ./
+          context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           # Build only, no push to registries
           push: false
@@ -193,6 +194,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'yarn'
+          cache-dependency-path: yarn.lock
 
       - name: Install dependencies and build bundle
         run: |
@@ -215,7 +217,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release == 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./
+          context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |
@@ -228,7 +230,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release != 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./
+          context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |
@@ -250,6 +252,7 @@ jobs:
         with:
           node-version: '22'
           cache: 'yarn'
+          cache-dependency-path: yarn.lock
 
       - name: Install dependencies and build bundle
         run: |
@@ -275,7 +278,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release == 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./
+          context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |
@@ -288,7 +291,7 @@ jobs:
         if: needs.set-docker-tags.outputs.is_release != 'true'
         uses: docker/build-push-action@v5
         with:
-          context: ./
+          context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
           push: true
           tags: |
