@@ -196,12 +196,17 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: yarn.lock
 
-      - name: Install dependencies and build bundle
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Configure
+        run: yarn configure
+
+      - name: Build bundle
+        id: build
         run: |
-          yarn install --frozen-lockfile
-          cd packages/cactus-plugin-satp-hermes
-          yarn run build
-          yarn run build:bundle
+          yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+          echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -254,12 +259,17 @@ jobs:
           cache: 'yarn'
           cache-dependency-path: yarn.lock
 
-      - name: Install dependencies and build bundle
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Configure
+        run: yarn configure
+
+      - name: Build bundle
+        id: build
         run: |
-          yarn install --frozen-lockfile
-          cd packages/cactus-plugin-satp-hermes
-          yarn run build
-          yarn run build:bundle
+          yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+          echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
