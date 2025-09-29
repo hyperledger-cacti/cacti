@@ -82,133 +82,97 @@ export class Stage0SATPHandler implements SATPHandler {
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
+      let session: SATPSession | undefined;
       try {
-        let session: SATPSession | undefined;
-        try {
-          this.Log.debug(`${fnTag}, New Session...`);
-          this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
+        this.Log.debug(`${fnTag}, New Session...`);
+        this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
 
-          session = this.sessions.get(req.sessionId);
+        session = this.sessions.get(req.sessionId);
 
-          if (req.gatewayId == "") {
-            throw new SenderGatewayNetworkIdError(fnTag);
-          }
-
-          if (!this.pubKeys.has(req.gatewayId)) {
-            throw new PubKeyError(fnTag);
-          }
-
-          session = await this.serverService.checkNewSessionRequest(
-            req,
-            session,
-            this.pubKeys.get(req.gatewayId)!,
-          );
-
-          this.sessions.set(session.getSessionId(), session);
-
-          saveMessageInSessionData(session.getServerSessionData(), req);
-
-          const message = await this.serverService.newSessionResponse(
-            req,
-            session,
-          );
-
-          if (!message) {
-            throw new FailedToCreateMessageError(
-              fnTag,
-              getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
-            );
-          }
-
-          this.Log.debug(`${fnTag}, Returning response: ${message}`);
-
-          saveMessageInSessionData(session.getServerSessionData(), message);
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 0;
-          attributes.operation = "newSession";
-
-          const startTimestamp =
-            session.getServerSessionData().receivedTimestamps?.stage0
-              ?.newSessionRequestMessageTimestamp;
-          const endTimestamp =
-            session.getServerSessionData().processedTimestamps?.stage0
-              ?.newSessionResponseMessageTimestamp;
-
-          if (startTimestamp && endTimestamp) {
-            const duration = Number(endTimestamp) - Number(startTimestamp);
-            await this.monitorService.recordHistogram(
-              "operation_duration",
-              duration,
-              attributes,
-            );
-          }
-
-          return message;
-        } catch (error) {
-          this.Log.error(
-            `${fnTag}, Error: ${new FailedToProcessError(
-              fnTag,
-              getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
-              error,
-            )}`,
-          );
-          setError(session, MessageType.NEW_SESSION_RESPONSE, error);
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 0;
-
-          this.monitorService.updateCounter(
-            "ongoing_transactions",
-            -1,
-            attributes,
-          );
-
-          this.monitorService.updateCounter(
-            "failed_transactions",
-            1,
-            attributes,
-          );
-          return await this.serverService.newSessionErrorResponse(error);
+        if (req.gatewayId == "") {
+          throw new SenderGatewayNetworkIdError(fnTag);
         }
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
+
+        if (!this.pubKeys.has(req.gatewayId)) {
+          throw new PubKeyError(fnTag);
+        }
+
+        session = await this.serverService.checkNewSessionRequest(
+          req,
+          session,
+          this.pubKeys.get(req.gatewayId)!,
+        );
+
+        this.sessions.set(session.getSessionId(), session);
+
+        saveMessageInSessionData(session.getServerSessionData(), req);
+
+        const message = await this.serverService.newSessionResponse(
+          req,
+          session,
+        );
+
+        if (!message) {
+          throw new FailedToCreateMessageError(
+            fnTag,
+            getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+          );
+        }
+
+        this.Log.debug(`${fnTag}, Returning response: ${message}`);
+
+        saveMessageInSessionData(session.getServerSessionData(), message);
+
+        attributes.senderNetworkId =
+          session?.getServerSessionData().senderAsset?.networkId?.id ||
+          undefined;
+        attributes.receiverNetworkId =
+          session?.getServerSessionData().receiverAsset?.networkId?.id ||
+          undefined;
+        attributes.senderGatewayNetworkId =
+          session?.getServerSessionData().senderGatewayNetworkId || undefined;
+        attributes.receiverGatewayNetworkId =
+          session?.getServerSessionData().recipientGatewayNetworkId ||
+          undefined;
+        attributes.assetProfileId =
+          session?.getServerSessionData().assetProfileId || undefined;
+        attributes.sessionId = session?.getSessionId() || undefined;
+        attributes.sourceLedgerAssetId =
+          session?.getServerSessionData().sourceLedgerAssetId || undefined;
+        attributes.recipientLedgerAssetId =
+          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        attributes.satp_phase = 0;
+        attributes.operation = "newSession";
+
+        const startTimestamp =
+          session.getServerSessionData().receivedTimestamps?.stage0
+            ?.newSessionRequestMessageTimestamp;
+        const endTimestamp =
+          session.getServerSessionData().processedTimestamps?.stage0
+            ?.newSessionResponseMessageTimestamp;
+
+        if (startTimestamp && endTimestamp) {
+          const duration = Number(endTimestamp) - Number(startTimestamp);
+          await this.monitorService.recordHistogram(
+            "operation_duration",
+            duration,
+            attributes,
+          );
+        }
+
+        return message;
+      } catch (error) {
+        this.Log.error(
+          `${fnTag}, Error: ${new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.NEW_SESSION_RESPONSE),
+            error,
+          )}`,
+        );
+        setError(session, MessageType.NEW_SESSION_RESPONSE, error);
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        return await this.serverService.newSessionErrorResponse(error);
       } finally {
         span.end();
       }
@@ -227,129 +191,94 @@ export class Stage0SATPHandler implements SATPHandler {
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
+      let session: SATPSession | undefined;
       try {
-        let session: SATPSession | undefined;
-        try {
-          this.Log.debug(`${fnTag}, PreSATPTransfer...`);
-          this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
+        this.Log.debug(`${fnTag}, PreSATPTransfer...`);
+        this.Log.debug(`${fnTag}, Request: ${safeStableStringify(req)}}`);
 
-          session = this.sessions.get(req.sessionId);
+        session = this.sessions.get(req.sessionId);
 
-          if (!session) {
-            throw new SessionNotFoundError(fnTag);
-          }
+        if (!session) {
+          throw new SessionNotFoundError(fnTag);
+        }
 
-          span.setAttribute("sessionId", session.getSessionId() || "");
+        span.setAttribute("sessionId", session.getSessionId() || "");
 
-          await this.serverService.checkPreSATPTransferRequest(req, session);
+        await this.serverService.checkPreSATPTransferRequest(req, session);
 
-          saveMessageInSessionData(session.getServerSessionData(), req);
+        saveMessageInSessionData(session.getServerSessionData(), req);
 
-          await this.serverService.wrapToken(session);
+        await this.serverService.wrapToken(session);
 
-          const message = await this.serverService.preSATPTransferResponse(
-            req,
-            session,
-          );
+        const message = await this.serverService.preSATPTransferResponse(
+          req,
+          session,
+        );
 
-          if (!message) {
-            throw new FailedToCreateMessageError(
-              fnTag,
-              getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
-            );
-          }
-
-          this.Log.debug(`${fnTag}, Returning response: ${message}`);
-
-          saveMessageInSessionData(session.getServerSessionData(), message);
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 0;
-          attributes.operation = "preSATPTransfer";
-
-          const startTimestamp =
-            session.getServerSessionData().receivedTimestamps?.stage0
-              ?.preSatpTransferRequestMessageTimestamp;
-          const endTimestamp =
-            session.getServerSessionData().processedTimestamps?.stage0
-              ?.preSatpTransferResponseMessageTimestamp;
-
-          if (startTimestamp && endTimestamp) {
-            const duration = Number(endTimestamp) - Number(startTimestamp);
-            await this.monitorService.recordHistogram(
-              "operation_duration",
-              duration,
-              attributes,
-            );
-          }
-
-          return message;
-        } catch (error) {
-          this.Log.error(
-            `${fnTag}, Error: ${new FailedToProcessError(
-              fnTag,
-              getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
-              error,
-            )}`,
-          );
-          setError(session, MessageType.PRE_SATP_TRANSFER_RESPONSE, error);
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 0;
-
-          this.monitorService.updateCounter(
-            "ongoing_transactions",
-            -1,
-            attributes,
-          );
-
-          this.monitorService.updateCounter(
-            "failed_transactions",
-            1,
-            attributes,
-          );
-          return await this.serverService.preSATPTransferErrorResponse(
-            error,
-            session,
+        if (!message) {
+          throw new FailedToCreateMessageError(
+            fnTag,
+            getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
           );
         }
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
+
+        this.Log.debug(`${fnTag}, Returning response: ${message}`);
+
+        saveMessageInSessionData(session.getServerSessionData(), message);
+
+        attributes.senderNetworkId =
+          session?.getServerSessionData().senderAsset?.networkId?.id ||
+          undefined;
+        attributes.receiverNetworkId =
+          session?.getServerSessionData().receiverAsset?.networkId?.id ||
+          undefined;
+        attributes.senderGatewayNetworkId =
+          session?.getServerSessionData().senderGatewayNetworkId || undefined;
+        attributes.receiverGatewayNetworkId =
+          session?.getServerSessionData().recipientGatewayNetworkId ||
+          undefined;
+        attributes.assetProfileId =
+          session?.getServerSessionData().assetProfileId || undefined;
+        attributes.sessionId = session?.getSessionId() || undefined;
+        attributes.sourceLedgerAssetId =
+          session?.getServerSessionData().sourceLedgerAssetId || undefined;
+        attributes.recipientLedgerAssetId =
+          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        attributes.satp_phase = 0;
+        attributes.operation = "preSATPTransfer";
+
+        const startTimestamp =
+          session.getServerSessionData().receivedTimestamps?.stage0
+            ?.preSatpTransferRequestMessageTimestamp;
+        const endTimestamp =
+          session.getServerSessionData().processedTimestamps?.stage0
+            ?.preSatpTransferResponseMessageTimestamp;
+
+        if (startTimestamp && endTimestamp) {
+          const duration = Number(endTimestamp) - Number(startTimestamp);
+          await this.monitorService.recordHistogram(
+            "operation_duration",
+            duration,
+            attributes,
+          );
+        }
+
+        return message;
+      } catch (error) {
+        this.Log.error(
+          `${fnTag}, Error: ${new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.PRE_SATP_TRANSFER_RESPONSE),
+            error,
+          )}`,
+        );
+        setError(session, MessageType.PRE_SATP_TRANSFER_RESPONSE, error);
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        return await this.serverService.preSATPTransferErrorResponse(
+          error,
+          session,
+        );
       } finally {
         span.end();
       }

@@ -282,66 +282,23 @@ export class SATPManager {
   }
 
   public healthCheck(): HealthCheckResponseStatusEnum {
-    const fnTag = `${SATPManager.CLASS_NAME}#healthCheck`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        return this.status;
-      } catch (error) {
-        span.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: String(error),
-        });
-        span.recordException(error);
-        throw error;
-      } finally {
-        span.end();
-      }
-    });
+    //const fnTag = `${SATPManager.CLASS_NAME}#healthCheck`;
+    return this.status;
   }
   public getSessions(): Map<string, SATPSession> {
     const fnTag = `${SATPManager.CLASS_NAME}#getSessions`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        const activeSessionsCount = this.sessions.size;
-        this.logger.debug(`${fnTag} active sessions: ${activeSessionsCount}`);
-        return this.sessions;
-      } catch (error) {
-        span.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: String(error),
-        });
-        span.recordException(error);
-        throw error;
-      } finally {
-        span.end();
-      }
-    });
+    const activeSessionsCount = this.sessions.size;
+    this.logger.debug(`${fnTag} active sessions: ${activeSessionsCount}`);
+    return this.sessions;
   }
 
   public getSession(sessionId: string): SATPSession | undefined {
     const fnTag = `${SATPManager.CLASS_NAME}#getSession`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    span.setAttributes({ sessionId });
-    return context.with(ctx, () => {
-      try {
-        this.logger.debug(`${fnTag} retrieving session: ${sessionId}`);
-        if (this.sessions == undefined) {
-          return undefined;
-        }
-        return this.sessions.get(sessionId);
-      } catch (error) {
-        span.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: String(error),
-        });
-        span.recordException(error);
-        throw error;
-      } finally {
-        span.end();
-      }
-    });
+    this.logger.debug(`${fnTag} retrieving session: ${sessionId}`);
+    if (this.sessions == undefined) {
+      return undefined;
+    }
+    return this.sessions.get(sessionId);
   }
 
   public getConnectedDLTs(): NetworkId[] {
@@ -358,27 +315,13 @@ export class SATPManager {
    */
   public getSATPSessionState(): boolean {
     const fnTag = `${SATPManager.CLASS_NAME}#getSATPSessionStatus()`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        this.logger.info(`${fnTag}, Getting SATP Session Status...`);
-        for (const value of this.sessions.values()) {
-          if (value.getSessionState() !== State.COMPLETED) {
-            return false;
-          }
-        }
-        return true;
-      } catch (error) {
-        span.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: String(error),
-        });
-        span.recordException(error);
-        throw error;
-      } finally {
-        span.end();
+    this.logger.info(`${fnTag}, Getting SATP Session Status...`);
+    for (const value of this.sessions.values()) {
+      if (value.getSessionState() !== State.COMPLETED) {
+        return false;
       }
-    });
+    }
+    return true;
   }
 
   public getOrCreateSession(
@@ -413,29 +356,15 @@ export class SATPManager {
   }
 
   private createNewSession(contextID: string): SATPSession {
-    const fnTag = `${SATPManager.CLASS_NAME}#createNewSession()`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        const session = new SATPSession({
-          contextID: contextID,
-          server: false,
-          client: true,
-          monitorService: this.monitorService,
-        });
-        this.sessions?.set(session.getSessionId(), session);
-        return session;
-      } catch (error) {
-        span.setStatus({
-          code: SpanStatusCode.ERROR,
-          message: String(error),
-        });
-        span.recordException(error);
-        throw error;
-      } finally {
-        span.end();
-      }
+    //const fnTag = `${SATPManager.CLASS_NAME}#createNewSession()`;
+    const session = new SATPSession({
+      contextID: contextID,
+      server: false,
+      client: true,
+      monitorService: this.monitorService,
     });
+    this.sessions?.set(session.getSessionId(), session);
+    return session;
   }
 
   get StageHandlers() {
