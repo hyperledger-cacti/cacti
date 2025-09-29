@@ -431,11 +431,11 @@ export class MonitorService {
     }
 
     counter.metric.add(amount, attributes, ctx);
-    this.logger.debug(
+    this.logger.trace(
       `${fnTag} - Incremented counter: ${metricName} by ${amount} with attributes ${JSON.stringify(attributes)}`,
     );
     this.createLog(
-      "debug",
+      "trace",
       `${fnTag} - Incremented counter: ${metricName} by ${amount} with attributes ${JSON.stringify(attributes)}`,
     );
   }
@@ -473,11 +473,11 @@ export class MonitorService {
       );
     }
     histogram.record(value, attributes, ctx);
-    this.logger.debug(
+    this.logger.trace(
       `${fnTag} - Recorded value ${value} in histogram ${metricName} with attributes ${JSON.stringify(attributes)}`,
     );
     this.createLog(
-      "debug",
+      "trace",
       `${fnTag} - Recorded value ${value} in histogram ${metricName} with attributes ${JSON.stringify(attributes)}`,
     );
   }
@@ -508,10 +508,10 @@ export class MonitorService {
 
     const new_ctx = trace.setSpan(ctx, span);
     this.createLog(
-      "debug",
+      "trace",
       `${fnTag} - Starting span: ${spanName} with tracer: ${tracerName} in context: ${ctx}`,
     );
-    this.logger.debug(
+    this.logger.trace(
       `${fnTag} - Started span: ${spanName} with tracer: ${tracerName} in context: ${new_ctx}`,
     );
     return { span, context: new_ctx };

@@ -84,129 +84,121 @@ export class Stage3SATPHandler implements SATPHandler {
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
+      let session: SATPSession | undefined;
       try {
-        let session: SATPSession | undefined;
-        try {
-          this.Log.debug(`${fnTag}, Commit Preparation...`);
-          this.Log.debug(`${fnTag}, Request: ${req}`);
+        this.Log.debug(`${fnTag}, Commit Preparation...`);
+        this.Log.debug(`${fnTag}, Request: ${req}`);
 
-          session = this.sessions.get(getSessionId(req));
-          if (!session) {
-            throw new SessionNotFoundError(fnTag);
-          }
+        session = this.sessions.get(getSessionId(req));
+        if (!session) {
+          throw new SessionNotFoundError(fnTag);
+        }
 
-          span.setAttribute("sessionId", session.getSessionId() || "");
+        span.setAttribute("sessionId", session.getSessionId() || "");
 
-          await this.serverService.checkCommitPreparationRequest(req, session);
+        await this.serverService.checkCommitPreparationRequest(req, session);
 
-          saveMessageInSessionData(session.getServerSessionData(), req);
+        saveMessageInSessionData(session.getServerSessionData(), req);
 
-          await this.serverService.mintAsset(session);
+        await this.serverService.mintAsset(session);
 
-          const message = await this.serverService.commitReadyResponse(
-            req,
-            session,
-          );
+        const message = await this.serverService.commitReadyResponse(
+          req,
+          session,
+        );
 
-          this.Log.debug(`${fnTag}, Returning response: ${message}`);
+        this.Log.debug(`${fnTag}, Returning response: ${message}`);
 
-          if (!message) {
-            throw new FailedToCreateMessageError(
-              fnTag,
-              getMessageTypeName(MessageType.COMMIT_READY),
-            );
-          }
-
-          saveMessageInSessionData(session.getServerSessionData(), message);
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 3;
-          attributes.operation = "commitPreparation";
-
-          const startTimestamp =
-            session.getServerSessionData().receivedTimestamps?.stage3
-              ?.commitPreparationRequestMessageTimestamp;
-          const endTimestamp =
-            session.getServerSessionData().processedTimestamps?.stage3
-              ?.commitReadyResponseMessageTimestamp;
-
-          if (startTimestamp && endTimestamp) {
-            const duration = Number(endTimestamp) - Number(startTimestamp);
-            await this.monitorService.recordHistogram(
-              "operation_duration",
-              duration,
-              attributes,
-            );
-          }
-
-          return message;
-        } catch (error) {
-          this.Log.error(
-            `${fnTag}, Error: ${new FailedToProcessError(
-              fnTag,
-              getMessageTypeName(MessageType.COMMIT_READY),
-              error,
-            )}`,
-          );
-          setError(session, MessageType.COMMIT_READY, error);
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 3;
-
-          this.monitorService.updateCounter(
-            "ongoing_transactions",
-            -1,
-            attributes,
-          );
-
-          this.monitorService.updateCounter(
-            "failed_transactions",
-            1,
-            attributes,
-          );
-          return await this.serverService.commitReadyErrorResponse(
-            error,
-            session,
+        if (!message) {
+          throw new FailedToCreateMessageError(
+            fnTag,
+            getMessageTypeName(MessageType.COMMIT_READY),
           );
         }
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
+
+        saveMessageInSessionData(session.getServerSessionData(), message);
+
+        attributes.senderNetworkId =
+          session?.getServerSessionData().senderAsset?.networkId?.id ||
+          undefined;
+        attributes.receiverNetworkId =
+          session?.getServerSessionData().receiverAsset?.networkId?.id ||
+          undefined;
+        attributes.senderGatewayNetworkId =
+          session?.getServerSessionData().senderGatewayNetworkId || undefined;
+        attributes.receiverGatewayNetworkId =
+          session?.getServerSessionData().recipientGatewayNetworkId ||
+          undefined;
+        attributes.assetProfileId =
+          session?.getServerSessionData().assetProfileId || undefined;
+        attributes.sessionId = session?.getSessionId() || undefined;
+        attributes.sourceLedgerAssetId =
+          session?.getServerSessionData().sourceLedgerAssetId || undefined;
+        attributes.recipientLedgerAssetId =
+          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        attributes.satp_phase = 3;
+        attributes.operation = "commitPreparation";
+
+        const startTimestamp =
+          session.getServerSessionData().receivedTimestamps?.stage3
+            ?.commitPreparationRequestMessageTimestamp;
+        const endTimestamp =
+          session.getServerSessionData().processedTimestamps?.stage3
+            ?.commitReadyResponseMessageTimestamp;
+
+        if (startTimestamp && endTimestamp) {
+          const duration = Number(endTimestamp) - Number(startTimestamp);
+          await this.monitorService.recordHistogram(
+            "operation_duration",
+            duration,
+            attributes,
+          );
+        }
+
+        return message;
+      } catch (error) {
+        this.Log.error(
+          `${fnTag}, Error: ${new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.COMMIT_READY),
+            error,
+          )}`,
+        );
+        setError(session, MessageType.COMMIT_READY, error);
+
+        attributes.senderNetworkId =
+          session?.getServerSessionData().senderAsset?.networkId?.id ||
+          undefined;
+        attributes.receiverNetworkId =
+          session?.getServerSessionData().receiverAsset?.networkId?.id ||
+          undefined;
+        attributes.senderGatewayNetworkId =
+          session?.getServerSessionData().senderGatewayNetworkId || undefined;
+        attributes.receiverGatewayNetworkId =
+          session?.getServerSessionData().recipientGatewayNetworkId ||
+          undefined;
+        attributes.assetProfileId =
+          session?.getServerSessionData().assetProfileId || undefined;
+        attributes.sessionId = session?.getSessionId() || undefined;
+        attributes.sourceLedgerAssetId =
+          session?.getServerSessionData().sourceLedgerAssetId || undefined;
+        attributes.recipientLedgerAssetId =
+          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        attributes.satp_phase = 3;
+
+        this.monitorService.updateCounter(
+          "ongoing_transactions",
+          -1,
+          attributes,
+        );
+
+        this.monitorService.updateCounter("failed_transactions", 1, attributes);
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        return await this.serverService.commitReadyErrorResponse(
+          error,
+          session,
+        );
       } finally {
         span.end();
       }
@@ -225,133 +217,122 @@ export class Stage3SATPHandler implements SATPHandler {
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
+      let session: SATPSession | undefined;
       try {
-        let session: SATPSession | undefined;
-        try {
-          this.Log.debug(`${fnTag}, Commit Final Assertion...`);
-          this.Log.debug(`${fnTag}, Request: ${req}`);
+        this.Log.debug(`${fnTag}, Commit Final Assertion...`);
+        this.Log.debug(`${fnTag}, Request: ${req}`);
 
-          session = this.sessions.get(getSessionId(req));
-          if (!session) {
-            throw new SessionNotFoundError(fnTag);
-          }
+        session = this.sessions.get(getSessionId(req));
+        if (!session) {
+          throw new SessionNotFoundError(fnTag);
+        }
 
-          span.setAttribute("sessionId", session.getSessionId() || "");
+        span.setAttribute("sessionId", session.getSessionId() || "");
 
-          await this.serverService.checkCommitFinalAssertionRequest(
+        await this.serverService.checkCommitFinalAssertionRequest(req, session);
+
+        saveMessageInSessionData(session.getServerSessionData(), req);
+
+        await this.serverService.assignAsset(session);
+
+        const message =
+          await this.serverService.commitFinalAcknowledgementReceiptResponse(
             req,
             session,
           );
 
-          saveMessageInSessionData(session.getServerSessionData(), req);
+        this.Log.debug(`${fnTag}, Returning response: ${message}`);
 
-          await this.serverService.assignAsset(session);
-
-          const message =
-            await this.serverService.commitFinalAcknowledgementReceiptResponse(
-              req,
-              session,
-            );
-
-          this.Log.debug(`${fnTag}, Returning response: ${message}`);
-
-          if (!message) {
-            throw new FailedToCreateMessageError(
-              fnTag,
-              getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-            );
-          }
-
-          saveMessageInSessionData(session.getServerSessionData(), message);
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 3;
-          attributes.operation = "commitFinalAssertion";
-
-          const startTimestamp =
-            session.getServerSessionData().receivedTimestamps?.stage3
-              ?.commitFinalAssertionRequestMessageTimestamp;
-          const endTimestamp =
-            session.getServerSessionData().processedTimestamps?.stage3
-              ?.commitFinalAcknowledgementReceiptResponseMessageTimestamp;
-
-          if (startTimestamp && endTimestamp) {
-            const duration = Number(endTimestamp) - Number(startTimestamp);
-            await this.monitorService.recordHistogram(
-              "operation_duration",
-              duration,
-              attributes,
-            );
-          }
-
-          return message;
-        } catch (error) {
-          this.Log.error(
-            `${fnTag}, Error: ${new FailedToProcessError(
-              fnTag,
-              getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
-              error,
-            )}`,
-          );
-          setError(session, MessageType.ACK_COMMIT_FINAL, error);
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 3;
-
-          this.monitorService.updateCounter(
-            "ongoing_transactions",
-            -1,
-            attributes,
-          );
-
-          this.monitorService.updateCounter(
-            "failed_transactions",
-            1,
-            attributes,
-          );
-          return await this.serverService.commitFinalAcknowledgementReceiptErrorResponse(
-            error,
-            session,
+        if (!message) {
+          throw new FailedToCreateMessageError(
+            fnTag,
+            getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
           );
         }
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
+
+        saveMessageInSessionData(session.getServerSessionData(), message);
+
+        attributes.senderNetworkId =
+          session?.getServerSessionData().senderAsset?.networkId?.id ||
+          undefined;
+        attributes.receiverNetworkId =
+          session?.getServerSessionData().receiverAsset?.networkId?.id ||
+          undefined;
+        attributes.senderGatewayNetworkId =
+          session?.getServerSessionData().senderGatewayNetworkId || undefined;
+        attributes.receiverGatewayNetworkId =
+          session?.getServerSessionData().recipientGatewayNetworkId ||
+          undefined;
+        attributes.assetProfileId =
+          session?.getServerSessionData().assetProfileId || undefined;
+        attributes.sessionId = session?.getSessionId() || undefined;
+        attributes.sourceLedgerAssetId =
+          session?.getServerSessionData().sourceLedgerAssetId || undefined;
+        attributes.recipientLedgerAssetId =
+          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        attributes.satp_phase = 3;
+        attributes.operation = "commitFinalAssertion";
+
+        const startTimestamp =
+          session.getServerSessionData().receivedTimestamps?.stage3
+            ?.commitFinalAssertionRequestMessageTimestamp;
+        const endTimestamp =
+          session.getServerSessionData().processedTimestamps?.stage3
+            ?.commitFinalAcknowledgementReceiptResponseMessageTimestamp;
+
+        if (startTimestamp && endTimestamp) {
+          const duration = Number(endTimestamp) - Number(startTimestamp);
+          await this.monitorService.recordHistogram(
+            "operation_duration",
+            duration,
+            attributes,
+          );
+        }
+
+        return message;
+      } catch (error) {
+        this.Log.error(
+          `${fnTag}, Error: ${new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.ACK_COMMIT_FINAL),
+            error,
+          )}`,
+        );
+        setError(session, MessageType.ACK_COMMIT_FINAL, error);
+
+        attributes.senderNetworkId =
+          session?.getServerSessionData().senderAsset?.networkId?.id ||
+          undefined;
+        attributes.receiverNetworkId =
+          session?.getServerSessionData().receiverAsset?.networkId?.id ||
+          undefined;
+        attributes.senderGatewayNetworkId =
+          session?.getServerSessionData().senderGatewayNetworkId || undefined;
+        attributes.receiverGatewayNetworkId =
+          session?.getServerSessionData().recipientGatewayNetworkId ||
+          undefined;
+        attributes.assetProfileId =
+          session?.getServerSessionData().assetProfileId || undefined;
+        attributes.sessionId = session?.getSessionId() || undefined;
+        attributes.sourceLedgerAssetId =
+          session?.getServerSessionData().sourceLedgerAssetId || undefined;
+        attributes.recipientLedgerAssetId =
+          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        attributes.satp_phase = 3;
+
+        this.monitorService.updateCounter(
+          "ongoing_transactions",
+          -1,
+          attributes,
+        );
+
+        this.monitorService.updateCounter("failed_transactions", 1, attributes);
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        return await this.serverService.commitFinalAcknowledgementReceiptErrorResponse(
+          error,
+          session,
+        );
       } finally {
         span.end();
       }
@@ -370,111 +351,99 @@ export class Stage3SATPHandler implements SATPHandler {
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
+      let session: SATPSession | undefined;
       try {
-        let session: SATPSession | undefined;
-        try {
-          this.Log.debug(`${fnTag}, Transfer Complete...`);
-          this.Log.debug(`${fnTag}, Request: ${req}`);
+        this.Log.debug(`${fnTag}, Transfer Complete...`);
+        this.Log.debug(`${fnTag}, Request: ${req}`);
 
-          session = this.sessions.get(getSessionId(req));
-          if (!session) {
-            throw new SessionNotFoundError(fnTag);
-          }
+        session = this.sessions.get(getSessionId(req));
+        if (!session) {
+          throw new SessionNotFoundError(fnTag);
+        }
 
-          span.setAttribute("sessionId", session.getSessionId() || "");
+        span.setAttribute("sessionId", session.getSessionId() || "");
 
-          await this.serverService.checkTransferCompleteRequest(req, session);
+        await this.serverService.checkTransferCompleteRequest(req, session);
 
-          saveMessageInSessionData(session.getServerSessionData(), req);
+        saveMessageInSessionData(session.getServerSessionData(), req);
 
-          const message = await this.serverService.transferCompleteResponse(
-            req,
-            session,
-          );
+        const message = await this.serverService.transferCompleteResponse(
+          req,
+          session,
+        );
 
-          if (!message) {
-            throw new FailedToCreateMessageError(
-              fnTag,
-              getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
-            );
-          }
-
-          saveMessageInSessionData(session.getServerSessionData(), message);
-
-          attributes.satp_phase = 3;
-          attributes.operation = "transferComplete";
-
-          const startTimestamp =
-            session.getServerSessionData().receivedTimestamps?.stage3
-              ?.transferCompleteMessageTimestamp;
-          const endTimestamp =
-            session.getServerSessionData().processedTimestamps?.stage3
-              ?.transferCompleteResponseMessageTimestamp;
-
-          if (startTimestamp && endTimestamp) {
-            const duration = Number(endTimestamp) - Number(startTimestamp);
-            await this.monitorService.recordHistogram(
-              "operation_duration",
-              duration,
-              attributes,
-            );
-          }
-
-          return message;
-        } catch (error) {
-          this.Log.error(
-            `${fnTag}, Error: ${new FailedToProcessError(
-              fnTag,
-              getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
-              error,
-            )}`,
-          );
-          setError(
-            session,
-            MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-            error,
-          );
-
-          attributes.senderNetworkId =
-            session?.getServerSessionData().senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getServerSessionData().receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getServerSessionData().senderGatewayNetworkId || undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getServerSessionData().recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getServerSessionData().assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getServerSessionData().sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getServerSessionData().recipientLedgerAssetId || undefined;
-          attributes.satp_phase = 3;
-
-          this.monitorService.updateCounter(
-            "ongoing_transactions",
-            -1,
-            attributes,
-          );
-
-          this.monitorService.updateCounter(
-            "failed_transactions",
-            1,
-            attributes,
-          );
-          return await this.serverService.transferCompleteErrorResponse(
-            error,
-            session,
+        if (!message) {
+          throw new FailedToCreateMessageError(
+            fnTag,
+            getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
           );
         }
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
+
+        saveMessageInSessionData(session.getServerSessionData(), message);
+
+        attributes.satp_phase = 3;
+        attributes.operation = "transferComplete";
+
+        const startTimestamp =
+          session.getServerSessionData().receivedTimestamps?.stage3
+            ?.transferCompleteMessageTimestamp;
+        const endTimestamp =
+          session.getServerSessionData().processedTimestamps?.stage3
+            ?.transferCompleteResponseMessageTimestamp;
+
+        if (startTimestamp && endTimestamp) {
+          const duration = Number(endTimestamp) - Number(startTimestamp);
+          await this.monitorService.recordHistogram(
+            "operation_duration",
+            duration,
+            attributes,
+          );
+        }
+
+        return message;
+      } catch (error) {
+        this.Log.error(
+          `${fnTag}, Error: ${new FailedToProcessError(
+            fnTag,
+            getMessageTypeName(MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE),
+            error,
+          )}`,
+        );
+        setError(session, MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE, error);
+
+        attributes.senderNetworkId =
+          session?.getServerSessionData().senderAsset?.networkId?.id ||
+          undefined;
+        attributes.receiverNetworkId =
+          session?.getServerSessionData().receiverAsset?.networkId?.id ||
+          undefined;
+        attributes.senderGatewayNetworkId =
+          session?.getServerSessionData().senderGatewayNetworkId || undefined;
+        attributes.receiverGatewayNetworkId =
+          session?.getServerSessionData().recipientGatewayNetworkId ||
+          undefined;
+        attributes.assetProfileId =
+          session?.getServerSessionData().assetProfileId || undefined;
+        attributes.sessionId = session?.getSessionId() || undefined;
+        attributes.sourceLedgerAssetId =
+          session?.getServerSessionData().sourceLedgerAssetId || undefined;
+        attributes.recipientLedgerAssetId =
+          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        attributes.satp_phase = 3;
+
+        this.monitorService.updateCounter(
+          "ongoing_transactions",
+          -1,
+          attributes,
+        );
+
+        this.monitorService.updateCounter("failed_transactions", 1, attributes);
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+        span.recordException(error);
+        return await this.serverService.transferCompleteErrorResponse(
+          error,
+          session,
+        );
       } finally {
         span.end();
       }
