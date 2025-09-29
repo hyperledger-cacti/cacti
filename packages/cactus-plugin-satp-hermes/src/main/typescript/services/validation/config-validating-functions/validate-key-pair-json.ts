@@ -1,28 +1,42 @@
+import { Logger } from "@hyperledger/cactus-common";
+
 export interface KeyPairJSON {
   privateKey: string;
   publicKey: string;
 }
 
 // Type guard for the keyPairJSON
-export function isKeyPairJSON(obj: unknown): obj is KeyPairJSON {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "privateKey" in obj &&
-    typeof (obj as Record<string, unknown>).privateKey === "string" &&
-    "publicKey" in obj &&
-    typeof (obj as Record<string, unknown>).publicKey === "string"
-  );
+export function isKeyPairJSON(obj: unknown, log: Logger): obj is KeyPairJSON {
+  if (typeof obj !== "object" || obj === null) {
+    log.error("isKeyPairJSON: obj is not an object or is null");
+    return false;
+  } else if (!("privateKey" in obj)) {
+    log.error("isKeyPairJSON: 'privateKey' property missing");
+    return false;
+  } else if (typeof (obj as Record<string, unknown>).privateKey !== "string") {
+    log.error("isKeyPairJSON: 'privateKey' property is not a string");
+    return false;
+  } else if (!("publicKey" in obj)) {
+    log.error("isKeyPairJSON: 'publicKey' property missing");
+    return false;
+  } else if (typeof (obj as Record<string, unknown>).publicKey !== "string") {
+    log.error("isKeyPairJSON: 'publicKey' property is not a string");
+    return false;
+  }
+  return true;
 }
 
-export function validateSatpKeyPairJSON(opts: {
-  readonly configValue: unknown;
-}): KeyPairJSON | undefined {
+export function validateSatpKeyPairJSON(
+  opts: {
+    readonly configValue: unknown;
+  },
+  log: Logger,
+): KeyPairJSON | undefined {
   if (!opts || !opts.configValue) {
     return;
   }
 
-  if (!isKeyPairJSON(opts.configValue)) {
+  if (!isKeyPairJSON(opts.configValue, log)) {
     throw new TypeError(
       `Invalid config.keyPair: ${JSON.stringify(opts.configValue)}. Expected a keyPair object with 'publicKey' and 'privateKey' string fields.`,
     );

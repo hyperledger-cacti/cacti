@@ -11,11 +11,16 @@ import {
 } from "./validate-fabric-options";
 import { isClaimFormat } from "./validate-bungee-options";
 import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { NetworkOptionsJSON } from "../validate-cc-config";
+import { NetworkId, NetworkOptionsJSON } from "../validate-cc-config";
 import { isNetworkId } from "../validate-satp-gateway-identity";
 import { isKeyPairJSON, KeyPairJSON } from "../validate-key-pair-json";
 import { X509Identity } from "fabric-network";
 import { Logger } from "@hyperledger/cactus-common";
+import {
+  chainConfigElement,
+  identifyAndCheckConfigFormat,
+} from "../../../utils";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export interface FabricConfigJSON extends NetworkOptionsJSON {
   userIdentity?: X509Identity;
@@ -167,6 +172,10 @@ function isUserIdentity(obj: unknown, log: Logger): obj is X509Identity {
   return true;
 }
 
+export function isFabricNetworkId(obj: NetworkId) {
+  return (obj.ledgerType as LedgerType) === LedgerType.Fabric2;
+}
+
 // Type guard for FabricConfigJSON
 export function isFabricConfigJSON(
   obj: unknown,
@@ -176,110 +185,90 @@ export function isFabricConfigJSON(
     log.error("isFabricConfigJSON: obj is not an object or is null");
     return false;
   }
+
+  const configDefaultFields: chainConfigElement<unknown>[] = [
+    {
+      configElement: "channelName",
+      configElementType: "string",
+    },
+    {
+      configElement: "userIdentity",
+      configElementTypeguard: isUserIdentity,
+    },
+    {
+      configElement: "connectorOptions",
+      configElementTypeguard: isFabricOptionsJSON,
+    },
+    {
+      configElement: "networkIdentification",
+      configElementTypeguard: isNetworkId,
+    },
+    {
+      configElement: "caFilePath",
+      configElementType: "string",
+    },
+    {
+      configElement: "coreYamlFilePath",
+      configElementType: "string",
+    },
+  ];
+
+  const configOptionalFields: chainConfigElement<unknown>[] = [
+    {
+      configElement: "targetOrganizations",
+      configElementTypeguard: Array.isArray,
+      configSubElementType: "object",
+    },
+    {
+      configElement: "ccSequence",
+      configElementType: "number",
+    },
+    {
+      configElement: "orderer",
+      configElementType: "string",
+    },
+    {
+      configElement: "ordererTLSHostnameOverride",
+      configElementType: "string",
+    },
+    {
+      configElement: "connTimeout",
+      configElementType: "number",
+    },
+    {
+      configElement: "signaturePolicy",
+      configElementType: "string",
+    },
+    {
+      configElement: "mspId",
+      configElementType: "string",
+    },
+    {
+      configElement: "wrapperContractName",
+      configElementType: "string",
+    },
+    {
+      configElement: "leafId",
+      configElementType: "string",
+    },
+    {
+      configElement: "keyPair",
+      configElementTypeguard: isKeyPairJSON,
+    },
+    {
+      configElement: "claimFormats",
+      configElementTypeguard: Array.isArray,
+      configSubElementFunctionTypeguard: isClaimFormat,
+    },
+  ];
+
   const objRecord = obj as Record<string, unknown>;
 
-  if (!("channelName" in obj) || typeof objRecord.channelName !== "string") {
-    log.error("isFabricConfigJSON: channelName missing or not a string");
-    return false;
-  }
-  if (
-    !("userIdentity" in obj) ||
-    !isUserIdentity(objRecord.userIdentity, log)
-  ) {
-    log.error("isFabricConfigJSON: userIdentity missing or invalid");
-    return false;
-  }
-  if (
-    !("connectorOptions" in obj) ||
-    !isFabricOptionsJSON(objRecord.connectorOptions, log)
-  ) {
-    log.error("isFabricConfigJSON: connectorOptions missing or invalid");
-    return false;
-  }
-  if (
-    !("networkIdentification" in obj) ||
-    !isNetworkId(objRecord.networkIdentification)
-  ) {
-    log.error("isFabricConfigJSON: networkIdentification missing or invalid");
-    return false;
-  }
-  if (
-    "targetOrganizations" in obj &&
-    (!Array.isArray(objRecord.targetOrganizations) ||
-      !objRecord.targetOrganizations.every(
-        (org) => typeof org === "object" && org !== null,
-      ))
-  ) {
-    log.error("isFabricConfigJSON: targetOrganizations invalid");
-    return false;
-  }
-  if (!("caFilePath" in obj) || typeof objRecord.caFilePath !== "string") {
-    log.error("isFabricConfigJSON: caFilePath missing or not a string");
-    return false;
-  }
-  if (
-    !("coreYamlFilePath" in obj) ||
-    typeof objRecord.coreYamlFilePath !== "string"
-  ) {
-    log.error("isFabricConfigJSON: coreYamlFilePath missing or not a string");
-    return false;
-  }
-  if ("ccSequence" in obj && typeof objRecord.ccSequence !== "number") {
-    log.error("isFabricConfigJSON: ccSequence present but not a number");
-    return false;
-  }
-  if ("orderer" in obj && typeof objRecord.orderer !== "string") {
-    log.error("isFabricConfigJSON: orderer present but not a string");
-    return false;
-  }
-  if (
-    "ordererTLSHostnameOverride" in obj &&
-    typeof objRecord.ordererTLSHostnameOverride !== "string"
-  ) {
-    log.error(
-      "isFabricConfigJSON: ordererTLSHostnameOverride present but not a string",
-    );
-    return false;
-  }
-  if ("connTimeout" in obj && typeof objRecord.connTimeout !== "number") {
-    log.error("isFabricConfigJSON: connTimeout present but not a number");
-    return false;
-  }
-  if (
-    "signaturePolicy" in obj &&
-    typeof objRecord.signaturePolicy !== "string"
-  ) {
-    log.error("isFabricConfigJSON: signaturePolicy present but not a string");
-    return false;
-  }
-  if ("mspId" in obj && typeof objRecord.mspId !== "string") {
-    log.error("isFabricConfigJSON: mspId present but not a string");
-    return false;
-  }
-  if (
-    "wrapperContractName" in obj &&
-    typeof objRecord.wrapperContractName !== "string"
-  ) {
-    log.error(
-      "isFabricConfigJSON: wrapperContractName present but not a string",
-    );
-    return false;
-  }
-  if ("leafId" in obj && typeof objRecord.leafId !== "string") {
-    log.error("isFabricConfigJSON: leafId present but not a string");
-    return false;
-  }
-  if ("keyPair" in obj && !isKeyPairJSON(obj.keyPair)) {
-    log.error("isFabricConfigJSON: keyPair present but invalid");
-    return false;
-  }
-  if (
-    "claimFormats" in obj &&
-    (!Array.isArray(objRecord.claimFormats) ||
-      !objRecord.claimFormats.every((format) => isClaimFormat(format)))
-  ) {
-    log.error("isFabricConfigJSON: claimFormats present but invalid");
-    return false;
-  }
-  return true;
+  return identifyAndCheckConfigFormat(
+    configDefaultFields,
+    objRecord,
+    log,
+    "isFabricConfigJSON",
+    configOptionalFields,
+  );
 }
