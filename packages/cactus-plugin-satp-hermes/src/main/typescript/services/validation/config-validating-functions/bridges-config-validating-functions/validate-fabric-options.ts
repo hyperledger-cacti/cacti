@@ -254,10 +254,10 @@ function isSignPayloadCallback(
 // Type guard for FabricOptionsJSON
 export function isFabricOptionsJSON(
   obj: unknown,
-  log: Logger,
+  log?: Logger,
 ): obj is FabricOptionsJSON {
   if (typeof obj !== "object" || obj === null) {
-    log.error("FabricOptionsJSON is not an object:", obj);
+    log!.error("FabricOptionsJSON is not an object:", obj);
     return false;
   }
   const objRecord = obj as Record<string, unknown>;
@@ -265,7 +265,7 @@ export function isFabricOptionsJSON(
     "dockerNetworkName" in obj &&
     typeof objRecord.dockerNetworkName !== "string"
   ) {
-    log.error(
+    log!.error(
       "FabricOptionsJSON invalid 'dockerNetworkName':",
       objRecord.dockerNetworkName,
     );
@@ -275,7 +275,7 @@ export function isFabricOptionsJSON(
     "discoveryOptions" in obj &&
     !isGatewayDiscoveryOptions(objRecord.discoveryOptions)
   ) {
-    log.error(
+    log!.error(
       "FabricOptionsJSON invalid 'discoveryOptions':",
       objRecord.discoveryOptions,
     );
@@ -283,9 +283,9 @@ export function isFabricOptionsJSON(
   }
   if (
     "eventHandlerOptions" in obj &&
-    !isGatewayEventHandlerOptions(objRecord.eventHandlerOptions, log)
+    !isGatewayEventHandlerOptions(objRecord.eventHandlerOptions, log!)
   ) {
-    log.error(
+    log!.error(
       "FabricOptionsJSON invalid 'eventHandlerOptions':",
       objRecord.eventHandlerOptions,
     );
@@ -293,16 +293,16 @@ export function isFabricOptionsJSON(
   }
   if (
     "supportedIdentity" in obj &&
-    !isFabricSigningCredentialType(objRecord.supportedIdentity, log)
+    !isFabricSigningCredentialType(objRecord.supportedIdentity, log!)
   ) {
-    log.error(
+    log!.error(
       "FabricOptionsJSON invalid 'supportedIdentity':",
       objRecord.supportedIdentity,
     );
     return false;
   }
-  if ("vaultConfig" in obj && !isIVaultConfig(objRecord.vaultConfig, log)) {
-    log.error(
+  if ("vaultConfig" in obj && !isIVaultConfig(objRecord.vaultConfig, log!)) {
+    log!.error(
       "FabricOptionsJSON invalid 'vaultConfig':",
       objRecord.vaultConfig,
     );
@@ -310,9 +310,9 @@ export function isFabricOptionsJSON(
   }
   if (
     "webSocketConfig" in obj &&
-    !isIWebSocketConfig(objRecord.webSocketConfig, log)
+    !isIWebSocketConfig(objRecord.webSocketConfig, log!)
   ) {
-    log.error(
+    log!.error(
       "FabricOptionsJSON invalid 'webSocketConfig':",
       objRecord.webSocketConfig,
     );
@@ -320,9 +320,9 @@ export function isFabricOptionsJSON(
   }
   if (
     "signCallback" in obj &&
-    !isSignPayloadCallback(objRecord.signCallback, log)
+    !isSignPayloadCallback(objRecord.signCallback, log!)
   ) {
-    log.error(
+    log!.error(
       "FabricOptionsJSON invalid 'signCallback':",
       objRecord.signCallback,
     );

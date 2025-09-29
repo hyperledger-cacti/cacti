@@ -51,8 +51,8 @@ function NetworkOptionsJSON(
   return (
     isNetworkId(objRecord.networkIdentification) &&
     (isFabricConfigJSON(objRecord, log) ||
-      isBesuConfigJSON(objRecord) ||
-      isEthereumConfigJSON(objRecord))
+      isBesuConfigJSON(objRecord, log) ||
+      isEthereumConfigJSON(objRecord, log))
   );
 }
 
@@ -220,7 +220,7 @@ async function createBridgeConfig(
       } as Partial<IFabricLeafNeworkOptions> & INetworkOptions;
 
       bridgesConfigParsed.push(fabricConfig);
-    } else if (isBesuConfigJSON(config)) {
+    } else if (isBesuConfigJSON(config, log)) {
       const besuOptions = createBesuOptions(config.connectorOptions);
       const besuConfig = {
         networkIdentification: config.networkIdentification,
@@ -241,7 +241,7 @@ async function createBridgeConfig(
       } as Partial<IBesuLeafNeworkOptions> & INetworkOptions;
 
       bridgesConfigParsed.push(besuConfig);
-    } else if (isEthereumConfigJSON(config)) {
+    } else if (isEthereumConfigJSON(config, log)) {
       const ethereumOptions = createEthereumOptions(config.connectorOptions);
 
       const ethereumConfig = {
