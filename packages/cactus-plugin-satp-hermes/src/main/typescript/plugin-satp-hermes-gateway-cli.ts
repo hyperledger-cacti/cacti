@@ -55,15 +55,21 @@ export async function launchGateway(): Promise<void> {
   logger.debug("SATP Gateway instanceId is valid.");
 
   logger.debug("Validating SATP Gateway Identity...");
-  const gid = validateSatpGatewayIdentity({
-    configValue: config.gid,
-  });
+  const gid = validateSatpGatewayIdentity(
+    {
+      configValue: config.gid,
+    },
+    logger,
+  );
   logger.debug("Valid SATP Gateway Identity");
 
   logger.debug("Validating SATP Counter Party Gateways...");
-  const counterPartyGateways = validateSatpCounterPartyGateways({
-    configValue: config.counterPartyGateways,
-  });
+  const counterPartyGateways = validateSatpCounterPartyGateways(
+    {
+      configValue: config.counterPartyGateways,
+    },
+    logger,
+  );
   logger.debug("Valid SATP Counter Party Gateways");
 
   logger.debug("Validating SATP Log Level...");
@@ -103,9 +109,12 @@ export async function launchGateway(): Promise<void> {
   );
 
   logger.debug("Validating SATP KeyPair...");
-  const keyPair = validateSatpKeyPairJSON({
-    configValue: config.keyPair,
-  });
+  const keyPair = validateSatpKeyPairJSON(
+    {
+      configValue: config.keyPair,
+    },
+    logger,
+  );
   logger.debug("SATP KeyPair is valid.");
 
   logger.debug("Validating Cross Chain Config...");

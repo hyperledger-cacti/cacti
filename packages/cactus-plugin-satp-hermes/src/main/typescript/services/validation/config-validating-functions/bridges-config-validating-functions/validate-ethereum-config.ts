@@ -13,9 +13,15 @@ import {
 } from "./validate-ethereum-options";
 import { isClaimFormat } from "./validate-bungee-options";
 import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { NetworkOptionsJSON } from "../validate-cc-config";
+import { NetworkId, NetworkOptionsJSON } from "../validate-cc-config";
 import { KeyPairJSON } from "../validate-key-pair-json";
 import { isNetworkId } from "../validate-satp-gateway-identity";
+import { Logger } from "@hyperledger/cactus-common";
+import {
+  chainConfigElement,
+  identifyAndCheckConfigFormat,
+} from "../../../utils";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export interface EthereumConfigJSON extends NetworkOptionsJSON {
   signingCredential: Web3SigningCredential;
@@ -108,8 +114,12 @@ function isWeb3SigningCredentialNone(
 }
 
 // Type guard for Web3SigningCredential
-function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
+function isWeb3SigningCredential(
+  obj: unknown,
+  log: Logger,
+): obj is Web3SigningCredential {
   if (!obj || typeof obj !== "object") {
+    log.error("isWeb3SigningCredential: obj is not an object or is null");
     return false;
   }
   return (
@@ -120,8 +130,9 @@ function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
   );
 }
 
-function isGasConfig(obj: unknown): obj is GasTransactionConfig {
+function isGasConfig(obj: unknown, log: Logger): obj is GasTransactionConfig {
   if (!obj || typeof obj !== "object") {
+    log.error("isGasConfig: obj null or not obj");
     throw new TypeError(
       "isGasConfig: obj null or not obj" + JSON.stringify(obj),
     );
@@ -143,28 +154,70 @@ function isGasConfig(obj: unknown): obj is GasTransactionConfig {
   );
 }
 
+export function isEthereumNetworkId(obj: NetworkId) {
+  return (obj.ledgerType as LedgerType) === LedgerType.Ethereum;
+}
+
 // Type guard for EthereumConfigJSON
-export function isEthereumConfigJSON(obj: unknown): obj is EthereumConfigJSON {
+export function isEthereumConfigJSON(
+  obj: unknown,
+  log: Logger,
+): obj is EthereumConfigJSON {
   if (typeof obj !== "object" || obj === null) {
+    log.error("isEthereumConfigJSON: obj is not an object or is null");
     return false;
   }
+
+  const configDefaultFields: chainConfigElement<unknown>[] = [
+    {
+      configElement: "networkIdentification",
+      configElementTypeguard: isNetworkId,
+    },
+    {
+      configElement: "signingCredential",
+      configElementTypeguard: isWeb3SigningCredential,
+    },
+    {
+      configElement: "connectorOptions",
+      configElementTypeguard: isEthereumOptionsJSON,
+    },
+  ];
+
+  const configOptionalFields: chainConfigElement<unknown>[] = [
+    {
+      configElement: "wrapperContractName",
+      configElementType: "string",
+    },
+    {
+      configElement: "wrapperContractAddress",
+      configElementType: "string",
+    },
+    {
+      configElement: "gasConfig",
+      configElementTypeguard: isGasConfig,
+    },
+    {
+      configElement: "leafId",
+      configElementType: "string",
+    },
+    {
+      configElement: "keyPair",
+      configElementType: "object",
+    },
+    {
+      configElement: "claimFormats",
+      configElementTypeguard: Array.isArray,
+      configSubElementFunctionTypeguard: isClaimFormat,
+    },
+  ];
+
   const objRecord = obj as Record<string, unknown>;
-  return (
-    "networkIdentification" in obj &&
-    isNetworkId(objRecord.networkIdentification) &&
-    "signingCredential" in obj &&
-    isWeb3SigningCredential(objRecord.signingCredential) &&
-    "connectorOptions" in obj &&
-    isEthereumOptionsJSON(objRecord.connectorOptions) &&
-    (!("wrapperContractName" in obj) ||
-      typeof objRecord.wrapperContractName === "string") &&
-    (!("wrapperContractAddress" in obj) ||
-      typeof objRecord.wrapperContractAddress === "string") &&
-    (!("gasConfig" in obj) || isGasConfig(objRecord.gasConfig)) &&
-    (!("leafId" in obj) || typeof objRecord.leafId === "string") &&
-    (!("keyPair" in obj) || typeof objRecord.keyPair === "object") &&
-    (!("claimFormats" in obj) ||
-      (Array.isArray(objRecord.claimFormats) &&
-        objRecord.claimFormats.every((format) => isClaimFormat(format))))
+
+  return identifyAndCheckConfigFormat(
+    configDefaultFields,
+    objRecord,
+    log,
+    "isEthereumConfigJSON",
+    configOptionalFields,
   );
 }
