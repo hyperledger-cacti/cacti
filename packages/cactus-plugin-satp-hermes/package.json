@@ -73,7 +73,7 @@
     "bundle-openapi-yaml": "swagger-cli bundle ./src/main/yml/bol/openapi-blo.yml -o ./src/main/yml/bol/openapi-blo-bundled.yml -r -t yaml",
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "codegen:proto": "buf build --verbose",
+    "codegen:proto": "buf build --verbose && buf generate --verbose",
     "db:cleanup": "find src/knex/ -name '.dev.local-*.sqlite3' -delete",
     "db:destroy": "docker-compose down -v && npm run db:cleanup",
     "db:init": "run-s db:init:local db:init:remote",
