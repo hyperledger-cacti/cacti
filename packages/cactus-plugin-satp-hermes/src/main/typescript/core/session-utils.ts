@@ -762,8 +762,13 @@ export function setErrorChecking(
       return;
   }
 
+  const errorReformat = new SATPInternalError(
+    error.message,
+    error.cause,
+    error.code,
+  );
   sessionData.state = State.ERROR;
-  sessionData.errorCode = error.getSATPErrorType();
+  sessionData.errorCode = errorReformat.getSATPErrorType();
   sessionData.phaseError = stageMessage;
 }
 
