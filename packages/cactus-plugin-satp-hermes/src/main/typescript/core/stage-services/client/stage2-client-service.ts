@@ -10,7 +10,7 @@ import {
   LockAssertionRequest,
   LockAssertionRequestSchema,
 } from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
+import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   getMessageHash,
   saveHash,

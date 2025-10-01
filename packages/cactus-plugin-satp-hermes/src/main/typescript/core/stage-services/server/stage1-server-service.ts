@@ -14,7 +14,7 @@ import {
   CommonSatpSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 // eslint-disable-next-line prettier/prettier
-import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
+import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import { TransferClaims } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
   SessionType,
