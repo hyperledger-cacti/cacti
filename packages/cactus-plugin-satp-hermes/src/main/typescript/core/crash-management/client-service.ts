@@ -11,7 +11,7 @@ import { JsObjectSigner } from "@hyperledger/cactus-common";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
-import { bufArray2HexStr, sign } from "../../gateway-utils";
+import { bufArray2HexStr, sign } from "../../utils/gateway-utils";
 import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 import { getCrashedStage } from "../session-utils";
 import { context, SpanStatusCode } from "@opentelemetry/api";

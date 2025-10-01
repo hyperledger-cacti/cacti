@@ -1,3 +1,40 @@
+/**
+ * @fileoverview SATP Oracle Manager
+ *
+ * This module provides the central oracle management system for SATP cross-chain
+ * operations. The OracleManager coordinates oracle deployment, task execution,
+ * and result verification across multiple blockchain networks to support
+ * complex cross-chain computations and data validation.
+ *
+ * The oracle manager handles:
+ * - Oracle deployment and lifecycle management
+ * - Cross-chain task execution coordination
+ * - Network-specific oracle implementations
+ * - Task scheduling and notification dispatch
+ * - Result validation and consensus
+ * - Off-chain computation orchestration
+ *
+ * @example
+ * ```typescript
+ * import { OracleManager } from './oracle-manager';
+ *
+ * const oracleManager = new OracleManager({
+ *   logLevel: 'info',
+ *   bungeeOptions: hermesConfig,
+ *   monitorService: monitoringService
+ * });
+ *
+ * await oracleManager.deployOracles([
+ *   { networkId: 'ethereum-1', ledgerType: LedgerType.Ethereum },
+ *   { networkId: 'fabric-1', ledgerType: LedgerType.Fabric2 }
+ * ]);
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import {
   type ILoggerOptions,
   type LogLevelDesc,
@@ -270,6 +307,7 @@ export class OracleManager {
    * Retrieves the bridge endpoint (leaf) for the specified network ID.
    *
    * @param id - The network ID for which to retrieve the bridge endpoint.
+   * @param claimFormat - The format of the claim. Defaults to `ClaimFormat.DEFAULT` if not provided.
    * @throws {OracleError} If the bridge endpoint is not available for the specified network ID.
    * @returns {OracleAbstract} The bridge endpoint associated with the specified network ID.
    */

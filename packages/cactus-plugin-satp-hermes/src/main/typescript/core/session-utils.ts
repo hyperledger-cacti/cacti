@@ -1,3 +1,52 @@
+/**
+ * @fileoverview
+ * SATP Session Utilities - Comprehensive Session Data Management and Operations
+ *
+ * @description
+ * This module provides a comprehensive suite of utility functions for managing SATP
+ * (Secure Asset Transfer Protocol) session data, timestamps, hashes, signatures, and
+ * state tracking throughout the protocol lifecycle. These utilities are essential
+ * for maintaining session integrity, protocol compliance, and data consistency
+ * across all SATP operations.
+ *
+ * **Core Functionality:**
+ * - **Session Data Management**: Population, copying, and manipulation of session data
+ * - **Timestamp Management**: Recording and retrieving timestamps for protocol stages
+ * - **Hash Management**: Managing cryptographic hashes for message integrity
+ * - **Signature Management**: Handling digital signatures for authentication
+ * - **State Tracking**: Managing session state transitions and protocol stages
+ * - **Error Handling**: Comprehensive error tracking and reporting utilities
+ *
+ * **Key Utility Categories:**
+ * - **Data Population**: Functions for initializing and populating session data
+ * - **Cryptographic Operations**: Hash, signature, and timestamp management
+ * - **State Management**: Stage transitions and state tracking utilities
+ * - **Message Processing**: Message type handling and validation utilities
+ * - **Error Management**: Error setting, checking, and recovery functions
+ * - **Protocol Helpers**: Stage names, state names, and protocol metadata
+ *
+ * **Session Lifecycle Support:**
+ * These utilities support the complete SATP session lifecycle from initialization
+ * through completion, ensuring proper data management, security compliance, and
+ * protocol adherence at every stage of the cross-chain asset transfer process.
+ *
+ * **Integration Points:**
+ * - **Session Management**: Core integration with SATPSession class
+ * - **Protocol Stages**: Support for all SATP stages (0-3) operations
+ * - **Cryptographic Services**: Integration with signing and verification
+ * - **Database Persistence**: Support for session data storage and retrieval
+ * - **Error Handling**: Comprehensive error tracking and reporting
+ *
+ * @author SATP Development Team
+ * @since 2.0.0
+ * @version 2.0.0
+ * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
+ * @see {@link SATPSession} for session management integration
+ * @see {@link SessionData} for session data structure
+ * @see {@link State} for session state enumeration
+ * @see {@link SATPStage} for protocol stage enumeration
+ */
+
 import { create, isMessage } from "@bufbuild/protobuf";
 import {
   AssetSchema,
@@ -62,16 +111,68 @@ import { v4 as uuidv4 } from "uuid";
 import { TokenType } from "../public-api";
 import { TokenType as ProtoTokenType } from "../generated/proto/cacti/satp/v02/common/message_pb";
 
+/**
+ * Enumeration of timestamp types for SATP message processing.
+ *
+ * @description
+ * Defines the different types of timestamps that can be recorded during
+ * SATP message processing to accurately track message timing and processing
+ * flow throughout the protocol stages.
+ *
+ * @public
+ * @enum {string}
+ * @since 2.0.0
+ */
 export enum TimestampType {
+  /** Timestamp when message processing was completed */
   PROCESSED = "PROCESSED",
+  /** Timestamp when message was initially received */
   RECEIVED = "RECEIVED",
 }
 
+/**
+ * Enumeration of SATP session operation types.
+ *
+ * @description
+ * Defines the operational context for SATP sessions, distinguishing
+ * between client-initiated and server-handled session operations.
+ * This distinction is crucial for proper protocol flow and message
+ * handling throughout the SATP transfer process.
+ *
+ * @public
+ * @enum {string}
+ * @since 2.0.0
+ */
 export enum SessionType {
+  /** Server-side session operations and message handling */
   SERVER = "SERVER",
+  /** Client-side session operations and message initiation */
   CLIENT = "CLIENT",
 }
 
+/**
+ * Populates client-side session data with initial SATP transfer parameters.
+ *
+ * @description
+ * Initializes and populates client session data with all necessary parameters
+ * for SATP transfer operations. This function sets up the foundational data
+ * structure required for client-side protocol operations including asset
+ * information, gateway details, and protocol configuration.
+ *
+ * **Data Population:**
+ * - **Session Identifiers**: Sets session ID, transfer context, and gateway IDs
+ * - **Asset Information**: Configures source and destination asset details
+ * - **Protocol Parameters**: Sets SATP version, signature algorithms, and profiles
+ * - **Network Configuration**: Configures source and destination network details
+ * - **State Initialization**: Sets initial session state and stage information
+ *
+ * @public
+ * @function populateClientSessionData
+ * @param {SATPSession} session - SATP session instance to populate
+ * @since 2.0.0
+ * @see {@link SATPSession} for session management
+ * @see {@link SessionData} for data structure details
+ */
 export function populateClientSessionData(
   session: SATPSession,
   version: string,
@@ -253,6 +354,40 @@ export function copySessionDataAttributes(
   destSessionData.satpMessages = srcSessionData.satpMessages;
 }
 
+/**
+ * Saves timestamp information for SATP protocol messages and stages.
+ *
+ * @description
+ * Records timestamp information for protocol messages and stages to maintain
+ * accurate timing records throughout the SATP transfer process. This function
+ * supports both automatic timestamp generation and manual timestamp specification
+ * for comprehensive timing tracking and audit trails.
+ *
+ * **Timestamp Management:**
+ * - **Automatic Timestamps**: Generates current timestamp if not provided
+ * - **Manual Timestamps**: Accepts pre-calculated timestamps for specific scenarios
+ * - **Stage Association**: Associates timestamps with specific protocol stages
+ * - **Type Classification**: Distinguishes between RECEIVED and PROCESSED timestamps
+ * - **Data Persistence**: Stores timestamps in session data for later retrieval
+ *
+ * **Use Cases:**
+ * - **Protocol Timing**: Track message processing and receipt times
+ * - **Performance Analysis**: Measure stage processing durations
+ * - **Audit Trails**: Maintain comprehensive timing records for compliance
+ * - **Debug Support**: Provide timing information for troubleshooting
+ *
+ * @public
+ * @function saveTimestamp
+ * @param {SessionData | undefined} session - Session data to store timestamp in
+ * @param {MessageType} stageMessage - Protocol message type for timestamp association
+ * @param {TimestampType} type - Type of timestamp (RECEIVED or PROCESSED)
+ * @param {string} [time] - Optional pre-calculated timestamp (ISO string format)
+ * @returns {void}
+ * @throws {Error} When session data is not provided
+ * @since 2.0.0
+ * @see {@link TimestampType} for timestamp type options
+ * @see {@link MessageType} for message type enumeration
+ */
 export function saveTimestamp(
   session: SessionData | undefined,
   stageMessage: MessageType,

@@ -1,3 +1,23 @@
+/**
+ * @fileoverview SATP Oracle Abstract Base Class
+ *
+ * This module provides the abstract base class for oracle implementations
+ * in the SATP cross-chain system. Oracles handle off-chain computations,
+ * data validation, and task execution that support complex cross-chain
+ * operations following the IETF SATP v2 specification.
+ *
+ * The oracle abstraction provides:
+ * - Network-specific oracle deployment
+ * - Task execution and result handling
+ * - Cross-chain data validation
+ * - Event listening and notification
+ * - Integration with Bungee Hermes for data transport
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
 import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
 import { IOracleEntryBase, IOracleListenerBase } from "./oracle-types";
@@ -11,23 +31,63 @@ import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message
 import { MonitorService } from "../../services/monitoring/monitor";
 
 /**
- * Common interface options for all Oracles.
+ * Configuration options for oracle implementations.
+ *
+ * Defines the common parameters required across all oracle implementations
+ * including network identification, data transport configuration, and
+ * monitoring service integration.
+ *
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const oracleOptions: OracleAbstractOptions = {
+ *   networkIdentification: { id: 'ethereum-1', ledgerType: LedgerType.Ethereum },
+ *   leafId: 'oracle-leaf-001',
+ *   bungee: bungeeHermesInstance,
+ *   logLevel: 'debug',
+ *   monitorService: monitoringService
+ * };
+ * ```
  */
 export interface OracleAbstractOptions {
+  /** Network identification parameters */
   networkIdentification: NetworkId;
+  /** Optional unique identifier for the oracle leaf */
   leafId?: string;
+  /** Bungee Hermes plugin for cross-chain data transport */
   bungee: PluginBungeeHermes;
+  /** Optional logging level for oracle operations */
   logLevel?: LogLevelDesc;
+  /** Monitoring service for telemetry and metrics */
   monitorService: MonitorService;
 }
 
+/**
+ * Abstract base class for oracle implementations.
+ *
+ * Provides the common interface and functionality for oracle implementations
+ * across different blockchain networks. Oracles handle off-chain computations,
+ * data validation, and complex task execution that cannot be performed
+ * directly on-chain as part of SATP cross-chain operations.
+ *
+ * @abstract
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * class EthereumOracle extends OracleAbstract {
+ *   async executeTask(operation: OracleOperation): Promise<OracleResponse> {
+ *     // Network-specific oracle task implementation
+ *   }
+ * }
+ * ```
+ */
 export abstract class OracleAbstract {
   /**
    * Unique identifier for the bridge leaf.
    *
    * @protected
    * @abstract
-   * @readonlyf
+   * @readonly
    */
   protected abstract readonly id: string;
 
@@ -170,8 +230,9 @@ export abstract class OracleAbstract {
    * This method must be implemented by the subclass to define the
    * specific behavior for the target ledger.
    *
-   * @param eventName - The name of the event to listen for.
+   * @param args - The listener configuration containing event details.
    * @param callback - The callback function to handle the event data.
+   * @param filter - Optional filter parameters for the event subscription.
    * @returns A subscription object that can be used to unsubscribe from the event.
    */
   public abstract subscribeContractEvent(

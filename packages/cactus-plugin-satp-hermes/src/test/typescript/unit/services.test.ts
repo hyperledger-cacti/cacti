@@ -75,7 +75,7 @@ import {
 import { Knex, knex } from "knex";
 import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/database/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/database/repository/knex-remote-log-repository";
-import { GatewayPersistence } from "../../../main/typescript/gateway-persistence";
+import { GatewayPersistence } from "../../../main/typescript/database/gateway-persistence";
 import { create, isMessage } from "@bufbuild/protobuf";
 
 let knexInstanceClient: Knex; // test as a client

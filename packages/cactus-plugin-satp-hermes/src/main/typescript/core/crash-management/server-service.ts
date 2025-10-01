@@ -16,7 +16,11 @@ import type { SATPLogger as Logger } from "../../core/satp-logger";
 import { RollbackStrategyFactory } from "./rollback/rollback-strategy-factory";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
-import { bufArray2HexStr, sign, verifySignature } from "../../gateway-utils";
+import {
+  bufArray2HexStr,
+  sign,
+  verifySignature,
+} from "../../utils/gateway-utils";
 import { SignatureVerificationError } from "../errors/satp-service-errors";
 import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
