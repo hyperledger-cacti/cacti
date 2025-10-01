@@ -1,3 +1,40 @@
+/**
+ * @fileoverview SATP Bridge Manager
+ *
+ * This module provides the central bridge management system for SATP cross-chain
+ * asset transfers. The BridgeManager coordinates bridge deployment, asset locking/
+ * unlocking, and cross-chain transaction execution across multiple blockchain
+ * networks including Besu, Ethereum, and Hyperledger Fabric.
+ *
+ * The bridge manager handles:
+ * - Bridge deployment and lifecycle management
+ * - Cross-chain asset transfer coordination
+ * - Network-specific bridge leaf management
+ * - Asset ontology mapping and validation
+ * - Smart contract deployment and interaction
+ * - Transaction monitoring and verification
+ *
+ * @example
+ * ```typescript
+ * import { BridgeManager } from './bridge-manager';
+ *
+ * const bridgeManager = new BridgeManager({
+ *   logLevel: 'info',
+ *   ontologyOptions: { enableValidation: true },
+ *   monitorService: monitoringService
+ * });
+ *
+ * await bridgeManager.deployCrossChainBridge([
+ *   { networkId: 'besu-1', ledgerType: LedgerType.Besu2X },
+ *   { networkId: 'fabric-1', ledgerType: LedgerType.Fabric2 }
+ * ]);
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
@@ -301,6 +338,7 @@ export class BridgeManager
    * Retrieves the bridge endpoint (leaf) for the specified network ID.
    *
    * @param id - The network ID for which to retrieve the bridge endpoint.
+   * @param claimFormat - The format of the claim. Defaults to `ClaimFormat.DEFAULT` if not provided.
    * @throws {LeafError} If the bridge endpoint is not available for the specified network ID.
    * @returns {BridgeLeaf} The bridge endpoint associated with the specified network ID.
    */

@@ -19,6 +19,7 @@
   ],
   "exclude": [
     "./src/main/typescript/cross-chain-mechanisms/bridge/fabric-contracts",
-    "./src/test/typescript/fabric/**/*.ts"
+    "./src/test/typescript/fabric/**/*.ts",
+    "./public/**/*"
   ]
 }

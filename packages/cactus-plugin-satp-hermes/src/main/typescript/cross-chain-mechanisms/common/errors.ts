@@ -1,8 +1,58 @@
+/**
+ * @fileoverview SATP Cross-Chain Mechanism Error Classes
+ *
+ * This module provides specialized error classes for handling various failure
+ * scenarios in SATP cross-chain operations. These errors provide structured
+ * error handling with tracing, error codes, and detailed context information
+ * for debugging and monitoring cross-chain mechanism failures.
+ *
+ * The error classes handle:
+ * - Bridge deployment and operation failures
+ * - Oracle task execution and management errors
+ * - Network connectivity and configuration issues
+ * - Asset ontology and validation errors
+ * - Cross-chain transaction failures
+ * - Wrapper contract deployment errors
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import { asError } from "@hyperledger/cactus-common";
 import { RuntimeError } from "run-time-error-cjs";
 import { OracleTaskModeEnum, OracleTaskTypeEnum } from "../../public-api";
 
+/**
+ * Base error class for bridge mechanism internal failures.
+ *
+ * Provides structured error handling for cross-chain bridge operations
+ * with support for error codes, tracing information, and cause tracking.
+ * Used as the base class for all bridge-related error scenarios.
+ *
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * throw new BridgeInternalError(
+ *   'Bridge deployment failed',
+ *   originalError,
+ *   500,
+ *   'trace-id-123',
+ *   stackTrace
+ * );
+ * ```
+ */
 export class BridgeInternalError extends RuntimeError {
+  /**
+   * Creates a new bridge internal error.
+   *
+   * @param message - Descriptive error message
+   * @param cause - Underlying cause of the error
+   * @param code - HTTP-style error code (default: 500)
+   * @param traceID - Optional trace identifier for debugging
+   * @param trace - Optional stack trace information
+   * @since 0.0.2-beta
+   */
   constructor(
     public message: string,
     public cause: string | Error | null,

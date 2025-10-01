@@ -18,7 +18,7 @@ import {
   MintAssertionClaimFormatSchema,
   MintAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
+import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   getMessageHash,
   saveHash,

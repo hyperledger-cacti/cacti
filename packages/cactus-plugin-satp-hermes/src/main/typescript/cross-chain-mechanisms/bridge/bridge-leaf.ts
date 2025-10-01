@@ -1,3 +1,16 @@
+/**
+ * @fileoverview SATP Bridge Leaf Base Class
+ *
+ * This module provides the abstract base class for bridge leaf implementations
+ * in the SATP cross-chain system. Bridge leafs are independent modules that
+ * form the endpoint connections in cross-chain bridges, handling network-specific
+ * operations for asset transfers following the IETF SATP v2 specification.
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import {
   IPluginLedgerConnector,
   LedgerType,

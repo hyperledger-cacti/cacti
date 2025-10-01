@@ -55,6 +55,101 @@ import { getEnumKeyByValue } from "../../../services/utils";
 import { getUint8Key } from "./leafs-utils";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+/**
+ * @fileoverview
+ * Hyperledger Fabric-specific bridge leaf implementation for SATP Hermes cross-chain operations.
+ *
+ * @description
+ * This module provides a complete Hyperledger Fabric blockchain integration for the SATP bridge
+ * architecture, implementing both fungible and non-fungible asset operations. The FabricLeaf
+ * class serves as a concrete implementation of bridge leaf interfaces, providing Fabric-specific
+ * logic for chaincode interactions, asset management, and cross-chain transfer operations.
+ *
+ * **Core Fabric Integration Features:**
+ * - Hyperledger Fabric ledger connector integration with gRPC support
+ * - Chaincode deployment and interaction for asset wrapper contracts
+ * - Channel-based asset operations with multi-organization support
+ * - MSP (Membership Service Provider) identity management
+ * - TLS-secured orderer and peer communications
+ * - Fabric-specific transaction endorsement and commitment
+ * - Cross-chain proof generation using Bungee Hermes plugin
+ * - OpenTelemetry monitoring and distributed tracing
+ *
+ * **SATP Protocol Compliance:**
+ * The implementation follows IETF SATP Core v2 specification requirements for
+ * Fabric-based cross-chain asset transfers, including atomic operations,
+ * cryptographic proof generation, and secure asset custody management.
+ *
+ * **Fabric-Specific Operations:**
+ * - Chaincode deployment with signature policies and endorsement
+ * - Channel-based asset wrapping and unwrapping
+ * - MSP identity-based asset locking and unlocking
+ * - Fabric transaction fabric and endorsement handling
+ * - Client identity management for permissioned networks
+ * - Certificate-based authentication and authorization
+ *
+ * @example
+ * Basic Fabric leaf configuration:
+ * ```typescript
+ * const fabricOptions: IFabricLeafOptions = {
+ *   networkIdentification: {
+ *     id: 'fabric-network',
+ *     ledgerType: LedgerType.Fabric2
+ *   },
+ *   signingCredential: {
+ *     keychainId: 'fabric-keychain',
+ *     keychainRef: 'admin'
+ *   },
+ *   connectorOptions: {
+ *     connectionProfile: fabricConnectionProfile,
+ *     pluginRegistry: registry,
+ *     discoveryOptions: { enabled: true, asLocalhost: false }
+ *   },
+ *   channelName: 'bridge-channel',
+ *   targetOrganizations: [
+ *     { CORE_PEER_LOCALMSPID: 'Org1MSP', CORE_PEER_ADDRESS: 'peer0.org1:7051' }
+ *   ],
+ *   mspId: 'Org1MSP',
+ *   caFile: '-----BEGIN CERTIFICATE-----...',
+ *   orderer: 'orderer.example.com:7050',
+ *   ordererTLSHostnameOverride: 'orderer.example.com'
+ * };
+ *
+ * const fabricLeaf = new FabricLeaf(
+ *   fabricOptions,
+ *   ontologyManager,
+ *   monitorService
+ * );
+ *
+ * // Deploy chaincode wrapper contract
+ * await fabricLeaf.deployContracts();
+ *
+ * // Wrap Fabric asset for cross-chain transfer
+ * const asset: FabricAsset = {
+ *   id: 'fabric-token-123',
+ *   contractName: 'TokenContract',
+ *   owner: 'user1@org1.example.com',
+ *   type: TokenType.NONSTANDARD_FUNGIBLE,
+ *   channelName: 'bridge-channel',
+ *   mspId: 'Org1MSP'
+ * };
+ *
+ * const wrapResult = await fabricLeaf.wrapAsset(asset);
+ * console.log(`Asset wrapped: ${wrapResult.transactionId}`);
+ * ```
+ *
+ * @since 2.0.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://hyperledger-fabric.readthedocs.io/} Hyperledger Fabric Documentation
+ * @see {@link BridgeLeafFungible} for fungible asset interface
+ * @see {@link BridgeLeafNonFungible} for non-fungible asset interface
+ * @see {@link PluginLedgerConnectorFabric} for Fabric connector
+ *
+ * @author SATP Hermes Development Team
+ * @copyright 2024 Hyperledger Foundation
+ * @license Apache-2.0
+ */
+
 export interface IFabricLeafNeworkOptions extends INetworkOptions {
   signingCredential: FabricSigningCredential;
   connectorOptions: Partial<IPluginLedgerConnectorFabricOptions>;
