@@ -752,7 +752,9 @@ export class FabricTestLedgerV1 implements ITestLedger {
         const parts = relPath.split(path.sep);
         const filename = parts.pop()!;
         const filepath = parts.length ? parts.join("/") : undefined;
-
+        this.log.debug(
+          `Collecting file: ${filename} from path: ${fullPath} with relative path: ${relPath}`,
+        );
         files.push({
           filename,
           body: fileBuffer.toString("base64"),

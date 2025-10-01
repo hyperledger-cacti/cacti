@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  satp-hermes-gateway:
+    build:
+      context: ./
+      dockerfile: satp-hermes-gateway.Dockerfile
+    environment:
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-lgtm:4318
+
+    ports:
+      - 3010:3010/tcp # SERVER_PORT
+      - 3011:3011/tcp # CLIENT_PORT
+      - 3012:4010/tcp # API_PORT
+    depends_on:
+      - otel-lgtm
+
+  #https://grafana.com/blog/2024/03/13/an-opentelemetry-backend-in-a-docker-image-introducing-grafana/otel-lgtm/
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    container_name: otel-lgtm
+    environment:
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
+      OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: explicit_bucket_histogram
+    ports:
+      - "4000:3000" # Grafana 
+      - "4317:4317" # OpenTelemetry gRPC endpoint
+      - "4318:4318" # OpenTelemetry HTTP endpoint
+      - "9090:9090" # Prometheus
+      - "3100:3100" # Loki
+      - "3200:3200" # Tempo
+    restart: unless-stopped

@@ -1,0 +1,306 @@
+syntax = "proto3";
+package cacti.satp.v02.common;
+
+enum STATUS {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_OK = 1;
+  STATUS_ERROR = 2;
+};
+
+message TransferClaims {
+    string digital_asset_id = 1;
+    string asset_profile_id = 2;
+    string verified_originator_entity_id = 3;
+    string verified_beneficiary_entity_id = 4;
+    string originator_pubkey = 5;
+    string beneficiary_pubkey = 6;
+    string sender_gateway_network_id = 7;
+    string recipient_gateway_network_id = 8;
+    string client_gateway_pubkey = 9;
+    string server_gateway_pubkey = 10;
+    string sender_gateway_owner_id = 11;
+    string receiver_gateway_owner_id = 12;
+    uint32 max_retries = 13;
+    uint64 max_timeout = 14;
+    string amount_from_originator = 15;
+    string amount_to_beneficiary = 16;
+    repeated PrivacyPolicy process_policies = 17;
+    repeated PrivacyPolicy merge_policies = 18;
+}
+
+message TransferClaimsFormat {
+
+}
+
+message PrivacyPolicy {
+    string name = 1;
+    repeated string arguments = 2;
+  }
+
+message Permissions {
+
+}
+
+message SubsequentCalls {
+
+}
+
+message History {
+    repeated Transaction transactions = 1;
+    repeated ActionCategory action_categories = 2;
+    string origin = 3;
+    string destination = 4;
+    string balance = 5;
+    STATUS status = 6;
+    ApplicationParameters application_parameters = 7;
+}
+
+message ActionCategory {
+
+}
+
+message Transaction {
+
+}
+
+message ApplicationParameters {
+
+}
+
+message NetworkCapabilities {
+    string sender_gateway_network_id = 1;
+    SignatureAlgorithm signature_algorithm = 2;
+    repeated SignatureAlgorithm supported_signature_algorithms = 3;
+    LockType lock_type = 4;
+    uint64 lock_expiration_time = 5;
+    Permissions permissions = 6;
+    string developer_urn = 7;
+    CredentialProfile credential_profile = 8;
+    string application_profile = 9;
+    string logging_profile = 10;
+    string access_control_profile = 11;
+    SubsequentCalls subsequent_calls = 12;
+    repeated History history = 13;
+}
+
+enum MessageType {
+    MESSAGE_TYPE_UNSPECIFIED = 0;
+    MESSAGE_TYPE_PRE_INIT_PROPOSAL = 1;
+    MESSAGE_TYPE_PRE_INIT_RECEIPT = 2;
+    MESSAGE_TYPE_PRE_INIT_REJECT = 3;
+    MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_REQUEST = 4;
+    MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_RESPONSE = 5;
+    MESSAGE_TYPE_INIT_PROPOSAL = 6;
+    MESSAGE_TYPE_INIT_RECEIPT = 7;
+    MESSAGE_TYPE_INIT_REJECT = 8;
+    MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST = 9;
+    MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE = 10;
+    MESSAGE_TYPE_LOCK_ASSERT = 11;
+    MESSAGE_TYPE_ASSERTION_RECEIPT = 12;
+    MESSAGE_TYPE_COMMIT_PREPARE = 13;
+    MESSAGE_TYPE_COMMIT_READY = 14;
+    MESSAGE_TYPE_COMMIT_FINAL = 15;
+    MESSAGE_TYPE_ACK_COMMIT_FINAL = 16;
+    MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 17;
+    MESSAGE_TYPE_NEW_SESSION_REQUEST = 18;
+    MESSAGE_TYPE_NEW_SESSION_RESPONSE = 19;
+    MESSAGE_TYPE_PRE_SATP_TRANSFER_REQUEST = 20;
+    MESSAGE_TYPE_PRE_SATP_TRANSFER_RESPONSE = 21;
+    MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE_RESPONSE = 22;
+}
+
+message CommonSatp {
+    string version = 1;
+    MessageType message_type = 2;
+    string session_id = 3;
+    string transfer_context_id = 4;
+    uint64 sequence_number = 5;
+    string resource_url = 6;
+    ActionResponse action_response = 8;
+    string credential_block = 10;
+    PayloadProfile payload_profile = 11;
+    Payload payload = 13;
+    string payload_hash = 14;
+    string client_gateway_pubkey = 15;
+    string server_gateway_pubkey = 16;
+    string hash_previous_message = 17;
+    bool error = 18;
+    Error error_code = 19;
+}
+
+message ActionResponse {
+
+}
+
+enum CredentialProfile {
+    CREDENTIAL_PROFILE_UNSPECIFIED = 0;
+    CREDENTIAL_PROFILE_SAML = 1;
+    CREDENTIAL_PROFILE_OAUTH = 2;
+    CREDENTIAL_PROFILE_X509 = 3;
+}
+
+enum SignatureAlgorithm {
+    SIGNATURE_ALGORITHM_UNSPECIFIED = 0;
+    SIGNATURE_ALGORITHM_RSA = 1;
+    SIGNATURE_ALGORITHM_ECDSA = 2;
+    SIGNATURE_ALGORITHM_DSA = 3;
+    SIGNATURE_ALGORITHM_HMAC = 4;
+    SIGNATURE_ALGORITHM_RSASSA_PSS = 5;
+    SIGNATURE_ALGORITHM_EDDSA = 6;
+}
+
+enum LockType {
+    LOCK_TYPE_UNSPECIFIED = 0;
+    LOCK_TYPE_FAUCET = 1;
+    LOCK_TYPE_TIMELOCK = 2;
+    LOCK_TYPE_HASHLOCK = 3;
+    LOCK_TYPE_HASHLOCKTIME = 4;
+    LOCK_TYPE_MULTICLAIM = 5;
+    LOCK_TYPE_DESTROYBURN = 6;
+}
+
+message PayloadProfile {
+    AssetProfile asset_profile = 1;
+    string capabilities = 2;
+}
+
+message AssetProfile {
+    string issuer = 1;
+    string asset_code = 2;
+    string asset_code_type = 3;
+    string issuance_date = 4;
+    string expiration_date = 5;
+    string verification_end_point = 6;
+    string digital_signature = 7;
+    string prospectus_link = 8;
+    repeated string key_information_link = 9;
+    repeated string keywords = 10;
+    repeated string transfer_restrictions = 11;
+    repeated string ledger_requirements = 12;
+}
+
+message Payload {
+
+}
+
+enum Error {
+    ERROR_UNSPECIFIED = 0;
+    ERROR_BADLY_FORMATED_MESSAGE = 1;
+    ERROR_INCORRECT_PARAMETER = 2;
+    ERROR_ACK_MISMATCH = 3;
+    ERROR_BADLY_FORMATED_MESSAGE_CLAIM = 4;
+    ERROR_BADLY_FORMATED_MESSAGE_BAD_SIGNATURE = 5;
+    ERROR_BADLY_FORMATED_MESSAGE_WRONG_TRANSACTION_ID = 6;
+    ERROR_BADLY_FORMATED_MESSAGE_MISMATCH_HASH_VALUES = 7;
+    ERROR_EXPIRED_SIGNING_KEY_CERTIFICATE = 8;
+    ERROR_EXPIRED_CLAIM = 9;
+    ERROR_MESSAGE_OUT_OF_SEQUENCE = 10;
+    ERROR_SESSION_NOT_FOUND = 11;
+    ERROR_SESSION_ID_NOT_FOUND = 12;
+    ERROR_PUBLIC_KEY_NOT_FOUND = 13;
+    ERROR_SENDER_GATEWAY_NETWORK_ID_NOT_FOUND = 14;
+    ERROR_COMMON_BODY_BADLY_FORMATED = 15;
+    ERROR_SESSION_MISS_MATCH = 16;
+    ERROR_SESSION_DATA_LOADED_INCORRECTLY = 17;
+    ERROR_SESSION_DATA_NOT_FOUND = 18;
+    ERROR_SESSION_COMPLETED = 19;
+    ERROR_MISSING_PARAMETER = 20;
+    ERROR_SATP_VERSION_NOT_SUPPORTED = 21;
+    ERROR_SIGNATURE_VERIFICATION_FAILED = 22;
+    ERROR_DLT_NOT_SUPPORTED = 23;
+    ERROR_HASH_MISS_MATCH= 24;
+    ERROR_CONTEXT_ID_MISS_MATCH = 25;
+    ERROR_BRIDGE_PROBLEM = 26;
+    ERROR_LOCK_ASSERTION_BADLY_FORMATED = 27;
+    ERROR_LOCK_ASSERTION_CLAIM_FORMAT_MISSING = 28;
+    ERROR_LOCK_ASSERTION_EXPIRATION_ERROR = 29;
+    ERROR_BURN_ASSERTION_BADLY_FORMATED = 30;
+    ERROR_MINT_ASSERTION_BADLY_FORMATED = 31;
+    ERROR_ASSIGNMENT_ASSERTION_BADLY_FORMATED = 32;
+    ERROR_ONTOLOGY_BADLY_FORMATED = 33;
+    ERROR_WRAP_ASSERTION_BADLY_FORMATED = 34;
+}
+
+enum ClaimFormat {
+    CLAIM_FORMAT_UNSPECIFIED = 0;
+    CLAIM_FORMAT_DEFAULT = 1;
+    CLAIM_FORMAT_BUNGEE = 2;
+}
+message WrapAssertionClaimFormat {
+    ClaimFormat format = 1;
+}
+message LockAssertionClaimFormat {
+    ClaimFormat format = 1;
+}
+
+message MintAssertionClaimFormat {
+    ClaimFormat format = 1;
+}
+
+message BurnAssertionClaimFormat {
+    ClaimFormat format = 1;
+}
+
+message AssignmentAssertionClaimFormat {
+    ClaimFormat format = 1;
+}
+
+message LockAssertionClaim {
+    string receipt = 1;
+    string proof = 2;
+    string signature = 3;
+}
+
+message MintAssertionClaim {
+    string receipt = 1;
+    string proof = 2;
+    string signature = 3;
+}
+
+message BurnAssertionClaim {
+    string receipt = 1;
+    string proof = 2;
+    string signature = 3;
+}
+
+message AssignmentAssertionClaim {
+    string receipt = 1;
+    string proof = 2;
+    string signature = 3;
+}
+
+message WrapAssertionClaim {
+    string receipt = 1;
+    string proof = 2;
+    string signature = 3;
+}
+
+enum TokenType {
+    TOKEN_TYPE_UNSPECIFIED = 0;
+    TOKEN_TYPE_ERC20 = 1;
+    TOKEN_TYPE_ERC721 = 2;
+    TOKEN_TYPE_ERC1155 = 3;
+    TOKEN_TYPE_NONSTANDARD_FUNGIBLE = 4;
+    TOKEN_TYPE_NONSTANDARD_NONFUNGIBLE = 5;
+}
+
+message Asset {
+  string token_id = 1;
+  string reference_id = 2;
+  TokenType token_type = 3;
+  string owner = 4;
+  uint64 amount = 5;
+  string contract_name = 6;
+  //besu
+  string contract_address = 7;
+  //fabric
+  string msp_id = 8;
+  string channel_name = 9;
+  NetworkId network_id = 10;
+}
+
+message NetworkId {
+  string id = 1;
+  string type = 2;
+}
+

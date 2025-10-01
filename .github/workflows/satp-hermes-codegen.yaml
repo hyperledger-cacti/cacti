@@ -1,0 +1,95 @@
+name: SATP Hermes Gateway Codegen
+
+on:
+  workflow_call:
+    outputs:
+      codegen_success:
+        description: "Whether the code generation was successful"
+        value: ${{ jobs.codegen-satp.outputs.codegen_success }}
+
+jobs:
+  codegen-satp: 
+    runs-on: ubuntu-latest-16-cores
+    continue-on-error: false
+    outputs:
+      codegen_success: ${{ steps.codegen.outputs.success }}
+    env:
+      FULL_BUILD_DISABLED: true
+      TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
+      CUSTOM_CHECKS_DISABLED: true
+      CONFIGURE_DISABLED: false
+      CHECK_WORK_TREE_STATUS_DISABLED: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # Install Cacti pre-requisites
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: v22.18.0
+
+      # Download build artifacts using reusable action
+      - name: Download SATP build artifacts
+        uses: ./.github/actions/satp-download-build-artifacts
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Set working directory
+        run: cd packages/cactus-plugin-satp-hermes && pwd
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Generate protobuf files
+        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes codegen:proto
+
+      - name: Generate OpenAPI SDKs
+        run: |
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-yaml
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-json 
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes generate-sdk:typescript-axios-bol
+
+      - name: Generate ABIs
+        id: codegen
+        run: |
+          yarn workspace @hyperledger/cactus-plugin-satp-hermes forge:build:all
+          echo "success=true" >> "$GITHUB_OUTPUT"
+
+      # Upload generated artifacts for reuse in other jobs
+      - name: Upload generated protobuf files
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-hermes-generated-protobuf
+          path: packages/cactus-plugin-satp-hermes/src/main/typescript/generated/
+
+      - name: Upload generated OpenAPI files
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-hermes-generated-openapi
+          path: |
+            packages/cactus-plugin-satp-hermes/src/main/yml/bol/openapi-blo-bundled.yml
+            packages/cactus-plugin-satp-hermes/src/main/json/openapi-blo-bundled.json
+            packages/cactus-plugin-satp-hermes/src/main/typescript/generated/gateway-client/
+
+      - name: Upload generated Solidity artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-hermes-generated-solidity
+          path: packages/cactus-plugin-satp-hermes/src/main/solidity/generated/
+          
+      - name: Show yarn build log if it exists
+        if: always()
+        run: |
+          LOG_FILE=$(find /tmp -type f -name build.log | head -n 1)
+          if [ -f "$LOG_FILE" ]; then
+            echo "===== Build Log ====="
+            cat "$LOG_FILE"
+            echo "====================="
+          else
+            echo "No build log found."
+          fi

@@ -77,7 +77,7 @@
     "bl": "6.1.0",
     "express": "5.1.0",
     "express-openapi-validator": "5.2.0",
-    "form-data": "4.0.4",
+    "form-data": "4.0.0",
     "fs-extra": "11.2.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "http-status-codes": "2.1.4",

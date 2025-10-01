@@ -1,0 +1,66 @@
+[
+  {
+    "caseID": "FABRIC_MONITORING",
+    "receiptID": "33542c28f8cd5e7c3cf2e36090365d2bb4f58a57f0af5641edcd73302363814b",
+    "blockchainID": "FABRIC_2",
+    "invocationType": "FabricContractInvocationType.SEND",
+    "methodName": "CreateAsset",
+    "parameters": [
+      "2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939",
+      "10",
+      "owner1"
+    ],
+    "timestamp": "2024-07-03T14:44:24.035Z",
+    "identity": "user1",
+    "cost": 0,
+    "carbonFootprint": 0.00018,
+    "latency": 0
+  },
+  {
+    "caseID": "FABRIC_MONITORING",
+    "receiptID": "897772958c7ff6f916e9898599c89d9423e494a9bcb973e3081708ccbae22228",
+    "blockchainID": "FABRIC_2",
+    "invocationType": "FabricContractInvocationType.SEND",
+    "methodName": "TransferAsset",
+    "parameters": [
+      "2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939",
+      "owner2"
+    ],
+    "timestamp": "2024-07-03T14:44:29.269Z",
+    "identity": "user1",
+    "cost": 0,
+    "carbonFootprint": 0.00018,
+    "latency": 0
+  },
+  {
+    "caseID": "FABRIC_MONITORING",
+    "receiptID": "33d6f0d65caaab85bedd667476c5618f0b9f806ff252a4de28ddabfad8404357",
+    "blockchainID": "FABRIC_2",
+    "invocationType": "FabricContractInvocationType.SEND",
+    "methodName": "TransferAsset",
+    "parameters": [
+      "2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939",
+      "owner1"
+    ],
+    "timestamp": "2024-07-03T14:44:34.487Z",
+    "identity": "user1",
+    "cost": 0,
+    "carbonFootprint": 0.00018,
+    "latency": 0
+  },
+  {
+    "caseID": "FABRIC_MONITORING",
+    "receiptID": "479b9bd62032c1e0f3792b3a5fe04a4b501313aa693b59193e268b74575f8d62",
+    "blockchainID": "FABRIC_2",
+    "invocationType": "FabricContractInvocationType.SEND",
+    "methodName": "DeleteAsset",
+    "parameters": [
+      "2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939"
+    ],
+    "timestamp": "2024-07-03T14:44:39.720Z",
+    "identity": "user1",
+    "cost": 0,
+    "carbonFootprint": 0.00018,
+    "latency": 0
+  }
+]

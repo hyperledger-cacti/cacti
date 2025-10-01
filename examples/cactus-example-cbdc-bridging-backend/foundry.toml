@@ -1,0 +1,12 @@
+[profile.default]
+solc-version = "0.8.20"
+evm-version = "paris"
+libs = ["node_modules", "lib"]
+# The source directory
+src = "./src/main/solidity/contracts"
+# The test directory
+test = "src/main/solidity/tests"
+remappings = [
+    "ds-test/=./node_modules/ds-test/src/",
+    "forge-std/=./node_modules/forge-std/src/",
+]

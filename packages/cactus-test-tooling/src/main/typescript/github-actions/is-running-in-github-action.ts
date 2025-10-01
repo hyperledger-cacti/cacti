@@ -29,4 +29,5 @@ export function isRunningInGithubAction(
   // and therefore the hacky workaround here instead of just deleteing the whole
   // mechanism completely.
   return false;
+  //return env.GITHUB_ACTIONS === "true";
 }

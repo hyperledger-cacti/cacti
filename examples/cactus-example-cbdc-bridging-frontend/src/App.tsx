@@ -1,14 +1,28 @@
-import React from 'react';
-import HomePage from './pages/HomePage';
-import { CssBaseline } from '@mui/material';
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import Helper from "./pages/Helper";
+import "./App.css";
 
 function App() {
+  if (
+    process.env.REACT_APP_BACKEND_PATH == undefined ||
+    process.env.REACT_APP_BACKEND_PATH == ""
+  ) {
+    console.log("The BACKEND_PATH environment variable must be set.");
+    throw new Error("The BACKEND_PATH environment variable must be set.");
+  }
   return (
-    <>
-      <CssBaseline />
-      <HomePage />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/">
+          <Route
+            index
+            element={<HomePage path={process.env.REACT_APP_BACKEND_PATH} />}
+          />
+          <Route path="help" element={<Helper />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

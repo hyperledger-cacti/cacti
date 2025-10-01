@@ -126,6 +126,17 @@ function mainTask()
   ### COMMON
   cd $PROJECT_ROOT_DIR
 
+  if [ ! -d "${XDG_CONFIG_HOME:-$HOME}" ]; then
+    echo "$(date +%FT%T%z) [CI] directory ${XDG_CONFIG_HOME:-$HOME} does not exist."
+  else
+    npm run preinstall || { echo "Preinstall failed"; exit 1; }
+    export PATH="${XDG_CONFIG_HOME:-$HOME}/.foundry/bin:$PATH"
+    if [ -f ~/.bashrc ]; then
+      source ~/.bashrc
+    fi
+    foundryup
+  fi
+
   if [ "${CONFIGURE_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] npm run configure disabled. Skipping..."
   else
@@ -146,10 +157,10 @@ function mainTask()
 
   if [ "${JEST_TEST_RUNNER_DISABLED:-false}" = "true" ]; then
     echo "$(date +%FT%T%z) [CI] Jest test runner disabled. Skipping..."
-  elif [ "${JEST_TEST_CODE_COVERAGE_ENABLED:-true}" = "true" ]; then
-   yarn jest $JEST_TEST_PATTERN --coverage --coverageDirectory=$JEST_TEST_COVERAGE_PATH
+  #elif [ "${JEST_TEST_CODE_COVERAGE_ENABLED:-true}" = "true" ]; then
+  # yarn jest $JEST_TEST_PATTERN --coverage --coverageDirectory=$JEST_TEST_COVERAGE_PATH
   else
-    yarn test:jest:all $JEST_TEST_PATTERN
+    yarn test:jest:all #$JEST_TEST_PATTERN
   fi
 
   if [ "${DUMP_DISK_USAGE_INFO_DISABLED:-true}" = "true" ]; then

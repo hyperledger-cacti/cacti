@@ -112,6 +112,12 @@ export interface IRunTransactionV1Exchange {
   timestamp: Date;
 }
 
+export interface RunTransactionV1Exchange {
+  request: InvokeContractV1Request;
+  response: RunTransactionResponse;
+  timestamp: Date;
+}
+
 export const E_KEYCHAIN_NOT_FOUND = "cactus.connector.besu.keychain_not_found";
 
 export interface IPluginLedgerConnectorBesuOptions
@@ -441,7 +447,6 @@ export class PluginLedgerConnectorBesu
     req: InvokeContractV1Request,
   ): Promise<InvokeContractV1Response> {
     const fnTag = `${this.className}#invokeContract()`;
-
     const contractName = req.contractName;
     let contractInstance: Contract;
 

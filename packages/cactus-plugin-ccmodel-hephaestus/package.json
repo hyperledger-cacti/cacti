@@ -51,6 +51,7 @@
   ],
   "scripts": {
     "build": "npm run tsc",
+    "postinstall": "[ -d .venv ] || python3 -m venv .venv --without-pip; pip3 install --target .venv/lib/python*/site-packages -r requirements.txt",
     "tsc": "tsc --project ./tsconfig.json",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",

@@ -1,0 +1,88 @@
+
+syntax = "proto3";
+package cacti.satp.v02.service;
+
+service CrashRecoveryService {
+  rpc Recover(RecoverRequest) returns (RecoverResponse);
+  rpc RecoverSuccess(RecoverSuccessRequest) returns (RecoverSuccessResponse);
+  rpc Rollback(RollbackRequest) returns (RollbackResponse);
+}
+
+message RecoverRequest {
+  string session_id = 1;
+  string message_type = 2;
+  string satp_phase = 3;
+  int32 sequence_number = 4;
+  bool is_backup = 5;
+  string new_identity_public_key = 6;
+  int64 last_entry_timestamp = 7;
+  string client_signature = 8;
+}
+
+message RecoverResponse {
+  string session_id = 1;
+  string message_type = 2;
+  string hash_recover_message = 3;
+  repeated PersistLogEntry recovered_logs = 4;
+  string server_signature = 5;
+}
+
+message RecoverSuccessRequest {
+  string session_id = 1;
+  string message_type = 2;
+  string hash_recover_update_message = 3;
+  bool success = 4;
+  repeated string entries_changed = 5;
+  string client_signature = 6;
+}
+
+message RecoverSuccessResponse {
+  string session_id = 1;
+  bool received = 2;
+  string server_signature = 3;
+}
+
+message RollbackRequest {
+  string session_id = 1;
+  string message_type = 2;
+  bool success = 3;
+  repeated string actions_performed = 4;
+  repeated string proofs = 5;
+  string client_signature = 6;
+}
+
+message RollbackResponse {
+  string session_id = 1;
+  string message_type = 2;
+  bool success = 3;
+  repeated string actions_performed = 4;
+  repeated string proofs = 5;
+  string server_signature = 6;
+}
+
+message PersistLogEntry {
+  string session_id = 1;
+  string type = 2;
+  string key = 3;
+  string operation = 4;
+  string timestamp = 5;
+  string data = 6;
+  int32 sequence_number = 7;
+}
+
+message RollbackLogEntry {
+  string session_id = 1;
+  string stage = 2;
+  string timestamp = 3;
+  string action = 4; // action performed during rollback
+  string status = 5; 
+  string details = 6;
+}
+
+message RollbackState {
+  string session_id = 1;
+  string current_stage = 2;
+  repeated RollbackLogEntry rollback_log_entries = 3;
+  string status = 4; // Overall status (e.g., IN_PROGRESS, COMPLETED, FAILED)
+  string details = 5;
+}

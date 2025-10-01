@@ -1,0 +1,28 @@
+name: 'Download SATP Build Artifacts'
+description: 'Downloads pre-built SATP artifacts (build output, yarn cache, node_modules) for reuse'
+author: 'Hyperledger Cacti Team'
+
+branding:
+  icon: 'download'
+  color: 'blue'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Download build output
+      uses: actions/download-artifact@v4
+      with:
+        name: satp-hermes-build-output
+        path: packages/cactus-plugin-satp-hermes/dist/
+
+    - name: Download .yarn cache (if available)
+      uses: actions/download-artifact@v4
+      continue-on-error: true
+      with:
+        name: satp-hermes-yarn-cache
+        path: ./.yarn/
+
+    - name: Set executable permissions
+      shell: bash
+      run: |
+        echo "✅ Build artifacts downloaded and permissions restored"

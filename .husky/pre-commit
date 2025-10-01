@@ -1,5 +1,7 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
-# TODO: re-enable this once we were able to upgrade to the newer ESLint
-# ./node_modules/.bin/lint-staged
+echo  "pre-commit hook, running yarn run lint"
+yarn run lint
+if [ $? -ne 0 ]; then
+	echo "Lint failed. Please fix errors before committing."
+	exit 1
+fi

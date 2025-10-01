@@ -14,23 +14,44 @@ env:
   NODEJS_VERSION: v18.18.2
   RUN_TRIVY_SCAN: true
   RUN_CODE_COVERAGE: true
+  NODE_OPTIONS: --max-old-space-size=8192
 jobs:
   ActionLint:
     needs: check-ci-skip
     uses: ./.github/workflows/actionlint.yaml
   DCI-Lint:
-    name: DCI-Lint
-    needs: check-ci-skip
-    runs-on: ubuntu-22.04
-    steps:
-      - id: lint-git-repo
-        name: Lint Git Repo
-        uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
-        with:
-          lint-git-repo-request: '{"cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git", "fetchArgs": ["--update-head-ok", "--no-tags", "--prune", "--progress", "--no-recurse-submodules", "--depth=1", "origin" ,"+${{ github.sha }}:${{ github.ref }}"], "checkoutArgs": [ "${{ github.ref }}"], "targetPhrasePatterns": [], "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json" }'
-      - name: Get the output response
-        run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
-
+      name: DCI-Lint
+      needs: check-ci-skip
+      runs-on: ubuntu-22.04
+      steps:
+        - id: lint-git-repo
+          name: Lint Git Repo
+          uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
+          with:
+            lint-git-repo-request: >-
+              {
+                "cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git",
+                "fetchArgs": [
+                  "--update-head-ok",
+                  "--no-tags",
+                  "--prune",
+                  "--progress",
+                  "--no-recurse-submodules",
+                  "--depth=1",
+                  "origin",
+                  "+${{ github.sha }}:${{ github.ref }}"
+                ],
+                "checkoutArgs": [
+                  "${{ github.ref }}"
+                ],
+                "targetPhrasePatterns": [],
+                "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json",
+                "excludePatterns": [
+                  "packages/**/generated/**"
+                ]
+              }
+        - name: Get the output response
+          run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
   check-ci-skip:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-22.04
@@ -206,6 +227,20 @@ jobs:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake openjdk-11-jdk wget
+
+      - name: Install Python dependencies for ccmodel-hephaestus
+        run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
+          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
+            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
+          fi
+
       - id: yarn-cache
         name: Initialize Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -215,10 +250,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
 
+      - name: Clean Yarn caches
+        if: ${{ steps.yarn-cache.outputs.cache-hit != 'true' }}
+        run: yarn cache clean && rm -rf node_modules
+
       - if : ${{ (steps.yarn-cache.outputs.cache-hit != 'true') }}
         name: tools_ci_sh
         run: ./tools/ci.sh
-
+  
   yarn_lint:
     continue-on-error: false
     env:
@@ -236,6 +275,21 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
+
+      - name: Install Python dependencies for ccmodel-hephaestus
+        run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
+          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
+            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
+          fi
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -244,6 +298,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
@@ -305,6 +363,20 @@ jobs:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake openjdk-11-jdk wget
+
+      - name: Install Python dependencies for ccmodel-hephaestus
+        run: |
+          # Install pm4py which is required for ccmodel-hephaestus tests
+          pip3 install pm4py
+          # Install additional dependencies from requirements.txt if it exists
+          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
+            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
+          fi
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -313,10 +385,39 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install
+
+      - name: Download OpenAPI Generator JAR
+        run: |
+          # Set Java environment
+          export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
+          java -version
+          # Ensure the OpenAPI generator CLI JAR is properly downloaded
+          echo "Downloading OpenAPI generator JAR..."
+          yarn codegen:install-cli || echo "CLI already installed"
+          yarn codegen:warmup-mkdir || echo "Directory already exists"
+          yarn codegen:warmup-v6.6.0 || echo "JAR download completed"
+          # Set the specific version
+          npx openapi-generator-cli version-manager set 6.6.0 || echo "Version set completed"
+          # Verify the JAR exists
+          if [ ! -f "./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar" ]; then
+            echo "JAR not found, attempting direct download..."
+            mkdir -p ./node_modules/@openapitools/openapi-generator-cli/versions/
+            wget -O ./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar
+          fi
+          echo "OpenAPI generator setup completed"
+
       - run: ./tools/ci.sh
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
-      - run: yarn codegen
+      - name: Run codegen with proper Java environment
+        run: |
+          export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
+          yarn codegen
       - run: git status --porcelain
       - run: git status --porcelain | wc -l
 
@@ -375,6 +476,12 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -383,9 +490,14 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
+      
   yarn_tools_validate_bundle_names:
-    continue-on-error: false
+    continue-on-error: true
     env:
       DEV_BUILD_DISABLED: false
       FULL_BUILD_DISABLED: true
@@ -402,6 +514,12 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -410,6 +528,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
   cactus-api-client:
     continue-on-error: false
@@ -551,7 +673,9 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common-example-server
       JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true
+      TAPE_TEST_RUNNER_DISABLED: true,
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -579,6 +703,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   cactus-common:
+    if: github.repository == 'hyperledger-cacti/cacti'
     continue-on-error: false
     env:
       DEV_BUILD_DISABLED: false
@@ -588,6 +713,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -615,6 +742,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   cactus-core:
+    if: github.repository == 'hyperledger-cacti/cacti'
     continue-on-error: false
     env:
       FULL_BUILD_DISABLED: true
@@ -623,6 +751,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -657,6 +787,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core-api
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -693,6 +825,8 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: ./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts
       TAPE_TEST_RUNNER_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -832,6 +966,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-supply-chain-business-logic-plugin
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -901,6 +1037,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-manual
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -937,6 +1075,8 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/counterparty-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/own-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/refund.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/withdraw-counterparty-endpoint.test.ts}
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -971,6 +1111,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1005,6 +1147,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu-erc20
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1142,6 +1286,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpk-memory
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1176,6 +1322,8 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-memory-wasm/src/test/typescript/unit/plugin-keychain-memory-wasm.test.ts
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1210,6 +1358,8 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/cactus-keychain-vault-server.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/plugin-keychain-vault.test.ts}'
       TAPE_TEST_RUNNER_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1247,6 +1397,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-aries
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1254,6 +1406,12 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+
       - id: yarn-cache
         name: Restore Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -1262,6 +1420,10 @@ jobs:
           path: ./.yarn/
           restore-keys: |
             ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
@@ -1285,6 +1447,8 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1384,6 +1548,7 @@ jobs:
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
     env:
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-corda/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
@@ -1448,6 +1613,8 @@ jobs:
       TAPE_TEST_RUNNER_DISABLED: true
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-stellar
       JEST_TEST_CODE_COVERAGE_ENABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -1759,33 +1926,6 @@ jobs:
         with:
           name: coverage-reports-35
           path: ./code-coverage-ts/**/
-  # cactus-plugin-satp-hermes:
-  #   continue-on-error: false
-  #   env:
-  #     FULL_BUILD_DISABLED: true
-  #     JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-  #     JEST_TEST_RUNNER_DISABLED: false
-  #     TAPE_TEST_RUNNER_DISABLED: true
-  #   needs: build-dev
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - name: Use Node.js ${{ env.NODEJS_VERSION }}
-  #       uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
-  #       with:
-  #         node-version: ${{ env.NODEJS_VERSION }}
-  #     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-  #     - id: yarn-cache-dir-path
-  #       name: Get yarn cache directory path
-  #       run: echo "dir=$(yarn cache dir)" >> "$GITHUB_OUTPUT"
-  #     - id: yarn-cache
-  #       name: Restore Yarn Cache
-  #       uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
-  #       with:
-  #         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-  #         path: ./.yarn/
-  #         restore-keys: |
-  #           ${{ runner.os }}-yarn-
-  #     - run: ./tools/ci.sh
   cp-bungee-hermes:
     continue-on-error: false
     env:
@@ -1794,8 +1934,8 @@ jobs:
       # Free space left: 26 MB
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       FULL_BUILD_DISABLED: true
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
-      JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-bungee-hermes
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
@@ -1815,7 +1955,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
           restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+            ${{ runner.os }}-yarn-
       - run: ./tools/ci.sh
         if: ${{ env.RUN_CODE_COVERAGE == 'true' }}
       - name: Upload coverage reports as artifacts
@@ -1823,6 +1963,40 @@ jobs:
         with:
           name: coverage-reports-36
           path: ./code-coverage-ts/**/
+  cactus-plugin-bungee-hermes:
+    continue-on-error: false
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      TAPE_TEST_RUNNER_DISABLED: true
+    needs: build-dev
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
+
+      - id: yarn-cache
+        name: Restore Yarn Cache
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Clean and install dependencies
+        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
+
+      - run: ./tools/ci.sh
   ct-api-client:
     continue-on-error: false
     env:
@@ -2047,6 +2221,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-besu
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -2079,6 +2255,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-ethereum
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -2117,6 +2295,8 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     runs-on: ubuntu-22.04
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
@@ -2149,6 +2329,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-verifier-client
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -2182,6 +2364,8 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-static
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:

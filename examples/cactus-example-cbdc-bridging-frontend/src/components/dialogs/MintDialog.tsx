@@ -7,16 +7,18 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import Alert from "@mui/material/Alert";
-import { mintTokensFabric } from "../../api-calls/fabric-api";
+import { mintTokens } from "../../api-calls/ledgers-api";
 
 export interface IMintDialogOptions {
-  open: boolean
-  user: string
-  onClose: () => any
+  path: string;
+  open: boolean;
+  user: string;
+  ledger: string;
+  onClose: () => unknown;
 }
 
 export default function MintDialog(props: IMintDialogOptions) {
-  const [amount, setAmount] = useState<Number>(0);
+  const [amount, setAmount] = useState<number>(0);
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
 
@@ -27,7 +29,9 @@ export default function MintDialog(props: IMintDialogOptions) {
     }
   }, [props.open]);
 
-  const handleChangeAmount = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleChangeAmount = (
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     const value = parseInt(event.target.value);
 
     if (value < 0) {
@@ -44,7 +48,21 @@ export default function MintDialog(props: IMintDialogOptions) {
       setErrorMessage("Amount must be a positive value");
     } else {
       setSending(true);
-      await mintTokensFabric(props.user, amount.toString());
+      if (props.ledger !== "FABRIC" && props.ledger !== "BESU") {
+        setErrorMessage("Invalid ledger");
+        return;
+      }
+
+      if (
+        await mintTokens(
+          props.path,
+          props.ledger,
+          props.user,
+          amount.toString(),
+        )
+      ) {
+        window.location.reload();
+      }
       props.onClose();
     }
   };
@@ -82,7 +100,7 @@ export default function MintDialog(props: IMintDialogOptions) {
         ) : (
           <div>
             <Button onClick={props.onClose}>Cancel</Button>
-            <Button onClick={performMintTransaction}>Confirm</Button>
+            <Button onClick={performMintTransaction}>Mint</Button>
           </div>
         )}
       </DialogActions>
