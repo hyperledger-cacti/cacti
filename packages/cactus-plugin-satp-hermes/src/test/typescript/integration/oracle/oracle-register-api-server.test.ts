@@ -44,6 +44,8 @@ import { keccak256 } from "web3-utils";
 import { BLODispatcher } from "../../../../main/typescript/api1/dispatcher";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -79,16 +81,30 @@ beforeAll(async () => {
     const businessLogicContract = "OracleTestContract";
 
     try {
-      besuEnv = await BesuTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
-      });
+      besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+        {
+          logLevel,
+        },
+        [
+          {
+            assetType: SupportedBesuContractTypes.ORACLE,
+            contractName: businessLogicContract,
+          },
+        ],
+      );
       log.info("Besu Ledger started successfully");
 
-      ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
-      });
+      ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
+        {
+          logLevel,
+        },
+        [
+          {
+            assetType: SupportedEthereumContractTypes.ORACLE,
+            contractName: businessLogicContract,
+          },
+        ],
+      );
 
       fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
         contractName: businessLogicContract,
@@ -241,7 +257,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
       },
       destinationNetworkId: besuEnv.network,
       destinationContract: {
-        contractName: besuEnv.getTestContractName(),
+        contractName: besuEnv.getTestOracleContractName(),
         contractAddress: besuContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -269,7 +285,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
     await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestOracleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -284,7 +300,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
     await oracleApi.executeOracleTask({
       destinationNetworkId: ethereumEnv.network,
       destinationContract: {
-        contractName: ethereumEnv.getTestContractName(),
+        contractName: ethereumEnv.getTestOracleContractName(),
         contractAddress: ethereumContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -382,7 +398,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
       },
       destinationNetworkId: besuEnv.network,
       destinationContract: {
-        contractName: besuEnv.getTestContractName(),
+        contractName: besuEnv.getTestOracleContractName(),
         contractAddress: besuContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -484,7 +500,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
     const response = await oracleApi.registerOracleTask({
       destinationNetworkId: besuEnv.network,
       destinationContract: {
-        contractName: besuEnv.getTestContractName(),
+        contractName: besuEnv.getTestOracleContractName(),
         contractAddress: besuContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
@@ -506,7 +522,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
     const readNonceTask = await oracleApi.executeOracleTask({
       sourceNetworkId: besuEnv.network,
       sourceContract: {
-        contractName: besuEnv.getTestContractName(),
+        contractName: besuEnv.getTestOracleContractName(),
         contractAddress: besuContractAddress,
         contractAbi: OracleTestContract.abi,
         contractBytecode: OracleTestContract.bytecode.object,
