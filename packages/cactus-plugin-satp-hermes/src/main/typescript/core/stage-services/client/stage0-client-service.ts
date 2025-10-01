@@ -1,4 +1,49 @@
-import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
+/**
+ * @fileoverview
+ * SATP Stage 0 Client Service - Transfer Initiation and Session Negotiation
+ *
+ * @description
+ * This module implements the client-side business logic for SATP (Secure Asset Transfer Protocol)
+ * Stage 0, which handles transfer initiation and session negotiation between client and server
+ * gateways. Stage 0 is the foundational stage that establishes the transfer context, negotiates
+ * protocol parameters, and prepares the asset for cross-chain transfer.
+ *
+ * **Stage 0 Responsibilities:**
+ * - **Session Initiation**: Creates new SATP sessions and negotiates parameters
+ * - **Transfer Preparation**: Validates transfer requests and asset properties
+ * - **Asset Wrapping**: Prepares assets for cross-chain transfer through wrapping
+ * - **Proof Generation**: Creates cryptographic proofs of asset states and operations
+ * - **Gateway Communication**: Handles client-server message exchange for session setup
+ *
+ * **Client-Side Operations:**
+ * - **NewSessionRequest**: Initiates new SATP transfer sessions
+ * - **Response Validation**: Validates server responses and session confirmations
+ * - **PreSATPTransferRequest**: Requests transfer preparation and asset validation
+ * - **Asset Wrapping**: Wraps assets for cross-chain transfer operations
+ * - **Proof Management**: Generates and stores cryptographic proofs
+ *
+ * **Integration Points:**
+ * - **Bridge Managers**: Interfaces with cross-chain bridge implementations
+ * - **Asset Management**: Handles various asset types across different ledgers
+ * - **Cryptographic Services**: Manages digital signatures and proof generation
+ * - **Session Management**: Maintains transfer session state and metadata
+ * - **Database Persistence**: Stores session data, proofs, and audit trails
+ *
+ * **Protocol Compliance:**
+ * This implementation follows the IETF SATP Core v2 specification for Stage 0
+ * operations, ensuring interoperability with compliant SATP implementations
+ * across different gateway vendors and blockchain networks.
+ *
+ * @author SATP Development Team
+ * @since 2.0.0
+ * @version 2.0.0
+ * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
+ * @see {@link SATPService} Base service class
+ * @see {@link SATPSession} Session management interface
+ * @see {@link BridgeManagerClientInterface} Bridge integration interface
+ */
+
+import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   ClaimFormat,
   MessageType,
@@ -49,15 +94,91 @@ import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/br
 import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { buildAndCheckAsset, SessionSide } from "../../satp-utils";
+
+/**
+ * SATP Stage 0 Client Service implementation for transfer initiation and session negotiation.
+ *
+ * @description
+ * Implements client-side business logic for SATP Stage 0 operations, handling the initial
+ * phase of cross-chain asset transfers. This service manages session creation, parameter
+ * negotiation, asset preparation, and the foundational steps required before proceeding
+ * to subsequent SATP protocol stages.
+ *
+ * **Key Capabilities:**
+ * - **Session Management**: Creates and manages SATP transfer sessions
+ * - **Gateway Communication**: Handles client-server protocol message exchange
+ * - **Asset Preparation**: Prepares assets for cross-chain transfer operations
+ * - **Proof Generation**: Creates cryptographic proofs and assertions
+ * - **Bridge Integration**: Interfaces with cross-chain bridge mechanisms
+ * - **Error Handling**: Comprehensive error detection and recovery
+ *
+ * **Stage 0 Protocol Flow:**
+ * 1. **NewSessionRequest**: Client initiates transfer session with server
+ * 2. **NewSessionResponse**: Server responds with session parameters and acceptance
+ * 3. **PreSATPTransferRequest**: Client requests transfer preparation and validation
+ * 4. **Asset Wrapping**: Client wraps assets for cross-chain transfer
+ * 5. **Proof Storage**: Client generates and stores cryptographic proofs
+ *
+ * **Integration Architecture:**
+ * - Extends SATPService base class for common functionality
+ * - Uses BridgeManagerClientInterface for cross-chain bridge operations
+ * - Integrates with database persistence for session and proof storage
+ * - Implements comprehensive monitoring and logging capabilities
+ *
+ * @public
+ * @class Stage0ClientService
+ * @extends {SATPService}
+ * @since 2.0.0
+ * @see {@link SATPService} for base service functionality
+ * @see {@link BridgeManagerClientInterface} for bridge integration
+ * @see {@link SATPSession} for session management
+ */
 export class Stage0ClientService extends SATPService {
+  /** SATP protocol stage identifier */
   public static readonly SATP_STAGE = "0";
+  /** Service type designation */
   public static readonly SERVICE_TYPE = SATPServiceType.Client;
+  /** Internal service name for identification */
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
+  /** Cross-chain bridge manager interface for bridge operations */
   private bridgeManager: BridgeManagerClientInterface;
 
+  /** Asset claim format specification for proof generation */
   private claimFormat: ClaimFormat;
 
+  /**
+   * Constructs a new Stage 0 Client Service instance.
+   *
+   * @description
+   * Initializes the Stage 0 client service with all required dependencies including
+   * bridge management, cryptographic services, and database persistence. Validates
+   * that all essential components are available for Stage 0 operations.
+   *
+   * **Initialization Process:**
+   * 1. **Base Service Setup**: Configures common service properties and dependencies
+   * 2. **Bridge Validation**: Ensures bridge manager is available for cross-chain operations
+   * 3. **Claim Format**: Sets up asset claim format for proof generation
+   * 4. **Service Registration**: Registers service with monitoring and logging systems
+   *
+   * @public
+   * @constructor
+   * @param {ISATPClientServiceOptions} ops - Client service configuration options
+   * @throws {MissingBridgeManagerError} When bridge manager is not provided
+   * @since 2.0.0
+   * @example
+   * ```typescript
+   * const stage0Client = new Stage0ClientService({
+   *   serviceName: 'Stage0Client',
+   *   loggerOptions: { level: 'info' },
+   *   signer: cryptoSigner,
+   *   bridgeManager: bridgeInterface,
+   *   dbLogger: persistence,
+   *   monitorService: monitoring,
+   *   claimFormat: ClaimFormat.DEFAULT
+   * });
+   * ```
+   */
   constructor(ops: ISATPClientServiceOptions) {
     const commonOptions: ISATPServiceOptions = {
       stage: Stage0ClientService.SATP_STAGE,
@@ -79,6 +200,35 @@ export class Stage0ClientService extends SATPService {
     this.bridgeManager = ops.bridgeManager;
   }
 
+  /**
+   * Creates a new SATP session request to initiate cross-chain asset transfer.
+   *
+   * @description
+   * Initiates a new SATP transfer session by creating and configuring a NewSessionRequest
+   * message. This is the first step in the SATP protocol flow, establishing the transfer
+   * context, asset details, and gateway identifiers for the cross-chain operation.
+   *
+   * **Operation Steps:**
+   * 1. **Session Validation**: Validates session and gateway parameters
+   * 2. **Message Creation**: Creates Protocol Buffer NewSessionRequest message
+   * 3. **Common Fields**: Populates standard SATP message fields
+   * 4. **Asset Information**: Includes source asset details and recipient gateway
+   * 5. **Cryptographic Signing**: Signs the request for authentication
+   * 6. **Hash Generation**: Creates message hash for integrity verification
+   * 7. **Session Persistence**: Stores session data and request details
+   *
+   * @public
+   * @async
+   * @method newSessionRequest
+   * @param {SATPSession} session - SATP session containing transfer parameters
+   * @param {string} thisGatewayId - Client gateway identifier
+   * @returns {Promise<NewSessionRequest>} Protocol Buffer new session request message
+   * @throws {SessionError} When session is invalid or missing
+   * @throws {TokenIdMissingError} When source asset token ID is missing
+   * @throws {AmountMissingError} When transfer amount is missing
+   * @throws {LedgerAssetIdError} When asset ledger ID is invalid
+   * @since 2.0.0
+   */
   public async newSessionRequest(
     session: SATPSession,
     thisGatewayId: string,

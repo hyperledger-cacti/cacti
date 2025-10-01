@@ -12,6 +12,19 @@ const compat = new FlatCompat({
 });
 
 export default [
+  {
+    ignores: [
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'public/**/*',
+      'src/main/typescript/generated/**',
+      'src/main/solidity/generated/**',  
+      'src/test/solidity/generated/**',
+      'src/test/typescript/fabric/contracts/**',
+    ],
+  },
+
   // Include JS config
   js.configs.recommended,
   
@@ -86,17 +99,4 @@ export default [
       "no-undef": "off",
     },
   },
-  
-  // Package specific ignores
-  {
-    ignores: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/build/**',
-      '**/src/main/typescript/generated/**',
-      '**/src/main/solidity/generated/**',
-      '**/src/test/solidity/generated/**',
-      '**/src/test/typescript/fabric/contracts/**', // Added the fabric contracts test directory
-    ],
-  }
 ];

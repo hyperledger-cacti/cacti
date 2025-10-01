@@ -1,3 +1,44 @@
+/**
+ * @fileoverview SATP Gateway API Dispatcher
+ *
+ * This module provides the main BLODispatcher class which serves as the central
+ * request dispatcher for all SATP gateway API endpoints. It coordinates between
+ * different service layers including admin operations, transaction handling,
+ * oracle management, and cross-chain operations following the IETF SATP v2
+ * specification.
+ *
+ * The dispatcher manages:
+ * - Admin endpoints (status, health, audit, session management)
+ * - Transaction endpoints (asset transfer operations)
+ * - Oracle endpoints (task execution and management)
+ * - Cross-chain coordination and gateway communication
+ * - Request routing and error handling
+ * - Service lifecycle and shutdown management
+ *
+ * @example
+ * ```typescript
+ * import { BLODispatcher } from './api1/dispatcher';
+ *
+ * const dispatcher = new BLODispatcher({
+ *   logger: myLogger,
+ *   instanceId: 'gateway-001',
+ *   orchestrator: gatewayOrchestrator,
+ *   signer: cryptoSigner,
+ *   ccManager: crossChainManager,
+ *   pubKey: 'gateway_public_key_pem',
+ *   localRepository: localLogRepo,
+ *   remoteRepository: remoteLogRepo,
+ *   monitorService: monitoringService
+ * });
+ *
+ * const endpoints = await dispatcher.getOrCreateWebServices();
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import {
   Checks,
   type LogLevelDesc,
@@ -77,36 +118,153 @@ import { AuditEndpointV1 } from "./admin/audit-endpoint";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 
+/**
+ * Configuration options for BLODispatcher initialization.
+ *
+ * Provides all necessary dependencies and configuration parameters required
+ * to initialize the SATP gateway API dispatcher. Includes service references,
+ * repository connections, cryptographic components, and monitoring capabilities
+ * for complete SATP protocol operation support.
+ *
+ * @interface BLODispatcherOptions
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const dispatcherOptions: BLODispatcherOptions = {
+ *   logger: myLogger,
+ *   logLevel: 'debug',
+ *   instanceId: 'satp-gateway-prod-001',
+ *   orchestrator: new GatewayOrchestrator(orchestratorConfig),
+ *   signer: new EcdsaSecp256k1Signature(),
+ *   ccManager: new SATPCrossChainManager(ccConfig),
+ *   pubKey: 'your_key',
+ *   localRepository: new KnexLocalLogRepository(localDbConfig),
+ *   remoteRepository: new KnexRemoteLogRepository(remoteDbConfig),
+ *   claimFormat: ClaimFormat.JWT,
+ *   monitorService: new OpenTelemetryMonitorService()
+ * };
+ * ```
+ */
 export interface BLODispatcherOptions {
+  /** Logger instance for dispatcher operations */
   logger: Logger;
+  /** Optional log level override (defaults to INFO) */
   logLevel?: LogLevelDesc;
+  /** Unique identifier for this dispatcher instance */
   instanceId: string;
+  /** Gateway orchestrator for managing gateway interactions */
   orchestrator: GatewayOrchestrator;
+  /** Cryptographic signer for SATP protocol operations */
   signer: JsObjectSigner;
+  /** Cross-chain manager for blockchain integrations */
   ccManager: SATPCrossChainManager;
+  /** Public key in PEM format for signature verification */
   pubKey: string;
+  /** Local repository for gateway log persistence */
   localRepository: ILocalLogRepository;
+  /** Optional remote repository for distributed logging */
   remoteRepository?: IRemoteLogRepository;
+  /** Optional claim format specification (defaults to JWT) */
   claimFormat?: ClaimFormat;
+  /** Monitoring service for telemetry and metrics */
   monitorService: MonitorService;
 }
 
-// TODO: addGateways as an admin endpoint, simply calls orchestrator
+/**
+ * Business Logic Operations (BLO) Dispatcher for SATP Gateway API.
+ *
+ * The main request dispatcher that coordinates all SATP gateway operations
+ * including admin functions, transaction processing, oracle management, and
+ * cross-chain coordination. Acts as the central orchestrator for the SATP
+ * protocol implementation, routing requests to appropriate handlers and
+ * managing the lifecycle of gateway operations.
+ *
+ * Key responsibilities:
+ * - Web service endpoint registration and management
+ * - Request routing to appropriate service handlers
+ * - Cross-chain transaction coordination
+ * - Oracle task execution and management
+ * - Gateway administration and monitoring
+ * - Graceful shutdown and error handling
+ *
+ * @class BLODispatcher
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const dispatcher = new BLODispatcher({
+ *   logger: myLogger,
+ *   instanceId: 'gateway-prod-001',
+ *   orchestrator: gatewayOrchestrator,
+ *   signer: ecdsaSigner,
+ *   ccManager: crossChainManager,
+ *   pubKey: gatewayPublicKey,
+ *   localRepository: localLogRepo,
+ *   remoteRepository: remoteLogRepo,
+ *   monitorService: telemetryService
+ * });
+ *
+ * // Initialize web service endpoints
+ * const endpoints = await dispatcher.getOrCreateWebServices();
+ *
+ * // Process transaction request
+ * const response = await dispatcher.Transact(transactionRequest);
+ * ```
+ */
 export class BLODispatcher {
+  /** Class name constant for debugging and logging */
   public static readonly CLASS_NAME = "BLODispatcher";
+  /** Logger instance for dispatcher operations */
   private readonly logger: Logger;
+  /** Log level configuration */
   private readonly level: LogLevelDesc;
+  /** Logger label for identification */
   private readonly label: string;
+  /** Registered web service endpoints */
   private endpoints: IWebServiceEndpoint[] | undefined;
+  /** Unique instance identifier */
   private readonly instanceId: string;
+  /** SATP manager for protocol operations */
   private manager?: SATPManager;
+  /** Gateway orchestrator for inter-gateway communication */
   private orchestrator: GatewayOrchestrator;
+  /** Cross-chain manager for blockchain integrations */
   private ccManager: SATPCrossChainManager;
+  /** Local log repository for persistence */
   private localRepository: ILocalLogRepository;
+  /** Remote log repository for distributed coordination */
   private remoteRepository: IRemoteLogRepository | undefined;
+  /** Shutdown flag to prevent new requests during shutdown */
   private isShuttingDown = false;
+  /** Monitoring service for telemetry and metrics */
   private readonly monitorService: MonitorService;
 
+  /**
+   * Initialize the BLO Dispatcher with required dependencies.
+   *
+   * Creates and configures the dispatcher with all necessary service components
+   * including logging, monitoring, orchestration, and persistence layers.
+   * Initializes the SATP manager for protocol operations and sets up telemetry
+   * for request tracking and performance monitoring.
+   *
+   * @param options - Complete configuration for dispatcher initialization
+   * @throws Error if required options are missing or invalid
+   * @since 0.0.2-beta
+   * @example
+   * ```typescript
+   * const dispatcher = new BLODispatcher({
+   *   logger: satpLogger,
+   *   logLevel: 'debug',
+   *   instanceId: 'gateway-001',
+   *   orchestrator: myOrchestrator,
+   *   signer: cryptoSigner,
+   *   ccManager: crossChainManager,
+   *   pubKey: 'LS0tLS1CRUdJTi...',
+   *   localRepository: localRepo,
+   *   remoteRepository: remoteRepo,
+   *   monitorService: monitoring
+   * });
+   * ```
+   */
   constructor(public readonly options: BLODispatcherOptions) {
     const fnTag = `${BLODispatcher.CLASS_NAME}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -162,6 +320,34 @@ export class BLODispatcher {
     return BLODispatcher.CLASS_NAME;
   }
 
+  /**
+   * Get or create web service endpoints for the SATP gateway API.
+   *
+   * Initializes and returns all web service endpoints supported by this
+   * gateway dispatcher, including admin, transaction, and oracle endpoints.
+   * Implements lazy initialization - endpoints are created only on first
+   * access and cached for subsequent calls.
+   *
+   * Registered endpoints include:
+   * - Admin: status, health check, integrations, session management
+   * - Transaction: asset transfer operations and approve address queries
+   * - Oracle: task registration, execution, and status management
+   * - Gateway: counterparty gateway management and audit operations
+   *
+   * @returns Promise resolving to array of configured web service endpoints
+   * @throws Error if endpoint initialization fails
+   * @since 0.0.2-beta
+   * @example
+   * ```typescript
+   * const endpoints = await dispatcher.getOrCreateWebServices();
+   * console.log(`Registered ${endpoints.length} API endpoints`);
+   *
+   * // Endpoints can be registered with an Express server
+   * endpoints.forEach(endpoint => {
+   *   app.use(endpoint.getPath(), endpoint.getExpressRequestHandler());
+   * });
+   * ```
+   */
   public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
     const fnTag = `${BLODispatcher.CLASS_NAME}#getOrCreateWebServices()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -295,6 +481,26 @@ export class BLODispatcher {
     });
   }
 
+  /**
+   * Perform health check on the SATP gateway.
+   *
+   * Executes a comprehensive health check of the gateway's core components
+   * including SATP manager status, database connectivity, and service
+   * availability. Used for monitoring and load balancer health probes.
+   *
+   * @returns Promise resolving to health check response with status details
+   * @throws Error if SATP manager is not initialized or health check fails
+   * @since 0.0.2-beta
+   * @example
+   * ```typescript
+   * try {
+   *   const health = await dispatcher.healthCheck();
+   *   console.log('Gateway health:', health.status);
+   * } catch (error) {
+   *   console.error('Health check failed:', error.message);
+   * }
+   * ```
+   */
   public async healthCheck(): Promise<HealthCheckResponse> {
     const { span, context: ctx } =
       this.monitorService.startSpan("API1#healthCheck()");
@@ -354,13 +560,43 @@ export class BLODispatcher {
   }
 
   /**
-   * @notice Transact request handler
-   * @param req TransactRequest
-   * @throws GatewayShuttingDownError when the flag isShuttingDown is true
-   * @returns TransactResponse
+   * Process SATP transaction request for cross-chain asset transfer.
+   *
+   * Handles incoming transaction requests following the SATP protocol workflow.
+   * Coordinates with the SATP manager and gateway orchestrator to execute
+   * the multi-stage asset transfer process including validation, commitment,
+   * and finalization phases.
+   *
+   * The transaction process includes:
+   * - Request validation and authentication
+   * - Asset lock and commitment establishment
+   * - Cross-chain transfer coordination
+   * - Completion confirmation and logging
+   *
+   * @param req - SATP transaction request with asset and transfer details
+   * @returns Promise resolving to transaction response with operation status
+   * @throws GatewayShuttingDownError when gateway is shutting down
+   * @throws Error if SATP manager is not initialized or transaction fails
+   * @since 0.0.2-beta
+   * @example
+   * ```typescript
+   * const transactionRequest: TransactRequest = {
+   *   sessionId: 'session-123',
+   *   transferNumber: 1,
+   *   asset: {
+   *     assetType: 'ERC20',
+   *     assetId: '0x742d35...',
+   *     amount: '1000000000000000000' // 1 ETH in wei
+   *   },
+   *   sourceNetwork: { id: 'ethereum-mainnet' },
+   *   destinationNetwork: { id: 'polygon-mainnet' }
+   * };
+   *
+   * const response = await dispatcher.Transact(transactionRequest);
+   * console.log('Transaction status:', response.status);
+   * ```
    */
   public async Transact(req: TransactRequest): Promise<TransactResponse> {
-    //TODO pre-verify verify input
     const fnTag = `${BLODispatcher.CLASS_NAME}#transact()`;
     const { span, context: ctx } =
       this.monitorService.startSpan("API1#transact()");

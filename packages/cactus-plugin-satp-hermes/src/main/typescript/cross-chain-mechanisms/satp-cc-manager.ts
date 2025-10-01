@@ -1,3 +1,40 @@
+/**
+ * @fileoverview SATP Cross-Chain Manager
+ *
+ * This module provides the main cross-chain coordination manager for the SATP
+ * gateway system. It orchestrates bridge operations, oracle interactions, and
+ * ontology management to enable secure asset transfers across different
+ * blockchain networks following the IETF SATP v2 specification.
+ *
+ * The manager coordinates:
+ * - Bridge deployment and lifecycle management
+ * - Oracle task execution and monitoring
+ * - Cross-chain asset ontology mapping
+ * - Network configuration and validation
+ * - Distributed tracing and monitoring
+ *
+ * @example
+ * ```typescript
+ * import { SATPCrossChainManager } from './satp-cc-manager';
+ *
+ * const ccManager = new SATPCrossChainManager({
+ *   orquestrator: gatewayOrchestrator,
+ *   logLevel: 'info',
+ *   ontologyOptions: { enableValidation: true },
+ *   monitorService: monitoringService
+ * });
+ *
+ * await ccManager.deployCrossChainMechanisms({
+ *   bridgeConfig: [{ networkId: 'besu-network', ledgerType: LedgerType.Besu2X }],
+ *   oracleConfig: [{ networkId: 'oracle-network', ledgerType: LedgerType.Ethereum }]
+ * });
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import { type LogLevelDesc } from "@hyperledger/cactus-common";
 import type { SATPLogger as Logger } from "../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
@@ -9,66 +46,163 @@ import { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
 import { OracleManager } from "./oracle/oracle-manager";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+
+/**
+ * Configuration options for the SATP Cross-Chain Manager.
+ *
+ * Defines the core dependencies and settings required to initialize
+ * the cross-chain coordination system including orchestrator reference,
+ * logging configuration, and monitoring services.
+ *
+ * @since 0.0.2-beta
+ */
 export interface ISATPCrossChainManagerOptions {
+  /** Gateway orchestrator instance for coordination */
   orquestrator: GatewayOrchestrator;
+  /** Logging level for cross-chain operations */
   logLevel?: LogLevelDesc;
+  /** Ontology manager configuration options */
   ontologyOptions?: IOntologyManagerOptions;
+  /** Monitoring service for telemetry and metrics */
   monitorService: MonitorService;
 }
 
+/**
+ * Configuration options for cross-chain mechanisms.
+ *
+ * Specifies the network configurations for bridge and oracle
+ * deployments across different blockchain networks.
+ *
+ * @since 0.0.2-beta
+ */
 export interface ICrossChainMechanismsOptions {
+  /** Bridge network configuration array */
   bridgeConfig?: INetworkOptions[];
+  /** Oracle network configuration array */
   oracleConfig?: INetworkOptions[];
 }
 
-// TODO extend to accommodate oracle
-// does specific on-chain operations by calling bridge manager or oracle manager
-
 /**
- * The `ISATPCCManager` class is responsible for managing cross-chain mechanisms
- * within the SATP (Secure Asset Transfer Protocol) framework. It provides methods
- * to deploy cross-chain mechanisms and bridges based on the provided configuration.
+ * SATP Cross-Chain Manager for coordinating cross-chain mechanisms.
+ *
+ * The main coordination class responsible for managing cross-chain mechanisms
+ * within the SATP (Secure Asset Transfer Protocol) framework. Provides methods
+ * to deploy cross-chain mechanisms and bridges based on the provided configuration,
+ * orchestrate oracle operations, and manage asset ontology mappings.
+ *
+ * @todo Extend to accommodate oracle functionality fully
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const manager = new SATPCrossChainManager({
+ *   orquestrator: orchestrator,
+ *   logLevel: 'debug',
+ *   monitorService: monitoring
+ * });
+ *
+ * // Deploy bridge mechanisms
+ * await manager.deployCrossChainMechanisms({
+ *   bridgeConfig: bridgeConfigs,
+ *   oracleConfig: oracleConfigs
+ * });
+ *
+ * // Access bridge manager
+ * const bridgeManager = manager.getBridgeManager();
+ * ```
  */
 export class SATPCrossChainManager {
   /**
-   * The class name for logging purposes.
+   * The class name identifier for logging and debugging purposes.
+   *
+   * @readonly
+   * @since 0.0.2-beta
    */
   public static readonly CLASS_NAME = "SATPCrossChainManager";
 
   /**
-   * Logger instance for logging messages.
+   * Logger instance for cross-chain operation logging and debugging.
+   *
+   * @private
+   * @readonly
+   * @since 0.0.2-beta
    */
   private readonly log: Logger;
 
   /**
-   * Log level for the logger.
+   * Configured logging level for cross-chain operations.
+   *
+   * @private
+   * @readonly
+   * @since 0.0.2-beta
    */
   private readonly logLevel: LogLevelDesc;
 
   /**
-   * Instance of the BridgeManager to handle bridge-related operations.
+   * Bridge manager instance for coordinating cross-chain bridge operations.
+   *
+   * Manages deployment, configuration, and lifecycle of bridges across
+   * different blockchain networks for asset transfer operations.
+   *
+   * @private
+   * @since 0.0.2-beta
    */
   private bridgeManager?: BridgeManager;
 
   /**
-   * Instance of the GatewayOrchestrator to handle gateway-related operations.
+   * Gateway orchestrator instance for coordinating SATP protocol operations.
+   *
+   * Manages the overall coordination of gateway operations including
+   * session management, protocol state transitions, and inter-gateway
+   * communication.
+   *
+   * @private
+   * @since 0.0.2-beta
    */
   private gatewayOrchestrator?: GatewayOrchestrator;
 
   /**
-   * Instance of the OracleManager to handle oracle-related operations.
+   * Oracle manager instance for coordinating off-chain computation tasks.
+   *
+   * Manages oracle deployment, task execution, and result verification
+   * for complex cross-chain operations requiring external computation
+   * or data validation.
+   *
+   * @private
+   * @since 0.0.2-beta
    */
   private oracleManager?: OracleManager;
 
   /**
-   * Instance of the GatewayOrchestrator to handle gateway-related operations.
+   * Monitoring service for telemetry, metrics collection, and observability.
+   *
+   * Provides distributed tracing, performance metrics, and operational
+   * monitoring for cross-chain operations and system health tracking.
+   *
+   * @private
+   * @readonly
+   * @since 0.0.2-beta
    */
   private readonly monitorService: MonitorService;
 
   /**
-   * Constructs an instance of `ISATPCCManager`.
+   * Constructs an instance of the SATP Cross-Chain Manager.
    *
-   * @param options - The options for configuring the `ISATPCCManager`.
+   * Initializes the cross-chain coordination system with the provided
+   * configuration options including orchestrator, logging, and monitoring
+   * services. Sets up bridge and oracle managers for cross-chain operations.
+   *
+   * @param options - Configuration options for the cross-chain manager
+   * @throws Error if required dependencies are not provided
+   * @since 0.0.2-beta
+   * @example
+   * ```typescript
+   * const manager = new SATPCrossChainManager({
+   *   orquestrator: gatewayOrchestrator,
+   *   logLevel: 'debug',
+   *   ontologyOptions: { enableValidation: true },
+   *   monitorService: monitoringService
+   * });
+   * ```
    */
   constructor(private options: ISATPCrossChainManagerOptions) {
     const fnTag = `${SATPCrossChainManager.CLASS_NAME}#constructor()`;
@@ -111,7 +245,7 @@ export class SATPCrossChainManager {
   /**
    * Deploys cross-chain mechanisms based on the provided bridge configurations.
    *
-   * @param bridgesConfig - An array of bridge configuration options.
+   * @param config - Cross-chain mechanisms configuration options.
    * @returns A promise that resolves when the deployment is complete.
    */
   public async deployCCMechanisms(
@@ -151,7 +285,7 @@ export class SATPCrossChainManager {
   /**
    * Deploys bridges based on the provided configuration.
    *
-   * @param bridgesConfig - An array of bridge configuration options.
+   * @param bridgesNetworkConfig - An array of bridge network configuration options.
    * @returns A promise that resolves when the deployment is complete.
    */
   public async deployBridgeFromConfig(

@@ -95,7 +95,7 @@ import {
 import {
   IGatewayPersistenceConfig,
   GatewayPersistence,
-} from "../../gateway-persistence";
+} from "../../database/gateway-persistence";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 

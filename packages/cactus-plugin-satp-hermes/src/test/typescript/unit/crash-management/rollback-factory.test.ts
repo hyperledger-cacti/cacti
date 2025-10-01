@@ -39,7 +39,7 @@ import {
   IGatewayOrchestratorOptions,
   GatewayOrchestrator,
 } from "../../../../main/typescript/services/gateway/gateway-orchestrator";
-import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
+import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {

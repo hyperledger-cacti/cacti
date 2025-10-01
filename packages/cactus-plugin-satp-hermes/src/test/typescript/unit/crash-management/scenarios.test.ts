@@ -25,7 +25,7 @@ import { SATPSession } from "../../../../main/typescript/core/satp-session";
 import {
   bufArray2HexStr,
   getSatpLogKey,
-} from "../../../../main/typescript/gateway-utils";
+} from "../../../../main/typescript/utils/gateway-utils";
 import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   GatewayOrchestrator,

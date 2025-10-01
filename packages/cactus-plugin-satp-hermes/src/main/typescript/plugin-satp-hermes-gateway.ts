@@ -37,7 +37,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "./core/constants";
-import { bufArray2HexStr } from "./gateway-utils";
+import { bufArray2HexStr } from "./utils/gateway-utils";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
@@ -87,26 +87,344 @@ import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 import { SATPManager } from "./services/gateway/satp-manager";
 import { ExtensionConfig } from "./services/validation/config-validating-functions/validate-extensions";
 
+/**
+ * SATP Gateway Configuration Interface - Complete configuration for fault-tolerant gateway.
+ *
+ * @description
+ * Configuration interface for SATP gateway instances implementing the IETF SATP v2 specification
+ * with Hermes crash recovery mechanisms. Provides comprehensive setup for cross-chain asset
+ * transfers with gateway-to-gateway communication, persistence, and fault tolerance.
+ *
+ * **SATP Protocol Implementation:**
+ * - Gateway identity and cryptographic key management
+ * - Cross-chain mechanism configuration for bridge operations
+ * - Crash recovery and persistence configuration
+ * - Privacy and merge policy definitions for data handling
+ * - Monitoring and validation options for protocol compliance
+ *
+ * **Crash Recovery Context:**
+ * The configuration supports both local and remote repository options for implementing
+ * the Hermes fault-tolerant design with primary-backup mechanisms and log replication.
+ *
+ * @interface SATPGatewayConfig
+ * @extends ICactusPluginOptions
+ *
+ * @example
+ * Basic gateway configuration:
+ * ```typescript
+ * const config: SATPGatewayConfig = {
+ *   instanceId: 'gateway-fabric-besu',
+ *   gid: {
+ *     id: 'gateway-1',
+ *     pubKey: '0x...',
+ *     connectedDLTs: ['fabric-network', 'besu-testnet'],
+ *     gatewayServerPort: 3010
+ *   },
+ *   keyPair: generatedKeyPair,
+ *   enableCrashRecovery: true,
+ *   pluginRegistry: new PluginRegistry({ plugins: [] })
+ * };
+ * ```
+ *
+ * @example
+ * Production configuration with crash recovery:
+ * ```typescript
+ * const prodConfig: SATPGatewayConfig = {
+ *   instanceId: 'prod-gateway-1',
+ *   environment: 'production',
+ *   enableCrashRecovery: true,
+ *   localRepository: knexPostgresConfig,
+ *   remoteRepository: knexRemoteConfig,
+ *   ccConfig: {
+ *     bridgeConfig: [fabricBridge, besuBridge]
+ *   },
+ *   pluginRegistry: registry
+ * };
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link SATPGateway} for the main gateway implementation
+ * @see {@link GatewayIdentity} for gateway identity structure
+ * @see {@link ICrossChainMechanismsOptions} for bridge configuration
+ * @see {@link CrashManager} for crash recovery implementation
+ *
+ * @since 2.0.0
+ */
 export interface SATPGatewayConfig extends ICactusPluginOptions {
+  /**
+   * Gateway identity configuration for SATP network participation.
+   * @description
+   * Defines the gateway's identity including cryptographic public key, supported DLT systems,
+   * network addresses, and protocol version information. Essential for gateway discovery
+   * and authentication in SATP protocol operations.
+   *
+   * @see {@link GatewayIdentity} for identity structure details
+   */
   gid?: GatewayIdentity;
+
+  /**
+   * Counter-party gateway configurations for cross-chain communications.
+   * @description
+   * Array of known gateway identities that this gateway can communicate with for
+   * cross-chain asset transfers. Used for gateway discovery and establishing
+   * secure communication channels between SATP gateways.
+   *
+   * @see {@link GatewayIdentity} for gateway identity structure
+   */
   counterPartyGateways?: GatewayIdentity[];
+
+  /**
+   * Cryptographic key pair for gateway signing operations.
+   * @description
+   * SECP256k1 key pair used for signing SATP protocol messages, asset transfer proofs,
+   * and establishing gateway identity. Essential for cryptographic integrity and
+   * non-repudiation in cross-chain transactions.
+   *
+   * @see {@link ISignerKeyPair} for key pair structure
+   * @see {@link JsObjectSigner} for signing implementation
+   */
   keyPair?: ISignerKeyPair;
+
+  /**
+   * Deployment environment configuration for gateway behavior.
+   * @description
+   * Specifies runtime environment affecting logging levels, validation strictness,
+   * and error handling behavior. Production mode enables stricter validation and
+   * optimized performance settings.
+   */
   environment?: "development" | "production";
+
+  /**
+   * Class-validator options for message validation.
+   * @description
+   * Validation configuration for SATP protocol messages and data structures.
+   * Ensures compliance with IETF SATP specification and prevents malformed
+   * messages from compromising gateway operations.
+   *
+   * @see {@link ValidatorOptions} for validation configuration options
+   */
   validationOptions?: ValidatorOptions;
+
+  /**
+   * Privacy policies for sensitive data handling.
+   * @description
+   * Defines privacy policies applied to cross-chain transaction data, including
+   * data minimization and access control policies for SATP
+   * protocol messages and asset transfer information.
+   *
+   * @see {@link IPrivacyPolicyValue} for privacy policy structure
+   */
   privacyPolicies?: IPrivacyPolicyValue[];
+
+  /**
+   * Merge policies for data consolidation across chains.
+   * @description
+   * Policies for merging and consolidating data from multiple blockchain networks
+   * during cross-chain asset transfers. Ensures consistent data representation
+   * and conflict resolution in multi-chain environments.
+   *
+   * @see {@link IMergePolicyValue} for merge policy structure
+   */
   mergePolicies?: IMergePolicyValue[];
+
+  /**
+   * Cross-chain mechanism configuration for bridge operations.
+   * @description
+   * Configuration for blockchain bridges and cross-chain mechanisms supporting
+   * asset transfers between different DLT systems. Includes bridge-specific
+   * settings for Fabric, Besu, and other supported blockchain networks.
+   *
+   * @see {@link ICrossChainMechanismsOptions} for bridge configuration
+   * @see {@link SATPCrossChainManager} for bridge management
+   */
   ccConfig?: ICrossChainMechanismsOptions;
+
+  /**
+   * Local database configuration for persistence.
+   * @description
+   * Knex.js configuration for local database persistence of SATP session data,
+   * transaction logs, and recovery checkpoints. Essential for crash recovery
+   * and maintaining gateway state across restarts.
+   *
+   * @see {@link Knex.Config} for database configuration options
+   * @see {@link LocalLogRepository} for local persistence implementation
+   */
   localRepository?: Knex.Config;
+
+  /**
+   * Remote database configuration for distributed logging.
+   * @description
+   * Knex.js configuration for remote database persistence supporting distributed
+   * logging and primary-backup crash recovery mechanisms. Enables fault-tolerant
+   * operation with log replication across gateway instances.
+   *
+   * @see {@link Knex.Config} for database configuration options
+   * @see {@link RemoteLogRepository} for remote persistence implementation
+   */
   remoteRepository?: Knex.Config;
+
+  /**
+   * Enable crash recovery mechanisms.
+   * @description
+   * Activates Hermes crash recovery features including checkpoint logging,
+   * session recovery, and rollback mechanisms. When enabled, the gateway
+   * can recover from crashes and continue interrupted asset transfers.
+   *
+   * @see {@link CrashManager} for crash recovery implementation
+   */
   enableCrashRecovery?: boolean;
+
+  /**
+   * Monitoring service for observability and tracing.
+   * @description
+   * Service for collecting metrics, traces, and logs from gateway operations.
+   * Provides observability into SATP protocol execution, performance monitoring,
+   * and debugging capabilities for cross-chain asset transfers.
+   *
+   * @see {@link MonitorService} for monitoring implementation
+   */
   monitorService?: MonitorService;
+
+  /**
+   * Claim format for cryptographic proofs.
+   * @description
+   * Specifies the format for cryptographic claims and proofs used in SATP
+   * protocol messages. Supports different claim formats as defined in the
+   * IETF SATP specification for asset ownership and transfer evidence.
+   *
+   * @see {@link ClaimFormat} for supported claim formats
+   */
   claimFormat?: string;
+
+  /**
+   * Path to ontology files for semantic interoperability.
+   * @description
+   * File system path to ontology definitions supporting semantic interoperability
+   * between different blockchain networks. Enables consistent asset representation
+   * and meaning preservation across heterogeneous DLT systems.
+   */
   ontologyPath?: string;
   extensions?: ExtensionConfig[];
+
+  /**
+   * Plugin registry for extensibility.
+   * @description
+   * Registry of Hyperledger Cacti plugins extending gateway functionality.
+   * Enables modular architecture and integration with additional blockchain
+   * connectors, security modules, and protocol extensions.
+   *
+   * @see {@link PluginRegistry} for plugin management
+   */
   pluginRegistry: PluginRegistry;
+
+  /**
+   * Logging level for gateway operations.
+   * @description
+   * Configures the verbosity of gateway logging for debugging, monitoring,
+   * and operational visibility. Higher verbosity levels provide detailed
+   * protocol execution traces for development and troubleshooting.
+   *
+   * @see {@link LogLevelDesc} for available logging levels
+   */
   logLevel?: LogLevelDesc;
 }
 
+/**
+ * SATP Gateway - Fault-Tolerant Cross-Chain Asset Transfer Gateway Implementation
+ *
+ * @description
+ * Core implementation of the Secure Asset Transfer Protocol (SATP) gateway following the
+ * IETF SATP v2 specification with Hermes crash recovery mechanisms. Provides fault-tolerant
+ * cross-chain asset transfers through gateway-to-gateway communication with atomic transaction
+ * guarantees and crash recovery capabilities.
+ *
+ * **SATP Protocol Implementation:**
+ * - **Phase 1**: Transfer Initiation with gateway authentication and asset definition
+ * - **Phase 2**: Lock-Evidence Verification with cryptographic proof generation
+ * - **Phase 3**: Commitment Establishment with atomic burn/mint operations
+ * - **Recovery**: Crash fault tolerance with checkpoint logging and rollback mechanisms
+ *
+ * **Gateway Architecture:**
+ * - Gateway-to-gateway communication model for cross-chain interoperability
+ * - Multi-DLT support through pluggable blockchain connector architecture
+ * - Distributed logging with local and remote persistence for fault tolerance
+ * - Session management with recovery checkpoints and state consistency
+ * - Cryptographic signing and verification for message integrity
+ *
+ * **Hermes Crash Recovery Features:**
+ * - Primary-backup mechanisms with log replication
+ * - Checkpoint-based recovery for interrupted asset transfers
+ * - Rollback capabilities for failed or inconsistent transactions
+ * - Session state reconstruction from persistent logs
+ * - Automatic recovery initiation on gateway restart
+ *
+ * @class SATPGateway
+ * @implements {IPluginWebService}
+ * @implements {ICactusPlugin}
+ *
+ * @example
+ * Basic gateway initialization:
+ * ```typescript
+ * const config: SATPGatewayConfig = {
+ *   instanceId: 'gateway-1',
+ *   gid: { id: 'gateway-1', connectedDLTs: ['fabric', 'besu'] },
+ *   keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
+ *   pluginRegistry: new PluginRegistry({ plugins: [] }),
+ *   enableCrashRecovery: true
+ * };
+ *
+ * const gateway = new SATPGateway(config);
+ * await gateway.onPluginInit();
+ * ```
+ *
+ * @example
+ * Gateway with cross-chain bridge configuration:
+ * ```typescript
+ * const gateway = new SATPGateway({
+ *   instanceId: 'multi-chain-gateway',
+ *   ccConfig: {
+ *     bridgeConfig: [
+ *       { sourceNetwork: 'fabric-network', targetNetwork: 'besu-testnet' }
+ *     ]
+ *   },
+ *   localRepository: postgresConfig,
+ *   remoteRepository: remoteDbConfig,
+ *   pluginRegistry: registry
+ * });
+ *
+ * // Start gateway services
+ * await gateway.startup();
+ *
+ * // Register web service endpoints
+ * const app = express();
+ * await gateway.registerWebServices(app);
+ * ```
+ *
+ * @example
+ * Gateway shutdown with session verification:
+ * ```typescript
+ * // Graceful shutdown ensuring all sessions complete
+ * gateway.onShutdown({
+ *   name: 'session-cleanup',
+ *   hook: async () => {
+ *     await gateway.verifySessionsState();
+ *   }
+ * });
+ *
+ * await gateway.shutdown();
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
+ * @see {@link SATPGatewayConfig} for configuration options
+ * @see {@link BLODispatcher} for protocol message dispatching
+ * @see {@link SATPCrossChainManager} for cross-chain bridge management
+ * @see {@link CrashManager} for crash recovery mechanisms
+ * @see {@link GatewayOrchestrator} for gateway coordination
+ * @see {@link MonitorService} for observability and monitoring
+ *
+ * @since 2.0.0
+ */
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsDefined()
   @IsNotEmptyObject()
@@ -151,6 +469,74 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private activeJobs: Set<schedule.Job> = new Set();
   private initialSpanContext: { span: Span; context: Context };
 
+  /**
+   * SATPGateway Constructor - Initialize fault-tolerant cross-chain gateway.
+   *
+   * @description
+   * Constructs a new SATP gateway instance with complete initialization of all subsystems
+   * including cryptographic signing, database repositories, cross-chain managers, protocol
+   * dispatchers, and crash recovery mechanisms. Validates configuration and establishes
+   * gateway identity for SATP network participation.
+   *
+   * **Initialization Sequence:**
+   * 1. Configuration validation and default value processing
+   * 2. Cryptographic key pair setup and signer initialization
+   * 3. Database repository configuration (local/remote persistence)
+   * 4. Gateway orchestration and cross-chain manager setup
+   * 5. Protocol dispatcher and web service endpoint creation
+   * 6. Crash recovery manager initialization (if enabled)
+   * 7. Monitoring service integration and telemetry setup
+   *
+   * **Crash Recovery Setup:**
+   * When crash recovery is enabled, initializes checkpoint logging, session state
+   * persistence, and recovery mechanisms following Hermes fault-tolerant design patterns.
+   *
+   * @param options - Complete gateway configuration including identity, repositories, and features
+   *
+   * @throws {Error} When required configuration options are missing or invalid
+   * @throws {Error} When cryptographic key pair initialization fails
+   * @throws {Error} When database repository setup fails
+   * @throws {Error} When gateway identity configuration is invalid
+   *
+   * @example
+   * Minimal gateway construction:
+   * ```typescript
+   * const gateway = new SATPGateway({
+   *   instanceId: 'gateway-1',
+   *   pluginRegistry: new PluginRegistry({ plugins: [] })
+   * });
+   * ```
+   *
+   * @example
+   * Full production gateway construction:
+   * ```typescript
+   * const gateway = new SATPGateway({
+   *   instanceId: 'prod-gateway',
+   *   gid: {
+   *     id: 'gateway-fabric-besu',
+   *     connectedDLTs: ['fabric-mainnet', 'ethereum-mainnet'],
+   *     gatewayServerPort: 3010
+   *   },
+   *   keyPair: existingKeyPair,
+   *   environment: 'production',
+   *   enableCrashRecovery: true,
+   *   localRepository: postgresConfig,
+   *   remoteRepository: distributedDbConfig,
+   *   ccConfig: { bridgeConfig: [fabricBridge, ethereumBridge] },
+   *   pluginRegistry: productionRegistry,
+   *   logLevel: 'INFO'
+   * });
+   * ```
+   *
+   * @see {@link SATPGatewayConfig} for configuration options
+   * @see {@link ProcessGatewayCoordinatorConfig} for configuration processing
+   * @see {@link GatewayOrchestrator} for gateway coordination setup
+   * @see {@link BLODispatcher} for protocol message handling
+   * @see {@link CrashManager} for crash recovery initialization
+   * @see {@link MonitorService} for observability setup
+   *
+   * @since 2.0.0
+   */
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -556,10 +942,65 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   /**
-   * Startup Methods
-   * ----------------
-   * This section includes methods responsible for starting up the server and its associated services independently of the existence of a Hyperledger Cacti Node.
-   * It ensures that both the GatewayServer and Bridges are initiated concurrently for efficient launch.
+   * Gateway Startup - Initialize all gateway services and cross-chain mechanisms.
+   *
+   * @description
+   * Comprehensive startup sequence for SATP gateway services independent of Hyperledger Cacti
+   * node infrastructure. Initializes database repositories, deploys cross-chain mechanisms,
+   * and starts the Gateway Operations Layer (GOL) server for protocol communication.
+   *
+   * **Startup Sequence:**
+   * 1. **Database Repository Creation**: Initialize local and remote persistence layers
+   * 2. **Cross-Chain Mechanism Deployment**: Deploy bridge configurations for supported DLTs
+   * 3. **GOL Server Startup**: Launch gateway communication server for SATP protocol
+   * 4. **Service Registration**: Register web service endpoints for protocol phases
+   * 5. **Monitoring Activation**: Initialize telemetry and observability features
+   *
+   * **Concurrent Initialization:**
+   * Database and cross-chain mechanism setup run concurrently for efficient startup,
+   * while GOL server initialization waits for completion to ensure all dependencies
+   * are ready before accepting SATP protocol messages.
+   *
+   * **Crash Recovery Integration:**
+   * If crash recovery is enabled, startup includes recovery checkpoint validation
+   * and potential session restoration from persistent logs following Hermes
+   * fault-tolerant design patterns.
+   *
+   * @returns Promise resolving when all gateway services are fully operational
+   *
+   * @throws {Error} When database repository initialization fails
+   * @throws {Error} When cross-chain mechanism deployment fails
+   * @throws {Error} When GOL server startup encounters configuration issues
+   * @throws {Error} When monitoring service initialization fails
+   *
+   * @example
+   * Basic gateway startup:
+   * ```typescript
+   * const gateway = new SATPGateway(config);
+   * await gateway.startup();
+   * console.log('Gateway ready for SATP protocol operations');
+   * ```
+   *
+   * @example
+   * Startup with error handling:
+   * ```typescript
+   * try {
+   *   await gateway.startup();
+   *   logger.info('Gateway services started successfully');
+   * } catch (error) {
+   *   logger.error('Gateway startup failed:', error);
+   *   await gateway.shutdown();
+   *   throw error;
+   * }
+   * ```
+   *
+   * @see {@link createDBRepository} for database initialization
+   * @see {@link SATPCrossChainManager.deployCCMechanisms} for bridge deployment
+   * @see {@link startupGOLServer} for protocol server initialization
+   * @see {@link MonitorService} for observability and tracing
+   * @see {@link CrashManager} for crash recovery integration
+   *
+   * @since 2.0.0
    */
   public async startup(): Promise<void> {
     const fnTag = `${this.className}#startup()`;
@@ -841,6 +1282,74 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     });
   }
 
+  /**
+   * Gateway Shutdown - Graceful termination with session verification and cleanup.
+   *
+   * @description
+   * Performs graceful shutdown of all gateway services with proper session verification,
+   * resource cleanup, and crash recovery checkpoint finalization. Ensures all active
+   * SATP sessions are completed or safely persisted before termination to maintain
+   * protocol consistency and enable recovery.
+   *
+   * **Shutdown Sequence:**
+   * 1. **Session State Verification**: Verify all active SATP sessions are concluded
+   * 2. **OpenAPI Server Shutdown**: Terminate HTTP server and web service endpoints
+   * 3. **GOL Server Shutdown**: Stop Gateway Operations Layer communication server
+   * 4. **Database Cleanup**: Finalize local and remote repository connections
+   * 5. **Scheduled Job Cancellation**: Stop all background monitoring and verification jobs
+   * 6. **Shutdown Hook Execution**: Execute registered cleanup hooks in sequence
+   * 7. **Resource Cleanup**: Release cryptographic resources and network connections
+   *
+   * **Session Verification:**
+   * Before shutdown, verifies that all SATP sessions have reached terminal states
+   * (completed, failed, or rolled back) to prevent inconsistent cross-chain states.
+   * Active sessions trigger scheduled verification jobs until completion.
+   *
+   * **Crash Recovery Integration:**
+   * Finalizes crash recovery checkpoints and ensures all persistent logs are
+   * flushed to enable proper recovery on restart. Follows Hermes fault-tolerant
+   * shutdown procedures for data consistency.
+   *
+   * @returns Promise resolving when gateway shutdown is complete
+   *
+   * @throws {Error} When critical shutdown operations fail (logged but not propagated)
+   *
+   * @example
+   * Graceful gateway shutdown:
+   * ```typescript
+   * // Register cleanup hooks before shutdown
+   * gateway.onShutdown({
+   *   name: 'custom-cleanup',
+   *   hook: async () => {
+   *     await customCleanupLogic();
+   *   }
+   * });
+   *
+   * await gateway.shutdown();
+   * console.log('Gateway shutdown complete');
+   * ```
+   *
+   * @example
+   * Shutdown with session monitoring:
+   * ```typescript
+   * try {
+   *   console.log('Initiating gateway shutdown...');
+   *   await gateway.shutdown();
+   *   console.log('All sessions completed, gateway terminated');
+   * } catch (error) {
+   *   console.error('Shutdown encountered issues:', error);
+   *   // Gateway still shuts down, errors are logged
+   * }
+   * ```
+   *
+   * @see {@link verifySessionsState} for session verification process
+   * @see {@link onShutdown} for registering cleanup hooks
+   * @see {@link shutdownGOLServer} for GOL server termination
+   * @see {@link ShutdownHook} for cleanup hook interface
+   * @see {@link CrashManager} for crash recovery finalization
+   *
+   * @since 2.0.0
+   */
   public async shutdown(): Promise<void> {
     const fnTag = `${this.className}#shutdown()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);

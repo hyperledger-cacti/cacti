@@ -9,3 +9,6 @@ src/main/solidity/generated/build-info/
 src/main/typescript/database/*
 reports/junit/satp-hermes-tests-unit.xml
 reports/junit/satp-hermes-tests-integration.xml
+
+# TypeDoc generated documentation
+public/typedoc/

@@ -1,3 +1,35 @@
+/**
+ * @fileoverview SATP Gateway Integrations Endpoint
+ *
+ * This module provides the web service endpoint for SATP integration management.
+ * Handles HTTP requests for retrieving integration status, configuration details,
+ * and connected system information within the SATP gateway ecosystem.
+ *
+ * The endpoint provides:
+ * - Integration status reporting
+ * - Connected gateway discovery
+ * - Network topology information
+ * - System health and connectivity
+ * - Configuration validation
+ *
+ * @example
+ * ```typescript
+ * import { IntegrationsEndpointV1 } from './integrations-endpoint';
+ *
+ * const endpoint = new IntegrationsEndpointV1({
+ *   logLevel: 'info',
+ *   instanceId: 'gateway-integrations'
+ * });
+ *
+ * // Register with Express app
+ * await endpoint.registerExpress(app);
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import {
   Checks,
   type IAsyncProvider,
@@ -17,6 +49,28 @@ import {
   registerWebServiceEndpoint,
 } from "@hyperledger/cactus-core";
 
+/**
+ * Web service endpoint for SATP integration operations.
+ *
+ * Provides HTTP endpoint handling for integration-related requests including
+ * gateway connectivity status, network topology, and system configuration.
+ * Integrates with the OpenAPI specification for standardized API documentation.
+ *
+ * @implements IWebServiceEndpoint
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const integrationsEndpoint = new IntegrationsEndpointV1({
+ *   logLevel: 'debug',
+ *   instanceId: 'integrations-service-001'
+ * });
+ *
+ * // Register with Express application
+ * await integrationsEndpoint.registerExpress(expressApp);
+ *
+ * // Endpoint available at GET /api/v1/satp/integrations
+ * ```
+ */
 export class IntegrationsEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "IntegrationsEndpointV1";
 

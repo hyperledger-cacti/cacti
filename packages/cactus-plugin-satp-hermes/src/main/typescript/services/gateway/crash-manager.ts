@@ -35,7 +35,7 @@ import type { GatewayIdentity } from "../../core/types";
 import type { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import type { SATPHandler } from "../../types/satp-protocol";
 import { CrashStatus } from "../../core/types";
-import { verifySignature } from "../../gateway-utils";
+import { verifySignature } from "../../utils/gateway-utils";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 
