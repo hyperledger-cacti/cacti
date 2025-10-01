@@ -94,6 +94,16 @@
     "db:setup": "bash -c 'npm run db:destroy || true && run-s db:start db:migrate db:seed'",
     "db:start": "docker-compose up -d",
     "db:stop": "docker-compose down",
+    "docs:clean": "rm -rf ./public/typedoc",
+    "docs:generate": "typedoc --options typedoc.json",
+    "docs:serve": "python3 -m http.server 8080 --directory ./public/typedoc || python -m SimpleHTTPServer 8080",
+    "docs:open": "open ./public/typedoc/index.html || xdg-open ./public/typedoc/index.html || start ./public/typedoc/index.html",
+    "docs:validate": "typedoc --options typedoc.json --validation.notDocumented",
+    "docs:validate:strict": "typedoc --options typedoc.json --validation.notDocumented --treatWarningsAsErrors",
+    "docs:watch": "typedoc --options typedoc.json --watch",
+    "docs:build": "npm run docs:clean && npm run docs:generate && echo 'Documentation built successfully!'",
+    "docs:dev": "npm run docs:generate && npm run docs:serve",
+    "docs:check": "npm run build && npm run docs:validate && echo 'All SATP components documented!'",
     "docker:build:dev": "npm run build:bundle && cd ../.. && docker build --file ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile -t hyperledger/cacti-satp-hermes-gateway:$(date +\"%Y-%m-%d\")-dev-$(git rev-parse --short HEAD) ./packages/cactus-plugin-satp-hermes",
     "docker:build:latest": "npm run build:bundle && cd ../.. && docker build --file ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile -t hyperledger/cacti-satp-hermes-gateway:latest ./packages/cactus-plugin-satp-hermes",
     "docker:build:stable": "npm run build:bundle && cd ../.. && docker build --file ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile -t hyperledger/cacti-satp-hermes-gateway:$(node -e \"console.log(require('./package.json').customMetadata['satp-package-version'])\") ./packages/cactus-plugin-satp-hermes",
@@ -142,7 +152,8 @@
       "^(\\.?\\.?/.*)\\.js$": "$1"
     },
     "modulePathIgnorePatterns": [
-      "<rootDir>/dist/"
+      "<rootDir>/dist/",
+      "<rootDir>/public/"
     ],
     "preset": "ts-jest",
     "testEnvironment": "node",
@@ -274,6 +285,7 @@
     "swagger-cli": "4.0.4",
     "ts-jest": "29.3.3",
     "ts-node": "10.9.1",
+    "typedoc": "0.28.13",
     "typescript": "5.5.2"
   },
   "engines": {
@@ -299,7 +311,8 @@
         "src/*/yml/**/*"
       ],
       "ignore": [
-        "src/**/generated/*"
+        "src/**/generated/*",
+        "public/**/*"
       ],
       "extensions": [
         "ts",

@@ -1,11 +1,23 @@
 # @hyperledger/cactus-plugin-satp-hermes
-The package provides `Hyperledger Cacti` a way to standardize cross-chain transactions between ledgers. Using this we can perform:
-- A unidirectional atomic asset transfer between 2 parties in different ledgers.
-- Lock of the asset in the source ledger and proof is sent to the counterparty.
-- Extinguishment of the asset in the source blockchain and regeneration of the asset in the recipient blockchain.
-- This package implements [Hermes as defined in the paper](https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337), namely the gateway paradigm and crash recovery.
 
-At the moment, we assume a crash-fault environment under some assumptions detailed in section [Assumptions](#assumptions)
+The Hyperledger Cacti SATP (Secure Asset Transfer Protocol) Hermes plugin provides a comprehensive implementation of the IETF SATP protocol for secure, atomic cross-chain asset transfers. This plugin enables standardized interoperability between different distributed ledger technologies.
+
+## Key Features
+
+- **Atomic Asset Transfers**: Secure, atomic asset transfers between heterogeneous blockchain networks
+- **Multi-Ledger Support**: Native support for Hyperledger Fabric, Ethereum/Besu, and extensible architecture for additional ledgers
+- **Crash Recovery**: Comprehensive crash recovery mechanisms ensuring transaction consistency and fault tolerance
+- **IETF SATP Compliance**: Full implementation of the IETF SATP protocol specification
+- **Gateway Architecture**: Implements the gateway paradigm as defined in [Hermes research paper](https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337)
+- **Session Management**: Advanced session lifecycle management with persistent logging and state recovery
+- **Security**: Cryptographic security with digital signatures, proof verification, and secure messaging
+
+The plugin supports both bidirectional and unidirectional asset transfers with the following capabilities:
+- Asset locking and proof generation on source ledger
+- Secure proof transmission and verification
+- Asset extinguishment on source ledger and regeneration on destination ledger
+- Rollback mechanisms for failed transfers
+- Comprehensive audit trails and accountability
 
 ## Table of Contents
 
@@ -46,16 +58,41 @@ Know how to use the following plugins of the project:
 
 ## Architecture
 
-### Entities
-Firstly let us identify the different entities involved in the protocol and what is their function:
-- Two gateways in each side of the protocol: they implement endpoints to exchange the messages defined in the protocol.
-- Ledgers connectors in each side (each connected to a different gateway): they expose the API so that gateways can interact the respective ledgers (e.g., locking, deleting and creating assets).
-- SQLite3 database: persistent log and proofs storage in each gateway.
-- IPFS connector: is exposed the API so that both gateways have access to the same structure. This is used to store the hashes and signatures of the logs and proofs, so that accountability is guaranteed.
+### Core Components
 
-The sequence diagram of SATP is pictured below.
+The SATP Hermes implementation consists of several key components working together to enable secure cross-chain transfers:
 
-<img src="./images/SATP-Protocol.png" alt="drawing" width="700"/>
+#### Gateway Layer
+- **Source Gateway**: Manages the asset transfer initiation, asset locking, and proof generation
+- **Destination Gateway**: Handles transfer validation, asset creation, and completion confirmation
+- **Protocol Handlers**: Implement SATP protocol stages (0-3) with comprehensive message handling
+- **Session Management**: Maintains transfer state, handles timeouts, and manages recovery procedures
+
+#### Ledger Integration Layer
+- **Fabric Connector**: Native Hyperledger Fabric integration with chaincode invocation and event handling
+- **Besu Connector**: Ethereum/Besu integration with smart contract deployment and interaction
+- **Extensible Architecture**: Plugin-based design for adding support for additional ledger types
+
+#### Persistence Layer
+- **Local Database**: SQLite/PostgreSQL support for local session data and logging
+- **Remote Logging**: Distributed logging with IPFS integration for accountability and auditability
+- **Session Storage**: Persistent storage of transfer sessions, proofs, and cryptographic signatures
+
+#### Security Layer
+- **Cryptographic Operations**: Digital signatures, hash verification, and proof generation
+- **Identity Management**: Gateway authentication and authorization
+- **Secure Messaging**: End-to-end encrypted communication between gateways
+
+### Protocol Flow
+
+The SATP protocol operates in four distinct stages:
+
+1. **Stage 0 (Initialization)**: Session establishment and capability negotiation
+2. **Stage 1 (Transfer Agreement)**: Asset details negotiation and transfer commitment
+3. **Stage 2 (Lock Evidence)**: Asset locking and proof generation/verification
+4. **Stage 3 (Commitment)**: Final asset transfer completion and confirmation
+
+The SATP protocol follows a standardized sequence of cross-chain asset transfer operations as defined in the IETF SATP v2 specification.
 
 ### Crash Recovery Integration
 The crash recovery protocol ensures session consistency across all stages of SATP. Each session's state, logs, hashes, timestamps, and signatures are stored and recovered using the following mechanisms:
@@ -130,38 +167,51 @@ These features enhance reliability in scenarios where network or gateway disrupt
 - **Single-Gateway Topology Enhancement**  
   The crash recovery and rollback mechanisms are implemented for configurations where client and server data are handled separately. For single-gateway setups, where both client and server data coexist in session, the current implementation of fetching a single log may not suffice. This requires to fetch multiple logs (X logs) `recoverSessions()` to differentiate and handle client and server-specific data accurately, to reconstruct the session back after the crash.
   
-## Example of a Gateway Configuration
+## Gateway Configuration
+
+The SATP Hermes plugin provides flexible configuration options to support various deployment scenarios. Configuration can be provided programmatically through TypeScript interfaces or loaded from JSON configuration files.
+
+### Configuration Architecture
+
+The gateway configuration follows a modular structure with the following main sections:
+
+1. **Gateway Core Configuration** - Basic gateway settings and identity
+2. **Database Configuration** - Local session storage and remote audit logging
+3. **Ledger Connections** - Blockchain-specific connection parameters
+4. **Security Configuration** - TLS, encryption, and authentication settings
+5. **Monitoring Configuration** - Metrics, health checks, and alerting
+6. **Performance Configuration** - Optimization and scaling parameters
+
+### Configuration Templates
+
+The plugin includes pre-built configuration templates for common deployment scenarios:
+
+| Template | Use Case | Description |
+|----------|----------|-------------|
+| **Development** | Local testing | Minimal security, in-memory databases, debug logging |
+| **Fabric-to-Besu** | Enterprise bridging | Production fabric to consortium Besu transfers |
+| **Besu-to-Ethereum** | DeFi bridging | Testnet to mainnet asset transfers |
+| **Multi-Ledger** | Complex interop | 3+ blockchain networks with advanced features |
+| **Production** | Enterprise deployment | Maximum security, compliance, and monitoring |
+
+### Core Gateway Interface
 
 ```typescript
-const gatewayConfig: {
-  gid: {
-    id: "gatewayId",
-    name: "GatewayWithBesuConnection",
-    version: [
-      {
-        "Core": "v02",
-        "Architecture": "v02",
-        "Crash": "v02"
-      }
-    ],
-    proofID: "mockProofID10",
-    address: "http://gateway1.satp-hermes" // The address of the gateway
-  },
-  logLevel: "TRACE",
-  counterPartyGateways: [],
-  localRepository: localDbKnexConfig,
-  remoteRepository: remoteDbKnexConfig,
-  environment: "development" || "production", // The environment in which the gateway is running
-  ccConfig: { // The configuration of the cross-chain connections
-    bridgeConfig: [ leafConfig... ],  // The configuration of the cross-chain connections
-  },
-  enableCrashRecovery: true || false, // Enable or disable crash recovery
-  ontologyPath: "/opt/cacti/satp-hermes/ontologies" // The path to the ontology files
+export interface IPluginSatpGatewayConstructorOptions {
+  name: string;                           // Plugin instance name
+  dltIDs: string[];                      // Supported DLT identifiers
+  instanceId: string;                    // Unique instance identifier
+  keyPair?: IKeyPair;                    // Cryptographic key pair for signing
+  backupGatewaysAllowed?: string[];      // List of allowed backup gateways
+  clientHelper: ClientGatewayHelper;     // Client-side protocol helper
+  serverHelper: ServerGatewayHelper;     // Server-side protocol helper
+  knexLocalConfig?: Knex.Config;        // Local database configuration
+  knexRemoteConfig?: Knex.Config;       // Remote logging database config
+  ipfsPath?: string;                     // IPFS endpoint for distributed logging
 }
-
 ```
 
-### Bridge Configuration
+### Configuration Examples
 
 #### Reusing Deployed Wrapper Contracts
 
@@ -215,6 +265,290 @@ const ethereumWrapperConfig = {
 If both `wrapperContractName` and `wrapperContractAddress` are present (Fabric only requires the name), leaf deployment logs that contracts already exist and continues without redeploying them.
 
 #### Fabric Configuration Example:
+Comprehensive configuration examples are available in the `src/examples/config/` directory:
+
+#### Quick Start - Development Configuration
+
+```typescript
+import { developmentGatewayConfig } from './src/examples/config/gateway-configs';
+
+const gateway = new FabricSatpGateway({
+  name: "dev-gateway",
+  dltIDs: ["local-fabric", "local-besu"],
+  instanceId: "dev-001",
+  keyPair: Secp256k1Keys.generateKeyPairsBuffer(),
+  clientHelper: new ClientGatewayHelper(),
+  serverHelper: new ServerGatewayHelper(),
+  knexLocalConfig: {
+    client: 'sqlite3',
+    connection: { filename: ':memory:' },
+    useNullAsDefault: true
+  }
+});
+```
+
+#### Production Configuration from JSON
+
+```typescript
+import * as fs from 'fs';
+
+// Load configuration from JSON file
+const config = JSON.parse(
+  fs.readFileSync('./src/examples/config/production-gateway.json', 'utf8')
+);
+
+// Environment variable substitution
+const processedConfig = processEnvironmentVariables(config);
+
+// Create gateway instance
+const gateway = new FabricSatpGateway(processedConfig);
+```
+
+### Configuration Validation
+
+The plugin provides built-in configuration validation:
+
+```typescript
+import { validateConfiguration } from './src/examples/config/gateway-configs';
+
+try {
+  validateConfiguration(config);
+  console.log('✓ Configuration is valid');
+} catch (error) {
+  console.error('✗ Configuration validation failed:', error.message);
+}
+```
+
+### Environment-Specific Settings
+
+#### Development Environment
+- **Database**: In-memory SQLite for fast testing
+- **Security**: Disabled TLS/authentication for simplicity
+- **Logging**: Verbose debug logging enabled
+- **Monitoring**: Basic health checks only
+
+#### Production Environment
+- **Database**: PostgreSQL with SSL and connection pooling
+- **Security**: Full TLS/mTLS with certificate-based authentication
+- **Logging**: Structured logging with audit trails
+- **Monitoring**: Comprehensive metrics, alerting, and dashboards
+
+#### Hyperledger Fabric Configuration
+
+Fabric gateways require connection profiles, MSP configuration, and channel/chaincode details:
+
+```json
+{
+  "fabric": {
+    "type": "fabric",
+    "networkId": "fabric-production",
+    "connectorUrl": "https://fabric-connector.example.com:4000",
+    "signingCredential": {
+      "keychainId": "fabric-keychain",
+      "keychainRef": "gateway-identity",
+      "type": "VAULT_X509"
+    },
+    "channelName": "asset-transfer-channel",
+    "contractName": "satp-asset-wrapper",
+    "connectionProfile": {
+      "name": "production-network",
+      "organizations": { ... },
+      "peers": { ... },
+      "orderers": { ... }
+    }
+  }
+}
+```
+
+#### Besu/Ethereum Configuration
+
+Ethereum-compatible networks use Web3 signing credentials and contract addresses:
+
+```json
+{
+  "besu": {
+    "type": "besu",
+    "networkId": "besu-mainnet",
+    "connectorUrl": "https://besu-connector.example.com:4000",
+    "web3SigningCredential": {
+      "ethAccount": "${ETH_ACCOUNT}",
+      "secret": "${ETH_PRIVATE_KEY}",
+      "type": "PRIVATE_KEY_HEX"
+    },
+    "contractName": "SATPAssetWrapper",
+    "contractAddress": "${CONTRACT_ADDRESS}",
+    "rpcEndpoints": {
+      "http": "https://mainnet.infura.io/v3/${PROJECT_ID}",
+      "ws": "wss://mainnet.infura.io/ws/v3/${PROJECT_ID}"
+    },
+    "gasLimit": 3000000
+  }
+}
+```
+
+### Security Configuration Choices
+
+#### Certificate-Based Authentication (Recommended for Production)
+
+```json
+{
+  "security": {
+    "enableTLS": true,
+    "certificatePath": "/certs/gateway.crt",
+    "privateKeyPath": "/certs/gateway.key",
+    "enableMTLS": true,
+    "clientCACertPath": "/certs/client-ca.crt",
+    "encryption": {
+      "algorithm": "AES-256-GCM",
+      "keyRotationInterval": "12h"
+    }
+  }
+}
+```
+
+#### OAuth2 Integration
+
+```json
+{
+  "api": {
+    "authentication": {
+      "enabled": true,
+      "type": "oauth2",
+      "oauthServerUrl": "https://oauth.example.com",
+      "clientId": "${OAUTH_CLIENT_ID}",
+      "clientSecret": "${OAUTH_CLIENT_SECRET}",
+      "scope": ["satp:read", "satp:write"]
+    }
+  }
+}
+```
+
+### Database Configuration Choices
+
+#### SQLite (Development/Testing)
+```json
+{
+  "database": {
+    "local": {
+      "client": "sqlite3",
+      "connection": { "filename": ":memory:" },
+      "useNullAsDefault": true
+    }
+  }
+}
+```
+
+#### PostgreSQL (Production)
+```json
+{
+  "database": {
+    "local": {
+      "client": "postgresql",
+      "connection": {
+        "host": "${DB_HOST}",
+        "port": 5432,
+        "user": "${DB_USER}",
+        "password": "${DB_PASSWORD}",
+        "database": "${DB_NAME}",
+        "ssl": { "rejectUnauthorized": true }
+      },
+      "pool": { "min": 10, "max": 50 }
+    }
+  }
+}
+```
+
+### Monitoring Configuration Choices
+
+#### Basic Monitoring (Development)
+```json
+{
+  "monitoring": {
+    "enabled": true,
+    "healthCheckPort": 8080,
+    "prometheus": { "enabled": false }
+  }
+}
+```
+
+#### Advanced Monitoring (Production)
+```json
+{
+  "monitoring": {
+    "enabled": true,
+    "metricsPort": 9090,
+    "healthCheckPort": 8080,
+    "prometheus": { "enabled": true, "endpoint": "/metrics" },
+    "grafana": { "dashboardUrl": "https://grafana.example.com" },
+    "alerting": {
+      "enabled": true,
+      "pagerduty": { "integrationKey": "${PAGERDUTY_KEY}" },
+      "slack": { "webhookUrl": "${SLACK_WEBHOOK}" },
+      "email": { "recipients": ["ops@example.com"] }
+    }
+  }
+}
+```
+
+### Performance Configuration Choices
+
+#### Standard Performance
+```json
+{
+  "performance": {
+    "sessionPoolSize": 100,
+    "maxConcurrentTransfers": 50,
+    "transferTimeout": "10m"
+  }
+}
+```
+
+#### High-Performance Configuration
+```json
+{
+  "performance": {
+    "sessionPoolSize": 500,
+    "maxConcurrentTransfers": 200,
+    "transferTimeout": "5m",
+    "retryPolicy": {
+      "maxRetries": 5,
+      "backoffMultiplier": 1.5,
+      "initialBackoffMs": 1000
+    },
+    "caching": {
+      "enabled": true,
+      "redis": {
+        "host": "${REDIS_HOST}",
+        "password": "${REDIS_PASSWORD}"
+      }
+    }
+  }
+}
+```
+
+### Configuration File Usage
+
+All configuration examples are available as JSON files in `src/examples/config/`:
+
+```bash
+# Development setup
+cp src/examples/config/development-gateway.json ./gateway-config.json
+
+# Production setup with environment variables
+cp src/examples/config/production-gateway.json ./gateway-config.json
+# Set environment variables in .env or deployment system
+
+# Multi-ledger setup
+cp src/examples/config/multi-ledger-gateway.json ./gateway-config.json
+```
+
+For detailed configuration options and examples, see the [Configuration Examples Documentation](./src/examples/config/README.md).
+
+### Legacy Configuration Examples
+
+The following examples show the previous programmatic configuration approach:
+
+#### Legacy Fabric Configuration Example:
 ```typescript
 const leafConfig = {
   networkIdentification: {

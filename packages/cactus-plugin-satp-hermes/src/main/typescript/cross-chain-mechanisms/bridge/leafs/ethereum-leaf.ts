@@ -1,3 +1,94 @@
+/**
+ * @fileoverview
+ * Ethereum-specific bridge leaf implementation for SATP Hermes cross-chain operations.
+ *
+ * @description
+ * This module provides a complete Ethereum blockchain integration for the SATP bridge
+ * architecture, implementing both fungible and non-fungible asset operations. The
+ * EthereumLeaf class serves as a concrete implementation of bridge leaf interfaces,
+ * providing Ethereum-specific logic for asset management, smart contract interactions,
+ * and cross-chain transfer operations.
+ *
+ * **Core Ethereum Integration Features:**
+ * - Ethereum ledger connector integration with Web3 support
+ * - ERC-20 and ERC-721 asset wrapper contract deployment
+ * - Gas optimization and transaction configuration management
+ * - Ethereum-specific signing credential handling
+ * - Smart contract interaction with SATP wrapper contracts
+ * - Cross-chain proof generation using Bungee Hermes plugin
+ * - OpenTelemetry monitoring and distributed tracing
+ * - Comprehensive error handling and transaction validation
+ *
+ * **SATP Protocol Compliance:**
+ * The implementation follows IETF SATP Core v2 specification requirements for
+ * Ethereum-based cross-chain asset transfers, including atomic operations,
+ * cryptographic proof generation, and secure asset custody management.
+ *
+ * **Asset Management Operations:**
+ * - Asset wrapping and unwrapping with metadata preservation
+ * - Asset locking and unlocking for cross-chain transfers
+ * - Asset minting and burning for bridge representations
+ * - Asset assignment and ownership transfer operations
+ * - Batch asset operations and transaction optimization
+ *
+ * @example
+ * Basic Ethereum leaf configuration:
+ * ```typescript
+ * const ethereumOptions: IEthereumLeafOptions = {
+ *   networkIdentification: {
+ *     id: 'ethereum-mainnet',
+ *     ledgerType: LedgerType.Ethereum
+ *   },
+ *   signingCredential: {
+ *     ethAccount: '0x123...',
+ *     secret: 'private-key-hex',
+ *     type: Web3SigningCredentialType.PrivateKeyHex
+ *   },
+ *   connectorOptions: {
+ *     rpcApiHttpHost: 'https://mainnet.infura.io/v3/...',
+ *     rpcApiWsHost: 'wss://mainnet.infura.io/ws/v3/...',
+ *     pluginRegistry: registry
+ *   },
+ *   gasConfig: {
+ *     gasPrice: '20000000000', // 20 gwei
+ *     gasLimit: 6000000
+ *   }
+ * };
+ *
+ * const ethereumLeaf = new EthereumLeaf(
+ *   ethereumOptions,
+ *   ontologyManager,
+ *   monitorService
+ * );
+ *
+ * // Deploy wrapper contracts
+ * await ethereumLeaf.deployContracts();
+ *
+ * // Wrap ERC-20 asset for cross-chain transfer
+ * const asset: EvmAsset = {
+ *   id: 'usdc-token-123',
+ *   contractAddress: '0xA0b86a33E...',
+ *   amount: '1000.0',
+ *   owner: '0x789abc...',
+ *   type: TokenType.ERC20
+ * };
+ *
+ * const wrapResult = await ethereumLeaf.wrapAsset(asset);
+ * console.log(`Asset wrapped: ${wrapResult.transactionId}`);
+ * ```
+ *
+ * @since 2.0.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://ethereum.org/en/developers/docs/} Ethereum Development Documentation
+ * @see {@link BridgeLeafFungible} for fungible asset interface
+ * @see {@link BridgeLeafNonFungible} for non-fungible asset interface
+ * @see {@link PluginLedgerConnectorEthereum} for Ethereum connector
+ *
+ * @author SATP Hermes Development Team
+ * @copyright 2024 Hyperledger Foundation
+ * @license Apache-2.0
+ */
+
 import { INetworkOptions, TransactionResponse } from "../bridge-types";
 import {
   EthContractInvocationType,
@@ -61,16 +152,277 @@ import { getUint8Key } from "./leafs-utils";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 
+/**
+ * Configuration options specific to Ethereum network integration for SATP bridge leaf operations.
+ *
+ * @description
+ * This interface extends the base INetworkOptions to provide Ethereum-specific configuration
+ * parameters required for establishing a connection to Ethereum networks and managing
+ * cross-chain asset operations through the SATP protocol.
+ *
+ * **Key Configuration Areas:**
+ * - **Authentication**: Web3 signing credentials for transaction authorization
+ * - **Network Connection**: Ethereum ledger connector configuration options
+ * - **Smart Contracts**: Optional wrapper contract deployment parameters
+ * - **Transaction Management**: Gas configuration and optimization settings
+ * - **Identity Management**: Cryptographic key pairs and leaf identification
+ * - **Proof Generation**: Supported claim formats for cross-chain proofs
+ *
+ * @interface IEthereumLeafNeworkOptions
+ * @extends INetworkOptions
+ *
+ * @example
+ * Basic Ethereum mainnet configuration:
+ * ```typescript
+ * const ethereumOptions: IEthereumLeafNeworkOptions = {
+ *   networkIdentification: {
+ *     id: 'ethereum-mainnet',
+ *     ledgerType: LedgerType.Ethereum
+ *   },
+ *   signingCredential: {
+ *     ethAccount: '0x123...',
+ *     secret: 'private-key-hex',
+ *     type: Web3SigningCredentialType.PrivateKeyHex
+ *   },
+ *   connectorOptions: {
+ *     rpcApiHttpHost: 'https://mainnet.infura.io/v3/PROJECT_ID',
+ *     rpcApiWsHost: 'wss://mainnet.infura.io/ws/v3/PROJECT_ID',
+ *     pluginRegistry: registry
+ *   },
+ *   gasConfig: {
+ *     gasPrice: '20000000000', // 20 gwei
+ *     gasLimit: 6000000
+ *   },
+ *   claimFormats: [ClaimFormat.BUNGEE, ClaimFormat.DEFAULT]
+ * };
+ * ```
+ *
+ * @since 2.0.0
+ * @see {@link INetworkOptions} for base network configuration
+ * @see {@link Web3SigningCredential} for signing credential types
+ * @see {@link IPluginLedgerConnectorEthereumOptions} for connector configuration
+ */
 export interface IEthereumLeafNeworkOptions extends INetworkOptions {
+  /**
+   * Web3 signing credential used for transaction authorization and smart contract interactions.
+   *
+   * @description
+   * Specifies the cryptographic credentials required for signing Ethereum transactions.
+   * Supports multiple credential types including private keys, keychain references,
+   * and Geth keychain passwords for flexible deployment scenarios.
+   *
+   * @type {Web3SigningCredential}
+   *
+   * @example
+   * Private key credential:
+   * ```typescript
+   * signingCredential: {
+   *   ethAccount: '0x1234567890123456789012345678901234567890',
+   *   secret: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+   *   type: Web3SigningCredentialType.PrivateKeyHex
+   * }
+   * ```
+   */
   signingCredential: Web3SigningCredential;
+
+  /**
+   * Configuration options for the Ethereum ledger connector plugin.
+   *
+   * @description
+   * Partial configuration object for establishing connection to Ethereum networks.
+   * Must include essential properties like pluginRegistry for proper plugin initialization.
+   * Supports both HTTP and WebSocket RPC endpoints for optimal network connectivity.
+   *
+   * @type {Partial<IPluginLedgerConnectorEthereumOptions>}
+   *
+   * @example
+   * Infura connector configuration:
+   * ```typescript
+   * connectorOptions: {
+   *   rpcApiHttpHost: 'https://mainnet.infura.io/v3/YOUR_PROJECT_ID',
+   *   rpcApiWsHost: 'wss://mainnet.infura.io/ws/v3/YOUR_PROJECT_ID',
+   *   pluginRegistry: pluginRegistry,
+   *   prometheusExporter: prometheusExporter
+   * }
+   * ```
+   */
   connectorOptions: Partial<IPluginLedgerConnectorEthereumOptions>;
+
+  /**
+   * Optional name for the SATP wrapper contract to be deployed or referenced.
+   *
+   * @description
+   * Human-readable identifier for the wrapper contract used in cross-chain operations.
+   * If provided along with wrapperContractAddress, references an existing contract.
+   * If omitted, a new contract will be deployed with an auto-generated name.
+   *
+   * @type {string}
+   * @optional
+   *
+   * @example
+   * ```typescript
+   * wrapperContractName: 'MainnetSATPWrapper'
+   * ```
+   */
   wrapperContractName?: string;
+
+  /**
+   * Optional Ethereum address of an existing SATP wrapper contract.
+   *
+   * @description
+   * If provided along with wrapperContractName, references a pre-deployed wrapper contract.
+   * Must be a valid Ethereum address format. If omitted, a new contract will be deployed
+   * during leaf initialization.
+   *
+   * @type {string}
+   * @optional
+   *
+   * @example
+   * ```typescript
+   * wrapperContractAddress: '0x1234567890123456789012345678901234567890'
+   * ```
+   */
   wrapperContractAddress?: string;
+
+  /**
+   * Optional gas configuration for Ethereum transaction optimization.
+   *
+   * @description
+   * Specifies gas price and gas limit parameters for efficient transaction execution.
+   * If omitted, the connector will use network defaults or dynamic gas estimation.
+   * Critical for cost optimization in high-traffic scenarios.
+   *
+   * @type {GasTransactionConfig}
+   * @optional
+   *
+   * @example
+   * ```typescript
+   * gasConfig: {
+   *   gasPrice: '20000000000', // 20 gwei
+   *   gasLimit: 6000000        // 6M gas units
+   * }
+   * ```
+   */
   gasConfig?: GasTransactionConfig;
+
+  /**
+   * Optional unique identifier for this bridge leaf instance.
+   *
+   * @description
+   * Custom identifier for the bridge leaf, useful for multi-leaf deployments
+   * and monitoring. If omitted, an auto-generated UUID will be assigned.
+   *
+   * @type {string}
+   * @optional
+   *
+   * @example
+   * ```typescript
+   * leafId: 'ethereum-mainnet-leaf-01'
+   * ```
+   */
   leafId?: string;
+
+  /**
+   * Optional cryptographic key pair for signing and identity operations.
+   *
+   * @description
+   * Secp256k1 key pair used for cryptographic operations including proof generation
+   * and identity verification. If omitted, a new key pair will be generated automatically.
+   *
+   * @type {ISignerKeyPair}
+   * @optional
+   *
+   * @example
+   * ```typescript
+   * keyPair: {
+   *   privateKey: Buffer.from('...'),
+   *   publicKey: Buffer.from('...')
+   * }
+   * ```
+   */
   keyPair?: ISignerKeyPair;
+
+  /**
+   * Optional array of supported claim formats for cross-chain proof generation.
+   *
+   * @description
+   * Specifies which proof generation mechanisms are supported by this leaf.
+   * Includes DEFAULT format (basic proofs) and BUNGEE format (advanced cryptographic proofs).
+   * If omitted, defaults to [ClaimFormat.DEFAULT].
+   *
+   * @type {ClaimFormat[]}
+   * @optional
+   *
+   * @example
+   * ```typescript
+   * claimFormats: [ClaimFormat.BUNGEE, ClaimFormat.DEFAULT]
+   * ```
+   */
   claimFormats?: ClaimFormat[];
 }
+
+/**
+ * Complete configuration options for creating an Ethereum bridge leaf instance.
+ *
+ * @description
+ * This interface combines both base bridge leaf options and Ethereum-specific network
+ * configuration to provide a comprehensive configuration contract for EthereumLeaf
+ * instantiation. It serves as the primary configuration interface for establishing
+ * Ethereum-based cross-chain bridge operations within the SATP protocol framework.
+ *
+ * **Configuration Inheritance:**
+ * - **IBridgeLeafOptions**: Base bridge leaf configuration (monitoring, logging)
+ * - **IEthereumLeafNeworkOptions**: Ethereum-specific network and connector settings
+ *
+ * **Usage Context:**
+ * This interface is used exclusively for EthereumLeaf constructor initialization,
+ * ensuring all required configuration parameters are provided for successful
+ * Ethereum blockchain integration and SATP protocol compliance.
+ *
+ * @interface IEthereumLeafOptions
+ * @extends IBridgeLeafOptions
+ * @extends IEthereumLeafNeworkOptions
+ *
+ * @example
+ * Complete Ethereum leaf configuration:
+ * ```typescript
+ * const ethereumLeafOptions: IEthereumLeafOptions = {
+ *   // Base bridge leaf options
+ *   logLevel: 'INFO',
+ *
+ *   // Ethereum network configuration
+ *   networkIdentification: {
+ *     id: 'ethereum-goerli',
+ *     ledgerType: LedgerType.Ethereum
+ *   },
+ *   signingCredential: {
+ *     ethAccount: '0x742d35Cc6634C0532925a3b8D4C2d4a8b1b8B1b8',
+ *     secret: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+ *     type: Web3SigningCredentialType.PrivateKeyHex
+ *   },
+ *   connectorOptions: {
+ *     rpcApiHttpHost: 'https://goerli.infura.io/v3/PROJECT_ID',
+ *     pluginRegistry: registry
+ *   },
+ *   gasConfig: {
+ *     gasPrice: '2000000000', // 2 gwei for testnet
+ *     gasLimit: 3000000
+ *   },
+ *   claimFormats: [ClaimFormat.BUNGEE]
+ * };
+ *
+ * const ethereumLeaf = new EthereumLeaf(
+ *   ethereumLeafOptions,
+ *   ontologyManager,
+ *   monitorService
+ * );
+ * ```
+ *
+ * @since 2.0.0
+ * @see {@link IBridgeLeafOptions} for base configuration options
+ * @see {@link IEthereumLeafNeworkOptions} for Ethereum-specific options
+ * @see {@link EthereumLeaf} for the implementation class
+ */
 export interface IEthereumLeafOptions
   extends IBridgeLeafOptions,
     IEthereumLeafNeworkOptions {}
@@ -121,48 +473,312 @@ export class EthereumLeaf
   extends BridgeLeaf
   implements BridgeLeafFungible, BridgeLeafNonFungible
 {
+  /**
+   * Static class identifier used for logging, error reporting, and debugging.
+   *
+   * @static
+   * @readonly
+   * @type {string}
+   */
   public static readonly CLASS_NAME = "EthereumLeaf";
 
+  /**
+   * Logger instance for capturing debug, info, warn, and error messages throughout
+   * the Ethereum leaf lifecycle.
+   *
+   * @description
+   * Configured with class-specific labeling and log level from options.
+   * Integrates with OpenTelemetry monitoring for distributed tracing support.
+   *
+   * @protected
+   * @readonly
+   * @type {Logger}
+   */
   protected readonly log: Logger;
+
+  /**
+   * Logging verbosity level controlling which messages are captured and output.
+   *
+   * @description
+   * Determines the minimum severity level for log messages. Supports standard
+   * log levels: TRACE, DEBUG, INFO, WARN, ERROR, FATAL. Defaults to 'INFO'
+   * if not specified in constructor options.
+   *
+   * @protected
+   * @readonly
+   * @type {LogLevelDesc}
+   */
   protected readonly logLevel: LogLevelDesc;
 
+  /**
+   * Unique identifier for this Ethereum bridge leaf instance.
+   *
+   * @description
+   * Used for instance identification in multi-leaf deployments, monitoring,
+   * and logging contexts. Generated automatically from CLASS_NAME if not
+   * provided in options, or uses custom leafId from configuration.
+   *
+   * @protected
+   * @readonly
+   * @type {string}
+   */
   protected readonly id: string;
 
+  /**
+   * Network identification information including network ID and ledger type.
+   *
+   * @description
+   * Specifies the target Ethereum network (mainnet, testnet, private) and
+   * confirms the ledger type is Ethereum. Used for network-specific operations
+   * and cross-chain protocol routing.
+   *
+   * @protected
+   * @readonly
+   * @type {NetworkId}
+   */
   protected readonly networkIdentification: NetworkId;
 
+  /**
+   * Cryptographic key pair used for signing operations and identity verification.
+   *
+   * @description
+   * Secp256k1 key pair used for cryptographic proof generation, identity
+   * verification, and secure communication. Generated automatically if not
+   * provided in constructor options.
+   *
+   * @protected
+   * @readonly
+   * @type {ISignerKeyPair}
+   */
   protected readonly keyPair: ISignerKeyPair;
 
+  /**
+   * Ethereum ledger connector plugin instance for blockchain interactions.
+   *
+   * @description
+   * Primary interface for executing transactions, deploying contracts, and
+   * querying blockchain state on Ethereum networks. Configured with RPC
+   * endpoints and authentication credentials during initialization.
+   *
+   * @protected
+   * @readonly
+   * @type {PluginLedgerConnectorEthereum}
+   */
   protected readonly connector: PluginLedgerConnectorEthereum;
 
+  /**
+   * Optional Bungee Hermes plugin for advanced cryptographic proof generation.
+   *
+   * @description
+   * Initialized only when BUNGEE claim format is specified in configuration.
+   * Provides enhanced proof generation capabilities for cross-chain asset
+   * verification and state consistency validation.
+   *
+   * @protected
+   * @type {PluginBungeeHermes | undefined}
+   */
   protected bungee?: PluginBungeeHermes;
 
+  /**
+   * Array of supported claim formats for cross-chain proof generation.
+   *
+   * @description
+   * Specifies which proof generation mechanisms this leaf supports.
+   * Always includes DEFAULT format, with optional BUNGEE format for
+   * enhanced cryptographic proofs. Used to determine available proof types
+   * for cross-chain operations.
+   *
+   * @protected
+   * @readonly
+   * @type {ClaimFormat[]}
+   */
   protected readonly claimFormats: ClaimFormat[];
 
+  /**
+   * Ontology manager instance for asset metadata and interaction management.
+   *
+   * @description
+   * Manages asset definitions, metadata schemas, and interaction patterns
+   * for cross-chain operations. Provides standardized asset representation
+   * and validation across different blockchain networks.
+   *
+   * @protected
+   * @readonly
+   * @type {OntologyManager}
+   */
   protected readonly ontologyManager: OntologyManager;
 
+  /**
+   * Web3 signing credential for transaction authorization and smart contract interactions.
+   *
+   * @description
+   * Cryptographic credential used to sign Ethereum transactions. Supports multiple
+   * credential types including private keys, keychain references, and Geth keychain
+   * passwords. Must not be Web3SigningCredentialNone type.
+   *
+   * @private
+   * @readonly
+   * @type {Web3SigningCredentialPrivateKeyHex | Web3SigningCredentialGethKeychainPassword | Web3SigningCredentialCactiKeychainRef}
+   */
   private readonly signingCredential:
     | Web3SigningCredentialPrivateKeyHex
     | Web3SigningCredentialGethKeychainPassword
     | Web3SigningCredentialCactiKeychainRef;
 
+  /**
+   * Optional gas configuration for transaction cost optimization.
+   *
+   * @description
+   * Specifies gas price and gas limit parameters for Ethereum transactions.
+   * If undefined, the connector will use network defaults or dynamic estimation.
+   * Critical for cost control in production deployments.
+   *
+   * @private
+   * @readonly
+   * @type {GasTransactionConfig | undefined}
+   */
   private readonly gasConfig: GasTransactionConfig | undefined;
 
   private wrapperDeployReceipt: Web3TransactionReceipt | undefined;
+  /**
+   * Transaction receipt from fungible wrapper contract deployment.
+   *
+   * @description
+   * Contains deployment transaction details including contract address,
+   * gas used, and transaction hash. Set during deployFungibleWrapperContract()
+   * execution and used for contract verification and debugging.
+   *
+   * @private
+   * @type {Web3TransactionReceipt | undefined}
+   */
+  private wrapperFungibleDeployReceipt: Web3TransactionReceipt | undefined;
 
+  /**
+   * Ethereum address of the deployed or referenced SATP wrapper contract.
+   *
+   * @description
+   * Contract address used for all asset wrapping, locking, minting, and burning
+   * operations. Set during contract deployment or provided in constructor options.
+   * Required for all smart contract interactions.
+   *
+   * @private
+   * @type {string | undefined}
+   */
   private wrapperContractAddress: string | undefined;
 
+  /**
+   * Human-readable name of the SATP wrapper contract.
+   *
+   * @description
+   * Contract identifier used for logging, debugging, and contract management.
+   * Set during contract deployment or provided in constructor options.
+   * Used in conjunction with wrapperContractAddress for contract operations.
+   *
+   * @private
+   * @type {string | undefined}
+   */
   private wrapperContractName: string | undefined;
 
+  /**
+   * Monitoring service instance for OpenTelemetry tracing and metrics collection.
+   *
+   * @description
+   * Provides distributed tracing capabilities for monitoring cross-chain operations,
+   * performance metrics, and error tracking. Integrates with OpenTelemetry ecosystem
+   * for comprehensive observability.
+   *
+   * @private
+   * @readonly
+   * @type {MonitorService}
+   */
   private readonly monitorService: MonitorService;
 
   /**
-   * Constructs a new instance of the `EthereumLeaf` class.
+   * Constructs a new instance of the EthereumLeaf class for SATP cross-chain operations.
    *
-   * @param {EthereumLeafOptions} options - The options for configuring the Ethereum leaf.
+   * @description
+   * Initializes an Ethereum-specific bridge leaf with comprehensive configuration validation,
+   * connector setup, and optional Bungee Hermes integration for advanced proof generation.
+   * The constructor performs extensive validation to ensure all required components are
+   * properly configured for secure cross-chain asset operations.
    *
-   * @throws {UnsupportedNetworkError} If the network type is not Ethereum.
-   * @throws {NoSigningCredentialError} If no signing credential is provided.
-   * @throws {InvalidWrapperContract} If the wrapper contract name or address is missing.
+   * **Initialization Process:**
+   * 1. **Network Validation**: Ensures network type is Ethereum
+   * 2. **Credential Validation**: Verifies signing credentials are provided
+   * 3. **Connector Setup**: Initializes Ethereum ledger connector
+   * 4. **Contract Configuration**: Validates wrapper contract parameters
+   * 5. **Claim Format Setup**: Configures proof generation mechanisms
+   * 6. **Monitoring Integration**: Establishes OpenTelemetry tracing
+   *
+   * **Security Considerations:**
+   * - Validates signing credentials are not of type Web3SigningCredentialNone
+   * - Ensures connector options include required pluginRegistry
+   * - Performs wrapper contract configuration consistency checks
+   * - Initializes Bungee Hermes with proper key pair encoding
+   *
+   * @constructor
+   * @param {IEthereumLeafOptions} options - Complete configuration options for the Ethereum leaf
+   * @param {OntologyManager} ontologyManager - Asset ontology and metadata management service
+   * @param {MonitorService} monitorService - OpenTelemetry monitoring and tracing service
+   *
+   * @throws {UnsupportedNetworkError} When network type is not LedgerType.Ethereum
+   * @throws {NoSigningCredentialError} When signing credential is Web3SigningCredentialNone or missing
+   * @throws {ConnectorOptionsError} When connector options are incomplete or invalid
+   * @throws {InvalidWrapperContract} When wrapper contract configuration is inconsistent
+   * @throws {ClaimFormatError} When an unsupported claim format is specified
+   *
+   * @example
+   * Basic Ethereum leaf initialization:
+   * ```typescript
+   * const ethereumOptions: IEthereumLeafOptions = {
+   *   networkIdentification: {
+   *     id: 'ethereum-mainnet',
+   *     ledgerType: LedgerType.Ethereum
+   *   },
+   *   signingCredential: {
+   *     ethAccount: '0x1234567890123456789012345678901234567890',
+   *     secret: '0xabcdef...',
+   *     type: Web3SigningCredentialType.PrivateKeyHex
+   *   },
+   *   connectorOptions: {
+   *     rpcApiHttpHost: 'https://mainnet.infura.io/v3/PROJECT_ID',
+   *     pluginRegistry: registry
+   *   },
+   *   gasConfig: {
+   *     gasPrice: '20000000000',
+   *     gasLimit: 6000000
+   *   },
+   *   claimFormats: [ClaimFormat.BUNGEE, ClaimFormat.DEFAULT]
+   * };
+   *
+   * const ethereumLeaf = new EthereumLeaf(
+   *   ethereumOptions,
+   *   ontologyManager,
+   *   monitorService
+   * );
+   * ```
+   *
+   * @example
+   * Pre-deployed wrapper contract initialization:
+   * ```typescript
+   * const ethereumOptions: IEthereumLeafOptions = {
+   *   // ... network and credential configuration
+   *   wrapperContractName: 'MainnetSATPWrapper',
+   *   wrapperContractAddress: '0x742d35Cc6634C0532925a3b8D4C2d4a8b1b8B1b8',
+   *   // ... other options
+   * };
+   *
+   * const ethereumLeaf = new EthereumLeaf(
+   *   ethereumOptions,
+   *   ontologyManager,
+   *   monitorService
+   * );
+   * ```
+   *
+   * @since 2.0.0
+   * @see {@link IEthereumLeafOptions} for complete configuration options
+   * @see {@link OntologyManager} for asset ontology management
+   * @see {@link MonitorService} for monitoring and tracing
    */
   constructor(
     public readonly options: IEthereumLeafOptions,
@@ -500,18 +1116,19 @@ export class EthereumLeaf
    * @throws {WrapperContractError} If the wrapper contract is not deployed.
    * @throws {TransactionError} If the transaction fails.
    */
-  public async wrapAsset(asset: EvmAsset): Promise<TransactionResponse> {
+  public async wrapAsset(asset: Asset): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#wrapAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
       try {
+        const evmAsset = asset as EvmAsset;
         this.log.debug(
-          `${fnTag}, Wrapping Asset: {${asset.id}, ${asset.owner}, ${asset.contractAddress}, ${asset.type}}`,
+          `${fnTag}, Wrapping Asset: {${evmAsset.id}, ${evmAsset.owner}, ${evmAsset.contractAddress}, ${evmAsset.type}}`,
         );
 
         const interactions = this.ontologyManager.getOntologyInteractions(
           LedgerType.Ethereum,
-          asset.referenceId,
+          evmAsset.referenceId,
         );
 
         switch (asset.type) {
@@ -539,12 +1156,12 @@ export class EthereumLeaf
           invocationType: EthContractInvocationType.Send,
           methodName: "wrap",
           params: [
-            asset.contractName,
-            asset.contractAddress,
-            asset.type,
-            asset.id,
-            asset.referenceId,
-            asset.owner,
+            evmAsset.contractName,
+            evmAsset.contractAddress,
+            evmAsset.type,
+            evmAsset.id,
+            evmAsset.referenceId,
+            evmAsset.owner,
             interactions,
             asset.ercTokenStandard,
           ],
@@ -1273,6 +1890,68 @@ export class EthereumLeaf
     });
   }
 
+  /**
+   * Gracefully shuts down the Ethereum connector and releases associated resources.
+   *
+   * @description
+   * Performs a clean shutdown of the Ethereum ledger connector, closing active connections,
+   * stopping background processes, and releasing network resources. This method should be
+   * called when the bridge leaf is no longer needed to prevent resource leaks and ensure
+   * proper cleanup of the Ethereum network connection.
+   *
+   * **Shutdown Process:**
+   * 1. **Connection Termination**: Closes active RPC connections (HTTP/WebSocket)
+   * 2. **Resource Cleanup**: Releases connector-associated resources
+   * 3. **Background Process Termination**: Stops any ongoing background operations
+   * 4. **Error Handling**: Properly handles and logs shutdown errors
+   * 5. **Observability**: Records shutdown metrics and traces
+   *
+   * **Best Practices:**
+   * - Call this method during application shutdown or leaf decommissioning
+   * - Ensure all pending transactions are completed before shutdown
+   * - Handle potential shutdown errors appropriately in calling code
+   * - Use in conjunction with proper application lifecycle management
+   *
+   * @public
+   * @async
+   * @method shutdownConnection
+   * @returns {Promise<void>} Promise that resolves when shutdown is complete
+   *
+   * @throws {Error} When connector shutdown fails due to network or resource issues
+   *
+   * @example
+   * Graceful application shutdown:
+   * ```typescript
+   * // During application shutdown
+   * try {
+   *   await ethereumLeaf.shutdownConnection();
+   *   console.log('Ethereum leaf connection closed successfully');
+   * } catch (error) {
+   *   console.error('Error during shutdown:', error);
+   *   // Handle shutdown error appropriately
+   * }
+   * ```
+   *
+   * @example
+   * Multiple leaf shutdown with error handling:
+   * ```typescript
+   * const shutdownPromises = [
+   *   ethereumLeaf.shutdownConnection(),
+   *   fabricLeaf.shutdownConnection(),
+   *   besuLeaf.shutdownConnection()
+   * ];
+   *
+   * try {
+   *   await Promise.allSettled(shutdownPromises);
+   *   console.log('All bridge leafs shutdown initiated');
+   * } catch (error) {
+   *   console.error('Critical shutdown error:', error);
+   * }
+   * ```
+   *
+   * @since 2.0.0
+   * @see {@link PluginLedgerConnectorEthereum.shutdown} for connector shutdown details
+   */
   public async shutdownConnection(): Promise<void> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}#shutdownConnection`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1299,6 +1978,49 @@ export class EthereumLeaf
     });
   }
 
+  /**
+   * Type guard function to validate that connector options contain all required properties.
+   *
+   * @description
+   * Performs runtime validation to ensure that partial connector options contain
+   * the essential pluginRegistry property required for proper Ethereum connector
+   * initialization. This type guard helps prevent runtime errors during connector
+   * instantiation by validating configuration completeness.
+   *
+   * **Validation Logic:**
+   * - Checks for presence of pluginRegistry property
+   * - Serves as TypeScript type narrowing guard
+   * - Prevents incomplete configuration from reaching connector constructor
+   *
+   * **Usage Context:**
+   * Called during constructor initialization to validate connector options
+   * before creating the PluginLedgerConnectorEthereum instance. Essential
+   * for ensuring proper plugin ecosystem integration.
+   *
+   * @private
+   * @method isFullPluginOptions
+   * @param {Partial<IPluginLedgerConnectorEthereumOptions>} obj - Partial connector configuration to validate
+   * @returns {boolean} True if obj contains all required properties for connector initialization
+   *
+   * @example
+   * Type guard usage in constructor:
+   * ```typescript
+   * if (!this.isFullPluginOptions(options.connectorOptions)) {
+   *   throw new ConnectorOptionsError(
+   *     "Invalid options provided. Please provide a valid IPluginLedgerConnectorEthereumOptions object."
+   *   );
+   * }
+   *
+   * // TypeScript now knows connectorOptions is complete
+   * this.connector = new PluginLedgerConnectorEthereum(
+   *   options.connectorOptions as IPluginLedgerConnectorEthereumOptions
+   * );
+   * ```
+   *
+   * @since 2.0.0
+   * @see {@link IPluginLedgerConnectorEthereumOptions} for complete connector configuration
+   * @see {@link PluginLedgerConnectorEthereum} for the connector implementation
+   */
   private isFullPluginOptions = (
     obj: Partial<IPluginLedgerConnectorEthereumOptions>,
   ): obj is IPluginLedgerConnectorEthereumOptions => {

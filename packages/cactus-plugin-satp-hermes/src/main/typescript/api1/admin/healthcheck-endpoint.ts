@@ -1,3 +1,36 @@
+/**
+ * @fileoverview SATP Gateway Health Check Endpoint
+ *
+ * This module provides the health check endpoint for SATP gateway monitoring
+ * and availability verification. Used by load balancers, monitoring systems,
+ * and operational tools to determine gateway health status and service
+ * availability for high-availability deployments.
+ *
+ * The health check verifies:
+ * - Gateway service availability
+ * - Database connectivity status
+ * - SATP manager initialization
+ * - Cross-chain connection health
+ * - Resource availability and limits
+ *
+ * @example
+ * ```typescript
+ * // GET /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck
+ * const response = await fetch('/api/v1/healthcheck', {
+ *   method: 'GET'
+ * });
+ *
+ * const health = await response.json();
+ * if (health.status === 'OK') {
+ *   console.log('Gateway is healthy');
+ * }
+ * ```
+ *
+ * @see {@link https://microservices.io/patterns/observability/health-check-api.html} Health Check API Pattern
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import {
   Checks,
   type IAsyncProvider,
@@ -17,6 +50,37 @@ import {
   registerWebServiceEndpoint,
 } from "@hyperledger/cactus-core";
 
+/**
+ * Web service endpoint for SATP gateway health monitoring.
+ *
+ * Implements the GET /healthcheck endpoint that provides gateway health
+ * status information for monitoring systems, load balancers, and operational
+ * tools. Performs comprehensive health checks of gateway components and
+ * returns standardized health status responses.
+ *
+ * Health check components:
+ * - Service availability verification
+ * - Database connection testing
+ * - SATP manager status validation
+ * - Resource utilization monitoring
+ * - Cross-chain connectivity verification
+ *
+ * @class HealthCheckEndpointV1
+ * @implements {IWebServiceEndpoint}
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const healthEndpoint = new HealthCheckEndpointV1({
+ *   dispatcher: satpDispatcher,
+ *   logLevel: 'info'
+ * });
+ *
+ * // Register with Express application
+ * await healthEndpoint.registerExpress(app);
+ *
+ * // Health checks available at GET /api/v1/healthcheck
+ * ```
+ */
 export class HealthCheckEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "HealthCheckEndpointV1";
 

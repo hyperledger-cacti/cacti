@@ -18,7 +18,7 @@ import {
   TransferCompleteRequestSchema,
   TransferCompleteResponse,
 } from "../../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
+import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   getMessageHash,
   saveHash,

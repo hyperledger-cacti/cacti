@@ -1,3 +1,35 @@
+/**
+ * @fileoverview SATP Gateway Transaction Endpoint
+ *
+ * This module provides the web service endpoint for SATP transaction operations.
+ * Handles HTTP requests for initiating, monitoring, and managing cross-chain
+ * asset transfers following the IETF SATP protocol specification.
+ *
+ * The endpoint provides:
+ * - Transaction initiation and processing
+ * - Cross-chain asset transfer coordination
+ * - Session management and state tracking
+ * - Error handling and recovery
+ * - Protocol compliance validation
+ *
+ * @example
+ * ```typescript
+ * import { TransactEndpointV1 } from './transact-endpoint';
+ *
+ * const endpoint = new TransactEndpointV1({
+ *   logLevel: 'info',
+ *   instanceId: 'transaction-gateway'
+ * });
+ *
+ * // Register with Express app
+ * await endpoint.registerExpress(app);
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import {
   Checks,
   IAsyncProvider,
@@ -21,6 +53,28 @@ import { SATPInternalError } from "../../core/errors/satp-errors";
 import { getEnumKeyByValue } from "../../services/utils";
 import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 
+/**
+ * Web service endpoint for SATP transaction operations.
+ *
+ * Provides HTTP endpoint handling for transaction-related requests including
+ * cross-chain asset transfers, session initiation, and state management.
+ * Integrates with the OpenAPI specification for standardized API documentation.
+ *
+ * @implements IWebServiceEndpoint
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const transactEndpoint = new TransactEndpointV1({
+ *   logLevel: 'debug',
+ *   instanceId: 'transaction-service-001'
+ * });
+ *
+ * // Register with Express application
+ * await transactEndpoint.registerExpress(expressApp);
+ *
+ * // Endpoint available at POST /api/v1/satp/transact
+ * ```
+ */
 export class TransactEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "TransactEndpointV1";
 

@@ -1,5 +1,73 @@
-// this file contains a class that encapsulates the logic for managing the SATP bridge (lock, unlock, etc).
-// should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
+/**
+ * @fileoverview
+ * SATP Bridge Execution Layer implementation for cross-chain asset operations.
+ *
+ * @description
+ * This module provides the concrete implementation of the SATP Bridge Execution Layer,
+ * which serves as the primary interface for executing cross-chain asset operations
+ * within the SATP Hermes framework. The execution layer orchestrates asset management
+ * operations across different blockchain networks while maintaining SATP protocol
+ * compliance and atomic transaction semantics.
+ *
+ * **Core Execution Layer Responsibilities:**
+ * - Asset wrapping and unwrapping operations across chains
+ * - Asset locking and unlocking for cross-chain transfers
+ * - Asset minting and burning for bridge representations
+ * - Asset assignment and ownership transfer operations
+ * - Transaction receipt generation and proof management
+ * - Gateway session data integration and processing
+ * - Smart contract output processing and validation
+ *
+ * **SATP Protocol Integration:**
+ * The execution layer implements IETF SATP Core v2 specification requirements for
+ * cross-chain asset operations, including atomic transfers, cryptographic proof
+ * generation, rollback mechanisms, and distributed transaction coordination.
+ *
+ * **Bridge Architecture Integration:**
+ * - Gateway session data injection for transaction parameters
+ * - Bridge leaf orchestration for blockchain-specific operations
+ * - Claim format management for cross-chain proofs
+ * - Monitoring and observability integration
+ * - Error handling and transaction rollback support
+ *
+ * @example
+ * Basic execution layer setup:
+ * ```typescript
+ * const executionLayer = new SATPBridgeExecutionLayerImpl({
+ *   leafBridge: ethereumLeaf,
+ *   claimType: ClaimFormat.BUNGEE,
+ *   logLevel: 'debug',
+ *   monitorService: monitoringService
+ * });
+ *
+ * // Wrap asset for cross-chain transfer
+ * const asset: FungibleAsset = {
+ *   id: 'usdc-token-123',
+ *   referenceId: 'original-usdc-456',
+ *   type: TokenType.ERC20,
+ *   owner: '0x123...',
+ *   contractName: 'USDC',
+ *   network: { id: 'ethereum-mainnet', ledgerType: LedgerType.Ethereum },
+ *   amount: '1000.0'
+ * };
+ *
+ * const wrapReceipt = await executionLayer.wrapAsset(asset);
+ * console.log('Asset wrapped:', wrapReceipt.transactionId);
+ * console.log('Proof generated:', wrapReceipt.proof);
+ * ```
+ *
+ * @since 2.0.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link SATPBridgeExecutionLayer} for execution layer interface
+ * @see {@link BridgeLeaf} for bridge leaf implementations
+ * @see {@link Asset} for asset data structures
+ * @see {@link TransactionReceipt} for transaction receipt format
+ *
+ * @author SATP Hermes Development Team
+ * @copyright 2024 Hyperledger Foundation
+ * @license Apache-2.0
+ */
+
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
@@ -29,16 +97,43 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
 import { TransactionResponse } from "./bridge-types";
 
 /**
- * Options for configuring the ISATPBridgeExecutionLayerImpl.
+ * Configuration options for the SATP Bridge Execution Layer implementation.
  *
- * @property {BridgeLeaf} leafBridge - The bridge leaf instance used for the execution layer.
- * @property {ClaimFormat} [claimType] - Optional claim format type.
- * @property {LogLevelDesc} [logLevel] - Optional log level description for logging purposes.
+ * @description
+ * Defines the configuration parameters required to initialize the SATP Bridge
+ * Execution Layer implementation. These options control the bridge behavior,
+ * logging, claim format handling, and monitoring integration.
+ *
+ * **Configuration Components:**
+ * - Bridge leaf instance for blockchain-specific operations
+ * - Claim format specification for cross-chain proofs
+ * - Logging configuration for debugging and monitoring
+ * - Monitoring service integration for observability
+ *
+ * @example
+ * Basic configuration:
+ * ```typescript
+ * const options: ISATPBridgeExecutionLayerImplOptions = {
+ *   leafBridge: ethereumLeaf,
+ *   claimType: ClaimFormat.BUNGEE,
+ *   logLevel: 'info',
+ *   monitorService: monitoringService
+ * };
+ * ```
+ *
+ * @since 2.0.0
+ * @see {@link BridgeLeaf} for bridge leaf implementations
+ * @see {@link ClaimFormat} for supported claim formats
+ * @see {@link MonitorService} for monitoring integration
  */
 export interface ISATPBridgeExecutionLayerImplOptions {
+  /** Bridge leaf instance providing blockchain-specific asset operations */
   leafBridge: BridgeLeaf;
+  /** Claim format type for cross-chain proof generation (default: DEFAULT) */
   claimType?: ClaimFormat;
+  /** Log level for debugging and monitoring (default: INFO) */
   logLevel?: LogLevelDesc;
+  /** Monitoring service for observability and metrics collection */
   monitorService: MonitorService;
 }
 
@@ -58,11 +153,66 @@ export interface IdentifiedTransactionResponse {
 }
 
 /**
- * @class SATPBridgeExecutionLayerImpl
- * @implements SATPBridgeExecutionLayer
- * @description Provides methods to wrap, unwrap, lock, unlock, mint, burn, and assign assets across different blockchain networks.
+ * Concrete implementation of the SATP Bridge Execution Layer interface.
+ *
+ * @description
+ * Provides the complete implementation of cross-chain asset operations within
+ * the SATP bridge architecture. This class orchestrates asset management
+ * operations across different blockchain networks, ensuring SATP protocol
+ * compliance, atomic transaction execution, and proper error handling.
+ *
+ * **Core Execution Capabilities:**
+ * - Asset wrapping and unwrapping with proof generation
+ * - Asset locking and unlocking for cross-chain transfers
+ * - Asset minting and burning for bridge representations
+ * - Asset assignment and ownership transfers
+ * - Transaction receipt processing and validation
+ * - Cross-chain proof generation and verification
+ * - Bridge leaf orchestration and coordination
+ *
+ * **SATP Protocol Compliance:**
+ * - Implements IETF SATP Core v2 specification requirements
+ * - Maintains atomic transaction semantics across chains
+ * - Provides cryptographic proof generation for operations
+ * - Supports rollback mechanisms for failed transfers
+ * - Ensures consistent state across distributed operations
+ *
+ * **Integration Features:**
+ * - Bridge leaf abstraction for blockchain compatibility
+ * - Claim format management for different proof types
+ * - Monitoring and observability integration
+ * - Comprehensive error handling and logging
+ * - Transaction receipt standardization
+ *
+ * @example
+ * Complete asset transfer workflow:
+ * ```typescript
+ * const executionLayer = new SATPBridgeExecutionLayerImpl({
+ *   leafBridge: ethereumLeaf,
+ *   claimType: ClaimFormat.BUNGEE,
+ *   logLevel: 'debug',
+ *   monitorService: monitoringService
+ * });
+ *
+ * // Source chain: Lock asset
+ * const lockReceipt = await executionLayer.lockAsset(sourceAsset, 1000);
+ * console.log('Asset locked:', lockReceipt.transactionId);
+ *
+ * // Destination chain: Mint equivalent asset
+ * const mintReceipt = await executionLayer.mintAsset(targetAsset, 1000);
+ * console.log('Asset minted:', mintReceipt.transactionId);
+ *
+ * // Verify both operations with proofs
+ * console.log('Lock proof:', lockReceipt.proof);
+ * console.log('Mint proof:', mintReceipt.proof);
+ * ```
+ *
+ * @implements {SATPBridgeExecutionLayer}
+ * @since 2.0.0
+ * @see {@link SATPBridgeExecutionLayer} for interface definition
+ * @see {@link BridgeLeaf} for bridge leaf implementations
+ * @see {@link TransactionReceipt} for receipt format
  */
-
 export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
   public static readonly CLASS_NAME = "SATPBridgeExecutionLayerImpl";
 
@@ -73,11 +223,37 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
   private readonly monitorService: MonitorService;
 
   /**
-   * Constructs an instance of SATPBridgeExecutionLayerImpl.
+   * Creates a new SATP Bridge Execution Layer implementation instance.
    *
-   * @param options - The options for configuring the SATPBridgeExecutionLayerImpl instance.
+   * @description
+   * Initializes the execution layer with the specified configuration options,
+   * including bridge leaf integration, claim format validation, logging setup,
+   * and monitoring service registration. The constructor validates that the
+   * specified claim format is supported by the provided bridge leaf.
    *
-   * @throws {ClaimFormatError} If the provided claim type is not supported by the bridge.
+   * **Initialization Process:**
+   * - Validates claim format compatibility with bridge leaf
+   * - Sets up logging configuration with specified level
+   * - Initializes monitoring service integration
+   * - Configures bridge endpoint for asset operations
+   * - Prepares execution context for cross-chain operations
+   *
+   * @param options - Configuration options for the execution layer
+   * @throws {ClaimFormatError} When claim format is not supported by bridge leaf
+   *
+   * @example
+   * Creating execution layer with Ethereum bridge:
+   * ```typescript
+   * const executionLayer = new SATPBridgeExecutionLayerImpl({
+   *   leafBridge: ethereumLeaf,
+   *   claimType: ClaimFormat.BUNGEE,
+   *   logLevel: 'debug',
+   *   monitorService: monitoringService
+   * });
+   * ```
+   *
+   * @since 2.0.0
+   * @see {@link ISATPBridgeExecutionLayerImplOptions} for configuration options
    */
   constructor(public readonly options: ISATPBridgeExecutionLayerImplOptions) {
     const label = SATPBridgeExecutionLayerImpl.CLASS_NAME;
@@ -225,6 +401,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    * @throws {TransactionIdUndefinedError} If the transaction ID is undefined.
    * @throws {Error} If the asset is non-fungible.
    */
+  /**\n   * Wraps a fungible asset into the bridge wrapper contract for cross-chain operations.\n   *\n   * @description\n   * Encapsulates a fungible asset within the bridge wrapper contract, enabling it to\n   * participate in cross-chain transfer operations. This operation transfers custody\n   * of the original asset to the bridge while creating a bridge-managed representation\n   * that can be transferred across blockchain networks.\n   *\n   * **Asset Wrapping Process:**\n   * - Validates asset is fungible and has required properties\n   * - Transfers asset custody to bridge wrapper contract\n   * - Creates bridge-managed asset representation\n   * - Generates transaction receipt with proof for cross-chain verification\n   * - Records wrapping metadata for asset tracking\n   *\n   * **Cross-Chain Integration:**\n   * The wrapped asset becomes eligible for cross-chain transfers, with the wrapping\n   * proof serving as verification for the asset's existence and custody on the\n   * source blockchain network.\n   *\n   * @param asset - Fungible asset to be wrapped with amount and ownership details\n   * @returns Promise resolving to transaction receipt with wrapping proof\n   *\n   * @throws {TransactionIdUndefinedError} When transaction ID is missing from response\n   * @throws {Error} When asset is non-fungible (not supported for wrapping)\n   * @throws {WrapperContractError} When bridge wrapper contract interaction fails\n   *\n   * @example\n   * Wrapping ERC-20 token for cross-chain transfer:\n   * ```typescript\n   * const usdcAsset: FungibleAsset = {\n   *   id: 'usdc-bridge-123',\n   *   referenceId: 'usdc-ethereum-456',\n   *   type: TokenType.ERC20,\n   *   owner: '0x123...',\n   *   contractName: 'USDC',\n   *   network: { id: 'ethereum-mainnet', ledgerType: LedgerType.Ethereum },\n   *   amount: '1500.0'\n   * };\n   *\n   * const wrapReceipt = await executionLayer.wrapAsset(usdcAsset);\n   * console.log('Wrapped transaction:', wrapReceipt.transactionId);\n   * console.log('Cross-chain proof:', wrapReceipt.proof);\n   * \n   * // Asset is now ready for cross-chain transfer\n   * ```\n   *\n   * @since 2.0.0\n   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1\n   * @see {@link FungibleAsset} for asset data structure\n   * @see {@link TransactionReceipt} for receipt format\n   * @see {@link unwrapAsset} for asset unwrapping operations\n   */
   public async wrapAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#wrapAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);

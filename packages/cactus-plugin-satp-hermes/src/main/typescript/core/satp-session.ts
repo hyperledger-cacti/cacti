@@ -1,3 +1,48 @@
+/**
+ * @fileoverview
+ * SATP Session Management - Core Session Lifecycle and State Management
+ *
+ * @description
+ * This module provides comprehensive session management capabilities for SATP (Secure Asset
+ * Transfer Protocol) operations within the Hyperledger Cacti ecosystem. It manages the
+ * complete lifecycle of SATP transfer sessions, including creation, state tracking,
+ * data persistence, and validation across all protocol stages.
+ *
+ * **Core Functionality:**
+ * - **Session Lifecycle**: Complete session creation, management, and termination
+ * - **State Management**: Tracking session state across all SATP protocol stages
+ * - **Data Persistence**: Managing session data, messages, signatures, and hashes
+ * - **Dual-Side Support**: Handles both client and server session perspectives
+ * - **Validation Framework**: Comprehensive session data validation and verification
+ *
+ * **Session Architecture:**
+ * - **Client Sessions**: Manages client-side session data and operations
+ * - **Server Sessions**: Manages server-side session data and operations
+ * - **Protocol Stages**: Supports all SATP stages (0-3) with stage-specific data
+ * - **Message Tracking**: Maintains complete message history and audit trails
+ * - **Cryptographic Integration**: Manages signatures, hashes, and verification
+ *
+ * **Key Features:**
+ * - **State Persistence**: Maintains session state across protocol operations
+ * - **Data Integrity**: Ensures session data consistency and validation
+ * - **Error Handling**: Comprehensive error detection and recovery mechanisms
+ * - **Monitoring Integration**: Full observability and debugging support
+ * - **Protocol Compliance**: Ensures adherence to IETF SATP specifications
+ *
+ * **Usage Patterns:**
+ * Sessions are created at the start of SATP transfers and maintained throughout
+ * the entire protocol flow. They serve as the central repository for all
+ * transfer-related data, state, and cryptographic materials.
+ *
+ * @author SATP Development Team
+ * @since 2.0.0
+ * @version 2.0.0
+ * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
+ * @see {@link SessionData} for session data structure
+ * @see {@link SATPLogger} for logging integration
+ * @see {@link MonitorService} for monitoring capabilities
+ */
+
 import { v4 as uuidv4 } from "uuid";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -59,21 +104,90 @@ import { create } from "@bufbuild/protobuf";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 
-// Define interface on protos
+/**
+ * Configuration options for SATP session initialization.
+ *
+ * @description
+ * Defines the required and optional parameters for creating new SATP session
+ * instances. These options control session behavior, logging configuration,
+ * and specify whether the session operates in client or server mode.
+ *
+ * **Configuration Parameters:**
+ * - **contextID**: Unique transfer context identifier for the SATP operation
+ * - **sessionID**: Optional session identifier (auto-generated if not provided)
+ * - **server**: Flag indicating server-side session operation
+ * - **client**: Flag indicating client-side session operation
+ * - **logLevel**: Optional logging level configuration
+ * - **monitorService**: Monitoring service for observability and metrics
+ *
+ * @public
+ * @interface ISATPSessionOptions
+ * @since 2.0.0
+ * @see {@link SATPSession} for session implementation
+ * @see {@link MonitorService} for monitoring integration
+ */
 export interface ISATPSessionOptions {
+  /** Optional logging level for session operations */
   logLevel?: LogLevelDesc;
+  /** Unique transfer context identifier */
   contextID: string;
+  /** Optional session identifier (auto-generated if not provided) */
   sessionID?: string;
+  /** Flag indicating server-side session operation */
   server: boolean;
+  /** Flag indicating client-side session operation */
   client: boolean;
+  /** Monitoring service for observability and metrics collection */
   monitorService: MonitorService;
 }
 
+/**
+ * SATP Session implementation for managing cross-chain asset transfer sessions.
+ *
+ * @description
+ * Comprehensive session management implementation that handles the complete
+ * lifecycle of SATP transfer sessions. Manages both client and server session
+ * data, tracks protocol state across all stages, and provides validation
+ * and verification capabilities essential for secure cross-chain transfers.
+ *
+ * **Key Capabilities:**
+ * - **Dual-Side Management**: Handles both client and server session perspectives
+ * - **State Tracking**: Maintains session state across all SATP protocol stages
+ * - **Data Integrity**: Ensures session data consistency and validation
+ * - **Message Management**: Tracks all protocol messages, signatures, and hashes
+ * - **Lifecycle Control**: Manages session creation, operation, and termination
+ * - **Verification Framework**: Provides comprehensive session data verification
+ *
+ * **Session Lifecycle:**
+ * 1. **Creation**: Initialize session with context and configuration
+ * 2. **Data Management**: Store and retrieve session data throughout protocol
+ * 3. **State Tracking**: Monitor and update session state across stages
+ * 4. **Validation**: Verify session data integrity and compliance
+ * 5. **Completion**: Handle session termination and cleanup
+ *
+ * **Architecture Benefits:**
+ * - **Protocol Compliance**: Ensures adherence to IETF SATP specifications
+ * - **Error Resilience**: Comprehensive error handling and recovery
+ * - **Observability**: Full logging and monitoring integration
+ * - **Flexibility**: Supports various transfer scenarios and configurations
+ *
+ * @public
+ * @class SATPSession
+ * @since 2.0.0
+ * @see {@link ISATPSessionOptions} for initialization options
+ * @see {@link SessionData} for session data structure
+ * @see {@link State} for session state enumeration
+ */
 export class SATPSession {
+  /** Class identifier for logging and debugging purposes */
   public static readonly CLASS_NAME = "SATPSession";
+  /** Client-side session data and state information */
   private clientSessionData: SessionData | undefined;
+  /** Server-side session data and state information */
   private serverSessionData: SessionData | undefined;
+  /** SATP-specific logger instance for session operations */
   private readonly logger: Logger;
+  /** Monitoring service for session observability and metrics */
   private readonly monitorService: MonitorService;
 
   constructor(ops: ISATPSessionOptions) {

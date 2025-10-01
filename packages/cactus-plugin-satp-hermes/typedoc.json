@@ -1,0 +1,98 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "SATP Hermes Plugin API Documentation",
+  "entryPoints": [
+    "./src/main/typescript/index.ts",
+    "./src/main/typescript/public-api.ts"
+  ],
+  "entryPointStrategy": "resolve",
+  "out": "./public/typedoc",
+  "theme": "default",
+  "includeVersion": true,
+  "exclude": [
+    "**/node_modules/**",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "**/dist/**",
+    "**/build/**",
+    "**/coverage/**",
+    "**/generated/**",
+    "**/fabric-contracts/**",
+    "**/chaincode-typescript/**"
+  ],
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": true,
+  "readme": "./README.md",
+  "excludeExternals": true,
+  "categorizeByGroup": true,
+  "cleanOutputDir": true,
+  "navigationLinks": {
+    "SATP Protocol": "https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-satp-hermes",
+    "Hyperledger Cacti": "https://hyperledger-cacti.github.io/cacti/",
+    "GitHub Repository": "https://github.com/hyperledger-cacti/cacti"
+  },
+  "searchInComments": true,
+  "sort": ["source-order"],
+  "treatWarningsAsErrors": false,
+  "skipErrorChecking": true,
+  "externalSymbolLinkMappings": {
+    "@hyperledger/cactus-common": {
+      "ISignerKeyPair": "https://hyperledger-cacti.github.io/cacti/interfaces/_hyperledger_cactus_common.ISignerKeyPair.html",
+      "JsObjectSigner": "https://hyperledger-cacti.github.io/cacti/classes/_hyperledger_cactus_common.JsObjectSigner.html",
+      "LogLevelDesc": "https://hyperledger-cacti.github.io/cacti/types/_hyperledger_cactus_common.LogLevelDesc.html",
+      "Logger": "https://hyperledger-cacti.github.io/cacti/classes/_hyperledger_cactus_common.Logger.html",
+      "ILoggerOptions": "https://hyperledger-cacti.github.io/cacti/interfaces/_hyperledger_cactus_common.ILoggerOptions.html"
+    },
+    "@hyperledger/cactus-core": {
+      "PluginRegistry": "https://hyperledger-cacti.github.io/cacti/classes/_hyperledger_cactus_core.PluginRegistry.html"
+    },
+    "@hyperledger/cactus-plugin-bungee-hermes": {
+      "IPrivacyPolicyValue": "#",
+      "IMergePolicyValue": "#"
+    },
+    "class-validator": {
+      "ValidatorOptions": "#"
+    },
+    "knex": {
+      "Knex.Config": "#"
+    },
+    "@types/crypto-js": {
+      "__global.CryptoJS.SHA256": "#"
+    },
+    "safe-stable-stringify": {
+      "stringify": "#"
+    }
+  },
+  "blockTags": [
+    "@alpha",
+    "@beta",
+    "@defaultValue", 
+    "@deprecated",
+    "@example",
+    "@experimental",
+    "@inheritDoc",
+    "@internal",
+    "@override",
+    "@packageDocumentation",
+    "@param",
+    "@privateRemarks",
+    "@public",
+    "@readonly",
+    "@remarks",
+    "@returns",
+    "@sealed",
+    "@see",
+    "@since",
+    "@throws",
+    "@typeParam",
+    "@virtual",
+    "@fileoverview",
+    "@description",
+    "@implements",
+    "@module",
+    "@export",
+    "@extends",
+    "@todo"
+  ]
+}

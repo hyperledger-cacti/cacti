@@ -1,3 +1,37 @@
+/**
+ * @fileoverview SATP Gateway Status Handler Service
+ *
+ * This module provides the business logic for handling SATP session status
+ * requests. Processes status queries by retrieving session information from
+ * the SATP manager and formatting comprehensive status responses including
+ * stage progression, transaction states, and network details.
+ *
+ * The service handles:
+ * - Session status retrieval and validation
+ * - Stage and state information formatting
+ * - Network configuration details
+ * - Error condition mapping and reporting
+ * - Transaction progress tracking
+ *
+ * @example
+ * ```typescript
+ * import { executeGetStatus } from './get-status-handler-service';
+ *
+ * const statusResponse = await executeGetStatus(
+ *   'debug',
+ *   { sessionID: 'session-123' },
+ *   satpManager
+ * );
+ *
+ * console.log('Session stage:', statusResponse.stage);
+ * console.log('Session status:', statusResponse.status);
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
+ */
+
 import { GetStatusError } from "../../core/errors/satp-errors";
 import {
   NetworkId,
@@ -18,6 +52,38 @@ import {
 import { State } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 
+/**
+ * Execute status retrieval for a SATP session.
+ *
+ * Processes a status request by querying the SATP manager for session
+ * information and formatting a comprehensive status response. Includes
+ * error handling for invalid sessions and service failures.
+ *
+ * @param logLevel - Logging level for operation tracking
+ * @param req - Status request with session identifier
+ * @param manager - SATP manager instance for session queries
+ * @returns Promise resolving to formatted status response
+ * @throws GetStatusError for session-specific errors
+ * @throws Error for unexpected service failures
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * try {
+ *   const status = await executeGetStatus(
+ *     'info',
+ *     { sessionID: 'session-abc123' },
+ *     manager
+ *   );
+ *
+ *   console.log(`Session ${status.sessionID} is in ${status.stage} stage`);
+ *   console.log(`Status: ${status.status}, Substatus: ${status.substatus}`);
+ * } catch (error) {
+ *   if (error instanceof GetStatusError) {
+ *     console.error('Session not found:', error.message);
+ *   }
+ * }
+ * ```
+ */
 export async function executeGetStatus(
   logLevel: LogLevelDesc,
   req: StatusRequest,
@@ -46,6 +112,25 @@ export async function executeGetStatus(
   }
 }
 
+/**
+ * Get network configuration details for status responses.
+ *
+ * Maps network identifiers to detailed network configuration objects
+ * including DLT protocol type, subnet information, and gateway details.
+ * Supports multiple ledger types with specific configuration mappings.
+ *
+ * @param networkId - Network identifier containing ledger type and ID
+ * @returns Formatted network details for status response
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const networkId = { id: 'network-1', ledgerType: LedgerType.Besu2X };
+ * const details = getNetworkDetails(networkId);
+ *
+ * console.log('Protocol:', details.dltProtocol);
+ * console.log('Subnet:', details.dltSubnetworkID);
+ * ```
+ */
 function getNetworkDetails(
   networkId: NetworkId,
 ): Transact200ResponseStatusResponseOriginNetwork {
@@ -76,7 +161,23 @@ function getNetworkDetails(
       };
   }
 }
-// TODO call SATP core, use try catch to propagate errors
+
+/**
+ * Internal service function for status retrieval operations.
+ *
+ * Handles the core business logic of retrieving session information
+ * from the SATP manager and constructing formatted status responses.
+ * Includes comprehensive error handling and state mapping.
+ *
+ * @param logLevel - Logging level for internal operation tracking
+ * @param req - Processed status request with session identifier
+ * @param manager - SATP manager instance for session data access
+ * @returns Promise resolving to complete status response
+ * @throws GetStatusError when session is not found or invalid
+ * @todo Call SATP core directly, use try-catch to propagate errors
+ * @internal
+ * @since 0.0.2-beta
+ */
 export async function getStatusService(
   logLevel: LogLevelDesc,
   req: StatusRequest,

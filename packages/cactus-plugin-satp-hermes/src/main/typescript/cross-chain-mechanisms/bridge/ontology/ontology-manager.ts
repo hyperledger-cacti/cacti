@@ -1,7 +1,36 @@
 /**
- * @file ontology-manager.ts
- * @description This file contains the implementation of the OntologyManager class, which is responsible for managing ontologies for different ledger types.
- * It provides methods to load, retrieve, and interact with ontologies.
+ * @fileoverview SATP Asset Ontology Manager
+ *
+ * This module provides the asset ontology management system for SATP cross-chain
+ * operations. The OntologyManager maintains asset definitions, interaction signatures,
+ * and validation rules across different blockchain networks to enable seamless
+ * cross-chain asset representation and transfer operations.
+ *
+ * The ontology manager handles:
+ * - Asset type definitions and mappings
+ * - Cross-chain interaction signature management
+ * - Ledger-specific asset validation rules
+ * - Asset metadata and property standardization
+ * - Cross-network asset compatibility verification
+ * - Dynamic ontology loading and caching
+ *
+ * @example
+ * ```typescript
+ * import { OntologyManager } from './ontology-manager';
+ *
+ * const ontologyManager = new OntologyManager({
+ *   logLevel: 'info',
+ *   ontologiesPath: './ontologies',
+ *   monitorService: monitoringService
+ * });
+ *
+ * const evmInteractions = ontologyManager.getInteractionSignature(LedgerType.Ethereum);
+ * const assetOntology = ontologyManager.getOntologyForAsset('ERC20', LedgerType.Ethereum);
+ * ```
+ *
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @author Hyperledger Cacti Contributors
+ * @since 0.0.2-beta
  */
 
 import { LedgerType } from "@hyperledger/cactus-core-api";
@@ -33,10 +62,21 @@ import {
 import { BridgeLeaf } from "../bridge-leaf";
 
 /**
- * Options for configuring the OntologyManager.
- * @interface IOntologyManagerOptions
- * @property {LogLevelDesc} [logLevel] - The log level for the logger.
- * @property {string} [ontologiesPath] - The path to the directory containing ontology files.
+ * Configuration options for the SATP Ontology Manager.
+ *
+ * Defines the settings required to initialize the ontology management
+ * system including logging configuration, ontology file paths, and
+ * monitoring service integration.
+ *
+ * @since 0.0.2-beta
+ * @example
+ * ```typescript
+ * const options: IOntologyManagerOptions = {
+ *   logLevel: 'debug',
+ *   ontologiesPath: './custom-ontologies',
+ *   monitorService: monitoringService
+ * };
+ * ```
  */
 export interface IOntologyManagerOptions {
   logLevel?: LogLevelDesc;
