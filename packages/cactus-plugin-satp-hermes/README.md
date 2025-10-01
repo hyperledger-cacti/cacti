@@ -353,5 +353,8 @@ We welcome contributions to Hyperledger Cacti in many forms, and there’s alway
 
 Please review [CONTRIBUTING.md](https://github.com/hyperledger/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
 
+## Release process
+TBD. For each release, a commit in the form: "chore(satp-hermes): version X release" will be made.
+
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.

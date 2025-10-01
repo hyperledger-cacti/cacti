@@ -17,6 +17,15 @@ packages/cactus-test-tooling/src/main/typescript/keycloak/keycloak-container.ts
 examples/cactus-example-carbon-accounting-backend/src/main/json/generated/build-info/**
 **/src/main/go/generated/openapi/go-client/client.go
 
+# Generated OpenAPI client files (git_push.sh scripts)
+**/generated/**/typescript-axios/git_push.sh
+examples/cactus-example-cbdc-bridging-backend/src/main/typescript/generated/openapi/typescript-axios/git_push.sh
+packages/cactus-plugin-satp-hermes/src/main/typescript/generated/gateway-client/typescript-axios/git_push.sh
+packages/cactus-plugin-satp-hermes/src/main/typescript/generated/openapi-blo/typescript-axios/git_push.sh
+
+# Generated architecture diagrams
+packages/cactus-plugin-satp-hermes/docs/architecture/satp-hermes-arch-v2.1.0.vsdx
+
 # Cannot be edited as its a name of a imported Corda library, and Corda syntax
 weaver/core/drivers/corda-driver/src/main/kotlin/CustomSerializationWhitelist.kt
 weaver/samples/corda/corda-simple-application/clients/src/main/kotlin/com/cordaSimpleApplication/client/CustomSerializationWhitelist.kt

@@ -282,7 +282,7 @@
       "satp-architecture": "02",
       "satp-crash": "02"
     },
-    "satp-package-version": "0.0.2-beta"
+    "satp-package-version": "0.0.3-beta"
   },
   "watch": {
     "tsc": {
