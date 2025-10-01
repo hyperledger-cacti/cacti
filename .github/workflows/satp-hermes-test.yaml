@@ -50,7 +50,7 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running unit tests with coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit --coverage --coverageDirectory=./code-coverage-ts/satp-hermes || true
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit --coverage --coverageDirectory=./code-coverage-ts/satp-hermes
           else
             echo "Running unit tests without coverage"
             yarn workspace @hyperledger/cactus-plugin-satp-hermes test:unit
@@ -80,22 +80,7 @@ jobs:
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml
           reporter: jest-junit
           list-tests: failed
-          fail-on-error: false  # Don't fail the job, just report results
-
-      - name: Set job outcome based on test results
-        if: always() && steps.check_unit_junit.outputs.found == 'true'
-        run: |
-          if grep -q 'failures="[1-9]' packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml 2>/dev/null; then
-            echo "❌ Unit tests failed - check test results above"
-            echo "::warning::SATP Unit tests have failures"
-            exit 1
-          elif grep -q 'errors="[1-9]' packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml 2>/dev/null; then
-            echo "❌ Unit tests had errors - check test results above"
-            echo "::warning::SATP Unit tests have errors"
-            exit 1
-          else
-            echo "✅ Unit tests passed successfully"
-          fi
+          fail-on-error: false
 
       - name: Check for SATP unit coverage artifacts
         id: check_unit_coverage
@@ -155,7 +140,7 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running integration bridge tests with coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:bridge --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-bridge || true
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:bridge --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-bridge
           else
             echo "Running integration bridge tests without coverage"
             yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:bridge
@@ -245,7 +230,7 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running integration oracle tests with coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:oracle --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-oracle || true
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:oracle --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-oracle
           else
             echo "Running integration oracle tests without coverage"
             yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:oracle
@@ -337,7 +322,7 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running integration gateway tests with coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:gateway --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-gateway || true
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:gateway --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-gateway
           else
             echo "Running integration gateway tests without coverage"
             yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:gateway
@@ -428,7 +413,7 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running integration docker tests with coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:docker --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-docker || true
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:docker --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-integration-docker
           else
             echo "Running integration docker tests without coverage"
             yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:docker
@@ -531,7 +516,7 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running CBDC integration tests with coverage"
-            yarn workspace @hyperledger/cactus-example-cbdc-bridging-backend test:integration --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-cbdc || true
+            yarn workspace @hyperledger/cactus-example-cbdc-bridging-backend test:integration --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-cbdc
           else
             echo "Running CBDC integration tests without coverage"
             yarn workspace @hyperledger/cactus-example-cbdc-bridging-backend test:integration
