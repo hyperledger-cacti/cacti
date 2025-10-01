@@ -564,3 +564,246 @@ jobs:
           name: coverage-reports-satp-hermes-${{ github.job }}
           path: |
             packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
+
+  run-satp-tests-on-chain:
+    if: inputs.skip_tests != true
+    runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      RUN_CODE_COVERAGE: "true"
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: false
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: v22.18.0
+
+      # Download build artifacts using reusable action
+      - name: Download SATP build artifacts
+        uses: ./.github/actions/satp-download-build-artifacts
+
+      # Download generated artifacts
+      - name: Download generated artifacts
+        uses: ./.github/actions/satp-download-generated-artifacts
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - name: Configure and build all packages
+        run: yarn configure
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Run Foundry tests
+        run: |
+          set -euo pipefail
+          cd packages/cactus-plugin-satp-hermes
+          echo "Running Foundry on-chain tests"
+          yarn forge:all
+
+      - name: Upload SATP foundry test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-foundry-report-${{ github.job }}
+          path: |
+            packages/cactus-plugin-satp-hermes/src/test/solidity/generated/**/*
+            packages/cactus-plugin-satp-hermes/src/main/solidity/generated/**/*
+
+  run-satp-tests-recovery:
+    if: inputs.skip_tests != true
+    runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      RUN_CODE_COVERAGE: "true"
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: true
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: v22.18.0
+
+      # Download build artifacts using reusable action
+      - name: Download SATP build artifacts
+        uses: ./.github/actions/satp-download-build-artifacts
+
+      # Download generated artifacts
+      - name: Download generated artifacts
+        uses: ./.github/actions/satp-download-generated-artifacts
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - name: Configure and build all packages
+        run: yarn configure
+
+      - name: Run SATP recovery tests (with optional coverage)
+        run: |
+          set -euo pipefail
+          if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
+            echo "Running recovery tests with coverage"
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:recovery --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-recovery
+          else
+            echo "Running recovery tests without coverage"
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:recovery
+          fi
+
+      - name: Upload SATP recovery test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-recovery-junit-report-${{ github.job }}
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-recovery.xml
+
+      - name: Check for SATP recovery junit report
+        id: check_recovery_junit
+        run: |
+          if [ -f packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-recovery.xml ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report SATP recovery test results (annotate)
+        if: always() && steps.check_recovery_junit.outputs.found == 'true'
+        uses: dorny/test-reporter@v1.9.1
+        with:
+          name: "SATP Recovery Tests"
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-recovery.xml
+          reporter: jest-junit
+          list-tests: failed
+          fail-on-error: false
+
+      - name: Check for SATP recovery coverage artifacts
+        id: check_recovery_coverage
+        run: |
+          if [ -d packages/cactus-plugin-satp-hermes/code-coverage-ts ] || [ -f packages/cactus-plugin-satp-hermes/coverage/coverage-final.json ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload SATP recovery coverage (if present)
+        if: always() && steps.check_recovery_coverage.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports-satp-hermes-${{ github.job }}
+          path: |
+            packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
+
+  run-satp-tests-rollback:
+    if: inputs.skip_tests != true
+    runs-on: ubuntu-latest-16-cores
+    continue-on-error: true
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      RUN_CODE_COVERAGE: "true"
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: true
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: v22.18.0
+
+      # Download build artifacts using reusable action
+      - name: Download SATP build artifacts
+        uses: ./.github/actions/satp-download-build-artifacts
+
+      # Download generated artifacts
+      - name: Download generated artifacts
+        uses: ./.github/actions/satp-download-generated-artifacts
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - name: Configure and build all packages
+        run: yarn configure
+
+      - name: Run SATP rollback tests (with optional coverage)
+        run: |
+          set -euo pipefail
+          if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
+            echo "Running rollback tests with coverage"
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:rollback --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-rollback
+          else
+            echo "Running rollback tests without coverage"
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:rollback
+          fi
+
+      - name: Upload SATP rollback test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-rollback-junit-report-${{ github.job }}
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-rollback.xml
+
+      - name: Check for SATP rollback junit report
+        id: check_rollback_junit
+        run: |
+          if [ -f packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-rollback.xml ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report SATP rollback test results (annotate)
+        if: always() && steps.check_rollback_junit.outputs.found == 'true'
+        uses: dorny/test-reporter@v1.9.1
+        with:
+          name: "SATP Rollback Tests"
+          path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-rollback.xml
+          reporter: jest-junit
+          list-tests: failed
+          fail-on-error: false
+
+      - name: Check for SATP rollback coverage artifacts
+        id: check_rollback_coverage
+        run: |
+          if [ -d packages/cactus-plugin-satp-hermes/code-coverage-ts ] || [ -f packages/cactus-plugin-satp-hermes/coverage/coverage-final.json ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload SATP rollback coverage (if present)
+        if: always() && steps.check_rollback_coverage.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports-satp-hermes-${{ github.job }}
+          path: |
+            packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
