@@ -173,34 +173,29 @@ export function isFabricConfigJSON(
   log: Logger,
 ): obj is FabricConfigJSON {
   if (typeof obj !== "object" || obj === null) {
-    log.error("isFabricConfigJSON: obj is not an object or is null");
     return false;
   }
   const objRecord = obj as Record<string, unknown>;
 
   if (!("channelName" in obj) || typeof objRecord.channelName !== "string") {
-    log.error("isFabricConfigJSON: channelName missing or not a string");
     return false;
   }
   if (
     !("userIdentity" in obj) ||
     !isUserIdentity(objRecord.userIdentity, log)
   ) {
-    log.error("isFabricConfigJSON: userIdentity missing or invalid");
     return false;
   }
   if (
     !("connectorOptions" in obj) ||
     !isFabricOptionsJSON(objRecord.connectorOptions, log)
   ) {
-    log.error("isFabricConfigJSON: connectorOptions missing or invalid");
     return false;
   }
   if (
     !("networkIdentification" in obj) ||
     !isNetworkId(objRecord.networkIdentification)
   ) {
-    log.error("isFabricConfigJSON: networkIdentification missing or invalid");
     return false;
   }
   if (
@@ -210,67 +205,51 @@ export function isFabricConfigJSON(
         (org) => typeof org === "object" && org !== null,
       ))
   ) {
-    log.error("isFabricConfigJSON: targetOrganizations invalid");
     return false;
   }
   if (!("caFilePath" in obj) || typeof objRecord.caFilePath !== "string") {
-    log.error("isFabricConfigJSON: caFilePath missing or not a string");
     return false;
   }
   if (
     !("coreYamlFilePath" in obj) ||
     typeof objRecord.coreYamlFilePath !== "string"
   ) {
-    log.error("isFabricConfigJSON: coreYamlFilePath missing or not a string");
     return false;
   }
   if ("ccSequence" in obj && typeof objRecord.ccSequence !== "number") {
-    log.error("isFabricConfigJSON: ccSequence present but not a number");
     return false;
   }
   if ("orderer" in obj && typeof objRecord.orderer !== "string") {
-    log.error("isFabricConfigJSON: orderer present but not a string");
     return false;
   }
   if (
     "ordererTLSHostnameOverride" in obj &&
     typeof objRecord.ordererTLSHostnameOverride !== "string"
   ) {
-    log.error(
-      "isFabricConfigJSON: ordererTLSHostnameOverride present but not a string",
-    );
     return false;
   }
   if ("connTimeout" in obj && typeof objRecord.connTimeout !== "number") {
-    log.error("isFabricConfigJSON: connTimeout present but not a number");
     return false;
   }
   if (
     "signaturePolicy" in obj &&
     typeof objRecord.signaturePolicy !== "string"
   ) {
-    log.error("isFabricConfigJSON: signaturePolicy present but not a string");
     return false;
   }
   if ("mspId" in obj && typeof objRecord.mspId !== "string") {
-    log.error("isFabricConfigJSON: mspId present but not a string");
     return false;
   }
   if (
     "wrapperContractName" in obj &&
     typeof objRecord.wrapperContractName !== "string"
   ) {
-    log.error(
-      "isFabricConfigJSON: wrapperContractName present but not a string",
-    );
     return false;
   }
   if ("leafId" in obj && typeof objRecord.leafId !== "string") {
-    log.error("isFabricConfigJSON: leafId present but not a string");
     return false;
   }
   if ("keyPair" in obj && !isKeyPairJSON(obj.keyPair)) {
-    log.error("isFabricConfigJSON: keyPair present but invalid");
     return false;
   }
   if (
@@ -278,7 +257,6 @@ export function isFabricConfigJSON(
     (!Array.isArray(objRecord.claimFormats) ||
       !objRecord.claimFormats.every((format) => isClaimFormat(format)))
   ) {
-    log.error("isFabricConfigJSON: claimFormats present but invalid");
     return false;
   }
   return true;
