@@ -37,6 +37,10 @@ on:
         description: "Whether this is a release build"
         value: ${{ jobs.set-docker-tags.outputs.is_release }}
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   # Set Docker tags based on branch and commit information
   set-docker-tags:
