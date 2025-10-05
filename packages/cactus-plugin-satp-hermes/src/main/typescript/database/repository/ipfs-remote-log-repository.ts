@@ -16,7 +16,7 @@
  * @see {@link https://ipfs.io/} InterPlanetary File System
  * @see {@link https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-object-store-ipfs} Cacti IPFS Plugin
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
@@ -41,7 +41,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
  * - Base64 encoding for binary safety
  *
  * @implements {IRemoteLogRepository}
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const repository = new IPFSRemoteLogRepository('http://localhost:5001');
@@ -74,7 +74,7 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
    * log storage and retrieval operations.
    *
    * @param ipfsPath - IPFS API endpoint URL (e.g., 'http://localhost:5001')
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public constructor(ipfsPath: string) {
     const config = new Configuration({ basePath: ipfsPath });
@@ -86,7 +86,7 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
    * Get the class name for debugging and logging purposes.
    *
    * @returns Class name string
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public get className(): string {
     return IPFSRemoteLogRepository.CLASS_NAME;
@@ -102,7 +102,7 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
    * @param logKey - Content-addressed key for the log entry in IPFS
    * @returns Promise resolving to the remote log entry
    * @throws Error if IPFS retrieval fails
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   readById(logKey: string): Promise<RemoteLog> {
     const fnTag = `${this.className}#readById()`;
@@ -130,7 +130,7 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
    * @param log - Remote log entry to store in IPFS
    * @returns Promise resolving when storage completes
    * @throws Error if IPFS storage fails
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   create(log: RemoteLog): any {
     const fnTag = `${this.className}#create()`;
@@ -153,7 +153,7 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
    * This method exists to satisfy the interface contract.
    *
    * @returns Promise resolving immediately
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   async reset() {}
 
@@ -164,7 +164,7 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
    * This method exists to satisfy the interface contract.
    *
    * @returns Promise resolving immediately
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   async destroy() {}
 }

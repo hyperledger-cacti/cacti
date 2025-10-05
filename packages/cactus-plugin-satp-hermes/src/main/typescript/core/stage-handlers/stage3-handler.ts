@@ -95,7 +95,7 @@
  * await stage3Handler.CheckTransferCompleteResponse(completeRes);
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage3ServerService} for server-side business logic
@@ -286,7 +286,7 @@ import {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPHandler} for base handler interface and common methods
  * @see {@link Stage3ServerService} for server-side business logic implementation
  * @see {@link Stage3ClientService} for client-side business logic implementation
@@ -417,7 +417,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * ```
    *
    * @throws {Error} When required configuration options are missing or invalid
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
@@ -1027,7 +1027,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * ```
    *
    * @throws {Error} When router configuration fails or service registration errors occur
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link SatpStage3Service} for service definition
    * @see {@link ConnectRouter} for router interface
    */
@@ -1546,7 +1546,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link TransferCompleteResponse} for response message structure
    * @see {@link Stage3ClientService} for business logic implementation
    */

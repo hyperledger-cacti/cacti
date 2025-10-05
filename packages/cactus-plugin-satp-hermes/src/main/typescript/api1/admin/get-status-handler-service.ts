@@ -29,7 +29,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import { GetStatusError } from "../../core/errors/satp-errors";
@@ -65,7 +65,7 @@ import { LedgerType } from "@hyperledger/cactus-core-api";
  * @returns Promise resolving to formatted status response
  * @throws GetStatusError for session-specific errors
  * @throws Error for unexpected service failures
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * try {
@@ -121,7 +121,7 @@ export async function executeGetStatus(
  *
  * @param networkId - Network identifier containing ledger type and ID
  * @returns Formatted network details for status response
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const networkId = { id: 'network-1', ledgerType: LedgerType.Besu2X };
@@ -176,7 +176,7 @@ function getNetworkDetails(
  * @throws GetStatusError when session is not found or invalid
  * @todo Call SATP core directly, use try-catch to propagate errors
  * @internal
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 export async function getStatusService(
   logLevel: LogLevelDesc,

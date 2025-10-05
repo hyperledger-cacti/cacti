@@ -36,7 +36,7 @@
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import { ILoggerOptions } from "@hyperledger/cactus-common";
@@ -64,7 +64,7 @@ import { MonitorService } from "../services/monitoring/monitor";
  * handler enables fault-tolerant operations following Hermes design patterns.
  *
  * @enum {string}
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const handlerType = SATPHandlerType.STAGE1;
@@ -94,7 +94,7 @@ export enum SATPHandlerType {
  * asset transfers. Each stage has specific responsibilities and message types.
  *
  * @enum {string}
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const currentStage = Stage.STAGE1;
@@ -128,7 +128,7 @@ export enum Stage {
  * for different SATP protocol stages.
  *
  * @interface SATPServiceStatic
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * class MyStage1Service implements SATPServiceStatic {
@@ -167,7 +167,7 @@ export interface SATPServiceStatic {
  * with the Connect protocol routing system.
  *
  * @interface ISATPHandler
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * class MyStage1Handler implements ISATPHandler {
@@ -208,7 +208,7 @@ export interface ISATPHandler {
  * type-safe handler polymorphism and dynamic handler selection based on
  * protocol stage requirements.
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * function createHandler(stage: Stage): SATPHandlerInstance {
@@ -238,7 +238,7 @@ export type SATPHandlerInstance =
  * across all SATP protocol stages.
  *
  * @interface SATPHandler
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * class Stage1Handler implements SATPHandler {
@@ -283,7 +283,7 @@ export interface SATPHandler {
  * protocol operation support.
  *
  * @interface SATPHandlerOptions
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const handlerOptions: SATPHandlerOptions = {

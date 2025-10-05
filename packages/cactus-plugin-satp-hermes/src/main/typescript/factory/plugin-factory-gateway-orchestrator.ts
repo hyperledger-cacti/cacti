@@ -30,7 +30,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import {
@@ -55,7 +55,7 @@ import { validateOrReject } from "class-validator";
  * - Consistent plugin lifecycle management
  *
  * @extends PluginFactory<SATPGateway, SATPGatewayConfig, IPluginFactoryOptions>
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const factory = new PluginFactorySATPGateway();
@@ -115,7 +115,7 @@ export class PluginFactorySATPGateway extends PluginFactory<
    *   },
    *   validationOptions: {
    *     whitelist: true,
-   *     forbidNonWhitelisted: true
+   *     forbidNonAllowListed: true
    *   }
    * };
    *
@@ -127,7 +127,7 @@ export class PluginFactorySATPGateway extends PluginFactory<
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   async create(pluginOptions: SATPGatewayConfig): Promise<SATPGateway> {
     const coordinator = new SATPGateway(pluginOptions);

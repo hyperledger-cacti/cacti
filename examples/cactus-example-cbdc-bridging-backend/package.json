@@ -102,7 +102,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
     "@hyperledger/cactus-plugin-object-store-ipfs": "2.1.0",
-    "@hyperledger/cactus-plugin-satp-hermes": "2.1.0",
+    "@hyperledger/cactus-plugin-satp-hermes": "workspace:*",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@openzeppelin/contracts": "4.9.6",
     "@openzeppelin/contracts-upgradeable": "4.9.6",

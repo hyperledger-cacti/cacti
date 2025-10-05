@@ -42,7 +42,7 @@
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType} for protocol error type enumeration
@@ -91,7 +91,7 @@ import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/com
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.SESSION_NOT_FOUND} for protocol error type
  */
@@ -144,7 +144,7 @@ export class SessionNotFoundError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.SESSION_ID_NOT_FOUND} for protocol error type
  */
@@ -206,7 +206,7 @@ export class SessionIdNotFoundError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class FailedToCreateMessageError extends SATPInternalError {
@@ -276,7 +276,7 @@ export class FailedToCreateMessageError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class FailedToProcessError extends SATPInternalError {
@@ -337,7 +337,7 @@ export class FailedToProcessError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.SENDER_GATEWAY_NETWORK_ID_NOT_FOUND} for protocol error type
  */
@@ -397,7 +397,7 @@ export class SenderGatewayNetworkIdError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.PUBLIC_KEY_NOT_FOUND} for protocol error type
  */
