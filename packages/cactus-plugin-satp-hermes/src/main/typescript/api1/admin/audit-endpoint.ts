@@ -27,7 +27,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import type { Express, Request, Response } from "express";
@@ -58,7 +58,7 @@ import { AuditRequest } from "../../public-api";
  * with the OpenAPI specification for standardized API documentation.
  *
  * @implements IWebServiceEndpoint
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const auditEndpoint = new AuditEndpointV1({
@@ -90,7 +90,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    *
    * @param options - Configuration options for the endpoint
    * @throws Error if required options are missing
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   constructor(public readonly options: IRequestOptions) {
     const fnTag = `${this.className}#constructor()`;
@@ -109,7 +109,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    * endpoint. Used by the Express framework for route registration.
    *
    * @returns HTTP path string for the audit endpoint
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public getPath(): string {
     const apiPath =
@@ -124,7 +124,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    * Used for Express route registration and request validation.
    *
    * @returns HTTP verb in lowercase (e.g., 'get', 'post')
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public getVerbLowerCase(): string {
     const apiPath =
@@ -139,7 +139,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    * specification used for documentation and client generation.
    *
    * @returns OpenAPI operation ID string
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public getOperationId(): string {
     return OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"].get
@@ -155,7 +155,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    *
    * @returns Promise resolving to authorization options
    * @todo Make this an injectable dependency in the constructor
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
     // TODO: make this an injectable dependency in the constructor
@@ -176,7 +176,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    *
    * @param expressApp - Express application instance
    * @returns Promise resolving to the registered endpoint
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public async registerExpress(
     expressApp: Express,
@@ -192,7 +192,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    * Used by the Express framework for request processing.
    *
    * @returns Express request handler function
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public getExpressRequestHandler(): IExpressRequestHandler {
     return this.handleRequest.bind(this);
@@ -209,7 +209,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    * @param res - Express response object for sending results
    * @todo Discover way to inherit OAS schema and have request types here
    * @todo Parameter checks should be enforced by the type system
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;

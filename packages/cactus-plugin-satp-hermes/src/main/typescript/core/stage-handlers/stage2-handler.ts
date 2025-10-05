@@ -73,7 +73,7 @@
  * console.log('Asset locked and assertion validated');
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage2ServerService} for server-side business logic
@@ -232,7 +232,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPHandler} for base handler interface and common methods
  * @see {@link Stage2ServerService} for server-side business logic implementation
  * @see {@link Stage2ClientService} for client-side business logic implementation
@@ -346,7 +346,7 @@ export class Stage2SATPHandler implements SATPHandler {
    * ```
    *
    * @throws {Error} When required configuration options are missing or invalid
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
@@ -486,7 +486,7 @@ export class Stage2SATPHandler implements SATPHandler {
    *                                           [Validate signatures]
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link Stage2ServerService} for business logic implementation
    * @see {@link LockAssertionRequest} for request message structure
    * @see {@link LockAssertionResponse} for response message structure
@@ -667,7 +667,7 @@ export class Stage2SATPHandler implements SATPHandler {
    * ```
    *
    * @throws {Error} When router configuration fails or service registration errors occur
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link SatpStage2Service} for service definition
    * @see {@link ConnectRouter} for router interface
    */
@@ -797,7 +797,7 @@ export class Stage2SATPHandler implements SATPHandler {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link LockAssertionRequest} for message structure
    * @see {@link TransferCommenceResponse} for input message structure
    * @see {@link Stage2ClientService} for business logic implementation

@@ -35,8 +35,8 @@
  * transfer-related data, state, and cryptographic materials.
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
  * @see {@link SessionData} for session data structure
  * @see {@link SATPLogger} for logging integration
@@ -122,7 +122,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  *
  * @public
  * @interface ISATPSessionOptions
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPSession} for session implementation
  * @see {@link MonitorService} for monitoring integration
  */
@@ -173,7 +173,7 @@ export interface ISATPSessionOptions {
  *
  * @public
  * @class SATPSession
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link ISATPSessionOptions} for initialization options
  * @see {@link SessionData} for session data structure
  * @see {@link State} for session state enumeration

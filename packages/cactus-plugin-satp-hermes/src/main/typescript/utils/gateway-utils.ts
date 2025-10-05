@@ -46,7 +46,7 @@
  * @see {@link GatewayPersistence} for log management using these utilities
  * @see {@link SATPGateway} for main gateway implementation using these utilities
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import { JsObjectSigner } from "@hyperledger/cactus-common";
@@ -94,7 +94,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
  * @see {@link verifySignature} for verifying hex-formatted signatures
  * @see {@link JsObjectSigner} for cryptographic operations requiring format conversion
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function bufArray2HexStr(array: Uint8Array | Buffer | string): string {
   if (typeof array === "string") {
@@ -155,7 +155,7 @@ export function bufArray2HexStr(array: Uint8Array | Buffer | string): string {
  * @see {@link JsObjectSigner} for signer configuration and usage
  * @see {@link SATPGateway.gatewaySigner} for gateway signer instance
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function sign(objectSigner: JsObjectSigner, msg: string): Uint8Array {
   return objectSigner.sign(msg);
@@ -230,9 +230,8 @@ export function sign(objectSigner: JsObjectSigner, msg: string): Uint8Array {
  * @see {@link sign} for creating signatures that this function verifies
  * @see {@link bufArray2HexStr} for public key format conversion
  * @see {@link JsObjectSigner.verify} for underlying cryptographic verification
- * @see {@link SATPGateway.verifySignature} for gateway-level signature validation
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function verifySignature(
@@ -344,7 +343,7 @@ export function verifySignature(
  * @see {@link RemoteLog} for distributed logging with standardized keys
  * @see {@link CrashManager} for crash recovery using session keys
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function getSatpLogKey(
   sessionID: string,
@@ -425,12 +424,10 @@ export function getSatpLogKey(
  * }
  * ```
  *
- * @see {@link GatewayPersistence.getHash} for persistence-specific hashing
  * @see {@link sign} for signing hash values for non-repudiation
- * @see {@link SHA256} for underlying hash algorithm
- * @see {@link safeStableStringify} for deterministic object serialization
+ * @see {@link getSatpLogKey} for generating persistence keys from session data
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function getHash(object: unknown): string {
   return SHA256(safeStableStringify(object) ?? "").toString();

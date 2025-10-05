@@ -57,7 +57,7 @@
  * );
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SATPInternalError} for base error class
  * @see {@link RuntimeError} for underlying error infrastructure
@@ -135,7 +135,7 @@ import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/com
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPErrorType} for protocol error type enumeration
  * @see {@link RuntimeError} for base error functionality
  */
@@ -252,7 +252,7 @@ export class SATPInternalError extends RuntimeError {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public getSATPErrorType(): SATPErrorType {
     return this.errorType;
@@ -298,7 +298,7 @@ export class SATPInternalError extends RuntimeError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class BootstrapError extends SATPInternalError {
@@ -370,7 +370,7 @@ export class BootstrapError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class NonExistantGatewayIdentity extends SATPInternalError {
@@ -460,7 +460,7 @@ export class NonExistantGatewayIdentity extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class GetApproveAddressError extends SATPInternalError {
@@ -537,7 +537,7 @@ export class GetApproveAddressError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class GetStatusError extends SATPInternalError {
@@ -610,7 +610,7 @@ export class GetStatusError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class TransactError extends SATPInternalError {
@@ -646,7 +646,7 @@ export class TransactError extends SATPInternalError {
  * @class CreateSATPRequestError
  * @extends SATPInternalError
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class CreateSATPRequestError extends SATPInternalError {
@@ -687,7 +687,7 @@ export class CreateSATPRequestError extends SATPInternalError {
  * @class RetrieveSATPMessageError
  * @extends SATPInternalError
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class RetrieveSATPMessageError extends SATPInternalError {
@@ -752,7 +752,7 @@ export class RetrieveSATPMessageError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class RecoverMessageError extends SATPInternalError {
@@ -814,7 +814,7 @@ export class RecoverMessageError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class BLODispatcherErraneousError extends SATPInternalError {
@@ -875,7 +875,7 @@ export class BLODispatcherErraneousError extends SATPInternalError {
  * ```
  *
  * @todo Implement client-facing error logic that maps SATPInternalErrors to user-friendly errors
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for internal error representation
  */
 export class SATPError extends Error {

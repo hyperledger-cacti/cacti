@@ -63,7 +63,7 @@
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link CommonSatp} for common message structure
  * @see {@link SessionData} for session data structure
@@ -208,7 +208,7 @@ import { getMessageTypeName } from "../satp-utils";
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link CommonSatp} for common message field structure
  * @see {@link SessionData} for session data structure
  * @see {@link MessageType} for supported message types
@@ -416,7 +416,7 @@ export function commonBodyVerifier(
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link JsObjectSigner} for cryptographic signer interface
  * @see {@link verifySignature} for underlying signature verification logic
  * @see {@link SessionData} for session data and public key storage

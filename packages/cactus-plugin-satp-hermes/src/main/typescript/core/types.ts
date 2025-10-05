@@ -24,8 +24,8 @@
  * - **Documentation**: Well-documented types for developer experience
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link SATPGateway} for gateway implementation
  * @see {@link SATPSession} for session management
  * @see {@link NetworkId} for network identification

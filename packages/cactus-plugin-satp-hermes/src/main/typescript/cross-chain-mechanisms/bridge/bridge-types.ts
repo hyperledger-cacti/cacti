@@ -13,7 +13,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import { NetworkId } from "../../public-api";
@@ -25,7 +25,7 @@ import { NetworkId } from "../../public-api";
  * execution including transaction identifiers, receipts, and operation
  * outputs across different blockchain networks.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const response: TransactionResponse = {
@@ -51,7 +51,7 @@ export interface TransactionResponse {
  * required for establishing bridge connections to specific blockchain
  * networks within the SATP ecosystem.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const networkOptions: INetworkOptions = {

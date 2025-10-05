@@ -1,0 +1,118 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+
+graph TB
+    subgraph API3["🔗 API3 - SATP Protocol gRPC/ConnectRPC"]
+        direction TB
+        
+        subgraph ClientServices["📤 Client Services - Outbound Requests"]
+            direction TB
+            
+            subgraph Stage0Client["Stage 0 - Transfer Initiation (Client)"]
+                S0C_Propose["<b>Transfer Proposal Request</b><br/>stage0-client-service.ts<br/>sendTransferProposalRequest()<br/>Asset details<br/>Gateway info<br/>Cryptographic proof"]
+                S0C_Response["<b>Receive Proposal Response</b><br/>receiveTransferProposalResponse()<br/>Acknowledgment<br/>Session ID<br/>Acceptance/Rejection"]
+            end
+            
+            subgraph Stage1Client["Stage 1 - Lock Assertion (Client)"]
+                S1C_Lock["<b>Lock Assertion Request</b><br/>stage1-client-service.ts<br/>sendLockAssertionRequest()<br/>Lock proof<br/>Claim format<br/>Expiration time"]
+                S1C_Response["<b>Receive Lock Response</b><br/>receiveLockAssertionResponse()<br/>Lock acknowledgment<br/>Claim verification<br/>Receipt signature"]
+            end
+            
+            subgraph Stage2Client["Stage 2 - Commitment (Client)"]
+                S2C_Prepare["<b>Commit Prepare Request</b><br/>stage2-client-service.ts<br/>sendCommitPrepareRequest()<br/>Commitment message<br/>Hash preimage<br/>Digital signature"]
+                S2C_Ready["<b>Commit Ready Request</b><br/>sendCommitReadyRequest()<br/>Ready signal<br/>Final commitment<br/>Signed receipt"]
+            end
+            
+            subgraph Stage3Client["Stage 3 - Completion (Client)"]
+                S3C_Final["<b>Commit Final Assertion</b><br/>stage3-client-service.ts<br/>sendCommitFinalAssertionRequest()<br/>Transfer completion<br/>Unlock proof<br/>Success confirmation"]
+                S3C_Ack["<b>Transfer Complete Ack</b><br/>sendTransferCompleteRequest()<br/>Final acknowledgment<br/>Session closure<br/>Audit trail"]
+            end
+        end
+        
+        subgraph ServerServices["📥 Server Services - Inbound Handlers"]
+            direction TB
+            
+            subgraph Stage0Server["Stage 0 - Transfer Initiation (Server)"]
+                S0S_Receive["<b>Receive Proposal Request</b><br/>stage0-server-service.ts<br/>receiveTransferProposalRequest()<br/>Validate request<br/>Policy check<br/>Session creation"]
+                S0S_Send["<b>Send Proposal Response</b><br/>sendTransferProposalResponse()<br/>Accept/Reject<br/>Session details<br/>Gateway commitment"]
+            end
+            
+            subgraph Stage1Server["Stage 1 - Lock Assertion (Server)"]
+                S1S_Receive["<b>Receive Lock Assertion</b><br/>stage1-server-service.ts<br/>receiveLockAssertionRequest()<br/>Verify lock proof<br/>Validate claim<br/>Record state"]
+                S1S_Send["<b>Send Lock Response</b><br/>sendLockAssertionResponse()<br/>Acknowledgment<br/>Receipt generation<br/>Signature creation"]
+            end
+            
+            subgraph Stage2Server["Stage 2 - Commitment (Server)"]
+                S2S_Prepare["<b>Receive Commit Prepare</b><br/>stage2-server-service.ts<br/>receiveCommitPrepareRequest()<br/>Verify commitment<br/>Store preimage hash<br/>Validate signature"]
+                S2S_Ready["<b>Receive Commit Ready</b><br/>receiveCommitReadyRequest()<br/>Confirm readiness<br/>Receipt verification<br/>State transition"]
+            end
+            
+            subgraph Stage3Server["Stage 3 - Completion (Server)"]
+                S3S_Final["<b>Receive Commit Final</b><br/>stage3-server-service.ts<br/>receiveCommitFinalAssertionRequest()<br/>Verify completion<br/>Unlock verification<br/>Success validation"]
+                S3S_Complete["<b>Receive Transfer Complete</b><br/>receiveTransferCompleteRequest()<br/>Final confirmation<br/>Session finalization<br/>Audit log"]
+            end
+        end
+        
+        subgraph CrashRecovery["🚨 Crash Recovery Protocol"]
+            direction LR
+            CrashClient["<b>Recovery Client</b><br/>crash-management/client-service.ts<br/>sendRecoveryUpdateRequest()<br/>State restoration<br/>Rollback initiation"]
+            CrashServer["<b>Recovery Server</b><br/>crash-management/server-service.ts<br/>receiveRecoveryUpdateRequest()<br/>Recovery coordination<br/>Rollback execution"]
+        end
+    end
+    
+    subgraph ProtocolFlow["🔄 Message Flow"]
+        direction TB
+        SourceGW["<b>Source Gateway</b><br/>Transfer initiator<br/>Asset sender<br/>Client role"]
+        DestGW["<b>Destination Gateway</b><br/>Transfer receiver<br/>Asset recipient<br/>Server role"]
+    end
+    
+    %% Client to Counterparty Gateway
+    S0C_Propose -.->|"gRPC/ConnectRPC"| DestGW
+    S1C_Lock -.->|"gRPC/ConnectRPC"| DestGW
+    S2C_Prepare -.->|"gRPC/ConnectRPC"| DestGW
+    S2C_Ready -.->|"gRPC/ConnectRPC"| DestGW
+    S3C_Final -.->|"gRPC/ConnectRPC"| DestGW
+    S3C_Ack -.->|"gRPC/ConnectRPC"| DestGW
+    
+    %% Server receives from Remote Gateway
+    SourceGW -.->|"gRPC/ConnectRPC"| S0S_Receive
+    SourceGW -.->|"gRPC/ConnectRPC"| S1S_Receive
+    SourceGW -.->|"gRPC/ConnectRPC"| S2S_Prepare
+    SourceGW -.->|"gRPC/ConnectRPC"| S2S_Ready
+    SourceGW -.->|"gRPC/ConnectRPC"| S3S_Final
+    SourceGW -.->|"gRPC/ConnectRPC"| S3S_Complete
+    
+    %% Stage transitions
+    S0C_Propose --> S0C_Response
+    S0C_Response --> S1C_Lock
+    S1C_Lock --> S1C_Response
+    S1C_Response --> S2C_Prepare
+    S2C_Prepare --> S2C_Ready
+    S2C_Ready --> S3C_Final
+    S3C_Final --> S3C_Ack
+    
+    S0S_Receive --> S0S_Send
+    S0S_Send --> S1S_Receive
+    S1S_Receive --> S1S_Send
+    S1S_Send --> S2S_Prepare
+    S2S_Prepare --> S2S_Ready
+    S2S_Ready --> S3S_Final
+    S3S_Final --> S3S_Complete
+    
+    %% Crash recovery connections
+    CrashClient -.->|"Recovery protocol"| DestGW
+    SourceGW -.->|"Recovery protocol"| CrashServer
+    
+    %% Style definitions
+    classDef primaryStyle fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff
+    classDef secondaryStyle fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46
+    classDef tertiaryStyle fill:#86efac,stroke:#4ade80,stroke-width:3px,color:#065f46
+    classDef quaternaryStyle fill:#bbf7d0,stroke:#86efac,stroke-width:3px,color:#065f46
+    classDef quinaryStyle fill:#dcfce7,stroke:#bbf7d0,stroke-width:2px,color:#065f46
+    classDef externalStyle fill:#f0fdf4,stroke:#86efac,stroke-width:2px,color:#065f46
+    
+    class S0C_Propose,S0C_Response primaryStyle
+    class S1C_Lock,S1C_Response,S0S_Receive,S0S_Send secondaryStyle
+    class S2C_Prepare,S2C_Ready,S1S_Receive,S1S_Send tertiaryStyle
+    class S3C_Final,S3C_Ack,S2S_Prepare,S2S_Ready quaternaryStyle
+    class S3S_Final,S3S_Complete,CrashClient,CrashServer quinaryStyle
+    class SourceGW,DestGW externalStyle

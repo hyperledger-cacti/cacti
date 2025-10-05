@@ -38,8 +38,8 @@
  * - **Error Handling**: Comprehensive error tracking and reporting
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
  * @see {@link SATPSession} for session management integration
  * @see {@link SessionData} for session data structure
@@ -121,7 +121,7 @@ import { TokenType as ProtoTokenType } from "../generated/proto/cacti/satp/v02/c
  *
  * @public
  * @enum {string}
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export enum TimestampType {
   /** Timestamp when message processing was completed */
@@ -141,7 +141,7 @@ export enum TimestampType {
  *
  * @public
  * @enum {string}
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export enum SessionType {
   /** Server-side session operations and message handling */
@@ -169,7 +169,7 @@ export enum SessionType {
  * @public
  * @function populateClientSessionData
  * @param {SATPSession} session - SATP session instance to populate
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPSession} for session management
  * @see {@link SessionData} for data structure details
  */
@@ -384,7 +384,7 @@ export function copySessionDataAttributes(
  * @param {string} [time] - Optional pre-calculated timestamp (ISO string format)
  * @returns {void}
  * @throws {Error} When session data is not provided
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link TimestampType} for timestamp type options
  * @see {@link MessageType} for message type enumeration
  */

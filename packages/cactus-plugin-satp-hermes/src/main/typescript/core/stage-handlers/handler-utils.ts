@@ -34,7 +34,7 @@
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SessionIdNotFoundError} for session validation error handling
  *
@@ -133,7 +133,7 @@ import { SessionIdNotFoundError } from "../errors/satp-handler-errors";
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SessionIdNotFoundError} for specific error type
  * @see {@link SATPHandler} for stage handler interface
  */

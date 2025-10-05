@@ -1,180 +1,161 @@
-# SATP Hermes Plugin Documentation
+# SATP Hermes Plugin - Documentation
 
-This directory contains the configuration and generated documentation for the SATP (Secure Asset Transfer Protocol) Hermes plugin.
+This directory contains comprehensive documentation and high-quality architecture diagrams for the SATP (Secure Asset Transfer Protocol) Hermes plugin.
 
-## 🎯 What's Been Set Up
+## 📊 Architecture Diagrams
 
-### Configuration Files
-- ✅ **`typedoc.json`** - Main TypeDoc configuration
-- ✅ **Custom CSS** - `docs/assets/styles/satp-typedoc.css` for SATP branding
-- ✅ **Documentation README** - `docs/README.md` with usage instructions
+Professional Mermaid diagrams showing the complete SATP Hermes architecture. All diagrams use a **high-contrast green color palette** optimized for visibility on both light and dark backgrounds.
 
-### Directory Structure
-```
-packages/cactus-plugin-satp-hermes/
-├── typedoc.json                    # TypeDoc configuration
-├── docs/
-│   ├── README.md                   # Documentation guide
-│   └── assets/
-│       └── styles/
-│           └── satp-typedoc.css    # Custom styling
-└── public/
-    └── typedoc/                    # Generated documentation (gitignored)
-```
+### Available Formats
 
-## Documentation Generation
+#### 🎨 **SVG** - Web-optimized vector graphics (2x scale, 19-73 KB)
+#### 📄 **PDF** - Print-ready documents (3x scale, 46-140 KB, white background)
+#### 🖼️ **PNG** - 4K raster images (3840px width, ultra high-res)
 
-The project uses [TypeDoc](https://typedoc.org/) to generate API documentation from TypeScript source code and comments.
+### Architecture Overview Diagrams
 
-### Quick Start
+1. **architecture-overview** - Complete system architecture with all layers
+2. **entrypoint-flow** - Gateway initialization sequence diagram
+3. **entrypoint-use-cases** - Three deployment scenarios
 
-```bash
-# Generate documentation
-npm run docs:generate
+### Module-Level Diagrams
 
-# Serve documentation locally (http://localhost:8080) - Python
-npm run docs:serve
+4. **module-core** - SATP protocol implementation with stage handlers
+5. **module-api** - REST endpoints and dispatcher routing
+6. **module-cross-chain** - Bridge and oracle mechanisms
+7. **module-database** - Persistence layer and repositories
+8. **module-services** - Gateway orchestration and monitoring
+9. **module-factory** - Component creation and dependency injection
 
-# Alternative: Pure Node.js server (no external deps)
-npm run docs:serve:node
+### API Layer Diagrams
 
-# Alternative: Open directly in browser
-npm run docs:open
+10. **api1-endpoints** - BLO REST endpoints (admin, transactions, oracle)
+11. **api3-satp-protocol** - SATP gRPC/ConnectRPC protocol interactions
 
-# Clean generated documentation
-npm run docs:clean
+### Color Palette (High Contrast)
 
-# Watch for changes and regenerate
-npm run docs:watch
+| Component | Color | Hex | Visibility |
+|-----------|-------|-----|------------|
+| Entry Points | Bright Emerald | `#22c55e` | White text, 4px borders |
+| Core Services | Medium Green | `#4ade80` | Dark text, high contrast |
+| Cross-Chain | Light Green | `#86efac` | Visible connections |
+| Data Layer | Pale Green | `#bbf7d0` | Subtle hierarchy |
+| Protocol Stages | Ice Green | `#dcfce7` | Light backgrounds |
 
-# Validate documentation completeness
-npm run docs:validate
-```
+**Features:** 4px borders • White text on dark BG • Light green lines (#86efac) • Rounded corners • Works on light/dark themes
 
-### Available Scripts
-
-| Script | Description |
-|--------|-------------|
-| `docs:generate` | Generate TypeDoc documentation from source code |
-| `docs:serve` | Start Python HTTP server (no deps required) |
-| `docs:serve:node` | Start pure Node.js server (no external deps) |
-| `docs:open` | Open documentation directly in default browser |
-| `docs:clean` | Remove generated documentation files |
-| `docs:watch` | Watch for changes and auto-regenerate |
-| `docs:validate` | Check for missing documentation |
-| `docs:validate:strict` | Validate with warnings treated as errors |
-| `docs:build` | Clean and generate documentation |
-| `docs:dev` | Generate and serve documentation locally |
-| `docs:check` | Comprehensive build and validation check |
-
-### Package.json Scripts Implementation
-```json
-{
-  "docs:clean": "rm -rf ./public/typedoc",
-  "docs:generate": "typedoc --options typedoc.json",
-  "docs:serve": "python3 -m http.server 8080 --directory ./public/typedoc || python -m SimpleHTTPServer 8080",
-  "docs:serve:node": "node -e \"const http=require('http'),fs=require('fs'),path=require('path'); http.createServer((req,res)=>{const file=path.join('./public/typedoc',req.url==='/'?'index.html':req.url); fs.readFile(file,(err,data)=>{if(err){res.writeHead(404);res.end('Not found');return;} const ext=path.extname(file); const mime={'html':'text/html','css':'text/css','js':'application/javascript','png':'image/png','jpg':'image/jpeg','svg':'image/svg+xml'}; res.writeHead(200,{'Content-Type':mime[ext.slice(1)]||'text/plain'}); res.end(data);});}).listen(8080,()=>console.log('Docs server running at http://localhost:8080'));\"",
-  "docs:open": "open ./public/typedoc/index.html || xdg-open ./public/typedoc/index.html || start ./public/typedoc/index.html",
-  "docs:validate": "typedoc --options typedoc.json --validation.notDocumented",
-  "docs:validate:strict": "typedoc --options typedoc.json --validation.notDocumented --treatWarningsAsErrors",
-  "docs:watch": "typedoc --options typedoc.json --watch",
-  "docs:build": "npm run docs:clean && npm run docs:generate && echo 'Documentation built successfully!'",
-  "docs:dev": "npm run docs:generate && npm run docs:serve",
-  "docs:check": "npm run build && npm run docs:validate && echo 'All SATP components documented!'"
-}
-
-### Configuration
-
-The documentation is configured via `typedoc.json`:
-
-- **Entry Points**: `./src/main/typescript` - Main TypeScript source directory
-- **Output**: `./public/typedoc` - Generated documentation location
-- **Theme**: Default TypeDoc theme with custom CSS styling
-- **Exclusions**: Test files, generated code, and build artifacts are excluded
-
-### Key Features
-- **Clean documentation generation** with minimal warnings
-- **Focused entry points** using main API files only
-- **Comprehensive exclusions** for test files, generated code, and fabric contracts
-- **Navigation links** to SATP specification and Hyperledger Cacti
-- **Auto-cleanup** and watch mode support
-- **Validation** tools for documentation completeness
-- **Default TypeDoc theme** for maximum compatibility
-
-### Configuration Highlights
-
-The documentation is configured for **clean, warning-free generation**:
-- **Entry Points**: Main API files (`index.ts`, `public-api.ts`) for focused documentation  
-- **Theme**: Default TypeDoc theme for maximum compatibility
-- **Exclusions**: Test files, generated code, fabric contracts, and chaincode
-- **Block Tags**: Custom JSDoc tags recognized to eliminate warnings
-- **Error Handling**: Skip error checking and treat warnings as non-fatal
-
-### Documentation Structure
-
-The generated documentation includes:
-
-1. **API Reference** - Complete TypeScript API documentation
-2. **Module Documentation** - Organized by functionality
-3. **Class Hierarchies** - Inheritance and implementation details
-4. **Interface Documentation** - Contract definitions
-5. **Type Definitions** - Custom types and enums
-
-### External Links
-
-- [SATP Protocol Specification](https://datatracker.ietf.org/doc/draft-hardjono-sat/)
-- [Hyperledger Cacti Documentation](https://hyperledger-cacti.github.io/cacti/)
-- [GitHub Repository](https://github.com/hyperledger-cacti/cacti)
-
-### Contributing
-
-When adding new code:
-
-1. Include comprehensive JSDoc comments
-2. Document all public methods and classes
-3. Add usage examples where appropriate
-4. Run `npm run docs:validate` to check completeness
-5. Test generated documentation locally
-
-## 🚀 Quick Usage
+## 🛠️ Generating Diagrams
 
 ```bash
-# Generate and serve documentation
-npm run docs:generate && npm run docs:serve
+# Generate SVG (default, recommended)
+yarn docs:diagrams
 
-# Development workflow with auto-regeneration
-npm run docs:watch
+# Generate 4K PNG (presentations)
+yarn docs:diagrams:png
 
-# Validate all code is documented
-npm run docs:validate
+# Generate PDF (print/reports)
+yarn docs:diagrams:pdf
 
-# Comprehensive build and validation
-npm run docs:check
+# Generate ALL formats (SVG + PNG + PDF)
+yarn docs:diagrams:all
 ```
 
-## ✅ Verification Status
-
-- TypeDoc successfully generates from `./src/main/typescript`
-- Documentation outputs to `./public/typedoc`
-- Local server runs on `http://localhost:8080`
-- Custom CSS styling is applied correctly
-- All required dependencies are available (TypeDoc 0.28.13)
-
-### Deployment
-
-For production deployment:
+## 📖 Complete Documentation Workflow
 
 ```bash
-npm run docs:build
-# Copy ./public/typedoc contents to web server
+# Clean previous builds
+yarn docs:clean
+
+# Generate diagrams + TypeDoc
+yarn docs:generate
+
+# Serve at http://localhost:8080
+yarn docs:serve
+
+# Open in browser
+yarn docs:open
+
+# Watch for changes
+yarn docs:watch
+
+# Validate completeness
+yarn docs:validate
 ```
 
-The documentation is self-contained and can be served from any static web server.
+## 📁 Directory Structure
 
-## 📝 Notes
+```
+docs/
+├── README.md                           # This file
+├── diagrams/                          # Mermaid source (.mmd)
+│   ├── architecture-overview.mmd      # System overview
+│   ├── entrypoint-flow.mmd            # Initialization sequence
+│   ├── entrypoint-use-cases.mmd       # Deployment scenarios
+│   ├── module-core.mmd                # Core protocol module
+│   ├── module-api.mmd                 # REST API layer
+│   ├── module-cross-chain.mmd         # Bridge & oracle
+│   ├── module-database.mmd            # Persistence layer
+│   ├── module-services.mmd            # Gateway services
+│   ├── module-factory.mmd             # Component factory
+│   ├── api1-endpoints.mmd             # BLO REST endpoints
+│   └── api3-satp-protocol.mmd         # SATP protocol gRPC
+└── architecture/
+    └── satp-hermes.md                 # Main architecture doc
 
-- The configuration excludes generated files, tests, and build artifacts
-- Custom CSS provides SATP-specific branding and improved UX
-- Documentation is gitignored to avoid repository bloat
-- All scripts use existing project dependencies (no new installations needed)
-- Ready for production deployment via static file hosting
+assets/                                # Package root assets
+└── diagrams/                          # Generated outputs (11 diagrams)
+    ├── *.svg  (2x scale, transparent, 19-73 KB)
+    ├── *.png  (4K, 3840px, large files)
+    └── *.pdf  (3x scale, white BG, 46-140 KB)
+```
+
+## 🎨 Customizing Diagrams
+
+Edit `.mmd` files in `docs/diagrams/`, then regenerate:
+
+```bash
+yarn docs:diagrams
+```
+
+**Resources:**
+- [Mermaid Docs](https://mermaid.js.org/)
+- [Flowchart Syntax](https://mermaid.js.org/syntax/flowchart.html)
+- [Sequence Diagrams](https://mermaid.js.org/syntax/sequenceDiagram.html)
+
+## 📚 Available Scripts
+
+| Script | Output | Description |
+|--------|--------|-------------|
+| `docs:diagrams` | SVG | Web-optimized (2x scale) |
+| `docs:diagrams:png` | PNG | 4K high-res (3840px) |
+| `docs:diagrams:pdf` | PDF | Print-ready (3x scale) |
+| `docs:diagrams:all` | All | SVG + PNG + PDF |
+| `docs:generate` | TypeDoc | Complete docs + diagrams |
+| `docs:serve` | Server | http://localhost:8080 |
+| `docs:validate` | Check | Documentation completeness |
+| `docs:build` | Full | Clean + generate + validate |
+
+## 🚀 Quick Tips
+
+- ✅ **Web docs**: Use SVG (best quality/size)
+- ✅ **Presentations**: Use PNG (4K, universal)
+- ✅ **Print/Reports**: Use PDF (professional)
+
+## 🔧 Configuration
+
+- **TypeDoc**: `typedoc.json` in root
+- **Main Doc**: `docs/architecture/satp-hermes.md`
+- **Mermaid CLI**: Puppeteer renderer, custom green theme
+- **Quality**: SVG (2x), PNG (4K @ 2x), PDF (3x, white BG)
+
+## ✅ Status
+
+- 3 professional diagrams with high-contrast colors
+- Multiple export formats (SVG/PNG/PDF)
+- Optimized for light/dark backgrounds
+- Integrated with TypeDoc build
+- Production-ready
+
+---
+
+**Tip**: SVG is recommended for web (infinite scalability, small size). Generate PNG/PDF only when specifically needed.
