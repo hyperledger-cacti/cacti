@@ -28,7 +28,7 @@
  *
  * @see {@link https://microservices.io/patterns/observability/health-check-api.html} Health Check API Pattern
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import {
@@ -67,7 +67,7 @@ import {
  *
  * @class HealthCheckEndpointV1
  * @implements {IWebServiceEndpoint}
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const healthEndpoint = new HealthCheckEndpointV1({

@@ -16,7 +16,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import { asError } from "@hyperledger/cactus-common";
@@ -30,7 +30,7 @@ import { OracleTaskModeEnum, OracleTaskTypeEnum } from "../../public-api";
  * with support for error codes, tracing information, and cause tracking.
  * Used as the base class for all bridge-related error scenarios.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * throw new BridgeInternalError(
@@ -51,7 +51,7 @@ export class BridgeInternalError extends RuntimeError {
    * @param code - HTTP-style error code (default: 500)
    * @param traceID - Optional trace identifier for debugging
    * @param trace - Optional stack trace information
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   constructor(
     public message: string,

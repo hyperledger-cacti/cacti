@@ -28,8 +28,8 @@
  * follows consistent patterns and integrates properly with the monitoring infrastructure.
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link SATPLogger} for SATP logger implementation
  * @see {@link MonitorService} for monitoring integration
  * @see {@link ILoggerOptions} for logger configuration options
@@ -60,7 +60,7 @@ import { MonitorService } from "../services/monitoring/monitor";
  *
  * @public
  * @class SATPLoggerProvider
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPLogger} for logger implementation details
  * @see {@link getOrCreate} for logger factory method
  * @see {@link setLogLevel} for global log level management
@@ -120,7 +120,7 @@ export class SATPLoggerProvider {
    * );
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link SATPLogger} for logger implementation
    * @see {@link ILoggerOptions} for configuration options
    */
@@ -195,7 +195,7 @@ export class SATPLoggerProvider {
    * SATPLoggerProvider.setLogLevel('warn');
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link LogLevelDesc} for available log levels
    * @see {@link SATPLogger.setLogLevel} for individual logger level setting
    */

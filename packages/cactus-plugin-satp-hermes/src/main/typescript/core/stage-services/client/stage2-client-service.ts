@@ -101,7 +101,7 @@ export class Stage2ClientService extends SATPService {
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${messageType}`);
         await this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: messageType,
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -110,7 +110,7 @@ export class Stage2ClientService extends SATPService {
         try {
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -190,7 +190,7 @@ export class Stage2ClientService extends SATPService {
           );
 
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "done",
             data: safeStableStringify(sessionData),
@@ -203,7 +203,7 @@ export class Stage2ClientService extends SATPService {
         } catch (error) {
           this.Log.error(`fail-${messageType}`, error);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "fail",
             data: safeStableStringify(sessionData),
@@ -295,7 +295,7 @@ export class Stage2ClientService extends SATPService {
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${stepTag}`);
         this.dbLogger.storeProof({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: "lock-asset",
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -304,7 +304,7 @@ export class Stage2ClientService extends SATPService {
         try {
           this.Log.info(`exec-${stepTag}`);
           this.dbLogger.storeProof({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "lock-asset",
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -371,7 +371,7 @@ export class Stage2ClientService extends SATPService {
           );
 
           this.dbLogger.storeProof({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "lock-asset",
             operation: "done",
             data: safeStableStringify(sessionData.lockAssertionClaim.proof),
@@ -380,7 +380,7 @@ export class Stage2ClientService extends SATPService {
           this.Log.info(`${fnTag}, done-${fnTag}`);
         } catch (error) {
           this.dbLogger.storeProof({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "lock-asset",
             operation: "fail",
             data: safeStableStringify(sessionData),

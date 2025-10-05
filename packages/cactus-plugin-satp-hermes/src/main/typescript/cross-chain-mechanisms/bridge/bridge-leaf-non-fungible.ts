@@ -40,7 +40,7 @@
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link BridgeLeafFungible} for fungible asset operations
  * @see {@link BridgeManagerClientInterface} for bridge endpoint management
@@ -93,7 +93,7 @@
  * ```
  *
  * @abstract
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
  * @see {@link https://eips.ethereum.org/EIPS/eip-721} ERC-721 NFT Standard
  * @see {@link BridgeLeafFungible} for fungible asset operations
@@ -143,7 +143,7 @@ export abstract class BridgeLeafNonFungible {
    * console.log(`Deployment gas used: ${receipt.gasUsed}`);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    * @see {@link https://eips.ethereum.org/EIPS/eip-721} ERC-721 NFT Standard
    * @see {@link getDeployNonFungibleWrapperContractReceipt} for deployment receipt
@@ -197,7 +197,7 @@ export abstract class BridgeLeafNonFungible {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link deployNonFungibleWrapperContract} for wrapper deployment
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    */

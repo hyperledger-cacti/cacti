@@ -66,7 +66,7 @@
  * @see {@link ./generated/gateway-client/typescript-axios} for REST API client interfaces
  * @see {@link SATPGateway} for server-side gateway implementation (Node.js only)
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  *
  * @remarks
  * This empty export serves as a placeholder for future browser-compatible

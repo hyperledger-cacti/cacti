@@ -2,8 +2,17 @@
   "$schema": "https://typedoc.org/schema.json",
   "name": "SATP Hermes Plugin API Documentation",
   "entryPoints": [
-    "./src/main/typescript/index.ts",
-    "./src/main/typescript/public-api.ts"
+    "./src/main/typescript/plugin-satp-hermes-gateway.ts",
+    "./src/main/typescript/plugin-satp-hermes-gateway-cli.ts",
+    "./src/main/typescript/public-api.ts",
+    "./src/main/typescript/api1",
+    "./src/main/typescript/core",
+    "./src/main/typescript/cross-chain-mechanisms",
+    "./src/main/typescript/database",
+    "./src/main/typescript/services",
+    "./src/main/typescript/factory",
+    "./src/main/typescript/types",
+    "./src/main/typescript/utils"
   ],
   "entryPointStrategy": "resolve",
   "out": "./public/typedoc",
@@ -16,7 +25,6 @@
     "**/dist/**",
     "**/build/**",
     "**/coverage/**",
-    "**/generated/**",
     "**/fabric-contracts/**",
     "**/chaincode-typescript/**"
   ],
@@ -24,10 +32,44 @@
   "excludeProtected": false,
   "excludeInternal": true,
   "readme": "./README.md",
-  "excludeExternals": true,
+  "excludeExternals": false,
+  "validation": {
+    "notExported": false,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "requiredToBeDocumented": [],
+  "treatValidationWarningsAsErrors": false,
   "categorizeByGroup": true,
+  "groupOrder": [
+    "Entry Points",
+    "SATP Gateway",
+    "Gateway CLI", 
+    "API Layer",
+    "Core - Protocol Engine",
+    "Core - Session Management",
+    "Core - Crash Recovery",
+    "Core - Error Handling",
+    "Core - Stage Handlers",
+    "Core - Stage Services",
+    "Cross-Chain Mechanisms",
+    "Cross-Chain Bridge",
+    "Cross-Chain Oracle",
+    "Database & Persistence",
+    "Database Repositories",
+    "Services",
+    "Network Identification",
+    "Gateway Services",
+    "Monitoring",
+    "Validation",
+    "Factory & Configuration",
+    "Type Definitions",
+    "Utilities",
+    "*"
+  ],
   "cleanOutputDir": true,
   "navigationLinks": {
+    "Documentation": "./docs/",
     "SATP Protocol": "https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-satp-hermes",
     "Hyperledger Cacti": "https://hyperledger-cacti.github.io/cacti/",
     "GitHub Repository": "https://github.com/hyperledger-cacti/cacti"
@@ -36,63 +78,5 @@
   "sort": ["source-order"],
   "treatWarningsAsErrors": false,
   "skipErrorChecking": true,
-  "externalSymbolLinkMappings": {
-    "@hyperledger/cactus-common": {
-      "ISignerKeyPair": "https://hyperledger-cacti.github.io/cacti/interfaces/_hyperledger_cactus_common.ISignerKeyPair.html",
-      "JsObjectSigner": "https://hyperledger-cacti.github.io/cacti/classes/_hyperledger_cactus_common.JsObjectSigner.html",
-      "LogLevelDesc": "https://hyperledger-cacti.github.io/cacti/types/_hyperledger_cactus_common.LogLevelDesc.html",
-      "Logger": "https://hyperledger-cacti.github.io/cacti/classes/_hyperledger_cactus_common.Logger.html",
-      "ILoggerOptions": "https://hyperledger-cacti.github.io/cacti/interfaces/_hyperledger_cactus_common.ILoggerOptions.html"
-    },
-    "@hyperledger/cactus-core": {
-      "PluginRegistry": "https://hyperledger-cacti.github.io/cacti/classes/_hyperledger_cactus_core.PluginRegistry.html"
-    },
-    "@hyperledger/cactus-plugin-bungee-hermes": {
-      "IPrivacyPolicyValue": "#",
-      "IMergePolicyValue": "#"
-    },
-    "class-validator": {
-      "ValidatorOptions": "#"
-    },
-    "knex": {
-      "Knex.Config": "#"
-    },
-    "@types/crypto-js": {
-      "__global.CryptoJS.SHA256": "#"
-    },
-    "safe-stable-stringify": {
-      "stringify": "#"
-    }
-  },
-  "blockTags": [
-    "@alpha",
-    "@beta",
-    "@defaultValue", 
-    "@deprecated",
-    "@example",
-    "@experimental",
-    "@inheritDoc",
-    "@internal",
-    "@override",
-    "@packageDocumentation",
-    "@param",
-    "@privateRemarks",
-    "@public",
-    "@readonly",
-    "@remarks",
-    "@returns",
-    "@sealed",
-    "@see",
-    "@since",
-    "@throws",
-    "@typeParam",
-    "@virtual",
-    "@fileoverview",
-    "@description",
-    "@implements",
-    "@module",
-    "@export",
-    "@extends",
-    "@todo"
-  ]
+  
 }

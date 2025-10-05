@@ -7,7 +7,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 /**
@@ -17,7 +17,7 @@
  * with computed results, including contract interaction parameters and
  * method invocation details for cross-chain operations.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const oracleEntry: IOracleEntryBase = {
@@ -43,7 +43,7 @@ export interface IOracleEntryBase {
  * networks to trigger oracle computations based on on-chain events
  * as part of cross-chain coordination workflows.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const oracleListener: IOracleListenerBase = {

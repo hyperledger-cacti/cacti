@@ -23,7 +23,7 @@
  *
  * @see {@link https://knexjs.org/guide/} Knex.js Documentation
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import path from "path";
@@ -43,7 +43,7 @@ dotenv.config({ path: envPath });
  * for optimal SATP protocol logging performance.
  *
  * @constant {Object.<string, Knex.Config>}
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export const knexLocalInstance: { [key: string]: Knex.Config } = {
   /** Default SQLite configuration for local SATP gateway persistence */

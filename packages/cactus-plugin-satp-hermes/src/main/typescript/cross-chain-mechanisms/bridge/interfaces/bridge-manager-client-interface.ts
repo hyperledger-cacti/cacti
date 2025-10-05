@@ -156,7 +156,7 @@ export abstract class BridgeManagerClientInterface {
    * const lockedAsset = await fabricBridge.lockAsset('asset-123', 100);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
    * @see {@link BridgeLeaf} for bridge endpoint implementation details
    * @see {@link ClaimFormat} for supported proof formats
@@ -213,7 +213,7 @@ export abstract class BridgeManagerClientInterface {
    * );
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 3.3
    * @see {@link NetworkId} for network identification details
    * @see {@link getBridgeEndPoint} for accessing specific network bridges
@@ -270,7 +270,7 @@ export abstract class BridgeManagerClientInterface {
    * await sourceExecution.burnAsset(asset);          // Phase 3: Burn
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
    * @see {@link SATPBridgeExecutionLayer} for execution layer interface details
    * @see {@link getBridgeEndPoint} for underlying bridge endpoint access
@@ -330,7 +330,7 @@ export abstract class BridgeManagerClientInterface {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    * @see {@link TokenType} for supported asset type enumeration
    * @see {@link NetworkId} for network identification structure

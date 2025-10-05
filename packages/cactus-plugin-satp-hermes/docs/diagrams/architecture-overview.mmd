@@ -1,0 +1,87 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'noteBkgColor':'#d1fae5', 'noteTextColor':'#065f46', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'edgeLabelBackground':'#ffffff', 'mainBkg':'#ffffff'}}}%%
+graph TB
+    %% Entry Points Layer
+    subgraph EntryPoints["🎯 Entry Points"]
+        CLI["<b>Gateway CLI</b><br/>plugin-satp-hermes-gateway-cli.ts<br/>Command-line launcher<br/>Configuration validation<br/>Production deployment"]
+        Gateway["<b>SATP Gateway Plugin</b><br/>plugin-satp-hermes-gateway.ts<br/>Core plugin implementation<br/>Main orchestrator<br/>Web service management"]
+        API["<b>API Dispatcher</b><br/>api1/dispatcher.ts<br/>BLO API endpoints<br/>Request routing<br/>Service coordination"]
+    end
+
+    %% Core Services Layer
+    subgraph CoreServices["⚙️ Core Services"]
+        Orchestrator["<b>Gateway Orchestrator</b><br/>services/gateway/gateway-orchestrator.ts<br/>Counterparty gateway management<br/>Channel & connection handling<br/>gRPC/Connect RPC routing"]
+        Manager["<b>SATP Manager</b><br/>services/gateway/satp-manager.ts<br/>SATP session lifecycle<br/>Stage handler coordination<br/>Protocol state management"]
+    end
+
+    %% Cross-Chain Layer
+    subgraph CrossChain["🔗 Cross-Chain Mechanisms"]
+        CCManager["<b>Cross-Chain Manager</b><br/>cross-chain-mechanisms/satp-cc-manager.ts<br/>Bridge coordination<br/>Oracle management<br/>Ontology resolution"]
+        Bridge["<b>Bridge Manager</b><br/>Bridge implementations<br/>Asset lock/unlock<br/>Ledger interactions"]
+        Oracle["<b>Oracle Manager</b><br/>Event monitoring<br/>State verification<br/>Proof generation"]
+    end
+
+    %% Data Layer
+    subgraph DataLayer["💾 Data & Persistence"]
+        Persistence["<b>Gateway Persistence</b><br/>database/gateway-persistence.ts<br/>Unified logging interface<br/>Local & remote repositories<br/>Proof storage"]
+        LocalRepo["<b>Local Repository</b><br/>Knex + SQLite/PostgreSQL<br/>Transaction logging"]
+        RemoteRepo["<b>Remote Repository</b><br/>IPFS/Knex<br/>Immutable proof storage"]
+    end
+
+    %% Protocol Implementation Layer
+    subgraph Protocol["📋 SATP Protocol Stages"]
+        Stage0["<b>Stage 0</b><br/>Transfer Initiation"]
+        Stage1["<b>Stage 1</b><br/>Lock Assertion"]
+        Stage2["<b>Stage 2</b><br/>Commitment Establishment"]
+        Stage3["<b>Stage 3</b><br/>Transfer Completion"]
+        Crash["<b>Crash Recovery</b><br/>Rollback strategies"]
+    end
+
+    %% Relationships - Entry Points to Services
+    CLI -->|launches & configures| Gateway
+    Gateway -->|instantiates| Orchestrator
+    Gateway -->|initializes| API
+    API -->|dispatches to| Manager
+    
+    %% Core Services Relationships
+    Orchestrator -->|manages sessions via| Manager
+    Manager -->|coordinates stages with| Orchestrator
+    
+    %% Cross-Chain Relationships
+    Manager -->|requests operations from| CCManager
+    CCManager -->|controls| Bridge
+    CCManager -->|manages| Oracle
+    Bridge -->|reports to| Manager
+    Oracle -->|notifies| Manager
+    
+    %% Data Layer Relationships
+    Manager -->|persists via| Persistence
+    Orchestrator -->|logs via| Persistence
+    API -->|stores via| Persistence
+    Persistence -->|writes to| LocalRepo
+    Persistence -->|replicates to| RemoteRepo
+    
+    %% Protocol Stage Relationships
+    Manager -->|executes| Stage0
+    Manager -->|executes| Stage1
+    Manager -->|executes| Stage2
+    Manager -->|executes| Stage3
+    Manager -->|handles failures via| Crash
+    
+    Stage0 -->|logs to| Persistence
+    Stage1 -->|logs to| Persistence
+    Stage2 -->|logs to| Persistence
+    Stage3 -->|logs to| Persistence
+    Crash -->|recovers using| Persistence
+
+    %% Styling with high-contrast green color scheme
+    classDef entryPoint fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10
+    classDef coreService fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef crossChain fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef dataLayer fill:#bbf7d0,stroke:#86efac,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef protocol fill:#dcfce7,stroke:#bbf7d0,stroke-width:4px,color:#065f46,rx:10,ry:10
+    
+    class CLI,Gateway,API entryPoint
+    class Orchestrator,Manager coreService
+    class CCManager,Bridge,Oracle crossChain
+    class Persistence,LocalRepo,RemoteRepo dataLayer
+    class Stage0,Stage1,Stage2,Stage3,Crash protocol

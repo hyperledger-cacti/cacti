@@ -31,7 +31,7 @@
  *
  * @see {@link https://knexjs.org/guide/migrations.html} Knex Migration Guide
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import { Knex } from "knex";
@@ -49,7 +49,7 @@ import * as create_remote_logs_table from "./migrations/20240130234303_create_re
  * across SATP gateway deployments.
  *
  * @interface IKnexMigration
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export interface IKnexMigration {
   /** Execute migration to upgrade database schema */
@@ -69,7 +69,7 @@ export interface IKnexMigration {
  *
  * @interface IKnexMigrationSource
  * @template T - Migration type (typically IKnexMigration)
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export interface IKnexMigrationSource<T> {
   /** Retrieve list of available migration identifiers */
@@ -90,7 +90,7 @@ export interface IKnexMigrationSource<T> {
  * @param migrations - Map of registered migrations
  * @param aMigration - Migration to register
  * @returns Result indicating success or duplicate ID error
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 function registerMigration(
   migrations: Map<string, IKnexMigration>,
@@ -119,7 +119,7 @@ function registerMigration(
  *
  * @returns Configured migration source ready for Knex.js integration
  * @throws Error if duplicate migration IDs are detected
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const migrationSource = createMigrationSource();

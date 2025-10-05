@@ -17,7 +17,7 @@
  * The utilities ensure consistent key handling across different blockchain
  * connectors and cryptographic libraries used in the SATP bridge architecture.
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link ISignerKeyPair} for key pair interface
  * @see {@link EthereumLeaf} for Ethereum bridge leaf implementation
@@ -83,7 +83,7 @@ import { ISignerKeyPair } from "@hyperledger/cactus-common";
  * // Keys are now in Uint8Array format for cryptographic operations
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Uint8Array} Uint8Array Documentation
  * @see {@link ISignerKeyPair} for key pair interface definition
  * @see {@link PluginBungeeHermes} for key usage in Bungee plugin

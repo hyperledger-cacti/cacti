@@ -37,7 +37,7 @@
  * };
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link TokenType} for supported asset types
  * @see {@link NetworkId} for network identification
@@ -88,7 +88,7 @@ import { NetworkId } from "../../../../public-api";
  * };
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link FungibleAsset} for fungible token extensions
  * @see {@link TokenType} for asset type enumeration
  * @see {@link NetworkId} for network identification structure
@@ -137,7 +137,7 @@ export interface Asset {
  * };
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link Asset} for base asset properties
  * @see {@link instanceOfFungibleAsset} for type checking
  */
@@ -172,7 +172,7 @@ export interface FungibleAsset extends Asset {
  * const customType = getTokenType('nonstandard_fungible'); // Returns TokenType.NONSTANDARD_FUNGIBLE
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link TokenType} for available token type values
  */
 export function getTokenType(stringType: string) {
@@ -219,7 +219,7 @@ export function getTokenType(stringType: string) {
  * );
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link TokenType} for token type values
  * @see {@link uuidv4} for UUID generation
  */
@@ -263,7 +263,7 @@ export function createAssetId(
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link FungibleAsset} for fungible asset interface
  * @see {@link Asset} for base asset interface
  */
