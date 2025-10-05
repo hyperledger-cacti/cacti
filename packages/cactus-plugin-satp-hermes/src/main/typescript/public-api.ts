@@ -78,8 +78,8 @@ export * from "./generated/gateway-client/typescript-axios";
  * transfer evidence, and cryptographic attestations during cross-chain operations.
  * Based on IETF SATP v2 common message protobuf definitions.
  *
- * @see {@link SATPGateway.sign} for claim signing operations
- * @see {@link SATPGateway.verifySignature} for claim verification
+ * @see {@link sign} for claim signing operations
+ * @see {@link verifySignature} for claim verification
  */
 export { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
 
@@ -232,11 +232,12 @@ export { KeyPairJSON } from "./services/validation/config-validating-functions/v
  * operations, data format conversions, signature verification, and protocol message
  * handling. Provides foundational functionality for secure cross-chain asset transfers.
  *
- * @see {@link bufArray2HexStr} for buffer to hex conversion
- * @see {@link sign} for cryptographic signing operations
- * @see {@link verifySignature} for signature verification
- * @see {@link getSatpLogKey} for standardized log key generation
- * @see {@link getHash} for data integrity hashing
+ * Key utility functions:
+ * - `bufArray2HexStr` - Convert buffer arrays to hexadecimal strings
+ * - `sign` - Cryptographic signing operations for SATP messages
+ * - `verifySignature` - Verify digital signatures on protocol messages
+ * - `getSatpLogKey` - Generate standardized keys for transaction logs
+ * - `getHash` - Compute cryptographic hashes for data integrity
  */
 export {
   bufArray2HexStr,
@@ -253,18 +254,25 @@ export {
  * Comprehensive persistence layer for SATP gateways implementing Hermes fault-tolerant
  * design patterns with local and remote logging capabilities. Provides crash recovery
  * support, data integrity verification, and distributed logging for cross-chain operations.
- * Located in the database directory as part of the data persistence infrastructure.
+ * The persistence layer is implemented through repository pattern interfaces that provide
+ * abstraction over different database backends (SQLite, PostgreSQL, etc.) using Knex.js.
  *
- * @see {@link GatewayPersistence} for main persistence implementation
- * @see {@link IGatewayPersistenceConfig} for configuration options
- * @see {@link ILocalLogRepository} for local database persistence
- * @see {@link IRemoteLogRepository} for distributed logging
+ * Key Features:
+ * - Local log repository for session-scoped SATP protocol logging
+ * - Remote log repository for distributed crash recovery mechanisms
+ * - Session management with chronological and sequence-based queries
+ * - Database schema migrations and version control
+ * - Support for multiple database backends via Knex.js
+ *
+ * @see {@link ILocalLogRepository} for local database persistence interface
+ * @see {@link IRemoteLogRepository} for distributed logging interface
+ * @see {@link KnexLocalLogRepository} for Knex.js-based local implementation
+ * @see {@link KnexRemoteLogRepository} for Knex.js-based remote implementation
+ * @see {@link LocalLog} for local log data structure
+ * @see {@link RemoteLog} for remote log data structure
+ *
+ * @since 0.0.3-beta
  */
-export {
-  GatewayPersistence,
-  type IGatewayPersistenceConfig,
-  type GatewayLogEntryPersistence,
-} from "./database/gateway-persistence";
 
 /**
  * Repository Interfaces - Database repository contracts for SATP gateway persistence.
@@ -275,14 +283,41 @@ export {
  * crash recovery support. These interfaces enable consistent data persistence
  * across different storage backends while maintaining SATP protocol compliance.
  *
- * @see {@link GatewayPersistence} for implementations using these interfaces
+ * **Local Repository:**
+ * Manages session-scoped SATP protocol logs with support for chronological queries,
+ * sequence-based recovery, and proof evidence filtering.
+ *
+ * **Remote Repository:**
+ * Handles distributed logging for crash recovery with cryptographic hashes and
+ * signatures for data integrity across gateway instances.
+ *
+ * @see {@link KnexLocalLogRepository} for Knex.js-based local implementation
+ * @see {@link KnexRemoteLogRepository} for Knex.js-based remote implementation
  * @see {@link LocalLog} for local log data structure
  * @see {@link RemoteLog} for remote log data structure
+ *
+ * @since 0.0.3-beta
  */
 export {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./database/repository/interfaces/repository";
+
+/**
+ * Gateway Persistence - Unified persistence layer for SATP protocol logging.
+ *
+ * @description
+ * Provides a high-level persistence interface that coordinates between local and
+ * remote repositories for SATP gateway operations. Includes configuration interface
+ * for initializing persistence with repository instances and cryptographic components.
+ *
+ * @see {@link ILocalLogRepository} for local repository interface
+ * @see {@link IRemoteLogRepository} for remote repository interface
+ */
+export {
+  GatewayPersistence,
+  IGatewayPersistenceConfig,
+} from "./database/gateway-persistence";
 
 /**
  * Repository Implementations - Concrete implementations of SATP repository interfaces.
@@ -306,8 +341,19 @@ export { KnexRemoteLogRepository } from "./database/repository/knex-remote-log-r
  * including transaction tracking, performance metrics, and error reporting.
  * Integrates with OpenTelemetry for distributed tracing and observability.
  *
- * @see {@link GatewayPersistence} for monitoring integration with persistence
+ * **Key Features:**
+ * - OpenTelemetry integration for metrics, traces, and logs
+ * - Performance monitoring and metrics collection
+ * - Distributed tracing for cross-chain operations
+ * - Error tracking and reporting capabilities
+ * - Configurable exporters for OTLP-compatible backends
+ *
+ * @see {@link ILocalLogRepository} for persistence layer integration
+ * @see {@link IRemoteLogRepository} for distributed logging integration
  * @see {@link SATPGateway} for gateway monitoring setup
+ * @see {@link SATPLogger} for logging integration with monitoring
+ *
+ * @since 0.0.3-beta
  */
 export {
   MonitorService,

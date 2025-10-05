@@ -15,7 +15,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import type { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -37,7 +37,7 @@ import { MonitorService } from "../../services/monitoring/monitor";
  * including network identification, data transport configuration, and
  * monitoring service integration.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const oracleOptions: OracleAbstractOptions = {
@@ -71,7 +71,7 @@ export interface OracleAbstractOptions {
  * directly on-chain as part of SATP cross-chain operations.
  *
  * @abstract
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * class EthereumOracle extends OracleAbstract {

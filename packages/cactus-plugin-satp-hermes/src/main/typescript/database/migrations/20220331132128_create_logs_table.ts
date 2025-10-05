@@ -16,7 +16,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import { Knex } from "knex";
@@ -31,7 +31,7 @@ import { Knex } from "knex";
  *
  * @param knex - Knex database connection instance
  * @returns Schema builder for table creation
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function up(knex: Knex): Knex.SchemaBuilder {
   return knex.schema.createTable("logs", (table) => {
@@ -61,7 +61,7 @@ export function up(knex: Knex): Knex.SchemaBuilder {
  *
  * @param knex - Knex database connection instance
  * @returns Schema builder for table removal
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function down(knex: Knex): Knex.SchemaBuilder {
   return knex.schema.dropTable("logs");
@@ -74,7 +74,7 @@ export function down(knex: Knex): Knex.SchemaBuilder {
  * migration execution order and preventing duplicate applications.
  *
  * @returns Migration identifier string
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function getId(): Readonly<string> {
   return "20220331132128_create_logs_table";

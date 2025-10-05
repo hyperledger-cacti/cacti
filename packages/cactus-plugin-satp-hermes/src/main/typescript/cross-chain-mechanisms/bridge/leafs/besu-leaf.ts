@@ -206,7 +206,7 @@ interface BesuResponse {
  * console.log(`Asset wrapped on Besu: ${wrapResult.transactionId}`);
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link https://besu.hyperledger.org/} Hyperledger Besu Documentation
  * @see {@link BridgeLeafFungible} for fungible asset interface

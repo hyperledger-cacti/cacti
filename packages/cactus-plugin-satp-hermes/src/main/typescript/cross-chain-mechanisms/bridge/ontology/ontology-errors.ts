@@ -34,7 +34,7 @@
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link OntologyManager} for ontology management operations
  * @see {@link RuntimeError} for base error functionality
@@ -73,7 +73,7 @@ import { RuntimeError } from "run-time-error-cjs";
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link RuntimeError} for base error functionality
  * @see {@link OntologyManager} for context where errors are thrown
  */
@@ -130,7 +130,7 @@ export class OntologyInternalError extends RuntimeError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link OntologyManager.getOntology} for ontology retrieval
  */
 export class OntologyNotFoundError extends OntologyInternalError {
@@ -174,7 +174,7 @@ export class OntologyNotFoundError extends OntologyInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link OntologyManager.getOntologyInteractions} for interaction retrieval
  * @see {@link LedgerType} for supported ledger types
  */

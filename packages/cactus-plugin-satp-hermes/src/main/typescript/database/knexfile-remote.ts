@@ -28,7 +28,7 @@
  * @see {@link https://knexjs.org/guide/} Knex.js Documentation
  * @see {@link https://www.postgresql.org/docs/} PostgreSQL Documentation
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import path from "path";
@@ -47,7 +47,7 @@ dotenv.config({ path: envPath });
  * enable cross-gateway coordination and distributed crash recovery capabilities.
  *
  * @constant {Object.<string, Knex.Config>}
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export const knexRemoteInstance: { [key: string]: Knex.Config } = {
   /** Default SQLite configuration for remote gateway development/testing */

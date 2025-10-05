@@ -8,7 +8,7 @@
  *
  * @see {@link https://knexjs.org/guide/} Knex.js Documentation
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import type { IRemoteLogRepository } from "./interfaces/repository";
@@ -32,7 +32,7 @@ import { createMigrationSource } from "../knex-migration-source";
  * - Environment-specific configuration
  *
  * @implements {IRemoteLogRepository}
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const repository = new KnexRemoteLogRepository({
@@ -68,7 +68,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
    * the same remote log database.
    *
    * @param config - Optional Knex configuration (uses environment default if undefined)
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
@@ -92,7 +92,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
    *
    * @returns Query builder configured for remote-logs table
    * @private
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   getLogsTable(): Knex.QueryBuilder {
     return this.database("remote-logs");
@@ -103,7 +103,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
    *
    * @param logKey - Unique remote log entry identifier
    * @returns Promise resolving to remote log entry or undefined
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   readById(logKey: string): Promise<RemoteLog> {
     return this.getLogsTable().where({ key: logKey }).first();
@@ -118,7 +118,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
    *
    * @param log - Remote log entry with cryptographic verification data
    * @returns Database insertion promise
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @todo Fix return type annotation
    */
   create(log: RemoteLog): any {
@@ -132,7 +132,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
    * Primarily used for testing and development environments.
    *
    * @returns Promise resolving when reset completes
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   async reset() {
     await this.database.migrate.rollback();
@@ -146,7 +146,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
    * Should be called when the repository is no longer needed.
    *
    * @returns Promise resolving when cleanup completes
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   async destroy() {
     await this.database.destroy();

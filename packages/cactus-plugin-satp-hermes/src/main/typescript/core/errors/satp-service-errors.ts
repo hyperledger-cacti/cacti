@@ -47,7 +47,7 @@
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType} for protocol error type enumeration
@@ -114,7 +114,7 @@ import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/com
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.COMMON_BODY_BADLY_FORMATED} for protocol error type
  */
@@ -158,7 +158,7 @@ export class SatpCommonBodyError extends SATPInternalError {
  * @class SessionError
  * @extends SATPInternalError
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.SESSION_NOT_FOUND} for protocol error type
  */
@@ -197,7 +197,7 @@ export class SessionError extends SATPInternalError {
  * @class SessionIdError
  * @extends SATPInternalError
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.SESSION_ID_NOT_FOUND} for protocol error type
  */
@@ -256,7 +256,7 @@ export class SessionIdError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.SESSION_MISS_MATCH} for protocol error type
  */
@@ -296,7 +296,7 @@ export class SessionMissMatchError extends SATPInternalError {
  * @class SessionDataNotLoadedCorrectlyError
  * @extends SATPInternalError
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class SessionDataNotLoadedCorrectlyError extends SATPInternalError {
@@ -339,7 +339,7 @@ export class SessionDataNotLoadedCorrectlyError extends SATPInternalError {
  * @class SessionDataNotAvailableError
  * @extends SATPInternalError
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class SessionDataNotAvailableError extends SATPInternalError {
@@ -378,7 +378,7 @@ export class SessionDataNotAvailableError extends SATPInternalError {
  * @class SessionCompletedError
  * @extends SATPInternalError
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  */
 export class SessionCompletedError extends SATPInternalError {
@@ -443,7 +443,7 @@ export class SessionCompletedError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.MISSING_PARAMETER} for missing version error type
  * @see {@link SATPErrorType.SATP_VERSION_NOT_SUPPORTED} for unsupported version error type
@@ -492,7 +492,7 @@ export class SATPVersionError extends SATPInternalError {
  *
  * @class SignatureAlgorithmError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class SignatureAlgorithmError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -521,7 +521,7 @@ export class SignatureAlgorithmError extends SATPInternalError {
  *
  * @class SignatureVerificationError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class SignatureVerificationError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -543,7 +543,7 @@ export class SignatureVerificationError extends SATPInternalError {
  *
  * @class SignatureMissingError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class SignatureMissingError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -561,7 +561,7 @@ export class SignatureMissingError extends SATPInternalError {
  *
  * @class LockTypeError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class LockTypeError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -580,7 +580,7 @@ export class LockTypeError extends SATPInternalError {
  *
  * @class lockExpirationTimeError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class lockExpirationTimeError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -599,7 +599,7 @@ export class lockExpirationTimeError extends SATPInternalError {
  *
  * @class CredentialProfileError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class CredentialProfileError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -618,7 +618,7 @@ export class CredentialProfileError extends SATPInternalError {
  *
  * @class LoggingProfileError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class LoggingProfileError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -637,7 +637,7 @@ export class LoggingProfileError extends SATPInternalError {
  *
  * @class AccessControlProfileError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class AccessControlProfileError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -701,7 +701,7 @@ export class AccessControlProfileError extends SATPInternalError {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType.MESSAGE_OUT_OF_SEQUENCE} for protocol error type
  */
@@ -757,7 +757,7 @@ export class MessageTypeError extends SATPInternalError {
  *
  * @class TransferInitClaimsError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class TransferInitClaimsError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -782,7 +782,7 @@ export class TransferInitClaimsError extends SATPInternalError {
  *
  * @class TransferInitClaimsHashError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class TransferInitClaimsHashError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -805,7 +805,7 @@ export class TransferInitClaimsHashError extends SATPInternalError {
  *
  * @class NetworkCapabilitiesError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class NetworkCapabilitiesError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -830,7 +830,7 @@ export class NetworkCapabilitiesError extends SATPInternalError {
  *
  * @class DLTNotSupportedError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class DLTNotSupportedError extends SATPInternalError {
   constructor(tag: string, dlt: string, cause?: string | Error | null) {
@@ -848,7 +848,7 @@ export class DLTNotSupportedError extends SATPInternalError {
  *
  * @class ServerGatewayPubkeyError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class ServerGatewayPubkeyError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -870,7 +870,7 @@ export class ServerGatewayPubkeyError extends SATPInternalError {
  *
  * @class ClientGatewayPubkeyError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class ClientGatewayPubkeyError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -895,7 +895,7 @@ export class ClientGatewayPubkeyError extends SATPInternalError {
  *
  * @class SequenceNumberError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class SequenceNumberError extends SATPInternalError {
   constructor(
@@ -925,7 +925,7 @@ export class SequenceNumberError extends SATPInternalError {
  *
  * @class HashError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class HashError extends SATPInternalError {
   constructor(
@@ -957,7 +957,7 @@ export class HashError extends SATPInternalError {
  *
  * @class TransferContextIdError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class TransferContextIdError extends SATPInternalError {
   constructor(
@@ -996,7 +996,7 @@ export class TransferContextIdError extends SATPInternalError {
  *
  * @class MissingBridgeManagerError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class MissingBridgeManagerError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1015,7 +1015,7 @@ export class MissingBridgeManagerError extends SATPInternalError {
  *
  * @class LockAssertionClaimError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class LockAssertionClaimError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1033,7 +1033,7 @@ export class LockAssertionClaimError extends SATPInternalError {
  *
  * @class LockAssertionClaimFormatError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class LockAssertionClaimFormatError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1051,7 +1051,7 @@ export class LockAssertionClaimFormatError extends SATPInternalError {
  *
  * @class LockAssertionExpirationError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class LockAssertionExpirationError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1074,7 +1074,7 @@ export class LockAssertionExpirationError extends SATPInternalError {
  *
  * @class BurnAssertionClaimError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class BurnAssertionClaimError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1093,7 +1093,7 @@ export class BurnAssertionClaimError extends SATPInternalError {
  *
  * @class MintAssertionClaimError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class MintAssertionClaimError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1112,7 +1112,7 @@ export class MintAssertionClaimError extends SATPInternalError {
  *
  * @class AssignmentAssertionClaimError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class AssignmentAssertionClaimError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1134,7 +1134,7 @@ export class AssignmentAssertionClaimError extends SATPInternalError {
  *
  * @class ResourceUrlError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class ResourceUrlError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1152,7 +1152,7 @@ export class ResourceUrlError extends SATPInternalError {
  *
  * @class GatewayNetworkIdError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class GatewayNetworkIdError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1172,7 +1172,7 @@ export class GatewayNetworkIdError extends SATPInternalError {
  *
  * @class OntologyContractError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class OntologyContractError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1194,7 +1194,7 @@ export class OntologyContractError extends SATPInternalError {
  *
  * @class LedgerAssetIdError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class LedgerAssetIdError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1212,7 +1212,7 @@ export class LedgerAssetIdError extends SATPInternalError {
  *
  * @class LedgerAssetError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class LedgerAssetError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1241,7 +1241,7 @@ export class BadAssetBuildError extends SATPInternalError {
  *
  * @class NetworkIdError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class NetworkIdError extends SATPInternalError {
   constructor(tag: string, type: string, cause?: string | Error | null) {
@@ -1259,7 +1259,7 @@ export class NetworkIdError extends SATPInternalError {
  *
  * @class AssetMissing
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class AssetMissing extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1278,7 +1278,7 @@ export class AssetMissing extends SATPInternalError {
  *
  * @class WrapAssertionClaimError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class WrapAssertionClaimError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1296,7 +1296,7 @@ export class WrapAssertionClaimError extends SATPInternalError {
  *
  * @class TokenIdMissingError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class TokenIdMissingError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1314,7 +1314,7 @@ export class TokenIdMissingError extends SATPInternalError {
  *
  * @class AmountMissingError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class AmountMissingError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1338,7 +1338,7 @@ export class UniqueTokenDescriptorMissingError extends SATPInternalError {
  *
  * @class MissingRecipientError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class MissingRecipientError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1356,7 +1356,7 @@ export class MissingRecipientError extends SATPInternalError {
  *
  * @class DigitalAssetIdError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class DigitalAssetIdError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
@@ -1376,7 +1376,7 @@ export class DigitalAssetIdError extends SATPInternalError {
  *
  * @class PubKeyError
  * @extends SATPInternalError
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class PubKeyError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {

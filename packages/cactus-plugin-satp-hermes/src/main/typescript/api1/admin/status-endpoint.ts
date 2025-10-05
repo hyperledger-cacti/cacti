@@ -29,7 +29,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import type { Express, Request, Response } from "express";
@@ -69,7 +69,7 @@ import type { StatusRequest } from "../../generated/gateway-client/typescript-ax
  *
  * @class GetStatusEndpointV1
  * @implements {IWebServiceEndpoint}
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const endpoint = new GetStatusEndpointV1({

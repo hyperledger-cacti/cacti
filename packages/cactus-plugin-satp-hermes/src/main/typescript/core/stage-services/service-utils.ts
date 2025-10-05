@@ -36,8 +36,8 @@
  * maintaining all necessary metadata for proper asset handling.
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
  * @see {@link FungibleAsset} Internal asset representation
  * @see {@link ProtoAsset} Protocol Buffer asset schema
@@ -139,7 +139,7 @@ export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
  * console.log(protoAsset.channelName); // 'mychannel'
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link FungibleAsset} for internal asset structure
  * @see {@link ProtoAsset} for Protocol Buffer asset schema
  * @see {@link NetworkId} for network identification
@@ -266,7 +266,7 @@ export function assetToProto(
  * console.log((fabricAsset as FabricFungibleAsset).mspId); // 'Org1MSP'
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link ProtoAsset} for Protocol Buffer asset schema
  * @see {@link Asset} for internal asset interface
  * @see {@link FungibleAsset} for fungible asset structure
@@ -385,7 +385,7 @@ export function protoToAsset(asset: ProtoAsset, networkId: NetworkId): Asset {
  * }
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link ProtoAsset} for Protocol Buffer asset schema
  * @see {@link assetToProto} for asset conversion to Protocol Buffer
  * @see {@link protoToAsset} for Protocol Buffer to internal conversion

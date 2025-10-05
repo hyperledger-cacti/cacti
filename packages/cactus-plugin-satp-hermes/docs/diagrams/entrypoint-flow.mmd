@@ -1,0 +1,65 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'15px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'actorBkg':'#dcfce7','actorBorder':'#22c55e','actorTextColor':'#065f46','signalColor':'#4ade80','signalTextColor':'#065f46','labelBoxBkgColor':'#f0fdf4','labelBoxBorderColor':'#22c55e','noteBkgColor':'#f0fdf4','noteTextColor':'#065f46','noteBorderColor':'#16a34a','loopTextColor':'#065f46'}}}%%
+sequenceDiagram
+    participant User
+    participant CLI as Gateway CLI<br/>(plugin-satp-hermes-gateway-cli.ts)
+    participant Config as Configuration Validator
+    participant Gateway as SATP Gateway<br/>(plugin-satp-hermes-gateway.ts)
+    participant Orchestrator as Gateway Orchestrator
+    participant API as BLO API Dispatcher<br/>(api1/dispatcher.ts)
+    participant Manager as SATP Manager
+    
+    User->>CLI: Start gateway with config.json
+    activate CLI
+    CLI->>Config: Load & validate configuration
+    Config-->>CLI: Configuration validated
+    
+    CLI->>Gateway: new SATPGateway(config)
+    activate Gateway
+    Gateway->>Gateway: Initialize crypto (keys, signer)
+    Gateway->>Gateway: Setup databases (local/remote repos)
+    
+    Gateway->>Orchestrator: new GatewayOrchestrator(options)
+    activate Orchestrator
+    Orchestrator->>Orchestrator: Discover counterparty gateways
+    Orchestrator->>Orchestrator: Setup gRPC channels
+    Orchestrator-->>Gateway: Orchestrator ready
+    deactivate Orchestrator
+    
+    Gateway->>Manager: new SATPManager(options)
+    activate Manager
+    Manager->>Manager: Initialize stage handlers
+    Manager->>Manager: Setup crash recovery
+    Manager-->>Gateway: Manager ready
+    deactivate Manager
+    
+    Gateway->>API: new BLODispatcher(options)
+    activate API
+    API->>API: Register admin endpoints
+    API->>API: Register transaction endpoints
+    API->>API: Register oracle endpoints
+    API-->>Gateway: API ready
+    deactivate API
+    
+    Gateway->>Gateway: Start web servers<br/>(Client/Server/OpenAPI)
+    Gateway-->>CLI: Gateway initialized
+    deactivate Gateway
+    
+    CLI->>CLI: Setup graceful shutdown handlers
+    CLI-->>User: Gateway running on ports:<br/>Client, Server, OpenAPI
+    deactivate CLI
+    
+    Note over User,Manager: Gateway is now ready to process SATP requests
+
+    User->>API: HTTP POST /api/v1/transfer
+    activate API
+    API->>Manager: initiateTransfer(request)
+    activate Manager
+    Manager->>Orchestrator: Get channel to counterparty
+    activate Orchestrator
+    Orchestrator-->>Manager: gRPC channel ready
+    deactivate Orchestrator
+    Manager->>Manager: Execute Stage 0-3
+    Manager-->>API: Transfer initiated
+    deactivate Manager
+    API-->>User: 200 OK {sessionId, status}
+    deactivate API

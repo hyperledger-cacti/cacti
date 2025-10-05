@@ -66,6 +66,6 @@
  * @see {@link ./index.web} for browser/web environment entry point
  * @see {@link ./public-api} for detailed API documentation
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export * from "./public-api";

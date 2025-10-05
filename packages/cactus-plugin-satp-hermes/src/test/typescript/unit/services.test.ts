@@ -266,8 +266,11 @@ afterAll(async () => {
   ];
 
   for (const service of services) {
-    await service.dbLogger.localRepository.destroy();
-    await service.dbLogger.remoteRepository!.destroy();
+    await service.dbLogger.getLocalRepository().destroy();
+    const remoteRepo = service.dbLogger.getRemoteRepository();
+    if (remoteRepo) {
+      await remoteRepo.destroy();
+    }
   }
 
   if (knexInstanceClient) {

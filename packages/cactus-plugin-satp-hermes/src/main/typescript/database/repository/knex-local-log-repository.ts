@@ -8,7 +8,7 @@
  *
  * @see {@link https://knexjs.org/guide/} Knex.js Documentation
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import type { LocalLog } from "../../core/types";
@@ -33,7 +33,7 @@ import { createMigrationSource } from "../knex-migration-source";
  * - Database lifecycle management
  *
  * @implements {ILocalLogRepository}
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const repository = new KnexLocalLogRepository({
@@ -71,7 +71,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * configuration with fallback to development settings.
    *
    * @param config - Optional Knex configuration (uses default if undefined)
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
@@ -94,7 +94,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * Check if repository has been properly initialized.
    *
    * @returns Repository initialization status
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public getCreated(): boolean {
     return this.created;
@@ -105,7 +105,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    *
    * @returns Query builder configured for logs table
    * @private
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   getLogsTable(): Knex.QueryBuilder {
     return this.database("logs");
@@ -116,7 +116,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    *
    * @param logKey - Unique log entry identifier
    * @returns Promise resolving to log entry or undefined
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   readById(logKey: string): Promise<LocalLog> {
     return this.getLogsTable().where({ key: logKey }).first();
@@ -127,7 +127,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    *
    * @param sessionID - SATP session identifier
    * @returns Promise resolving to latest log entry for session
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   readLastestLog(sessionID: string): Promise<LocalLog> {
     return this.getLogsTable()
@@ -141,7 +141,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    *
    * @param timestamp - ISO timestamp string for filtering
    * @returns Promise resolving to array of matching log entries
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]> {
     return this.getLogsTable()
@@ -154,7 +154,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    *
    * @param log - Local log entry to persist
    * @returns Database insertion promise
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @todo Fix return type annotation
    */
   create(log: LocalLog): any {
@@ -166,7 +166,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    *
    * @param sessionID - SATP session identifier
    * @returns Database deletion promise
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @todo Fix return type annotation
    */
   deleteBySessionId(sessionID: string): any {
@@ -180,7 +180,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * useful for getting current session states without proof evidence.
    *
    * @returns Promise resolving to array of non-proof log entries
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   readLogsNotProofs(): Promise<LocalLog[]> {
     return this.getLogsTable()
@@ -203,7 +203,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * @param sessionId - SATP session identifier
    * @param sequenceNumber - Starting sequence number (exclusive)
    * @returns Promise resolving to array of log entries after sequence number
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   fetchLogsFromSequence(
     sessionId: string,
@@ -221,7 +221,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * Primarily used for testing and development environments.
    *
    * @returns Promise resolving when reset completes
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   async reset() {
     await this.database.migrate.rollback();
@@ -235,7 +235,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * Should be called when the repository is no longer needed.
    *
    * @returns Promise resolving when cleanup completes
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   async destroy() {
     await this.database.destroy();
