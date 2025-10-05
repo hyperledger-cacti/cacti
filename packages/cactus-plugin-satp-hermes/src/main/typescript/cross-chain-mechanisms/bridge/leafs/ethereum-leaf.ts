@@ -77,7 +77,7 @@
  * console.log(`Asset wrapped: ${wrapResult.transactionId}`);
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link https://ethereum.org/en/developers/docs/} Ethereum Development Documentation
  * @see {@link BridgeLeafFungible} for fungible asset interface
@@ -197,7 +197,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  * };
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link INetworkOptions} for base network configuration
  * @see {@link Web3SigningCredential} for signing credential types
  * @see {@link IPluginLedgerConnectorEthereumOptions} for connector configuration
@@ -418,7 +418,7 @@ export interface IEthereumLeafNeworkOptions extends INetworkOptions {
  * );
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link IBridgeLeafOptions} for base configuration options
  * @see {@link IEthereumLeafNeworkOptions} for Ethereum-specific options
  * @see {@link EthereumLeaf} for the implementation class
@@ -775,7 +775,7 @@ export class EthereumLeaf
    * );
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link IEthereumLeafOptions} for complete configuration options
    * @see {@link OntologyManager} for asset ontology management
    * @see {@link MonitorService} for monitoring and tracing
@@ -1949,7 +1949,7 @@ export class EthereumLeaf
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link PluginLedgerConnectorEthereum.shutdown} for connector shutdown details
    */
   public async shutdownConnection(): Promise<void> {
@@ -2017,7 +2017,7 @@ export class EthereumLeaf
    * );
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link IPluginLedgerConnectorEthereumOptions} for complete connector configuration
    * @see {@link PluginLedgerConnectorEthereum} for the connector implementation
    */

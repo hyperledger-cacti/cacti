@@ -29,8 +29,8 @@
  * production SATP deployments.
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link Logger} for base logging functionality
  * @see {@link MonitorService} for monitoring integration
  * @see {@link SATPLoggerProvider} for logger factory
@@ -68,7 +68,7 @@ import { MonitorService } from "../services/monitoring/monitor";
  *
  * @public
  * @class SATPLogger
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link Logger} for underlying logging implementation
  * @see {@link MonitorService} for monitoring service integration
  * @see {@link ILoggerOptions} for configuration options
@@ -95,7 +95,7 @@ export class SATPLogger {
    *
    * @param options - Logger configuration options
    * @param monitorService - Monitoring service for log collection
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   constructor(
     public readonly options: ILoggerOptions,
@@ -115,7 +115,7 @@ export class SATPLogger {
    * logger recreation or system restart.
    *
    * @param logLevel - New log level to apply
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public setLogLevel(logLevel: LogLevelDesc): void {
     this.backend.setLogLevel(logLevel);
@@ -130,7 +130,7 @@ export class SATPLogger {
    * to both backend and monitoring service for audit purposes.
    *
    * @returns Promise that resolves when shutdown is complete
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public async shutdown(): Promise<void> {
     this.backend.info("Shut down logger OK.");
@@ -147,7 +147,7 @@ export class SATPLogger {
    * that require immediate attention.
    *
    * @param msg - Error messages and data to log
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public error(...msg: unknown[]): void {
     this.backend.error(...msg);
@@ -163,7 +163,7 @@ export class SATPLogger {
    * recoverable problems that should be monitored.
    *
    * @param msg - Warning messages and data to log
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public warn(...msg: unknown[]): void {
     this.backend.warn(...msg);
@@ -179,7 +179,7 @@ export class SATPLogger {
    * and general information about system behavior.
    *
    * @param msg - Informational messages and data to log
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public info(...msg: unknown[]): void {
     this.backend.info(...msg);
@@ -195,7 +195,7 @@ export class SATPLogger {
    * and troubleshooting support.
    *
    * @param msg - Debug messages and data to log
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public debug(...msg: unknown[]): void {
     this.backend.debug(...msg);
@@ -211,7 +211,7 @@ export class SATPLogger {
    * internal state information, and fine-grained debugging data.
    *
    * @param msg - Trace messages and data to log
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public trace(...msg: unknown[]): void {
     this.backend.trace(...msg);

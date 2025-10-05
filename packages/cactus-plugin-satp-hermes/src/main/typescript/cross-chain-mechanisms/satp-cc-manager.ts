@@ -6,6 +6,10 @@
  * ontology management to enable secure asset transfers across different
  * blockchain networks following the IETF SATP v2 specification.
  *
+ * @group Cross-Chain Mechanisms
+ * @module cross-chain-mechanisms/satp-cc-manager
+ * @since 0.0.3-beta
+ *
  * The manager coordinates:
  * - Bridge deployment and lifecycle management
  * - Oracle task execution and monitoring
@@ -32,7 +36,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import { type LogLevelDesc } from "@hyperledger/cactus-common";
@@ -54,7 +58,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  * the cross-chain coordination system including orchestrator reference,
  * logging configuration, and monitoring services.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 export interface ISATPCrossChainManagerOptions {
   /** Gateway orchestrator instance for coordination */
@@ -73,7 +77,7 @@ export interface ISATPCrossChainManagerOptions {
  * Specifies the network configurations for bridge and oracle
  * deployments across different blockchain networks.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 export interface ICrossChainMechanismsOptions {
   /** Bridge network configuration array */
@@ -91,7 +95,7 @@ export interface ICrossChainMechanismsOptions {
  * orchestrate oracle operations, and manage asset ontology mappings.
  *
  * @todo Extend to accommodate oracle functionality fully
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const manager = new SATPCrossChainManager({
@@ -115,7 +119,7 @@ export class SATPCrossChainManager {
    * The class name identifier for logging and debugging purposes.
    *
    * @readonly
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public static readonly CLASS_NAME = "SATPCrossChainManager";
 
@@ -124,7 +128,7 @@ export class SATPCrossChainManager {
    *
    * @private
    * @readonly
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   private readonly log: Logger;
 
@@ -133,7 +137,7 @@ export class SATPCrossChainManager {
    *
    * @private
    * @readonly
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   private readonly logLevel: LogLevelDesc;
 
@@ -144,7 +148,7 @@ export class SATPCrossChainManager {
    * different blockchain networks for asset transfer operations.
    *
    * @private
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   private bridgeManager?: BridgeManager;
 
@@ -156,7 +160,7 @@ export class SATPCrossChainManager {
    * communication.
    *
    * @private
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   private gatewayOrchestrator?: GatewayOrchestrator;
 
@@ -168,7 +172,7 @@ export class SATPCrossChainManager {
    * or data validation.
    *
    * @private
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   private oracleManager?: OracleManager;
 
@@ -180,7 +184,7 @@ export class SATPCrossChainManager {
    *
    * @private
    * @readonly
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   private readonly monitorService: MonitorService;
 
@@ -193,7 +197,7 @@ export class SATPCrossChainManager {
    *
    * @param options - Configuration options for the cross-chain manager
    * @throws Error if required dependencies are not provided
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    * @example
    * ```typescript
    * const manager = new SATPCrossChainManager({

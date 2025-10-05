@@ -41,8 +41,8 @@
  * protocol logic while benefiting from shared infrastructure and utilities.
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
  * @see {@link SATPService} Abstract base class for service implementations
  * @see {@link ISATPServiceOptions} Service configuration interface
@@ -78,7 +78,7 @@ import { MonitorService } from "../../services/monitoring/monitor";
  *
  * @public
  * @enum {string}
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export enum SATPServiceType {
   /** Server-side service implementation for handling incoming SATP requests */
@@ -98,7 +98,7 @@ export enum SATPServiceType {
  * - **Stage 3**: Asset transfer commitment and finalization
  *
  * @public
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export type SATPStagesV02 = "0" | "1" | "2" | "3";
 
@@ -126,7 +126,7 @@ export type SATPStagesV02 = "0" | "1" | "2" | "3";
  *
  * @public
  * @interface ISATPServiceOptions
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPService} for service implementation
  * @see {@link SATPServiceType} for service type options
  * @see {@link SATPStagesV02} for supported protocol stages
@@ -174,7 +174,7 @@ export type ISATPServiceOptions = {
  *
  * @public
  * @interface SATPServiceStatic
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link ISATPServiceOptions} for constructor parameter structure
  * @see {@link SATPService} for instance interface
  */
@@ -210,7 +210,7 @@ export interface SATPServiceStatic {
  * Each service type includes both the Protocol Buffer generated interface
  * and the static service metadata interface for complete type coverage.
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPServiceStatic} for static interface requirements
  */
 export type SATPServiceInstance =
@@ -230,7 +230,7 @@ export type SATPServiceInstance =
  *
  * @public
  * @type ISATPServerServiceOptions
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link ISATPServiceOptions} for detailed configuration options
  */
 export type ISATPServerServiceOptions = ISATPServiceOptions;
@@ -246,7 +246,7 @@ export type ISATPServerServiceOptions = ISATPServiceOptions;
  *
  * @public
  * @type ISATPClientServiceOptions
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link ISATPServiceOptions} for detailed configuration options
  */
 export type ISATPClientServiceOptions = ISATPServiceOptions;
@@ -301,7 +301,7 @@ export type ISATPClientServiceOptions = ISATPServiceOptions;
  * @public
  * @abstract
  * @class SATPService
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link ISATPServiceOptions} for constructor options
  * @see {@link SATPServiceType} for service type enumeration
  * @see {@link SATPStagesV02} for supported protocol stages
@@ -341,7 +341,7 @@ export abstract class SATPService {
    * @protected
    * @param ops - Service configuration options
    * @throws {Error} When dbLogger is not provided (required dependency)
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   constructor(ops: ISATPServiceOptions) {
     this.monitorService = ops.monitorService;
@@ -375,7 +375,7 @@ export abstract class SATPService {
    * const service = new MyStageService({ ... });
    * console.log(service.getServiceIdentifier()); // "Client#1" or "Server#2"
    * ```
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public getServiceIdentifier(): string {
     return `${this.serviceType}#${this.stage}`;
@@ -387,7 +387,7 @@ export abstract class SATPService {
    * @public
    * @readonly
    * @returns {string} Protocol stage identifier (0-3)
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public get Stage(): string {
     return this.stage;
@@ -399,7 +399,7 @@ export abstract class SATPService {
    * @public
    * @readonly
    * @returns {Logger} SATP-specific logger with monitoring integration
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public get Log(): Logger {
     return this.logger;
@@ -411,7 +411,7 @@ export abstract class SATPService {
    * @public
    * @readonly
    * @returns {SATPServiceType} Service type designation
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public get ServiceType(): SATPServiceType {
     return this.serviceType;
@@ -423,7 +423,7 @@ export abstract class SATPService {
    * @public
    * @readonly
    * @returns {string} Service name for identification and logging
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public get ServiceName(): string {
     return this.serviceName;
@@ -440,7 +440,7 @@ export abstract class SATPService {
    * @public
    * @readonly
    * @returns {JsObjectSigner} Cryptographic signer instance
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public get Signer(): JsObjectSigner {
     return this.signer;

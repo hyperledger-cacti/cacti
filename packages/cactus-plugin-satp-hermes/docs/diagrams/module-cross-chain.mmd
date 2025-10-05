@@ -1,0 +1,85 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+graph TB
+    subgraph CrossChain["🔗 Cross-Chain Mechanisms Module"]
+        direction TB
+        
+        CCManager["<b>Cross-Chain Manager</b><br/>satp-cc-manager.ts<br/>Bridge coordination<br/>Oracle orchestration<br/>Ontology resolution"]
+        
+        subgraph Bridge["🌉 Bridge Component"]
+            direction TB
+            BridgeCore["<b>Bridge Core</b><br/>bridge/<br/>Lock/unlock coordination<br/>Multi-ledger support<br/>State synchronization"]
+            
+            subgraph BridgeImplementations["Bridge Implementations"]
+                FabricBridge["<b>Fabric Bridge</b><br/>Hyperledger Fabric<br/>Chaincode interaction<br/>Channel management"]
+                EVMBridge["<b>EVM Bridge</b><br/>Ethereum/Besu<br/>Smart contract calls<br/>Gas management"]
+                BesuBridge["<b>Besu Bridge</b><br/>Hyperledger Besu<br/>Private transactions<br/>Permission management"]
+            end
+            
+            Interfaces["<b>Bridge Interfaces</b><br/>interfaces/<br/>IBridge interface<br/>ILockable interface<br/>Contract standards"]
+            
+            Leafs["<b>Leaf Implementations</b><br/>leafs/<br/>Specific ledger adapters<br/>Protocol translation<br/>Native API wrappers"]
+            
+            Ontology["<b>Ontology Manager</b><br/>ontology/<br/>Asset type mapping<br/>Schema translation<br/>Semantic resolution"]
+            
+            FabricContracts["<b>Fabric Contracts</b><br/>fabric-contracts/<br/>Asset lock chaincode<br/>Transfer logic<br/>Proof generation"]
+        end
+        
+        subgraph Oracle["🔮 Oracle Component"]
+            direction TB
+            OracleCore["<b>Oracle Core</b><br/>oracle/<br/>Event monitoring<br/>State verification<br/>Proof validation"]
+            
+            OracleImpls["<b>Oracle Implementations</b><br/>implementations/<br/>Fabric event listener<br/>EVM event listener<br/>Block scanners"]
+            
+            SmartContracts["<b>Smart Contracts</b><br/>smart-contracts/<br/>Oracle interfaces<br/>Callback handlers<br/>Event emitters"]
+        end
+        
+        Common["<b>Common Utilities</b><br/>common/<br/>Shared types<br/>Helper functions<br/>Constants"]
+    end
+    
+    %% Relationships within Cross-Chain
+    CCManager -->|coordinates| BridgeCore
+    CCManager -->|orchestrates| OracleCore
+    CCManager -->|uses| Ontology
+    CCManager -->|uses| Common
+    
+    BridgeCore -->|implements| Interfaces
+    BridgeCore -->|uses| Leafs
+    BridgeCore -->|delegates to| FabricBridge
+    BridgeCore -->|delegates to| EVMBridge
+    BridgeCore -->|delegates to| BesuBridge
+    
+    FabricBridge -->|deploys| FabricContracts
+    FabricBridge -->|uses| Leafs
+    EVMBridge -->|uses| Leafs
+    BesuBridge -->|uses| Leafs
+    
+    Ontology -->|translates for| BridgeCore
+    Ontology -->|uses| Common
+    
+    OracleCore -->|uses| OracleImpls
+    OracleCore -->|interacts with| SmartContracts
+    OracleCore -->|uses| Common
+    
+    OracleImpls -->|monitors| FabricContracts
+    OracleImpls -->|monitors| SmartContracts
+    
+    %% External connections
+    CCManager -.->|called by| CoreHandlers["Stage Handlers<br/>(Core Module)"]
+    BridgeCore -.->|locks assets on| Blockchain["Source/Target<br/>Blockchains"]
+    OracleCore -.->|verifies on| Blockchain
+    CCManager -.->|logs to| Persistence["Gateway Persistence<br/>(Database Module)"]
+    
+    %% Styling
+    classDef managerClass fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10
+    classDef bridgeClass fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef implClass fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef oracleClass fill:#bbf7d0,stroke:#86efac,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef utilClass fill:#dcfce7,stroke:#bbf7d0,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef externalClass fill:#f0fdf4,stroke:#86efac,stroke-width:2px,stroke-dasharray: 5 5,color:#065f46,rx:10,ry:10
+    
+    class CCManager managerClass
+    class BridgeCore,Interfaces,Leafs,Ontology bridgeClass
+    class FabricBridge,EVMBridge,BesuBridge,FabricContracts implClass
+    class OracleCore,OracleImpls,SmartContracts oracleClass
+    class Common utilClass
+    class CoreHandlers,Blockchain,Persistence externalClass

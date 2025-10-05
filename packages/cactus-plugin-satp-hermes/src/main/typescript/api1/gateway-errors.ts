@@ -32,7 +32,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Error Handling
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import { asError } from "@hyperledger/cactus-common";
@@ -56,7 +56,7 @@ import { Error as GatewayErrorType } from "../generated/proto/cacti/satp/v02/com
  *
  * @class GatewayError
  * @extends RuntimeError
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * // Create a gateway error with full context
@@ -85,7 +85,7 @@ export class GatewayError extends RuntimeError {
    * @param code - HTTP status code for API responses (defaults to 500)
    * @param traceID - Optional distributed tracing identifier
    * @param trace - Optional detailed stack trace information
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   constructor(
     public message: string,
@@ -107,7 +107,7 @@ export class GatewayError extends RuntimeError {
    * cross-gateway communications.
    *
    * @returns SATP protocol error type enumeration
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   public getGatewayErrorType(): GatewayErrorType {
     return this.errorType;
@@ -129,7 +129,7 @@ export class GatewayError extends RuntimeError {
  *
  * @class GatewayShuttingDownError
  * @extends GatewayError
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * // Check shutdown state before processing
@@ -154,7 +154,7 @@ export class GatewayShuttingDownError extends GatewayError {
    *
    * @param tag - Component or method tag where shutdown was detected
    * @param cause - Optional underlying cause of the shutdown
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    */
   constructor(tag: string, cause?: string | Error | null) {
     super(

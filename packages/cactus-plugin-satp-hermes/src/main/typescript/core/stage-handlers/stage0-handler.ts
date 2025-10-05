@@ -71,7 +71,7 @@
  * const preTransferRes = await sendToGateway(targetGateway, preTransferReq);
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage0ServerService} for server-side business logic
@@ -234,7 +234,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  * // Session is now ready for Stage 1 operations
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPHandler} for base handler interface and common methods
  * @see {@link Stage0ServerService} for server-side business logic implementation
  * @see {@link Stage0ClientService} for client-side business logic implementation
@@ -352,7 +352,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * ```
    *
    * @throws {Error} When required configuration options are missing or invalid
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
@@ -488,7 +488,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * NewSessionRequest -> Validate Gateway -> Create Session -> NewSessionResponse
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link Stage0ServerService} for business logic implementation
    * @see {@link NewSessionRequest} for request message structure
    * @see {@link NewSessionResponse} for response message structure
@@ -647,7 +647,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * PreSATPTransferRequest -> Validate Session -> Wrap Tokens -> PreSATPTransferResponse
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link Stage0ServerService} for business logic implementation
    * @see {@link PreSATPTransferRequest} for request message structure
    * @see {@link PreSATPTransferResponse} for response message structure
@@ -789,7 +789,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * ```
    *
    * @throws {Error} When router configuration fails or service registration errors occur
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link SatpStage0Service} for service definition
    * @see {@link ConnectRouter} for router interface
    */
@@ -906,7 +906,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link NewSessionRequest} for message structure
    * @see {@link Stage0ClientService} for business logic implementation
    * @see {@link SATPSession} for session management
@@ -1056,7 +1056,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link PreSATPTransferRequest} for message structure
    * @see {@link NewSessionResponse} for input message structure
    * @see {@link Stage0ClientService} for business logic implementation

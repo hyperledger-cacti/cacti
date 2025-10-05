@@ -157,7 +157,7 @@ export abstract class BridgeManagerAdminInterface {
    * await adminManager.deployLeaf(fabricLeafOptions);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    * @see {@link IBridgeLeafOptions} for comprehensive configuration options
    * @see {@link BridgeLeaf.deployContracts} for contract deployment details

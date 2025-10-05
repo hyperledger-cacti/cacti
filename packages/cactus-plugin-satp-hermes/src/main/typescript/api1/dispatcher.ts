@@ -15,6 +15,10 @@
  * - Request routing and error handling
  * - Service lifecycle and shutdown management
  *
+ * @group API Layer
+ * @module api1/dispatcher
+ * @since 0.0.3-beta
+ *
  * @example
  * ```typescript
  * import { BLODispatcher } from './api1/dispatcher';
@@ -36,7 +40,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import {
@@ -127,7 +131,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  * for complete SATP protocol operation support.
  *
  * @interface BLODispatcherOptions
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const dispatcherOptions: BLODispatcherOptions = {
@@ -188,7 +192,7 @@ export interface BLODispatcherOptions {
  * - Graceful shutdown and error handling
  *
  * @class BLODispatcher
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const dispatcher = new BLODispatcher({
@@ -248,7 +252,7 @@ export class BLODispatcher {
    *
    * @param options - Complete configuration for dispatcher initialization
    * @throws Error if required options are missing or invalid
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    * @example
    * ```typescript
    * const dispatcher = new BLODispatcher({
@@ -336,7 +340,7 @@ export class BLODispatcher {
    *
    * @returns Promise resolving to array of configured web service endpoints
    * @throws Error if endpoint initialization fails
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    * @example
    * ```typescript
    * const endpoints = await dispatcher.getOrCreateWebServices();
@@ -490,7 +494,7 @@ export class BLODispatcher {
    *
    * @returns Promise resolving to health check response with status details
    * @throws Error if SATP manager is not initialized or health check fails
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    * @example
    * ```typescript
    * try {
@@ -577,7 +581,7 @@ export class BLODispatcher {
    * @returns Promise resolving to transaction response with operation status
    * @throws GatewayShuttingDownError when gateway is shutting down
    * @throws Error if SATP manager is not initialized or transaction fails
-   * @since 0.0.2-beta
+   * @since 0.0.3-beta
    * @example
    * ```typescript
    * const transactionRequest: TransactRequest = {

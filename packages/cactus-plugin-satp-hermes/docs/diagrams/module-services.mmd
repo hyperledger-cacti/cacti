@@ -1,0 +1,69 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+graph TB
+    subgraph Services["⚙️ Services Module - Gateway Operations"]
+        direction TB
+        
+        subgraph GatewayServices["🌐 Gateway Services"]
+            Orchestrator["<b>Gateway Orchestrator</b><br/>gateway/gateway-orchestrator.ts<br/>Counterparty management<br/>Channel lifecycle<br/>Connection handling<br/>Message routing"]
+            
+            SatpManager["<b>SATP Manager</b><br/>gateway/satp-manager.ts<br/>Protocol coordinator<br/>Session lifecycle<br/>Stage orchestration<br/>State machine"]
+        end
+        
+        subgraph Monitoring["📊 Monitoring Services"]
+            MetricsCollector["<b>Metrics Collector</b><br/>monitoring/<br/>Performance metrics<br/>Transfer statistics<br/>Gateway health<br/>Session tracking"]
+            
+            AlertManager["<b>Alert Manager</b><br/>monitoring/<br/>Threshold monitoring<br/>Error alerting<br/>SLA tracking<br/>Notifications"]
+        end
+        
+        subgraph NetworkID["🌍 Network Identification"]
+            ChainIDList["<b>Chain ID List</b><br/>network-identification/<br/>Ledger registry<br/>Network metadata<br/>Endpoint mapping<br/>Protocol support"]
+            
+            NetworkResolver["<b>Network Resolver</b><br/>network-identification/<br/>Gateway discovery<br/>DNS resolution<br/>Service location<br/>Load balancing"]
+        end
+        
+        subgraph Validation["✅ Validation Services"]
+            ConfigValidator["<b>Config Validator</b><br/>validation/<br/>Configuration validation<br/>Parameter checking<br/>Schema enforcement"]
+            
+            MessageValidator["<b>Message Validator</b><br/>validation/<br/>SATP message validation<br/>Signature verification<br/>Format checking"]
+            
+            ValidatingFunctions["<b>Validating Functions</b><br/>config-validating-functions/<br/>Reusable validators<br/>Type checking<br/>Business rules"]
+        end
+    end
+    
+    %% Internal relationships
+    Orchestrator -->|manages sessions via| SatpManager
+    SatpManager -->|reports to| Orchestrator
+    
+    Orchestrator -->|uses| NetworkResolver
+    Orchestrator -->|validates with| ConfigValidator
+    
+    SatpManager -->|validates with| MessageValidator
+    SatpManager -->|reports metrics to| MetricsCollector
+    
+    MetricsCollector -->|triggers| AlertManager
+    
+    NetworkResolver -->|queries| ChainIDList
+    
+    ConfigValidator -->|uses| ValidatingFunctions
+    MessageValidator -->|uses| ValidatingFunctions
+    
+    %% External connections
+    Orchestrator -.->|creates| CoreSessions["SATP Sessions<br/>(Core Module)"]
+    SatpManager -.->|executes| StageHandlers["Stage Handlers<br/>(Core Module)"]
+    SatpManager -.->|coordinates| CrossChainManager["Cross-Chain Manager<br/>(Cross-Chain Module)"]
+    Orchestrator -.->|logs to| GatewayPersistence["Gateway Persistence<br/>(Database Module)"]
+    SatpManager -.->|logs to| GatewayPersistence
+    NetworkResolver -.->|communicates with| RemoteGateways["Remote Gateways<br/>(External)"]
+    
+    %% Styling
+    classDef gatewayClass fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10
+    classDef monitoringClass fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef networkClass fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef validationClass fill:#bbf7d0,stroke:#86efac,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef externalClass fill:#f0fdf4,stroke:#86efac,stroke-width:2px,stroke-dasharray: 5 5,color:#065f46,rx:10,ry:10
+    
+    class Orchestrator,SatpManager gatewayClass
+    class MetricsCollector,AlertManager monitoringClass
+    class ChainIDList,NetworkResolver networkClass
+    class ConfigValidator,MessageValidator,ValidatingFunctions validationClass
+    class CoreSessions,StageHandlers,CrossChainManager,GatewayPersistence,RemoteGateways externalClass

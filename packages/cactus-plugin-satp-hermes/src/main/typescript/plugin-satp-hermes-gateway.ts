@@ -1,3 +1,15 @@
+/**
+ * @fileoverview SATP Hermes Gateway - Main Plugin Implementation
+ *
+ * This module provides the core SATP Gateway plugin that implements the IETF
+ * Secure Asset Transfer Protocol for cross-chain asset transfers. The gateway
+ * acts as the primary orchestrator for all SATP operations.
+ *
+ * @group SATP Gateway
+ * @module plugin-satp-hermes-gateway
+ * @since 0.0.3-beta
+ */
+
 import {
   Secp256k1Keys,
   Checks,
@@ -148,7 +160,7 @@ import { ExtensionConfig } from "./services/validation/config-validating-functio
  * @see {@link ICrossChainMechanismsOptions} for bridge configuration
  * @see {@link CrashManager} for crash recovery implementation
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export interface SATPGatewayConfig extends ICactusPluginOptions {
   /**
@@ -423,7 +435,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
  * @see {@link GatewayOrchestrator} for gateway coordination
  * @see {@link MonitorService} for observability and monitoring
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsDefined()
@@ -535,7 +547,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * @see {@link CrashManager} for crash recovery initialization
    * @see {@link MonitorService} for observability setup
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -1000,7 +1012,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * @see {@link MonitorService} for observability and tracing
    * @see {@link CrashManager} for crash recovery integration
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public async startup(): Promise<void> {
     const fnTag = `${this.className}#startup()`;
@@ -1348,7 +1360,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    * @see {@link ShutdownHook} for cleanup hook interface
    * @see {@link CrashManager} for crash recovery finalization
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    */
   public async shutdown(): Promise<void> {
     const fnTag = `${this.className}#shutdown()`;

@@ -65,19 +65,19 @@ jobs:
       - name: Set image tags
         id: set_tags
         run: |
-          # Extract SATP package version from package.json customMetadata
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          # Extract SATP package version from package.json version field
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
           
           # Check if this is a release build (manual trigger with is_release=true)
           IS_RELEASE="${{ inputs.is_release }}"
           if [ "$IS_RELEASE" = "true" ]; then
-            # Release mode: Use package.json satp-package-version or custom version as the main tag
+            # Release mode: Use package.json version or custom version as the main tag
             if [ -n "${{ inputs.custom_version }}" ]; then
               TAG_VERSION="${{ inputs.custom_version }}"
               echo "Building release version with custom version: ${{ inputs.custom_version }}"
             else
               TAG_VERSION="${PACKAGE_VERSION}"
-              echo "Building release version with satp-package-version: ${PACKAGE_VERSION}"
+              echo "Building release version with package.json version: ${PACKAGE_VERSION}"
             fi
             TAG_SUFFIX="release"
           else
@@ -103,7 +103,7 @@ jobs:
 
       - name: Debug Build Info
         run: |
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
           {
             echo "Debug: Current ref = ${{ github.ref }}"
             echo "Debug: Event name = ${{ github.event_name }}"
@@ -112,7 +112,7 @@ jobs:
             echo "Debug: Building for tag version = ${{ steps.set_tags.outputs.tag_version }}"
             echo "Debug: Building for dockerhub image = ${{ steps.set_tags.outputs.dockerhub_image }}"
             echo "Debug: Node.js version = v22.18.0"
-            echo "Debug: SATP package version = ${PACKAGE_VERSION}"
+            echo "Debug: Package version = ${PACKAGE_VERSION}"
             echo "Debug: Commit hash = $(git rev-parse --short HEAD)"
           }
 

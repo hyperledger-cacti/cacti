@@ -1,0 +1,60 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+graph TB
+    subgraph API["🌐 API Layer - HTTP/REST Interface"]
+        direction TB
+        
+        Dispatcher["<b>BLO API Dispatcher</b><br/>dispatcher.ts<br/>Route management<br/>Request routing<br/>HTTP endpoint coordination"]
+        
+        subgraph AdminAPI["👤 Admin Operations"]
+            AdminEndpoints["<b>Admin Endpoints</b><br/>admin/<br/>Gateway status<br/>Session management<br/>Configuration<br/>Health checks"]
+        end
+        
+        subgraph TransactionAPI["💸 Transaction Operations"]
+            TransferInit["<b>Transfer Initiation</b><br/>POST /transfer<br/>Start new SATP transfer<br/>Parameter validation<br/>Session creation"]
+            TransferStatus["<b>Transfer Status</b><br/>GET /transfer/:id<br/>Query transfer state<br/>Progress tracking<br/>Session details"]
+            TransactionMgmt["<b>Transaction Management</b><br/>transaction/<br/>CRUD operations<br/>Query filters<br/>Status updates"]
+        end
+        
+        subgraph OracleAPI["🔮 Oracle Operations"]
+            OracleTask["<b>Oracle Task</b><br/>POST /oracle/task<br/>Trigger oracle actions<br/>Event monitoring<br/>Proof verification"]
+            OracleStatus["<b>Oracle Status</b><br/>GET /oracle/status<br/>Oracle health<br/>Monitored events<br/>Latest blocks"]
+        end
+        
+        Errors["<b>Gateway Errors</b><br/>gateway-errors.ts<br/>Error response formatting<br/>HTTP status codes<br/>Error serialization"]
+    end
+    
+    %% Relationships
+    Dispatcher -->|routes to| AdminEndpoints
+    Dispatcher -->|routes to| TransferInit
+    Dispatcher -->|routes to| TransferStatus
+    Dispatcher -->|routes to| TransactionMgmt
+    Dispatcher -->|routes to| OracleTask
+    Dispatcher -->|routes to| OracleStatus
+    
+    Dispatcher -->|handles errors via| Errors
+    AdminEndpoints -->|returns| Errors
+    TransferInit -->|returns| Errors
+    TransferStatus -->|returns| Errors
+    TransactionMgmt -->|returns| Errors
+    OracleTask -->|returns| Errors
+    OracleStatus -->|returns| Errors
+    
+    %% External connections
+    TransferInit -.->|creates| SessionFlow["SATP Session<br/>(Core Module)"]
+    OracleTask -.->|triggers| OracleManager["Oracle Manager<br/>(Cross-Chain Module)"]
+    AdminEndpoints -.->|queries| GatewayOrchestrator["Gateway Orchestrator<br/>(Services Module)"]
+    
+    %% Styling
+    classDef dispatcherClass fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10
+    classDef adminClass fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef transactionClass fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef oracleClass fill:#bbf7d0,stroke:#86efac,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef errorClass fill:#dcfce7,stroke:#bbf7d0,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef externalClass fill:#f0fdf4,stroke:#86efac,stroke-width:2px,stroke-dasharray: 5 5,color:#065f46,rx:10,ry:10
+    
+    class Dispatcher dispatcherClass
+    class AdminEndpoints adminClass
+    class TransferInit,TransferStatus,TransactionMgmt transactionClass
+    class OracleTask,OracleStatus oracleClass
+    class Errors errorClass
+    class SessionFlow,OracleManager,GatewayOrchestrator externalClass

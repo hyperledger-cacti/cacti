@@ -56,7 +56,7 @@
  * console.log('Proof generated:', wrapReceipt.proof);
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link SATPBridgeExecutionLayer} for execution layer interface
  * @see {@link BridgeLeaf} for bridge leaf implementations
@@ -121,7 +121,7 @@ import { TransactionResponse } from "./bridge-types";
  * };
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link BridgeLeaf} for bridge leaf implementations
  * @see {@link ClaimFormat} for supported claim formats
  * @see {@link MonitorService} for monitoring integration
@@ -208,7 +208,7 @@ export interface IdentifiedTransactionResponse {
  * ```
  *
  * @implements {SATPBridgeExecutionLayer}
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link SATPBridgeExecutionLayer} for interface definition
  * @see {@link BridgeLeaf} for bridge leaf implementations
  * @see {@link TransactionReceipt} for receipt format
@@ -252,7 +252,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    * });
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link ISATPBridgeExecutionLayerImplOptions} for configuration options
    */
   constructor(public readonly options: ISATPBridgeExecutionLayerImplOptions) {
@@ -402,6 +402,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    * @throws {Error} If the asset is non-fungible.
    */
   /**\n   * Wraps a fungible asset into the bridge wrapper contract for cross-chain operations.\n   *\n   * @description\n   * Encapsulates a fungible asset within the bridge wrapper contract, enabling it to\n   * participate in cross-chain transfer operations. This operation transfers custody\n   * of the original asset to the bridge while creating a bridge-managed representation\n   * that can be transferred across blockchain networks.\n   *\n   * **Asset Wrapping Process:**\n   * - Validates asset is fungible and has required properties\n   * - Transfers asset custody to bridge wrapper contract\n   * - Creates bridge-managed asset representation\n   * - Generates transaction receipt with proof for cross-chain verification\n   * - Records wrapping metadata for asset tracking\n   *\n   * **Cross-Chain Integration:**\n   * The wrapped asset becomes eligible for cross-chain transfers, with the wrapping\n   * proof serving as verification for the asset's existence and custody on the\n   * source blockchain network.\n   *\n   * @param asset - Fungible asset to be wrapped with amount and ownership details\n   * @returns Promise resolving to transaction receipt with wrapping proof\n   *\n   * @throws {TransactionIdUndefinedError} When transaction ID is missing from response\n   * @throws {Error} When asset is non-fungible (not supported for wrapping)\n   * @throws {WrapperContractError} When bridge wrapper contract interaction fails\n   *\n   * @example\n   * Wrapping ERC-20 token for cross-chain transfer:\n   * ```typescript\n   * const usdcAsset: FungibleAsset = {\n   *   id: 'usdc-bridge-123',\n   *   referenceId: 'usdc-ethereum-456',\n   *   type: TokenType.ERC20,\n   *   owner: '0x123...',\n   *   contractName: 'USDC',\n   *   network: { id: 'ethereum-mainnet', ledgerType: LedgerType.Ethereum },\n   *   amount: '1500.0'\n   * };\n   *\n   * const wrapReceipt = await executionLayer.wrapAsset(usdcAsset);\n   * console.log('Wrapped transaction:', wrapReceipt.transactionId);\n   * console.log('Cross-chain proof:', wrapReceipt.proof);\n   * \n   * // Asset is now ready for cross-chain transfer\n   * ```\n   *\n   * @since 2.0.0\n   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1\n   * @see {@link FungibleAsset} for asset data structure\n   * @see {@link TransactionReceipt} for receipt format\n   * @see {@link unwrapAsset} for asset unwrapping operations\n   */
+  /**\n   * Wraps a fungible asset into the bridge wrapper contract for cross-chain operations.\n   *\n   * @description\n   * Encapsulates a fungible asset within the bridge wrapper contract, enabling it to\n   * participate in cross-chain transfer operations. This operation transfers custody\n   * of the original asset to the bridge while creating a bridge-managed representation\n   * that can be transferred across blockchain networks.\n   *\n   * **Asset Wrapping Process:**\n   * - Validates asset is fungible and has required properties\n   * - Transfers asset custody to bridge wrapper contract\n   * - Creates bridge-managed asset representation\n   * - Generates transaction receipt with proof for cross-chain verification\n   * - Records wrapping metadata for asset tracking\n   *\n   * **Cross-Chain Integration:**\n   * The wrapped asset becomes eligible for cross-chain transfers, with the wrapping\n   * proof serving as verification for the asset's existence and custody on the\n   * source blockchain network.\n   *\n   * @param asset - Fungible asset to be wrapped with amount and ownership details\n   * @returns Promise resolving to transaction receipt with wrapping proof\n   *\n   * @throws {TransactionIdUndefinedError} When transaction ID is missing from response\n   * @throws {Error} When asset is non-fungible (not supported for wrapping)\n   * @throws {WrapperContractError} When bridge wrapper contract interaction fails\n   *\n   * @example\n   * Wrapping ERC-20 token for cross-chain transfer:\n   * ```typescript\n   * const usdcAsset: FungibleAsset = {\n   *   id: 'usdc-bridge-123',\n   *   referenceId: 'usdc-ethereum-456',\n   *   type: TokenType.ERC20,\n   *   owner: '0x123...',\n   *   contractName: 'USDC',\n   *   network: { id: 'ethereum-mainnet', ledgerType: LedgerType.Ethereum },\n   *   amount: '1500.0'\n   * };\n   *\n   * const wrapReceipt = await executionLayer.wrapAsset(usdcAsset);\n   * console.log('Wrapped transaction:', wrapReceipt.transactionId);\n   * console.log('Cross-chain proof:', wrapReceipt.proof);\n   * \n   * // Asset is now ready for cross-chain transfer\n   * ```\n   *\n   * @since 0.0.3-beta\n   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1\n   * @see {@link FungibleAsset} for asset data structure\n   * @see {@link TransactionReceipt} for receipt format\n   * @see {@link unwrapAsset} for asset unwrapping operations\n   */
   public async wrapAsset(asset: Asset): Promise<TransactionReceipt> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#wrapAsset()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);

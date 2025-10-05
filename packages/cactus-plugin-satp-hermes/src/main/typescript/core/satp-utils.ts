@@ -21,8 +21,8 @@ import { Asset } from "../cross-chain-mechanisms/bridge/ontology/assets/asset";
  * and message handling capabilities.
  *
  * @author SATP Development Team
- * @since 2.0.0
- * @version 2.0.0
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
  * @see {@link MessageType} for message type enumeration
  * @see {@link getEnumKeyByValue} for enum utility functions
  */
@@ -64,7 +64,7 @@ export enum SessionSide {
  * @function getMessageTypeName
  * @param {MessageType | undefined} messageType - Message type enum value
  * @returns {string} Human-readable message type name
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export function getMessageTypeName(
   messageType: MessageType | undefined,

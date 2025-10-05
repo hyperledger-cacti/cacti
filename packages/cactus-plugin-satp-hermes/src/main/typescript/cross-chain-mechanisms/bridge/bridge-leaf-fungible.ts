@@ -142,7 +142,7 @@ export abstract class BridgeLeafFungible {
    * console.log(`Wrapper deployed at: ${wrapperAddress}`);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    * @see {@link getDeployFungibleWrapperContractReceipt} for deployment receipt retrieval
    * @see {@link wrapAsset} for asset wrapping operations
@@ -178,7 +178,7 @@ export abstract class BridgeLeafFungible {
    * console.log(`Gas used: ${receipt.gasUsed}`);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link deployFungibleWrapperContract} for wrapper contract deployment
    * @see {@link TransactionResponse} for transaction response structure
    */
@@ -222,7 +222,7 @@ export abstract class BridgeLeafFungible {
    * console.log(`Wrapped in tx: ${wrapResult.transactionId}`);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    * @see {@link unwrapAsset} for asset unwrapping operations
    * @see {@link Asset} for asset data structure
@@ -264,7 +264,7 @@ export abstract class BridgeLeafFungible {
    * const nativeBalance = await erc20Contract.balanceOf(ownerAddress);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    * @see {@link wrapAsset} for asset wrapping operations
    * @see {@link TransactionResponse} for response format
@@ -305,7 +305,7 @@ export abstract class BridgeLeafFungible {
    * // Asset amount is now locked and ready for cross-chain transfer
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
    * @see {@link unlockAsset} for asset unlocking operations
    * @see {@link TransactionResponse} for response format
@@ -354,7 +354,7 @@ export abstract class BridgeLeafFungible {
    * }
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
    * @see {@link lockAsset} for asset locking operations
    * @see {@link TransactionResponse} for response format
@@ -398,7 +398,7 @@ export abstract class BridgeLeafFungible {
    * // New bridged asset amount is now available on destination chain
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
    * @see {@link burnAsset} for asset burning operations
    * @see {@link TransactionResponse} for response format
@@ -444,7 +444,7 @@ export abstract class BridgeLeafFungible {
    * await ethereumLeaf.unlockAssetWithProof('eth-original-123', 2.5, proof);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
    * @see {@link mintAsset} for asset minting operations
    * @see {@link TransactionResponse} for response format
@@ -478,7 +478,7 @@ export abstract class BridgeLeafFungible {
    * @throws {AssetNotFoundError} When specified asset ID does not exist
    * @throws {UnauthorizedAssignmentError} When caller lacks assignment permissions
    * @throws {InsufficientBalanceError} When asset balance is insufficient for assignment
-   * @throws {InvalidRecipientError} When recipient address is invalid or blacklisted
+   * @throws {InvalidRecipientError} When recipient address is invalid or in a denylist
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @example
@@ -494,7 +494,7 @@ export abstract class BridgeLeafFungible {
    * // Asset ownership is now transferred to recipient
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.4
    * @see {@link mintAsset} for asset minting operations
    * @see {@link TransactionResponse} for response format
@@ -542,7 +542,7 @@ export abstract class BridgeLeafFungible {
    * console.log(`Custom method executed in tx: ${customResult.transactionId}`);
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.5
    * @see {@link getReceipt} for transaction receipt retrieval
    * @see {@link TransactionResponse} for response format
@@ -591,7 +591,7 @@ export abstract class BridgeLeafFungible {
    * );
    * ```
    *
-   * @since 2.0.0
+   * @since 0.0.3-beta
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.6
    * @see {@link runTransaction} for transaction execution
    */

@@ -1,0 +1,94 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+
+graph TB
+    subgraph API1["🌐 API1 - BLO REST Endpoints"]
+        direction TB
+        
+        subgraph Dispatcher["📡 BLO API Dispatcher"]
+            direction TB
+            Router["<b>Express Router</b><br/>dispatcher.ts<br/>Route registration<br/>Middleware chain<br/>Error handling"]
+            Errors["<b>Gateway Errors</b><br/>gateway-errors.ts<br/>HTTP status codes<br/>Error responses<br/>Validation errors"]
+        end
+        
+        subgraph AdminAPI["⚙️ Admin Endpoints"]
+            direction TB
+            Health["<b>GET /healthcheck</b><br/>healthcheck-endpoint.ts<br/>Gateway health status<br/>Service availability<br/>Dependency checks"]
+            Status["<b>GET /status</b><br/>status-endpoint.ts<br/>Gateway configuration<br/>Network info<br/>Active sessions"]
+            Integrations["<b>GET /integrations</b><br/>integrations-endpoint.ts<br/>Blockchain connectors<br/>Available bridges<br/>Oracle integrations"]
+            Audit["<b>GET /audit</b><br/>audit-endpoint.ts<br/>Session logs<br/>Transaction history<br/>Proof retrieval"]
+            AddGateway["<b>POST /add-gateway</b><br/>add-counterparty-gateway-endpoint.ts<br/>Register counterparty<br/>Network topology<br/>Gateway discovery"]
+            Sessions["<b>GET /sessions</b><br/>get-all-session-ids-endpoints.ts<br/>Active sessions<br/>Session metadata<br/>State tracking"]
+        end
+        
+        subgraph TransactionAPI["💸 Transaction Endpoints"]
+            direction TB
+            Transact["<b>POST /transact</b><br/>transact-endpoint.ts<br/>Initiate transfer<br/>Asset details<br/>Counterparty info"]
+            ApproveAddr["<b>GET /approve-address</b><br/>get-approve-address-endpoint.ts<br/>Address validation<br/>Asset verification<br/>Gateway approval"]
+            TransactHandler["<b>Transact Handler</b><br/>transact-handler-service.ts<br/>Session creation<br/>Stage 0 initiation<br/>Response formatting"]
+            ApproveHandler["<b>Approve Handler</b><br/>get-approve-address-handler-service.ts<br/>Address lookup<br/>Policy validation<br/>Authorization"]
+        end
+        
+        subgraph OracleAPI["🔮 Oracle Endpoints"]
+            direction TB
+            RegisterTask["<b>POST /oracle/register</b><br/>oracle-register-task-endpoint.ts<br/>Event monitoring setup<br/>Filter configuration<br/>Callback registration"]
+            ExecuteTask["<b>POST /oracle/execute</b><br/>oracle-execute-task-endpoint.ts<br/>Manual task trigger<br/>Event processing<br/>Proof generation"]
+            UnregisterTask["<b>DELETE /oracle/unregister</b><br/>oracle-unregister-task-endpoint.ts<br/>Stop monitoring<br/>Cleanup resources<br/>Remove callbacks"]
+            OracleStatus["<b>GET /oracle/status</b><br/>oracle-get-status-endpoint.ts<br/>Task status<br/>Event queue<br/>Processing metrics"]
+            
+            RegisterHandler["<b>Register Handler</b><br/>oracle-register-task-handler-service.ts<br/>Task validation<br/>Oracle subscription<br/>Database persistence"]
+            ExecuteHandler["<b>Execute Handler</b><br/>oracle-execute-task-handler-service.ts<br/>Task retrieval<br/>Bridge invocation<br/>Result formatting"]
+            UnregisterHandler["<b>Unregister Handler</b><br/>oracle-unregister-task-handler-service.ts<br/>Task removal<br/>Cleanup operations"]
+            StatusHandler["<b>Status Handler</b><br/>oracle-get-status-handler-service.ts<br/>Status query<br/>Metrics collection"]
+        end
+    end
+    
+    subgraph External["🌍 External Connections"]
+        HTTPClient["<b>HTTP Clients</b><br/>REST API consumers<br/>Web applications<br/>CLI tools"]
+        Gateway["<b>SATP Gateway</b><br/>Core protocol engine<br/>Session management<br/>Bridge coordination"]
+        Oracle["<b>Oracle Manager</b><br/>Event monitoring<br/>Proof generation<br/>Blockchain queries"]
+    end
+    
+    %% Routing connections
+    HTTPClient -.->|"HTTP Requests"| Router
+    Router -->|"Route to"| AdminAPI
+    Router -->|"Route to"| TransactionAPI
+    Router -->|"Route to"| OracleAPI
+    Router -->|"Error handling"| Errors
+    
+    %% Admin API connections
+    Health -->|"Health check"| Gateway
+    Status -->|"Status query"| Gateway
+    Integrations -->|"Integration list"| Gateway
+    Audit -->|"Audit query"| Gateway
+    AddGateway -->|"Register gateway"| Gateway
+    Sessions -->|"Session list"| Gateway
+    
+    %% Transaction API connections
+    Transact --> TransactHandler
+    ApproveAddr --> ApproveHandler
+    TransactHandler -.->|"Initiate SATP"| Gateway
+    ApproveHandler -.->|"Validate"| Gateway
+    
+    %% Oracle API connections
+    RegisterTask --> RegisterHandler
+    ExecuteTask --> ExecuteHandler
+    UnregisterTask --> UnregisterHandler
+    OracleStatus --> StatusHandler
+    
+    RegisterHandler -.->|"Subscribe"| Oracle
+    ExecuteHandler -.->|"Execute"| Oracle
+    UnregisterHandler -.->|"Unsubscribe"| Oracle
+    StatusHandler -.->|"Query"| Oracle
+    
+    %% Style definitions
+    classDef primaryStyle fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff
+    classDef secondaryStyle fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46
+    classDef tertiaryStyle fill:#86efac,stroke:#4ade80,stroke-width:3px,color:#065f46
+    classDef quaternaryStyle fill:#bbf7d0,stroke:#86efac,stroke-width:3px,color:#065f46
+    classDef externalStyle fill:#dcfce7,stroke:#bbf7d0,stroke-width:2px,color:#065f46
+    
+    class Router,Errors primaryStyle
+    class Health,Status,Integrations,Audit,AddGateway,Sessions secondaryStyle
+    class Transact,ApproveAddr,TransactHandler,ApproveHandler tertiaryStyle
+    class RegisterTask,ExecuteTask,UnregisterTask,OracleStatus,RegisterHandler,ExecuteHandler,UnregisterHandler,StatusHandler quaternaryStyle
+    class HTTPClient,Gateway,Oracle externalStyle

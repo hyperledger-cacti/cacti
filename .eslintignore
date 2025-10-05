@@ -1,6 +1,7 @@
 **/node_modules/**
 **/dist/**
 **/build/** 
+**/public/**
 docs/*
 examples/cactus-example-carbon-accounting-frontend/www/
 examples/cactus-example-supply-chain-frontend/www/

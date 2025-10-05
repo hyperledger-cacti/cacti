@@ -138,7 +138,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  * console.log(`Asset wrapped: ${wrapResult.transactionId}`);
  * ```
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
  * @see {@link https://hyperledger-fabric.readthedocs.io/} Hyperledger Fabric Documentation
  * @see {@link BridgeLeafFungible} for fungible asset interface

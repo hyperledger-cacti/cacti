@@ -30,7 +30,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import { LedgerType } from "@hyperledger/cactus-core-api";
@@ -68,7 +68,7 @@ import { BridgeLeaf } from "../bridge-leaf";
  * system including logging configuration, ontology file paths, and
  * monitoring service integration.
  *
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const options: IOntologyManagerOptions = {

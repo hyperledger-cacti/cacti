@@ -2,7 +2,9 @@
  * @fileoverview Repository Interface Definitions for SATP Gateway Persistence
  *
  * This module defines the repository pattern interfaces for SATP gateway
- * data persistence operations. Provides type-safe contracts for local and
+ * data persistence operations.
+ *
+ * @group Database Repositories Provides type-safe contracts for local and
  * remote log repositories, enabling consistent data access patterns across
  * different storage implementations and ensuring SATP protocol compliance.
  *
@@ -26,7 +28,7 @@
  *
  * @see {@link https://martinfowler.com/eaaCatalog/repository.html} Repository Pattern
  * @author Hyperledger Cacti Contributors
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import type { LocalLog, RemoteLog } from "../../../core/types";
@@ -42,7 +44,7 @@ import type { LocalLog, RemoteLog } from "../../../core/types";
  * @template T - Entity type (LocalLog, RemoteLog, etc.)
  * @template K - Key type (string, number, etc.)
  * @interface IRepository
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export interface IRepository<T, K> {
   /** Retrieve entity by unique identifier */
@@ -72,7 +74,7 @@ export interface IRepository<T, K> {
  *
  * @interface ILocalLogRepository
  * @extends IRepository<LocalLog, string>
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const localRepo: ILocalLogRepository = new KnexLocalLogRepository(config);
@@ -131,7 +133,7 @@ export interface ILocalLogRepository extends IRepository<LocalLog, string> {
  *
  * @interface IRemoteLogRepository
  * @extends IRepository<RemoteLog, string>
- * @since 2.0.0
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const remoteRepo: IRemoteLogRepository = new KnexRemoteLogRepository(config);

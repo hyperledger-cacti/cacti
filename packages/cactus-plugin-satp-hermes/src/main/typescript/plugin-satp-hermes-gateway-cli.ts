@@ -9,6 +9,10 @@
  * deployment with external configuration files and comprehensive validation of all
  * SATP protocol parameters and cross-chain mechanism configurations.
  *
+ * @group Gateway CLI
+ * @module plugin-satp-hermes-gateway-cli
+ * @since 0.0.3-beta
+ *
  * **CLI Usage Context:**
  * This CLI is designed for production deployments where SATP gateways run as
  * standalone services with external configuration management. Supports:
@@ -46,7 +50,7 @@
  * @see {@link SATPGatewayConfig} for configuration structure
  * @see {@link launchGateway} for main launcher function
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 
 import { LoggerProvider } from "@hyperledger/cactus-common";
@@ -140,7 +144,7 @@ import { validateExtensions } from "./services/validation/config-validating-func
  * @see {@link validateCCConfig} for cross-chain configuration validation
  * @see {@link validateSatpKeyPairJSON} for cryptographic key validation
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 export async function launchGateway(): Promise<void> {
   const logger = LoggerProvider.getOrCreate({
@@ -357,7 +361,7 @@ export async function launchGateway(): Promise<void> {
  * @see {@link launchGateway} for the main launcher implementation
  * @see {@link SATPGateway} for gateway functionality
  *
- * @since 2.0.0
+ * @since 0.0.3-beta
  */
 if (require.main === module) {
   launchGateway();

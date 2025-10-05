@@ -13,7 +13,7 @@
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @author Hyperledger Cacti Contributors
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  */
 
 import {
@@ -30,7 +30,7 @@ import {
  *
  * @param x - Credential object to validate
  * @returns True if the credential type is None, false otherwise
- * @since 0.0.2-beta
+ * @since 0.0.3-beta
  * @example
  * ```typescript
  * const credential = { type: Web3SigningCredentialType.None };
