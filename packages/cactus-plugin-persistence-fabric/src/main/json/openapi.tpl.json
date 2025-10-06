@@ -14,7 +14,10 @@
       "TrackedOperationV1": {
         "description": "Persistence plugin operation that is tracked and returned in status report.",
         "type": "object",
-        "required": ["startAt", "operation"],
+        "required": [
+          "startAt",
+          "operation"
+        ],
         "properties": {
           "startAt": {
             "type": "string",
@@ -73,9 +76,29 @@
           }
         }
       },
+      "DiscoverNetworkResponseV1": {
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "nullable": false
+          },
+          "message": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
       "ErrorExceptionResponseV1": {
         "type": "object",
-        "required": ["message", "error"],
+        "required": [
+          "message",
+          "error"
+        ],
         "properties": {
           "message": {
             "type": "string",
@@ -108,6 +131,41 @@
               "text/plain": {
                 "schema": {
                   "$ref": "#/components/schemas/StatusResponseV1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network": {
+      "post": {
+        "operationId": "discoverNetworkV1",
+        "summary": "Refresh Fabric network structure in the database through discovery.",
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network"
+          }
+        },
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoverNetworkResponseV1"
                 }
               }
             }

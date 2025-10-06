@@ -16,10 +16,10 @@ export default function HomePage({ appConfig }: HomePageProps) {
         Applications
       </Typography>
       <Box
-        display="flex"
-        flexWrap="wrap"
-        justifyContent="space-between"
-        gap={5}
+        display="grid"
+        gridTemplateColumns="repeat(auto-fit, 400px)"
+        justifyContent="center"
+        gap="2rem"
         padding={5}
       >
         <AddApplicationPopupCard />

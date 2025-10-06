@@ -25,7 +25,11 @@ import {
 import PostgresDatabaseClient from "../../../main/typescript/db-client/db-client";
 
 import "jest-extended";
-import { invalidSampleBlock, sampleBlock } from "./sample-block";
+import {
+  invalidSampleBlock,
+  sampleBlock,
+  sampleDiscoveryResults,
+} from "./sample-data";
 
 // Logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -98,6 +102,27 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
     return response.rows;
   }
 
+  async function getDiscoveryMSPs() {
+    const response = await dbClient.client.query(
+      "SELECT * FROM fabric.discovery_msp",
+    );
+    return response.rows;
+  }
+
+  async function getDiscoveryPeers() {
+    const response = await dbClient.client.query(
+      "SELECT p.*, m.mspid FROM fabric.discovery_peers p JOIN fabric.discovery_msp m ON p.discovery_msp_id = m.id;",
+    );
+    return response.rows;
+  }
+
+  async function getDiscoveryOrderers() {
+    const response = await dbClient.client.query(
+      "SELECT o.*, m.mspid FROM fabric.discovery_orderers o JOIN fabric.discovery_msp m ON o.discovery_msp_id = m.id;",
+    );
+    return response.rows;
+  }
+
   //////////////////////////////////
   // Environment Setup
   //////////////////////////////////
@@ -153,6 +178,9 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
         "transaction",
         "transaction_action",
         "transaction_action_endorsement",
+        "discovery_msp",
+        "discovery_orderers",
+        "discovery_peers",
       ].sort(),
     );
 
@@ -376,5 +404,39 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
       .map((b) => b.block_number)
       .sort();
     expect(missingBlocksNumbers).toEqual([1, 2, 4, 5]);
+  });
+
+  test("insertDiscoveryResults updates ledger structure", async () => {
+    await dbClient.insertDiscoveryResults(sampleDiscoveryResults);
+
+    // Assert MSPs
+    const dbMsps = await getDiscoveryMSPs();
+    expect(dbMsps.length).toEqual(3);
+    for (const msp of dbMsps) {
+      expect(msp.mspid).toBeTruthy();
+      expect(msp.name).toBeTruthy();
+    }
+
+    // Assert Peers
+    const dbPeers = await getDiscoveryPeers();
+    expect(dbPeers.length).toEqual(2);
+    for (const peer of dbPeers) {
+      expect(peer.name).toBeTruthy();
+      expect(peer.endpoint).toBeTruthy();
+      expect(peer.ledger_height).toBeTruthy();
+      expect(peer.chaincodes).toBeTruthy();
+      expect(peer.discovery_msp_id).toBeTruthy();
+      expect(peer.mspid).toBeTruthy();
+    }
+
+    // Assert Orderers
+    const dbOrderers = await getDiscoveryOrderers();
+    expect(dbOrderers.length).toEqual(1);
+    const dbOrderer = dbOrderers[0];
+    expect(dbOrderer.name).toBeTruthy();
+    expect(dbOrderer.host).toBeTruthy();
+    expect(dbOrderer.port).toBeTruthy();
+    expect(dbOrderer.discovery_msp_id).toBeTruthy();
+    expect(dbOrderer.mspid).toBeTruthy();
   });
 });

@@ -63,7 +63,7 @@ export default function AddApplicationPopupCard() {
         sx={{
           display: "flex",
           flexDirection: "column",
-          width: 400,
+          width: "400px",
           minHeight: 250,
           backgroundColor: theme.palette.grey[100],
         }}
