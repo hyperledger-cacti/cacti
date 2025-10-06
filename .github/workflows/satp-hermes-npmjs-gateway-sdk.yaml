@@ -1,0 +1,411 @@
+name: SATP Hermes Gateway SDK - NPM Publish
+
+# =============================================================================
+# NPM PUBLISHING WORKFLOW DOCUMENTATION
+# =============================================================================
+#
+# This workflow publishes the SATP Hermes Gateway SDK to npmjs.org and GitHub
+# Package Registry (GPR) with support for both development and production releases.
+#
+# PACKAGE CONFIGURATION:
+#   Organization: @hyperledger
+#   Package: @hyperledger/cactus-plugin-satp-hermes
+#   Registry: https://registry.npmjs.org/
+#
+# VERSION STRATEGY:
+#   Version Source: package.json customMetadata.satp-package-version (0.0.3-beta)
+#   Note: package.json "version" field remains at 2.1.0 for monorepo compatibility.
+#         The workflow dynamically updates version from customMetadata before publishing.
+#   
+#   Development Builds:
+#     Format: {base-version}-dev.{timestamp}
+#     Example: 0.0.3-beta-dev.20250106120000
+#     NPM Tag: dev
+#     Trigger: Push to main, satp-dev, or satp-stg branches
+#   
+#   Release Builds:
+#     Format: {base-version} or custom version
+#     Example: 0.0.3-beta
+#     NPM Tags: latest (primary) + version tag (0.0.3-beta)
+#     Trigger: Manual workflow dispatch with is_release=true
+#     Note: Production releases are tagged with both 'latest' and the specific version
+#
+# PACKAGE CONTENTS:
+#   Files Included (package.json "files" field):
+#     - dist/lib/main/**/*.js      # Compiled JavaScript
+#     - dist/lib/main/**/*.d.ts    # TypeScript definitions
+#     - dist/lib/main/**/*.json    # JSON configs, OpenAPI specs, Solidity ABIs
+#     - README.md                  # Package documentation
+#     - CHANGELOG.md               # Version history
+#     - LICENSE                    # Apache-2.0 license
+#   
+#   Package Size: ~900 KB compressed, ~5.6 MB unpacked
+#   
+#   Files Excluded:
+#     - Source TypeScript (src/)
+#     - Test files
+#     - Docker bundle (dist/bundle/)
+#     - Examples (dist/lib/examples/)
+#     - Build configs, dev scripts
+#
+# REQUIRED SECRETS:
+#   NPM_TOKEN: NPM authentication token with publish permissions for @hyperledger
+#   GITHUB_TOKEN: Auto-provided by GitHub Actions for GPR publishing
+#
+# USAGE:
+#   Development Release (Automatic):
+#     git push origin main
+#   
+#   Production Release (Manual):
+#     1. Go to Actions tab
+#     2. Select "SATP Hermes Gateway SDK - NPM Publish"
+#     3. Click "Run workflow"
+#     4. Set is_release=true
+#     5. Optionally set custom_version
+#
+# VERIFICATION:
+#   npm view @hyperledger/cactus-plugin-satp-hermes
+#   npm install @hyperledger/cactus-plugin-satp-hermes@dev
+#   npm install @hyperledger/cactus-plugin-satp-hermes@latest
+#
+# =============================================================================
+
+on:
+  workflow_call:
+    inputs:
+      skip_tests:
+        description: 'Skip test execution (for emergency releases only)'
+        required: false
+        default: false
+        type: boolean
+      is_release:
+        description: 'Create release version using package.json version'
+        required: false
+        default: false
+        type: boolean
+      custom_version:
+        description: 'Custom version tag (leave empty to use package.json version)'
+        required: false
+        type: string
+    outputs:
+      package_version:
+        description: "Package version from package.json"
+        value: ${{ jobs.set-npm-tags.outputs.package_version }}
+      tag_suffix:
+        description: "Tag suffix (dev or release)"
+        value: ${{ jobs.set-npm-tags.outputs.tag_suffix }}
+      tag_version:
+        description: "Full tag version"
+        value: ${{ jobs.set-npm-tags.outputs.tag_version }}
+      npm_package_name:
+        description: "NPM package name"
+        value: ${{ jobs.set-npm-tags.outputs.npm_package_name }}
+      is_release:
+        description: "Whether this is a release build"
+        value: ${{ jobs.set-npm-tags.outputs.is_release }}
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  # Set NPM tags based on branch and commit information
+  set-npm-tags:
+    # Handle conditional test dependencies - run if tests pass OR if tests are skipped in release mode
+    if: |
+      always() && (
+        (inputs.skip_tests == true && inputs.is_release == true) ||
+        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) ||
+        (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) ||
+        github.event_name == 'workflow_dispatch'
+      )
+    runs-on: ubuntu-latest-16-cores
+    outputs:
+      package_version: ${{ steps.set_tags.outputs.package_version }}
+      tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
+      tag_version: ${{ steps.set_tags.outputs.tag_version }}
+      npm_package_name: ${{ steps.set_tags.outputs.npm_package_name }}
+      is_release: ${{ steps.set_tags.outputs.is_release }}
+    steps:
+      - uses: actions/checkout@v4.1.7  
+      - name: Set package tags
+        id: set_tags
+        run: |
+          # Extract SATP package version from package.json customMetadata
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          
+          # Check if this is a release build (manual trigger with is_release=true)
+          IS_RELEASE="${{ inputs.is_release }}"
+          if [ "$IS_RELEASE" = "true" ]; then
+            # Release mode: Use package.json satp-package-version or custom version as the main tag
+            if [ -n "${{ inputs.custom_version }}" ]; then
+              TAG_VERSION="${{ inputs.custom_version }}"
+              echo "Building release version with custom version: ${{ inputs.custom_version }}"
+            else
+              TAG_VERSION="${PACKAGE_VERSION}"
+              echo "Building release version with satp-package-version: ${PACKAGE_VERSION}"
+            fi
+            TAG_SUFFIX="release"
+          else
+            # Development mode: Use date-based development tags for all branches
+            TAG_SUFFIX="dev"
+            TAG_VERSION="$(date -u +"%Y-%m-%d")-${TAG_SUFFIX}-$(git rev-parse --short HEAD)"
+            echo "Building development version: ${TAG_VERSION}"
+          fi
+          
+          # Standardized package name for Hyperledger organization
+          NPM_PACKAGE_NAME="@hyperledger/cactus-plugin-satp-hermes"
+          
+          {
+            echo "package_version=${PACKAGE_VERSION}"
+            echo "tag_suffix=${TAG_SUFFIX}"
+            echo "tag_version=${TAG_VERSION}"
+            echo "npm_package_name=${NPM_PACKAGE_NAME}"
+            echo "is_release=${IS_RELEASE:-false}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Debug Build Info
+        run: |
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          {
+            echo "Debug: Current ref = ${{ github.ref }}"
+            echo "Debug: Event name = ${{ github.event_name }}"
+            echo "Debug: GitHub workspace = ${{ github.workspace }}"
+            echo "Debug: Repository = ${{ github.repository }}"
+            echo "Debug: Building for tag version = ${{ steps.set_tags.outputs.tag_version }}"
+            echo "Debug: Building for npm package = ${{ steps.set_tags.outputs.npm_package_name }}"
+            echo "Debug: Node.js version = v22.18.0"
+            echo "Debug: SATP package version = ${PACKAGE_VERSION}"
+            echo "Debug: Commit hash = $(git rev-parse --short HEAD)"
+          }
+
+  # Build NPM package once for caching and reuse
+  build-satp-hermes-npm-package:
+    needs: [set-npm-tags]
+    # Build NPM packages for pushes, PRs targeting the release branches, and manual workflow dispatch.
+    # This job only builds, it does not publish to registries.
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest-16-cores
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'yarn'
+          cache-dependency-path: yarn.lock
+      
+      - id: yarn-cache
+        name: Initialize Yarn Cache
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+          path: ./.yarn/
+          restore-keys: |
+            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
+
+      - name: Set working directory
+        run: cd packages/cactus-plugin-satp-hermes           
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Configure
+        run: yarn configure
+
+      - name: Build package
+        id: build
+        run: |
+          yarn lerna run build --scope=@hyperledger/cactus-plugin-satp-hermes
+          echo "success=true" >> "$GITHUB_OUTPUT"
+
+      - name: Verify build artifacts
+        run: |
+          echo "Checking build artifacts..."
+          ls -la packages/cactus-plugin-satp-hermes/dist/
+          
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-hermes-build-artifacts
+          path: |
+            packages/cactus-plugin-satp-hermes/dist/lib/main/**/*.js
+            packages/cactus-plugin-satp-hermes/dist/lib/main/**/*.d.ts
+            packages/cactus-plugin-satp-hermes/dist/lib/main/**/*.json
+            packages/cactus-plugin-satp-hermes/package.json
+            packages/cactus-plugin-satp-hermes/README.md
+            packages/cactus-plugin-satp-hermes/CHANGELOG.md
+            packages/cactus-plugin-satp-hermes/LICENSE
+          retention-days: 1
+
+  # =============================================================================
+  # STAGE: PUBLISH NPM PACKAGES
+  # =============================================================================
+  # The following two jobs run in parallel on push events to release branches
+  # for faster deployment.
+
+  # Stage: Publish NPM package to npmjs.org
+  publish-satp-hermes-npm-package-npmjs:
+    needs: [build-satp-hermes-npm-package, set-npm-tags]
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest-16-cores
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          always-auth: true
+          registry-url: 'https://registry.npmjs.org/'
+          scope: '@hyperledger'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: satp-hermes-build-artifacts
+          path: packages/cactus-plugin-satp-hermes/
+
+      - name: Configure git user
+        run: |
+          git config --global user.email "npm-ci@hyperledger.org"
+          git config --global user.name "hyperledger-ghci"
+
+      - name: Update package version for development build
+        if: needs.set-npm-tags.outputs.is_release != 'true'
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          # Get the base version from customMetadata
+          BASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+          # Create a development version with timestamp
+          DEV_VERSION="${BASE_VERSION}-dev.$(date +%Y%m%d%H%M%S)"
+          # Update package.json version field
+          npm version "$DEV_VERSION" --no-git-tag-version --allow-same-version
+          echo "Updated package version to: $DEV_VERSION"
+          grep version package.json
+
+      - name: Update package version for release build
+        if: needs.set-npm-tags.outputs.is_release == 'true'
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          # Use the version from customMetadata or custom version input
+          if [ -n "${{ inputs.custom_version }}" ]; then
+            RELEASE_VERSION="${{ inputs.custom_version }}"
+          else
+            RELEASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+          fi
+          # Update package.json version field
+          npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
+          echo "Updated package version to: $RELEASE_VERSION"
+          grep version package.json
+
+      - name: Verify package contents
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          echo "Package contents to be published:"
+          npm pack --dry-run
+          
+      - name: Publish to npmjs.org (Development)
+        if: needs.set-npm-tags.outputs.is_release != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          npm whoami
+          npm publish --tag dev --access public
+
+      - name: Publish to npmjs.org (Release)
+        if: needs.set-npm-tags.outputs.is_release == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          npm whoami
+          # Publish with latest tag (npm automatically tags with version)
+          npm publish --tag latest --access public
+          # Also add version-specific tag for easier reference
+          PACKAGE_VERSION=$(node -e "console.log(require('./package.json').version)")
+          echo "Published version ${PACKAGE_VERSION} with 'latest' tag"
+
+  # Stage: Publish NPM package to GitHub Package Registry
+  publish-satp-hermes-npm-package-ghcr:
+    needs: [build-satp-hermes-npm-package, set-npm-tags]
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest-16-cores
+    continue-on-error: true  # Don't fail the workflow if GitHub Package Registry push fails
+    steps:
+      - uses: actions/checkout@v4.1.7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          always-auth: true
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@hyperledger'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: satp-hermes-build-artifacts
+          path: packages/cactus-plugin-satp-hermes/
+
+      - name: Configure git user
+        run: |
+          git config --global user.email "npm-ci@hyperledger.org"
+          git config --global user.name "hyperledger-ghci"
+
+      - name: Update package version for development build
+        if: needs.set-npm-tags.outputs.is_release != 'true'
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          # Get the base version from customMetadata
+          BASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+          # Create a development version with timestamp
+          DEV_VERSION="${BASE_VERSION}-dev.$(date +%Y%m%d%H%M%S)"
+          # Update package.json version field
+          npm version "$DEV_VERSION" --no-git-tag-version --allow-same-version
+          echo "Updated package version to: $DEV_VERSION"
+
+      - name: Update package version for release build
+        if: needs.set-npm-tags.outputs.is_release == 'true'
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          # Use the version from customMetadata or custom version input
+          if [ -n "${{ inputs.custom_version }}" ]; then
+            RELEASE_VERSION="${{ inputs.custom_version }}"
+          else
+            RELEASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+          fi
+          # Update package.json version field
+          npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
+          echo "Updated package version to: $RELEASE_VERSION"
+
+      - name: Publish to GitHub Package Registry (Development)
+        if: needs.set-npm-tags.outputs.is_release != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          npm whoami --registry=https://npm.pkg.github.com/
+          npm publish --tag dev --access public --registry=https://npm.pkg.github.com/
+
+      - name: Publish to GitHub Package Registry (Release)
+        if: needs.set-npm-tags.outputs.is_release == 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd packages/cactus-plugin-satp-hermes
+          npm whoami --registry=https://npm.pkg.github.com/
+          # Publish with latest tag (npm automatically tags with version)
+          npm publish --tag latest --access public --registry=https://npm.pkg.github.com/
+          PACKAGE_VERSION=$(node -e "console.log(require('./package.json').version)")
+          echo "Published version ${PACKAGE_VERSION} with 'latest' tag to GitHub Package Registry"

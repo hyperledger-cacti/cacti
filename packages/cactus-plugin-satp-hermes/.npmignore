@@ -1,0 +1,91 @@
+# IMPORTANT: The "files" field in package.json takes precedence
+# Only dist/lib/main/**/* is included via the "files" field
+# This .npmignore serves as additional protection against accidental includes
+
+# Source files (never publish source, only compiled)
+src/
+
+# Docker bundle (not needed for npm package)
+dist/bundle/
+
+# Examples (not needed for npm package)
+dist/lib/examples/
+
+# Test files
+dist/lib/test/
+
+# Development files
+.eslint.config.mjs
+.prettierignore
+.gitignore
+tsconfig.json
+jest.config*.ts
+jest.config*.js
+makefile
+openapitools.json
+buf.gen.yaml
+buf.yaml
+foundry.toml
+remappings.txt
+
+# Docker bundle (not needed for npm package)
+dist/bundle/
+
+# Build artifacts that shouldn't be published
+node_modules/
+cache/
+reports/
+.yarn/
+
+# Test files
+src/test/
+*.test.ts
+*.spec.ts
+__tests__/
+__mocks__/
+
+# Docker files
+docker-compose*.yml
+*.Dockerfile
+*.Dockerfile.dockerignore
+*.Dockerfile.healthcheck.mjs
+supervisord.conf
+
+# Scripts
+load-docker-image.sh
+start-satp.sh
+gateway_log_controller.sh
+
+# Database files
+*.sqlite3
+*.db
+
+# Logs
+logs/
+*.log
+
+# Documentation build artifacts
+docs/
+images/
+assets/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Solidity build artifacts (if not needed in package)
+src/main/solidity/generated/
+src/test/solidity/
+
+# Public assets (if not needed)
+public/
+
+# Keep only essential source files
+# The "files" field in package.json will control what gets included
