@@ -62,7 +62,12 @@
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
   "files": [
-    "dist/*"
+    "dist/lib/main/**/*.js",
+    "dist/lib/main/**/*.d.ts",
+    "dist/lib/main/**/*.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "run-s codegen tsc",
@@ -276,7 +281,8 @@
     "npm": ">=8"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "customMetadata": {
     "satp-draft-versions": {
