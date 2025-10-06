@@ -9,6 +9,10 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   # Test execution jobs: run unit and integration tests in parallel
   run-satp-tests-unit:
@@ -608,12 +612,19 @@ jobs:
         with:
           version: stable
 
+      - name: Build Foundry contracts
+        run: |
+          set -euo pipefail
+          cd packages/cactus-plugin-satp-hermes
+          echo "Building Foundry contracts and tests"
+          yarn forge:build:all
+
       - name: Run Foundry tests
         run: |
           set -euo pipefail
           cd packages/cactus-plugin-satp-hermes
           echo "Running Foundry on-chain tests"
-          yarn forge:all
+          yarn forge:test
 
       - name: Upload SATP foundry test reports
         if: always()
