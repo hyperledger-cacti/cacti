@@ -4401,6 +4401,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@bufbuild/protobuf@npm:2.2.2":
+  version: 2.2.2
+  resolution: "@bufbuild/protobuf@npm:2.2.2"
+  checksum: 10/f739b7787f3e978db7ed5eff55fb15ec6fea3d7ab9ae8f1de9e03375e786facd4c8bfd09ea4f9558bf29f8521b524781bfeec6960fc910e7d1309c4a2329317b
+  languageName: node
+  linkType: hard
+
+"@bufbuild/protobuf@npm:^2.2.2":
+  version: 2.8.0
+  resolution: "@bufbuild/protobuf@npm:2.8.0"
+  checksum: 10/6fbea41b8c4995ef589b3fa2f407223a4832c9fff380514bbfde387e23f1df8350f6e0643f5624dec8628a0a59ed640818c01c7cba4abd88bdeddfb44eb40ece
+  languageName: node
+  linkType: hard
+
 "@bufbuild/protoc-gen-es@npm:1.8.0":
   version: 1.8.0
   resolution: "@bufbuild/protoc-gen-es@npm:1.8.0"
@@ -9314,6 +9328,8 @@ __metadata:
     joi: "npm:17.13.3"
     json5: "npm:2.2.3"
     jsrsasign: "npm:11.0.0"
+    level: "npm:8.0.0"
+    lodash: "npm:4.17.21"
     long: "npm:5.2.3"
     multer: "npm:1.4.5-lts.1"
     ngo: "npm:2.7.0"

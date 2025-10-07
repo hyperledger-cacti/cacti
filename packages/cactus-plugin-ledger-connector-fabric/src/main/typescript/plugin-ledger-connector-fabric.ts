@@ -207,7 +207,7 @@ export interface IPluginLedgerConnectorFabricOptions
    * This is especially relevant when testing with the fabricAIO image.
    */
   dockerNetworkName?: string;
-  
+
   //cc-tx-viz
   collectTransactionReceipts?: boolean;
   persistMessages?: boolean;
