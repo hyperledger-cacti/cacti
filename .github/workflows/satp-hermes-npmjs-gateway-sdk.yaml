@@ -1,7 +1,7 @@
 name: SATP Hermes Gateway SDK - NPM Publish
 
 # =============================================================================
-# NPM PUBLISHING WORKFLOW DOCUMENTATION
+# NPM PUBLISHING WORKFLOW
 # =============================================================================
 #
 # This workflow publishes the SATP Hermes Gateway SDK to npmjs.org and GitHub
