@@ -9,6 +9,10 @@ on:
         default: false
         type: boolean
 
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   # Test execution jobs: run unit and integration tests in parallel
   run-satp-tests-unit:
@@ -79,8 +83,10 @@ jobs:
           name: "SATP Unit Tests"
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-unit.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for SATP unit coverage artifacts
         id: check_unit_coverage
@@ -169,8 +175,10 @@ jobs:
           name: "SATP Integration Tests (Bridge)"
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-bridge.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for SATP bridge integration coverage artifacts
         id: check_bridge_coverage
@@ -259,8 +267,10 @@ jobs:
           name: "SATP Integration Tests (Oracle)"
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-oracle.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for SATP oracle integration coverage artifacts
         id: check_oracle_coverage
@@ -351,8 +361,10 @@ jobs:
           name: "SATP Integration Tests (Gateway)"
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-gateway.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for SATP gateway integration coverage artifacts
         id: check_gateway_coverage
@@ -442,8 +454,10 @@ jobs:
           name: "SATP Integration Tests (Docker)"
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-integration-docker.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for SATP docker integration coverage artifacts
         id: check_docker_coverage
@@ -545,8 +559,10 @@ jobs:
           name: "CBDC Integration Tests"
           path: examples/cactus-example-cbdc-bridging-backend/reports/junit/cbdc-bridging-tests-integration.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for CBDC integration coverage artifacts
         id: check_cbdc_coverage
@@ -608,12 +624,19 @@ jobs:
         with:
           version: stable
 
+      - name: Build Foundry contracts
+        run: |
+          set -euo pipefail
+          cd packages/cactus-plugin-satp-hermes
+          echo "Building Foundry contracts and tests"
+          yarn forge:build:all
+
       - name: Run Foundry tests
         run: |
           set -euo pipefail
           cd packages/cactus-plugin-satp-hermes
           echo "Running Foundry on-chain tests"
-          yarn forge:all
+          yarn forge:test
 
       - name: Upload SATP foundry test reports
         if: always()
@@ -696,8 +719,10 @@ jobs:
           name: "SATP Recovery Tests"
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-recovery.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for SATP recovery coverage artifacts
         id: check_recovery_coverage
@@ -788,8 +813,10 @@ jobs:
           name: "SATP Rollback Tests"
           path: packages/cactus-plugin-satp-hermes/reports/junit/satp-hermes-tests-rollback.xml
           reporter: jest-junit
-          list-tests: failed
+          list-tests: all
+          max-annotations: 50
           fail-on-error: false
+          only-summary: false
 
       - name: Check for SATP rollback coverage artifacts
         id: check_rollback_coverage

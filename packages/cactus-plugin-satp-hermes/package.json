@@ -62,7 +62,12 @@
   "module": "dist/lib/main/typescript/index.js",
   "types": "dist/lib/main/typescript/index.d.ts",
   "files": [
-    "dist/*"
+    "dist/lib/main/**/*.js",
+    "dist/lib/main/**/*.d.ts",
+    "dist/lib/main/**/*.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "run-s codegen tsc",
@@ -117,8 +122,8 @@
     "test:integration:docker": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/docker --runInBand --forceExit  --config=jest.config-integration-docker.ts",
     "test:integration:gateway": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/gateway --runInBand --forceExit --config=jest.config-integration-gateway.ts",
     "test:integration:oracle": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/oracle --runInBand --forceExit --config=jest.config-integration-oracle.ts",
-    "test:integration:recovery": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/recovery --runInBand --forceExit --config=jest.config-unit.ts",
-    "test:integration:rollback": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/rollback --runInBand --forceExit --config=jest.config-unit.ts",
+    "test:integration:recovery": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/recovery --runInBand --forceExit --config=jest.config-integration.ts",
+    "test:integration:rollback": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/rollback --runInBand --forceExit --config=jest.config-integration.ts",
     "test:unit": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/unit --runInBand --forceExit --config=jest.config-unit.ts",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
@@ -276,7 +281,8 @@
     "npm": ">=8"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "customMetadata": {
     "satp-draft-versions": {
