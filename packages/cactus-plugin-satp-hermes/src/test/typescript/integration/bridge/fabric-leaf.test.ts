@@ -16,6 +16,7 @@ import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mec
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import { FabricLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let ontologyManager: OntologyManager;
 
@@ -102,10 +103,12 @@ describe("Fabric Bridge Test", () => {
   });
   it("Should deploy Wrapper Smart Contract", async () => {
     await fabricLeaf.deployContracts();
-    expect(fabricLeaf.getDeployFungibleWrapperContractReceipt()).toBeDefined();
+    expect(fabricLeaf.getDeployWrapperContractReceipt()).toBeDefined();
   });
   it("Should return the wrapper contract name", async () => {
-    const wrapperContractName = fabricLeaf.getWrapperContract("FUNGIBLE");
+    const wrapperContractName = fabricLeaf.getWrapperContract(
+      TokenType.NONSTANDARD_FUNGIBLE,
+    );
     expect(wrapperContractName).toBeDefined();
 
     await fabricEnv.giveRoleToBridge(fabricEnv.getBridgeMSPID());
@@ -124,7 +127,7 @@ describe("Fabric Bridge Test", () => {
       contractName: fabricEnv.satpContractName,
       channelName: fabricEnv.fabricChannelName,
       mspId: fabricEnv.userIdentity.mspId,
-      amount: "100",
+      amount: 100 as Amount,
       network: {
         id: FabricTestEnvironment.FABRIC_NETWORK_ID,
         ledgerType: LedgerType.Fabric2,
@@ -161,7 +164,7 @@ describe("Fabric Bridge Test", () => {
   });
 
   it("Should Lock a token", async () => {
-    const responseLock = await fabricLeaf.lockAsset(asset.id, 100);
+    const responseLock = await fabricLeaf.lockAsset(asset.id, 100 as Amount);
     expect(responseLock).toBeDefined();
     expect(responseLock.transactionId).toBeDefined();
     expect(responseLock.output).toBeDefined();
@@ -203,7 +206,10 @@ describe("Fabric Bridge Test", () => {
   });
 
   it("Should Unlock a token", async () => {
-    const responseUnlock = await fabricLeaf.unlockAsset(asset.id, 100);
+    const responseUnlock = await fabricLeaf.unlockAsset(
+      asset.id,
+      100 as Amount,
+    );
 
     expect(responseUnlock).toBeDefined();
     expect(responseUnlock.transactionId).toBeDefined();
@@ -250,14 +256,14 @@ describe("Fabric Bridge Test", () => {
       "100",
     );
 
-    const responseLock = await fabricLeaf.lockAsset(asset.id, 100);
+    const responseLock = await fabricLeaf.lockAsset(asset.id, 100 as Amount);
 
     expect(responseLock).toBeDefined();
     expect(responseLock.transactionId).toBeDefined();
     expect(responseLock.output).toBeDefined();
     log.info("Locked 100 tokens successfully");
 
-    const responseBurn = await fabricLeaf.burnAsset(asset.id, 100);
+    const responseBurn = await fabricLeaf.burnAsset(asset.id, 100 as Amount);
     expect(responseBurn).toBeDefined();
     expect(responseBurn.transactionId).toBeDefined();
     expect(responseBurn.output).toBeDefined();
@@ -296,7 +302,7 @@ describe("Fabric Bridge Test", () => {
   });
 
   it("Should Mint a token", async () => {
-    const responseMint = await fabricLeaf.mintAsset(asset.id, 100);
+    const responseMint = await fabricLeaf.mintAsset(asset.id, 100 as Amount);
     expect(responseMint).toBeDefined();
     expect(responseMint.transactionId).toBeDefined();
     expect(responseMint.output).toBeDefined();
@@ -330,7 +336,7 @@ describe("Fabric Bridge Test", () => {
     const responseAssign = await fabricLeaf.assignAsset(
       asset.id,
       asset.owner,
-      100,
+      100 as Amount,
     );
     expect(responseAssign).toBeDefined();
     expect(responseAssign.transactionId).toBeDefined();

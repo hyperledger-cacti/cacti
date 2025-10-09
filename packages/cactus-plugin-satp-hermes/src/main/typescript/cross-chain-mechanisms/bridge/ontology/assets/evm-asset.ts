@@ -1,14 +1,20 @@
-import { Asset, FungibleAsset } from "./asset";
+import { Asset, FungibleAsset, NonFungibleAsset } from "./asset";
 import { InteractionsRequest as EvmInteractionSignature } from "../../../../generated/SATPWrapperContract";
 import { getInteractionType, InteractionData } from "./interact-types";
+import {
+  Logger,
+  LoggerProvider,
+  LogLevelDesc,
+} from "@hyperledger/cactus-common";
 
 export interface EvmAsset extends Asset {
   contractAddress: string;
 }
 
 export interface EvmFungibleAsset extends EvmAsset, FungibleAsset {}
+export interface EvmNonFungibleAsset extends EvmAsset, NonFungibleAsset {}
 
-export enum VarType {
+export enum AssetParameterIdentifier {
   CONTRACTADDRESS = 0,
   TOKENTYPE = 1,
   TOKENID = 2,
@@ -16,15 +22,22 @@ export enum VarType {
   AMOUNT = 4,
   BRIDGE = 5,
   RECEIVER = 6,
+  UNIQUE_DESCRIPTOR = 7,
 }
 
-export function getVarTypes(stringType: string) {
-  return VarType[stringType.toUpperCase() as keyof typeof VarType];
+export function getAssetParameterIdentifier(stringType: string) {
+  return AssetParameterIdentifier[
+    stringType.toUpperCase() as keyof typeof AssetParameterIdentifier
+  ];
 }
 
 export function evmInteractionList(
   jsonString: string,
 ): EvmInteractionSignature[] {
+  const label: string = "EvmInteractionList";
+  const logLevel: LogLevelDesc = "INFO";
+  const log: Logger = LoggerProvider.getOrCreate({ label, level: logLevel });
+
   const ontologyJSON = JSON.parse(jsonString);
 
   const interactions: EvmInteractionSignature[] = [];
@@ -40,7 +53,7 @@ export function evmInteractionList(
       const vars: string | number[] = [];
 
       for (const variable of signature.variables) {
-        vars.push(getVarTypes(variable));
+        vars.push(getAssetParameterIdentifier(variable));
       }
       variables.push(vars);
     }
@@ -52,6 +65,7 @@ export function evmInteractionList(
       available: true,
     };
     interactions.push(interactionRequest);
+    log.info(interactionRequest);
   }
 
   return interactions;

@@ -4,6 +4,7 @@ import {
   ClaimFormat,
   CommonSatpSchema,
   MessageType,
+  //TokenType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATP_VERSION } from "../../constants";
 import {
@@ -38,24 +39,18 @@ import { SATPSession } from "../../satp-session";
 import { LockAssertionResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
-  AmountMissingError,
   AssignmentAssertionClaimError,
   BurnAssertionClaimError,
-  LedgerAssetError,
   MintAssertionClaimError,
   MissingBridgeManagerError,
   SessionError,
-  TokenIdMissingError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
-import { LedgerType } from "@hyperledger/cactus-core-api";
-import { FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
-import { protoToAsset } from "../service-utils";
-import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { buildAndCheckAsset, SessionSide } from "../../satp-utils";
 
 export class Stage3ClientService extends SATPService {
   public static readonly SATP_STAGE = "3";
@@ -797,40 +792,22 @@ export class Stage3ClientService extends SATPService {
             sequenceNumber: Number(sessionData.lastSequenceNumber),
           });
 
-          if (sessionData.senderAsset == undefined) {
-            throw new LedgerAssetError(fnTag);
-          }
-
-          const networkId = {
-            id: sessionData.senderAsset.networkId?.id,
-            ledgerType: sessionData.senderAsset.networkId?.type as LedgerType,
-          } as NetworkId;
-
-          const token: FungibleAsset = protoToAsset(
-            sessionData.senderAsset,
-            networkId,
-          ) as FungibleAsset;
-
-          if (token.id == undefined) {
-            throw new TokenIdMissingError(fnTag);
-          }
-
-          if (token.amount == undefined) {
-            throw new AmountMissingError(fnTag);
-          }
-
-          this.Log.debug(
-            `${fnTag}, Burn Asset ID: ${token.id} amount: ${token.amount}`,
+          const tokenBuildData = buildAndCheckAsset(
+            fnTag,
+            stepTag,
+            this.Log,
+            sessionData,
+            SessionSide.CLIENT,
           );
 
           const bridge = this.bridgeManager.getSATPExecutionLayer(
-            networkId,
+            tokenBuildData.networkId,
             this.claimFormat,
           );
 
           sessionData.burnAssertionClaim = create(BurnAssertionClaimSchema, {});
 
-          const res = await bridge.burnAsset(token);
+          const res = await bridge.burnAsset(tokenBuildData.token);
 
           sessionData.burnAssertionClaim.receipt = res.receipt;
 
