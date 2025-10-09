@@ -1,0 +1,18 @@
+apiVersion: 1
+
+providers:
+  - name: "Performance Metrics"
+    type: file
+    options:
+      path: /otel-lgtm/custom/performance_metrics.json
+      foldersFromFilesStructure: false
+  - name: "Financial Metrics"
+    type: file
+    options:
+      path: /otel-lgtm/custom/financial_metrics.json
+      foldersFromFilesStructure: false
+  - name: "System Overview"
+    type: file
+    options:
+      path: /otel-lgtm/custom/system_overview.json
+      foldersFromFilesStructure: false

@@ -31,3 +31,7 @@ services:
       - "3100:3100" # Loki
       - "3200:3200" # Tempo
     restart: unless-stopped
+    volumes:
+    - ./grafana/dashboards:/otel-lgtm/custom
+    - ./grafana/alerts:/otel-lgtm/grafana/conf/provisioning/alerting
+    - ./grafana/grafana-dashboards.yaml:/otel-lgtm/grafana/conf/provisioning/dashboards/grafana-dashboards.yaml
