@@ -285,7 +285,10 @@ beforeAll(async () => {
   console.info("Besu Ledger started successfully");
   await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   // Start monitoring system
-  startDockerComposeService("otel-lgtm");
+  startDockerComposeService(path.resolve(
+    __dirname,
+    "../../../../../docker-compose-satp.yml",
+  ), "otel-lgtm");
   await executeTransfer("100", 1, "100");
 }, TIMEOUT);
 
@@ -313,7 +316,10 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-  stopDockerComposeService("otel-lgtm");
+  stopDockerComposeService(path.resolve(
+    __dirname,
+    "../../../../../docker-compose-satp.yml",
+  ),"otel-lgtm");
 }, TIMEOUT);
 
 describe("otel-lgtm captures information when a transaction occurs", () => {

@@ -289,6 +289,12 @@ export class Stage3SATPHandler implements SATPHandler {
           );
         }
 
+        this.monitorService.updateCounter(
+            "total_value_exchanged",
+            Number(session?.getServerSessionData()?.senderAsset?.amount),
+            { ...attributes, transaction_direction: "received" },
+          );
+
         return message;
       } catch (error) {
         this.Log.error(
@@ -634,6 +640,12 @@ export class Stage3SATPHandler implements SATPHandler {
 
           saveMessageInSessionData(session.getClientSessionData(), request);
 
+          this.monitorService.updateCounter(
+            "total_value_exchanged",
+            Number(session?.getClientSessionData()?.senderAsset?.amount),
+            { ...attributes, transaction_direction: "sent" },
+          );
+
           return request;
         } catch (error) {
           this.Log.error(
@@ -911,16 +923,6 @@ export class Stage3SATPHandler implements SATPHandler {
             "successful_transactions",
             1,
             attributes,
-          );
-          this.monitorService.updateCounter(
-            "total_value_exchanged",
-            Number(session?.getClientSessionData()?.senderAsset?.amount),
-            { ...attributes, transaction_direction: "sent" },
-          );
-          this.monitorService.updateCounter(
-            "total_value_exchanged",
-            Number(session?.getClientSessionData()?.receiverAsset?.amount),
-            { ...attributes, transaction_direction: "received" },
           );
 
           saveMessageInSessionData(session.getClientSessionData(), response);

@@ -36,11 +36,6 @@ export function getTestConfigFilesDirectory(basePath: string): string {
   return testFilesDirectoryConfig;
 }
 
-const composeFilePath = path.resolve(
-  __dirname,
-  "../../../../../packages/cactus-plugin-satp-hermes/docker-compose-satp.yml",
-);
-
 // Function overloads for creating different types of API clients
 export function createClient(
   type: "AdminApi",
@@ -397,7 +392,7 @@ export interface IContractJson {
   };
 }
 
-export function startDockerComposeService(serviceName: string) {
+export function startDockerComposeService(composeFilePath: string, serviceName: string) {
   if (!fs.existsSync(composeFilePath)) {
     throw new Error(`Compose file does not exist at ${composeFilePath}`);
   }
@@ -406,7 +401,7 @@ export function startDockerComposeService(serviceName: string) {
   });
 }
 
-export function stopDockerComposeService(serviceName: string) {
+export function stopDockerComposeService(composeFilePath: string, serviceName: string) {
   if (!fs.existsSync(composeFilePath)) {
     throw new Error(`Compose file does not exist at ${composeFilePath}`);
   }
