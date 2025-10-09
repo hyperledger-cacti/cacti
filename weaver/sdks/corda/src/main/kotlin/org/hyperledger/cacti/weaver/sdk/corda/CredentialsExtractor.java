@@ -151,6 +151,14 @@ public class CredentialsExtractor {
 							File outputDir = new File(tempStore + "root/");
 							if (!outputDir.exists()) {
 								outputDir.mkdirs();
+								// remove all privilege from all previous users
+								outputDir.setReadable(false, false);
+								outputDir.setWritable(false, false);
+								outputDir.setExecutable(false, false);
+								// add all privilege to owner
+								outputDir.setReadable(true, true); 
+								outputDir.setWritable(true, true);
+								outputDir.setExecutable(true, true);
 							}
 							JcaPEMWriter xwriter = new JcaPEMWriter(new FileWriter(tempStore + "root/rootcert.pem"));
 							xwriter.writeObject(xcert);
@@ -201,6 +209,14 @@ public class CredentialsExtractor {
 							File outputDir = new File(tmpStore);
 							if (!outputDir.exists()) {
 								outputDir.mkdirs();
+								// remove all permissions from all users (including owner)
+								outputDir.setReadable(false, false);
+								outputDir.setWritable(false, false);
+								outputDir.setExecutable(false, false);
+								// grant full permissions to owner only
+								outputDir.setReadable(true, true); 
+								outputDir.setWritable(true, true);  
+								outputDir.setExecutable(true, true);
 							}
 							String filePath = tmpStore + tmpCertfiles[i] + ".pem";
 							JcaPEMWriter xwriter = new JcaPEMWriter(new FileWriter(filePath));
