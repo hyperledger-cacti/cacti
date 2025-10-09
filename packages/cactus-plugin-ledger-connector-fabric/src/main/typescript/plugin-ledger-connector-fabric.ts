@@ -22,6 +22,10 @@ import {
   Wallet,
   ContractEvent,
   ContractListener,
+  BlockEvent,
+  CommitEvent,
+  BlockListener,
+  CommitListener,
 } from "fabric-network";
 import {
   BuildProposalRequest,
@@ -104,7 +108,15 @@ import {
   GetChainInfoResponseV1,
   GetDiscoveryResultsRequestV1,
   GetDiscoveryResultsResponseV1,
+  RunInvokeRequest,
+  EndorsedProposalResponse,
+  RunInvokeResponse,
+  EventType,
+  GetLatestBlockNumberRequestV1,
+  GetLatestBlockNumberResponseV1,
 } from "./generated/openapi/typescript-axios/index";
+
+import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { IQueryInstalledResponse } from "./peer/i-query-installed-response";
@@ -146,7 +158,6 @@ import { GetDiscoveryResultsEndpointV1 } from "./get-discovery-results/get-disco
 import { querySystemChainCode } from "./common/query-system-chain-code";
 import { isSshExecOk } from "./common/is-ssh-exec-ok";
 import {
-  asBuffer,
   assertFabricFunctionIsAvailable,
   CreateListenerRequest,
   FabricLong,
@@ -156,6 +167,12 @@ import { findAndReplaceFabricLoggingSpecArray } from "./common/find-and-replace-
 import { Observable, ReplaySubject } from "rxjs";
 import { CompilerTools } from "./compiler-tools/compiler-tools";
 import tar from "tar-fs";
+import fabproto6 from "fabric-protos";
+import { GetLatestBlockNumberEndpointV1 } from "./get-block-number/get-block-number-endpoint-v1";
+import {
+  DriverConfig,
+  FabricDriverServer,
+} from "./weaver/fabric-driver-server";
 import { stringify } from "json5";
 
 const { loadFromConfig } = require("fabric-network/lib/impl/ccp/networkconfig");
@@ -198,6 +215,8 @@ export interface IPluginLedgerConnectorFabricOptions
   eventProvider?: string;
 }
 
+export type FabricEvent = ContractEvent | BlockEvent | CommitEvent;
+
 export class PluginLedgerConnectorFabric
   implements
     IPluginLedgerConnector<
@@ -219,6 +238,8 @@ export class PluginLedgerConnectorFabric
   private readonly certStore: CertDatastore;
   private runningWatchBlocksMonitors = new Set<WatchBlocksV1Endpoint>();
   private txSubject: ReplaySubject<IRunTxReqWithTxId> = new ReplaySubject();
+
+  private driver: FabricDriverServer | undefined;
 
   private dockerNetworkName: string = "bridge";
 
@@ -280,8 +301,16 @@ export class PluginLedgerConnectorFabric
     this.signCallback = opts.signCallback;
   }
 
+  public getConnectionProfile(): ConnectionProfile {
+    return this.connectionProfile;
+  }
+
   public getOpenApiSpec(): unknown {
     return OAS;
+  }
+
+  public getCertStore(): CertDatastore {
+    return this.certStore;
   }
 
   public async shutdown(): Promise<void> {
@@ -1002,6 +1031,14 @@ export class PluginLedgerConnectorFabric
       endpoints.push(endpoint);
     }
 
+    {
+      const endpoint = new GetLatestBlockNumberEndpointV1({
+        connector: this,
+        logLevel: this.opts.logLevel,
+      });
+      endpoints.push(endpoint);
+    }
+
     const pkg = this.getPackageName();
     log.info(`Installed web services for plugin ${pkg} OK`, { endpoints });
 
@@ -1022,7 +1059,7 @@ export class PluginLedgerConnectorFabric
    * @param req must contain either gatewayOptions or signingCredential.
    * @returns Fabric SDK Gateway
    */
-  protected async createGateway(req: {
+  public async createGateway(req: {
     gatewayOptions?: GatewayOptions;
     signingCredential?: FabricSigningCredential;
   }): Promise<Gateway> {
@@ -1280,6 +1317,150 @@ export class PluginLedgerConnectorFabric
     }
 
     return transientMap;
+  }
+
+  // Main invoke function wtih logic to handle policy and turn response from chaincode into a view.
+  // 1. Prepare credentials/gateway for communicating with fabric network
+  // 2. Prepare info required for invoke (address/policy)
+  // 3. Set the endorser list for the transaction, this enforces that the list provided will endorse the proposed transaction
+  // 4. Prepare the view and return.
+  public async invoke(req: RunInvokeRequest): Promise<RunInvokeResponse> {
+    this.log.info("Running query on fabric network");
+    try {
+      const {
+        channelName,
+        contractName,
+        methodName: ccFunc,
+        params,
+        //transientData,
+        policies,
+      } = req;
+      const identities = policies || [];
+
+      // 1. Prepare credentials/gateway for communicating with fabric network
+      const gateway = await this.createGateway(req);
+
+      this.log.debug(`Channel: ${channelName}`);
+      const network = await gateway.getNetwork(channelName);
+      const currentChannel = network.getChannel();
+      const endorsers = currentChannel.getEndorsers();
+
+      //this.log.info(`policy: ${query.getPolicyList()}`);
+      // const chaincodeId = process.env.INTEROP_CHAINCODE
+      //   ? process.env.INTEROP_CHAINCODE
+      //   : "interop";
+
+      // this.log.debug(
+      //   `Message: ${query.getAddress() + query.getNonce()} ${identities}`,
+      // );
+      // const cert = Certificate.fromPEM(
+      //   Buffer.from(req.signingCredential!.keychainRef),
+      // );
+      //const orgName = cert.issuer.organizationName;
+      // this.log.info(
+      //   `CC ARGS:
+      //       ${ccName},
+      //       ${params},
+      //       ${query.getRequestingNetwork()},
+      //       ${query.getRequestingOrg() ? query.getRequestingOrg() : orgName},
+      //       ${query.getCertificate()},
+      //       ${query.getRequestorSignature()},
+      //       ${query.getAddress() + query.getNonce()}`,
+      // );
+      // const b64QueryBytes = Buffer.from(query.serializeBinary()).toString( //is this necessary to be a different arg, it should be good to be in the parms.
+      //   "base64",
+      // );
+
+      if (!gateway.identityContext) {
+        throw new Error(`Gateway is missing identity context`);
+      }
+
+      const idx = gateway.identityContext?.calculateTransactionId();
+      this.log.debug(`Using transaction ID: ${idx}`);
+      const queryProposal = currentChannel.newQuery(contractName);
+      const request = {
+        fcn: ccFunc,
+        args: params,
+        generateTransactionId: false,
+      };
+      queryProposal.build(idx, request);
+      await queryProposal.sign(idx);
+      // 3. Set the endorser list for the transaction, this enforces that the list provided will endorse the proposed transaction
+      let proposalRequest;
+      if (identities.length > 0) {
+        const endorserList = endorsers.filter((endorser: Endorser) => {
+          //@ts-expect-error: should expect string
+          const cert = Certificate.fromPEM(endorser.options.pem);
+          const orgName = cert.issuer.organizationName;
+          return (
+            identities.includes(endorser.mspid) || identities.includes(orgName)
+          );
+        });
+        this.log.debug(`Set endorserList: ${endorserList}`);
+        proposalRequest = {
+          targets: endorserList,
+          requestTimeout: 30000,
+        };
+      } else {
+        // When no identities provided it will default to all peers
+        this.log.debug(`Set endorsers: ${endorsers}`);
+        proposalRequest = {
+          targets: endorsers,
+          requestTimeout: 30000,
+        };
+      }
+
+      // submit query transaction and get result from chaincode
+      const proposalResponseResult = await queryProposal.send(proposalRequest);
+      this.log.debug(
+        `proposal result: ${JSON.stringify(proposalResponseResult, null, 2)}`,
+      );
+
+      const endorsedProposalResponses: EndorsedProposalResponse[] = [];
+
+      let endorsementCounter = 0;
+      for (const response of proposalResponseResult.responses) {
+        const deserializedPayload = this.deserializeProposalResponsePayload(
+          response.payload,
+        );
+        const endorsedProposalResponse: EndorsedProposalResponse = {
+          payload: {
+            proposalHash: deserializedPayload.proposal_hash.toString(),
+            extension: deserializedPayload.extension.toString(),
+          },
+          endorsement: {
+            endorser: response.endorsement?.endorser.toString("base64"),
+            signature: response.endorsement?.signature.toString("base64"),
+          },
+        };
+
+        // Add to list of endorsedProposalResponses
+        endorsedProposalResponses.push(endorsedProposalResponse);
+
+        this.log.info(
+          `InteropPayload: ${endorsementCounter}, ${JSON.stringify(endorsedProposalResponse.payload)}`,
+        );
+        this.log.info(
+          `Endorsement: ${endorsementCounter}, ${JSON.stringify(endorsedProposalResponse.endorsement)}`,
+        );
+        endorsementCounter++;
+      }
+
+      this.log.info(
+        `Got ${endorsedProposalResponses.length} endorsed proposal responses`,
+      );
+
+      // Disconnect from the gateway.
+      gateway.disconnect();
+      return {
+        view: {
+          endorsedProposalResponses: endorsedProposalResponses,
+        },
+      };
+    } catch (error) {
+      this.log.error(`Failed to submit transaction: ${error}`);
+      throw error;
+    }
   }
 
   public async transact(
@@ -1753,6 +1934,43 @@ export class PluginLedgerConnectorFabric
     }
   }
 
+  /*
+   * Get latest block number using query to QSCC
+   */
+  async getLatestBlockNumber(
+    req: GetLatestBlockNumberRequestV1,
+  ): Promise<GetLatestBlockNumberResponseV1> {
+    const fnTag = `${this.className}:getBlockNumber(req: GetBlockRequestV1)`;
+    this.log.debug(
+      "getCurrBlockNumber() called, channelName:",
+      req.channelName,
+    );
+
+    this.log.debug("%s Creating Fabric Gateway instance...", fnTag);
+    const gateway = await this.createGateway(req);
+    this.log.debug("%s Obtaining Fabric gateway network instance...", fnTag);
+    const network = await gateway.getNetwork(req.channelName);
+    this.log.debug("%s Obtaining Fabric contract instance...", fnTag);
+    const contract = network.getContract("qscc");
+
+    const result = await contract.evaluateTransaction(
+      "GetChainInfo",
+      req.channelName,
+    );
+
+    if (!result) {
+      throw new Error("No result returned from GetChainInfo transaction.");
+    }
+    const blockHeight = fabproto6.common.BlockchainInfo.decode(
+      new Uint8Array(Buffer.isBuffer(result) ? result : Buffer.from(result)),
+    ).height as number;
+    const blockNumber = blockHeight - 1;
+    this.log.debug(
+      `getCurrBlockNumber: Get current block number: ${blockNumber}`,
+    );
+    return { blockNumber };
+  }
+
   /**
    * Get fabric chain info from the system chaincode (qscc.GetChainInfo())
    *
@@ -1778,8 +1996,9 @@ export class PluginLedgerConnectorFabric
       channelName,
     );
 
-    const decodedResponse =
-      fabricProtos.common.BlockchainInfo.decode(responseData);
+    const decodedResponse = fabricProtos.common.BlockchainInfo.decode(
+      new Uint8Array(responseData),
+    );
     if (!decodedResponse) {
       throw new RuntimeError("Could not decode BlockchainInfo");
     }
@@ -1922,7 +2141,7 @@ export class PluginLedgerConnectorFabric
           if (res.response.status === 200 && res.endorsement) {
             return {
               functionOutput: this.convertToTransactionResponseType(
-                asBuffer(res.response.payload),
+                res.response.payload,
               ),
               transactionId: "",
             };
@@ -1995,7 +2214,7 @@ export class PluginLedgerConnectorFabric
             this.log.warn(`Endorsement from peer ERROR: ${endorsementStatus}`);
           } else {
             this.log.debug(`Endorsement from peer OK: ${endorsementStatus}`);
-            endorsedMethodResponse = asBuffer(response.payload);
+            endorsedMethodResponse = response.payload;
           }
         }
 
@@ -2103,37 +2322,113 @@ export class PluginLedgerConnectorFabric
    */
   public async createFabricListener(
     req: CreateListenerRequest,
-    callback: (event: ContractEvent) => Promise<void>,
+    callback: (event: FabricEvent) => Promise<void>,
   ): Promise<{
     removeListener: () => void;
-    listener: Promise<ContractListener>;
+    listener: Promise<ContractListener | BlockListener | CommitListener>;
   }> {
     const fnTag = `${this.className}#createFabricListener()`;
 
-    const listener = async (contractEvent: ContractEvent) =>
-      callback(contractEvent);
+    if (!callback) {
+      throw new Error(`${fnTag} No callback provided for the listener`);
+    }
 
     try {
       const gateway = await this.createGateway(req);
       const network = await gateway.getNetwork(req.channelName);
-      const contract = network.getContract(req.contractName);
 
-      this.log.debug(
-        `Subscribing to events emitted in contract ${req.contractName} in channel ${req.channelName}...`,
-      );
+      if (req.eventType === EventType.Contract) {
+        const contract = network.getContract(req.contractName);
+        const listener = async (contractEvent: ContractEvent) =>
+          callback(contractEvent as ContractEvent);
 
-      return {
-        listener: contract.addContractListener(listener),
-        removeListener: () => {
-          contract.removeContractListener(listener);
-          gateway.disconnect();
-        },
-      };
+        this.log.debug(
+          `Subscribing to contract events for ${req.contractName} on channel ${req.channelName}...`,
+        );
+
+        return {
+          listener: contract.addContractListener(listener),
+          removeListener: () => {
+            contract.removeContractListener(listener);
+            gateway.disconnect();
+          },
+        };
+      } else if (req.eventType === EventType.Block) {
+        const listener = async (blockEvent: BlockEvent) => callback(blockEvent);
+
+        this.log.debug(
+          `Subscribing to block events on channel ${req.channelName}...`,
+        );
+
+        return {
+          listener: network.addBlockListener(listener),
+          removeListener: () => {
+            network.removeBlockListener(listener);
+            gateway.disconnect();
+          },
+        };
+      } else if (req.eventType === EventType.Commit) {
+        // TODO implement commit listener
+        throw new Error(`${fnTag} Commit event type is not supported yet.`);
+      } else {
+        throw new Error(`${fnTag} Unknown eventType: ${req.eventType}`);
+      }
     } catch (error) {
       throw new Error(
-        `${fnTag} Failed to create fabric listener. ` +
-          `Error: ${error.message}`,
+        `${fnTag} Failed to create fabric listener. Error: ${error.message}`,
       );
     }
+  }
+
+  public async bindWeaverDriveService(options: {
+    expressServer: Express;
+    weaverOptions: {
+      mock?: boolean;
+      networkName?: string;
+      monitorSyncPeriod?: number;
+      monitorEnabled?: boolean;
+      walletPath?: string;
+      driverConfig: DriverConfig;
+      relayEndpoint: string;
+      ca: Buffer;
+      gatewayOptions: GatewayOptions;
+      signingCredential: FabricSigningCredential;
+      tls?: boolean;
+    };
+  }): Promise<void> {
+    const fnTag = `${this.className}#bindWeaverDriveService()`;
+    this.log.debug("%s called", fnTag);
+
+    this.driver = new FabricDriverServer({
+      connector: this,
+      logLevel: this.opts.logLevel,
+      ...options.weaverOptions,
+    });
+
+    const expressServer = options.expressServer;
+
+    expressServer.use(
+      expressConnectMiddleware({
+        routes: this.driver.setupRouter.bind(this.driver),
+      }),
+    );
+
+    try {
+      await this.driver.configSetup();
+      this.log.info("Starting Weaver server with TLS");
+      this.driver.monitorService();
+    } catch (error) {
+      this.log.error(
+        `${fnTag} Failed to bind weaver drive service. Error: ${error.message}`,
+      );
+    }
+  }
+
+  private deserializeProposalResponsePayload(
+    payloadBytes: Buffer,
+  ): fabricProtos.protos.ProposalResponsePayload {
+    return fabproto6.protos.ProposalResponsePayload.decode(
+      new Uint8Array(payloadBytes),
+    );
   }
 }

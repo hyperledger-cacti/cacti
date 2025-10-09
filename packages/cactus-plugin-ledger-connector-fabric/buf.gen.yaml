@@ -1,0 +1,13 @@
+version: v2
+clean: true
+plugins:
+  - local: protoc-gen-es
+    out: src/main/typescript/generated/protos/
+    opt: target=ts
+    strategy: directory
+  - local: protoc-gen-connect-es
+    out: src/main/typescript/generated/protos/
+    opt:
+      - target=ts
+      - js_import_style=module
+    strategy: directory
