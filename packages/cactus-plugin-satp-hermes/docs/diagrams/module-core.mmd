@@ -1,0 +1,91 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+graph TB
+    subgraph Core["📦 Core Module - SATP Protocol Implementation"]
+        direction TB
+        
+        subgraph Utils["🛠️ Utilities & Configuration"]
+            Constants["<b>Constants</b><br/>constants.ts<br/>Protocol constants<br/>Stage definitions<br/>Message types"]
+            Logger["<b>SATP Logger</b><br/>satp-logger.ts<br/>Structured logging<br/>Session tracking<br/>Audit trail"]
+            LoggerProvider["<b>Logger Provider</b><br/>satp-logger-provider.ts<br/>Logger factory<br/>Configuration<br/>Instance management"]
+            SatpUtils["<b>SATP Utils</b><br/>satp-utils.ts<br/>Crypto helpers<br/>Message builders<br/>Validators"]
+            SessionUtils["<b>Session Utils</b><br/>session-utils.ts<br/>Session helpers<br/>State management<br/>Data converters"]
+            Types["<b>Type Definitions</b><br/>types.ts<br/>Core interfaces<br/>Protocol types<br/>Message schemas"]
+        end
+        
+        subgraph SessionMgmt["🔐 Session Management"]
+            Session["<b>SATP Session</b><br/>satp-session.ts<br/>Session state<br/>Lifecycle management<br/>Data persistence"]
+        end
+        
+        subgraph StageHandlers["⚙️ Stage Handlers - Protocol Execution"]
+            Stage0Handler["<b>Stage 0 Handler</b><br/>Transfer Initiation<br/>Parameter negotiation<br/>Session establishment"]
+            Stage1Handler["<b>Stage 1 Handler</b><br/>Lock Assertion<br/>Asset locking<br/>Proof generation"]
+            Stage2Handler["<b>Stage 2 Handler</b><br/>Commitment<br/>Gateway commitment<br/>Receipt exchange"]
+            Stage3Handler["<b>Stage 3 Handler</b><br/>Completion<br/>Asset unlock<br/>Transfer finalization"]
+        end
+        
+        subgraph StageServices["🔄 Stage Services"]
+            direction LR
+            ClientServices["<b>Client Services</b><br/>client/<br/>Outbound requests<br/>Gateway client<br/>Message sending"]
+            ServerServices["<b>Server Services</b><br/>server/<br/>Inbound handlers<br/>Request processing<br/>Response generation"]
+        end
+        
+        subgraph CrashMgmt["🛡️ Crash Recovery"]
+            CrashManager["<b>Crash Manager</b><br/>crash-management/<br/>Recovery coordinator<br/>State restoration<br/>Rollback orchestration"]
+            RollbackStrategies["<b>Rollback Strategies</b><br/>rollback/<br/>Per-stage rollback<br/>State reversion<br/>Compensating actions"]
+        end
+        
+        subgraph ErrorHandling["⚠️ Error Handling"]
+            ErrorTypes["<b>Error Types</b><br/>errors/<br/>SATP errors<br/>Protocol errors<br/>Network errors"]
+        end
+    end
+    
+    %% Relationships
+    Logger -->|uses| LoggerProvider
+    Session -->|uses| SatpUtils
+    Session -->|uses| SessionUtils
+    Session -->|references| Types
+    Session -->|logs via| Logger
+    
+    Stage0Handler -->|manages| Session
+    Stage1Handler -->|manages| Session
+    Stage2Handler -->|manages| Session
+    Stage3Handler -->|manages| Session
+    
+    Stage0Handler -->|uses| ClientServices
+    Stage1Handler -->|uses| ClientServices
+    Stage2Handler -->|uses| ClientServices
+    Stage3Handler -->|uses| ClientServices
+    
+    Stage0Handler -->|implements| ServerServices
+    Stage1Handler -->|implements| ServerServices
+    Stage2Handler -->|implements| ServerServices
+    Stage3Handler -->|implements| ServerServices
+    
+    CrashManager -->|uses| RollbackStrategies
+    CrashManager -->|restores| Session
+    RollbackStrategies -->|reverts| Stage0Handler
+    RollbackStrategies -->|reverts| Stage1Handler
+    RollbackStrategies -->|reverts| Stage2Handler
+    RollbackStrategies -->|reverts| Stage3Handler
+    
+    ErrorTypes -->|thrown by| Stage0Handler
+    ErrorTypes -->|thrown by| Stage1Handler
+    ErrorTypes -->|thrown by| Stage2Handler
+    ErrorTypes -->|thrown by| Stage3Handler
+    
+    Constants -->|configures| Session
+    SatpUtils -->|used by| ClientServices
+    SatpUtils -->|used by| ServerServices
+    
+    %% Styling
+    classDef utilClass fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10
+    classDef sessionClass fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef handlerClass fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef serviceClass fill:#bbf7d0,stroke:#86efac,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef crashClass fill:#dcfce7,stroke:#bbf7d0,stroke-width:4px,color:#065f46,rx:10,ry:10
+    
+    class Constants,Logger,LoggerProvider,SatpUtils,SessionUtils,Types utilClass
+    class Session sessionClass
+    class Stage0Handler,Stage1Handler,Stage2Handler,Stage3Handler handlerClass
+    class ClientServices,ServerServices serviceClass
+    class CrashManager,RollbackStrategies,ErrorTypes crashClass

@@ -1,0 +1,83 @@
+{
+  "gid": {
+    "id": "mockID-1",
+    "name": "CustomGateway",
+    "version": [
+      {
+        "Core": "v02",
+        "Architecture": "v02",
+        "Crash": "v02"
+      }
+    ],
+    "connectedDLTs": [
+      {
+        "id": "HardhatTestNetwork1",
+        "ledgerType": "ETHEREUM"
+      }
+    ],
+    "proofID": "mockProofID10",
+    "address": "http://satp-hermes-gateway-1",
+    "gatewayClientPort": 3011,
+    "gatewayServerPort": 3010,
+    "gatewayOapiPort": 4010,
+    "pubKey": "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171c"
+  },
+  "logLevel": "TRACE",
+  "counterPartyGateways": [
+    {
+      "id": "mockID-2",
+      "name": "CustomGateway",
+      "version": [
+        {
+          "Core": "v02",
+          "Architecture": "v02",
+          "Crash": "v02"
+        }
+      ],
+      "connectedDLTs": [
+        {
+          "id": "HardhatTestNetwork2",
+          "ledgerType": "ETHEREUM"
+        }
+      ],
+      "proofID": "mockProofID11",
+      "address": "http://satp-hermes-gateway-2",
+      "gatewayClientPort": 3011,
+      "gatewayServerPort": 3010,
+      "gatewayOapiPort": 4010,
+      "pubKey": "024c0cf54f92d23dbb3d409a8047aa2a44abcb911767d3516b19fd94c2358dec65"
+    }
+  ],
+  "environment": "development",
+  "ccConfig": {
+    "bridgeConfig": [
+      {
+        "networkIdentification": {
+          "id": "HardhatTestNetwork1",
+          "ledgerType": "ETHEREUM"
+        },
+        "signingCredential": {
+          "ethAccount": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "secret": "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+          "type": "PRIVATE_KEY_HEX"
+        },
+        "gasConfig": {
+          "gas": "6721975",
+          "gasPrice": "20000000000"
+        },
+        "connectorOptions": {
+          "rpcApiHttpHost": "http://host.docker.internal:8545"
+        },
+        "claimFormats": [
+          1
+        ]
+      }
+    ]
+  },
+  "keyPair": {
+    "privateKey": "38c732b7b86d752c5c051a9c944a683da994eac1cc1544462518b90f89d8146d",
+    "publicKey": "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171c"
+  },
+  "enableCrashRecovery": false,
+  "ontologyPath": "/opt/cacti/satp-hermes/ontologies"
+}

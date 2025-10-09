@@ -1,3 +1,15 @@
+/**
+ * @fileoverview SATP Manager - Protocol State Machine Orchestrator
+ *
+ * The SATP Manager is the central orchestrator for the Secure Asset Transfer Protocol
+ * state machine. It manages protocol stages, handlers, and services for both client
+ * and server roles in cross-chain asset transfers.
+ *
+ * @group Gateway Services
+ * @module services/gateway/satp-manager
+ * @since 0.0.3-beta
+ */
+
 import {
   Checks,
   JsObjectSigner,
@@ -95,7 +107,7 @@ import {
 import {
   IGatewayPersistenceConfig,
   GatewayPersistence,
-} from "../../gateway-persistence";
+} from "../../database/gateway-persistence";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 

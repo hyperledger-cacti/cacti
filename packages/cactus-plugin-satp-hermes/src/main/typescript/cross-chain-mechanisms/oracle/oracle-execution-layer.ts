@@ -14,10 +14,6 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
 
 /**
  * Options for configuring the IOracleExecutionLayer.
- *
- * @property {OracleAbstract} oracleImpl - The bridge leaf instance used for the execution layer.
- * @property {ClaimFormat} [claimType] - Optional claim format type.
- * @property {LogLevelDesc} [logLevel] - Optional log level description for logging purposes.
  */
 export interface IOracleExecutionLayerOptions {
   oracleImpl: OracleAbstract;

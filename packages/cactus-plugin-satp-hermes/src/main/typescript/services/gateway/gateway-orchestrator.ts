@@ -1,3 +1,15 @@
+/**
+ * @fileoverview Gateway Orchestrator for SATP Protocol Implementation
+ *
+ * The Gateway Orchestrator manages connections and communications with counterparty
+ * gateways in the SATP protocol. It handles gateway discovery, channel management,
+ * and message routing between gateways.
+ *
+ * @group Gateway Services
+ * @module services/gateway/gateway-orchestrator
+ * @since 0.0.3-beta
+ */
+
 // a helper class to manage connections to counterparty gateways
 import {
   ILoggerOptions,

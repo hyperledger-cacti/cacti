@@ -36,11 +36,9 @@ import { UninitializedMonitorServiceError } from "../../cross-chain-mechanisms/c
 /**
  * Options for configuring the MonitorService.
  *
- * @property {LogLevelDesc} [logLevel] - The log level for the MonitorService.
- * @property {string} [otelMetricsExporterUrl] - The URL for the OpenTelemetry metrics exporter.
- * @property {string} [otelLogsExporterUrl] - The URL for the OpenTelemetry logs exporter.
- * @property {string} [otelTracesExporterUrl] - The URL for the OpenTelemetry traces exporter.
- * @property {boolean} [enabled] - Whether the MonitorService is enabled. Defaults to true unless in test environment.
+ * Configuration interface for SATP gateway monitoring service setup including
+ * OpenTelemetry exporters for metrics, logs, and traces. Enables comprehensive
+ * observability for cross-chain asset transfer operations.
  */
 export interface MonitorServiceOptions {
   logLevel?: LogLevelDesc;

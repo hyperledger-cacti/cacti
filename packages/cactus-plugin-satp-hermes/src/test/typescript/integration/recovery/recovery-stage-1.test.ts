@@ -10,7 +10,7 @@ import { AssetSchema } from "../../../../main/typescript/generated/proto/cacti/s
 import { v4 as uuidv4 } from "uuid";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
-import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
+import { getSatpLogKey } from "../../../../main/typescript/utils/gateway-utils";
 import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   SATPGatewayConfig,
@@ -21,7 +21,7 @@ import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
+import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
