@@ -16,9 +16,9 @@ export function getEnumValueByKey<T extends object>(
 export interface chainConfigElement<T> {
   configElement: string;
   configElementType?: T;
-  configElementTypeguard?: (value: unknown, log?: Logger) => boolean;
+  configElementTypeguard?: (value: unknown, log: Logger) => boolean;
   configSubElementType?: T;
-  configSubElementFunctionTypeguard?: (value: unknown, log?: Logger) => boolean;
+  configSubElementFunctionTypeguard?: (value: unknown, log: Logger) => boolean;
 }
 
 export function identifyAndCheckConfigFormat<T>(
@@ -91,7 +91,7 @@ export function checkConfigElementFormat<T>(
       return false;
     } else if (
       ccElement.configElementTypeguard &&
-      !ccElement.configElementTypeguard(obj[ccElement.configElement])
+      !ccElement.configElementTypeguard(obj[ccElement.configElement], log)
     ) {
       log.error(
         `${fnTag}: ${ccElement.configElement} present but with invalid format`,
@@ -128,7 +128,7 @@ export function checkConfigElementFormat<T>(
       ) {
         obj[ccElement.configElement].forEach((subEl: unknown) => {
           if (
-            !ccElement.configSubElementFunctionTypeguard!(subEl) ||
+            !ccElement.configSubElementFunctionTypeguard!(subEl, log) ||
             subEl === null
           ) {
             log.error(

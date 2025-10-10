@@ -126,46 +126,46 @@ function isFabricSigningCredential(
   );
 }
 
-function isUserIdentity(obj: unknown, log?: Logger): obj is X509Identity {
+function isUserIdentity(obj: unknown, log: Logger): obj is X509Identity {
   const objRecord = obj as Record<string, unknown>;
   if (typeof obj !== "object" || obj === null) {
-    log!.error("isUserIdentity: obj is not an object or is null");
+    log.error("isUserIdentity: obj is not an object or is null");
     return false;
   }
   if (!("type" in obj)) {
-    log!.error("isUserIdentity: 'type' property missing");
+    log.error("isUserIdentity: 'type' property missing");
     return false;
   }
   if (typeof objRecord.type !== "string") {
-    log!.error("isUserIdentity: 'type' property is not a string");
+    log.error("isUserIdentity: 'type' property is not a string");
     return false;
   }
   if (!("credentials" in obj)) {
-    log!.error("isUserIdentity: 'credentials' property missing");
+    log.error("isUserIdentity: 'credentials' property missing");
     return false;
   }
   if (
     typeof objRecord.credentials !== "object" ||
     objRecord.credentials === null
   ) {
-    log!.error("isUserIdentity: 'credentials' is not an object or is null");
+    log.error("isUserIdentity: 'credentials' is not an object or is null");
     return false;
   }
   const credentials = objRecord.credentials as Record<string, unknown>;
   if (!("certificate" in credentials)) {
-    log!.error("isUserIdentity: 'certificate' property missing in credentials");
+    log.error("isUserIdentity: 'certificate' property missing in credentials");
     return false;
   }
   if (typeof credentials.certificate !== "string") {
-    log!.error("isUserIdentity: 'certificate' property is not a string");
+    log.error("isUserIdentity: 'certificate' property is not a string");
     return false;
   }
   if (!("privateKey" in credentials)) {
-    log!.error("isUserIdentity: 'privateKey' property missing in credentials");
+    log.error("isUserIdentity: 'privateKey' property missing in credentials");
     return false;
   }
   if (typeof credentials.privateKey !== "string") {
-    log!.error("isUserIdentity: 'privateKey' property is not a string");
+    log.error("isUserIdentity: 'privateKey' property is not a string");
     return false;
   }
   return true;

@@ -94,8 +94,12 @@ function isWeb3SigningCredentialNone(
 }
 
 // Type guard for Web3SigningCredential
-function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
+function isWeb3SigningCredential(
+  obj: unknown,
+  log: Logger,
+): obj is Web3SigningCredential {
   if (!obj || typeof obj !== "object") {
+    log.error("isWeb3SigningCredential: obj is not an object or is null");
     return false;
   }
   return (

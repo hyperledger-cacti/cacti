@@ -113,8 +113,12 @@ function isWeb3SigningCredentialNone(
 }
 
 // Type guard for Web3SigningCredential
-function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
+function isWeb3SigningCredential(
+  obj: unknown,
+  log: Logger,
+): obj is Web3SigningCredential {
   if (!obj || typeof obj !== "object") {
+    log.error("isWeb3SigningCredential: obj is not an object or is null");
     return false;
   }
   return (
@@ -125,8 +129,9 @@ function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
   );
 }
 
-function isGasConfig(obj: unknown): obj is GasTransactionConfig {
+function isGasConfig(obj: unknown, log: Logger): obj is GasTransactionConfig {
   if (!obj || typeof obj !== "object") {
+    log.error("isGasConfig: obj null or not obj");
     throw new TypeError(
       "isGasConfig: obj null or not obj" + JSON.stringify(obj),
     );
@@ -181,10 +186,6 @@ export function isEthereumConfigJSON(
     {
       configElement: "wrapperContractAddress",
       configElementType: String,
-    },
-    {
-      configElement: "gasConfig",
-      configElementTypeguard: isGasConfig,
     },
     {
       configElement: "gasConfig",

@@ -1,3 +1,4 @@
+import { Logger } from "@hyperledger/cactus-common";
 import { IPluginLedgerConnectorEthereumOptions } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 
 export interface EthereumOptionsJSON {
@@ -8,8 +9,10 @@ export interface EthereumOptionsJSON {
 
 export function isEthereumOptionsJSON(
   obj: unknown,
+  log: Logger,
 ): obj is EthereumOptionsJSON {
   if (typeof obj !== "object" || obj === null) {
+    log.error("isEthereumOptionsJSON: obj is not an object or is null");
     return false;
   }
   const objRecord = obj as Record<string, unknown>;

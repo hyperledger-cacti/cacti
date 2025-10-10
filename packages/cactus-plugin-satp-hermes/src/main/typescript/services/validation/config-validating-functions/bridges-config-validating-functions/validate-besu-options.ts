@@ -1,3 +1,4 @@
+import { Logger } from "@hyperledger/cactus-common/";
 import { IPluginLedgerConnectorBesuOptions } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 
 export interface BesuOptionsJSON {
@@ -7,8 +8,12 @@ export interface BesuOptionsJSON {
 }
 
 // Type guard for BesuOptionsJSON
-export function isBesuOptionsJSON(obj: unknown): obj is BesuOptionsJSON {
+export function isBesuOptionsJSON(
+  obj: unknown,
+  log: Logger,
+): obj is BesuOptionsJSON {
   if (typeof obj !== "object" || obj === null) {
+    log.error("isBesuOptionsJSON: obj is not an object or is null");
     return false;
   }
   const objRecord = obj as Record<string, unknown>;
