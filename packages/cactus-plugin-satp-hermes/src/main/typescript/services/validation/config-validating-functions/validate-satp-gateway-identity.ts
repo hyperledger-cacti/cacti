@@ -6,6 +6,7 @@ import {
   type GatewayIdentity,
 } from "../../../core/types";
 import { NetworkId } from "../../../public-api";
+import { Logger } from "@hyperledger/cactus-common";
 
 // Type guard for Address
 function isAddress(input: unknown): input is Address {
@@ -44,7 +45,7 @@ function isPrivacyDraftVersionsArray(
 }
 
 // Type guard for NetworkId
-export function isNetworkId(obj: unknown): obj is NetworkId {
+export function isNetworkId(obj: unknown, log: Logger): obj is NetworkId {
   try {
     return (
       typeof obj === "object" &&
@@ -55,6 +56,7 @@ export function isNetworkId(obj: unknown): obj is NetworkId {
       Object.values(LedgerType).includes(obj.ledgerType as LedgerType)
     );
   } catch (error) {
+    log.error(`NetworkId Error: ${error}`);
     return false;
   }
 }
@@ -68,12 +70,18 @@ export function isSupportedDLT(obj: unknown): obj is LedgerType {
 }
 
 // Type guard for an array of NetworkId
-function isNetworkIdArray(input: unknown): input is Array<NetworkId> {
-  return Array.isArray(input) && input.every(isNetworkId);
+function isNetworkIdArray(
+  input: unknown,
+  log: Logger,
+): input is Array<NetworkId> {
+  return Array.isArray(input) && input.every((item) => isNetworkId(item, log));
 }
 
 // Type guard for GatewayIdentity
-export function isGatewayIdentity(obj: unknown): obj is GatewayIdentity {
+export function isGatewayIdentity(
+  obj: unknown,
+  log: Logger,
+): obj is GatewayIdentity {
   return (
     typeof obj === "object" &&
     obj !== null &&
@@ -82,7 +90,7 @@ export function isGatewayIdentity(obj: unknown): obj is GatewayIdentity {
     "version" in obj &&
     isPrivacyDraftVersionsArray((obj as Record<string, unknown>).version) &&
     (!("connectedDLTs" in obj) ||
-      isNetworkIdArray((obj as Record<string, unknown>).connectedDLTs)) &&
+      isNetworkIdArray((obj as Record<string, unknown>).connectedDLTs, log)) &&
     (!("pubKey" in obj) ||
       typeof (obj as Record<string, unknown>).pubKey === "string") &&
     (!("name" in obj) ||
@@ -101,14 +109,17 @@ export function isGatewayIdentity(obj: unknown): obj is GatewayIdentity {
   );
 }
 
-export function validateSatpGatewayIdentity(opts: {
-  readonly configValue: unknown;
-}): GatewayIdentity {
+export function validateSatpGatewayIdentity(
+  opts: {
+    readonly configValue: unknown;
+  },
+  log: Logger,
+): GatewayIdentity {
   if (
     !opts ||
     !opts.configValue ||
     typeof opts.configValue !== "object" ||
-    !isGatewayIdentity(opts.configValue)
+    !isGatewayIdentity(opts.configValue, log)
   ) {
     throw new TypeError(
       `Invalid config.gid: ${JSON.stringify(opts.configValue)}`,
