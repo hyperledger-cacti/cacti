@@ -22,7 +22,7 @@ jobs:
   DCI-Lint:
       name: DCI-Lint
       needs: check-ci-skip
-      runs-on: ubuntu-22.04
+      runs-on: ubuntu-latest-16-cores
       steps:
         - id: lint-git-repo
           name: Lint Git Repo
@@ -54,7 +54,7 @@ jobs:
           run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
   check-ci-skip:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: Check CI Skip
@@ -64,7 +64,7 @@ jobs:
     needs: check-ci-skip
     outputs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: Set output
@@ -87,7 +87,7 @@ jobs:
       test-tooling-changed: ${{ steps.changes.outputs.test-tooling-changed }}
       ghcr-dev-container-vscode-changed: ${{ steps.changes.outputs.ghcr-dev-container-vscode-changed }}
       copm-changed: ${{ steps.changes.outputs.copm-changed }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
@@ -219,7 +219,7 @@ jobs:
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -268,7 +268,7 @@ jobs:
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -355,7 +355,7 @@ jobs:
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -469,7 +469,7 @@ jobs:
       CONFIGURE_DISABLED: false
       CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION: 3.0.3
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -507,7 +507,7 @@ jobs:
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -544,7 +544,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -585,7 +585,7 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -677,7 +677,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -716,7 +716,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -754,7 +754,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -790,7 +790,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -828,7 +828,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -862,7 +862,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -897,7 +897,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -933,7 +933,7 @@ jobs:
       TAPE_TEST_PATTERN: '--files={./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-backend-api-calls.test.ts,./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts}'
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -969,7 +969,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1004,7 +1004,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1040,7 +1040,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1078,7 +1078,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1114,7 +1114,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1150,7 +1150,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1185,7 +1185,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1220,7 +1220,7 @@ jobs:
       TAPE_TEST_PATTERN: ./packages/cactus-plugin-keychain-azure-kv/src/test/typescript/integration/plugin-keychain-azure-kv.test.ts
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1254,7 +1254,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1289,7 +1289,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1325,7 +1325,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1361,7 +1361,7 @@ jobs:
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1399,7 +1399,7 @@ jobs:
       TAPE_TEST_RUNNER_DISABLED: true
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1449,7 +1449,7 @@ jobs:
       TAPE_TEST_RUNNER_DISABLED: false
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1517,7 +1517,7 @@ jobs:
       - build-dev
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-polkadot-changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1557,7 +1557,7 @@ jobs:
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1615,7 +1615,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       DUMP_DISK_USAGE_INFO_DISABLED: false
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1664,7 +1664,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/plc-fabric-0
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1701,7 +1701,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cplc-iroha2
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1737,7 +1737,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cplc-ethereum
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1769,7 +1769,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1803,7 +1803,7 @@ jobs:
         --files={./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/deploy-contract-from-json-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/invoke-contract-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation.test.ts}
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1836,7 +1836,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1869,7 +1869,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1903,7 +1903,7 @@ jobs:
       TAPE_TEST_PATTERN: '--files={./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts,./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts}'
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1937,7 +1937,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -1968,7 +1968,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2004,7 +2004,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2040,7 +2040,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-cmd-api-server
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2073,7 +2073,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2107,7 +2107,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpt-consortium-manual
       JEST_TEST_CODE_COVERAGE_ENABLED: true
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2142,7 +2142,7 @@ jobs:
       TAPE_TEST_PATTERN: '--files=./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts'
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2182,7 +2182,7 @@ jobs:
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2220,7 +2220,7 @@ jobs:
       TAPE_TEST_RUNNER_DISABLED: true
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       DUMP_DISK_USAGE_INFO_DISABLED: false
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2255,7 +2255,7 @@ jobs:
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2294,7 +2294,7 @@ jobs:
       TAPE_TEST_RUNNER_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       DUMP_DISK_USAGE_INFO_DISABLED: false
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2329,7 +2329,7 @@ jobs:
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2364,7 +2364,7 @@ jobs:
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
       DUMP_DISK_USAGE_INFO_DISABLED: false
     needs: build-dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - name: Use Node.js ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -2388,13 +2388,13 @@ jobs:
           name: coverage-reports-47
           path: ./code-coverage-ts/**/
   ghcr-besu-all-in-one:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-besu-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
   ghcr-connector-corda-server:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.plugin-ledger-connector-corda-changed == 'true'
@@ -2405,14 +2405,14 @@ jobs:
         run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
          
   ghcr-corda-all-in-one-flowdb:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
 
   ghcr-dev-container-vscode:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     needs:
       - compute_changed_packages
     if: needs.compute_changed_packages.outputs.ghcr-dev-container-vscode-changed == 'true'
@@ -2430,28 +2430,28 @@ jobs:
         run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"
 
   ghcr-example-supply-chain-app:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
         run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
 
   ghcr-fabric2-all-in-one:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
 
   ghcr-daml-all-in-one:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/daml-all-in-one
         run: DOCKER_BUILDKIT=1 docker build ./tools/docker/daml-all-in-one/ -f ./tools/docker/daml-all-in-one/Dockerfile
 
   ghcr-keychain-vault-server:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest-16-cores
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: ghcr.io/hyperledger/cactus-keychain-vault-server
