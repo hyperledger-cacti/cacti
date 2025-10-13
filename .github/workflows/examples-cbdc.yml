@@ -1,0 +1,95 @@
+name: CBDC Example CI
+permissions:
+  contents: write  # Required for test result publishing
+  checks: write    # Required for test result reports
+  packages: write  # Required for publishing to GitHub Container Registry
+env:
+  NODEJS_VERSION: v22.18.0
+on:
+    pull_request:
+        branches: [main, satp-dev, satp-stg]
+    push:
+        branches: [main, satp-dev, satp-stg]
+
+jobs:
+  # Test execution jobs: run unit and integration tests in parallel
+  run-satp-tests-integration-cbdc:
+    runs-on: ubuntu-22.04
+    env:
+      FULL_BUILD_DISABLED: true
+      JEST_TEST_RUNNER_DISABLED: false
+      RUN_CODE_COVERAGE: "true"
+      # SATP specific configuration
+      SATP_ENABLE_CRASH_RECOVERY: false
+      SATP_LOG_LEVEL: DEBUG
+      SATP_ENABLE_LOCAL_REPOSITORY: true
+      SATP_ENABLE_REMOTE_REPOSITORY: false
+
+    steps:
+      - uses: actions/checkout@v4.1.7
+      - name: Use Node.js
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: v22.18.0
+
+      - name: Install dependencies
+        run: yarn install
+      
+      - run: ./tools/ci-env-clean-up.sh
+
+      - name: Configure and build all packages
+        run: yarn configure
+
+      - name: Run CBDC integration tests (with optional coverage)
+        run: |
+          set -euo pipefail
+          if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
+            echo "Running CBDC integration tests with coverage"
+            yarn workspace @hyperledger/cactus-example-cbdc-bridging-backend test:integration --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-cbdc || true
+          else
+            echo "Running CBDC integration tests without coverage"
+            yarn workspace @hyperledger/cactus-example-cbdc-bridging-backend test:integration
+          fi
+
+      - name: Upload CBDC integration test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cbdc-integration-junit-report-${{ github.job }}
+          path: examples/cactus-example-cbdc-bridging-backend/reports/junit/cbdc-bridging-tests-integration.xml
+
+      - name: Check for CBDC junit report
+        id: check_cbdc_junit
+        run: |
+          if [ -f examples/cactus-example-cbdc-bridging-backend/reports/junit/cbdc-bridging-tests-integration.xml ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report CBDC integration test results (annotate)
+        if: always() && steps.check_cbdc_junit.outputs.found == 'true'
+        uses: dorny/test-reporter@v1.9.1
+        with:
+          name: "CBDC Integration Tests"
+          path: examples/cactus-example-cbdc-bridging-backend/reports/junit/cbdc-bridging-tests-integration.xml
+          reporter: jest-junit
+          list-tests: failed
+          fail-on-error: true
+
+      - name: Check for CBDC integration coverage artifacts
+        id: check_cbdc_coverage
+        run: |
+          if [ -d packages/cactus-plugin-satp-hermes/code-coverage-ts ] || [ -f packages/cactus-plugin-satp-hermes/coverage/coverage-final.json ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload CBDC integration coverage (if present)
+        if: always() && steps.check_cbdc_coverage.outputs.found == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-reports-satp-hermes-${{ github.job }}
+          path: |
+            packages/cactus-plugin-satp-hermes/code-coverage-ts/**/
