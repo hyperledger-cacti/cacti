@@ -25,7 +25,6 @@ export interface ISATPGatewayRunnerConstructorOptions {
   configPath?: string;
   logsPath?: string;
   ontologiesPath?: string;
-  databasePath?: string;
   networkName?: string;
   url?: string; // URL for the SATP gateway
 }

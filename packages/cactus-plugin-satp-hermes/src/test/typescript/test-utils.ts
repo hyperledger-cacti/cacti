@@ -20,6 +20,7 @@ import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript
 import { EventEmitter } from "events";
 import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { createMigrationSource } from "../../main/typescript/database/knex-migration-source";
+import { ExtensionConfig } from "../../main/typescript/services/validation/config-validating-functions/validate-extensions";
 
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
@@ -141,6 +142,7 @@ export interface GatewayDockerConfig {
     privateKey: string;
     publicKey: string;
   };
+  extensions?: ExtensionConfig[];
 }
 
 export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
@@ -157,6 +159,7 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     localRepository,
     remoteRepository,
     gatewayKeyPair,
+    extensions,
   } = config;
 
   const jsonObject = {
@@ -180,6 +183,7 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     keyPair: gatewayKeyPair,
     enableCrashRecovery: enableCrashRecovery,
     ontologyPath: "/opt/cacti/satp-hermes/ontologies",
+    extensions,
   };
 
   const directory = testFilesDirectory;

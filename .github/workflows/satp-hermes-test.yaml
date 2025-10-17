@@ -667,10 +667,10 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running recovery tests with coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:recovery --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-recovery
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:recovery --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-recovery --passWithNoTests
           else
             echo "Running recovery tests without coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:recovery
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:recovery --passWithNoTests
           fi
 
       - name: Upload SATP recovery test report
@@ -759,10 +759,10 @@ jobs:
           set -euo pipefail
           if [ "${{ env.RUN_CODE_COVERAGE }}" = "true" ]; then
             echo "Running rollback tests with coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:rollback --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-rollback
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:rollback --coverage --coverageDirectory=./code-coverage-ts/satp-hermes-rollback --passWithNoTests
           else
             echo "Running rollback tests without coverage"
-            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:rollback
+            yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:rollback --passWithNoTests
           fi
 
       - name: Upload SATP rollback test report

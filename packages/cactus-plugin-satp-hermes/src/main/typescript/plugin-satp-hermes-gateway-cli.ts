@@ -22,6 +22,8 @@ import { validateKnexRepositoryConfig } from "./services/validation/config-valid
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { validateInstanceId } from "./services/validation/config-validating-functions/validate-instance-id";
 import { v4 as uuidv4 } from "uuid";
+import { validateOntologyPath } from "./services/validation/config-validating-functions/validate-ontology-path";
+import { validateExtensions } from "./services/validation/config-validating-functions/validate-extensions";
 
 export async function launchGateway(): Promise<void> {
   const logger = LoggerProvider.getOrCreate({
@@ -109,7 +111,7 @@ export async function launchGateway(): Promise<void> {
   logger.debug("Validating Cross Chain Config...");
   const ccConfig = await validateCCConfig(
     {
-      configValue: config.ccConfig,
+      configValue: config.ccConfig || null,
     },
     logger,
   );
@@ -136,10 +138,15 @@ export async function launchGateway(): Promise<void> {
   logger.debug("SATP Bridges Config is valid.");
 
   logger.debug("Validating Ontologies Path...");
-  const ontologyPath = validateInstanceId({
+  const ontologyPath = validateOntologyPath({
     configValue: config.ontologyPath,
   });
-  logger.debug("SATP Gateway instanceId is valid.");
+  logger.debug("SATP Gateway ontologyPath is valid.");
+
+  logger.debug("Validating Extensions...");
+  const extensions = validateExtensions({
+    configValue: config.extensions,
+  });
 
   logger.debug("Creating SATPGatewayConfig...");
   const gatewayConfig: SATPGatewayConfig = {
@@ -162,6 +169,7 @@ export async function launchGateway(): Promise<void> {
     enableCrashRecovery,
     localRepository,
     remoteRepository,
+    extensions,
     pluginRegistry: new PluginRegistry({ plugins: [] }),
     ontologyPath,
   };

@@ -29,7 +29,7 @@ export interface EthereumConfigJSON extends NetworkOptionsJSON {
 }
 
 // Type guard for Web3SigningCredentialType
-function isWeb3SigningCredentialType(
+export function isWeb3SigningCredentialType(
   value: unknown,
 ): value is Web3SigningCredentialType {
   return (
