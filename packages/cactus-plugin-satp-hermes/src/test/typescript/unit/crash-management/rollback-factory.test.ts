@@ -41,6 +41,9 @@ import {
 } from "../../../../main/typescript/services/gateway/gateway-orchestrator";
 import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-satp-local-log-repository";
+import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
+import { ILocalLogRepository } from "../../../../main/typescript/database/repository/interfaces/repository";
 
 const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
   const mockSession = new SATPSession({
@@ -57,6 +60,7 @@ const createMockSession = (hashes?: MessageStagesHashes): SATPSession => {
   return mockSession;
 };
 
+let localRepository: ILocalLogRepository;
 const logLevel: LogLevelDesc = "DEBUG";
 const monitorService = MonitorService.createOrGetMonitorService({
   enabled: false,
@@ -75,6 +79,7 @@ describe.skip("RollbackStrategyFactory Tests", () => {
   let bridgesManager: SATPCrossChainManager;
 
   beforeAll(async () => {
+    localRepository = new KnexLocalLogRepository(knexLocalInstance.default);
     const gatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway",
@@ -112,6 +117,9 @@ describe.skip("RollbackStrategyFactory Tests", () => {
         ontologiesPath: ontologiesPath,
       },
       monitorService: monitorService,
+      localRepository: localRepository,
+      signer: signer,
+      pubKey: bufArray2HexStr(keyPairs.publicKey),
     };
     bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
 

@@ -36,6 +36,7 @@
  */
 
 import {
+  JsObjectSigner,
   type ILoggerOptions,
   type LogLevelDesc,
 } from "@hyperledger/cactus-common";
@@ -83,12 +84,31 @@ import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
 import { OracleSchedulerManager } from "./oracle-scheduler-manager";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import {
+  ILocalLogRepository,
+  IRemoteLogRepository,
+} from "../../database/repository/interfaces/repository";
+import {
+  IGatewayPersistenceConfig,
+  GatewayPersistence,
+} from "../../gateway-persistence";
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;
   bungee: IPluginBungeeHermesOptions | undefined;
   initialTasks?: OracleTask[];
+  localRepository: ILocalLogRepository;
+  remoteRepository?: IRemoteLogRepository;
   monitorService: MonitorService;
+  signer: JsObjectSigner;
+  pubKey: string;
+}
+
+export enum logOperation {
+  INIT = "init",
+  EXEC = "exec",
+  DONE = "done",
+  FAIL = "fail",
 }
 
 export class OracleManager {
@@ -96,6 +116,12 @@ export class OracleManager {
   private readonly logger: Logger;
   private readonly logLevel: LogLevelDesc = "INFO";
   private readonly monitorService: MonitorService;
+
+  private readonly dbLogger: GatewayPersistence;
+  private localRepository: ILocalLogRepository;
+  private remoteRepository: IRemoteLogRepository | undefined;
+  private _pubKey: string;
+  private signer: JsObjectSigner;
 
   // Group oracle by the network, a network can have various oracles (bridges)
   private readonly oracles: Map<string, Map<string, OracleAbstract>> =
@@ -123,6 +149,32 @@ export class OracleManager {
       this.monitorService,
     );
     this.logger.info(`${fnTag}: Initializing OracleManager`);
+
+    // if (!options.localRepository) {
+    //   throw new Error(`${fnTag}: localRepository is required`);
+    // }
+    this.localRepository = options.localRepository;
+    this.remoteRepository = options.remoteRepository;
+    if (!options.signer) {
+      throw new Error(`${fnTag}: signer is required`);
+    }
+    this.signer = options.signer;
+    if (!options.pubKey) {
+      throw new Error(`${fnTag}: pubKey is required`);
+    }
+    this._pubKey = options.pubKey;
+    const level = this.options.logLevel || "DEBUG";
+    const oracleLoggerConfig: IGatewayPersistenceConfig = {
+      localRepository: this.localRepository,
+      remoteRepository: this.remoteRepository,
+      signer: this.signer,
+      pubKey: this._pubKey,
+      logLevel: level,
+      monitorService: this.monitorService,
+    };
+
+    this.dbLogger = new GatewayPersistence(oracleLoggerConfig);
+    this.logger.debug(`${fnTag} dbLogger initialized: ${!!this.dbLogger}`);
 
     // this.notificationDispatcher = new OracleNotificationDispatcher({
     //   logger: this.logger,
@@ -673,10 +725,28 @@ export class OracleManager {
 
         let response: OracleResponse;
 
+        const logEntryInit = {
+          type: `oracle-${operation.type.toLowerCase()}`,
+          operation: logOperation.INIT,
+          data: safeStableStringify(operation),
+          taskId: task.taskID,
+          oracleOperationId: operation.id,
+        };
+        await this.dbLogger.persistLogEntry(logEntryInit);
+
         try {
           const oracle = this.getOracleExecutionLayer(operation.networkId);
 
           const entry = oracle.convertOperationToEntry(operation);
+
+          const logEntryExec = {
+            type: `oracle-${operation.type.toLowerCase()}`,
+            operation: logOperation.EXEC,
+            data: safeStableStringify(operation),
+            taskId: task.taskID,
+            oracleOperationId: operation.id,
+          };
+          await this.dbLogger.persistLogEntry(logEntryExec);
 
           if (operation.type === OracleOperationTypeEnum.Read) {
             response = await oracle.readEntry(entry as IOracleEntryBase);
@@ -690,9 +760,23 @@ export class OracleManager {
             response,
           );
           task.operations.push(operation);
+
+          const logEntryDone = {
+            type: `oracle-${operation.type.toLowerCase()}`,
+            operation: logOperation.DONE,
+            data: safeStableStringify(operation),
+            taskId: task.taskID,
+            oracleOperationId: operation.id,
+          };
+          await this.dbLogger.persistLogEntry(logEntryDone);
         } catch (error) {
+          const causeMessage =
+            error.cause && error.cause.message
+              ? ". " + error.cause.message
+              : "";
+
           response = {
-            output: error.message + ". " + error.cause.message,
+            output: error.message + causeMessage,
           } as OracleResponse;
 
           this.logger.error(
@@ -704,6 +788,14 @@ export class OracleManager {
             response,
           );
           task.operations.push(operation);
+          const logEntryFail = {
+            type: `oracle-${operation.type.toLowerCase()}`,
+            operation: logOperation.FAIL,
+            data: safeStableStringify(operation),
+            taskId: task.taskID,
+            oracleOperationId: operation.id,
+          };
+          await this.dbLogger.persistLogEntry(logEntryFail);
           throw new OracleError(error);
         }
 
