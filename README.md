@@ -1,7 +1,8 @@
  [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://vscode.dev/github/hyperledger-cacti/cacti)
- [![License](https://img.shields.io/github/license/hyperledger-cacti/cacti)](https://opensource.org/licenses/Apache-2.0) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
+ [![License](https://img.shields.io/github/license/hyperledger-cacti/cacti)](https://opensource.org/licenses/Apache-2.0) [![LFX Health Score](https://insights.linuxfoundation.org/api/badge/health-score?project=cacti)](https://insights.linuxfoundation.org/project/cacti) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
  [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyperledger-cacti/cacti/badge)](https://scorecard.dev/viewer/?uri=github.com/hyperledger-cacti/cacti)
  [![GitHub issues](https://img.shields.io/github/issues/hyperledger-cacti/cacti)](https://github.com/hyperledger-cacti/cacti/issues)
+[![LFX Active Contributors](https://insights.linuxfoundation.org/api/badge/active-contributors?project=cacti)](https://insights.linuxfoundation.org/project/cacti)
 
 ![Cacti Logo Color](./images/HL_Cacti_Logo_Color.png#gh-light-mode-only)
 ![Cacti Logo Color](./images/HL_Cacti_Logo_Colorreverse.svg#gh-dark-mode-only)
