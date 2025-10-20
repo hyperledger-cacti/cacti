@@ -11,7 +11,7 @@
  * @since 0.0.3-beta
  */
 
-import type { LocalLog } from "../../core/types";
+import type { SATPLocalLog } from "../../core/types";
 import type { ILocalLogRepository } from "./interfaces/repository";
 import knex, { type Knex } from "knex";
 import { knexLocalInstance } from "../knexfile";
@@ -108,7 +108,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * @since 0.0.3-beta
    */
   getLogsTable(): Knex.QueryBuilder {
-    return this.database("logs");
+    return this.database("satp_logs");
   }
 
   /**
@@ -118,7 +118,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * @returns Promise resolving to log entry or undefined
    * @since 0.0.3-beta
    */
-  readById(logKey: string): Promise<LocalLog> {
+  readById(logKey: string): Promise<SATPLocalLog> {
     return this.getLogsTable().where({ key: logKey }).first();
   }
 
@@ -129,7 +129,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * @returns Promise resolving to latest log entry for session
    * @since 0.0.3-beta
    */
-  readLastestLog(sessionID: string): Promise<LocalLog> {
+  readLastestLog(sessionID: string): Promise<SATPLocalLog> {
     return this.getLogsTable()
       .orderBy("timestamp", "desc")
       .where({ sessionID: sessionID })
@@ -143,7 +143,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * @returns Promise resolving to array of matching log entries
    * @since 0.0.3-beta
    */
-  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]> {
+  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<SATPLocalLog[]> {
     return this.getLogsTable()
       .where("timestamp", ">", timestamp)
       .whereNot("type", "like", "%proof%");
@@ -157,7 +157,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * @since 0.0.3-beta
    * @todo Fix return type annotation
    */
-  create(log: LocalLog): any {
+  create(log: SATPLocalLog): any {
     return this.getLogsTable().insert(log);
   }
 
@@ -182,7 +182,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
    * @returns Promise resolving to array of non-proof log entries
    * @since 0.0.3-beta
    */
-  readLogsNotProofs(): Promise<LocalLog[]> {
+  readLogsNotProofs(): Promise<SATPLocalLog[]> {
     return this.getLogsTable()
       .select(
         this.database.raw(
@@ -208,7 +208,7 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
   fetchLogsFromSequence(
     sessionId: string,
     sequenceNumber: number,
-  ): Promise<LocalLog[]> {
+  ): Promise<SATPLocalLog[]> {
     return this.getLogsTable()
       .where("sessionId", sessionId)
       .andWhere("sequenceNumber", ">", sequenceNumber);

@@ -34,7 +34,7 @@ import { Knex } from "knex";
  * @since 0.0.3-beta
  */
 export function up(knex: Knex): Knex.SchemaBuilder {
-  return knex.schema.createTable("logs", (table) => {
+  return knex.schema.createTable("satp_logs", (table) => {
     /** SATP session identifier for grouping related logs */
     table.string("sessionId").notNullable();
     /** Log entry type classification (state, event, proof, etc.) */
@@ -64,7 +64,7 @@ export function up(knex: Knex): Knex.SchemaBuilder {
  * @since 0.0.3-beta
  */
 export function down(knex: Knex): Knex.SchemaBuilder {
-  return knex.schema.dropTable("logs");
+  return knex.schema.dropTable("satp_logs");
 }
 
 /**
@@ -77,5 +77,5 @@ export function down(knex: Knex): Knex.SchemaBuilder {
  * @since 0.0.3-beta
  */
 export function getId(): Readonly<string> {
-  return "20220331132128_create_logs_table";
+  return "20220331132128_create_satp_logs_table";
 }

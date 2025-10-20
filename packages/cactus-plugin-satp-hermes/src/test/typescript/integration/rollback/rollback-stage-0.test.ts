@@ -2,7 +2,7 @@ import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
-  LocalLog,
+  SATPLocalLog,
   GatewayIdentity,
   Address,
   SupportedSigningAlgorithms,
@@ -445,7 +445,7 @@ describe.skip("Rollback Test stage 0", () => {
     const serverSessionData = serverSession.getServerSessionData();
 
     const key1 = getSatpLogKey(sessionId, "type", "operation1");
-    const mockLogEntry1: LocalLog = {
+    const mockLogEntry1: SATPLocalLog = {
       sessionId: sessionId,
       type: "type",
       key: key1,
@@ -459,7 +459,7 @@ describe.skip("Rollback Test stage 0", () => {
     await mockLogRepository1.create(mockLogEntry1);
 
     const key2 = getSatpLogKey(sessionId, "type2", "done");
-    const mockLogEntry2: LocalLog = {
+    const mockLogEntry2: SATPLocalLog = {
       sessionId: sessionId,
       type: "type2",
       key: key2,

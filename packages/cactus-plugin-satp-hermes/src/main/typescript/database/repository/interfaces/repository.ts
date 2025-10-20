@@ -32,6 +32,12 @@
  */
 
 import type { LocalLog, RemoteLog } from "../../../core/types";
+import type {
+  Log,
+  OracleLocalLog,
+  SATPLocalLog,
+  SATPRemoteLog,
+} from "../../../core/types";
 
 /**
  * Base repository interface for generic data persistence operations.
@@ -89,26 +95,29 @@ export interface IRepository<T, K> {
  * const sequenceLogs = await localRepo.fetchLogsFromSequence('session-123', 10);
  * ```
  */
-export interface ILocalLogRepository extends IRepository<LocalLog, string> {
+export interface ILocalLogRepository
+  extends IRepository<SATPLocalLog | OracleLocalLog, string> {
   /** Underlying database connection instance */
   database: any;
   /** Retrieve local log by unique identifier */
-  readById(id: string): Promise<LocalLog>;
+  readById(id: string): Promise<SATPLocalLog | OracleLocalLog>;
   /** Read all logs excluding proof-type entries */
-  readLogsNotProofs(): Promise<LocalLog[]>;
+  readLogsNotProofs(): Promise<SATPLocalLog[]>;
   /** Read logs created after specified timestamp */
-  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]>;
+  readLogsMoreRecentThanTimestamp(
+    timestamp: string,
+  ): Promise<SATPLocalLog[] | OracleLocalLog[]>;
   /** Read most recent log entry for a specific session */
-  readLastestLog(sessionID: string): Promise<LocalLog>;
+  readLastestLog(sessionID: string): Promise<SATPLocalLog | OracleLocalLog>;
   /** Create new local log entry */
-  create(log: LocalLog): Promise<LocalLog>;
+  create(entity: Log): Promise<Log>;
   /** Delete all logs associated with a session ID */
   deleteBySessionId(log: string): any;
   /** Fetch logs from a specific sequence number onwards */
   fetchLogsFromSequence(
     sessionId: string,
     sequenceNumber: number,
-  ): Promise<LocalLog[]>;
+  ): Promise<SATPLocalLog[] | OracleLocalLog[]>;
   /** Clean up repository resources and connections */
   destroy(): any;
   /** Reset repository to initial state */
@@ -153,7 +162,8 @@ export interface ILocalLogRepository extends IRepository<LocalLog, string> {
  * const retrievedLog = await remoteRepo.readById('remote-log-123');
  * ```
  */
-export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
+export interface IRemoteLogRepository
+  extends IRepository<SATPRemoteLog, string> {
   /** Underlying database connection instance */
   database: any;
   /** Retrieve remote log by unique identifier */

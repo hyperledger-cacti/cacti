@@ -2,7 +2,7 @@ import "jest-extended";
 import { Secp256k1Keys } from "@hyperledger/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
-  LocalLog,
+  SATPLocalLog,
   GatewayIdentity,
   Address,
   SupportedSigningAlgorithms,
@@ -340,7 +340,7 @@ describe.skip("Stage 1 Recovery Test", () => {
     const sessionId = clientSessionData.id;
 
     const clientLogKey = getSatpLogKey(sessionId, "stage1", "partial");
-    const clientLogEntry: LocalLog = {
+    const clientLogEntry: SATPLocalLog = {
       sessionId: sessionId,
       type: "stage1",
       key: clientLogKey,
@@ -359,7 +359,7 @@ describe.skip("Stage 1 Recovery Test", () => {
     serverSessionData.id = sessionId;
 
     const serverLogKey = getSatpLogKey(sessionId, "stage1", "done");
-    const serverLogEntry: LocalLog = {
+    const serverLogEntry: SATPLocalLog = {
       sessionId: sessionId,
       type: "stage1",
       key: serverLogKey,

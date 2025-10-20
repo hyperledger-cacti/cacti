@@ -59,7 +59,7 @@ import type {
   IRemoteLogRepository,
 } from "./database/repository/interfaces/repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "./database/repository/knex-remote-log-repository";
-import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-local-log-repository";
+import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-satp-local-log-repository";
 import { BLODispatcher, type BLODispatcherOptions } from "./api1/dispatcher";
 import { type JsonObject } from "swagger-ui-express";
 import type {
@@ -658,6 +658,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           throw new Error("GatewayIdentity is not defined");
         }
 
+        if (!this.localRepository) {
+          throw new Error(
+            "Local repository must be defined before creating SATPCCManager",
+          );
+        }
+
         const SATPCCManagerOptions: ISATPCrossChainManagerOptions = {
           orquestrator: this.gatewayOrchestrator,
           ontologyOptions: {
@@ -665,6 +671,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           },
           logLevel: this.config.logLevel,
           monitorService: this.monitorService,
+          localRepository: this.localRepository,
+          signer: this.signer,
+          pubKey: this._pubKey,
         };
 
         this.SATPCCManager = new SATPCrossChainManager(SATPCCManagerOptions);
