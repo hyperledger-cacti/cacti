@@ -1,4 +1,4 @@
-import { type LogLevelDesc } from "@hyperledger/cactus-common";
+import { type LogLevelDesc, JsObjectSigner } from "@hyperledger/cactus-common";
 import type { SATPLogger as Logger } from "../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import { BridgeManager } from "./bridge/bridge-manager";
@@ -9,11 +9,19 @@ import { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
 import { OracleManager } from "./oracle/oracle-manager";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import {
+  ILocalLogRepository,
+  IRemoteLogRepository,
+} from "../database/repository/interfaces/repository";
 export interface ISATPCrossChainManagerOptions {
   orquestrator: GatewayOrchestrator;
   logLevel?: LogLevelDesc;
   ontologyOptions?: IOntologyManagerOptions;
+  localRepository: ILocalLogRepository;
+  remoteRepository?: IRemoteLogRepository;
   monitorService: MonitorService;
+  signer: JsObjectSigner;
+  pubKey: string;
 }
 
 export interface ICrossChainMechanismsOptions {
@@ -61,9 +69,29 @@ export class SATPCrossChainManager {
   private oracleManager?: OracleManager;
 
   /**
+   * Instance of the local log repository.
+   */
+  private readonly localRepository: ILocalLogRepository;
+
+  /**
+   * Instance of the remote log repository.
+   */
+  private readonly remoteRepository?: IRemoteLogRepository;
+
+  /**
    * Instance of the GatewayOrchestrator to handle gateway-related operations.
    */
   private readonly monitorService: MonitorService;
+
+  /**
+   * Instance of the signer to handle signing operations.
+   */
+  private readonly signer: JsObjectSigner;
+
+  /**
+   * Instance of the public key to handle signing operations.
+   */
+  private readonly pubKey: string;
 
   /**
    * Constructs an instance of `ISATPCCManager`.
@@ -75,6 +103,11 @@ export class SATPCrossChainManager {
     const label = SATPCrossChainManager.CLASS_NAME;
     this.logLevel = this.options.logLevel || "INFO";
     this.monitorService = this.options.monitorService;
+    this.localRepository = this.options.localRepository;
+    this.remoteRepository = this.options.remoteRepository;
+    this.monitorService = this.options.monitorService;
+    this.signer = this.options.signer;
+    this.pubKey = this.options.pubKey;
     this.log = LoggerProvider.getOrCreate(
       { label, level: this.logLevel },
       this.monitorService,
@@ -97,6 +130,10 @@ export class SATPCrossChainManager {
           bungee: undefined,
           initialTasks: [],
           monitorService: this.monitorService,
+          localRepository: this.localRepository,
+          remoteRepository: this.remoteRepository,
+          signer: this.signer,
+          pubKey: this.pubKey,
         });
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
