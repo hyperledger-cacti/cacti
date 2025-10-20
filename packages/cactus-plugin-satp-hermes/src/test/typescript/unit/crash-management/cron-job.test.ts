@@ -37,7 +37,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { LocalLog } from "../../../../main/typescript/core/types";
+import { SATPLocalLog } from "../../../../main/typescript/core/types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import knex, { Knex } from "knex";
 import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
@@ -46,7 +46,7 @@ import path from "path";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
-import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-local-log-repository";
+import { KnexLocalLogRepository } from "../../../../main/typescript/database/repository/knex-satp-local-log-repository";
 import { KnexRemoteLogRepository } from "../../../../main/typescript/database/repository/knex-remote-log-repository";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
@@ -160,6 +160,9 @@ beforeAll(async () => {
     ontologyOptions: {
       ontologiesPath: ontologiesPath,
     },
+    localRepository: localRepository,
+    signer: signer,
+    pubKey: bufArray2HexStr(keyPairs.publicKey),
     monitorService: monitorService,
   };
   const bridgesManager = new SATPCrossChainManager(bridgesManagerOptions);
@@ -203,7 +206,7 @@ describe.skip("CrashManager Tests", () => {
 
     const key = getSatpLogKey(sessionId, "type2", "done");
 
-    const log: LocalLog = {
+    const log: SATPLocalLog = {
       sessionId: sessionId,
       type: "type2",
       key: key,
@@ -242,7 +245,7 @@ describe.skip("CrashManager Tests", () => {
 
     const key = getSatpLogKey(sessionId, "type3", "done");
 
-    const log: LocalLog = {
+    const log: SATPLocalLog = {
       sessionId: sessionId,
       type: "type3",
       key: key,
