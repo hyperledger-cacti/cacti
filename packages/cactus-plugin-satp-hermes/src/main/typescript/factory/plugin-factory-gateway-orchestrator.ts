@@ -114,7 +114,7 @@ export class PluginFactorySATPGateway extends PluginFactory<
    *     label: 'satp-gateway'
    *   },
    *   validationOptions: {
-   *     whitelist: true,
+   *     allowlist: true,
    *     forbidNonAllowListed: true
    *   }
    * };
