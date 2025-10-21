@@ -1,6 +1,5 @@
  [![Open in Visual Studio Code](https://img.shields.io/static/v1?logo=visualstudiocode&label=&message=Open%20in%20Visual%20Studio%20Code&labelColor=2c2c32&color=007acc&logoColor=007acc)](https://vscode.dev/github/hyperledger-cacti/cacti)
- [![License](https://img.shields.io/github/license/hyperledger-cacti/cacti)](https://opensource.org/licenses/Apache-2.0) [![LFX Health Score](https://insights.linuxfoundation.org/api/badge/health-score?project=cacti)](https://insights.linuxfoundation.org/project/cacti) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)
- [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyperledger-cacti/cacti/badge)](https://scorecard.dev/viewer/?uri=github.com/hyperledger-cacti/cacti)
+ [![License](https://img.shields.io/github/license/hyperledger-cacti/cacti)](https://opensource.org/licenses/Apache-2.0) [![LFX Health Score](https://insights.linuxfoundation.org/api/badge/health-score?project=cacti)](https://insights.linuxfoundation.org/project/cacti) [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/4089/badge)](https://bestpractices.coreinfrastructure.org/projects/4089)[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/hyperledger-cacti/cacti/badge)](https://scorecard.dev/viewer/?uri=github.com/hyperledger-cacti/cacti)
  [![GitHub issues](https://img.shields.io/github/issues/hyperledger-cacti/cacti)](https://github.com/hyperledger-cacti/cacti/issues)
 [![LFX Active Contributors](https://insights.linuxfoundation.org/api/badge/active-contributors?project=cacti)](https://insights.linuxfoundation.org/project/cacti)
 
@@ -13,6 +12,18 @@ Hyperledger Cacti is a multi-faceted pluggable interoperability framework to lin
 
 [Cacti is a _Graduated_ Hyperledger project](https://www.hyperledger.org/blog/hyperledger-cacti-a-general-purpose-modular-interoperability-framework-moves-to-graduated-status). Information on the different stages of a Hyperledger project and graduation criteria can be found in
 the [Hyperledger Project Incubation Exit Criteria document](https://wiki.hyperledger.org/display/TSC/Project+Incubation+Exit+Criteria).
+
+# 📍 Important announcement
+
+We are conducting an initiative called "Cacti cleanup". The initiative focuses on several key goals:​
+1. Reduce complexity: Simplifying the codebase architecture
+2. Delete old code: Removing deprecated or low-value components to focus energy on high-value features
+3. Reduce vulnerability surface: Improving security posture
+4. Improve documentation: Making the project more accessible and understandable
+5. Enhance onboarding: Making it easier for new contributors to get started
+6. Optimize the CI/CD pipelines by reducing runtime and costs
+
+Please refer to [the overview of this initiative (+ the SATP-Hermes initiative)](https://www.youtube.com/watch?v=pN1m0vgV7bY), and the [public Github project board](https://github.com/orgs/hyperledger-cacti/projects/2). Please contribute and vote on the different aspects of the initiative [on the Discord threads](https://discord.com/channels/905194001349627914/908379338716631050/1428405972992266343).
 
 ## Scope of Project
 
