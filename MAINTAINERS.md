@@ -11,6 +11,7 @@ Maintainers
 | Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] | vramaiitkgp |
 | Sandeep Nishad | [sandeepnRES][sandeepnRES] | sandeepn |
 | Rafael Belchior | [RafaelAPB][RafaelAPB] | rafaelapb |
+| André Augusto | [AndreAugusto11][AndreAugusto11] | andreaugusto |
 
 [izuru0]: https://github.com/izuru0
 [outSH]: https://github.com/outSH
@@ -18,6 +19,7 @@ Maintainers
 [VRamakrishna]: https://github.com/VRamakrishna
 [sandeepnRES]: https://github.com/sandeepnRES
 [RafaelAPB]: https://github.com/RafaelAPB
+[AndreAugusto11]: https://github.com/AndreAugusto11
 
 **Emeritus Maintainers**
 
