@@ -673,7 +673,7 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common-example-server
       JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_RUNNER_DISABLED: true,
+      TAPE_TEST_RUNNER_DISABLED: true
       DUMP_DISK_USAGE_INFO_DISABLED: false
       FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
@@ -1929,10 +1929,7 @@ jobs:
   cp-bungee-hermes:
     continue-on-error: false
     env:
-      # Otherwise it fails with: You are running out of disk space.
-      # The runner will stop working when the machine runs out of disk space.
-      # Free space left: 26 MB
-      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: true
       FULL_BUILD_DISABLED: true
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_RUNNER_DISABLED: false
@@ -2142,7 +2139,7 @@ jobs:
       JEST_TEST_RUNNER_DISABLED: false
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-htlc-eth-besu
       JEST_TEST_CODE_COVERAGE_ENABLED: true
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts}'
+      TAPE_TEST_PATTERN: '--files=./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts'
       TAPE_TEST_RUNNER_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04

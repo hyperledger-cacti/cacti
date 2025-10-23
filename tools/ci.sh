@@ -160,7 +160,7 @@ function mainTask()
   #elif [ "${JEST_TEST_CODE_COVERAGE_ENABLED:-true}" = "true" ]; then
   # yarn jest $JEST_TEST_PATTERN --coverage --coverageDirectory=$JEST_TEST_COVERAGE_PATH
   else
-    yarn test:jest:all #$JEST_TEST_PATTERN
+    yarn test:jest:all $JEST_TEST_PATTERN
   fi
 
   if [ "${DUMP_DISK_USAGE_INFO_DISABLED:-true}" = "true" ]; then
