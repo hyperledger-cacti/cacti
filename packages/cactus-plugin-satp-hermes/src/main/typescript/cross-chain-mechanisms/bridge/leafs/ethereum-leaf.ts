@@ -1290,4 +1290,37 @@ export class EthereumLeaf
   ): obj is IPluginLedgerConnectorEthereumOptions => {
     return obj.pluginRegistry !== undefined;
   };
+
+  public async getContractBytecode(contractAddress: string): Promise<any> {
+    const fnTag = `${EthereumLeaf.CLASS_NAME}}#getContractBytecode`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.log.debug(
+          `${fnTag}, fetching bytecode for contract on address ${contractAddress}`,
+        );
+
+        const response = (await this.connector.invokeRawWeb3EthMethod({
+          methodName: "getCode",
+          params: [contractAddress, "latest"],
+        })) as EthereumResponse;
+
+        if (!response) {
+          throw new Error(
+            `Failed to fetch bytecode for contract on address ${contractAddress}`,
+          );
+        }
+
+        return {
+          response,
+        };
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
+  }
 }

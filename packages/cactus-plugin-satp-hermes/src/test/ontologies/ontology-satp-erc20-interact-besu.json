@@ -2,6 +2,7 @@
     "name": "SATP-ERC20",
     "id": "SATP-ERC20-BESU",
     "type": "BESU_2X",
+    "contract": "solidity",
     "ontology": {
         "lock": [{
             "functionSignature": "transferFrom(address,address,uint256)",
@@ -42,6 +43,6 @@
         ]
     },
     "bytecode": "",
-    "ownerSignature": "",
-    "bridgeSignature": ""
+    "signature": "",
+    "hash": ""
 }

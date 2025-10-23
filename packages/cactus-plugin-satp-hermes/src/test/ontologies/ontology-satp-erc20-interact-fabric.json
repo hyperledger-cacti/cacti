@@ -2,6 +2,7 @@
     "name": "SATP-ERC20",
     "id": "SATP-ERC20-FABRIC",
     "type": "FABRIC_2",
+    "contract": "base64",
     "ontology": {
         "lock": [{
             "functionSignature": "transferFrom",
@@ -34,6 +35,7 @@
             } 
         ]
     },
-    "ownerSignature": "",
-    "bridgeSignature": ""
+    "bytecode": "",
+    "signature": "",
+    "hash": ""
 }
