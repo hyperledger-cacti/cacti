@@ -232,15 +232,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake openjdk-11-jdk wget
 
-      - name: Install Python dependencies for ccmodel-hephaestus
-        run: |
-          # Install pm4py which is required for ccmodel-hephaestus tests
-          pip3 install pm4py
-          # Install additional dependencies from requirements.txt if it exists
-          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
-            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
-          fi
-
       - id: yarn-cache
         name: Initialize Yarn Cache
         uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
@@ -280,15 +271,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake
-
-      - name: Install Python dependencies for ccmodel-hephaestus
-        run: |
-          # Install pm4py which is required for ccmodel-hephaestus tests
-          pip3 install pm4py
-          # Install additional dependencies from requirements.txt if it exists
-          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
-            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
-          fi
 
       - id: yarn-cache
         name: Restore Yarn Cache
@@ -367,15 +349,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential python3 python3-pip python3-setuptools gcc g++ make pkg-config libsqlite3-dev libtool autoconf automake openjdk-11-jdk wget
-
-      - name: Install Python dependencies for ccmodel-hephaestus
-        run: |
-          # Install pm4py which is required for ccmodel-hephaestus tests
-          pip3 install pm4py
-          # Install additional dependencies from requirements.txt if it exists
-          if [ -f packages/cactus-plugin-ccmodel-hephaestus/requirements.txt ]; then
-            pip3 install -r packages/cactus-plugin-ccmodel-hephaestus/requirements.txt
-          fi
 
       - id: yarn-cache
         name: Restore Yarn Cache

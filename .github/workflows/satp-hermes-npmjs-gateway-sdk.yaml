@@ -71,6 +71,29 @@ name: SATP Hermes Gateway SDK - NPM Publish
 # =============================================================================
 
 on:
+  push:
+    branches: [main, satp-dev, satp-stg]
+    paths:
+      - 'packages/cactus-plugin-satp-hermes/**'
+      - '.github/workflows/satp-hermes-npmjs-gateway-sdk.yaml'
+  
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip test execution (for emergency releases only)'
+        required: false
+        default: false
+        type: boolean
+      is_release:
+        description: 'Create release version using package.json version'
+        required: false
+        default: false
+        type: boolean
+      custom_version:
+        description: 'Custom version tag (leave empty to use package.json version)'
+        required: false
+        type: string
+  
   workflow_call:
     inputs:
       skip_tests:
