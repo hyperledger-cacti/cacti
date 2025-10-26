@@ -23,9 +23,6 @@
       "path": "./packages/cactus-plugin-bungee-hermes/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-ccmodel-hephaestus/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-plugin-consortium-manual/tsconfig.json"
     },
     {
@@ -141,9 +138,6 @@
     },
     {
       "path": "./packages/cactus-test-verifier-client/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-ccmodel-hephaestus/tsconfig.json"
     },
     {
       "path": "./examples/cactus-common-example-server/tsconfig.json"
