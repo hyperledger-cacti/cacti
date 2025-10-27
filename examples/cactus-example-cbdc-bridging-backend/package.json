@@ -41,6 +41,7 @@
   ],
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cactus-example-cbdc-bridging-backend.web.umd.js",
   "types": "dist/lib/main/typescript/index.d.ts",
   "files": [
     "dist/*"
