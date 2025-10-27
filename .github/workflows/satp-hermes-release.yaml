@@ -21,6 +21,31 @@ on:
         description: 'Tag version from docker stage'
         required: true
         type: string
+  
+  workflow_dispatch:
+    inputs:
+      is_release:
+        description: 'Create release version using package.json version'
+        required: false
+        default: true
+        type: boolean
+      release_branch:
+        description: 'Branch to create release from'
+        required: false
+        default: 'main'
+        type: choice
+        options:
+          - main
+          - satp-stg
+          - satp-dev
+      custom_version:
+        description: 'Custom version tag (leave empty to use package.json version)'
+        required: false
+        type: string
+      tag_version:
+        description: 'Tag version (e.g., 0.0.3-beta)'
+        required: true
+        type: string
 
 jobs:
   # =============================================================================

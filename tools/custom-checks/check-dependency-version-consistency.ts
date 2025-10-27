@@ -61,7 +61,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger/cacti-weaver-besu-simplestate",
   "@hyperledger/cacti-weaver-sdk-besu",
   "@hyperledger/cactus-test-plugin-keychain-memory",
-  "@hyperledger/cactus-plugin-ccmodel-hephaestus",
   "@hyperledger/cactus",
 ];
 

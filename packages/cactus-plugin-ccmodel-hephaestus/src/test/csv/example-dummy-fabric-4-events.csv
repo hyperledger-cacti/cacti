@@ -1,5 +1,0 @@
-caseID;receiptID;timestamp;blockchainID;invocationType;methodName;parameters;identity;cost;carbonFootprint;latency
-FABRIC_MONITORING;33542c28f8cd5e7c3cf2e36090365d2bb4f58a57f0af5641edcd73302363814b;2024-07-03T14:44:24.035Z;FABRIC_2;FabricContractInvocationType.SEND;CreateAsset;2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939,10,owner1;user1;0;0.00018;0
-FABRIC_MONITORING;897772958c7ff6f916e9898599c89d9423e494a9bcb973e3081708ccbae22228;2024-07-03T14:44:29.269Z;FABRIC_2;FabricContractInvocationType.SEND;TransferAsset;2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939,owner2;user1;0;0.00018;0
-FABRIC_MONITORING;33d6f0d65caaab85bedd667476c5618f0b9f806ff252a4de28ddabfad8404357;2024-07-03T14:44:34.487Z;FABRIC_2;FabricContractInvocationType.SEND;TransferAsset;2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939,owner1;user1;0;0.00018;0
-FABRIC_MONITORING;479b9bd62032c1e0f3792b3a5fe04a4b501313aa693b59193e268b74575f8d62;2024-07-03T14:44:39.720Z;FABRIC_2;FabricContractInvocationType.SEND;DeleteAsset;2a57d2e0-10ef-4358-9ddb-4c5c0c0ba939;user1;0;0.00018;0
