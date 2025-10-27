@@ -25,7 +25,7 @@ async function getContractInstance(provider, pathToJson) {
 }
 
 // Function to obtain the account balances of sender and recipient for
-// the specified token type and print them them to the console
+// the specified token type and print them to the console
 async function getBalances(tokenContract, sender, recipient) {
   const senderBalance = await tokenContract.balanceOf(sender);
   console.log(`Account balance of the sender: ${senderBalance.toString()}`);
