@@ -146,7 +146,7 @@ export class MonitorService {
     }
 
     const resource = new Resource({
-      "service.name": process.env.OTEL_SERVICE_NAME || "Satp-Hermes-Gateway",
+      "service.name": process.env.OTEL_SERVICE_NAME || "satp-hermes-gateway",
     });
 
     if (!this.sdk) {
@@ -391,16 +391,16 @@ export class MonitorService {
   }
 
   /**
-   * Increments the counter for the given metric by the specified amount.
+   * Updates the counter for the given metric by the specified amount.
    *
-   * @param metricName - The name of the metric to increment.
-   * @param amount - The amount to increment the counter by (default is 1).
+   * @param metricName - The name of the metric to update.
+   * @param amount - The amount to update the counter by (default is 1).
    * @param attributes - The attributes to attach to the metric (default is an empty object).
-   * @param ctx - The context in which to increment the counter (default is the current context).
+   * @param ctx - The context in which to update the counter (default is the current context).
    * @throws {UninitializedMonitorServiceError} If the NodeSDK is not initialized.
    * @throws {Error} If the counter for the given metric does not exist.
-   * @throws {Error} If the amount to increment is less than 1.
-   * @returns {Promise<void>} A promise that resolves when the counter is incremented.
+   * @throws {Error} If the amount to update is less than 1.
+   * @returns {Promise<void>} A promise that resolves when the counter is updated.
    */
   public async updateCounter(
     metricName: string,
@@ -431,13 +431,6 @@ export class MonitorService {
     }
 
     counter.metric.add(amount, attributes, ctx);
-    this.logger.trace(
-      `${fnTag} - Incremented counter: ${metricName} by ${amount} with attributes ${JSON.stringify(attributes)}`,
-    );
-    this.createLog(
-      "trace",
-      `${fnTag} - Incremented counter: ${metricName} by ${amount} with attributes ${JSON.stringify(attributes)}`,
-    );
   }
 
   /**
@@ -473,13 +466,6 @@ export class MonitorService {
       );
     }
     histogram.record(value, attributes, ctx);
-    this.logger.trace(
-      `${fnTag} - Recorded value ${value} in histogram ${metricName} with attributes ${JSON.stringify(attributes)}`,
-    );
-    this.createLog(
-      "trace",
-      `${fnTag} - Recorded value ${value} in histogram ${metricName} with attributes ${JSON.stringify(attributes)}`,
-    );
   }
 
   /**
@@ -507,13 +493,6 @@ export class MonitorService {
     }
 
     const new_ctx = trace.setSpan(ctx, span);
-    this.createLog(
-      "trace",
-      `${fnTag} - Starting span: ${spanName} with tracer: ${tracerName} in context: ${ctx}`,
-    );
-    this.logger.trace(
-      `${fnTag} - Started span: ${spanName} with tracer: ${tracerName} in context: ${new_ctx}`,
-    );
     return { span, context: new_ctx };
   }
 

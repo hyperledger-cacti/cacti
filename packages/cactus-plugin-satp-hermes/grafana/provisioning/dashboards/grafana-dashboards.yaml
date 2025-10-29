@@ -1,0 +1,22 @@
+# Grafana dashboard providers configuration
+apiVersion: 1
+
+# Each entry in the providers list defines a new dashboard
+# Each dashboard is defined in a separate JSON file
+# THIS IS AN EXAMPLE FILE. MODIFY OR REPLACE THE VALUES WITH YOUR OWN DASHBOARD FILE PATHS TO ENABLE DASHBOARDS.
+providers:
+  - name: "Performance Metrics"
+    type: file
+    options:
+      path: /otel-lgtm/grafana/conf/provisioning/dashboards/example_performance_metrics.json
+      foldersFromFilesStructure: false
+  - name: "Financial Metrics"
+    type: file
+    options:
+      path: /otel-lgtm/grafana/conf/provisioning/dashboards/example_financial_metrics.json
+      foldersFromFilesStructure: false
+  - name: "System Overview"
+    type: file
+    options:
+      path: /otel-lgtm/grafana/conf/provisioning/dashboards/example_system_overview.json
+      foldersFromFilesStructure: false

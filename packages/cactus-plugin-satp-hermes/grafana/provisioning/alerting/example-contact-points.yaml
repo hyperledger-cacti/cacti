@@ -1,0 +1,22 @@
+apiVersion: 1
+
+# Definition of contact points for alerting
+# THIS IS AN EXAMPLE FILE. REPLACE THE VALUES WITH YOUR OWN CONTACT INFORMATION TO ENABLE ALERT NOTIFICATIONS.
+contactPoints:
+    - orgId: 1
+      name: test-contact-points
+      receivers:
+        - uid: af1q2g33sy3uod
+          type: discord
+          settings:
+            # Replace with your Discord webhook URL (to test existing one, join the server using https://discord.gg/VnvMpcs2kT)
+            url: https://discord.com/api/webhooks/1430194325597196369/7Giic1fhAVEyhSO3Uy00yzgsyWMREEILBPMQACKXUghoB1KNdoOhoqWHntdE0CEanEJb
+            use_discord_username: false
+          disableResolveMessage: false
+        - uid: ff1q2g33sy3upc
+          type: email
+          settings:
+            # Replace with your email address
+            addresses: example@gmail.com
+            singleEmail: false
+          disableResolveMessage: false

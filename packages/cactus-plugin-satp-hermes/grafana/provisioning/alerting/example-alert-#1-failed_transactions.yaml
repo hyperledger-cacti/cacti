@@ -1,0 +1,65 @@
+apiVersion: 1
+
+# Definition of alert rule for failed transactions 
+# THIS IS AN EXAMPLE FILE. REPLACE THE VALUES WITH YOUR OWN ALERT CONDITIONS TO ENABLE ALERT NOTIFICATIONS.
+groups:
+    - orgId: 1
+      name: Alerts
+      folder: Alerts
+      interval: 1m
+      rules:
+        - uid: bf0keqynb8ni8d
+          title: Failed Transactions
+          condition: Failed Transactions over 0
+          data:
+            - refId: Failed Transactions
+              relativeTimeRange:
+                from: 600
+                to: 0
+              datasourceUid: prometheus
+              model:
+                disableTextWrap: false
+                editorMode: builder
+                expr: failed_transactions_total
+                fullMetaSearch: false
+                includeNullMetadata: true
+                instant: true
+                intervalMs: 1000
+                legendFormat: __auto
+                maxDataPoints: 43200
+                range: false
+                refId: Failed Transactions
+                useBackend: false
+            - refId: Failed Transactions over 0
+              datasourceUid: __expr__
+              model:
+                conditions:
+                    - evaluator:
+                        params:
+                            - 0
+                        type: gt
+                      operator:
+                        type: and
+                      query:
+                        params:
+                            - Failed Transactions over 0
+                      reducer:
+                        params: []
+                        type: last
+                      type: query
+                datasource:
+                    type: __expr__
+                    uid: __expr__
+                expression: Failed Transactions 
+                intervalMs: 1000
+                maxDataPoints: 43200
+                refId: Failed Transactions over 0
+                type: threshold
+          noDataState: NoData
+          execErrState: Error
+          for: 1m
+          annotations: {}
+          labels: {}
+          isPaused: false
+          notification_settings:
+            receiver: test-contact-points
