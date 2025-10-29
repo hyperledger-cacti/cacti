@@ -285,7 +285,10 @@ beforeAll(async () => {
   console.info("Besu Ledger started successfully");
   await besuEnv.deployAndSetupContracts(ClaimFormat.BUNGEE);
   // Start monitoring system
-  startDockerComposeService("otel-lgtm");
+  startDockerComposeService(
+    path.resolve(__dirname, "../../../../../docker-compose-satp.yml"),
+    "otel-lgtm",
+  );
   await executeTransfer("100", 1, "100");
 }, TIMEOUT);
 
@@ -313,13 +316,16 @@ afterAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-  stopDockerComposeService("otel-lgtm");
+  stopDockerComposeService(
+    path.resolve(__dirname, "../../../../../docker-compose-satp.yml"),
+    "otel-lgtm",
+  );
 }, TIMEOUT);
 
 describe("otel-lgtm captures information when a transaction occurs", () => {
   it("otel-lgtm ports should be open", async () => {
     await Promise.all([
-      waitForPort(4000),
+      waitForPort(3000),
       waitForPort(4317),
       waitForPort(4318),
       waitForPort(9090),
@@ -348,7 +354,7 @@ describe("otel-lgtm captures information when a transaction occurs", () => {
 
     expect(hasValueOne).toBe(true);
     //If using these links, please comment the function stopDockerComposeService
-    //http://localhost:4000/a/grafana-metricsdrilldown-app/drilldown?nativeHistogramMetric=&layout=grid&filters-rule=&filters-prefix=&filters-suffix=&from=now-6h&to=now&timezone=browser&var-filters=&var-labelsWingman=%28none%29&search_txt=&var-metrics-reducer-sort-by=default&var-ds=prometheus&var-other_metric_filters=
+    //http://localhost:3000/a/grafana-metricsdrilldown-app/drilldown?nativeHistogramMetric=&layout=grid&filters-rule=&filters-prefix=&filters-suffix=&from=now-6h&to=now&timezone=browser&var-filters=&var-labelsWingman=%28none%29&search_txt=&var-metrics-reducer-sort-by=default&var-ds=prometheus&var-other_metric_filters=
   });
 
   it("should capture the transaction logs using Loki", async () => {
@@ -356,7 +362,7 @@ describe("otel-lgtm captures information when a transaction occurs", () => {
     const end = Math.floor(Date.now() / 1000); // now in seconds
     const start = end - 60 * 60; // 1 hour ago
     const params = {
-      query: '{service_name="Satp-Hermes-Gateway"}',
+      query: '{service_name="satp-hermes-gateway"}',
       start: start,
       end: end,
       limit: 1000,
@@ -386,7 +392,7 @@ describe("otel-lgtm captures information when a transaction occurs", () => {
 
     expect(hasMessage).toBe(true);
     //If using these links, please comment the function stopDockerComposeService
-    //http://localhost:4000/a/grafana-lokiexplore-app/explore?patterns=%5B%5D&var-primary_label=service_name%7C%3D~%7C.%2B&from=now-6h&to=now&timezone=browser&var-lineFormat=&var-ds=loki&var-filters=&var-fields=&var-levels=&var-metadata=&var-jsonFields=&var-all-fields=&var-patterns=&var-lineFilterV2=&var-lineFilters=&var-filters_replica=
+    //http://localhost:3000/a/grafana-lokiexplore-app/explore?patterns=%5B%5D&var-primary_label=service_name%7C%3D~%7C.%2B&from=now-6h&to=now&timezone=browser&var-lineFormat=&var-ds=loki&var-filters=&var-fields=&var-levels=&var-metadata=&var-jsonFields=&var-all-fields=&var-patterns=&var-lineFilterV2=&var-lineFilters=&var-filters_replica=
   });
   it("should capture the transaction traces using Tempo", async () => {
     const tempoUrl = `${TEMPO_URL}/api/search`;
@@ -401,6 +407,6 @@ describe("otel-lgtm captures information when a transaction occurs", () => {
     expect(Array.isArray(results)).toBe(true);
     expect(results.length).toBeGreaterThan(0);
     //If using these links, please comment the function stopDockerComposeService
-    //http://localhost:4000/a/grafana-exploretraces-app/explore?from=now-3h&to=now&timezone=browser&var-ds=tempo&var-primarySignal=nestedSetParent%3C0&var-filters=&var-metric=rate&var-groupBy=resource.service.name&var-spanListColumns=&var-latencyThreshold=&var-partialLatencyThreshold=&actionView=breakdown
+    //http://localhost:3000/a/grafana-exploretraces-app/explore?from=now-3h&to=now&timezone=browser&var-ds=tempo&var-primarySignal=nestedSetParent%3C0&var-filters=&var-metric=rate&var-groupBy=resource.service.name&var-spanListColumns=&var-latencyThreshold=&var-partialLatencyThreshold=&actionView=breakdown
   });
 });

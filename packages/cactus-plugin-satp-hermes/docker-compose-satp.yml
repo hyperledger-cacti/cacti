@@ -24,10 +24,13 @@ services:
       OTEL_METRIC_EXPORT_INTERVAL: "1000"
       OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: explicit_bucket_histogram
     ports:
-      - "4000:3000" # Grafana 
+      - "3000:3000" # Grafana 
       - "4317:4317" # OpenTelemetry gRPC endpoint
       - "4318:4318" # OpenTelemetry HTTP endpoint
       - "9090:9090" # Prometheus
       - "3100:3100" # Loki
       - "3200:3200" # Tempo
     restart: unless-stopped
+    volumes:
+    - ./grafana/provisioning/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards
+    - ./grafana/provisioning/alerting:/otel-lgtm/grafana/conf/provisioning/alerting
