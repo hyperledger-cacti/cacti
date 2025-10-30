@@ -9670,7 +9670,7 @@ __metadata:
     forge-std: "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
     fs-extra: "npm:11.2.0"
     google-protobuf: "npm:3.21.2"
-    grpc-tools: "npm:1.12.4"
+    grpc-tools: "npm:1.13"
     grpc_tools_node_protoc_ts: "npm:5.3.3"
     hardhat: "npm:2.22.5"
     internal-ip: "npm:6.2.0"
@@ -32227,6 +32227,18 @@ __metadata:
     grpc_tools_node_protoc: bin/protoc.js
     grpc_tools_node_protoc_plugin: bin/protoc_plugin.js
   checksum: 10/56852c756fe34be5f3b2cf75b1d432886b17ad32d438cacbcf8d30e980c7361a8e8325b1e626ce99826b8dbf1364145bedbedeb6d7feb916c4801481810a05d1
+  languageName: node
+  linkType: hard
+
+"grpc-tools@npm:1.13":
+  version: 1.13.0
+  resolution: "grpc-tools@npm:1.13.0"
+  dependencies:
+    "@mapbox/node-pre-gyp": "npm:^1.0.5"
+  bin:
+    grpc_tools_node_protoc: bin/protoc.js
+    grpc_tools_node_protoc_plugin: bin/protoc_plugin.js
+  checksum: 10/8e7edb1f1bb0b2ce4602f13b4ab2000b177723a3db747d088f985634bb4474a854c72134de7017eb17d9e39ba1d6ea42de21b905172b246ec0f9d504a510d422
   languageName: node
   linkType: hard
 
