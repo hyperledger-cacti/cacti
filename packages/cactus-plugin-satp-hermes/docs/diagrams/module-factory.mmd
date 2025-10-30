@@ -1,0 +1,45 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+graph LR
+    subgraph Factory["🏭 Factory Module - Component Creation"]
+        direction TB
+        
+        OrchestratorFactory["<b>Plugin Factory</b><br/>plugin-factory-gateway-orchestrator.ts<br/><br/>🔧 Creates Gateway Orchestrator instances<br/>📦 Dependency injection<br/>⚙️ Configuration management<br/>🔄 Lifecycle coordination"]
+        
+        subgraph FactoryInputs["📥 Factory Inputs"]
+            Config["<b>Configuration</b><br/>Gateway settings<br/>Network parameters<br/>Crypto keys<br/>Repository configs"]
+            
+            Dependencies["<b>Dependencies</b><br/>Logger instances<br/>Persistence layer<br/>Network resolver<br/>Validators"]
+        end
+        
+        subgraph CreatedComponents["📤 Created Components"]
+            CreatedOrchestrator["<b>Gateway Orchestrator</b><br/>Fully configured<br/>Ready to accept connections<br/>Integrated with services"]
+            
+            CreatedManager["<b>SATP Manager</b><br/>Protocol coordinator<br/>Linked to orchestrator<br/>Stage handlers ready"]
+        end
+    end
+    
+    %% Factory process
+    Config -->|provides| OrchestratorFactory
+    Dependencies -->|injects into| OrchestratorFactory
+    
+    OrchestratorFactory -->|creates & configures| CreatedOrchestrator
+    OrchestratorFactory -->|creates & configures| CreatedManager
+    
+    CreatedOrchestrator -->|manages| CreatedManager
+    
+    %% External usage
+    OrchestratorFactory -.->|used by| Gateway["Gateway Plugin<br/>(Entry Point)"]
+    OrchestratorFactory -.->|used by| CLI["Gateway CLI<br/>(Entry Point)"]
+    CreatedOrchestrator -.->|integrates with| ServicesModule["Services Module"]
+    CreatedManager -.->|integrates with| CoreModule["Core Module"]
+    
+    %% Styling
+    classDef factoryClass fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10
+    classDef inputClass fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef outputClass fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef externalClass fill:#f0fdf4,stroke:#86efac,stroke-width:2px,stroke-dasharray: 5 5,color:#065f46,rx:10,ry:10
+    
+    class OrchestratorFactory factoryClass
+    class Config,Dependencies inputClass
+    class CreatedOrchestrator,CreatedManager outputClass
+    class Gateway,CLI,ServicesModule,CoreModule externalClass

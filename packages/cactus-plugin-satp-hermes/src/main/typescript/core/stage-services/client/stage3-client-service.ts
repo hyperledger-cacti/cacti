@@ -17,7 +17,7 @@ import {
   TransferCompleteRequestSchema,
   TransferCompleteResponse,
 } from "../../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { bufArray2HexStr, getHash, sign } from "../../../gateway-utils";
+import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   getMessageHash,
   saveHash,
@@ -110,7 +110,7 @@ export class Stage3ClientService extends SATPService {
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${messageType}`);
         await this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: messageType,
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -119,7 +119,7 @@ export class Stage3ClientService extends SATPService {
         try {
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -188,7 +188,7 @@ export class Stage3ClientService extends SATPService {
           );
 
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "done",
             data: safeStableStringify(sessionData),
@@ -201,7 +201,7 @@ export class Stage3ClientService extends SATPService {
         } catch (error) {
           this.Log.error(`fail-${messageType}`, error);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "fail",
             data: safeStableStringify(sessionData),
@@ -240,7 +240,7 @@ export class Stage3ClientService extends SATPService {
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${messageType}`);
         await this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: messageType,
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -249,7 +249,7 @@ export class Stage3ClientService extends SATPService {
         try {
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -334,7 +334,7 @@ export class Stage3ClientService extends SATPService {
           );
 
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "done",
             data: safeStableStringify(sessionData),
@@ -347,7 +347,7 @@ export class Stage3ClientService extends SATPService {
         } catch (error) {
           this.Log.error(`fail-${messageType}`, error);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "fail",
             data: safeStableStringify(sessionData),
@@ -386,7 +386,7 @@ export class Stage3ClientService extends SATPService {
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${messageType}`);
         await this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: messageType,
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -395,7 +395,7 @@ export class Stage3ClientService extends SATPService {
         try {
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -467,7 +467,7 @@ export class Stage3ClientService extends SATPService {
           );
 
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "done",
             data: safeStableStringify(sessionData),
@@ -480,7 +480,7 @@ export class Stage3ClientService extends SATPService {
         } catch (error) {
           this.Log.error(`fail-${messageType}`, error);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "fail",
             data: safeStableStringify(sessionData),
@@ -780,7 +780,7 @@ export class Stage3ClientService extends SATPService {
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${stepTag}`);
         this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: "burn-asset",
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -790,7 +790,7 @@ export class Stage3ClientService extends SATPService {
         try {
           this.Log.info(`exec-${stepTag}`);
           this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "burn-asset",
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -851,7 +851,7 @@ export class Stage3ClientService extends SATPService {
             sign(this.Signer, sessionData.burnAssertionClaim.receipt),
           );
           this.dbLogger.storeProof({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "burn-asset",
             operation: "done",
             data: safeStableStringify(sessionData.burnAssertionClaim.proof),
@@ -860,7 +860,7 @@ export class Stage3ClientService extends SATPService {
           this.Log.info(`${fnTag}, done-${fnTag}`);
         } catch (error) {
           this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "burn-asset",
             operation: "fail",
             data: safeStableStringify(sessionData),
