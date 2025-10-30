@@ -25,7 +25,7 @@ To build using code purely from this clone of Weaver, do the following:
   make build-local
   ```
 
-To build using existing Weaver Github packages, run the the following:
+To build using existing Weaver Github packages, run the following:
 ```bash
 make build
 ```
