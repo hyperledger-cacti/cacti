@@ -803,6 +803,14 @@ jobs:
           docker logs corda_network2_partya_1
         working-directory: weaver
 
+      - name: Free up Space
+        run: |
+          df -h .
+          docker system prune -a -f
+          rm -rf ~/.cargo/registry
+          df -h .
+        working-directory: weaver
+
       # RELAY
       - name: Start Relay for network1
         run: RELAY_CONFIG=config/Fabric_Relay.toml cargo run --bin server &> relay-n1.out &
