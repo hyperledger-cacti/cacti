@@ -657,6 +657,13 @@ jobs:
           docker logs --tail 5 iin-agent-Org1MSP-network2
         working-directory: weaver/samples/fabric/fabric-cli
 
+      - name: Free up Space
+        run: |
+          df -h .
+          docker system prune -a -f
+          df -h .
+        working-directory: weaver
+
       # CORDA CLIENT
       - name: Corda CLI Initialize Vault
         run: make initialise-vault-docker
@@ -968,6 +975,14 @@ jobs:
         run: |
           cat tests/network-setups/corda/corda-net.out
           docker logs corda_partya_1
+        working-directory: weaver
+
+      - name: Free up Space
+        run: |
+          df -h .
+          docker system prune -a -f
+          rm -rf ~/.cargo/registry
+          df -h .
         working-directory: weaver
 
       # RELAY
