@@ -203,7 +203,7 @@ describe("PluginLedgerConnectorFabric", () => {
     await Servers.shutdown(server);
   });
 
-  it("getBlockV1() -Get first block by it's number - decoded.", async () => {
+  it("getBlockV1() - Get first block by it's number - decoded.", async () => {
     const ledgerChannelName = "mychannel";
     // Check decoded
     const decodedFirstBlock = await getBlock({
@@ -220,6 +220,16 @@ describe("PluginLedgerConnectorFabric", () => {
     expect(decodedFirstBlock.header.number.high).toBe(0);
     expect(decodedFirstBlock.data).toBeTruthy();
     expect(decodedFirstBlock.metadata).toBeTruthy();
+  });
+  it("getLatestCurrBlockNumber() - Get current block number.", async () => {
+    const ledgerChannelName = "mychannel";
+    const currentBlockNumber = await apiClient.getLatestBlockNumberV1({
+      channelName: ledgerChannelName,
+      gatewayOptions,
+    });
+    log.debug("Current block number:", currentBlockNumber.data);
+    expect(currentBlockNumber.data.blockNumber).toBeDefined();
+    expect(currentBlockNumber.data.blockNumber).toBeGreaterThanOrEqual(1);
   });
 
   it("getBlockV1() - Get first block by it's number - encoded.", async () => {

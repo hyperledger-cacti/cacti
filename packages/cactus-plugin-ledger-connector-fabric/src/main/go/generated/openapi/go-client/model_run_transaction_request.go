@@ -25,7 +25,7 @@ type RunTransactionRequest struct {
 	EndorsingOrgs []string `json:"endorsingOrgs,omitempty"`
 	TransientData map[string]interface{} `json:"transientData,omitempty"`
 	GatewayOptions *GatewayOptions `json:"gatewayOptions,omitempty"`
-	SigningCredential FabricSigningCredential `json:"signingCredential"`
+	SigningCredential *FabricSigningCredential `json:"signingCredential,omitempty"`
 	ChannelName string `json:"channelName"`
 	ContractName string `json:"contractName"`
 	InvocationType FabricContractInvocationType `json:"invocationType"`
@@ -38,9 +38,8 @@ type RunTransactionRequest struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewRunTransactionRequest(signingCredential FabricSigningCredential, channelName string, contractName string, invocationType FabricContractInvocationType, methodName string, params []*string) *RunTransactionRequest {
+func NewRunTransactionRequest(channelName string, contractName string, invocationType FabricContractInvocationType, methodName string, params []*string) *RunTransactionRequest {
 	this := RunTransactionRequest{}
-	this.SigningCredential = signingCredential
 	this.ChannelName = channelName
 	this.ContractName = contractName
 	this.InvocationType = invocationType
@@ -186,28 +185,36 @@ func (o *RunTransactionRequest) SetGatewayOptions(v GatewayOptions) {
 	o.GatewayOptions = &v
 }
 
-// GetSigningCredential returns the SigningCredential field value
+// GetSigningCredential returns the SigningCredential field value if set, zero value otherwise.
 func (o *RunTransactionRequest) GetSigningCredential() FabricSigningCredential {
-	if o == nil {
+	if o == nil || IsNil(o.SigningCredential) {
 		var ret FabricSigningCredential
 		return ret
 	}
-
-	return o.SigningCredential
+	return *o.SigningCredential
 }
 
-// GetSigningCredentialOk returns a tuple with the SigningCredential field value
+// GetSigningCredentialOk returns a tuple with the SigningCredential field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 func (o *RunTransactionRequest) GetSigningCredentialOk() (*FabricSigningCredential, bool) {
-	if o == nil {
+	if o == nil || IsNil(o.SigningCredential) {
 		return nil, false
 	}
-	return &o.SigningCredential, true
+	return o.SigningCredential, true
 }
 
-// SetSigningCredential sets field value
+// HasSigningCredential returns a boolean if a field has been set.
+func (o *RunTransactionRequest) HasSigningCredential() bool {
+	if o != nil && !IsNil(o.SigningCredential) {
+		return true
+	}
+
+	return false
+}
+
+// SetSigningCredential gets a reference to the given FabricSigningCredential and assigns it to the SigningCredential field.
 func (o *RunTransactionRequest) SetSigningCredential(v FabricSigningCredential) {
-	o.SigningCredential = v
+	o.SigningCredential = &v
 }
 
 // GetChannelName returns the ChannelName field value
@@ -384,7 +391,9 @@ func (o RunTransactionRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.GatewayOptions) {
 		toSerialize["gatewayOptions"] = o.GatewayOptions
 	}
-	toSerialize["signingCredential"] = o.SigningCredential
+	if !IsNil(o.SigningCredential) {
+		toSerialize["signingCredential"] = o.SigningCredential
+	}
 	toSerialize["channelName"] = o.ChannelName
 	toSerialize["contractName"] = o.ContractName
 	toSerialize["invocationType"] = o.InvocationType
