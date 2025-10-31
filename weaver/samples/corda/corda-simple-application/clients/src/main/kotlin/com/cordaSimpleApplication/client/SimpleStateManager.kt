@@ -33,11 +33,13 @@ class CreateStateCommand : CliktCommand(help = "Invokes the CreateState flow. Re
  * Helper function used by CreateStateCommand
  */
 fun createStateHelper(key: String, value: String, config: Map<String, String>) {
+    println("Hello starting rpc")
     val rpc = NodeRPCConnection(
             host = config["CORDA_HOST"]!!,
             username = "clientUser1",
             password = "test",
             rpcPort = config["CORDA_PORT"]!!.toInt())
+    println("Hello started rpc")
     try {
         println("CreateState flow with arguments $key, $value")
         val proxy = rpc.proxy

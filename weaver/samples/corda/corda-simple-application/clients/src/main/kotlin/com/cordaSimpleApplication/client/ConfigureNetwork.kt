@@ -79,7 +79,9 @@ class ConfigureCreateAllCommand : CliktCommand(name="create-all",
  * Helper function used by ConfigureDataCommand
  */
 fun configDataHelper(config: Map<String, String>) {
+    println("Reading sample states from bootstrap-states.csv...")
     var linesIterator = object {}.javaClass.getResourceAsStream("/bootstrap-states.csv")?.bufferedReader()?.lines()!!.iterator()
+    println("Creating sample states...")
     while (linesIterator.hasNext()) {
         val line = linesIterator.next()
         val keyValue = line.split(",").map{ it.strip() }.toTypedArray()
