@@ -190,13 +190,13 @@ export class SATPCrossChainManager {
   }
 
   /**
-   * Deploys bridges based on the provided configuration.
+   * Deploys oracles based on the provided configuration.
    *
-   * @param bridgesConfig - An array of bridge configuration options.
+   * @param oraclesConfig - An array of oracle configuration options.
    * @returns A promise that resolves when the deployment is complete.
    */
   public async deployOracleFromConfig(
-    bridgesNetworkConfig: INetworkOptions[],
+    oraclesConfig: INetworkOptions[],
   ): Promise<void> {
     const fnTag = `${SATPCrossChainManager.CLASS_NAME}#deployOracleFromConfig()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -204,7 +204,7 @@ export class SATPCrossChainManager {
       try {
         this.log.debug(`${fnTag}, Deploying Oracles...`);
 
-        for (const config of bridgesNetworkConfig) {
+        for (const config of oraclesConfig) {
           await this.oracleManager?.deployOracle(config);
         }
       } catch (err) {
