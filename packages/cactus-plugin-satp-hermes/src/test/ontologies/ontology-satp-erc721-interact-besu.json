@@ -1,0 +1,47 @@
+{
+    "name": "SATP-ERC721",
+    "id": "SATP-ERC721-BESU",
+    "type": "BESU_2X",
+    "ontology": {
+        "lock": [{
+            "functionSignature": "lock(address,address,uint256)",
+            "variables": ["owner", "bridge", "unique_descriptor"],
+            "available": true
+        }
+        ],
+        "unlock": [
+            {
+            "functionSignature": "unlock(address,address,uint256)",
+            "variables": ["bridge", "owner", "unique_descriptor"],
+            "available": true
+            }
+        ],
+        "mint": [{
+            "functionSignature": "mint(address,uint256)",
+            "variables": ["bridge", "unique_descriptor"],
+            "available": true
+            }
+        ],
+        "burn": [{
+            "functionSignature": "burn(uint256)",
+            "variables": ["unique_descriptor"],
+            "available": true
+            }
+        ],
+        "assign": [{
+                "functionSignature": "assign(address,uint256)",
+                "variables": ["receiver", "unique_descriptor"],
+                "available": true
+            }
+        ],
+        "checkPermission": [{
+            "functionSignature": "hasBridgeRole(address)",
+            "variables": ["bridge"],
+            "available": true
+            } 
+        ]
+    },
+    "bytecode": "",
+    "signature": "",
+    "hash": ""
+}

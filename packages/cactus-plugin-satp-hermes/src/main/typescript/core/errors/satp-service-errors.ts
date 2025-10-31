@@ -369,6 +369,17 @@ export class LedgerAssetError extends SATPInternalError {
   }
 }
 
+export class BadAssetBuildError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(
+      `${tag}, asset build is missing crucial elements`,
+      cause ?? null,
+      400,
+    );
+    this.errorType = SATPErrorType.MISSING_PARAMETER;
+  }
+}
+
 export class NetworkIdError extends SATPInternalError {
   constructor(tag: string, type: string, cause?: string | Error | null) {
     super(`${tag}, ${type} networkId missing or missmatch`, cause ?? null, 400);
@@ -399,6 +410,12 @@ export class TokenIdMissingError extends SATPInternalError {
 export class AmountMissingError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
     super(`${tag}, Amount missing`, cause ?? null, 400);
+    this.errorType = SATPErrorType.MISSING_PARAMETER;
+  }
+}
+export class UniqueTokenDescriptorMissingError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(`${tag}, Unique Descriptor missing`, cause ?? null, 400);
     this.errorType = SATPErrorType.MISSING_PARAMETER;
   }
 }
