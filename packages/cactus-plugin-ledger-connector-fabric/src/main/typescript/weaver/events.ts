@@ -48,7 +48,7 @@ export class Events {
   private readonly logger: Logger;
   private readonly connector: PluginLedgerConnectorFabric;
 
-  private listner: Listener;
+  private listener: Listener;
 
   private certificate: any;
 
@@ -59,7 +59,7 @@ export class Events {
     };
     this.logger = LoggerProvider.getOrCreate(logOptions);
     this.connector = options.driver.getConnectorInstance();
-    this.listner = options.driver.getListenerInstance();
+    this.listener = options.driver.getListenerInstance();
     this.certificate = options.certificate;
   }
 
@@ -98,7 +98,7 @@ export class Events {
         // event being subscribed for the first time
         // Start an appropriate type of event listener for this event subscription if one is not already active
         const [, error] = await handlePromise(
-          this.listner.registerListenerForEventSubscription(
+          this.listener.registerListenerForEventSubscription(
             call_request.eventMatcher!,
             gatewayOptions,
           ),
@@ -157,7 +157,7 @@ export class Events {
     gatewayOptions: GatewayOptions,
   ) {
     const [unregister, err] = await handlePromise(
-      this.listner.unregisterListenerForEventSubscription(
+      this.listener.unregisterListenerForEventSubscription(
         call_request.eventMatcher!,
         gatewayOptions,
       ),
@@ -198,7 +198,7 @@ export class Events {
       const ack_send = create(AckSchema, {
         requestId: newRequestId,
         // event got unsubscribed
-        message: `Event ${JSON.stringify(deletedSubscription)} unsubscription is successful!`,
+        message: `Event ${JSON.stringify(deletedSubscription)} unsubscription was successful!`,
         status: Ack_STATUS.OK,
       });
 

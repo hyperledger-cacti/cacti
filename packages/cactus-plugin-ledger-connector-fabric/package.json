@@ -34,7 +34,7 @@
       "email": "peter.somogyvari@accenture.com",
       "url": "https://accenture.com"
     },
-     {
+    {
       "name": "Carlos Amaro",
       "email": "carlosrscamaro@tecnico.ulisboa.pt",
       "url": "https://accenture.com"
@@ -73,6 +73,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "axios": "1.8.4",
     "bl": "6.1.0",
     "bn.js": "4.12.0",

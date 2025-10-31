@@ -1319,7 +1319,7 @@ export class PluginLedgerConnectorFabric
     return transientMap;
   }
 
-  // Main invoke function wtih logic to handle policy and turn response from chaincode into a view.
+  // Main invoke function with logic to handle policy and turn response from chaincode into a view.
   // 1. Prepare credentials/gateway for communicating with fabric network
   // 2. Set the endorser list for the transaction, this enforces that the list provided will endorse the proposed transaction
   // 3. Prepare the view and return.

@@ -27,7 +27,7 @@ jobs:
   asset-transfer:
     with: 
       run_all: $RUN_ALL
-    uses: ./.github/workflows/test_weaver-asset-transfer.yaml
+    uses: ./.github/workflows/test_weaver-asset-transfer.yaml ./.github/workflows/test_weaver-asset-transfer-fabric-connector.yaml
   relay:
     with: 
       run_all: $RUN_ALL
@@ -47,7 +47,7 @@ jobs:
   data-sharing:
     with: 
       run_all: $RUN_ALL
-    uses: ./.github/workflows/test_weaver-data-sharing.yaml
+    uses: ./.github/workflows/test_weaver-data-sharing.yaml ./.github/workflows/test_weaver-data-sharing-fabric-connector.yaml
   node-pkgs:
     with: 
       run_all: $RUN_ALL 
