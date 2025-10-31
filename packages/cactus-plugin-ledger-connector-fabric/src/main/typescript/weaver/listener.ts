@@ -26,7 +26,7 @@ import {
 } from "./utils";
 import { Events } from "./events";
 import { FabricDriverServer } from "./fabric-driver-server";
-import * as fabproto6 from "fabric-protos";
+import * as FabricProto6 from "fabric-protos";
 import {
   GatewayOptions,
   GetBlockResponseDecodedV1,
@@ -232,14 +232,14 @@ export class Listener {
     // Parse the block data; typically there is only one element in this array but we will interate over it just to be safe
     const blockNum = block.header.number;
     const blockData = (
-      (block as fabproto6.common.Block).data as fabproto6.common.BlockData
+      (block as FabricProto6.common.Block).data as FabricProto6.common.BlockData
     ).data;
     const blockMetadata = (
-      (block as fabproto6.common.Block)
-        .metadata as fabproto6.common.BlockMetadata
+      (block as FabricProto6.common.Block)
+        .metadata as FabricProto6.common.BlockMetadata
     ).metadata;
     const txFilterIndex =
-      fabproto6.common.BlockMetadataIndex.TRANSACTIONS_FILTER;
+      FabricProto6.common.BlockMetadataIndex.TRANSACTIONS_FILTER;
     const txValid = blockMetadata[txFilterIndex];
     this.logger.debug(
       `Event ${loggerName}: block #${blockNum}, #Transactions: ${blockData.length}`,
@@ -256,7 +256,7 @@ export class Listener {
         `Event ${loggerName}: Transaction with TxId: ${tx_id}, index: ${index}`,
       );
 
-      if (txValid[index] === fabproto6.protos.TxValidationCode.VALID) {
+      if (txValid[index] === FabricProto6.protos.TxValidationCode.VALID) {
         // Iterate through the transaction list
         transactions.forEach(async (transaction: any) => {
           // Check if block subscription and then call handle block event
@@ -326,7 +326,7 @@ export class Listener {
         });
       } else {
         this.logger.error(
-          `Event ${loggerName}: Transaction with TxId: ${tx_id} is invalid with code ${txValid[index]}:${fabproto6.protos.TxValidationCode[txValid[index]]}. Discarding.`,
+          `Event ${loggerName}: Transaction with TxId: ${tx_id} is invalid with code ${txValid[index]}:${FabricProto6.protos.TxValidationCode[txValid[index]]}. Discarding.`,
         );
       }
     });

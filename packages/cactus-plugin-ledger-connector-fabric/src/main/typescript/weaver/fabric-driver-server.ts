@@ -90,7 +90,7 @@ export class FabricDriverServer {
   private readonly relayEndpoint: string;
   private readonly mock: boolean;
   private readonly events: Events;
-  private readonly listner: Listener;
+  private readonly listener: Listener;
 
   private networkName: string = "network1";
   private monitorSyncPeriod: number = 30; // in seconds
@@ -153,7 +153,7 @@ export class FabricDriverServer {
       certificate: this.certificate,
     });
 
-    this.listner = new Listener({
+    this.listener = new Listener({
       logLevel: this.loglevel,
       driver: this,
       chainCodeId: this.interopChainCode,
@@ -183,7 +183,7 @@ export class FabricDriverServer {
   }
 
   public getListenerInstance(): Listener {
-    return this.listner;
+    return this.listener;
   }
 
   public getEventsInstance(): Events {
@@ -276,14 +276,14 @@ export class FabricDriverServer {
         });
         return create(AckSchema, {
           requestId: newRequestId,
-          message: "Mock Procesing addEventSubscription",
+          message: "Mock Processing addEventSubscription",
           status: Ack_STATUS.OK,
         });
       } else {
         this.spawnSubscribeEventHelper(request, newRequestId);
         const ackResponse = create(AckSchema, {
           requestId: newRequestId,
-          message: "Procesing addEventSubscription",
+          message: "Processing addEventSubscription",
           status: Ack_STATUS.OK,
         });
         // gRPC response.
@@ -587,7 +587,7 @@ export class FabricDriverServer {
     this.logger.info("Starting monitor...");
     this.logger.info(`Monitor sync period: ${this.monitorSyncPeriod}`);
     while (true) {
-      await this.listner.monitorBlockForMissedEvents(this.gatewayOptions);
+      await this.listener.monitorBlockForMissedEvents(this.gatewayOptions);
       await delay(this.monitorSyncPeriod * 1000);
     }
   }
@@ -609,7 +609,7 @@ export class FabricDriverServer {
     }
 
     // Register all listeners again
-    const status = await this.listner.loadEventSubscriptionsFromStorage(
+    const status = await this.listener.loadEventSubscriptionsFromStorage(
       this.gatewayOptions,
     );
     this.logger.info(`Load Event Subscriptions Status: ${status}`);
