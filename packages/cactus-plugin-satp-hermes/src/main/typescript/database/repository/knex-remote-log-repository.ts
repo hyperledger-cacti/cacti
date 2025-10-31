@@ -1,5 +1,5 @@
 import type { IRemoteLogRepository } from "./interfaces/repository";
-import type { RemoteLog } from "../../core/types";
+import type { SATPRemoteLog } from "../../core/types";
 import knex, { type Knex } from "knex";
 import { knexRemoteInstance } from "../../database/knexfile-remote";
 import { createMigrationSource } from "../knex-migration-source";
@@ -31,12 +31,12 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
     return this.database("remote-logs");
   }
 
-  readById(logKey: string): Promise<RemoteLog> {
+  readById(logKey: string): Promise<SATPRemoteLog> {
     return this.getLogsTable().where({ key: logKey }).first();
   }
 
   // TODO fix any type
-  create(log: RemoteLog): any {
+  create(log: SATPRemoteLog): any {
     return this.getLogsTable().insert(log);
   }
 
