@@ -99,6 +99,7 @@ describe("Ethereum Leaf Test", () => {
     );
     expect(ethereumLeaf).toBeDefined();
   });
+
   it("Should deploy Wrapper Smart Contract", async () => {
     await ethereumLeaf.deployContracts();
     expect(
@@ -115,6 +116,25 @@ describe("Ethereum Leaf Test", () => {
 
     await ethereumEnv.approveAmount(wrapperContractAddress, "100");
   });
+
+  it("Should fetch the contract bytecode, which should be the same as the one in the respective ontology", async () => {
+    const wrapperContractAddress =
+      await ethereumLeaf.getWrapperContract("FUNGIBLE");
+
+    const response = await ethereumLeaf.getContractBytecode(
+      wrapperContractAddress,
+    );
+    expect(response).toBeDefined();
+
+    console.log(response.response);
+    const response2 = await ontologyManager.checkOntologyBytecode(
+      LedgerType.Ethereum,
+      "SATP-ERC20-ETHEREUM",
+      ethereumLeaf,
+    );
+    expect(response2).toBe(true);
+  });
+
   it("Should Wrap a token", async () => {
     asset = {
       id: ethereumEnv.defaultAsset.id,
