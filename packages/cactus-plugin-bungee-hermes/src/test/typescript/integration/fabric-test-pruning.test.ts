@@ -30,6 +30,7 @@ import {
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import {
   Containers,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
@@ -93,7 +94,7 @@ beforeEach(async () => {
     fabricLedger = new FabricTestLedgerV1({
       emitContainerLogs: true,
       publishAllPorts: true,
-      imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       logLevel,

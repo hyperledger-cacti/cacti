@@ -21,8 +21,8 @@ type ShipmentChaincode struct {
 }
 
 type Shipment struct {
-	Id          string \`json:"id"\`
-	BookshelfId string \`json:"bookshelfId"\`
+	Id          string `json:"id"`
+	BookshelfId string `json:"bookshelfId"`
 }
 
 func main() {

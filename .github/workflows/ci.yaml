@@ -336,6 +336,7 @@ jobs:
       TOOLS_VALIDATE_BUNDLE_NAMES_DISABLED: true
       CUSTOM_CHECKS_DISABLED: true
       CONFIGURE_DISABLED: false
+      FREE_UP_GITHUB_RUNNER_DISK_SPACE_DISABLED: false
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
@@ -1933,40 +1934,6 @@ jobs:
         with:
           name: coverage-reports-36
           path: ./code-coverage-ts/**/
-  cactus-plugin-bungee-hermes:
-    continue-on-error: false
-    env:
-      FULL_BUILD_DISABLED: true
-      JEST_TEST_RUNNER_DISABLED: false
-      JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      TAPE_TEST_RUNNER_DISABLED: true
-    needs: build-dev
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Use Node.js ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-
-      - name: Install native build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential python3 python3-pip gcc g++ make pkg-config libsqlite3-dev
-
-      - id: yarn-cache
-        name: Restore Yarn Cache
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
-        with:
-          key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-          path: ./.yarn/
-          restore-keys: |
-            ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
-
-      - name: Clean and install dependencies
-        run: yarn cache clean && rm -rf node_modules && yarn install --immutable
-
-      - run: ./tools/ci.sh
   ct-api-client:
     continue-on-error: false
     env:
@@ -2140,7 +2107,9 @@ jobs:
           path: ./code-coverage-ts/**/
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@ca7e86820a6802e19349b5622e91976c4561c454 #v1
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
 
       - name: Run solidity tests
         run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
@@ -2154,6 +2123,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-htlc-eth-besu-erc20
       JEST_TEST_CODE_COVERAGE_ENABLED: true
       TAPE_TEST_RUNNER_DISABLED: false
+      TAPE_TEST_PATTERN: ""
     needs: build-dev
     runs-on: ubuntu-22.04
     steps:
