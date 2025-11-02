@@ -204,8 +204,12 @@ export class MonitorService {
         "Total number of sessions created",
       );
       this.createCounter(
-        "total_value_exchanged",
-        "Total token value exchanged",
+        "total_value_exchanged_USD",
+        "Total token value exchanged in USD",
+      );
+      this.createCounter(
+        "total_value_exchanged_token",
+        "Total token value exchanged in token units",
       );
       this.createCounter(
         "initiated_transactions",

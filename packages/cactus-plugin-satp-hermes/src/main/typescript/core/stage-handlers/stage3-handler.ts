@@ -29,12 +29,17 @@ import { LockAssertionResponse } from "../../generated/proto/cacti/satp/v02/serv
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
+  collectSessionAttributes,
   saveMessageInSessionData,
   setError,
   setErrorChecking,
 } from "../session-utils";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import {
+  PriceManager,
+  PriceManagerOptions,
+} from "../../services/token-price-check/price-manager";
 
 export class Stage3SATPHandler implements SATPHandler {
   public static readonly CLASS_NAME = SATPHandlerType.STAGE3;
@@ -43,6 +48,7 @@ export class Stage3SATPHandler implements SATPHandler {
   private serverService: Stage3ServerService;
   private logger: Logger;
   private readonly monitorService: MonitorService;
+  private priceManager: PriceManager;
 
   constructor(ops: SATPHandlerOptions) {
     this.sessions = ops.sessions;
@@ -53,6 +59,11 @@ export class Stage3SATPHandler implements SATPHandler {
       ops.loggerOptions,
       this.monitorService,
     );
+    const priceManagerOptions: PriceManagerOptions = {
+      logLevel: ops.loggerOptions.level,
+      monitorService: this.monitorService,
+    };
+    this.priceManager = new PriceManager(priceManagerOptions);
     this.logger.trace(`Initialized ${Stage3SATPHandler.CLASS_NAME}`);
   }
 
@@ -80,7 +91,7 @@ export class Stage3SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
-      const attributes: Record<
+      let attributes: Record<
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
@@ -117,27 +128,7 @@ export class Stage3SATPHandler implements SATPHandler {
         }
 
         saveMessageInSessionData(session.getServerSessionData(), message);
-
-        attributes.senderNetworkId =
-          session?.getServerSessionData().senderAsset?.networkId?.id ||
-          undefined;
-        attributes.receiverNetworkId =
-          session?.getServerSessionData().receiverAsset?.networkId?.id ||
-          undefined;
-        attributes.senderGatewayNetworkId =
-          session?.getServerSessionData().senderGatewayNetworkId || undefined;
-        attributes.receiverGatewayNetworkId =
-          session?.getServerSessionData().recipientGatewayNetworkId ||
-          undefined;
-        attributes.assetProfileId =
-          session?.getServerSessionData().assetProfileId || undefined;
-        attributes.sessionId = session?.getSessionId() || undefined;
-        attributes.sourceLedgerAssetId =
-          session?.getServerSessionData().sourceLedgerAssetId || undefined;
-        attributes.recipientLedgerAssetId =
-          session?.getServerSessionData().recipientLedgerAssetId || undefined;
-        attributes.satp_phase = 3;
-        attributes.operation = "commitPreparation";
+        attributes = collectSessionAttributes(session, "server");
 
         const startTimestamp =
           session.getServerSessionData().receivedTimestamps?.stage3
@@ -151,7 +142,11 @@ export class Stage3SATPHandler implements SATPHandler {
           await this.monitorService.recordHistogram(
             "operation_duration",
             duration,
-            attributes,
+            { ...attributes, operation: "commitPreparation", satp_phase: 3 },
+          );
+        } else {
+          this.Log.warn(
+            `${fnTag}, Missing timestamps for operation duration calculation`,
           );
         }
 
@@ -166,25 +161,11 @@ export class Stage3SATPHandler implements SATPHandler {
         );
         setError(session, MessageType.COMMIT_READY, error);
 
-        attributes.senderNetworkId =
-          session?.getServerSessionData().senderAsset?.networkId?.id ||
-          undefined;
-        attributes.receiverNetworkId =
-          session?.getServerSessionData().receiverAsset?.networkId?.id ||
-          undefined;
-        attributes.senderGatewayNetworkId =
-          session?.getServerSessionData().senderGatewayNetworkId || undefined;
-        attributes.receiverGatewayNetworkId =
-          session?.getServerSessionData().recipientGatewayNetworkId ||
-          undefined;
-        attributes.assetProfileId =
-          session?.getServerSessionData().assetProfileId || undefined;
-        attributes.sessionId = session?.getSessionId() || undefined;
-        attributes.sourceLedgerAssetId =
-          session?.getServerSessionData().sourceLedgerAssetId || undefined;
-        attributes.recipientLedgerAssetId =
-          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        if (session) {
+          attributes = collectSessionAttributes(session, "server");
+        }
         attributes.satp_phase = 3;
+        attributes.operation = "commitPreparation";
 
         this.monitorService.updateCounter(
           "ongoing_transactions",
@@ -213,7 +194,7 @@ export class Stage3SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
-      const attributes: Record<
+      let attributes: Record<
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
@@ -252,26 +233,7 @@ export class Stage3SATPHandler implements SATPHandler {
 
         saveMessageInSessionData(session.getServerSessionData(), message);
 
-        attributes.senderNetworkId =
-          session?.getServerSessionData().senderAsset?.networkId?.id ||
-          undefined;
-        attributes.receiverNetworkId =
-          session?.getServerSessionData().receiverAsset?.networkId?.id ||
-          undefined;
-        attributes.senderGatewayNetworkId =
-          session?.getServerSessionData().senderGatewayNetworkId || undefined;
-        attributes.receiverGatewayNetworkId =
-          session?.getServerSessionData().recipientGatewayNetworkId ||
-          undefined;
-        attributes.assetProfileId =
-          session?.getServerSessionData().assetProfileId || undefined;
-        attributes.sessionId = session?.getSessionId() || undefined;
-        attributes.sourceLedgerAssetId =
-          session?.getServerSessionData().sourceLedgerAssetId || undefined;
-        attributes.recipientLedgerAssetId =
-          session?.getServerSessionData().recipientLedgerAssetId || undefined;
-        attributes.satp_phase = 3;
-        attributes.operation = "commitFinalAssertion";
+        attributes = collectSessionAttributes(session, "server");
 
         const startTimestamp =
           session.getServerSessionData().receivedTimestamps?.stage3
@@ -285,7 +247,11 @@ export class Stage3SATPHandler implements SATPHandler {
           await this.monitorService.recordHistogram(
             "operation_duration",
             duration,
-            attributes,
+            { ...attributes, satp_phase: 3, operation: "commitFinalAssertion" },
+          );
+        } else {
+          this.Log.warn(
+            `${fnTag}, Missing timestamps for operation duration calculation`,
           );
         }
 
@@ -300,25 +266,11 @@ export class Stage3SATPHandler implements SATPHandler {
         );
         setError(session, MessageType.ACK_COMMIT_FINAL, error);
 
-        attributes.senderNetworkId =
-          session?.getServerSessionData().senderAsset?.networkId?.id ||
-          undefined;
-        attributes.receiverNetworkId =
-          session?.getServerSessionData().receiverAsset?.networkId?.id ||
-          undefined;
-        attributes.senderGatewayNetworkId =
-          session?.getServerSessionData().senderGatewayNetworkId || undefined;
-        attributes.receiverGatewayNetworkId =
-          session?.getServerSessionData().recipientGatewayNetworkId ||
-          undefined;
-        attributes.assetProfileId =
-          session?.getServerSessionData().assetProfileId || undefined;
-        attributes.sessionId = session?.getSessionId() || undefined;
-        attributes.sourceLedgerAssetId =
-          session?.getServerSessionData().sourceLedgerAssetId || undefined;
-        attributes.recipientLedgerAssetId =
-          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        if (session) {
+          attributes = collectSessionAttributes(session, "server");
+        }
         attributes.satp_phase = 3;
+        attributes.operation = "commitFinalAssertion";
 
         this.monitorService.updateCounter(
           "ongoing_transactions",
@@ -347,7 +299,7 @@ export class Stage3SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
-      const attributes: Record<
+      let attributes: Record<
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
@@ -381,8 +333,7 @@ export class Stage3SATPHandler implements SATPHandler {
 
         saveMessageInSessionData(session.getServerSessionData(), message);
 
-        attributes.satp_phase = 3;
-        attributes.operation = "transferComplete";
+        attributes = collectSessionAttributes(session, "server");
 
         const startTimestamp =
           session.getServerSessionData().receivedTimestamps?.stage3
@@ -396,9 +347,58 @@ export class Stage3SATPHandler implements SATPHandler {
           await this.monitorService.recordHistogram(
             "operation_duration",
             duration,
-            attributes,
+            { ...attributes, satp_phase: 3, operation: "transferComplete" },
+          );
+        } else {
+          this.Log.warn(
+            `${fnTag}, Missing timestamps for operation duration calculation`,
           );
         }
+
+        const receiverAssetAmount = Number(
+          session.getServerSessionData().receiverAsset?.amount,
+        );
+
+        const receiverGasUsed =
+          Number(
+            JSON.parse(
+              session.getServerSessionData().receiverWrapAssertionClaim
+                ?.receipt ?? "{}",
+            ).gas ?? 0,
+          ) +
+          Number(
+            JSON.parse(
+              session.getServerSessionData().mintAssertionClaim?.receipt ??
+                "{}",
+            ).gas ?? 0,
+          ) +
+          Number(
+            JSON.parse(
+              session.getServerSessionData().assignmentAssertionClaim
+                ?.receipt ?? "{}",
+            ).gas ?? 0,
+          );
+
+        this.monitorService.updateCounter(
+          "total_value_exchanged_token",
+          receiverAssetAmount,
+          { ...attributes, transaction_direction: "received" },
+        );
+
+        this.monitorService.updateCounter(
+          "total_value_exchanged_USD",
+          this.priceManager.convertTokensToUSD(
+            receiverAssetAmount,
+            session.getServerSessionData().receiverAsset?.networkId?.id || "",
+          ),
+          { ...attributes, transaction_direction: "received" },
+        );
+
+        this.monitorService.updateCounter(
+          "transaction_gas_used",
+          receiverGasUsed,
+          { ...attributes, side: "server" },
+        );
 
         return message;
       } catch (error) {
@@ -411,25 +411,11 @@ export class Stage3SATPHandler implements SATPHandler {
         );
         setError(session, MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE, error);
 
-        attributes.senderNetworkId =
-          session?.getServerSessionData().senderAsset?.networkId?.id ||
-          undefined;
-        attributes.receiverNetworkId =
-          session?.getServerSessionData().receiverAsset?.networkId?.id ||
-          undefined;
-        attributes.senderGatewayNetworkId =
-          session?.getServerSessionData().senderGatewayNetworkId || undefined;
-        attributes.receiverGatewayNetworkId =
-          session?.getServerSessionData().recipientGatewayNetworkId ||
-          undefined;
-        attributes.assetProfileId =
-          session?.getServerSessionData().assetProfileId || undefined;
-        attributes.sessionId = session?.getSessionId() || undefined;
-        attributes.sourceLedgerAssetId =
-          session?.getServerSessionData().sourceLedgerAssetId || undefined;
-        attributes.recipientLedgerAssetId =
-          session?.getServerSessionData().recipientLedgerAssetId || undefined;
+        if (session) {
+          attributes = collectSessionAttributes(session, "server");
+        }
         attributes.satp_phase = 3;
+        attributes.operation = "transferComplete";
 
         this.monitorService.updateCounter(
           "ongoing_transactions",
@@ -489,10 +475,6 @@ export class Stage3SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
-      const attributes: Record<
-        string,
-        undefined | string | number | boolean | string[] | number[] | boolean[]
-      > = {};
       try {
         let session: SATPSession | undefined;
         try {
@@ -537,27 +519,20 @@ export class Stage3SATPHandler implements SATPHandler {
             )}`,
           );
           setError(session, MessageType.COMMIT_PREPARE, error);
+          let attributes: Record<
+            string,
+            | undefined
+            | string
+            | number
+            | boolean
+            | string[]
+            | number[]
+            | boolean[]
+          > = {};
 
-          attributes.senderNetworkId =
-            session?.getClientSessionData()?.senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getClientSessionData()?.receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getClientSessionData()?.senderGatewayNetworkId ||
-            undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getClientSessionData()?.recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getClientSessionData()?.assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getClientSessionData()?.sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getClientSessionData()?.recipientLedgerAssetId ||
-            undefined;
+          if (session) {
+            attributes = collectSessionAttributes(session, "client");
+          }
           attributes.satp_phase = 3;
 
           this.monitorService.updateCounter(
@@ -594,7 +569,7 @@ export class Stage3SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
-      const attributes: Record<
+      let attributes: Record<
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
@@ -609,6 +584,7 @@ export class Stage3SATPHandler implements SATPHandler {
             throw new SessionNotFoundError(fnTag);
           }
 
+          attributes = collectSessionAttributes(session, "client");
           span.setAttribute("sessionId", session.getSessionId() || "");
 
           await this.clientService.checkCommitPreparationResponse(
@@ -634,6 +610,25 @@ export class Stage3SATPHandler implements SATPHandler {
 
           saveMessageInSessionData(session.getClientSessionData(), request);
 
+          const senderAssetAmount = Number(
+            session.getClientSessionData().senderAsset?.amount,
+          );
+
+          this.monitorService.updateCounter(
+            "total_value_exchanged_token",
+            senderAssetAmount,
+            { ...attributes, transaction_direction: "sent" },
+          );
+
+          this.monitorService.updateCounter(
+            "total_value_exchanged_USD",
+            this.priceManager.convertTokensToUSD(
+              senderAssetAmount,
+              session.getClientSessionData().senderAsset?.networkId?.id || "",
+            ),
+            { ...attributes, transaction_direction: "sent" },
+          );
+
           return request;
         } catch (error) {
           this.Log.error(
@@ -645,26 +640,9 @@ export class Stage3SATPHandler implements SATPHandler {
           );
           setError(session, MessageType.COMMIT_FINAL, error);
 
-          attributes.senderNetworkId =
-            session?.getClientSessionData()?.senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getClientSessionData()?.receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getClientSessionData()?.senderGatewayNetworkId ||
-            undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getClientSessionData()?.recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getClientSessionData()?.assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getClientSessionData()?.sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getClientSessionData()?.recipientLedgerAssetId ||
-            undefined;
+          if (session) {
+            attributes = collectSessionAttributes(session, "client");
+          }
           attributes.satp_phase = 3;
 
           this.monitorService.updateCounter(
@@ -701,7 +679,7 @@ export class Stage3SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
-      const attributes: Record<
+      let attributes: Record<
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
@@ -750,26 +728,9 @@ export class Stage3SATPHandler implements SATPHandler {
           );
           setError(session, MessageType.ACK_COMMIT_FINAL, error);
 
-          attributes.senderNetworkId =
-            session?.getClientSessionData()?.senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getClientSessionData()?.receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getClientSessionData()?.senderGatewayNetworkId ||
-            undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getClientSessionData()?.recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getClientSessionData()?.assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getClientSessionData()?.sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getClientSessionData()?.recipientLedgerAssetId ||
-            undefined;
+          if (session) {
+            attributes = collectSessionAttributes(session, "client");
+          }
           attributes.satp_phase = 3;
 
           this.monitorService.updateCounter(
@@ -806,7 +767,7 @@ export class Stage3SATPHandler implements SATPHandler {
     const fnTag = `${this.getHandlerIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     await context.with(ctx, async () => {
-      const attributes: Record<
+      let attributes: Record<
         string,
         undefined | string | number | boolean | string[] | number[] | boolean[]
       > = {};
@@ -828,32 +789,13 @@ export class Stage3SATPHandler implements SATPHandler {
             session,
           );
 
-          attributes.sessionId = session.getSessionId() || undefined;
-          attributes.senderNetworkId =
-            session?.getClientSessionData()?.senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getClientSessionData()?.receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getClientSessionData()?.senderGatewayNetworkId ||
-            undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getClientSessionData()?.recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getClientSessionData()?.assetProfileId || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getClientSessionData()?.sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getClientSessionData()?.recipientLedgerAssetId ||
-            undefined;
+          attributes = collectSessionAttributes(session, "client");
 
           const stage0Str =
-            session?.getClientSessionData()?.processedTimestamps?.stage0
+            session.getClientSessionData().processedTimestamps?.stage0
               ?.newSessionRequestMessageTimestamp;
           const stage3Str =
-            session?.getClientSessionData()?.receivedTimestamps?.stage3
+            session.getClientSessionData().receivedTimestamps?.stage3
               ?.transferCompleteResponseMessageTimestamp;
 
           if (stage0Str && stage3Str) {
@@ -863,44 +805,35 @@ export class Stage3SATPHandler implements SATPHandler {
               duration,
               attributes,
             );
-          }
-          this.monitorService.updateCounter(
-            "transaction_gas_used",
+          } else
+            this.Log.warn(
+              `${fnTag}, Missing timestamps for transaction duration calculation`,
+            );
+
+          const senderGasUsed =
             Number(
               JSON.parse(
-                session?.getClientSessionData()?.senderWrapAssertionClaim
+                session.getClientSessionData().senderWrapAssertionClaim
                   ?.receipt ?? "{}",
               ).gas ?? 0,
             ) +
-              Number(
-                JSON.parse(
-                  session?.getClientSessionData()?.lockAssertionClaim
-                    ?.receipt ?? "{}",
-                ).gas ?? 0,
-              ) +
-              Number(
-                JSON.parse(
-                  session?.getClientSessionData()?.burnAssertionClaim
-                    ?.receipt ?? "{}",
-                ).gas ?? 0,
-              ),
+            Number(
+              JSON.parse(
+                session.getClientSessionData().lockAssertionClaim?.receipt ??
+                  "{}",
+              ).gas ?? 0,
+            ) +
+            Number(
+              JSON.parse(
+                session.getClientSessionData().burnAssertionClaim?.receipt ??
+                  "{}",
+              ).gas ?? 0,
+            );
+
+          this.monitorService.updateCounter(
+            "transaction_gas_used",
+            senderGasUsed,
             { ...attributes, side: "client" },
-          );
-          this.monitorService.updateCounter(
-            "transaction_gas_used",
-            Number(
-              JSON.parse(
-                session?.getClientSessionData()?.receiverWrapAssertionClaim
-                  ?.receipt ?? "{}",
-              ).gas ?? 0,
-            ) +
-              Number(
-                JSON.parse(
-                  session?.getClientSessionData()?.mintAssertionClaim
-                    ?.receipt ?? "{}",
-                ).gas ?? 0,
-              ),
-            { ...attributes, side: "server" },
           );
           this.monitorService.updateCounter(
             "ongoing_transactions",
@@ -911,16 +844,6 @@ export class Stage3SATPHandler implements SATPHandler {
             "successful_transactions",
             1,
             attributes,
-          );
-          this.monitorService.updateCounter(
-            "total_value_exchanged",
-            Number(session?.getClientSessionData()?.senderAsset?.amount),
-            { ...attributes, transaction_direction: "sent" },
-          );
-          this.monitorService.updateCounter(
-            "total_value_exchanged",
-            Number(session?.getClientSessionData()?.receiverAsset?.amount),
-            { ...attributes, transaction_direction: "received" },
           );
 
           saveMessageInSessionData(session.getClientSessionData(), response);
@@ -941,26 +864,9 @@ export class Stage3SATPHandler implements SATPHandler {
             error,
           );
 
-          attributes.senderNetworkId =
-            session?.getClientSessionData()?.senderAsset?.networkId?.id ||
-            undefined;
-          attributes.receiverNetworkId =
-            session?.getClientSessionData()?.receiverAsset?.networkId?.id ||
-            undefined;
-          attributes.senderGatewayNetworkId =
-            session?.getClientSessionData()?.senderGatewayNetworkId ||
-            undefined;
-          attributes.receiverGatewayNetworkId =
-            session?.getClientSessionData()?.recipientGatewayNetworkId ||
-            undefined;
-          attributes.assetProfileId =
-            session?.getClientSessionData()?.assetProfileId || undefined;
-          attributes.sessionId = session?.getSessionId() || undefined;
-          attributes.sourceLedgerAssetId =
-            session?.getClientSessionData()?.sourceLedgerAssetId || undefined;
-          attributes.recipientLedgerAssetId =
-            session?.getClientSessionData()?.recipientLedgerAssetId ||
-            undefined;
+          if (session) {
+            attributes = collectSessionAttributes(session, "client");
+          }
           attributes.satp_phase = 3;
 
           this.monitorService.updateCounter(
