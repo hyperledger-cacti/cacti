@@ -289,3 +289,9 @@ export class UninitializedMonitorServiceError extends BridgeInternalError {
     super("Uninitialized MonitorService", cause ?? null, 500, traceID, trace);
   }
 }
+
+export class PriceNotFoundError extends BridgeInternalError {
+  constructor(cause?: string | Error | null, traceID?: string, trace?: string) {
+    super("Price Not Found", cause ?? null, 500, traceID, trace);
+  }
+}

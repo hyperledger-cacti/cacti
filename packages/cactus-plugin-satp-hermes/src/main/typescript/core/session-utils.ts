@@ -1057,3 +1057,26 @@ export function getMessageInSessionData(
       throw new Error("Message type not found");
   }
 }
+
+export function collectSessionAttributes(
+  session: SATPSession,
+  sessionSide: "client" | "server",
+) {
+  let data: SessionData;
+  if (sessionSide === "client") {
+    data = session.getClientSessionData?.() || {};
+  } else {
+    data = session.getServerSessionData?.() || {};
+  }
+
+  return {
+    senderNetworkId: data.senderAsset?.networkId?.id,
+    receiverNetworkId: data.receiverAsset?.networkId?.id,
+    senderGatewayNetworkId: data.senderGatewayNetworkId,
+    receiverGatewayNetworkId: data.recipientGatewayNetworkId,
+    assetProfileId: data.assetProfileId,
+    sessionId: session.getSessionId?.(),
+    sourceLedgerAssetId: data.sourceLedgerAssetId,
+    recipientLedgerAssetId: data.recipientLedgerAssetId,
+  };
+}
