@@ -99,38 +99,79 @@ on:
         type: boolean
 
 jobs:
+  check_satp_code_changed:
+    outputs:
+      status: ${{ steps.changes_satp.outputs.satp_code_changed}}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 #v2.11.1
+        id: changes_satp
+        with:
+          filters: |
+            satp_code_changed:
+              - './packages/cactus-plugin-satp-hermes/**'
+              - '.github/workflows/satp-hermes-build.yaml'
+              - '.github/workflows/satp-hermes-codegen.yaml'
+              - '.github/workflows/satp-hermes-docker.yaml'
+              - '.github/workflows/satp-hermes-lint.yaml'
+              - '.github/workflows/satp-hermes-main.yaml'
+              - '.github/workflows/satp-hermes-test.yaml'
+  should_run_satp_pipelines:
+    needs: [check_satp_code_changed]
+    runs-on: ubuntu-22.04
+    outputs:
+      run: ${{ steps.set_satp_run.outputs.run }}
+    steps:
+      - name: Set run output
+        id: set_satp_run
+        run: |
+          if [[ "${{ needs.check_satp_code_changed.outputs.status }}" == "true" || "${{ env.RUN_SATP_HERMES_PIPELINE }}" == "true" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ needs.check_satp_code_changed.outputs.status }}" == "false" && "${{ env.RUN_SATP_HERMES_PIPELINE }}" == "false" ]]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          RUN_SATP_HERMES_PIPELINE: ${{ env.RUN_SATP_HERMES_PIPELINE }}
+
   # Stage 1: Build and Dependencies
   build-stage:
+    needs: [should_run_satp_pipelines]
+    if: needs.should_run_satp_pipelines.outputs.run == 'true'
     uses: ./.github/workflows/satp-hermes-build.yaml
 
   # Stage 2: Code Quality Validation
   lint-stage:
-    needs: [build-stage]
+    needs: [build-stage, should_run_satp_pipelines]
+    if: needs.should_run_satp_pipelines.outputs.run == 'true'
     uses: ./.github/workflows/satp-hermes-lint.yaml
 
   # Stage 3: Code Generation
   codegen-stage:
-    needs: [build-stage, lint-stage]
+    needs: [build-stage, lint-stage, should_run_satp_pipelines]
+    if: needs.should_run_satp_pipelines.outputs.run == 'true'
     uses: ./.github/workflows/satp-hermes-codegen.yaml
 
   # Stage 4: Test Execution
   test-stage:
-    needs: [build-stage, codegen-stage]
+    needs: [build-stage, codegen-stage, should_run_satp_pipelines]
+    if: needs.should_run_satp_pipelines.outputs.run == 'true'
     uses: ./.github/workflows/satp-hermes-test.yaml
     with:
       skip_tests: ${{ github.event.inputs.skip_tests == 'true' }}
 
   # Stage 5: Docker Build and Publishing
   docker-stage:
-    needs: [build-stage, test-stage]
-    if: |
-      always() && (
-        (github.event.inputs.skip_tests == 'true' && github.event.inputs.is_release == 'true') ||
-        (needs.test-stage.result == 'success') ||
-        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) ||
-        (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) ||
-        github.event_name == 'workflow_dispatch'
-      )
+    needs: [build-stage, test-stage, should_run_satp_pipelines]
+    if: needs.should_run_satp_pipelines.outputs.run == 'true' && 
+      ((github.event.inputs.skip_tests == 'true' &&
+       github.event.inputs.is_release == 'true') || 
+       (needs.test-stage.result == 'success') || 
+       (github.event_name == 'push' && (github.ref == 'refs/heads/main' || 
+       github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || 
+       (github.event_name == 'pull_request' && (github.base_ref == 'main' || 
+       github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || 
+       github.event_name == 'workflow_dispatch')
     uses: ./.github/workflows/satp-hermes-docker.yaml
     with:
       skip_tests: ${{ github.event.inputs.skip_tests == 'true' }}
@@ -140,8 +181,8 @@ jobs:
 
   # Stage 6: Release Creation (Release Mode Only)
   release-stage:
-    needs: [docker-stage]
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.is_release == 'true'
+    needs: [docker-stage, should_run_satp_pipelines]
+    if: needs.should_run_satp_pipelines.outputs.run == 'true' && github.event_name == 'workflow_dispatch' && github.event.inputs.is_release == 'true'
     uses: ./.github/workflows/satp-hermes-release.yaml
     with:
       is_release: ${{ github.event.inputs.is_release == 'true' }}

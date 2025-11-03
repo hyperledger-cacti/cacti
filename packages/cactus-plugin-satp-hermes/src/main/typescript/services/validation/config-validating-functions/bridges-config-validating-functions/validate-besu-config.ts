@@ -12,8 +12,14 @@ import {
 import { isClaimFormat } from "./validate-bungee-options";
 import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { KeyPairJSON } from "../validate-key-pair-json";
-import { NetworkOptionsJSON } from "../validate-cc-config";
+import { NetworkId, NetworkOptionsJSON } from "../validate-cc-config";
 import { isNetworkId } from "../validate-satp-gateway-identity";
+import { Logger } from "@hyperledger/cactus-common";
+import {
+  chainConfigElement,
+  identifyAndCheckConfigFormat,
+} from "../../../utils";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 export interface BesuConfigJSON extends NetworkOptionsJSON {
   signingCredential: Web3SigningCredential;
@@ -89,8 +95,12 @@ function isWeb3SigningCredentialNone(
 }
 
 // Type guard for Web3SigningCredential
-function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
+function isWeb3SigningCredential(
+  obj: unknown,
+  log: Logger,
+): obj is Web3SigningCredential {
   if (!obj || typeof obj !== "object") {
+    log.error("isWeb3SigningCredential: obj is not an object or is null");
     return false;
   }
   return (
@@ -100,31 +110,73 @@ function isWeb3SigningCredential(obj: unknown): obj is Web3SigningCredential {
   );
 }
 
+export function isBesuNetworkId(obj: NetworkId) {
+  return (
+    (obj.ledgerType as LedgerType) === LedgerType.Besu1X ||
+    (obj.ledgerType as LedgerType) === LedgerType.Besu2X
+  );
+}
+
 // Type guard for BesuConfigJSON
-export function isBesuConfigJSON(obj: unknown): obj is BesuConfigJSON {
+export function isBesuConfigJSON(
+  obj: unknown,
+  log: Logger,
+): obj is BesuConfigJSON {
   if (typeof obj !== "object" || obj === null) {
+    log.error("isBesuConfigJSON: obj is not an object or is null");
     return false;
   }
+
+  const configDefaultFields: chainConfigElement<unknown>[] = [
+    {
+      configElement: "networkIdentification",
+      configElementTypeguard: isNetworkId,
+    },
+    {
+      configElement: "signingCredential",
+      configElementTypeguard: isWeb3SigningCredential,
+    },
+    {
+      configElement: "connectorOptions",
+      configElementTypeguard: isBesuOptionsJSON,
+    },
+  ];
+
+  const optionalConfigElements: chainConfigElement<unknown>[] = [
+    {
+      configElement: "leafId",
+      configElementType: "string",
+    },
+    {
+      configElement: "keyPair",
+      configElementType: "object",
+    },
+    {
+      configElement: "claimFormats",
+      configElementTypeguard: Array.isArray,
+      configSubElementFunctionTypeguard: isClaimFormat,
+    },
+    {
+      configElement: "wrapperContractName",
+      configElementType: "string",
+    },
+    {
+      configElement: "wrapperContractAddress",
+      configElementType: "string",
+    },
+    {
+      configElement: "gas",
+      configElementType: "number",
+    },
+  ];
+
   const objRecord = obj as Record<string, unknown>;
-  return (
-    "networkIdentification" in obj &&
-    isNetworkId(objRecord.networkIdentification) &&
-    "signingCredential" in obj &&
-    isWeb3SigningCredential(objRecord.signingCredential) &&
-    "connectorOptions" in obj &&
-    isBesuOptionsJSON(objRecord.connectorOptions) &&
-    (!("leafId" in obj) || typeof objRecord.leafId === "string") &&
-    (!("keyPair" in obj) || typeof objRecord.keyPair === "object") &&
-    ("claimFormats" in objRecord
-      ? Array.isArray(objRecord.claimFormats) &&
-        objRecord.claimFormats.every(isClaimFormat)
-      : true) &&
-    ("wrapperContractName" in objRecord
-      ? typeof objRecord.wrapperContractName === "string"
-      : true) &&
-    ("wrapperContractAddress" in objRecord
-      ? typeof objRecord.wrapperContractAddress === "string"
-      : true) &&
-    ("gas" in objRecord ? typeof objRecord.gas === "number" : true)
+
+  return identifyAndCheckConfigFormat(
+    configDefaultFields,
+    objRecord,
+    log,
+    "isBesuConfigJSON",
+    optionalConfigElements,
   );
 }

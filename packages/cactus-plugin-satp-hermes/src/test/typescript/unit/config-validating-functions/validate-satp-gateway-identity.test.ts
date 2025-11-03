@@ -9,8 +9,13 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
+import { LoggerProvider } from "@hyperledger/cactus-common";
 
 describe("validateSatpGatewayIdentity", () => {
+  const logger = LoggerProvider.getOrCreate({
+    level: "DEBUG",
+    label: "SATP-Gateway",
+  });
   it("should pass with valid gateways", () => {
     const validGatewayIdentity = {
       id: "mockID-1",
@@ -36,9 +41,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayClientPort: 3011,
       gatewayUIPort: 3012,
     } as GatewayIdentity;
-    const result = validateSatpGatewayIdentity({
-      configValue: validGatewayIdentity,
-    });
+    const result = validateSatpGatewayIdentity(
+      {
+        configValue: validGatewayIdentity,
+      },
+      logger,
+    );
     expect(result).toEqual(validGatewayIdentity);
   });
 
@@ -68,9 +76,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
@@ -101,9 +112,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
@@ -128,9 +142,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
@@ -160,9 +177,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
@@ -194,9 +214,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
@@ -226,9 +249,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
@@ -260,9 +286,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
@@ -294,9 +323,12 @@ describe("validateSatpGatewayIdentity", () => {
       gatewayUIPort: 3012,
     };
     expect(() =>
-      validateSatpGatewayIdentity({
-        configValue: invalidGatewayIdentity,
-      }),
+      validateSatpGatewayIdentity(
+        {
+          configValue: invalidGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );

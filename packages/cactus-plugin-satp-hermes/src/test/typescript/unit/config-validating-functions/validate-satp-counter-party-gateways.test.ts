@@ -9,8 +9,13 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
+import { LoggerProvider } from "@hyperledger/cactus-common";
 
 describe("validateSatpCounterPartyGateways", () => {
+  const logger = LoggerProvider.getOrCreate({
+    level: "DEBUG",
+    label: "SATP-Gateway",
+  });
   it("should pass with valid gateways", () => {
     const validGatewayIdentity = {
       id: "mockID-1",
@@ -34,9 +39,12 @@ describe("validateSatpCounterPartyGateways", () => {
       gatewayServerPort: 3010,
       gatewayClientPort: 3011,
     } as GatewayIdentity;
-    const result = validateSatpCounterPartyGateways({
-      configValue: [validGatewayIdentity],
-    });
+    const result = validateSatpCounterPartyGateways(
+      {
+        configValue: [validGatewayIdentity],
+      },
+      logger,
+    );
     expect(result).toEqual([validGatewayIdentity]);
   });
 
@@ -64,9 +72,12 @@ describe("validateSatpCounterPartyGateways", () => {
       gatewayClientPort: 3011,
     } as GatewayIdentity;
     expect(() =>
-      validateSatpCounterPartyGateways({
-        configValue: validGatewayIdentity,
-      }),
+      validateSatpCounterPartyGateways(
+        {
+          configValue: validGatewayIdentity,
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.counterPartyGateways: ${JSON.stringify(validGatewayIdentity)}`,
     );
@@ -96,9 +107,12 @@ describe("validateSatpCounterPartyGateways", () => {
       gatewayClientPort: 3011,
     };
     expect(() =>
-      validateSatpCounterPartyGateways({
-        configValue: [validGatewayIdentity],
-      }),
+      validateSatpCounterPartyGateways(
+        {
+          configValue: [validGatewayIdentity],
+        },
+        logger,
+      ),
     ).toThrowError(
       `Invalid config.counterPartyGateways: ${JSON.stringify([validGatewayIdentity])}`,
     );
