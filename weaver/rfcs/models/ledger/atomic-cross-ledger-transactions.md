@@ -36,7 +36,7 @@ This is a cross-network interoperability mode that is a generalization of what i
 - Two parties, Alice and Bob, have accounts in both Network A and Network B.
 - Initially, Alice owns a property title (e.g. embodied in an NFT) in Network A and Bob owns some digital currency in Network B
 - Alice is willing to sell the title to Bob in exchange for some units of currency, and Bob is in agreement
-- Finally, the exchange must must either succeed or fail, as per atomicity constraints:
+- Finally, the exchange must either succeed or fail, as per atomicity constraints:
   - If it succeeds, Alice gains currency units in Network B and loses the property title in Network A while Bob gains the title in Network A and loses currency units in Network B
   - If it fails, there is no change to the original states of the assets and their ownerships
   - We must guarantee that the final state will not result in partial transactions, where either Alice or Bob ends up with both the property title and the currency units and the other party gets nothing in exchange
