@@ -26,7 +26,6 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * @param signingCredential 
  * @param channelName 
  * @param contractName 
  * @param invocationType 
@@ -36,14 +35,12 @@ import com.squareup.moshi.JsonClass
  * @param endorsingOrgs An array of endorsing organizations (by mspID or issuer org name on certificate) for the transaction.
  * @param transientData 
  * @param gatewayOptions 
+ * @param signingCredential 
  * @param responseType 
  */
 
 
 data class RunTransactionRequest (
-
-    @Json(name = "signingCredential")
-    val signingCredential: FabricSigningCredential,
 
     @Json(name = "channelName")
     val channelName: kotlin.String,
@@ -73,6 +70,9 @@ data class RunTransactionRequest (
 
     @Json(name = "gatewayOptions")
     val gatewayOptions: GatewayOptions? = null,
+
+    @Json(name = "signingCredential")
+    val signingCredential: FabricSigningCredential? = null,
 
     @Json(name = "responseType")
     val responseType: RunTransactionResponseType? = null
