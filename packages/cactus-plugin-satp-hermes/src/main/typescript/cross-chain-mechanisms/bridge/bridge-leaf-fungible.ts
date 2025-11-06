@@ -62,7 +62,6 @@ import { Amount, Asset } from "./ontology/assets/asset";
  * @see {@link SATPBridgeExecutionLayer} for higher-level execution coordination
  */
 
-import { Asset } from "./ontology/assets/asset";
 import { TransactionResponse } from "./bridge-types";
 
 /**

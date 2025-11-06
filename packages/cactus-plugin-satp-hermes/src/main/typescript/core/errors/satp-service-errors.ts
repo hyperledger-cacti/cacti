@@ -1221,6 +1221,19 @@ export class LedgerAssetError extends SATPInternalError {
   }
 }
 
+/**
+ * Error thrown when an asset object fails validation during construction.
+ *
+ * @description
+ * Indicates that an asset instance is missing one or more required properties
+ * or contains invalid values preventing correct processing within SATP flows.
+ * Typically raised by utility methods that assemble assets from protocol or
+ * session data prior to bridge execution.
+ *
+ * @class BadAssetBuildError
+ * @extends SATPInternalError
+ * @since 0.0.3-beta
+ */
 export class BadAssetBuildError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
     super(
@@ -1322,6 +1335,18 @@ export class AmountMissingError extends SATPInternalError {
     this.errorType = SATPErrorType.MISSING_PARAMETER;
   }
 }
+/**
+ * Error thrown when a non-fungible asset lacks a unique descriptor.
+ *
+ * @description
+ * Indicates that a NONSTANDARD_NONFUNGIBLE asset is missing its unique
+ * descriptor (token identifier) required to uniquely reference the NFT
+ * for bridge operations such as lock, mint, burn, or assign.
+ *
+ * @class UniqueTokenDescriptorMissingError
+ * @extends SATPInternalError
+ * @since 0.0.3-beta
+ */
 export class UniqueTokenDescriptorMissingError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
     super(`${tag}, Unique Descriptor missing`, cause ?? null, 400);

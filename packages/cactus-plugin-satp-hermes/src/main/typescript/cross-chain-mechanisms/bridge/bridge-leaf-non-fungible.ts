@@ -205,43 +205,86 @@ export abstract class BridgeLeafNonFungible {
    * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
    */
   public abstract getDeployWrapperContractReceipt(): unknown;
-
+  /**
+   * Wraps a native NFT into the bridge wrapper contract representation.
+   * @param asset - Non-fungible asset with unique descriptor and metadata
+   */
   public abstract wrapAsset(asset: Asset): Promise<TransactionResponse>;
 
+  /**
+   * Unwraps a previously wrapped NFT back to its native representation.
+   * @param assetId - Wrapped NFT identifier
+   */
   public abstract unwrapAsset(assetId: string): Promise<TransactionResponse>;
 
+  /**
+   * Locks a specific NFT (by unique descriptor) for cross-chain transfer.
+   * @param assetId - Wrapped NFT identifier
+   * @param nftID - Unique token identifier
+   */
   public abstract lockAsset(
     assetId: string,
     nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
+  /**
+   * Unlocks a previously locked NFT.
+   * @param assetId - Wrapped NFT identifier
+   * @param nftID - Unique token identifier
+   */
   public abstract unlockAsset(
     assetId: string,
     nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
+  /**
+   * Mints a bridged representation of an NFT on the destination chain.
+   * @param assetId - Destination bridged NFT identifier
+   * @param nftID - Unique token identifier
+   */
   public abstract mintAsset(
     assetId: string,
     nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
+  /**
+   * Burns a bridged NFT representation on the source/destination chain.
+   * @param assetId - Bridged NFT identifier
+   * @param nftID - Unique token identifier
+   */
   public abstract burnAsset(
     assetId: string,
     nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
+  /**
+   * Assigns NFT ownership to a recipient address.
+   * @param assetId - Bridged NFT identifier
+   * @param to - Recipient address
+   * @param nftID - Unique token identifier
+   */
   public abstract assignAsset(
     assetId: string,
     to: string,
     nftID: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
+  /**
+   * Executes a custom transaction on the NFT wrapper contract.
+   * @param methodName - Contract method name
+   * @param params - String-encoded parameters
+   * @param invocationType - Call or Send type
+   */
   public abstract runTransaction(
     methodName: string,
     params: string[],
     invocationType: unknown,
   ): Promise<TransactionResponse>;
 
+  /**
+   * Retrieves the blockchain receipt for a given transaction id.
+   * @param transactionId - Hash identifying the transaction
+   */
   public abstract getReceipt(transactionId: string): Promise<string>;
   // TODO: Implement comprehensive non-fungible bridge operations
   //

@@ -327,6 +327,25 @@ export class Stage0ClientService extends SATPService {
     });
   }
 
+  /**
+   * Validates a NEW_SESSION_RESPONSE and updates/creates the local session if needed.
+   *
+   * @description
+   * Performs protocol, signature, hash, contextId and sequencing consistency checks.
+   * Detects a session id change and instantiates a new session while copying existing
+   * attributes. Returns the active (possibly re-created) session instance.
+   *
+   * @param response - Incoming response message
+   * @param session - Existing client session instance
+   * @param sessionIds - Known session ids to detect collision/mismatch
+   * @throws {SessionError} If session reference is undefined
+   * @throws {SessionIdError} If response lacks session id
+   * @throws {TransferContextIdError} If context id mismatches
+   * @throws {SignatureVerificationError} If signature invalid
+   * @throws {MessageTypeError} If wrong message type received
+   * @throws {HashError} If previous message hash mismatches
+   * @throws {SessionMissMatchError} If conflicting session id already exists
+   */
   public async checkNewSessionResponse(
     response: NewSessionResponse,
     session: SATPSession,
@@ -428,7 +447,19 @@ export class Stage0ClientService extends SATPService {
       }
     });
   }
-
+  /**
+   * Constructs and signs a PRE_SATP_TRANSFER_REQUEST based on current client session state.
+   *
+   * @description
+   * Validates required sender/receiver asset presence, resolves approve address via bridge
+   * manager, attaches wrap assertion claim and persists hashes/timestamps for protocol
+   * continuity. Returns the signed protobuf request.
+   *
+   * @param session - Active client session
+   * @throws {SessionError} If session undefined
+   * @throws {LedgerAssetIdError | LedgerAssetError} For missing asset details
+   * @throws {Error} For unsupported token types
+   */
   public async preSATPTransferRequest(
     session: SATPSession,
   ): Promise<PreSATPTransferRequest> {
@@ -563,6 +594,18 @@ export class Stage0ClientService extends SATPService {
     });
   }
 
+  /**
+   * Performs client-side asset wrapping and stores resulting wrap assertion claim.
+   *
+   * @description
+   * Uses session sender asset to invoke execution layer wrap operation via bridge manager,
+   * captures receipt + proof, signs claim and persists proof & logs. Mutates sessionData with
+   * the produced wrapAssertionClaim.
+   *
+   * @param session - Active client session containing senderAsset
+   * @throws {SessionError} If session undefined
+   * @throws {FailedToProcessError} If wrapping contract call crashes
+   */
   public async wrapToken(session: SATPSession): Promise<void> {
     const stepTag = `wrapToken()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;

@@ -67,7 +67,6 @@
  * @copyright 2024 Hyperledger Foundation
  * @license Apache-2.0
  */
-
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
@@ -277,6 +276,19 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
     op: SATPStageOperations,
     asset: Asset,
   ): Promise<IdentifiedTransactionResponse> {
+    /**
+     * Executes a bridge leaf operation and obtains both receipt and proof artifacts.
+     *
+     * @description
+     * Selects fungible/non-fungible pathway, invokes the correct leaf method, fetches the
+     * transaction receipt and requests a proof from the bridge endpoint. Normalizes output
+     * into IdentifiedTransactionResponse for upstream processing.
+     *
+     * @param fnTag - Context tag for logging/error annotation
+     * @param op - Requested stage operation (wrap, lock, mint, etc.)
+     * @param asset - Asset subject of the operation
+     * @throws {TransactionIdUndefinedError} When underlying response lacks transaction id
+     */
     let bridgeEndPoint: BridgeLeafFungible | BridgeLeafNonFungible;
     if (instanceOfFungibleAsset(asset)) {
       bridgeEndPoint = this.bridgeEndPoint as unknown as BridgeLeafFungible;
