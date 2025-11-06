@@ -150,7 +150,6 @@ export class Stage0ServerService extends SATPService {
 
   constructor(ops: ISATPServerServiceOptions) {
     // for now stage1serverservice does not have any different options than the SATPService class
-
     const commonOptions: ISATPServiceOptions = {
       stage: Stage0ServerService.SATP_STAGE,
       loggerOptions: ops.loggerOptions,
@@ -170,7 +169,23 @@ export class Stage0ServerService extends SATPService {
     this.claimFormat = ops.claimFormat || ClaimFormat.DEFAULT;
     this.bridgeManager = ops.bridgeManager;
   }
-
+  /**
+   * Validates an incoming NEW_SESSION_REQUEST and initializes server session data.
+   *
+   * @description
+   * Verifies message type, client signature, session id, and creates or updates the
+   * server-side session. Persists signature/hash/timestamp and returns a session
+   * instance with server session data established.
+   *
+   * @param request - Incoming session creation request
+   * @param session - Optional existing session reference to reuse
+   * @param clientPubKey - Client gateway public key for signature verification
+   * @returns Active server-side SATPSession
+   * @throws {SignatureMissingError} If client signature missing
+   * @throws {SessionIdError} If session id missing
+   * @throws {MessageTypeError} If wrong message type
+   * @throws {SignatureVerificationError} If signature verification fails
+   */
   public async checkNewSessionRequest(
     request: NewSessionRequest,
     session: SATPSession | undefined,
@@ -268,6 +283,20 @@ export class Stage0ServerService extends SATPService {
     });
   }
 
+  /**
+   * Validates PRE_SATP_TRANSFER_REQUEST consistency against server session state.
+   *
+   * @description
+   * Ensures session id, previous hash, signature, sender/receiver assets and optional
+   * fields are correct. Updates server session data with request details including
+   * receiver asset token id generation.
+   *
+   * @param request - Incoming pre-transfer request
+   * @param session - Active server session
+   * @throws {SessionError} If session undefined
+   * @throws {MessageTypeError} If wrong message type
+   * @throws {Error} For missing mandatory fields or invalid signature/hash
+   */
   public async checkPreSATPTransferRequest(
     request: PreSATPTransferRequest,
     session: SATPSession,
