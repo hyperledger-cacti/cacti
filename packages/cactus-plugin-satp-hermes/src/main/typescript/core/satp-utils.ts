@@ -42,13 +42,27 @@ import { NetworkId } from "../public-api";
 import { TokenType } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import { SessionData } from "../generated/proto/cacti/satp/v02/session/session_pb";
 
+/**
+ * Aggregated asset and network information built from session data.
+ *
+ * @description
+ * Represents the token and its associated network identification derived
+ * from a SATP session, ready to be consumed by bridge execution layers.
+ */
 export interface SessionAssetBuildData {
+  /** Asset instance (fungible or non-fungible) reconstructed from session data */
   token: Asset;
+  /** Target network identifier containing ledger type and network id */
   networkId: NetworkId;
 }
 
+/**
+ * Identifies which side of a SATP session is being processed.
+ */
 export enum SessionSide {
+  /** Operations executed by the client gateway */
   CLIENT,
+  /** Operations executed by the server gateway */
   SERVER,
 }
 
@@ -77,6 +91,26 @@ export function getMessageTypeName(
   );
 }
 
+/**
+ * Builds and validates an Asset from session data for a given session side.
+ *
+ * @description
+ * Extracts the sender or receiver asset (based on session side), validates
+ * required properties according to the token type, and returns the built
+ * asset along with its network identification. Throws service errors on
+ * missing or invalid parameters.
+ *
+ * @param fnTag - Context tag for logging and error reporting
+ * @param protocolStep - Human-readable protocol step for logs
+ * @param logger - Logger instance for debug output
+ * @param sessionData - Session data containing sender/receiver assets
+ * @param sessionSide - Indicates if CLIENT or SERVER side should be used
+ * @returns Asset and NetworkId ready for bridge execution
+ * @throws {LedgerAssetError} If the chosen side asset is missing
+ * @throws {TokenIdMissingError} If token id is missing
+ * @throws {AmountMissingError} If fungible amount is missing
+ * @throws {UniqueTokenDescriptorMissingError} If NFT descriptor is missing
+ */
 export function buildAndCheckAsset(
   fnTag: string,
   protocolStep: string,

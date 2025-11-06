@@ -64,8 +64,6 @@ import {
   UniqueTokenID,
 } from "../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { NetworkId } from "../../public-api";
-
-export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
 /**
  * Converts internal fungible asset representation to Protocol Buffer format.
  *
@@ -144,10 +142,7 @@ export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
  * @see {@link ProtoAsset} for Protocol Buffer asset schema
  * @see {@link NetworkId} for network identification
  */
-export function assetToProto(
-  asset: FungibleAsset,
-  networkId: NetworkId,
-): ProtoAsset {
+export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
   const protoAsset = create(ProtoAssetSchema, {
     tokenId: asset.id,
     tokenType: asset.type,

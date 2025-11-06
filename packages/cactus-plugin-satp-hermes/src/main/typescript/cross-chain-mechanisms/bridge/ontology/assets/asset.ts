@@ -121,43 +121,8 @@ export interface FungibleAsset extends Asset {
 }
 
 export interface NonFungibleAsset extends Asset {
+  /** Unique NFT descriptor (e.g. tokenId for ERC-721) */
   uniqueDescriptor: UniqueTokenID;
-/**
- * Interface for fungible assets that have measurable amounts.
- *
- * @description
- * Extends the base Asset interface to include amount information for fungible
- * tokens such as ERC-20, where assets can be subdivided and measured in
- * precise quantities. The amount is represented as a string to maintain
- * precision for large numbers and decimal values.
- *
- * **Amount Representation:**
- * - String format to preserve precision for large numbers
- * - Supports decimal values for fractional amounts
- * - Compatible with blockchain native representations
- * - Maintains consistency across different networks
- *
- * @example
- * Creating fungible asset with amount:
- * ```typescript
- * const usdcAsset: FungibleAsset = {
- *   id: 'bridge-usdc-123',
- *   referenceId: 'usdc-ethereum-456',
- *   type: TokenType.ERC20,
- *   owner: '0x123...',
- *   contractName: 'USDC',
- *   network: { id: 'ethereum-mainnet', ledgerType: LedgerType.Ethereum },
- *   amount: '1500.250000' // 1500.25 USDC
- * };
- * ```
- *
- * @since 0.0.3-beta
- * @see {@link Asset} for base asset properties
- * @see {@link instanceOfFungibleAsset} for type checking
- */
-export interface FungibleAsset extends Asset {
-  /** Amount of the fungible asset (string format for precision) */
-  amount: string;
 }
 
 /**
@@ -285,6 +250,16 @@ export function instanceOfFungibleAsset(asset: Asset) {
   return "amount" in asset;
 }
 
+/**
+ * Type guard to check if an asset is a non-fungible asset.
+ *
+ * @description
+ * Determines whether an Asset includes the 'uniqueDescriptor' property,
+ * indicating it represents a non-fungible token.
+ *
+ * @param asset - Asset to evaluate
+ * @returns True if asset is non-fungible (has uniqueDescriptor), else false
+ */
 export function instanceOfNonFungibleAsset(asset: Asset) {
   return "uniqueDescriptor" in asset;
 }
