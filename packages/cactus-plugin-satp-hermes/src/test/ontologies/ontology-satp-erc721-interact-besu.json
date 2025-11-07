@@ -2,6 +2,7 @@
     "name": "SATP-ERC721",
     "id": "SATP-ERC721-BESU",
     "type": "BESU_2X",
+    "contract": "solidity",
     "ontology": {
         "lock": [{
             "functionSignature": "lock(address,address,uint256)",
