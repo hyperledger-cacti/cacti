@@ -146,19 +146,18 @@ describe("Ethereum Leaf Test with Fungible Tokens", () => {
   });
 
   it("Should fetch the contract bytecode, which should be the same as the one in the respective ontology", async () => {
-    const wrapperContractAddress = await ethereumLeaf.getWrapperContract(
-      TokenType.NONSTANDARD_FUNGIBLE,
-    );
+    const fungibleAssetContractAddress =
+      await ethereumEnv.getTestFungibleContractAddress();
 
     const response = await ethereumLeaf.getContractBytecode(
-      wrapperContractAddress,
+      fungibleAssetContractAddress,
     );
     expect(response).toBeDefined();
 
-    console.log(response.response);
     const response2 = await ontologyManager.checkOntologyBytecode(
       LedgerType.Ethereum,
       "SATP-ERC20-ETHEREUM",
+      fungibleAssetContractAddress,
       ethereumLeaf,
     );
     expect(response2).toBe(true);
@@ -457,6 +456,23 @@ describe("Ethereum Leaf Non Fungible Test", () => {
     expect(wrapperContractAddress).toBeDefined();
 
     await ethereumEnv.giveRoleToBridge(wrapperContractAddress);
+  });
+  it("Should fetch the contract bytecode, which should be the same as the one in the respective ontology", async () => {
+    const nonFungibleAssetContractAddress =
+      await ethereumEnv.getTestNonFungibleContractAddress();
+
+    const response = await ethereumLeaf.getContractBytecode(
+      nonFungibleAssetContractAddress,
+    );
+    expect(response).toBeDefined();
+
+    const response2 = await ontologyManager.checkOntologyBytecode(
+      LedgerType.Ethereum,
+      "SATP-ERC721-ETHEREUM",
+      nonFungibleAssetContractAddress,
+      ethereumLeaf,
+    );
+    expect(response2).toBe(true);
   });
   it("Should Wrap a token", async () => {
     nonFungibleAsset = {

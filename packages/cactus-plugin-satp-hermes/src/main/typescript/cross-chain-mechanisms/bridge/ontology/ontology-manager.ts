@@ -308,6 +308,7 @@ export class OntologyManager {
   public async checkOntologyBytecode(
     ledgerType: LedgerType,
     tokenId: string,
+    contractAddress: string,
     chainLeaf: BridgeLeaf,
   ): Promise<boolean> {
     const ontology = this.getOntology(ledgerType, tokenId);
@@ -315,6 +316,7 @@ export class OntologyManager {
       JSON.parse(ontology),
       ledgerType,
       chainLeaf,
+      contractAddress,
     );
   }
 }

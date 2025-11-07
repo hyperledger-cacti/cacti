@@ -22,7 +22,6 @@ import {
 } from "./ontology-errors";
 import { BridgeLeaf } from "../bridge-leaf";
 import { EthereumLeaf } from "../leafs/ethereum-leaf";
-import { TokenType } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 
 export enum OntologyCheckLevel {
   DEFAULT = "DEFAULT",
@@ -52,19 +51,23 @@ export function isValidOntologyJsonFormat(ontologyJSON: any) {
   if (typeof ontologyJSON !== "object" || ontologyJSON === null) {
     throw new Error("Provided ontology is null or not an object");
   }
-  if (
-    !("name" in ontologyJSON && isString(ontologyJSON.name)) ||
-    !("id" in ontologyJSON && isString(ontologyJSON.id)) ||
-    !("type" in ontologyJSON && isString(ontologyJSON.type)) ||
-    !("contract" in ontologyJSON && isString(ontologyJSON.contract)) ||
-    !("ontology" in ontologyJSON && isObject(ontologyJSON.ontology)) ||
-    !("bytecode" in ontologyJSON && isString(ontologyJSON.bytecode)) ||
-    !("hash" in ontologyJSON && isString(ontologyJSON.hash)) ||
-    !("signature" in ontologyJSON && isString(ontologyJSON.signature))
-  ) {
-    throw new Error(
-      "Provided Ontology not supported by necessary additional fields",
-    );
+  const requiredFields = [
+    { key: "name", check: isString },
+    { key: "id", check: isString },
+    { key: "type", check: isString },
+    { key: "contract", check: isString },
+    { key: "ontology", check: isObject },
+    { key: "bytecode", check: isString },
+    { key: "hash", check: isString },
+    { key: "signature", check: isString },
+  ];
+
+  for (const field of requiredFields) {
+    if (!(field.key in ontologyJSON) || !field.check(ontologyJSON[field.key])) {
+      throw new Error(
+        `Provided Ontology missing or invalid field: ${field.key}`,
+      );
+    }
   }
   return ontologyJSON as OntologyJson;
 }
@@ -189,14 +192,12 @@ export async function validateOntologyBytecode(
   ontology: OntologyJson,
   ledgerType: LedgerType,
   chainLeaf: BridgeLeaf,
+  contractAddress: string,
 ) {
   switch (ledgerType) {
     case LedgerType.Ethereum:
-      const address = (chainLeaf as EthereumLeaf).getWrapperContract(
-        TokenType.NONSTANDARD_FUNGIBLE,
-      );
       const bytecode = (
-        await (chainLeaf as EthereumLeaf).getContractBytecode(address)
+        await (chainLeaf as EthereumLeaf).getContractBytecode(contractAddress)
       ).response;
       if (ontology.bytecode !== bytecode) {
         throw new InvalidBytecodeError();
