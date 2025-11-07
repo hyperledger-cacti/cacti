@@ -83,7 +83,7 @@ import { AddressInfo } from "node:net";
 import { createMigrationSource } from "./database/knex-migration-source";
 import { ExtensionsManager } from "./extensions/extensions-manager";
 import { MonitorService } from "./services/monitoring/monitor";
-import { context, SpanStatusCode } from "@opentelemetry/api";
+import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
 import { SATPManager } from "./services/gateway/satp-manager";
 import { ExtensionConfig } from "./services/validation/config-validating-functions/validate-extensions";
 
@@ -149,6 +149,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private readonly monitorService: MonitorService;
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
+  private initialSpanContext: { span: Span; context: Context };
 
   constructor(public readonly options: SATPGatewayConfig) {
     const fnTag = `${this.className}#constructor()`;
@@ -230,9 +231,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     this.OAS = OAS;
 
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    this.initialSpanContext = this.monitorService.startSpan(
+      fnTag + "#startup()",
+    );
 
-    context.with(ctx, () => {
+    context.with(this.initialSpanContext.context, () => {
       try {
         if (this.config.gid) {
           const gatewayOrchestratorOptions: IGatewayOrchestratorOptions = {
@@ -313,11 +316,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           this.logger.info("CrashManager is disabled!");
         }
       } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
+        this.initialSpanContext.span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: String(err),
+        });
+        this.initialSpanContext.span.recordException(err);
         throw err;
       } finally {
-        span.end();
+        this.initialSpanContext.span.end();
       }
     });
   }
@@ -539,6 +545,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!pluginOptions.ccConfig) {
       pluginOptions.ccConfig = {
         bridgeConfig: [],
+        oracleConfig: [],
       } as ICrossChainMechanismsOptions;
     }
 
@@ -556,10 +563,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
    */
   public async startup(): Promise<void> {
     const fnTag = `${this.className}#startup()`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     this.logger.trace(`Entering ${fnTag}`);
 
-    await context.with(ctx, async () => {
+    await context.with(this.initialSpanContext.context, async () => {
       try {
         await Promise.all([
           this.createDBRepository(),
@@ -568,13 +574,16 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         // start everything before starting the GOL server
         await this.startupGOLServer();
-        span.setStatus({ code: SpanStatusCode.OK });
+        this.initialSpanContext.span.setStatus({ code: SpanStatusCode.OK });
       } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
+        this.initialSpanContext.span.setStatus({
+          code: SpanStatusCode.ERROR,
+          message: String(err),
+        });
+        this.initialSpanContext.span.recordException(err);
         throw err;
       } finally {
-        span.end();
+        this.initialSpanContext.span.end();
       }
     });
   }
