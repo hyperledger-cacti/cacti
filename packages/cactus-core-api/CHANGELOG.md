@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **core-api:** vulnerability GHSA-mc8h-8q98-g5hr ([dfdaa50](https://github.com/hyperledger-cacti/cacti/commit/dfdaa505e96444b10a8f06a1eebe04549609175b)), closes [#3873](https://github.com/hyperledger-cacti/cacti/issues/3873)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 ### Features

@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Features
+
+* **cmd-api-server:** configurable OpenAPI HTTP request validation ([5b38344](https://github.com/hyperledger-cacti/cacti/commit/5b383448329951effa3fc13ef213071d361fe01d)), closes [#3831](https://github.com/hyperledger-cacti/cacti/issues/3831)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-test-cmd-api-server

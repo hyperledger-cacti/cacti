@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Persistence Fabric",
     "description": "Synchronizes state of an fabric ledger into a DB that can later be viewed in GUI",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -14,10 +14,7 @@
       "TrackedOperationV1": {
         "description": "Persistence plugin operation that is tracked and returned in status report.",
         "type": "object",
-        "required": [
-          "startAt",
-          "operation"
-        ],
+        "required": ["startAt", "operation"],
         "properties": {
           "startAt": {
             "type": "string",
@@ -78,10 +75,7 @@
       },
       "DiscoverNetworkResponseV1": {
         "type": "object",
-        "required": [
-          "status",
-          "message"
-        ],
+        "required": ["status", "message"],
         "properties": {
           "status": {
             "type": "boolean",
@@ -95,10 +89,7 @@
       },
       "ErrorExceptionResponseV1": {
         "type": "object",
-        "required": [
-          "message",
-          "error"
-        ],
+        "required": ["message", "error"],
         "properties": {
           "message": {
             "type": "string",

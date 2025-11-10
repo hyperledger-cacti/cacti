@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Features
+
+* **satp-hermes:** update satp to 0.0.3-beta ([#3922](https://github.com/hyperledger-cacti/cacti/issues/3922)) ([e895a4c](https://github.com/hyperledger-cacti/cacti/commit/e895a4c9eebf5a510ad04bd786a34136dd57cfd5)), closes [#3147](https://github.com/hyperledger-cacti/cacti/issues/3147)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-keychain-aws-sm

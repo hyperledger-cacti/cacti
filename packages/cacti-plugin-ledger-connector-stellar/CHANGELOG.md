@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **stellar:** vulnerability GHSA-x4gp-pqpj-f43q ([2722fc6](https://github.com/hyperledger-cacti/cacti/commit/2722fc60bdb1f12cdc6392b184822d4f0739107b)), closes [#3861](https://github.com/hyperledger-cacti/cacti/issues/3861)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cacti-plugin-ledger-connector-stellar

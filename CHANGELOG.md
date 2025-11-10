@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **corda:** com.github.bft-smart:library:master-v1.1-beta-g6215ec8-87 not found ([ee3be7a](https://github.com/hyperledger-cacti/cacti/commit/ee3be7a773a9008025ea552b21f7b4d3027f63a1))
+* **core-api:** vulnerability GHSA-mc8h-8q98-g5hr ([dfdaa50](https://github.com/hyperledger-cacti/cacti/commit/dfdaa505e96444b10a8f06a1eebe04549609175b)), closes [#3873](https://github.com/hyperledger-cacti/cacti/issues/3873)
+* **dast:** ccp, sshconfig missing ([043d325](https://github.com/hyperledger-cacti/cacti/commit/043d325660bc5e7df351e6b2a6786a4318caab30))
+* **fabric-all-in-one:** upgrade fabric-ca to support ARM64 architecture ([bdea8f5](https://github.com/hyperledger-cacti/cacti/commit/bdea8f5ce5072d3e602e0d0703484282eb5e408b)), closes [#3949](https://github.com/hyperledger-cacti/cacti/issues/3949)
+* **fabric-connector:** cli image optimization ([#3969](https://github.com/hyperledger-cacti/cacti/issues/3969)) ([e7700c7](https://github.com/hyperledger-cacti/cacti/commit/e7700c79ab728f32b7aec1b1b10763ed39756180))
+* **fabric-interop-cc:** fix some comments ([d1d1751](https://github.com/hyperledger-cacti/cacti/commit/d1d17512582e6b06a5200dac39ebc45fcf4a4a48))
+* **ledger-browser:** supabase advisor errors and warnings ([3c02b1b](https://github.com/hyperledger-cacti/cacti/commit/3c02b1b2806019e244a77e3a53accbf92cbb56d7))
+* **logger:** files needs to migrated from Tape to Jest ([8035753](https://github.com/hyperledger-cacti/cacti/commit/8035753bfe2847788371c382d860337bf6e98721))
+* **satp-hermes:** fixed validate bundle names err ([#4024](https://github.com/hyperledger-cacti/cacti/issues/4024)) ([f7126f9](https://github.com/hyperledger-cacti/cacti/commit/f7126f9b1fabc0dc71d0ce6807915fefb2dde649))
+* **satp-hermes:** update vite dependency ([1c2d609](https://github.com/hyperledger-cacti/cacti/commit/1c2d609c02033d7d1fc46b580ce63b6a6dadecb3))
+* **satp:** add check in satp to verify smart contract ontology syntax ([c34879c](https://github.com/hyperledger-cacti/cacti/commit/c34879c5daa84dc0e953abd1ef2d6f1fce4616ea))
+* **satp:** fix errors on ontology, leading to test failures ([4307c34](https://github.com/hyperledger-cacti/cacti/commit/4307c34ee4dad3ab2d628b7dcbb5f62186cf53cc))
+* **satp:** fix isFabricConfigJSON always printing error ([dd99ce6](https://github.com/hyperledger-cacti/cacti/commit/dd99ce694f930ea016ad58ba658dc8c6577df279))
+* **security:** address GHSA ID GHSA-v778-237x-gjrc ([aad136a](https://github.com/hyperledger-cacti/cacti/commit/aad136a8bda9dc936b5eec06cec4fefd87101550)), closes [#3815](https://github.com/hyperledger-cacti/cacti/issues/3815)
+* **security:** address GHSA-vjh7-7g9h-fjfh upgrade elliptic to >=6.6.1 ([6d1e72e](https://github.com/hyperledger-cacti/cacti/commit/6d1e72e951ada52c89945974127f1d18bcdceb5e)), closes [#3805](https://github.com/hyperledger-cacti/cacti/issues/3805)
+* **security:** modify pinned dependencies to fix build issues ([133582a](https://github.com/hyperledger-cacti/cacti/commit/133582adfcae661d096c4d6d687ad2b065ef42a8))
+* **security:** upgrade http-proxy-middleware to >=2.0.7 to mitigate DoS ([bc682be](https://github.com/hyperledger-cacti/cacti/commit/bc682be287574ba3e21c1fd3793e5990ce362fcb)), closes [#3661](https://github.com/hyperledger-cacti/cacti/issues/3661)
+* **stellar:** vulnerability GHSA-x4gp-pqpj-f43q ([2722fc6](https://github.com/hyperledger-cacti/cacti/commit/2722fc60bdb1f12cdc6392b184822d4f0739107b)), closes [#3861](https://github.com/hyperledger-cacti/cacti/issues/3861)
+* upgrade body-parser to >=1.20.3 to fix CVE-2024-45590 DoS attacks ([6edec86](https://github.com/hyperledger-cacti/cacti/commit/6edec86d99ff68453518e1d9bde07e45574e065b)), closes [#3657](https://github.com/hyperledger-cacti/cacti/issues/3657)
+* **weaver-go:** weaver go chaincode update ([#3948](https://github.com/hyperledger-cacti/cacti/issues/3948)) ([8924727](https://github.com/hyperledger-cacti/cacti/commit/8924727c7bb3b21b3a8e59499227e38ab9d902a8))
+* **weaver-publish-npm:** corrected publish URLs ([fbe68c1](https://github.com/hyperledger-cacti/cacti/commit/fbe68c12bf35a69cac8df7044ede937ca8c7dcd6))
+* **weaver:** resource incorrect permission assignment ([1c067e1](https://github.com/hyperledger-cacti/cacti/commit/1c067e1fcf7b71b0f6d7dc59949c11218f8452ff)), closes [#2769](https://github.com/hyperledger-cacti/cacti/issues/2769)
+* **weaver:** update all weaver nodejs apps to v22 ([31d77fd](https://github.com/hyperledger-cacti/cacti/commit/31d77fdef213e2697cc33e2d64fad296620989f7))
+* **weaver:** update the npm url in .npmrc to hyperledger-cacti ([6249eb6](https://github.com/hyperledger-cacti/cacti/commit/6249eb677b9ba76bb9f3a53571c3801e5f28d416))
+
+### Features
+
+* **bungee-hermes:** add BUNGEE package ([f378f44](https://github.com/hyperledger-cacti/cacti/commit/f378f44dc1910b0f021ac12392fbd8b87d3076b0))
+* **cactus-connector-ethereum:** add RunTransactionV1Exchange to share receipt data ([a7d9746](https://github.com/hyperledger-cacti/cacti/commit/a7d97462b6491c79cd80f4e70fd6d9fb17748807))
+* **cactus-connector-fabric:** add get tx receipt by tx id ([c66a1c6](https://github.com/hyperledger-cacti/cacti/commit/c66a1c642bbd7335a0ceff3f8f1011ecf56d5217))
+* **ccmodel-hepheastus:** add Hepheastus plugin ([d2fac8a](https://github.com/hyperledger-cacti/cacti/commit/d2fac8a7fecd2fcd63c88b6a5a71146a590a6464))
+* **cmd-api-server:** configurable OpenAPI HTTP request validation ([5b38344](https://github.com/hyperledger-cacti/cacti/commit/5b383448329951effa3fc13ef213071d361fe01d)), closes [#3831](https://github.com/hyperledger-cacti/cacti/issues/3831)
+* **common:** add BigInt JSON replacer (number -> string) ([52779b0](https://github.com/hyperledger-cacti/cacti/commit/52779b09b3ad06556b0c0375f4f5c3bcf426c5ac))
+* **connector-ethereum:** add event listener for smart contracts ([694e2e3](https://github.com/hyperledger-cacti/cacti/commit/694e2e30fd584b82a405669bdfd49072195382b2))
+* **connector-fabric:** create event listener for fabric chaincode ([89ece5e](https://github.com/hyperledger-cacti/cacti/commit/89ece5eebd99fe48187d0bdd33e5d12589c4822c)), closes [#3864](https://github.com/hyperledger-cacti/cacti/issues/3864)
+* **copm:** add Corda COPM implementation ([6544a95](https://github.com/hyperledger-cacti/cacti/commit/6544a95f420ae10977cdd01e75a4b735de43b8df))
+* **fabric-connector:** add getDiscoveryResults endpoint ([7032f06](https://github.com/hyperledger-cacti/cacti/commit/7032f068e97e713aea933da443fc9b1a093dc704)), closes [#3726](https://github.com/hyperledger-cacti/cacti/issues/3726)
+* **fabric-connector:** replace deprecated fabric-tools with new cli ([#3955](https://github.com/hyperledger-cacti/cacti/issues/3955)) ([d16a14f](https://github.com/hyperledger-cacti/cacti/commit/d16a14f20ba16ae82ceac9725be96e484ef7642d))
+* **fabric-persistence:** save discovery results in a database ([9b04d5e](https://github.com/hyperledger-cacti/cacti/commit/9b04d5e54a1465aac7a66b86f95c10cf25f6fcdf)), closes [#3726](https://github.com/hyperledger-cacti/cacti/issues/3726) [#3836](https://github.com/hyperledger-cacti/cacti/issues/3836)
+* **fabric:** serialization of ccp and sshconfig ([d8d8e01](https://github.com/hyperledger-cacti/cacti/commit/d8d8e0113bd53ffbcaa1b452dbb68d6b23255b93)), closes [#3577](https://github.com/hyperledger-cacti/cacti/issues/3577)
+* **ledger-browser:** display new data about ERC721 ([9de3e4c](https://github.com/hyperledger-cacti/cacti/commit/9de3e4cad4dcf6186e9bf0c8b99da021c9ce189b)), closes [#3895](https://github.com/hyperledger-cacti/cacti/issues/3895)
+* **ledger-browser:** handle ERC721 token metadata ([46ed5b9](https://github.com/hyperledger-cacti/cacti/commit/46ed5b9c2d1fc81c37312bc3bca68871a50968ec)), closes [#3552](https://github.com/hyperledger-cacti/cacti/issues/3552)
+* **plugin-keychain-azure-kv:** add refresh token credential support ([157a4e6](https://github.com/hyperledger-cacti/cacti/commit/157a4e6ad34fbd3eaafb2a766dd1d14a7e52895f)), closes [#3824](https://github.com/hyperledger-cacti/cacti/issues/3824)
+* **satp-hermes:** add extensions functionality to SATP gateway ([944ba97](https://github.com/hyperledger-cacti/cacti/commit/944ba97056d84f9965a0bd09cc43df8cfc94e279)), closes [#4029](https://github.com/hyperledger-cacti/cacti/issues/4029)
+* **satp-hermes:** improve session tracing ([#4058](https://github.com/hyperledger-cacti/cacti/issues/4058)) ([e238d88](https://github.com/hyperledger-cacti/cacti/commit/e238d88cf309ecba18754e4d4f3cc13057adf496))
+* **satp-hermes:** update satp to 0.0.3-beta ([#3922](https://github.com/hyperledger-cacti/cacti/issues/3922)) ([e895a4c](https://github.com/hyperledger-cacti/cacti/commit/e895a4c9eebf5a510ad04bd786a34136dd57cfd5)), closes [#3147](https://github.com/hyperledger-cacti/cacti/issues/3147)
+* **satp:** add support for NFTs ([7fc9154](https://github.com/hyperledger-cacti/cacti/commit/7fc9154d243ee6b57c29cfc3bffe53809b51c916))
+* **satp:** added predefined grafana dashboards and alerts ([62d00d1](https://github.com/hyperledger-cacti/cacti/commit/62d00d15060e3e552fcc64a7be5c25c936683d66))
+* **satp:** multi gateway metrics ([1bbc3c3](https://github.com/hyperledger-cacti/cacti/commit/1bbc3c34cc28718277f355c5bc481f4ffd63c821))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 ### Bug Fixes

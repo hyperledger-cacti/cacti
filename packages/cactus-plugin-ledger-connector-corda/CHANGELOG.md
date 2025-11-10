@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **corda:** com.github.bft-smart:library:master-v1.1-beta-g6215ec8-87 not found ([ee3be7a](https://github.com/hyperledger-cacti/cacti/commit/ee3be7a773a9008025ea552b21f7b4d3027f63a1))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-corda

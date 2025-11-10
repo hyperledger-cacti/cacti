@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Features
+
+* **plugin-keychain-azure-kv:** add refresh token credential support ([157a4e6](https://github.com/hyperledger-cacti/cacti/commit/157a4e6ad34fbd3eaafb2a766dd1d14a7e52895f)), closes [#3824](https://github.com/hyperledger-cacti/cacti/issues/3824)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-keychain-azure-kv

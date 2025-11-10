@@ -89,7 +89,7 @@ jobs:
           always-auth: true
           node-version: ${{ env.NODEJS_VERSION }}
           registry-url: "https://npm.pkg.github.com/"
-          scope: "@hyperledger"
+          scope: "@{{ github.repository_owner }}"
 
       - run: cat /home/runner/work/_temp/.npmrc
 

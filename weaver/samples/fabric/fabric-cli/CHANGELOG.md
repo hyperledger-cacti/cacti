@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **weaver-publish-npm:** corrected publish URLs ([fbe68c1](https://github.com/hyperledger-cacti/cacti/commit/fbe68c12bf35a69cac8df7044ede937ca8c7dcd6))
+* **weaver:** update the npm url in .npmrc to hyperledger-cacti ([6249eb6](https://github.com/hyperledger-cacti/cacti/commit/6249eb677b9ba76bb9f3a53571c3801e5f28d416))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cacti-weaver-fabric-cli

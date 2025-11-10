@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **ledger-browser:** supabase advisor errors and warnings ([3c02b1b](https://github.com/hyperledger-cacti/cacti/commit/3c02b1b2806019e244a77e3a53accbf92cbb56d7))
+
+### Features
+
+* **fabric-connector:** replace deprecated fabric-tools with new cli ([#3955](https://github.com/hyperledger-cacti/cacti/issues/3955)) ([d16a14f](https://github.com/hyperledger-cacti/cacti/commit/d16a14f20ba16ae82ceac9725be96e484ef7642d))
+* **fabric-persistence:** save discovery results in a database ([9b04d5e](https://github.com/hyperledger-cacti/cacti/commit/9b04d5e54a1465aac7a66b86f95c10cf25f6fcdf)), closes [#3726](https://github.com/hyperledger-cacti/cacti/issues/3726) [#3836](https://github.com/hyperledger-cacti/cacti/issues/3836)
+* **satp-hermes:** update satp to 0.0.3-beta ([#3922](https://github.com/hyperledger-cacti/cacti/issues/3922)) ([e895a4c](https://github.com/hyperledger-cacti/cacti/commit/e895a4c9eebf5a510ad04bd786a34136dd57cfd5)), closes [#3147](https://github.com/hyperledger-cacti/cacti/issues/3147)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-persistence-fabric

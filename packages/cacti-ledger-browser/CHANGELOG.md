@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **ledger-browser:** supabase advisor errors and warnings ([3c02b1b](https://github.com/hyperledger-cacti/cacti/commit/3c02b1b2806019e244a77e3a53accbf92cbb56d7))
+* **satp-hermes:** update vite dependency ([1c2d609](https://github.com/hyperledger-cacti/cacti/commit/1c2d609c02033d7d1fc46b580ce63b6a6dadecb3))
+
+### Features
+
+* **ledger-browser:** display new data about ERC721 ([9de3e4c](https://github.com/hyperledger-cacti/cacti/commit/9de3e4cad4dcf6186e9bf0c8b99da021c9ce189b)), closes [#3895](https://github.com/hyperledger-cacti/cacti/issues/3895)
+* **satp-hermes:** update satp to 0.0.3-beta ([#3922](https://github.com/hyperledger-cacti/cacti/issues/3922)) ([e895a4c](https://github.com/hyperledger-cacti/cacti/commit/e895a4c9eebf5a510ad04bd786a34136dd57cfd5)), closes [#3147](https://github.com/hyperledger-cacti/cacti/issues/3147)
+
 # [2.0.0](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.7...v2.0.0) (2024-10-15)
 
 **Note:** Version bump only for package @hyperledger/cacti-ledger-browser

@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **security:** address GHSA-vjh7-7g9h-fjfh upgrade elliptic to >=6.6.1 ([6d1e72e](https://github.com/hyperledger-cacti/cacti/commit/6d1e72e951ada52c89945974127f1d18bcdceb5e)), closes [#3805](https://github.com/hyperledger-cacti/cacti/issues/3805)
+
+### Features
+
+* **fabric-connector:** replace deprecated fabric-tools with new cli ([#3955](https://github.com/hyperledger-cacti/cacti/issues/3955)) ([d16a14f](https://github.com/hyperledger-cacti/cacti/commit/d16a14f20ba16ae82ceac9725be96e484ef7642d))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-example-discounted-asset-trade

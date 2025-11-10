@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Features
+
+* **bungee-hermes:** add BUNGEE package ([f378f44](https://github.com/hyperledger-cacti/cacti/commit/f378f44dc1910b0f021ac12392fbd8b87d3076b0))
+* **common:** add BigInt JSON replacer (number -> string) ([52779b0](https://github.com/hyperledger-cacti/cacti/commit/52779b09b3ad06556b0c0375f4f5c3bcf426c5ac))
+* **fabric-connector:** replace deprecated fabric-tools with new cli ([#3955](https://github.com/hyperledger-cacti/cacti/issues/3955)) ([d16a14f](https://github.com/hyperledger-cacti/cacti/commit/d16a14f20ba16ae82ceac9725be96e484ef7642d))
+* **satp-hermes:** update satp to 0.0.3-beta ([#3922](https://github.com/hyperledger-cacti/cacti/issues/3922)) ([e895a4c](https://github.com/hyperledger-cacti/cacti/commit/e895a4c9eebf5a510ad04bd786a34136dd57cfd5)), closes [#3147](https://github.com/hyperledger-cacti/cacti/issues/3147)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-bungee-hermes

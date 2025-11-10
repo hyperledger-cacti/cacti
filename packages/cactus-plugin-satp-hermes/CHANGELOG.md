@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **satp:** add check in satp to verify smart contract ontology syntax ([c34879c](https://github.com/hyperledger-cacti/cacti/commit/c34879c5daa84dc0e953abd1ef2d6f1fce4616ea))
+* **satp:** fix errors on ontology, leading to test failures ([4307c34](https://github.com/hyperledger-cacti/cacti/commit/4307c34ee4dad3ab2d628b7dcbb5f62186cf53cc))
+* **satp:** fix isFabricConfigJSON always printing error ([dd99ce6](https://github.com/hyperledger-cacti/cacti/commit/dd99ce694f930ea016ad58ba658dc8c6577df279))
+
+### Features
+
+* **fabric-connector:** replace deprecated fabric-tools with new cli ([#3955](https://github.com/hyperledger-cacti/cacti/issues/3955)) ([d16a14f](https://github.com/hyperledger-cacti/cacti/commit/d16a14f20ba16ae82ceac9725be96e484ef7642d))
+* **satp-hermes:** add extensions functionality to SATP gateway ([944ba97](https://github.com/hyperledger-cacti/cacti/commit/944ba97056d84f9965a0bd09cc43df8cfc94e279)), closes [#4029](https://github.com/hyperledger-cacti/cacti/issues/4029)
+* **satp-hermes:** improve session tracing ([#4058](https://github.com/hyperledger-cacti/cacti/issues/4058)) ([e238d88](https://github.com/hyperledger-cacti/cacti/commit/e238d88cf309ecba18754e4d4f3cc13057adf496))
+* **satp-hermes:** update satp to 0.0.3-beta ([#3922](https://github.com/hyperledger-cacti/cacti/issues/3922)) ([e895a4c](https://github.com/hyperledger-cacti/cacti/commit/e895a4c9eebf5a510ad04bd786a34136dd57cfd5)), closes [#3147](https://github.com/hyperledger-cacti/cacti/issues/3147)
+* **satp:** add support for NFTs ([7fc9154](https://github.com/hyperledger-cacti/cacti/commit/7fc9154d243ee6b57c29cfc3bffe53809b51c916))
+* **satp:** added predefined grafana dashboards and alerts ([62d00d1](https://github.com/hyperledger-cacti/cacti/commit/62d00d15060e3e552fcc64a7be5c25c936683d66))
+* **satp:** multi gateway metrics ([1bbc3c3](https://github.com/hyperledger-cacti/cacti/commit/1bbc3c34cc28718277f355c5bc481f4ffd63c821))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-satp-hermes

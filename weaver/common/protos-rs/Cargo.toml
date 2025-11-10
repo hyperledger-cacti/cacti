@@ -1,7 +1,7 @@
 [package]
 name = "build-protos-rs"
 # Don't update this version, update the one in "pkg/Cargo.toml".
-version = "2.1.0"
+version = "2.2.0"
 authors = ["Peter Somogyvari  <peter.somogyvari@accenture.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
 edition = "2021"
 

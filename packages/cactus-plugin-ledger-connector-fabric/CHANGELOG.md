@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **dast:** ccp, sshconfig missing ([043d325](https://github.com/hyperledger-cacti/cacti/commit/043d325660bc5e7df351e6b2a6786a4318caab30))
+* **fabric-connector:** cli image optimization ([#3969](https://github.com/hyperledger-cacti/cacti/issues/3969)) ([e7700c7](https://github.com/hyperledger-cacti/cacti/commit/e7700c79ab728f32b7aec1b1b10763ed39756180))
+* **security:** address GHSA-vjh7-7g9h-fjfh upgrade elliptic to >=6.6.1 ([6d1e72e](https://github.com/hyperledger-cacti/cacti/commit/6d1e72e951ada52c89945974127f1d18bcdceb5e)), closes [#3805](https://github.com/hyperledger-cacti/cacti/issues/3805)
+
+### Features
+
+* **cactus-connector-fabric:** add get tx receipt by tx id ([c66a1c6](https://github.com/hyperledger-cacti/cacti/commit/c66a1c642bbd7335a0ceff3f8f1011ecf56d5217))
+* **connector-fabric:** create event listener for fabric chaincode ([89ece5e](https://github.com/hyperledger-cacti/cacti/commit/89ece5eebd99fe48187d0bdd33e5d12589c4822c)), closes [#3864](https://github.com/hyperledger-cacti/cacti/issues/3864)
+* **fabric-connector:** add getDiscoveryResults endpoint ([7032f06](https://github.com/hyperledger-cacti/cacti/commit/7032f068e97e713aea933da443fc9b1a093dc704)), closes [#3726](https://github.com/hyperledger-cacti/cacti/issues/3726)
+* **fabric-connector:** replace deprecated fabric-tools with new cli ([#3955](https://github.com/hyperledger-cacti/cacti/issues/3955)) ([d16a14f](https://github.com/hyperledger-cacti/cacti/commit/d16a14f20ba16ae82ceac9725be96e484ef7642d))
+* **fabric:** serialization of ccp and sshconfig ([d8d8e01](https://github.com/hyperledger-cacti/cacti/commit/d8d8e0113bd53ffbcaa1b452dbb68d6b23255b93)), closes [#3577](https://github.com/hyperledger-cacti/cacti/issues/3577)
+* **satp-hermes:** update satp to 0.0.3-beta ([#3922](https://github.com/hyperledger-cacti/cacti/issues/3922)) ([e895a4c](https://github.com/hyperledger-cacti/cacti/commit/e895a4c9eebf5a510ad04bd786a34136dd57cfd5)), closes [#3147](https://github.com/hyperledger-cacti/cacti/issues/3147)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-fabric

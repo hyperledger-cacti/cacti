@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **ledger-browser:** supabase advisor errors and warnings ([3c02b1b](https://github.com/hyperledger-cacti/cacti/commit/3c02b1b2806019e244a77e3a53accbf92cbb56d7))
+
+### Features
+
+* **common:** add BigInt JSON replacer (number -> string) ([52779b0](https://github.com/hyperledger-cacti/cacti/commit/52779b09b3ad06556b0c0375f4f5c3bcf426c5ac))
+* **ledger-browser:** handle ERC721 token metadata ([46ed5b9](https://github.com/hyperledger-cacti/cacti/commit/46ed5b9c2d1fc81c37312bc3bca68871a50968ec)), closes [#3552](https://github.com/hyperledger-cacti/cacti/issues/3552)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-persistence-ethereum

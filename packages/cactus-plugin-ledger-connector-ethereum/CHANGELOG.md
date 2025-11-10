@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0...v2.2.0) (2025-11-10)
+
+### Bug Fixes
+
+* **security:** upgrade http-proxy-middleware to >=2.0.7 to mitigate DoS ([bc682be](https://github.com/hyperledger-cacti/cacti/commit/bc682be287574ba3e21c1fd3793e5990ce362fcb)), closes [#3661](https://github.com/hyperledger-cacti/cacti/issues/3661)
+
+### Features
+
+* **cactus-connector-ethereum:** add RunTransactionV1Exchange to share receipt data ([a7d9746](https://github.com/hyperledger-cacti/cacti/commit/a7d97462b6491c79cd80f4e70fd6d9fb17748807))
+* **connector-ethereum:** add event listener for smart contracts ([694e2e3](https://github.com/hyperledger-cacti/cacti/commit/694e2e30fd584b82a405669bdfd49072195382b2))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-ledger-connector-ethereum
