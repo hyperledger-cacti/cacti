@@ -1,4 +1,4 @@
-name: SATP Hermes Gateway Docker
+name: SATP Hermes Gateway Docker Publish
 
 on:
   workflow_call:

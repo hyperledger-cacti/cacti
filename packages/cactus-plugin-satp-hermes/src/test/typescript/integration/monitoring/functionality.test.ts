@@ -8,7 +8,7 @@ import {
   getTransactRequest,
 } from "../../test-utils";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
@@ -267,7 +267,7 @@ async function executeTransfer(
 }
 
 beforeAll(async () => {
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       console.info("Pruning throw OK");
     })
@@ -329,7 +329,7 @@ afterAll(async () => {
   if (gateway) {
     await gateway.shutdown();
   }
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

@@ -27,7 +27,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import { GethTestLedger } from "@hyperledger/cactus-test-geth-ledger";
 
 import {
@@ -128,7 +128,9 @@ describe("Ethereum monitoring endpoints tests", () => {
   //////////////////////////////////
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
 
     ledger = new GethTestLedger({
@@ -147,7 +149,9 @@ describe("Ethereum monitoring endpoints tests", () => {
       await ledger.destroy();
     }
 
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
   });
 

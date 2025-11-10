@@ -227,6 +227,13 @@ export class BesuTestLedger implements ITestLedger {
     return receipt;
   }
 
+  // Get Besu key pair for Besu v21, this besu version does not have the genesis.json file
+  public async getV21BesuKeyPair(): Promise<IKeyPair> {
+    const publicKey = await this.getFileContents("/opt/besu/keys/key.pub");
+    const privateKey = await this.getFileContents("/opt/besu/keys/key");
+    return { publicKey, privateKey };
+  }
+
   public async getBesuKeyPair(
     opts: { genesisAllocIdx: number } = { genesisAllocIdx: 1 },
   ): Promise<IKeyPair> {
@@ -253,6 +260,13 @@ export class BesuTestLedger implements ITestLedger {
     }
     const pKey0x = privateKey.startsWith("0x") ? privateKey : "0x" + privateKey;
     return { publicKey, privateKey: pKey0x };
+  }
+
+  // Get Orion key pair for Besu v21, this besu version does not have the genesis.json file
+  public async getV21OrionKeyPair(): Promise<IKeyPair> {
+    const publicKey = await this.getFileContents("/config/orion/nodeKey.pub");
+    const privateKey = await this.getFileContents("/config/orion/nodeKey.key");
+    return { publicKey, privateKey };
   }
 
   public async getOrionKeyPair(): Promise<IKeyPair> {

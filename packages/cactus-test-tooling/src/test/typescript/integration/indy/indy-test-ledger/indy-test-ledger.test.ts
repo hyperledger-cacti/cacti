@@ -21,7 +21,7 @@ const testLogLevel: LogLevelDesc = "info";
 
 import {
   IndyTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "../../../../../main/typescript/index";
 
 import {
@@ -113,7 +113,7 @@ describe("Indy Test Ledger checks", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Start IndyTestLedger...");
     ledger = new IndyTestLedger({
@@ -139,7 +139,7 @@ describe("Indy Test Ledger checks", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     try {
       await rm(TEST_WALLET_PATH, {

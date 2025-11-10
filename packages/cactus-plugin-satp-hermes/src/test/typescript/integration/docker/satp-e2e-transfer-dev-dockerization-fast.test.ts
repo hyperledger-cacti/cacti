@@ -5,7 +5,7 @@ import {
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
@@ -88,7 +88,7 @@ afterEach(async () => {
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

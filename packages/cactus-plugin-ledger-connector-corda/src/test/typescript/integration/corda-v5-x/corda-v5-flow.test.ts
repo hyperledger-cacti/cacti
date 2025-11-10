@@ -3,7 +3,7 @@ import "jest-extended";
 import {
   CordaV5TestLedger,
   Containers,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -36,7 +36,7 @@ describe("Corda Test Case", () => {
   beforeAll(async () => {
     await cordaV5TestLedger.start();
     expect(cordaV5TestLedger).toBeTruthy();
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
     expressApp.use(bodyParser.json({ limit: "250mb" }));
     const sshConfig = await cordaV5TestLedger.getSshConfig();

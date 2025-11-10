@@ -54,7 +54,7 @@
     "codegen:openapi": "npm run generate-sdk",
     "copy-sql": "mkdir -p ./dist/lib/main/ && cp -Rfp ./src/main/sql ./dist/lib/main/",
     "copy-yarn-lock": "mkdir -p ./dist/lib/ && cp -rfp ../../yarn.lock ./dist/yarn.lock",
-    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "complete-sample-scenario": "npm run build && node ./dist/lib/test/typescript/manual/complete-sample-scenario.js",

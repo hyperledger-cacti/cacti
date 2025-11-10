@@ -27,7 +27,7 @@ import {
   Servers,
 } from "@hyperledger/cactus-common";
 
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 
 import {
   AuthzScope,
@@ -47,7 +47,7 @@ const log = LoggerProvider.getOrCreate({
 });
 
 test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
@@ -109,7 +109,7 @@ test.skip(testCase, async (t: Test) => {
   const carbonAccountingApp = new CarbonAccountingApp(appOptions);
   test.onFinish(async () => {
     await carbonAccountingApp.stop();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   try {

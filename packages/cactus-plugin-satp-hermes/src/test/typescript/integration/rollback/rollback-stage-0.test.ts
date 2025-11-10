@@ -7,7 +7,7 @@ import {
   Address,
 } from "../../../../main/typescript/core/types";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import { BesuTestEnvironment, FabricTestEnvironment } from "../../test-utils";
@@ -159,7 +159,7 @@ const createMockSession = (
 };
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -252,7 +252,7 @@ afterAll(async () => {
 
   monitorService.shutdown();
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

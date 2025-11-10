@@ -700,6 +700,124 @@ export class Containers {
     return response;
   }
 
+  /**
+   * Attempts to prune all containers docker resources that are unused on the current
+   * docker host in the following order:
+   * 1. Containers
+   * 2. Volumes
+   * 4. Networks
+   * This removes everything except images.
+   *
+   * @returns A complete rundown of how each pruning process worked out
+   * where the properties pertaining to the pruning processes are `undefined`
+   * if they failed.
+   */
+  public static async pruneDockerContainersResources(
+    req?: IPruneDockerResourcesRequest,
+  ): Promise<IPruneDockerResourcesResponse> {
+    const fnTag = `Containers#pruneDockerResources()`;
+    const level = req?.logLevel || "INFO";
+    const log = LoggerProvider.getOrCreate({ level, label: fnTag });
+    const docker = new Dockerode();
+    let containers;
+    let volumes;
+    let images;
+    let networks;
+    log.debug(`Pruning all docker resources...`);
+    try {
+      const { all } = await execa("docker", ["system", "df"], { all: true });
+      log.debug(all);
+    } catch (ex) {
+      log.info(`Ignoring failure of docker system df.`, ex);
+    }
+    try {
+      containers = await docker.pruneContainers();
+    } catch (ex) {
+      log.warn(`Failed to prune docker containers: `, ex);
+    }
+    try {
+      volumes = await docker.pruneVolumes();
+    } catch (ex) {
+      log.warn(`Failed to prune docker volumes: `, ex);
+    }
+    try {
+      networks = await docker.pruneNetworks();
+    } catch (ex) {
+      log.warn(`Failed to prune docker networks: `, ex);
+    }
+
+    // Before removing images, stop and remove all containers that might be using them
+    try {
+      const allContainers = await docker.listContainers({ all: true });
+      log.debug(
+        `Found ${allContainers.length} containers to check for cleanup`,
+      );
+
+      for (const containerInfo of allContainers) {
+        try {
+          const container = docker.getContainer(containerInfo.Id);
+
+          // Stop container if running
+          if (containerInfo.State === "running") {
+            log.debug(`Stopping running container ${containerInfo.Id}`);
+            await container.stop({ t: 30 }); // 30 second timeout
+          }
+
+          // Remove container
+          log.debug(`Removing container ${containerInfo.Id}`);
+          await container.remove({ force: true });
+        } catch (containerEx) {
+          // Continue with other containers even if one fails
+          log.info(
+            `Ignoring failure to stop/remove container ${containerInfo.Id}:`,
+            containerEx,
+          );
+        }
+      }
+    } catch (ex) {
+      log.info(
+        `Ignoring failure to cleanup containers before image removal:`,
+        ex,
+      );
+    }
+
+    const cleanUpCommands = [
+      { binary: "docker", args: ["volume", "prune", "--force"] },
+    ];
+    for (const { binary, args } of cleanUpCommands) {
+      try {
+        const { all, command } = await execa(binary, args, { all: true });
+        log.debug(command);
+        log.debug(all);
+      } catch (ex) {
+        // The first 3 commands might fail if there are no containers or images
+        // to delete (e.g. their number is zero)
+        log.info("Ignoring docker resource cleanup command failure.", ex);
+      }
+    }
+    const response: IPruneDockerResourcesResponse = {
+      containers,
+      images,
+      networks,
+      volumes,
+    };
+
+    log.debug(`Finished pruning all docker resources. Outcome: %o`, response);
+    try {
+      const { all } = await execa("df", [], { all: true });
+      log.debug(all);
+    } catch (ex) {
+      log.info(`Ignoring failure of df.`, ex);
+    }
+    try {
+      const { all } = await execa("docker", ["system", "df"], { all: true });
+      log.debug(all);
+    } catch (ex) {
+      log.info(`Ignoring failure of docker system df.`, ex);
+    }
+    return response;
+  }
+
   public static async streamLogs(req: IStreamLogsRequest): Promise<void> {
     const logOptions = { follow: true, stderr: true, stdout: true };
     const logStream = await req.container.logs(logOptions);

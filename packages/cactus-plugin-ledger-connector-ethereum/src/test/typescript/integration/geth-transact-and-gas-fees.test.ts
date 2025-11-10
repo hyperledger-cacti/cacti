@@ -25,7 +25,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
@@ -63,7 +63,9 @@ describe("Running ethereum transactions with different gas configurations", () =
   //////////////////////////////////
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
 
     //ledger = new GethTestLedger({ emitContainerLogs: true, testLogLevel });
@@ -101,7 +103,9 @@ describe("Running ethereum transactions with different gas configurations", () =
     await ledger.destroy();
     await Servers.shutdown(server);
 
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
   });
 
