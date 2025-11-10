@@ -610,15 +610,19 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
    * @throws {Error} If the method is not implemented.
    */
   public async verifyAssetExistence(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     assetId: string,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     invocationType: unknown,
   ): Promise<boolean | undefined> {
     const fnTag = `${SATPBridgeExecutionLayerImpl.CLASS_NAME}#verifyAssetExistence()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, () => {
       try {
+        this.log.debug(
+          `${fnTag}, Verifying asset existence for assetId: ${assetId}`,
+        );
+        this.log.debug(
+          `${fnTag}, invocationType: ${JSON.stringify(invocationType)}`,
+        );
         //todo: implement this
         throw new Error("Not implemented");
       } catch (err) {

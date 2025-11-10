@@ -397,8 +397,15 @@ export class FabricLeaf
           // this.deployNonFungibleWrapperContract(),
         ]);
       } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
+        if (err instanceof WrapperContractAlreadyCreatedError) {
+          this.log.debug(
+            `${fnTag}, Wrapper contracts already exist, skipping deployment`,
+          );
+          span.setStatus({ code: SpanStatusCode.OK });
+        } else {
+          span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+          span.recordException(err);
+        }
         throw err;
       } finally {
         span.end();
