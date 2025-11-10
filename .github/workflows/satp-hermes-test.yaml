@@ -17,7 +17,7 @@ jobs:
   # Test execution jobs: run unit and integration tests in parallel
   run-satp-tests-unit:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -107,7 +107,7 @@ jobs:
       
   run-satp-tests-integration-bridge:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -198,7 +198,7 @@ jobs:
 
   run-satp-tests-integration-oracle:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -292,7 +292,7 @@ jobs:
 
   run-satp-tests-integration-gateway:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -385,7 +385,7 @@ jobs:
 
   run-satp-tests-integration-docker:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -490,7 +490,7 @@ jobs:
 
   run-satp-tests-integration-cbdc:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -583,7 +583,7 @@ jobs:
 
   run-satp-tests-on-chain:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -649,7 +649,7 @@ jobs:
 
   run-satp-tests-recovery:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
@@ -743,7 +743,7 @@ jobs:
 
   run-satp-tests-rollback:
     if: inputs.skip_tests != true
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: true
     env:
       FULL_BUILD_DISABLED: true
