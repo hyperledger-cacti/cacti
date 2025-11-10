@@ -163,6 +163,57 @@ const gatewayConfig: {
 
 ### Bridge Configuration
 
+#### Reusing Deployed Wrapper Contracts
+
+When you already have bridge wrapper contracts on-chain, provide their identifiers in the leaf configuration so the deployment step skips redeployment. The CLI entrypoint loads the configuration, `validateCCConfig` verifies the schema, and the bridge manager attaches each leaf to the supplied contract details.
+
+##### Fabric Leaf Wrapper Example
+```typescript
+const fabricWrapperConfig = {
+  networkIdentification: {
+    id: "FabricLedgerTestNetwork",
+    ledgerType: "FABRIC_2",
+  },
+  channelName: "mychannel",
+  signingCredential: {/* Fabric signing credential */},
+  connectorOptions: {/* Fabric connector options */},
+  wrapperContractName: "satp-wrapper-fabric", // Existing chaincode package name
+  claimFormats: [1],
+};
+```
+
+##### Besu Leaf Wrapper Example
+```typescript
+const besuWrapperConfig = {
+  networkIdentification: {
+    id: "BesuLedgerTestNetwork",
+    ledgerType: "BESU_2X",
+  },
+  signingCredential: {/* Besu signing credential */},
+  connectorOptions: {/* Besu connector options */},
+  wrapperContractName: "BesuWrapper",
+  wrapperContractAddress: "0x1234...cdef",
+  claimFormats: [1],
+};
+```
+
+##### Ethereum Leaf Wrapper Example
+```typescript
+const ethereumWrapperConfig = {
+  networkIdentification: {
+    id: "EthereumLedgerTestNetwork",
+    ledgerType: "ETHEREUM",
+  },
+  signingCredential: {/* Ethereum signing credential */},
+  connectorOptions: {/* Ethereum connector options */},
+  wrapperContractName: "EthereumWrapper",
+  wrapperContractAddress: "0x9876...abcd",
+  claimFormats: [1],
+};
+```
+
+If both `wrapperContractName` and `wrapperContractAddress` are present (Fabric only requires the name), leaf deployment logs that contracts already exist and continues without redeploying them.
+
 #### Fabric Configuration Example:
 ```typescript
 const leafConfig = {
@@ -263,6 +314,49 @@ const leafConfig = {
   wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // Only used if the contract was already deployed
   claimFormats: [1]                               // Claim format identifiers (application-specific)
 }
+```
+
+### Gateway Example (One Leaf Using Existing Wrapper)
+```typescript
+const gatewayConfig = {
+  gid: {
+    id: "gatewayId",
+    name: "GatewayWithBesuConnection",
+    version: [{ Core: "v02", Architecture: "v02", Crash: "v02" }],
+    proofID: "mockProofID10",
+    address: "http://gateway1.satp-hermes",
+  },
+  logLevel: "TRACE",
+  counterPartyGateways: [],
+  localRepository: localDbKnexConfig,
+  remoteRepository: remoteDbKnexConfig,
+  environment: "development",
+  ontologyPath: "/opt/cacti/satp-hermes/ontologies",
+  enableCrashRecovery: true,
+  ccConfig: {
+    bridgeConfig: [
+      {
+        networkIdentification: {
+          id: "BesuLedgerTestNetwork",
+          ledgerType: "BESU_2X",
+        },
+        signingCredential: {
+          ethAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
+          secret: "0xc31e76f70d6416337d3a7b7a8711a43e30a14963b5ba622fa6c9dbb5b4555986",
+          type: "PRIVATE_KEY_HEX",
+        },
+        gas: 999999999999999,
+        connectorOptions: {
+          rpcApiHttpHost: "http://172.20.0.6:8545",
+          rpcApiWsHost: "ws://172.20.0.6:8546",
+        },
+        wrapperContractName: "BesuWrapper",
+        wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B",
+        claimFormats: [1],
+      },
+    ],
+  },
+};
 ```
 #### Notes:
 - **Field values:** Replace placeholders (such as file paths, endpoint addresses, credentials, etc.) with values appropriate for your environment.
