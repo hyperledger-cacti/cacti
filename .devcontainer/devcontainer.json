@@ -36,8 +36,8 @@
 			"version": "1.74",
 			"profile": "complete"
 		},
-		"ghcr.io/devcontainers-contrib/features/curl-apt-get:1": {},
-		"ghcr.io/devcontainers-contrib/features/protoc:1": {
+		"ghcr.io/devcontainers-extra/features/curl-apt-get:1": {},
+		"ghcr.io/devcontainers-extra/features/protoc:1": {
 			"version": "v3.20.3"
 		},
 		"ghcr.io/dhoeric/features/trivy:1.0.0": {

@@ -29,6 +29,7 @@ import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
 } from "@hyperledger/cactus-test-tooling";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
 import {
@@ -346,7 +347,7 @@ async function setupFabricTestLedger(): Promise<string> {
   fabricLedger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
     imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
     envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
     logLevel,
