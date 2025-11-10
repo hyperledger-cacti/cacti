@@ -9,7 +9,7 @@ on:
 
 jobs:
   codegen-satp: 
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     continue-on-error: false
     outputs:
       codegen_success: ${{ steps.codegen.outputs.success }}
