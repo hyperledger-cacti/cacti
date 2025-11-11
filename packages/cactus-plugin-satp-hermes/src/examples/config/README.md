@@ -129,7 +129,7 @@ All configuration files follow this standardized structure based on the SATP pro
           "ledgerType": "ETHEREUM"
         },
         "signingCredential": {
-          "ethAccount": "0x...",
+          "transactionSignerEthAccount": "0x...",
           "secret": "0x...",
           "type": "PRIVATE_KEY_HEX"
         },

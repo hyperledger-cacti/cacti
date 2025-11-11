@@ -28,16 +28,17 @@ import {
   AssetErcTokenStandardEnum,
 } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import {
-  IBesuLeafNeworkOptions,
-  IBesuLeafOptions,
-} from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntologyERC20 from "../../ontologies/ontology-satp-erc20-interact-besu.json";
 import ExampleOntologyERC721 from "../../ontologies/ontology-satp-erc721-interact-besu.json";
-import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
+import {
+  IBesuLeafOptions,
+  IBesuNetworkConfig,
+  INetworkOptions,
+} from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
 import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { BesuGasConfig } from "../../../main/typescript/services/validation/config-validating-functions/bridges-config-validating-functions/validate-besu-config";
 export interface IBesuTestEnvironment {
   logLevel: LogLevelDesc;
   network?: string;
@@ -94,8 +95,11 @@ export class BesuTestEnvironment {
     string
   >();
 
-  public besuConfig!: IBesuLeafNeworkOptions;
-  public gas: number = 999999999; // Default gas limit for transactions
+  public besuConfig!: IBesuNetworkConfig;
+
+  public gasConfig: BesuGasConfig = {
+    gasLimit: "999999999999999",
+  };
 
   private dockerContainerIP?: string;
   private dockerNetwork: string = "besu";
@@ -271,7 +275,7 @@ export class BesuTestEnvironment {
       signingCredential: this.besuConfig.signingCredential,
       wrapperContractName: this.besuConfig.wrapperContractName,
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
-      gas: this.besuConfig.gas,
+      gasConfig: this.besuConfig.gasConfig,
       connectorOptions: {
         rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
         rpcApiWsHost: this.connectorOptions.rpcApiWsHost,
@@ -287,7 +291,7 @@ export class BesuTestEnvironment {
       signingCredential: this.besuConfig.signingCredential,
       wrapperContractName: this.besuConfig.wrapperContractName,
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
-      gas: this.besuConfig.gas,
+      gasConfig: this.besuConfig.gasConfig,
       connectorOptions: {
         rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(),
         rpcApiWsHost: await this.ledger.getRpcApiWsHost(),
@@ -306,7 +310,7 @@ export class BesuTestEnvironment {
       signingCredential: this.besuConfig.signingCredential,
       wrapperContractName: this.besuConfig.wrapperContractName,
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
-      gas: this.besuConfig.gas,
+      gasConfig: this.besuConfig.gasConfig,
       connectorOptions: {
         instanceId: this.connectorOptions.instanceId,
         rpcApiHttpHost: this.connectorOptions.rpcApiHttpHost,
@@ -359,7 +363,7 @@ export class BesuTestEnvironment {
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
       bytecode: contractCode.bytecode.object,
-      gas: this.gas,
+      gas: Number(this.gasConfig.gasLimit),
     });
     expect(deployOutSATPTokenContract).toBeTruthy();
     expect(deployOutSATPTokenContract.transactionReceipt).toBeTruthy();
@@ -395,7 +399,7 @@ export class BesuTestEnvironment {
       leafId: "Testing-event-besu-leaf",
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: this.gas,
+      gasConfig: this.gasConfig,
     };
   }
 
@@ -427,7 +431,7 @@ export class BesuTestEnvironment {
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
       bytecode: contract.bytecode.object,
-      gas: this.gas,
+      gas: Number(this.gasConfig.gasLimit),
     });
     expect(blOracleContract).toBeTruthy();
     expect(blOracleContract.transactionReceipt).toBeTruthy();
@@ -450,7 +454,7 @@ export class BesuTestEnvironment {
       leafId: "Testing-event-besu-leaf",
       connectorOptions: this.connectorOptions,
       claimFormats: [claimFormat],
-      gas: this.gas,
+      gasConfig: this.gasConfig,
     };
 
     return blOracleContract.transactionReceipt.contractAddress!;
@@ -491,7 +495,7 @@ export class BesuTestEnvironment {
         secret: this.besuKeyPair.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: this.besuConfig.gas,
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
     });
     expect(responseMint).toBeTruthy();
     expect(responseMint.success).toBeTruthy();
@@ -585,7 +589,7 @@ export class BesuTestEnvironment {
         secret: this.besuKeyPair.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: this.besuConfig.gas,
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
     });
     expect(responseApprove).toBeTruthy();
     expect(responseApprove.success).toBeTruthy();
@@ -662,7 +666,7 @@ export class BesuTestEnvironment {
       methodName: "balanceOf",
       params: [account],
       signingCredential: signingCredential,
-      gas: this.besuConfig.gas,
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
     });
 
     expect(responseBalanceBridge).toBeTruthy();
@@ -731,7 +735,7 @@ export class BesuTestEnvironment {
         secret: this.bridgeEthAccount.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: this.besuConfig.gas,
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
     });
   }
 
@@ -754,7 +758,7 @@ export class BesuTestEnvironment {
         secret: this.bridgeEthAccount.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: this.besuConfig.gas,
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
     });
 
     expect(response).toBeTruthy();
@@ -782,7 +786,7 @@ export class BesuTestEnvironment {
         secret: this.bridgeEthAccount.privateKey,
         type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
       },
-      gas: this.besuConfig.gas,
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
     });
 
     expect(response).toBeTruthy();

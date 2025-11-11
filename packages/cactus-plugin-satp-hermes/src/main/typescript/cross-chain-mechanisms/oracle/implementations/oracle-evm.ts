@@ -21,10 +21,7 @@ import {
   Web3SigningCredentialPrivateKeyHex,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
-import {
-  EthereumLeaf,
-  IEthereumLeafNeworkOptions,
-} from "../../bridge/leafs/ethereum-leaf";
+import { EthereumLeaf } from "../../bridge/leafs/ethereum-leaf";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import {
   ClaimFormatError,
@@ -46,6 +43,7 @@ import { keccak256 } from "web3-utils";
 import { AbiEventFragment, DecodedParams } from "web3";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { IEthereumNetworkConfig } from "../../bridge/bridge-types";
 
 export interface IEVMOracleEntry extends IOracleEntryBase {
   contractAddress: string;
@@ -55,7 +53,7 @@ export interface IEVMOracleEntry extends IOracleEntryBase {
 
 export interface IOracleEVMOptions
   extends OracleAbstractOptions,
-    IEthereumLeafNeworkOptions {}
+    IEthereumNetworkConfig {}
 
 export class OracleEVM extends OracleAbstract {
   public static CLASS_NAME = "OracleEVM";

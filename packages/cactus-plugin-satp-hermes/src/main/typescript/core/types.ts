@@ -141,6 +141,30 @@ export type Address =
   | `${number}.${number}.${number}.${number}`;
 
 /**
+ * Enumeration of supported signing algorithms.
+ *
+ * @description
+ * Defines the cryptographic signing algorithms supported for
+ * gateway identification credentials.
+ */
+export enum SupportedSigningAlgorithms {
+  SECP256K1 = "SECP256K1",
+}
+
+/**
+ * Identification credential structure for gateways.
+ *
+ * @description
+ * Defines the structure for gateway identification credentials
+ * including the signing algorithm used for key generation and
+ * the respective public key.
+ */
+export type IdentificationCredential = {
+  signingAlgorithm: SupportedSigningAlgorithms;
+  pubKey: string;
+};
+
+/**
  * SATP gateway identity structure.
  *
  * @description
@@ -150,8 +174,8 @@ export type Address =
 export type GatewayIdentity = {
   /** Unique gateway identifier */
   id: string;
-  /** Optional public key for cryptographic operations */
-  pubKey?: string;
+  /** Optional identification credential for the gateway*/
+  identificationCredential?: IdentificationCredential;
   /** Optional human-readable gateway name */
   name?: string;
   /** Supported SATP draft versions */

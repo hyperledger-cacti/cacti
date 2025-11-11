@@ -371,7 +371,7 @@ Ethereum-compatible networks use Web3 signing credentials and contract addresses
     "networkId": "besu-mainnet",
     "connectorUrl": "https://besu-connector.example.com:4000",
     "web3SigningCredential": {
-      "ethAccount": "${ETH_ACCOUNT}",
+      "transactionSignerEthAccount": "${ETH_ACCOUNT}",
       "secret": "${ETH_PRIVATE_KEY}",
       "type": "PRIVATE_KEY_HEX"
     },
@@ -381,7 +381,9 @@ Ethereum-compatible networks use Web3 signing credentials and contract addresses
       "http": "https://mainnet.infura.io/v3/${PROJECT_ID}",
       "ws": "wss://mainnet.infura.io/ws/v3/${PROJECT_ID}"
     },
-    "gasLimit": 3000000
+    "gasConfig": {
+      "gasLimit": "3000000"
+    }    
   }
 }
 ```
@@ -613,11 +615,13 @@ const leafConfig = {
     ledgerType: "BESU_2X"                     // Ledger type constant for Besu 2.x
   },
   signingCredential: {
-    ethAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",           // Ethereum account address
+    transactionSignerEthAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4", // ETH account (public key) of the owner of the bridge that signs transactions
     secret: "0xc31e76f70d6416337d3a7b7a8711a43e30a14963b5ba622fa6c9dbb5b4555986", // Private key in hex
     type: "PRIVATE_KEY_HEX"
   },
-  gas: 999999999999999,                       // Default gas limit for transactions
+  gasConfig: {
+    gasLimit: "6000000",  // Default gas limit for transactions
+  },
   connectorOptions: {
     rpcApiHttpHost: "http://172.20.0.6:8545", // Besu JSON-RPC HTTP endpoint
     rpcApiWsHost: "ws://172.20.0.6:8546"      // Besu JSON-RPC WebSocket endpoint
@@ -635,11 +639,14 @@ const leafConfig = {
     ledgerType: "ETHEREUM"                    // Ledger type constant for Ethereum
   },
   signingCredential: {
-    ethAccount: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // Ethereum account address
+    transactionSignerEthAccount: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // ETH account (public key) of the owner of the bridge that signs transactions
     secret: "test",                                // Key store password or secret
     type: "GETH_KEYCHAIN_PASSWORD"                 // Credential type for geth keychain
   },
-  gas: 5000000,                                   // Default gas limit for transactions
+  gasConfig: {
+    gas: "6721975", // Default gas limit for transactions
+    gasPrice: "20000000000" // Default gas Price
+  },                                    
   connectorOptions: {
     rpcApiHttpHost: "http://172.20.0.7:8545",     // Ethereum JSON-RPC HTTP endpoint
     rpcApiWsHost: "ws://172.20.0.7:8546"          // Ethereum JSON-RPC WebSocket endpoint
@@ -656,6 +663,10 @@ const gatewayConfig = {
   gid: {
     id: "gatewayId",
     name: "GatewayWithBesuConnection",
+    identificationCredential: {
+      signingAlgorithm: "SECP256K1",
+      pubKey: "0x03a34e1d66b78e47fa1bba3445a6019acb5b9c87d0c6ad81c09e7d496682ae81fc",
+    },
     version: [{ Core: "v02", Architecture: "v02", Crash: "v02" }],
     proofID: "mockProofID10",
     address: "http://gateway1.satp-hermes",
@@ -675,11 +686,13 @@ const gatewayConfig = {
           ledgerType: "BESU_2X",
         },
         signingCredential: {
-          ethAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
+          transactionSignerEthAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
           secret: "0xc31e76f70d6416337d3a7b7a8711a43e30a14963b5ba622fa6c9dbb5b4555986",
           type: "PRIVATE_KEY_HEX",
         },
-        gas: 999999999999999,
+        gasConfig: {
+          gasLimit: "6000000",
+        },        
         connectorOptions: {
           rpcApiHttpHost: "http://172.20.0.6:8545",
           rpcApiWsHost: "ws://172.20.0.6:8546",

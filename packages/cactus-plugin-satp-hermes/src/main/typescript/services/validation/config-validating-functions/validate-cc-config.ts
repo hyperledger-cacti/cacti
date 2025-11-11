@@ -9,32 +9,24 @@ import {
   isBesuConfigJSON,
   isBesuNetworkId,
 } from "./bridges-config-validating-functions/validate-besu-config";
-import { createBesuOptions } from "./bridges-config-validating-functions/validate-besu-options";
 import {
   isEthereumConfigJSON,
   isEthereumNetworkId,
 } from "./bridges-config-validating-functions/validate-ethereum-config";
-import { createEthereumOptions } from "./bridges-config-validating-functions/validate-ethereum-options";
 import { ICrossChainMechanismsOptions } from "../../../cross-chain-mechanisms/satp-cc-manager";
-import { INetworkOptions } from "../../../cross-chain-mechanisms/bridge/bridge-types";
+import {
+  IBesuNetworkConfig,
+  IEthereumNetworkConfig,
+  INetworkOptions,
+} from "../../../cross-chain-mechanisms/bridge/bridge-types";
 import { IFabricLeafNeworkOptions } from "../../../cross-chain-mechanisms/bridge/leafs/fabric-leaf";
-import { IBesuLeafNeworkOptions } from "../../../cross-chain-mechanisms/bridge/leafs/besu-leaf";
-import { IEthereumLeafNeworkOptions } from "../../../cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
 import {
   DeploymentTargetOrganization,
   FileBase64,
 } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
 import path from "path";
 import { Logger } from "@hyperledger/cactus-common";
-
-export interface NetworkOptionsJSON {
-  networkIdentification: NetworkId;
-}
-
-export interface NetworkId {
-  id: string;
-  ledgerType: string;
-}
+import { NetworkId } from "../../../public-api";
 
 function isNetworkId(obj: unknown): obj is NetworkId {
   return (
@@ -47,11 +39,35 @@ function isNetworkId(obj: unknown): obj is NetworkId {
   );
 }
 
+export function isGasConfig(obj: unknown, log: Logger) {
+  if (!obj || typeof obj !== "object") {
+    log.error("isGasConfig: obj null or not obj");
+    throw new TypeError(
+      "isGasConfig: obj null or not obj" + JSON.stringify(obj),
+    );
+  }
+
+  const objRecord = obj as Record<string, unknown>;
+
+  return (
+    ("gas" in obj &&
+      typeof objRecord.gas === "string" &&
+      "gasPrice" in obj &&
+      typeof objRecord.gasPrice === "string") ||
+    ("gasLimit" in obj &&
+      typeof objRecord.gasLimit === "string" &&
+      "maxFeePerGas" in obj &&
+      typeof objRecord.maxFeePerGas === "string" &&
+      "maxPriorityFeePerGas" in obj &&
+      typeof objRecord.maxPriorityFeePerGas === "string") ||
+    (Object.keys(objRecord).length === 1 &&
+      Object.keys(objRecord)[0] === "gasLimit" &&
+      typeof objRecord.gasLimit === "string")
+  );
+}
+
 // Type guard for NetworkConfigJSON
-function NetworkOptionsJSON(
-  obj: unknown,
-  log: Logger,
-): obj is NetworkOptionsJSON {
+function NetworkOptionsJSON(obj: unknown, log: Logger): obj is INetworkOptions {
   if (typeof obj !== "object" || obj === null) {
     return false;
   }
@@ -71,7 +87,7 @@ function NetworkOptionsJSON(
 function NetworkOptionsJSONArray(
   obj: unknown,
   log: Logger,
-): obj is NetworkOptionsJSON[] {
+): obj is INetworkOptions[] {
   return (
     Array.isArray(obj) && obj.every((item) => NetworkOptionsJSON(item, log))
   );
@@ -92,7 +108,7 @@ function isCCConfigJSON(
 }
 
 async function createBridgeConfig(
-  configs: NetworkOptionsJSON[] | undefined = [],
+  configs: INetworkOptions[] | undefined = [],
   log: Logger,
 ): Promise<INetworkOptions[]> {
   const bridgesConfigParsed: INetworkOptions[] = [];
@@ -239,49 +255,37 @@ async function createBridgeConfig(
       isBesuNetworkId(config.networkIdentification) &&
       isBesuConfigJSON(config, log)
     ) {
-      const besuOptions = createBesuOptions(config.connectorOptions);
+      //const besuOptions = createBesuOptions(config.connectorOptions);
       const besuConfig = {
         networkIdentification: config.networkIdentification,
         signingCredential: config.signingCredential,
-        connectorOptions: besuOptions,
+        connectorOptions: config.connectorOptions,
         leafId: config.leafId,
-        keyPair:
-          config.keyPair === undefined
-            ? undefined
-            : {
-                publicKey: Buffer.from(config.keyPair.publicKey, "hex"),
-                privateKey: Buffer.from(config.keyPair.privateKey, "hex"),
-              },
+        keyPair: config.keyPair,
         claimFormats: config.claimFormats,
         wrapperContractAddress: config.wrapperContractAddress,
         wrapperContractName: config.wrapperContractName,
-        gas: config.gas,
-      } as Partial<IBesuLeafNeworkOptions> & INetworkOptions;
+        gasConfig: config.gasConfig,
+      } as Partial<IBesuNetworkConfig> & INetworkOptions;
 
       bridgesConfigParsed.push(besuConfig);
     } else if (
       isEthereumNetworkId(config.networkIdentification) &&
       isEthereumConfigJSON(config, log)
     ) {
-      const ethereumOptions = createEthereumOptions(config.connectorOptions);
+      //const ethereumOptions = createEthereumOptions(config.connectorOptions);
 
       const ethereumConfig = {
         networkIdentification: config.networkIdentification,
         signingCredential: config.signingCredential,
-        connectorOptions: ethereumOptions,
+        connectorOptions: config.connectorOptions,
         leafId: config.leafId,
-        keyPair:
-          config.keyPair === undefined
-            ? undefined
-            : {
-                publicKey: Buffer.from(config.keyPair.publicKey, "hex"),
-                privateKey: Buffer.from(config.keyPair.privateKey, "hex"),
-              },
+        keyPair: config.keyPair,
         claimFormats: config.claimFormats,
         wrapperContractAddress: config.wrapperContractAddress,
         wrapperContractName: config.wrapperContractName,
         gasConfig: config.gasConfig,
-      } as Partial<IEthereumLeafNeworkOptions> & INetworkOptions;
+      } as Partial<IEthereumNetworkConfig> & INetworkOptions;
 
       bridgesConfigParsed.push(ethereumConfig);
     }

@@ -40,17 +40,14 @@ import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-pro
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { BridgeLeaf } from "./bridge-leaf";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import { BesuLeaf, IBesuLeafNeworkOptions } from "./leafs/besu-leaf";
+import { BesuLeaf } from "./leafs/besu-leaf";
 import {
   DeployLeafError,
   LeafError,
   UnsupportedNetworkError,
   WrapperContractAlreadyCreatedError,
 } from "../common/errors";
-import {
-  EthereumLeaf,
-  IEthereumLeafNeworkOptions,
-} from "./leafs/ethereum-leaf";
+import { EthereumLeaf } from "./leafs/ethereum-leaf";
 import { FabricLeaf, IFabricLeafNeworkOptions } from "./leafs/fabric-leaf";
 import { BridgeManagerAdminInterface } from "./interfaces/bridge-manager-admin-interface";
 import { BridgeManagerClientInterface } from "./interfaces/bridge-manager-client-interface";
@@ -60,7 +57,11 @@ import {
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import { SATPBridgeExecutionLayer } from "./satp-bridge-execution-layer";
 import { SATPBridgeExecutionLayerImpl } from "./satp-bridge-execution-layer-implementation";
-import { INetworkOptions } from "./bridge-types";
+import {
+  IBesuNetworkConfig,
+  IEthereumNetworkConfig,
+  INetworkOptions,
+} from "./bridge-types";
 import {
   IOntologyManagerOptions,
   OntologyManager,
@@ -185,7 +186,7 @@ export class BridgeManager
                 )}`,
               );
               const besuNetworkOptions =
-                leafNetworkOptions as unknown as IBesuLeafNeworkOptions;
+                leafNetworkOptions as unknown as IBesuNetworkConfig;
               if (!this.ontologyManager) {
                 throw new Error(`${fnTag}, Ontology Manager is not defined`);
               }
@@ -215,7 +216,7 @@ export class BridgeManager
                 )}`,
               );
               const ethereumNetworkOptions =
-                leafNetworkOptions as unknown as IEthereumLeafNeworkOptions;
+                leafNetworkOptions as unknown as IEthereumNetworkConfig;
               if (!this.ontologyManager) {
                 throw new Error(`${fnTag}, Ontology Manager is not defined`);
               }
