@@ -580,13 +580,16 @@ export class SATPManager {
 
   private loadPubKeys(gateways: Map<string, GatewayIdentity>): void {
     gateways.forEach((gateway) => {
-      if (gateway.pubKey) {
-        this.gatewaysPubKeys.set(gateway.id, gateway.pubKey);
+      if (gateway.identificationCredential) {
+        this.gatewaysPubKeys.set(
+          gateway.id,
+          gateway.identificationCredential.pubKey,
+        );
       }
     });
     this.gatewaysPubKeys.set(
       this.orchestrator.getSelfId(),
-      this.orchestrator.ourGateway.pubKey!,
+      this.orchestrator.ourGateway.identificationCredential!.pubKey,
     );
   }
 
@@ -668,11 +671,12 @@ export class SATPManager {
             throw new Error(`${fnTag}, Failed to get clientSatpStage3`);
           }
 
-          if (!counterGatewayID.pubKey) {
+          if (!counterGatewayID.identificationCredential) {
             throw new Error(`${fnTag}, Failed to retrieve serverGatewayPubkey`);
           }
 
-          sessionData.serverGatewayPubkey = counterGatewayID.pubKey;
+          sessionData.serverGatewayPubkey =
+            counterGatewayID.identificationCredential.pubKey;
 
           let newSessionRequest: NewSessionRequest | undefined;
           let newSessionResponse: NewSessionResponse | undefined;
