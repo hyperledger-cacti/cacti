@@ -1,5 +1,4 @@
 import {
-  GasTransactionConfig,
   type Web3SigningCredential,
   type Web3SigningCredentialCactiKeychainRef,
   type Web3SigningCredentialGethKeychainPassword,
@@ -7,14 +6,9 @@ import {
   type Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import {
-  type EthereumOptionsJSON,
-  isEthereumOptionsJSON,
-} from "./validate-ethereum-options";
+import { isEthereumOptionsJSON } from "./validate-ethereum-options";
 import { isClaimFormat } from "./validate-bungee-options";
-import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { NetworkId, NetworkOptionsJSON } from "../validate-cc-config";
-import { KeyPairJSON } from "../validate-key-pair-json";
+import { isGasConfig } from "../validate-cc-config";
 import { isNetworkId } from "../validate-satp-gateway-identity";
 import { Logger } from "@hyperledger/cactus-common";
 import {
@@ -22,17 +16,8 @@ import {
   identifyAndCheckConfigFormat,
 } from "../../../utils";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-
-export interface EthereumConfigJSON extends NetworkOptionsJSON {
-  signingCredential: Web3SigningCredential;
-  connectorOptions: EthereumOptionsJSON;
-  wrapperContractName?: string;
-  wrapperContractAddress?: string;
-  gasConfig?: GasTransactionConfig;
-  leafId?: string;
-  keyPair?: KeyPairJSON;
-  claimFormats?: ClaimFormat[];
-}
+import { IEthereumNetworkConfig } from "../../../../cross-chain-mechanisms/bridge/bridge-types";
+import { NetworkId } from "../../../../public-api";
 
 // Type guard for Web3SigningCredentialType
 export function isWeb3SigningCredentialType(
@@ -56,8 +41,8 @@ function isWeb3SigningCredentialCactiKeychainRef(
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "ethAccount" in obj &&
-    typeof objRecord.ethAccount === "string" &&
+    "transactionSignerEthAccount" in obj &&
+    typeof objRecord.transactionSignerEthAccount === "string" &&
     "keychainEntryKey" in obj &&
     typeof objRecord.keychainEntryKey === "string" &&
     (!("keychainId" in obj) || typeof objRecord.keychainId === "string") &&
@@ -74,8 +59,8 @@ function isWeb3SigningCredentialGethKeychainPassword(
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "ethAccount" in obj &&
-    typeof objRecord.ethAccount === "string" &&
+    "transactionSignerEthAccount" in obj &&
+    typeof objRecord.transactionSignerEthAccount === "string" &&
     "secret" in obj &&
     typeof objRecord.secret === "string" &&
     "type" in obj &&
@@ -91,8 +76,8 @@ function isWeb3SigningCredentialPrivateKeyHex(
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "ethAccount" in obj &&
-    typeof objRecord.ethAccount === "string" &&
+    "transactionSignerEthAccount" in obj &&
+    typeof objRecord.transactionSignerEthAccount === "string" &&
     "secret" in obj &&
     typeof objRecord.secret === "string" &&
     "type" in obj &&
@@ -130,30 +115,6 @@ function isWeb3SigningCredential(
   );
 }
 
-function isGasConfig(obj: unknown, log: Logger): obj is GasTransactionConfig {
-  if (!obj || typeof obj !== "object") {
-    log.error("isGasConfig: obj null or not obj");
-    throw new TypeError(
-      "isGasConfig: obj null or not obj" + JSON.stringify(obj),
-    );
-  }
-
-  const objRecord = obj as Record<string, unknown>;
-
-  return (
-    ("gas" in obj &&
-      typeof objRecord.gas === "string" &&
-      "gasPrice" in obj &&
-      typeof objRecord.gasPrice === "string") ||
-    ("gasLimit" in obj &&
-      typeof objRecord.gasLimit === "string" &&
-      "maxFeePerGas" in obj &&
-      typeof objRecord.maxFeePerGas === "string" &&
-      "maxPriorityFeePerGas" in obj &&
-      typeof objRecord.maxPriorityFeePerGas === "string")
-  );
-}
-
 export function isEthereumNetworkId(obj: NetworkId) {
   return (obj.ledgerType as LedgerType) === LedgerType.Ethereum;
 }
@@ -162,7 +123,7 @@ export function isEthereumNetworkId(obj: NetworkId) {
 export function isEthereumConfigJSON(
   obj: unknown,
   log: Logger,
-): obj is EthereumConfigJSON {
+): obj is IEthereumNetworkConfig {
   if (typeof obj !== "object" || obj === null) {
     log.error("isEthereumConfigJSON: obj is not an object or is null");
     return false;

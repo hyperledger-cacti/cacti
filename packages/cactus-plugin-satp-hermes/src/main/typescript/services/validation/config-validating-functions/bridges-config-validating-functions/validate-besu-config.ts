@@ -5,14 +5,8 @@ import {
   type Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import {
-  type BesuOptionsJSON,
-  isBesuOptionsJSON,
-} from "./validate-besu-options";
+import { isBesuOptionsJSON } from "./validate-besu-options";
 import { isClaimFormat } from "./validate-bungee-options";
-import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { KeyPairJSON } from "../validate-key-pair-json";
-import { NetworkId, NetworkOptionsJSON } from "../validate-cc-config";
 import { isNetworkId } from "../validate-satp-gateway-identity";
 import { Logger } from "@hyperledger/cactus-common";
 import {
@@ -20,16 +14,12 @@ import {
   identifyAndCheckConfigFormat,
 } from "../../../utils";
 import { LedgerType } from "@hyperledger/cactus-core-api";
+import { IBesuNetworkConfig } from "../../../../cross-chain-mechanisms/bridge/bridge-types";
+import { NetworkId } from "../../../../public-api";
+import { isGasConfig } from "../validate-cc-config";
 
-export interface BesuConfigJSON extends NetworkOptionsJSON {
-  signingCredential: Web3SigningCredential;
-  connectorOptions: BesuOptionsJSON;
-  leafId?: string;
-  keyPair?: KeyPairJSON;
-  claimFormats?: ClaimFormat[];
-  wrapperContractName?: string;
-  wrapperContractAddress?: string;
-  gas?: number;
+export interface BesuGasConfig {
+  gasLimit?: string;
 }
 
 // Type guard for Web3SigningCredentialType
@@ -53,8 +43,8 @@ function isWeb3SigningCredentialCactusKeychainRef(
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "ethAccount" in obj &&
-    typeof objRecord.ethAccount === "string" &&
+    "transactionSignerEthAccount" in obj &&
+    typeof objRecord.transactionSignerEthAccount === "string" &&
     "keychainEntryKey" in obj &&
     typeof objRecord.keychainEntryKey === "string" &&
     "keychainId" in obj &&
@@ -72,8 +62,8 @@ function isWeb3SigningCredentialPrivateKeyHex(
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "ethAccount" in obj &&
-    typeof objRecord.ethAccount === "string" &&
+    "transactionSignerEthAccount" in obj &&
+    typeof objRecord.transactionSignerEthAccount === "string" &&
     "secret" in obj &&
     typeof objRecord.secret === "string" &&
     "type" in obj &&
@@ -121,7 +111,7 @@ export function isBesuNetworkId(obj: NetworkId) {
 export function isBesuConfigJSON(
   obj: unknown,
   log: Logger,
-): obj is BesuConfigJSON {
+): obj is IBesuNetworkConfig {
   if (typeof obj !== "object" || obj === null) {
     log.error("isBesuConfigJSON: obj is not an object or is null");
     return false;
@@ -165,8 +155,8 @@ export function isBesuConfigJSON(
       configElementType: "string",
     },
     {
-      configElement: "gas",
-      configElementType: "number",
+      configElement: "gasConfig",
+      configElementTypeguard: isGasConfig,
     },
   ];
 

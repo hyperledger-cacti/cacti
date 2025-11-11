@@ -5,6 +5,7 @@ import {
   LocalLog,
   GatewayIdentity,
   Address,
+  SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
   pruneDockerAllIfGithubAction,
@@ -212,7 +213,10 @@ describe("Rollback Test stage 1", () => {
     const gatewayIdentity1: GatewayIdentity = {
       id: "mockID-1",
       name: "CustomGateway1",
-      pubKey: bufArray2HexStr(gateway1KeyPair.publicKey),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: bufArray2HexStr(gateway1KeyPair.publicKey),
+      },
       version: [
         {
           Core: "v02",
@@ -235,7 +239,10 @@ describe("Rollback Test stage 1", () => {
     const gatewayIdentity2: GatewayIdentity = {
       id: "mockID-2",
       name: "CustomGateway2",
-      pubKey: bufArray2HexStr(gateway2KeyPair.publicKey),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: bufArray2HexStr(gateway2KeyPair.publicKey),
+      },
       version: [
         {
           Core: "v02",

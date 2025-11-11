@@ -32,14 +32,14 @@ import {
   NetworkId,
 } from "../../../main/typescript";
 import { LedgerType } from "@hyperledger/cactus-core-api";
-import {
-  IEthereumLeafNeworkOptions,
-  IEthereumLeafOptions,
-} from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntologyERC20 from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
 import ExampleOntologyERC721 from "../../ontologies/ontology-satp-erc721-interact-ethereum.json";
-import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
+import {
+  IEthereumLeafOptions,
+  IEthereumNetworkConfig,
+  INetworkOptions,
+} from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 export interface IEthereumTestEnvironment {
   logLevel: LogLevelDesc;
@@ -93,7 +93,7 @@ export class EthereumTestEnvironment {
   >();
   public wrapperContractAddress!: string;
 
-  public ethereumConfig!: IEthereumLeafNeworkOptions;
+  public ethereumConfig!: IEthereumNetworkConfig;
   public gasConfig: GasTransactionConfig | undefined = {
     gas: "6721975",
     gasPrice: "20000000000",
