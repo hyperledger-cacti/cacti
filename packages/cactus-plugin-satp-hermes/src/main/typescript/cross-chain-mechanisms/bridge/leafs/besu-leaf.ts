@@ -1,10 +1,9 @@
-import { INetworkOptions, TransactionResponse } from "../bridge-types";
+import { IBesuLeafOptions, TransactionResponse } from "../bridge-types";
 import {
   EthContractInvocationType,
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
   RunTransactionResponse,
-  Web3SigningCredential,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
   Web3TransactionReceipt,
@@ -29,7 +28,6 @@ import { LedgerType } from "@hyperledger/cactus-core-api";
 import { BridgeLeafFungible } from "../bridge-leaf-fungible";
 import { BridgeLeafNonFungible } from "../bridge-leaf-non-fungible";
 import { BridgeLeaf } from "../bridge-leaf";
-import { IBridgeLeafOptions } from "../bridge-leaf";
 import { v4 as uuidv4 } from "uuid";
 import {
   NoSigningCredentialError,
@@ -59,21 +57,6 @@ import { getUint8Key } from "./leafs-utils";
 import { isWeb3SigningCredentialNone } from "../../common/utils";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
-
-export interface IBesuLeafNeworkOptions extends INetworkOptions {
-  signingCredential: Web3SigningCredential;
-  connectorOptions: Partial<IPluginLedgerConnectorBesuOptions>;
-  leafId?: string;
-  keyPair?: ISignerKeyPair;
-  claimFormats?: ClaimFormat[];
-  wrapperContractName?: string;
-  wrapperContractAddress?: string;
-  gas?: number;
-}
-
-export interface IBesuLeafOptions
-  extends IBridgeLeafOptions,
-    IBesuLeafNeworkOptions {}
 
 /**
  * Represents the response from an Besu transaction.
@@ -311,7 +294,14 @@ export class BesuLeaf
         "Invalid options provided to the BesuLeaf constructor. Please provide a valid IPluginLedgerConnectorBesuOptions object.",
       );
     }
-    this.gas = options.gas || 6000000; // Default gas limit optimized for Besu networks
+
+    if (options.gasConfig && "gas" in options.gasConfig) {
+      this.gas = Number(options.gasConfig?.gas);
+    } else if (options.gasConfig && "gasLimit" in options.gasConfig) {
+      this.gas = Number(options.gasConfig?.gasLimit);
+    } else {
+      this.gas = 6000000;
+    }
 
     this.connector = new PluginLedgerConnectorBesu(
       options.connectorOptions as IPluginLedgerConnectorBesuOptions,

@@ -11,7 +11,6 @@ import {
 } from "./validate-fabric-options";
 import { isClaimFormat } from "./validate-bungee-options";
 import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { NetworkId, NetworkOptionsJSON } from "../validate-cc-config";
 import { isNetworkId } from "../validate-satp-gateway-identity";
 import { isKeyPairJSON, KeyPairJSON } from "../validate-key-pair-json";
 import { X509Identity } from "fabric-network";
@@ -21,8 +20,10 @@ import {
   identifyAndCheckConfigFormat,
 } from "../../../utils";
 import { LedgerType } from "@hyperledger/cactus-core-api";
+import { INetworkOptions } from "../../../../cross-chain-mechanisms/bridge/bridge-types";
+import { NetworkId } from "../../../../public-api";
 
-export interface FabricConfigJSON extends NetworkOptionsJSON {
+export interface FabricConfigJSON extends INetworkOptions {
   userIdentity?: X509Identity;
   channelName: string;
   connectorOptions: Partial<FabricOptionsJSON>;

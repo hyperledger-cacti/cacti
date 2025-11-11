@@ -45,7 +45,10 @@
       "gatewayClientPort": 3011,
       "gatewayServerPort": 3010,
       "gatewayOapiPort": 4010,
-      "pubKey": "024c0cf54f92d23dbb3d409a8047aa2a44abcb911767d3516b19fd94c2358dec65"
+      "identificationCredentials": {
+        "signingAlgorithm": "SECP256K1",
+        "pubKey": "024c0cf54f92d23dbb3d409a8047aa2a44abcb911767d3516b19fd94c2358dec65"
+      }      
     }
   ],
   "environment": "development",
@@ -57,7 +60,7 @@
           "ledgerType": "ETHEREUM"
         },
         "signingCredential": {
-          "ethAccount": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "transactionSignerEthAccount": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
           "secret": "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
           "type": "PRIVATE_KEY_HEX"
         },

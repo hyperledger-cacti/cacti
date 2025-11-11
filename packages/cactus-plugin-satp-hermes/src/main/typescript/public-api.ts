@@ -84,19 +84,6 @@ export * from "./generated/gateway-client/typescript-axios";
 export { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
 
 /**
- * Besu Network Configuration - Ethereum-compatible blockchain integration options.
- *
- * @description
- * Configuration interface for connecting SATP gateways to Hyperledger Besu networks,
- * enabling cross-chain asset transfers between Ethereum-compatible blockchains and
- * other supported networks like Hyperledger Fabric.
- *
- * @see {@link INetworkOptions} for general network configuration interface
- * @see {@link SATPGateway} for gateway implementation supporting multiple DLTs
- */
-export { IBesuLeafNeworkOptions } from "./cross-chain-mechanisms/bridge/leafs/besu-leaf";
-
-/**
  * SATP Gateway Core Implementation - Main gateway class and configuration.
  *
  * @description
@@ -179,6 +166,19 @@ export {
   DEFAULT_PORT_GATEWAY_SERVER,
   DEFAULT_PORT_GATEWAY_OAPI,
 } from "./core/constants";
+
+/**
+ * Besu Network Configuration - Ethereum-compatible blockchain integration options.
+ *
+ * @description
+ * Configuration interface for connecting SATP gateways to Hyperledger Besu networks,
+ * enabling cross-chain asset transfers between Ethereum-compatible blockchains and
+ * other supported networks like Hyperledger Fabric.
+ *
+ * @see {@link INetworkOptions} for general network configuration interface
+ * @see {@link SATPGateway} for gateway implementation supporting multiple DLTs
+ */
+export { IBesuNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-types";
 
 /**
  * Gateway Identity Management - Gateway identification and network discovery.
