@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.2.0](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v2.2.0) (2025-11-12)
+
+**Note:** Version bump only for package @hyperledger/cactus-test-verifier-client
+
 # [2.1.0](https://github.com/hyperledger/cactus/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-test-verifier-client

@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cacti Plugin - Common Operator Primitives",
     "description": "Contains/describes the Hyperledger Cacti Common Operator Primitives plugin.  These primitives require specific chaincode and Weaver relays to be deployed on the network as described at https://hyperledger-cacti.github.io/cacti/weaver/introduction/.",
-    "version": "2.1.0",
+    "version": "2.2.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"

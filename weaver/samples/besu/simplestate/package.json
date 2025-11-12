@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-besu-simplestate",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Sample Besu Application for Storing Key Value Pairs",
   "keywords": [
     "Hyperledger",

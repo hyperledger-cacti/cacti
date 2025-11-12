@@ -1,6 +1,6 @@
 [package]
 name = "relay"
-version = "2.1.0"
+version = "2.2.0"
 authors = ["Antony Targett <atargett@au1.ibm.com>", "Nick Waywood <nwaywood@au1.ibm.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
 edition = "2021"
 
@@ -38,7 +38,7 @@ base64 = "0.20.0"
 reqwest = { version = "0.11.16", features = ["json"] }
 serde_json = "1.0.108"
 # cacti_weaver_protos_rs = { path = "./protos-rs" }
-cacti_weaver_protos_rs = "2.1.0"
+cacti_weaver_protos_rs = "2.2.0"
 colored = {version="2.0.4"}
 rusqlite = "0.29.0"
 chrono = "0.4"

@@ -5,7 +5,7 @@ info:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: 'Hyperledger Cactus Plugin - Object Store - IPFS '
-  version: 2.1.0
+  version: 2.2.0
 servers:
 - description: Public test instance
   url: "https://www.cactus.stream/{basePath}"
