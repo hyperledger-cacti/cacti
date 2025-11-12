@@ -65,6 +65,7 @@ done
 ## Update Cargo.lock in relay
 pushd $ROOT_DIR/weaver/core/relay > /dev/null
 make build-local
+make protos
 popd > /dev/null
 
 # Dependencies
