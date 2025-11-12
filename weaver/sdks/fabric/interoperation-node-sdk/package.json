@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-sdk-fabric",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Supplemental library to 'fabric-client' with functions for relay-based cross-network interactions",
   "keywords": [
     "Hyperledger",
@@ -59,7 +59,7 @@
   "dependencies": {
     "@grpc/grpc-js": "1.13.3",
     "@grpc/proto-loader": "0.7.13",
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger/cacti-weaver-protos-js": "2.2.0",
     "elliptic": "6.6.1",
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
