@@ -23,6 +23,26 @@ Hence the first step is to update (find and replace all) the document (no need t
 
 ### Do a find and replace all for the version: 1.1.3
 
+#### Single script
+
+* Make sure your clone has latest changes from `main` branch. (Make sure to not have any local changes.)
+```sh
+git pull origin main
+```
+
+* Run the release script with the version:
+```sh
+./tools/release.sh 1.1.3
+```
+This will update the versions, and create a release commit
+
+* Push the commit to github.
+```
+git push origin release-1.1.3
+```
+
+#### Manually
+
 ```sh
 git fetch --all
 git switch main
@@ -42,13 +62,14 @@ yarn build:dev
 
 - The `./tools/weaver-update-version.sh` automation script seems slightly buggy at the moment so you'll have to manually update `./weaver/core/relay/Cargo.toml` yourself. See this comment for an example: https://github.com/hyperledger-cacti/cacti/pull/3427#discussion_r1686850372
 
+### Points to Note:
 - Double check that all of the package dependencies were updated from the previous
 version to the new one because lerna usually fails to do that for `devDependency` parts
 of the package.json files so you have to do this manually with search and replace through
 the entire repository...
 
-The trick is to search for the previous release version within package.json 
-files or just search for "@hyperledger/cact*-*" within the package.json files. 
+* The trick is to search for the previous release version within package.json 
+files or just search for "@hyperledger/cact*-*" or "@hyperledger-cacti/cact*-*" within the package.json files. 
 
 With VSCode you can do a project wide search & replace where:
   1. Make sure that regex based replacing is enabled on the VSCode search UI (top right corner of the search panel)
