@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-ethereum",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Allows Cactus nodes to connect to a Ethereum ledger.",
   "keywords": [
     "Hyperledger",
@@ -67,9 +67,9 @@
   "dependencies": {
     "@ethereumjs/common": "4.0.0",
     "@ethereumjs/tx": "5.0.0",
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "ethers": "6.8.1",
     "express": "5.1.0",
@@ -86,9 +86,9 @@
     "web3-eth-contract": "4.2.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.2.0",
-    "@hyperledger/cactus-test-geth-ledger": "2.2.0",
-    "@hyperledger/cactus-test-tooling": "2.2.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger/cactus-test-geth-ledger": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.1",
     "@types/js-yaml": "4.0.5",

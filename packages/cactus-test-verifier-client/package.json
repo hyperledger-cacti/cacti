@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-verifier-client",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Integration and stress tests for the verifier client.",
   "keywords": [
     "Hyperledger",
@@ -46,13 +46,13 @@
     "stress-test-inspect": "node --expose-gc --inspect-brk --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.2.0",
-    "@hyperledger/cactus-test-geth-ledger": "2.2.0",
-    "@hyperledger/cactus-test-tooling": "2.2.0",
-    "@hyperledger/cactus-verifier-client": "2.2.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+    "@hyperledger/cactus-test-geth-ledger": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@hyperledger/cactus-verifier-client": "2.1.0",
     "body-parser": "1.20.3",
     "express": "5.1.0",
     "log4js": "6.4.1",

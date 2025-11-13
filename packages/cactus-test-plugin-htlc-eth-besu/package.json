@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-htlc-eth-besu",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Integration tests for the Besu ledger and the API server.",
   "keywords": [
     "Hyperledger",
@@ -50,14 +50,14 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "2.2.0",
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
-    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.2.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.2.0",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.2.0",
-    "@hyperledger/cactus-test-tooling": "2.2.0",
+    "@hyperledger/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
     "axios": "1.8.4",
     "key-encoder": "2.0.3",
     "web3": "1.6.1",

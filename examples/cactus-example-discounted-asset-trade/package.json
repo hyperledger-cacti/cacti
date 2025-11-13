@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-example-discounted-asset-trade",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Sample application presenting asset-trade between Ethereum and Fabric ledgers with discounts verified on Indy.",
   "keywords": [
     "Hyperledger",
@@ -34,14 +34,14 @@
     "start-dockerless": "node ./dist/www.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-common-example-server": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.2.0",
-    "@hyperledger/cactus-plugin-ledger-connector-aries": "2.2.0",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.2.0",
-    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.2.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-common-example-server": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-aries": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
     "@types/node": "18.11.9",
     "axios": "1.8.4",
     "body-parser": "1.20.3",

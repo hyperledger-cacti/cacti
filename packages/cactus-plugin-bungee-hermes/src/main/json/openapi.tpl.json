@@ -17,7 +17,7 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - BUNGEE-Hermes",
     "description": "Can create blockchain views of different networks",
-    "version": "2.2.0",
+    "version": "2.1.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"

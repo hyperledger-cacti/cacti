@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Keychain Memory WASM",
     "description": "Contains/describes the Hyperledger Cactus Keychain Memory WASM plugin which is designed to help with testing and development and is implemented in Rust instead of Typescript.",
-    "version": "2.2.0",
+    "version": "2.1.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"

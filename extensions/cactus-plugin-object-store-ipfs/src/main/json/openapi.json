@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Object Store - IPFS ",
     "description": "Contains/describes the Hyperledger Cactus Object Store IPFS plugin.",
-    "version": "2.2.0",
+    "version": "2.1.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"

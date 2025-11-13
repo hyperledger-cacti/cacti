@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-consortium-manual",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "A web service plugin that provides management capabilities on a Cactus consortium as a whole for administrative purposes.",
   "keywords": [
     "Hyperledger",
@@ -56,9 +56,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "body-parser": "1.20.3",
     "express": "5.1.0",
