@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/golang/protobuf v1.5.4
 	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20230907062207-cd6eb2f89fb4
-	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.2.0
+	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.1.0
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a
 	github.com/hyperledger/fabric-contract-api-go v1.2.1
 	github.com/hyperledger/fabric-protos-go v0.3.3
@@ -21,7 +21,7 @@ require (
 	github.com/gobuffalo/envy v1.10.1 // indirect
 	github.com/gobuffalo/packd v1.0.1 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.2.0 // indirect
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.1.0 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect

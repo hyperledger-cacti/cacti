@@ -54,7 +54,7 @@ jobs:
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
-          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false || echo no.version.found)
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false)
           LOCAL_VERSION=$(node -p "require('./package.json').version")
           if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
             echo "PROTOS_JS_PUBLISH=false" >> $GITHUB_ENV
@@ -101,7 +101,7 @@ jobs:
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
-          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false || echo no.version.found)
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false)
           LOCAL_VERSION=$(node -p "require('./package.json').version")
           if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
             echo "WEAVER_FABRIC_SDK_PUBLISH=false" >> $GITHUB_ENV
@@ -146,7 +146,7 @@ jobs:
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
-          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false || echo no.version.found)
+          PUBLISHED_VERSION=$(npm view $PKG_NAME version --workspaces=false)
           LOCAL_VERSION=$(node -p "require('./package.json').version")
           if [[ "$PUBLISHED_VERSION" == "$LOCAL_VERSION" ]]; then
             echo "WEAVER_BESU_SDK_PUBLISH=false" >> $GITHUB_ENV

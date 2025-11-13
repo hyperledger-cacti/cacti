@@ -536,7 +536,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-relay-server
-  DOCKER_TAG=2.2.0
+  DOCKER_TAG=2.1.0
   ```
     - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
     - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
@@ -630,7 +630,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   EXTERNAL_NETWORK=<docker-bridge-network>
   TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-driver-fabric
-  DOCKER_TAG=2.2.0
+  DOCKER_TAG=2.1.0
   DRIVER_TLS=<true|false>
   DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
   DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver

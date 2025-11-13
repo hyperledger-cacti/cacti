@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-memory-wasm",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing. Same as the non-wasm version but this one has the backing implementation written in Rust and compiled down to WebAssembly.",
   "keywords": [
     "Hyperledger",
@@ -61,9 +61,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "express": "5.1.0",
     "prom-client": "15.1.3",

@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cacti-weaver-iin-agent",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Implementation of Weaver IIN agent.",
   "keywords": [
     "Hyperledger",
@@ -35,8 +35,8 @@
   "dependencies": {
     "@fidm/x509": "1.2.1",
     "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cacti-weaver-protos-js": "2.2.0",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.2.0",
+    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
     "dotenv": "8.6.0",
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",

@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-plugin-ledger-connector-cdl",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Allows Cacti nodes to connect to Fujitsu CDL.",
   "keywords": [
     "Hyperledger",
@@ -54,9 +54,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "sanitize-html": "2.12.1"
   },
