@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger/cactus-test-plugin-ledger-connector-ethereum",
-  "version": "2.2.0",
+  "version": "2.1.0",
   "description": "Integration tests for the Ethereum ledger and the API server.",
   "keywords": [
     "Hyperledger",
@@ -50,18 +50,18 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "2.2.0",
-    "@hyperledger/cactus-common": "2.2.0",
-    "@hyperledger/cactus-core": "2.2.0",
-    "@hyperledger/cactus-core-api": "2.2.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.2.0",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.2.0",
-    "@hyperledger/cactus-verifier-client": "2.2.0",
+    "@hyperledger/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger/cactus-core": "2.1.0",
+    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+    "@hyperledger/cactus-verifier-client": "2.1.0",
     "web3-eth-contract": "4.2.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-test-geth-ledger": "2.2.0",
-    "@hyperledger/cactus-test-tooling": "2.2.0",
+    "@hyperledger/cactus-test-geth-ledger": "2.1.0",
+    "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/lodash": "4.14.195",
     "@types/uuid": "10.0.0",
     "lodash": "4.17.21",

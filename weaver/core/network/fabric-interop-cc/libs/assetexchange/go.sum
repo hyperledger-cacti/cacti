@@ -157,5 +157,3 @@ gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.2.8 h1:obN1ZagJSUGI0Ek/LBmuj4SNLPfIny3KsKFopxRdj10=
 gopkg.in/yaml.v2 v2.2.8/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 honnef.co/go/tools v0.0.0-20190523083050-ea95bdfd59fc/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.2.0 h1:Fg8t19ig76+r108919rmNvci/Obss8Itp+RB9RG2wS0=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.2.0/go.mod h1:lW+4H8ZBFjihBQnIiejL8V4+ove47CUJ7GOgqDGbO2A=

@@ -140,7 +140,3 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.2.0 h1:Fg8t19ig76+r108919rmNvci/Obss8Itp+RB9RG2wS0=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.2.0/go.mod h1:lW+4H8ZBFjihBQnIiejL8V4+ove47CUJ7GOgqDGbO2A=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.2.0 h1:gD3ExVYO+r8OE67ckQae6YoC4bAnn70UCfYLAiRnUUU=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.2.0/go.mod h1:AdLXojaMZHORe2BU4v1NCPac484gfxfSBaUmuMfF5uY=

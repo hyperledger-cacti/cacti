@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Persistence Fabric",
     "description": "Synchronizes state of an fabric ledger into a DB that can later be viewed in GUI",
-    "version": "2.2.0",
+    "version": "2.1.0",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
