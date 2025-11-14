@@ -5,17 +5,13 @@ Maintainers
 
 | Name | GitHub | Chat |
 |------|--------|------|
-| Izuru Sato | [izuru0][izuru0] | izurusato |
-| Michal Bajer | [outSH][outSH] | - |
-| Takuma TAKEUCHI | [takeutak][takeutak] | takeutak |
+| Michal Bajer | [outSH][outSH] | bajerm |
 | Venkatraman Ramakrishna | [VRamakrishna][VRamakrishna] | vramaiitkgp |
 | Sandeep Nishad | [sandeepnRES][sandeepnRES] | sandeepn |
 | Rafael Belchior | [RafaelAPB][RafaelAPB] | rafaelapb |
 | André Augusto | [AndreAugusto11][AndreAugusto11] | andreaugusto |
 
-[izuru0]: https://github.com/izuru0
 [outSH]: https://github.com/outSH
-[takeutak]: https://github.com/takeutak
 [VRamakrishna]: https://github.com/VRamakrishna
 [sandeepnRES]: https://github.com/sandeepnRES
 [RafaelAPB]: https://github.com/RafaelAPB
@@ -30,12 +26,17 @@ Maintainers
 | Dhinakaran Vinayagamurthy | [dhinakaran2705][dhinakaran2705] | Dhinakaran |
 | Jagpreet Singh Sasan | [jagpreetsinghsasan][jagpreetsinghsasan] | jagpreetsinghsasan |
 | Peter Somogyvari | [petermetz][petermetz] | peter_somogyvari |
+| Takuma TAKEUCHI | [takeutak][takeutak] | takeutak |
+| Izuru Sato | [izuru0][izuru0] | izurusato |
+
 
 [jonathan-m-hamilton]: https://github.com/jonathan-m-hamilton
 [knarayan]: https://github.com/knarayan
 [dhinakaran2705]: https://github.com/dhinakaran2705
 [jagpreetsinghsasan]: https://github.com/jagpreetsinghsasan
 [petermetz]: https://github.com/petermetz
+[takeutak]: https://github.com/takeutak
+[izuru0]: https://github.com/izuru0
 
 Below is a list of former contributors to the [Weaver Lab](https://github.com/hyperledger-labs/weaver-dlt-interoperability) project, which is now a part of Cacti.
 
