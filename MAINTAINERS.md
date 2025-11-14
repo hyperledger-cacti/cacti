@@ -10,12 +10,14 @@ Maintainers
 | Sandeep Nishad | [sandeepnRES][sandeepnRES] | sandeepn |
 | Rafael Belchior | [RafaelAPB][RafaelAPB] | rafaelapb |
 | André Augusto | [AndreAugusto11][AndreAugusto11] | andreaugusto |
+| Carlos Amaro | [LordKubaya][LordKubaya] | kubaya |
 
 [outSH]: https://github.com/outSH
 [VRamakrishna]: https://github.com/VRamakrishna
 [sandeepnRES]: https://github.com/sandeepnRES
 [RafaelAPB]: https://github.com/RafaelAPB
 [AndreAugusto11]: https://github.com/AndreAugusto11
+[LordKubaya]: https://github.com/LordKubaya
 
 **Emeritus Maintainers**
 
