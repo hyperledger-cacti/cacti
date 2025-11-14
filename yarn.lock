@@ -7912,7 +7912,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     typescript: "npm:5.6.2"
     uuid: "npm:10.0.0"
-    webpack: "npm:5.94.0"
+    webpack: "npm:5.95.0"
     webpack-cli: "npm:5.1.4"
     webpack-dev-server: "npm:5.1.0"
   languageName: unknown
@@ -7943,7 +7943,7 @@ __metadata:
     react-dom: "npm:18.2.0"
     react-router-dom: "npm:6.21.3"
     typescript: "npm:5.5.2"
-    vite: "npm:6.2.6"
+    vite: "npm:7.1.11"
     web3: "npm:4.1.1"
   languageName: unknown
   linkType: soft
@@ -8631,7 +8631,7 @@ __metadata:
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
-    webpack: "npm:5.94.0"
+    webpack: "npm:5.95.0"
   languageName: unknown
   linkType: soft
 
@@ -10126,7 +10126,7 @@ __metadata:
     web3-core: "npm:4.1.1"
     web3-eth: "npm:4.1.1"
     web3-utils: "npm:4.3.0"
-    webpack: "npm:5.99.3"
+    webpack: "npm:5.95.0"
     webpack-cli: "npm:4.10.0"
     wget-improved: "npm:3.4.0"
     yargs: "npm:17.7.2"
@@ -53609,8 +53609,8 @@ __metadata:
   linkType: hard
 
 "vite@npm:>4.5.1":
-  version: 7.1.5
-  resolution: "vite@npm:7.1.5"
+  version: 7.2.2
+  resolution: "vite@npm:7.2.2"
   dependencies:
     esbuild: "npm:^0.25.0"
     fdir: "npm:^6.5.0"
@@ -53659,7 +53659,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10/59edeef7e98757a668b2ad8a1731a5657fa83e22a165a36b7359225ea98a9be39b2f486710c0cf5085edb85daee7c8b6b6b0bd85d0ef32a1aa84aef71aabd0f0
+  checksum: 10/aee08b420646d5bcd92d5f4130b13b90303cab1cf48ee4772030f5fa7b464cc602ba578e9b1800a71f9b1c9b8daf1336e8c069a4cf1bb90b7b05ae5b13f62b06
   languageName: node
   linkType: hard
 
@@ -56126,17 +56126,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:5.99.3":
-  version: 5.99.3
-  resolution: "webpack@npm:5.99.3"
+"webpack@npm:5.95.0":
+  version: 5.95.0
+  resolution: "webpack@npm:5.95.0"
   dependencies:
-    "@types/eslint-scope": "npm:^3.7.7"
-    "@types/estree": "npm:^1.0.6"
-    "@webassemblyjs/ast": "npm:^1.14.1"
-    "@webassemblyjs/wasm-edit": "npm:^1.14.1"
-    "@webassemblyjs/wasm-parser": "npm:^1.14.1"
-    acorn: "npm:^8.14.0"
-    browserslist: "npm:^4.24.0"
+    "@types/estree": "npm:^1.0.5"
+    "@webassemblyjs/ast": "npm:^1.12.1"
+    "@webassemblyjs/wasm-edit": "npm:^1.12.1"
+    "@webassemblyjs/wasm-parser": "npm:^1.12.1"
+    acorn: "npm:^8.7.1"
+    acorn-import-attributes: "npm:^1.9.5"
+    browserslist: "npm:^4.21.10"
     chrome-trace-event: "npm:^1.0.2"
     enhanced-resolve: "npm:^5.17.1"
     es-module-lexer: "npm:^1.2.1"
@@ -56148,9 +56148,9 @@ __metadata:
     loader-runner: "npm:^4.2.0"
     mime-types: "npm:^2.1.27"
     neo-async: "npm:^2.6.2"
-    schema-utils: "npm:^4.3.0"
+    schema-utils: "npm:^3.2.0"
     tapable: "npm:^2.1.1"
-    terser-webpack-plugin: "npm:^5.3.11"
+    terser-webpack-plugin: "npm:^5.3.10"
     watchpack: "npm:^2.4.1"
     webpack-sources: "npm:^3.2.3"
   peerDependenciesMeta:
@@ -56158,7 +56158,7 @@ __metadata:
       optional: true
   bin:
     webpack: bin/webpack.js
-  checksum: 10/07fb3e9b0fe1b3858945b62eac7aac75013f8486709a71dd97cdd4d299f47a372365be6ccbaf8af632c4bf9d8b3cc1ad96e0c8866f7f1c38af590cdf1f5b67a1
+  checksum: 10/0377ad3a550b041f26237c96fb55754625b0ce6bae83c1c2447e3262ad056b0b0ad770dcbb92b59f188e9a2bd56155ce910add17dcf023cfbe78bdec774380c1
   languageName: node
   linkType: hard
 
