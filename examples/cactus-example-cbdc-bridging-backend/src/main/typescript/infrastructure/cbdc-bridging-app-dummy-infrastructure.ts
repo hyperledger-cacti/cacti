@@ -312,7 +312,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       enableCrashRecovery: false,
       keyPair: {
         publicKey: Buffer.from(besuGatewayKeyPair.publicKey).toString("hex"),
-        privateKey: Buffer.from(besuGatewayKeyPair.privateKey).toString("hex"),
+        privateKey: besuGatewayKeyPair.privateKey.toString("hex"),
       },
       ontologyPath: "/opt/cacti/satp-hermes/ontologies",
     };
@@ -340,9 +340,7 @@ export class CbdcBridgingAppDummyInfrastructure {
       enableCrashRecovery: false,
       keyPair: {
         publicKey: Buffer.from(fabricGatewayKeyPair.publicKey).toString("hex"),
-        privateKey: Buffer.from(fabricGatewayKeyPair.privateKey).toString(
-          "hex",
-        ),
+        privateKey: fabricGatewayKeyPair.privateKey.toString("hex"),
       },
       ontologyPath: "/opt/cacti/satp-hermes/ontologies",
     };
@@ -641,39 +639,50 @@ export class CbdcBridgingAppDummyInfrastructure {
     this.log.debug(
       `Bridging tokens from ${sourceChain} to ${destinationChain}`,
     );
-    let senderAddress;
-    let receiverAddress;
     let sourceAsset;
     let receiverAsset;
 
     let api;
 
     if (sourceChain === "FABRIC") {
-      senderAddress = this.fabricEnvironment.getFabricId(sender);
+      const fabricSenderAddress = this.fabricEnvironment.getFabricId(sender);
+      if (!fabricSenderAddress) {
+        throw new Error(`Fabric sender address not found for ${sender}`);
+      }
       sourceAsset = this.fabricEnvironment.getFabricAsset(
-        senderAddress as string,
+        fabricSenderAddress,
         amount.toString(),
       );
       api = this.fabricGatewayTransactApi;
     } else {
-      senderAddress = this.besuEnvironment.getEthAddress(sender);
+      const besuSenderAddress = this.besuEnvironment.getEthAddress(sender);
+      if (!besuSenderAddress) {
+        throw new Error(`Besu sender address not found for ${sender}`);
+      }
       sourceAsset = this.besuEnvironment.getBesuAsset(
-        senderAddress as string,
+        besuSenderAddress,
         amount.toString(),
       );
       api = this.besuGatewayTransactApi;
     }
 
     if (destinationChain === "BESU") {
-      receiverAddress = this.besuEnvironment.getEthAddress(recipient);
+      const besuReceiverAddress = this.besuEnvironment.getEthAddress(recipient);
+      if (!besuReceiverAddress) {
+        throw new Error(`Besu recipient address not found for ${recipient}`);
+      }
       receiverAsset = this.besuEnvironment.getBesuAsset(
-        receiverAddress as string,
+        besuReceiverAddress,
         amount.toString(),
       );
     } else {
-      receiverAddress = this.fabricEnvironment.getFabricId(recipient);
+      const fabricReceiverAddress =
+        this.fabricEnvironment.getFabricId(recipient);
+      if (!fabricReceiverAddress) {
+        throw new Error(`Fabric recipient address not found for ${recipient}`);
+      }
       receiverAsset = this.fabricEnvironment.getFabricAsset(
-        receiverAddress as string,
+        fabricReceiverAddress,
         amount.toString(),
       );
     }

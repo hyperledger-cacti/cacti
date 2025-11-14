@@ -1,0 +1,67 @@
+{
+  "gid": {
+    "id": "mockID",
+    "name": "CustomGateway",
+    "version": [
+      {
+        "Core": "v02",
+        "Architecture": "v02",
+        "Crash": "v02"
+      }
+    ],
+    "proofID": "mockProofID10",
+    "address": "http://gateway.satp-hermes",
+    "gatewayClientPort": 3011,
+    "gatewayServerPort": 3010,
+    "gatewayOapiPort": 4010
+  },
+  "logLevel": "TRACE",
+  "counterPartyGateways": [],
+  "environment": "development",
+  "ccConfig": {
+    "oracleConfig": [
+      {
+        "networkIdentification": {
+          "id": "HardhatTestNetwork1",
+          "ledgerType": "ETHEREUM"
+        },
+        "signingCredential": {
+          "ethAccount": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+          "secret": "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+          "type": "PRIVATE_KEY_HEX"
+        },
+        "gasConfig": {
+          "gas": "6721975",
+          "gasPrice": "20000000000"
+        },
+        "connectorOptions": {
+          "rpcApiWsHost": "ws://host.docker.internal:8545"
+        },
+        "claimFormats": [
+          2
+        ]
+      },
+      {
+        "networkIdentification": {
+          "id": "HardhatTestNetwork2",
+          "ledgerType": "ETHEREUM"
+        },
+        "signingCredential": {
+          "ethAccount": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+          "secret": "0x47e179ec197488593b187f80a00eb0da91f1b9d0b13f8733639f19c30a34926a",
+          "type": "PRIVATE_KEY_HEX"
+        },
+        "gasConfig": {
+          "gas": "6721975",
+          "gasPrice": "20000000000"
+        },
+        "connectorOptions": {
+          "rpcApiHttpHost": "http://host.docker.internal:8546"
+        },
+        "claimFormats": [
+          2
+        ]
+      }
+    ]
+  }
+}

@@ -20,7 +20,7 @@ import {
 import { v4 as uuidv4 } from "uuid";
 import { SATP_VERSION } from "../../../../main/typescript/core/constants";
 import { SATPSession } from "../../../../main/typescript/core/satp-session";
-import { getSatpLogKey } from "../../../../main/typescript/gateway-utils";
+import { getSatpLogKey } from "../../../../main/typescript/utils/gateway-utils";
 import {
   SATPGatewayConfig,
   PluginFactorySATPGateway,
@@ -31,7 +31,7 @@ import {
   LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
-import { bufArray2HexStr } from "../../../../main/typescript/gateway-utils";
+import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import { Knex, knex } from "knex";

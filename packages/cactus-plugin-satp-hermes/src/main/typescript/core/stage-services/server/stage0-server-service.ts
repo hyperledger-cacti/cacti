@@ -1,9 +1,54 @@
+/**
+ * @fileoverview
+ * SATP Stage 0 Server Service - Transfer Initiation and Session Management
+ *
+ * @description
+ * This module implements the server-side business logic for SATP (Secure Asset Transfer Protocol)
+ * Stage 0, which handles incoming transfer requests, session creation, and asset validation
+ * on the recipient gateway. Stage 0 server operations establish the foundation for cross-chain
+ * asset transfers by validating requests and preparing the destination environment.
+ *
+ * **Stage 0 Server Responsibilities:**
+ * - **Session Management**: Processes new session requests and creates transfer sessions
+ * - **Request Validation**: Validates incoming transfer requests and asset parameters
+ * - **Asset Verification**: Verifies asset properties and transfer eligibility
+ * - **Response Generation**: Creates appropriate responses to client requests
+ * - **State Management**: Maintains server-side session state and transfer context
+ *
+ * **Server-Side Operations:**
+ * - **NewSessionResponse**: Responds to client session initiation requests
+ * - **Request Processing**: Processes and validates PreSATPTransferRequest messages
+ * - **Asset Validation**: Validates recipient assets and destination parameters
+ * - **Proof Verification**: Verifies cryptographic proofs from client gateways
+ * - **Error Handling**: Manages error conditions and recovery procedures
+ *
+ * **Integration Architecture:**
+ * - **Bridge Integration**: Interfaces with destination blockchain bridge mechanisms
+ * - **Asset Management**: Handles recipient asset creation and management
+ * - **Cryptographic Services**: Manages signature verification and proof validation
+ * - **Database Persistence**: Stores session data, proofs, and audit information
+ * - **Monitoring Integration**: Provides comprehensive logging and metrics collection
+ *
+ * **Protocol Compliance:**
+ * This implementation follows the IETF SATP Core v2 specification for Stage 0
+ * server operations, ensuring interoperability and standards compliance across
+ * different SATP gateway implementations and blockchain networks.
+ *
+ * @author SATP Development Team
+ * @since 0.0.3-beta
+ * @version 0.0.3-beta
+ * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
+ * @see {@link SATPService} Base service class
+ * @see {@link SATPSession} Session management interface
+ * @see {@link BridgeManagerClientInterface} Bridge integration interface
+ */
+
 import {
   bufArray2HexStr,
   getHash,
   sign,
   verifySignature,
-} from "../../../gateway-utils";
+} from "../../../utils/gateway-utils";
 import {
   ClaimFormat,
   MessageType,
@@ -57,18 +102,54 @@ import { type BridgeManagerClientInterface } from "../../../cross-chain-mechanis
 import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { buildAndCheckAsset, SessionSide } from "../../satp-utils";
+/**
+ * SATP Stage 0 Server Service implementation for transfer request processing and session management.
+ *
+ * @description
+ * Implements server-side business logic for SATP Stage 0 operations, handling incoming
+ * transfer requests, session creation, and asset validation on the recipient gateway.
+ * This service processes client requests and establishes the foundation for secure
+ * cross-chain asset transfers.
+ *
+ * **Key Server Capabilities:**
+ * - **Request Processing**: Handles NewSessionRequest and PreSATPTransferRequest messages
+ * - **Session Creation**: Creates and manages SATP transfer sessions on server side
+ * - **Asset Validation**: Validates recipient assets and destination parameters
+ * - **Response Generation**: Creates appropriate Protocol Buffer responses
+ * - **Bridge Coordination**: Coordinates with destination blockchain bridge mechanisms
+ * - **Security Verification**: Validates cryptographic signatures and proofs
+ *
+ * **Stage 0 Server Protocol Flow:**
+ * 1. **NewSessionRequest Processing**: Validates and responds to session creation requests
+ * 2. **PreSATPTransferRequest Handling**: Processes transfer preparation requests
+ * 3. **Asset Validation**: Verifies recipient asset properties and eligibility
+ * 4. **Response Generation**: Creates signed responses with session parameters
+ * 5. **State Persistence**: Stores session data and transfer context
+ *
+ * @public
+ * @class Stage0ServerService
+ * @extends {SATPService}
+ * @since 0.0.3-beta
+ * @see {@link SATPService} for base service functionality
+ * @see {@link BridgeManagerClientInterface} for bridge integration
+ * @see {@link SATPSession} for session management
+ */
 export class Stage0ServerService extends SATPService {
+  /** SATP protocol stage identifier */
   public static readonly SATP_STAGE = "0";
+  /** Service type designation */
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
+  /** Internal service name for identification */
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
+  /** Cross-chain bridge manager interface for destination bridge operations */
   private bridgeManager: BridgeManagerClientInterface;
 
+  /** Asset claim format specification for proof verification */
   private claimFormat: ClaimFormat;
 
   constructor(ops: ISATPServerServiceOptions) {
     // for now stage1serverservice does not have any different options than the SATPService class
-
     const commonOptions: ISATPServiceOptions = {
       stage: Stage0ServerService.SATP_STAGE,
       loggerOptions: ops.loggerOptions,
@@ -88,7 +169,23 @@ export class Stage0ServerService extends SATPService {
     this.claimFormat = ops.claimFormat || ClaimFormat.DEFAULT;
     this.bridgeManager = ops.bridgeManager;
   }
-
+  /**
+   * Validates an incoming NEW_SESSION_REQUEST and initializes server session data.
+   *
+   * @description
+   * Verifies message type, client signature, session id, and creates or updates the
+   * server-side session. Persists signature/hash/timestamp and returns a session
+   * instance with server session data established.
+   *
+   * @param request - Incoming session creation request
+   * @param session - Optional existing session reference to reuse
+   * @param clientPubKey - Client gateway public key for signature verification
+   * @returns Active server-side SATPSession
+   * @throws {SignatureMissingError} If client signature missing
+   * @throws {SessionIdError} If session id missing
+   * @throws {MessageTypeError} If wrong message type
+   * @throws {SignatureVerificationError} If signature verification fails
+   */
   public async checkNewSessionRequest(
     request: NewSessionRequest,
     session: SATPSession | undefined,
@@ -186,6 +283,20 @@ export class Stage0ServerService extends SATPService {
     });
   }
 
+  /**
+   * Validates PRE_SATP_TRANSFER_REQUEST consistency against server session state.
+   *
+   * @description
+   * Ensures session id, previous hash, signature, sender/receiver assets and optional
+   * fields are correct. Updates server session data with request details including
+   * receiver asset token id generation.
+   *
+   * @param request - Incoming pre-transfer request
+   * @param session - Active server session
+   * @throws {SessionError} If session undefined
+   * @throws {MessageTypeError} If wrong message type
+   * @throws {Error} For missing mandatory fields or invalid signature/hash
+   */
   public async checkPreSATPTransferRequest(
     request: PreSATPTransferRequest,
     session: SATPSession,
@@ -331,7 +442,7 @@ export class Stage0ServerService extends SATPService {
         const sessionData = session.getServerSessionData();
 
         await this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: messageType,
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -340,7 +451,7 @@ export class Stage0ServerService extends SATPService {
         try {
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -387,7 +498,7 @@ export class Stage0ServerService extends SATPService {
           );
 
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "done",
             data: safeStableStringify(sessionData),
@@ -400,7 +511,7 @@ export class Stage0ServerService extends SATPService {
         } catch (error) {
           this.Log.error(`fail-${messageType}`, error);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "fail",
             data: safeStableStringify(sessionData),
@@ -510,7 +621,7 @@ export class Stage0ServerService extends SATPService {
         const sessionData = session.getServerSessionData();
 
         await this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: messageType,
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -520,7 +631,7 @@ export class Stage0ServerService extends SATPService {
         try {
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -588,7 +699,7 @@ export class Stage0ServerService extends SATPService {
           );
 
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "done",
             data: safeStableStringify(sessionData),
@@ -601,7 +712,7 @@ export class Stage0ServerService extends SATPService {
         } catch (error) {
           this.Log.error(`fail-${messageType}`, error);
           await this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: messageType,
             operation: "fail",
             data: safeStableStringify(sessionData),
@@ -632,7 +743,7 @@ export class Stage0ServerService extends SATPService {
 
         const sessionData = session.getServerSessionData();
         this.dbLogger.persistLogEntry({
-          sessionID: sessionData.id,
+          sessionId: sessionData.id,
           type: "wrap-token-server",
           operation: "init",
           data: safeStableStringify(sessionData),
@@ -641,7 +752,7 @@ export class Stage0ServerService extends SATPService {
         try {
           this.Log.info(`exec-${stepTag}`);
           this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "wrap-token-server",
             operation: "exec",
             data: safeStableStringify(sessionData),
@@ -682,7 +793,7 @@ export class Stage0ServerService extends SATPService {
           );
 
           this.dbLogger.storeProof({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "wrap-token-server",
             operation: "done",
             data: safeStableStringify(
@@ -695,7 +806,7 @@ export class Stage0ServerService extends SATPService {
           this.Log.debug(`Crash in ${fnTag}`, error);
 
           this.dbLogger.persistLogEntry({
-            sessionID: sessionData.id,
+            sessionId: sessionData.id,
             type: "wrap-token-server",
             operation: "fail",
             data: safeStableStringify(sessionData),

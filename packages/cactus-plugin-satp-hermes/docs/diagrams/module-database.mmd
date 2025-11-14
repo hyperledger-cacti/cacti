@@ -1,0 +1,69 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%
+graph TB
+    subgraph Database["💾 Database & Persistence Module"]
+        direction TB
+        
+        GatewayPersistence["<b>Gateway Persistence</b><br/>gateway-persistence.ts<br/>Unified logging interface<br/>Dual repository pattern<br/>Audit trail coordination"]
+        
+        subgraph Repositories["📚 Repository Layer"]
+            LocalRepo["<b>Local Repository</b><br/>repository/<br/>SQLite/PostgreSQL<br/>Transaction logging<br/>Session state<br/>Query interface"]
+            
+            RemoteRepo["<b>Remote Repository</b><br/>repository/<br/>IPFS/Distributed storage<br/>Immutable proofs<br/>Content addressing<br/>Cryptographic hashes"]
+            
+            RepoInterfaces["<b>Repository Interfaces</b><br/>interfaces/<br/>IRepository<br/>ILocalLog<br/>IRemoteLog<br/>Common contracts"]
+        end
+        
+        subgraph DataLayer["🗄️ Data Management"]
+            DataModels["<b>Data Models</b><br/>data/<br/>Session schema<br/>Log entry structure<br/>State definitions"]
+            
+            Migrations["<b>Migrations</b><br/>migrations/<br/>Schema versioning<br/>Database evolution<br/>Rollback scripts"]
+            
+            Seeds["<b>Seed Data</b><br/>seeds/<br/>Initial data<br/>Test fixtures<br/>Development setup"]
+        end
+        
+        subgraph KnexConfig["⚙️ Knex Configuration"]
+            KnexSetup["<b>Knex Setup</b><br/>knex/<br/>Connection pooling<br/>Query builder<br/>Transaction management<br/>Multi-DB support"]
+        end
+        
+        SQLite["<b>SQLite Files</b><br/>.dev.local-*.sqlite3<br/>Development databases<br/>Per-session storage<br/>Lightweight persistence"]
+    end
+    
+    %% Relationships
+    GatewayPersistence -->|writes to| LocalRepo
+    GatewayPersistence -->|replicates to| RemoteRepo
+    
+    LocalRepo -->|implements| RepoInterfaces
+    RemoteRepo -->|implements| RepoInterfaces
+    
+    LocalRepo -->|uses| DataModels
+    RemoteRepo -->|uses| DataModels
+    
+    LocalRepo -->|configured by| KnexSetup
+    LocalRepo -->|applies| Migrations
+    LocalRepo -->|loads| Seeds
+    
+    KnexSetup -->|creates| SQLite
+    Migrations -->|modifies| SQLite
+    Seeds -->|populates| SQLite
+    
+    %% External connections
+    GatewayPersistence -.->|called by| CoreModule["Core Module<br/>Stage Handlers"]
+    GatewayPersistence -.->|called by| ServicesModule["Services Module<br/>SATP Manager"]
+    GatewayPersistence -.->|called by| APIModule["API Module<br/>Admin Endpoints"]
+    LocalRepo -.->|queried by| CrashRecovery["Crash Recovery<br/>(Core Module)"]
+    RemoteRepo -.->|provides proofs to| Counterparty["Counterparty<br/>Gateway"]
+    
+    %% Styling
+    classDef persistenceClass fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10
+    classDef repoClass fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef dataClass fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef configClass fill:#bbf7d0,stroke:#86efac,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef storageClass fill:#dcfce7,stroke:#bbf7d0,stroke-width:4px,color:#065f46,rx:10,ry:10
+    classDef externalClass fill:#f0fdf4,stroke:#86efac,stroke-width:2px,stroke-dasharray: 5 5,color:#065f46,rx:10,ry:10
+    
+    class GatewayPersistence persistenceClass
+    class LocalRepo,RemoteRepo,RepoInterfaces repoClass
+    class DataModels,Migrations,Seeds dataClass
+    class KnexSetup configClass
+    class SQLite storageClass
+    class CoreModule,ServicesModule,APIModule,CrashRecovery,Counterparty externalClass
