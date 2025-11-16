@@ -37,6 +37,12 @@ tags:
     description: API endpoints for interacting with blockchains via gateways
   - name: admin
     description: API endpoints for fetching information on SATP sessions
+  - name: get-approve-address
+    description: API endpoint for getting approve address for token transfer
+  - name: add-counterparty
+    description: API endpoint for adding a counterparty to the gateway
+  - name: oracle
+    description: API endpoints for oracle tasks management
 paths:
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact:
     post:
@@ -50,6 +56,7 @@ paths:
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transact
       requestBody:
+        description: Transact request object.
         required: true
         content:
           application/json:
@@ -80,6 +87,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel
       requestBody:
+        description: Cancel request object.
         content:
           application/json:
             schema:
@@ -142,6 +150,7 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids
       parameters:
         - name: SessionsRequest
+          description: Request object for fetching session IDs.
           in: query
           schema:
             $ref: ./schemas.yml#/AllSessionIdsRequest
@@ -190,6 +199,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue
       requestBody:
+        description: Continue request object.
         content:
           application/json:
             schema:
@@ -220,6 +230,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause
       requestBody:
+        description: Pause request object.
         content:
           application/json:
             schema:
@@ -377,11 +388,13 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address
       parameters:
         - name: networkId
+          description: The network of the DLT being interacted with.
           in: query
           schema:
             $ref: '#/components/schemas/NetworkId'
           required: true
         - name: tokenType
+          description: The type of token being transferred.
           in: query
           schema:
             $ref: '#/components/schemas/TokenType'
@@ -411,6 +424,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
       requestBody:
+        description: Add counterparty request object.
         required: true
         content:
           application/json:
@@ -442,6 +456,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute
       requestBody:
+        description: Execute request object.
         required: true
         content:
           application/json:
@@ -473,6 +488,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
       requestBody:
+        description: Register request object.
         required: true
         content:
           application/json:
