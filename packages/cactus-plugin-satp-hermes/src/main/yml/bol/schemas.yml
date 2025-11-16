@@ -1,4 +1,5 @@
 AuthzScope:
+  description: "Stores global constants related to the authorization of the application. Specifically enumerates the scopes to validate for."
   type: string
   enum:
     - group:admin
@@ -21,6 +22,7 @@ AuthzJwtClaim:
     - iss
   example: Hyperledger Labs - Carbon Accounting Tool
 CredentialProfile:
+  description: "Defines the supported credential profiles for SATP Hermes."
   type: string
   enum:
     - SAML
@@ -385,6 +387,7 @@ RoutesResponse:
       items:
         $ref: ./schemas.yml#/Route
 Route:
+  description: "Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information."
   type: object
   properties:
     id:
@@ -481,6 +484,7 @@ IntegrationsResponse:
   required:
     - integrations
 Integration:
+  description: "Details a network or system integration supported by SATP Hermes."
   type: object
   properties:
     id:
@@ -552,6 +556,7 @@ Tags:
     - satp
     - hyperledger
 HealthCheckResponse:
+  description: "Response schema for healthcheck endpoint indicating the availability status of the service."
   type: object
   properties:
     status:
@@ -594,6 +599,7 @@ IncludedStep:
       items:
         type: string
 Insurance:
+  description: "Details about the insurance applicability and fee for the transaction."
   type: object
   properties:
     state:
@@ -620,6 +626,7 @@ Insurance:
 #         - AVAILABLE
 #         - UNAVAILABLE
 Action:
+  description: "Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved."
   type: object
   properties:
     fromToken:
@@ -713,6 +720,7 @@ FeeCost:
       type: boolean
       description: Indicates if the fee is included in the transaction amount.
 GasCost:
+  description: Details about a specific gas cost associated with the transaction.
   type: object
   properties:
     type:
@@ -777,7 +785,7 @@ OracleRegisterRequest:
       description: The source blockchain network identifier. Only if taskType is READ or READ_AND_UPDATE.
     destinationNetworkId:
       $ref: ./schemas.yml#/NetworkId
-      description: The source blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
+      description: The destination blockchain network identifier. Only if taskType is UPDATE or READ_AND_UPDATE.
     sourceContract:
       $ref: ./schemas.yml#/BusinessLogicContract
       description: The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.

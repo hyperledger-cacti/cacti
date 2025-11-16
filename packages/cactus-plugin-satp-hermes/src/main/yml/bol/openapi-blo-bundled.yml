@@ -37,6 +37,12 @@ tags:
     description: API endpoints for interacting with blockchains via gateways
   - name: admin
     description: API endpoints for fetching information on SATP sessions
+  - name: get-approve-address
+    description: API endpoint for getting approve address for token transfer
+  - name: add-counterparty
+    description: API endpoint for adding a counterparty to the gateway
+  - name: oracle
+    description: API endpoints for oracle tasks management
 paths:
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact:
     post:
@@ -50,6 +56,7 @@ paths:
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transact
       requestBody:
+        description: Transact request object.
         required: true
         content:
           application/json:
@@ -366,6 +373,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel
       requestBody:
+        description: Cancel request object.
         content:
           application/json:
             schema:
@@ -690,6 +698,7 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids
       parameters:
         - name: SessionsRequest
+          description: Request object for fetching session IDs.
           in: query
           schema:
             type: object
@@ -728,6 +737,7 @@ paths:
           content:
             application/json:
               schema:
+                description: Response schema for healthcheck endpoint indicating the availability status of the service.
                 type: object
                 properties:
                   status:
@@ -749,6 +759,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue
       requestBody:
+        description: Continue request object.
         content:
           application/json:
             schema:
@@ -933,6 +944,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause
       requestBody:
+        description: Pause request object.
         content:
           application/json:
             schema:
@@ -1126,6 +1138,7 @@ paths:
                   integrations:
                     type: array
                     items:
+                      description: Details a network or system integration supported by SATP Hermes.
                       type: object
                       properties:
                         id:
@@ -1301,6 +1314,7 @@ paths:
                     type: array
                     description: A collection of route objects
                     items:
+                      description: 'Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.'
                       type: object
                       properties:
                         id:
@@ -1496,6 +1510,7 @@ paths:
                                 type: string
                                 description: 'Tool used in the step, e.g., ''stargate''.'
                               action:
+                                description: 'Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.'
                                 type: object
                                 properties:
                                   fromToken:
@@ -1705,6 +1720,7 @@ paths:
                                     type: array
                                     description: A collection of estimated gas costs for executing the transaction.
                                     items:
+                                      description: Details about a specific gas cost associated with the transaction.
                                       type: object
                                       properties:
                                         type:
@@ -1867,6 +1883,7 @@ paths:
                                 items:
                                   type: string
                         insurance:
+                          description: Details about the insurance applicability and fee for the transaction.
                           type: object
                           properties:
                             state:
@@ -1993,6 +2010,7 @@ paths:
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address
       parameters:
         - name: networkId
+          description: The network of the DLT being interacted with.
           in: query
           schema:
             type: object
@@ -2017,6 +2035,7 @@ paths:
               - ledgerType
           required: true
         - name: tokenType
+          description: The type of token being transferred.
           in: query
           schema:
             type: string
@@ -2057,6 +2076,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
       requestBody:
+        description: Add counterparty request object.
         required: true
         content:
           application/json:
@@ -2181,6 +2201,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute
       requestBody:
+        description: Execute request object.
         required: true
         content:
           application/json:
@@ -2581,6 +2602,7 @@ paths:
           verbLowerCase: post
           path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
       requestBody:
+        description: Register request object.
         required: true
         content:
           application/json:
@@ -3091,6 +3113,7 @@ paths:
 components:
   schemas:
     AuthzScope:
+      description: Stores global constants related to the authorization of the application. Specifically enumerates the scopes to validate for.
       type: string
       enum:
         - 'group:admin'
@@ -3113,6 +3136,7 @@ components:
         - iss
       example: Hyperledger Labs - Carbon Accounting Tool
     CredentialProfile:
+      description: Defines the supported credential profiles for SATP Hermes.
       type: string
       enum:
         - SAML
@@ -3941,6 +3965,7 @@ components:
           type: array
           description: A collection of route objects
           items:
+            description: 'Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.'
             type: object
             properties:
               id:
@@ -4136,6 +4161,7 @@ components:
                       type: string
                       description: 'Tool used in the step, e.g., ''stargate''.'
                     action:
+                      description: 'Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.'
                       type: object
                       properties:
                         fromToken:
@@ -4345,6 +4371,7 @@ components:
                           type: array
                           description: A collection of estimated gas costs for executing the transaction.
                           items:
+                            description: Details about a specific gas cost associated with the transaction.
                             type: object
                             properties:
                               type:
@@ -4507,6 +4534,7 @@ components:
                       items:
                         type: string
               insurance:
+                description: Details about the insurance applicability and fee for the transaction.
                 type: object
                 properties:
                   state:
@@ -4536,6 +4564,7 @@ components:
               - gatewayID
               - mode
     Route:
+      description: 'Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.'
       type: object
       properties:
         id:
@@ -4731,6 +4760,7 @@ components:
                 type: string
                 description: 'Tool used in the step, e.g., ''stargate''.'
               action:
+                description: 'Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.'
                 type: object
                 properties:
                   fromToken:
@@ -4940,6 +4970,7 @@ components:
                     type: array
                     description: A collection of estimated gas costs for executing the transaction.
                     items:
+                      description: Details about a specific gas cost associated with the transaction.
                       type: object
                       properties:
                         type:
@@ -5102,6 +5133,7 @@ components:
                 items:
                   type: string
         insurance:
+          description: Details about the insurance applicability and fee for the transaction.
           type: object
           properties:
             state:
@@ -5265,6 +5297,7 @@ components:
         integrations:
           type: array
           items:
+            description: Details a network or system integration supported by SATP Hermes.
             type: object
             properties:
               id:
@@ -5286,6 +5319,7 @@ components:
       required:
         - integrations
     Integration:
+      description: Details a network or system integration supported by SATP Hermes.
       type: object
       properties:
         id:
@@ -5381,6 +5415,7 @@ components:
         - satp
         - hyperledger
     HealthCheckResponse:
+      description: Response schema for healthcheck endpoint indicating the availability status of the service.
       type: object
       properties:
         status:
@@ -5410,6 +5445,7 @@ components:
           type: string
           description: 'Tool used in the step, e.g., ''stargate''.'
         action:
+          description: 'Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.'
           type: object
           properties:
             fromToken:
@@ -5619,6 +5655,7 @@ components:
               type: array
               description: A collection of estimated gas costs for executing the transaction.
               items:
+                description: Details about a specific gas cost associated with the transaction.
                 type: object
                 properties:
                   type:
@@ -5781,6 +5818,7 @@ components:
           items:
             type: string
     Insurance:
+      description: Details about the insurance applicability and fee for the transaction.
       type: object
       properties:
         state:
@@ -5797,6 +5835,7 @@ components:
           example: '10.00'
           pattern: '^(0|[1-9]\d*)(\.\d+)?$'
     Action:
+      description: 'Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.'
       type: object
       properties:
         fromToken:
@@ -6027,6 +6066,7 @@ components:
           type: array
           description: A collection of estimated gas costs for executing the transaction.
           items:
+            description: Details about a specific gas cost associated with the transaction.
             type: object
             properties:
               type:
@@ -6167,6 +6207,7 @@ components:
           type: boolean
           description: Indicates if the fee is included in the transaction amount.
     GasCost:
+      description: Details about a specific gas cost associated with the transaction.
       type: object
       properties:
         type:
