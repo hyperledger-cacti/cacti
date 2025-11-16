@@ -39,6 +39,18 @@
     {
       "name": "admin",
       "description": "API endpoints for fetching information on SATP sessions"
+    },
+    {
+      "name": "get-approve-address",
+      "description": "API endpoint for getting approve address for token transfer"
+    },
+    {
+      "name": "add-counterparty",
+      "description": "API endpoint for adding a counterparty to the gateway"
+    },
+    {
+      "name": "oracle",
+      "description": "API endpoints for oracle tasks management"
     }
   ],
   "paths": {
@@ -57,6 +69,7 @@
         "description": "Allows users to queue intents for transactions based on specified parameters.",
         "operationId": "Transact",
         "requestBody": {
+          "description": "Transact request object.",
           "required": true,
           "content": {
             "application/json": {
@@ -469,6 +482,7 @@
           }
         },
         "requestBody": {
+          "description": "Cancel request object.",
           "content": {
             "application/json": {
               "schema": {
@@ -885,6 +899,7 @@
         "parameters": [
           {
             "name": "SessionsRequest",
+            "description": "Request object for fetching session IDs.",
             "in": "query",
             "schema": {
               "type": "object",
@@ -940,6 +955,7 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "description": "Response schema for healthcheck endpoint indicating the availability status of the service.",
                   "type": "object",
                   "properties": {
                     "status": {
@@ -975,6 +991,7 @@
           }
         },
         "requestBody": {
+          "description": "Continue request object.",
           "content": {
             "application/json": {
               "schema": {
@@ -1212,6 +1229,7 @@
           }
         },
         "requestBody": {
+          "description": "Pause request object.",
           "content": {
             "application/json": {
               "schema": {
@@ -1457,6 +1475,7 @@
                     "integrations": {
                       "type": "array",
                       "items": {
+                        "description": "Details a network or system integration supported by SATP Hermes.",
                         "type": "object",
                         "properties": {
                           "id": {
@@ -1696,6 +1715,7 @@
                       "type": "array",
                       "description": "A collection of route objects",
                       "items": {
+                        "description": "Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.",
                         "type": "object",
                         "properties": {
                           "id": {
@@ -1951,6 +1971,7 @@
                                   "description": "Tool used in the step, e.g., 'stargate'."
                                 },
                                 "action": {
+                                  "description": "Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.",
                                   "type": "object",
                                   "properties": {
                                     "fromToken": {
@@ -2222,6 +2243,7 @@
                                       "type": "array",
                                       "description": "A collection of estimated gas costs for executing the transaction.",
                                       "items": {
+                                        "description": "Details about a specific gas cost associated with the transaction.",
                                         "type": "object",
                                         "properties": {
                                           "type": {
@@ -2438,6 +2460,7 @@
                             }
                           },
                           "insurance": {
+                            "description": "Details about the insurance applicability and fee for the transaction.",
                             "type": "object",
                             "properties": {
                               "state": {
@@ -2621,6 +2644,7 @@
         "parameters": [
           {
             "name": "networkId",
+            "description": "The network of the DLT being interacted with.",
             "in": "query",
             "schema": {
               "type": "object",
@@ -2653,6 +2677,7 @@
           },
           {
             "name": "tokenType",
+            "description": "The type of token being transferred.",
             "in": "query",
             "schema": {
               "type": "string",
@@ -2713,6 +2738,7 @@
           }
         },
         "requestBody": {
+          "description": "Add counterparty request object.",
           "required": true,
           "content": {
             "application/json": {
@@ -2883,6 +2909,7 @@
           }
         },
         "requestBody": {
+          "description": "Execute request object.",
           "required": true,
           "content": {
             "application/json": {
@@ -3435,6 +3462,7 @@
           }
         },
         "requestBody": {
+          "description": "Register request object.",
           "required": true,
           "content": {
             "application/json": {
@@ -4147,6 +4175,7 @@
   "components": {
     "schemas": {
       "AuthzScope": {
+        "description": "Stores global constants related to the authorization of the application. Specifically enumerates the scopes to validate for.",
         "type": "string",
         "enum": [
           "group:admin",
@@ -4177,6 +4206,7 @@
         "example": "Hyperledger Labs - Carbon Accounting Tool"
       },
       "CredentialProfile": {
+        "description": "Defines the supported credential profiles for SATP Hermes.",
         "type": "string",
         "enum": [
           "SAML",
@@ -5220,6 +5250,7 @@
             "type": "array",
             "description": "A collection of route objects",
             "items": {
+              "description": "Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.",
               "type": "object",
               "properties": {
                 "id": {
@@ -5475,6 +5506,7 @@
                         "description": "Tool used in the step, e.g., 'stargate'."
                       },
                       "action": {
+                        "description": "Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.",
                         "type": "object",
                         "properties": {
                           "fromToken": {
@@ -5746,6 +5778,7 @@
                             "type": "array",
                             "description": "A collection of estimated gas costs for executing the transaction.",
                             "items": {
+                              "description": "Details about a specific gas cost associated with the transaction.",
                               "type": "object",
                               "properties": {
                                 "type": {
@@ -5962,6 +5995,7 @@
                   }
                 },
                 "insurance": {
+                  "description": "Details about the insurance applicability and fee for the transaction.",
                   "type": "object",
                   "properties": {
                     "state": {
@@ -6005,6 +6039,7 @@
         }
       },
       "Route": {
+        "description": "Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.",
         "type": "object",
         "properties": {
           "id": {
@@ -6260,6 +6295,7 @@
                   "description": "Tool used in the step, e.g., 'stargate'."
                 },
                 "action": {
+                  "description": "Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.",
                   "type": "object",
                   "properties": {
                     "fromToken": {
@@ -6531,6 +6567,7 @@
                       "type": "array",
                       "description": "A collection of estimated gas costs for executing the transaction.",
                       "items": {
+                        "description": "Details about a specific gas cost associated with the transaction.",
                         "type": "object",
                         "properties": {
                           "type": {
@@ -6747,6 +6784,7 @@
             }
           },
           "insurance": {
+            "description": "Details about the insurance applicability and fee for the transaction.",
             "type": "object",
             "properties": {
               "state": {
@@ -6951,6 +6989,7 @@
           "integrations": {
             "type": "array",
             "items": {
+              "description": "Details a network or system integration supported by SATP Hermes.",
               "type": "object",
               "properties": {
                 "id": {
@@ -6983,6 +7022,7 @@
         ]
       },
       "Integration": {
+        "description": "Details a network or system integration supported by SATP Hermes.",
         "type": "object",
         "properties": {
           "id": {
@@ -7110,6 +7150,7 @@
         ]
       },
       "HealthCheckResponse": {
+        "description": "Response schema for healthcheck endpoint indicating the availability status of the service.",
         "type": "object",
         "properties": {
           "status": {
@@ -7149,6 +7190,7 @@
             "description": "Tool used in the step, e.g., 'stargate'."
           },
           "action": {
+            "description": "Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.",
             "type": "object",
             "properties": {
               "fromToken": {
@@ -7420,6 +7462,7 @@
                 "type": "array",
                 "description": "A collection of estimated gas costs for executing the transaction.",
                 "items": {
+                  "description": "Details about a specific gas cost associated with the transaction.",
                   "type": "object",
                   "properties": {
                     "type": {
@@ -7635,6 +7678,7 @@
         }
       },
       "Insurance": {
+        "description": "Details about the insurance applicability and fee for the transaction.",
         "type": "object",
         "properties": {
           "state": {
@@ -7656,6 +7700,7 @@
         }
       },
       "Action": {
+        "description": "Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.",
         "type": "object",
         "properties": {
           "fromToken": {
@@ -7954,6 +7999,7 @@
             "type": "array",
             "description": "A collection of estimated gas costs for executing the transaction.",
             "items": {
+              "description": "Details about a specific gas cost associated with the transaction.",
               "type": "object",
               "properties": {
                 "type": {
@@ -8138,6 +8184,7 @@
         }
       },
       "GasCost": {
+        "description": "Details about a specific gas cost associated with the transaction.",
         "type": "object",
         "properties": {
           "type": {

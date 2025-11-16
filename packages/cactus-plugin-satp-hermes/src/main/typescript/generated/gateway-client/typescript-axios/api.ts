@@ -61,7 +61,7 @@ export interface APIError {
     'timestamp': string;
 }
 /**
- * 
+ * Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.
  * @export
  * @interface Action
  */
@@ -403,7 +403,7 @@ export type AuthzJwtClaim = typeof AuthzJwtClaim[keyof typeof AuthzJwtClaim];
 
 
 /**
- * 
+ * Stores global constants related to the authorization of the application. Specifically enumerates the scopes to validate for.
  * @export
  * @enum {string}
  */
@@ -575,7 +575,7 @@ export interface ContinueResponse {
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
- * 
+ * Defines the supported credential profiles for SATP Hermes.
  * @export
  * @enum {string}
  */
@@ -1206,7 +1206,7 @@ export interface FeeCost {
     'included'?: boolean;
 }
 /**
- * 
+ * Details about a specific gas cost associated with the transaction.
  * @export
  * @interface GasCost
  */
@@ -1381,7 +1381,7 @@ export interface GetApproveAddressResponse {
     'approveAddress': string;
 }
 /**
- * 
+ * Response schema for healthcheck endpoint indicating the availability status of the service.
  * @export
  * @interface GetHealthCheck200Response
  */
@@ -1415,7 +1415,7 @@ export interface GetIntegrations200Response {
     'integrations': Array<GetIntegrations200ResponseIntegrationsInner>;
 }
 /**
- * 
+ * Details a network or system integration supported by SATP Hermes.
  * @export
  * @interface GetIntegrations200ResponseIntegrationsInner
  */
@@ -1554,7 +1554,7 @@ export interface GetRoutes200Response {
     'routes': Array<GetRoutes200ResponseRoutesInner>;
 }
 /**
- * 
+ * Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.
  * @export
  * @interface GetRoutes200ResponseRoutesInner
  */
@@ -1778,7 +1778,7 @@ export interface GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoVal
     'tokenAddress'?: string;
 }
 /**
- * 
+ * Details about the insurance applicability and fee for the transaction.
  * @export
  * @interface GetRoutes200ResponseRoutesInnerInsurance
  */
@@ -1861,7 +1861,7 @@ export interface GetRoutes200ResponseRoutesInnerStepsInner {
     'includedStepIds'?: Array<string>;
 }
 /**
- * 
+ * Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.
  * @export
  * @interface GetRoutes200ResponseRoutesInnerStepsInnerAction
  */
@@ -2008,7 +2008,7 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner 
     'included'?: boolean;
 }
 /**
- * 
+ * Details about a specific gas cost associated with the transaction.
  * @export
  * @interface GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
  */
@@ -2082,7 +2082,7 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerToolDetails {
     'logoURI': string;
 }
 /**
- * 
+ * Response schema for healthcheck endpoint indicating the availability status of the service.
  * @export
  * @interface HealthCheckResponse
  */
@@ -2158,7 +2158,7 @@ export interface IncludedStep {
     'includedStepIds'?: Array<string>;
 }
 /**
- * 
+ * Details about the insurance applicability and fee for the transaction.
  * @export
  * @interface Insurance
  */
@@ -2186,7 +2186,7 @@ export const InsuranceStateEnum = {
 export type InsuranceStateEnum = typeof InsuranceStateEnum[keyof typeof InsuranceStateEnum];
 
 /**
- * 
+ * Details a network or system integration supported by SATP Hermes.
  * @export
  * @interface Integration
  */
@@ -3141,7 +3141,7 @@ export interface RegisterOracleTaskRequestSourceContract {
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
- * 
+ * Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.
  * @export
  * @interface Route
  */
@@ -3922,7 +3922,7 @@ export const AddCounterpartyApiAxiosParamCreator = function (configuration?: Con
         /**
          * Add a counterparty to the Gateway
          * @summary Add counterparty
-         * @param {AddCounterpartyRequest} addCounterpartyRequest 
+         * @param {AddCounterpartyRequest} addCounterpartyRequest Add counterparty request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -3968,7 +3968,7 @@ export const AddCounterpartyApiFp = function(configuration?: Configuration) {
         /**
          * Add a counterparty to the Gateway
          * @summary Add counterparty
-         * @param {AddCounterpartyRequest} addCounterpartyRequest 
+         * @param {AddCounterpartyRequest} addCounterpartyRequest Add counterparty request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -3989,7 +3989,7 @@ export const AddCounterpartyApiFactory = function (configuration?: Configuration
         /**
          * Add a counterparty to the Gateway
          * @summary Add counterparty
-         * @param {AddCounterpartyRequest} addCounterpartyRequest 
+         * @param {AddCounterpartyRequest} addCounterpartyRequest Add counterparty request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4009,7 +4009,7 @@ export class AddCounterpartyApi extends BaseAPI {
     /**
      * Add a counterparty to the Gateway
      * @summary Add counterparty
-     * @param {AddCounterpartyRequest} addCounterpartyRequest 
+     * @param {AddCounterpartyRequest} addCounterpartyRequest Add counterparty request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AddCounterpartyApi
@@ -4029,7 +4029,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * Attempts to continue a previously paused transaction intent, resuming its execution.
          * @summary Continue a paused transaction session
-         * @param {ContinueRequest} continueRequest 
+         * @param {ContinueRequest} continueRequest Continue request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4095,7 +4095,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * Retrieve the all SATP session IDs
          * @summary Get SATP session ids
-         * @param {object} [sessionsRequest] 
+         * @param {object} [sessionsRequest] Request object for fetching session IDs.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4167,7 +4167,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
          * @summary Pause a transaction session
-         * @param {PauseRequest} pauseRequest 
+         * @param {PauseRequest} pauseRequest Pause request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4253,7 +4253,7 @@ export const AdminApiFp = function(configuration?: Configuration) {
         /**
          * Attempts to continue a previously paused transaction intent, resuming its execution.
          * @summary Continue a paused transaction session
-         * @param {ContinueRequest} continueRequest 
+         * @param {ContinueRequest} continueRequest Continue request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4274,7 +4274,7 @@ export const AdminApiFp = function(configuration?: Configuration) {
         /**
          * Retrieve the all SATP session IDs
          * @summary Get SATP session ids
-         * @param {object} [sessionsRequest] 
+         * @param {object} [sessionsRequest] Request object for fetching session IDs.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4296,7 +4296,7 @@ export const AdminApiFp = function(configuration?: Configuration) {
         /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
          * @summary Pause a transaction session
-         * @param {PauseRequest} pauseRequest 
+         * @param {PauseRequest} pauseRequest Pause request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4329,7 +4329,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
         /**
          * Attempts to continue a previously paused transaction intent, resuming its execution.
          * @summary Continue a paused transaction session
-         * @param {ContinueRequest} continueRequest 
+         * @param {ContinueRequest} continueRequest Continue request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4348,7 +4348,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
         /**
          * Retrieve the all SATP session IDs
          * @summary Get SATP session ids
-         * @param {object} [sessionsRequest] 
+         * @param {object} [sessionsRequest] Request object for fetching session IDs.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4368,7 +4368,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
         /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
          * @summary Pause a transaction session
-         * @param {PauseRequest} pauseRequest 
+         * @param {PauseRequest} pauseRequest Pause request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4399,7 +4399,7 @@ export class AdminApi extends BaseAPI {
     /**
      * Attempts to continue a previously paused transaction intent, resuming its execution.
      * @summary Continue a paused transaction session
-     * @param {ContinueRequest} continueRequest 
+     * @param {ContinueRequest} continueRequest Continue request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AdminApi
@@ -4422,7 +4422,7 @@ export class AdminApi extends BaseAPI {
     /**
      * Retrieve the all SATP session IDs
      * @summary Get SATP session ids
-     * @param {object} [sessionsRequest] 
+     * @param {object} [sessionsRequest] Request object for fetching session IDs.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AdminApi
@@ -4446,7 +4446,7 @@ export class AdminApi extends BaseAPI {
     /**
      * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
      * @summary Pause a transaction session
-     * @param {PauseRequest} pauseRequest 
+     * @param {PauseRequest} pauseRequest Pause request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AdminApi
@@ -4479,8 +4479,8 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {TransactRequestSourceAssetNetworkId} networkId 
-         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
+         * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4533,8 +4533,8 @@ export const GetApproveAddressApiFp = function(configuration?: Configuration) {
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {TransactRequestSourceAssetNetworkId} networkId 
-         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
+         * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4555,8 +4555,8 @@ export const GetApproveAddressApiFactory = function (configuration?: Configurati
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {TransactRequestSourceAssetNetworkId} networkId 
-         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
+         * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4576,8 +4576,8 @@ export class GetApproveAddressApi extends BaseAPI {
     /**
      * Get approve address for the token transfer
      * @summary Get approve address
-     * @param {TransactRequestSourceAssetNetworkId} networkId 
-     * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType 
+     * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+     * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GetApproveAddressApi
@@ -4597,7 +4597,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Execute a registered data transfer task from source to target blockchain
          * @summary Execute data transfer task
-         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest Execute request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4670,7 +4670,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Register data transfer from source to target blockchain
          * @summary Register data transfer task
-         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest Register request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4753,7 +4753,7 @@ export const OracleApiFp = function(configuration?: Configuration) {
         /**
          * Execute a registered data transfer task from source to target blockchain
          * @summary Execute data transfer task
-         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest Execute request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4775,7 +4775,7 @@ export const OracleApiFp = function(configuration?: Configuration) {
         /**
          * Register data transfer from source to target blockchain
          * @summary Register data transfer task
-         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest Register request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4807,7 +4807,7 @@ export const OracleApiFactory = function (configuration?: Configuration, basePat
         /**
          * Execute a registered data transfer task from source to target blockchain
          * @summary Execute data transfer task
-         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+         * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest Execute request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4827,7 +4827,7 @@ export const OracleApiFactory = function (configuration?: Configuration, basePat
         /**
          * Register data transfer from source to target blockchain
          * @summary Register data transfer task
-         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+         * @param {RegisterOracleTaskRequest} registerOracleTaskRequest Register request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4857,7 +4857,7 @@ export class OracleApi extends BaseAPI {
     /**
      * Execute a registered data transfer task from source to target blockchain
      * @summary Execute data transfer task
-     * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest 
+     * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest Execute request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OracleApi
@@ -4881,7 +4881,7 @@ export class OracleApi extends BaseAPI {
     /**
      * Register data transfer from source to target blockchain
      * @summary Register data transfer task
-     * @param {RegisterOracleTaskRequest} registerOracleTaskRequest 
+     * @param {RegisterOracleTaskRequest} registerOracleTaskRequest Register request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof OracleApi
@@ -4913,7 +4913,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
         /**
          * Attempts to cancel a previously submitted transaction intent using its session ID.
          * @summary Cancel a transaction session
-         * @param {CancelRequest} cancelRequest 
+         * @param {CancelRequest} cancelRequest Cancel request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5058,7 +5058,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
         /**
          * Allows users to queue intents for transactions based on specified parameters.
          * @summary Submit a transaction intent
-         * @param {TransactRequest} transactRequest 
+         * @param {TransactRequest} transactRequest Transact request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5104,7 +5104,7 @@ export const TransactionApiFp = function(configuration?: Configuration) {
         /**
          * Attempts to cancel a previously submitted transaction intent using its session ID.
          * @summary Cancel a transaction session
-         * @param {CancelRequest} cancelRequest 
+         * @param {CancelRequest} cancelRequest Cancel request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5142,7 +5142,7 @@ export const TransactionApiFp = function(configuration?: Configuration) {
         /**
          * Allows users to queue intents for transactions based on specified parameters.
          * @summary Submit a transaction intent
-         * @param {TransactRequest} transactRequest 
+         * @param {TransactRequest} transactRequest Transact request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5163,7 +5163,7 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
         /**
          * Attempts to cancel a previously submitted transaction intent using its session ID.
          * @summary Cancel a transaction session
-         * @param {CancelRequest} cancelRequest 
+         * @param {CancelRequest} cancelRequest Cancel request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5198,7 +5198,7 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
         /**
          * Allows users to queue intents for transactions based on specified parameters.
          * @summary Submit a transaction intent
-         * @param {TransactRequest} transactRequest 
+         * @param {TransactRequest} transactRequest Transact request object.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5218,7 +5218,7 @@ export class TransactionApi extends BaseAPI {
     /**
      * Attempts to cancel a previously submitted transaction intent using its session ID.
      * @summary Cancel a transaction session
-     * @param {CancelRequest} cancelRequest 
+     * @param {CancelRequest} cancelRequest Cancel request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof TransactionApi
@@ -5259,7 +5259,7 @@ export class TransactionApi extends BaseAPI {
     /**
      * Allows users to queue intents for transactions based on specified parameters.
      * @summary Submit a transaction intent
-     * @param {TransactRequest} transactRequest 
+     * @param {TransactRequest} transactRequest Transact request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof TransactionApi
