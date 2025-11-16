@@ -266,7 +266,7 @@
     "web3-core": "4.1.1",
     "web3-eth": "4.1.1",
     "web3-utils": "4.3.0",
-    "webpack": "5.99.3",
+    "webpack": "5.95.0",
     "webpack-cli": "4.10.0",
     "wget-improved": "3.4.0",
     "yargs": "17.7.2"
