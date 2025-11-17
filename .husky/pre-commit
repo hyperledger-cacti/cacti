@@ -1,7 +1,30 @@
-#!/bin/sh
-echo  "pre-commit hook, running yarn run lint"
-yarn run lint
-if [ $? -ne 0 ]; then
-	echo "Lint failed. Please fix errors before committing."
-	exit 1
+# This pre-commit hook applies linting and formatting only to changed files, instead of linting and formatting the whole file. This saves time during commits.
+echo "Running pre-commit hook..."
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | sed 's| |\\ |g')
+
+echo "Staged files:"
+echo "$STAGED_FILES"
+
+if echo "$STAGED_FILES" | grep -E 'openapi\.json$|\.ts$|\.js$'; then
+    echo "Linting and formatting staged files..."
+	FILES_TO_LINT_AND_FORMAT=$(echo "$STAGED_FILES" | grep -E 'openapi\.json$|\.ts$|\.js$')
+
+	# Run linter
+	npx eslint --config ./.eslintrc.js $FILES_TO_LINT_AND_FORMAT --quiet --fix
+	if [ $? -ne 0 ]; then
+        echo "eslint failed. Please apply fixes before committing."
+        exit 1
+    fi
+
+	#Run formatter
+    npx prettier --config .prettierrc.js --write $FILES_TO_LINT_AND_FORMAT
+    if [ $? -ne 0 ]; then
+        echo "Prettier failed. Please fix formatting before committing."
+        exit 1
+    fi
+	
+    # Update Git index so the commit contains linted and formatted files
+    git update-index --again
+else
+    echo "No staged files matching pattern — skipping linting and formatting."
 fi
