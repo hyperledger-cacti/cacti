@@ -1,6 +1,8 @@
-name: SATP Hermes Package Workflow
+name: Run All Examples Workflows
 
+# Controls when the workflow will run
 on:
+  # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
       node_version:
@@ -9,26 +11,30 @@ on:
       run_code_coverage:
         required: true
         type: string
-    
+      affected-packages:
+        required: false
+        type: string
+  
 concurrency:
-  group: satp-hermes-package-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: examples-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Test execution jobs: run unit and integration tests in parallel
-  run-satp-tests-unit:
-    runs-on: ubuntu-22.04
-    continue-on-error: true
+  ce-carbon-accounting-backend:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-carbon-accounting-backend')}}
+    continue-on-error: false
     env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/unit/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+      JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-carbon-accounting-backend
+      TAPE_TEST_PATTERN: ./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'
+          yarn_hardened_mode: '0'         
         uses: ./.github/actions/configure-repo/
 
       - name: Run Jest Tests
@@ -38,32 +44,34 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-unit-tests-report"
-
-      - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
-        with:
-          name: coverage-reports-satp-hermes-unit
-          path: ./code-coverage-ts/**/
-
+          report_name: ce-carbon-accounting-backend-report
       
-  run-satp-tests-integration-bridge:
-    runs-on: ubuntu-22.04
-    continue-on-error: true
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-7
+          path: ./code-coverage-ts/**/
+      
+  cactus-common-example-server:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-common-example-server')}}
+    continue-on-error: false
     env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/bridge/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+      JEST_TEST_PATTERN: examples/cactus-common-example-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common-example-server
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-
-      - name: CI environment clean-up
-        run: ./tools/ci-env-clean-up.sh
 
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'
+          yarn_hardened_mode: '0'         
         uses: ./.github/actions/configure-repo/
 
       - name: Run Jest Tests
@@ -73,31 +81,29 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-bridge-integration-tests-report"
-
+          report_name: cactus-common-example-server-report
+        
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
-          name: coverage-reports-satp-hermes-bridge
+          name: coverage-reports-3
           path: ./code-coverage-ts/**/
 
-  run-satp-tests-integration-oracle:
-    runs-on: ubuntu-22.04
-    continue-on-error: true
+  ce-carbon-accounting-business-logic-plugin:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-carbon-accounting-business-logic-plugin')}}
+    continue-on-error: false
     env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/oracle/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+      JEST_TEST_PATTERN: examples/cactus-example-carbon-accounting-business-logic-plugin/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-carbon-accounting-business-logic-plugin
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-
-      - name: CI environment clean-up
-        run: ./tools/ci-env-clean-up.sh
 
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'
+          yarn_hardened_mode: '0'         
         uses: ./.github/actions/configure-repo/
 
       - name: Run Jest Tests
@@ -107,32 +113,50 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-oracle-integration-tests-report"
-
+          report_name: ce-carbon-accounting-business-logic-plugin-report
+        
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
-          name: coverage-reports-satp-hermes-oracle
+          name: coverage-reports-8
           path: ./code-coverage-ts/**/
-
-
-  run-satp-tests-integration-gateway:
+  
+  ce-carbon-accounting-frontend:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-carbon-accounting-frontend')}}
+    continue-on-error: false
     runs-on: ubuntu-22.04
-    continue-on-error: true
-    env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/gateway/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-
-      - name: CI environment clean-up
-        run: ./tools/ci-env-clean-up.sh
 
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-9
+          path: ./code-coverage-ts/**/
+
+  ce-supply-chain-backend:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-supply-chain-backend')}}
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: examples/cactus-example-supply-chain-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-supply-chain-backend
+      TAPE_TEST_PATTERN: '--files={./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-backend-api-calls.test.ts,./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts}'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
         uses: ./.github/actions/configure-repo/
 
       - name: Run Jest Tests
@@ -142,22 +166,79 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-gateway-integration-tests-report"
-
+          report_name: ce-supply-chain-backend-report
+      
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
-          name: coverage-reports-satp-hermes-gateway
+          name: coverage-reports-10
+          path: ./code-coverage-ts/**/
+  
+  ce-supply-chain-business-logic-plugin:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-supply-chain-business-logic-plugin')}}
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: examples/cactus-example-supply-chain-business-logic-plugin/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-supply-chain-business-logic-plugin
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: ce-supply-chain-business-logic-plugin-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-11
           path: ./code-coverage-ts/**/
 
-
-  run-satp-tests-integration-docker:
+  ce-supply-chain-frontend:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-supply-chain-frontend')}}
+    continue-on-error: false
     runs-on: ubuntu-22.04
-    continue-on-error: true
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-12
+          path: ./code-coverage-ts/**/
+
+  ce-cbdc-bridging:
+    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-cbdc-bridging-backend')}}
+    continue-on-error: false
+    runs-on: ubuntu-22.04
     env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/docker/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+      JEST_TEST_PATTERN: examples/cactus-example-cbdc-bridging-backend/src/test/typescript/(unit|integration)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-cdbc-bridging
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
@@ -177,119 +258,12 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-gateway-docker-tests-report"
+          report_name: "ce-cdbc-bridging-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
-          name: coverage-reports-satp-hermes-gateway-docker
+          name: coverage-reports-ce-cdbc-bridging
           path: ./code-coverage-ts/**/
 
-  run-satp-tests-on-chain:
-    runs-on: ubuntu-22.04
-    continue-on-error: true
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-      
-      - name: build
-        with:
-          node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'         
-        uses: ./.github/actions/configure-repo/
-
-      - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
-        with:
-          version: stable
-
-      - name: Build Foundry contracts
-        run: |
-          set -euo pipefail
-          cd packages/cactus-plugin-satp-hermes
-          echo "Building Foundry contracts and tests"
-          yarn forge:build:all
-
-      - name: Run Foundry tests
-        run: |
-          set -euo pipefail
-          cd packages/cactus-plugin-satp-hermes
-          echo "Running Foundry on-chain tests"
-          yarn forge:test
-
-      - name: Upload SATP foundry test reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: satp-foundry-report-${{ github.job }}
-          path: |
-            packages/cactus-plugin-satp-hermes/src/test/solidity/generated/**/*
-            packages/cactus-plugin-satp-hermes/src/main/solidity/generated/**/*
-
-  run-satp-tests-recovery:
-    runs-on: ubuntu-22.04
-    continue-on-error: true
-    env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/recovery/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-
-      - name: CI environment clean-up
-        run: ./tools/ci-env-clean-up.sh
-
-      - name: build
-        with:
-          node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'
-        uses: ./.github/actions/configure-repo/
-
-      - name: Run Jest Tests
-        uses: ./.github/actions/jest-runner/
-        with:
-          run_code_coverage: ${{ inputs.run_code_coverage }}
-          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
-          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
-          github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-unit-tests-report"
-
-      - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
-        with:
-          name: coverage-reports-satp-hermes-recovery
-          path: ./code-coverage-ts/**/
-
-  run-satp-tests-rollback:
-    runs-on: ubuntu-22.04
-    continue-on-error: true
-    env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/rollback/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-
-      - name: CI environment clean-up
-        run: ./tools/ci-env-clean-up.sh
-
-      - name: build
-        with:
-          node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'
-        uses: ./.github/actions/configure-repo/
-
-      - name: Run Jest Tests
-        uses: ./.github/actions/jest-runner/
-        with:
-          run_code_coverage: ${{ inputs.run_code_coverage }}
-          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
-          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
-          github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-unit-tests-report"
-
-      - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
-        with:
-          name: coverage-reports-satp-hermes-rollback
-          path: ./code-coverage-ts/**/

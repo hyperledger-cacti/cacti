@@ -40,7 +40,10 @@ import fs from "fs-extra";
 import { getUserFromPseudonim } from "./utils";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
 import ExampleOntology from "../../json/ontologies/ontology-satp-erc20-interact-fabric.json";
-import { PeerCerts } from "@hyperledger/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
+import {
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  PeerCerts,
+} from "@hyperledger/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
 import {
   TargetOrganization,
   FabricConfigJSON,
@@ -98,7 +101,7 @@ export class FabricEnvironment {
     this.ledger = new FabricTestLedgerV1({
       emitContainerLogs: true,
       publishAllPorts: true,
-      imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       networkName: this.dockerNetwork,

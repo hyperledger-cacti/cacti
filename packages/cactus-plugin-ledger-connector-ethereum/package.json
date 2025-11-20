@@ -55,7 +55,7 @@
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "copy-artillery-config": "cp -af  ./src/test/typescript/benchmark/setup/geth-benchmark-config.yaml ./src/test/typescript/benchmark/setup/artillery-helper-functions.js ./dist/lib/test/typescript/benchmark/setup",
-    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
