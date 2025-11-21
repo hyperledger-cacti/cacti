@@ -171,7 +171,7 @@ class GetTokenStateAndContractId(
         //get the RealEstateEvolvableTokenType object
         val evolvableTokenType: FungibleHouseTokenState = stateAndRef.state.data
 
-        //get the pointer pointer to the house
+        //get the pointer to the house
         val tokenPointer: TokenPointer<FungibleHouseTokenState> = evolvableTokenType.toPointer(evolvableTokenType.javaClass)
 
         val issuerName: CordaX500Name = CordaX500Name.parse("O=PartyA,L=London,C=GB")
