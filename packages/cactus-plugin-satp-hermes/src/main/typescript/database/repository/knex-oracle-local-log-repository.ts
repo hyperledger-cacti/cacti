@@ -1,4 +1,4 @@
-import type { LocalLog } from "../../core/types";
+import type { OracleLocalLog, SATPLocalLog } from "../../core/types";
 import type { ILocalLogRepository } from "./interfaces/repository";
 import knex, { type Knex } from "knex";
 import { knexLocalInstance } from "../knexfile";
@@ -30,53 +30,54 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
   }
 
   getLogsTable(): Knex.QueryBuilder {
-    return this.database("logs");
+    return this.database("oracle_logs");
   }
 
-  readById(logKey: string): Promise<LocalLog> {
+  readById(logKey: string): Promise<OracleLocalLog> {
     return this.getLogsTable().where({ key: logKey }).first();
   }
 
-  readLastestLog(sessionID: string): Promise<LocalLog> {
+  readLastestLog(sessionID: string): Promise<OracleLocalLog> {
     return this.getLogsTable()
       .orderBy("timestamp", "desc")
       .where({ sessionID: sessionID })
       .first();
   }
 
-  readLogsMoreRecentThanTimestamp(timestamp: string): Promise<LocalLog[]> {
+  readLogsMoreRecentThanTimestamp(
+    timestamp: string,
+  ): Promise<OracleLocalLog[]> {
     return this.getLogsTable()
       .where("timestamp", ">", timestamp)
       .whereNot("type", "like", "%proof%");
   }
 
   // TODO fix any type
-  create(log: LocalLog): any {
+  create(log: OracleLocalLog): any {
     return this.getLogsTable().insert(log);
   }
 
-  // TODO fix any type
-  deleteBySessionId(sessionID: string): any {
-    return this.database().where({ sessionID: sessionID }).del();
+  async deleteBySessionId(sessionId: string): Promise<number> {
+    return this.getLogsTable().where("key", "like", `${sessionId}%`).del();
   }
 
-  readLogsNotProofs(): Promise<LocalLog[]> {
+  readLogsNotProofs(): Promise<SATPLocalLog[]> {
     return this.getLogsTable()
       .select(
         this.database.raw(
-          "sessionID, key, data, type, operation, MAX(timestamp) as timestamp",
+          "taskID, key, data, type, operation, oracleOperationId, MAX(timestamp) as timestamp",
         ),
       )
       .whereNot({ type: "proof" })
-      .groupBy("sessionID");
+      .groupBy("taskID");
   }
 
   fetchLogsFromSequence(
     sessionId: string,
     sequenceNumber: number,
-  ): Promise<LocalLog[]> {
+  ): Promise<OracleLocalLog[]> {
     return this.getLogsTable()
-      .where("sessionId", sessionId)
+      .where("taskID", sessionId)
       .andWhere("sequenceNumber", ">", sequenceNumber);
   }
 
