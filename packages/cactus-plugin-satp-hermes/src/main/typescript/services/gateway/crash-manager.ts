@@ -969,18 +969,23 @@ export class CrashManager {
     context.with(ctx, () => {
       try {
         for (const gateway of gateways.values()) {
-          if (gateway.pubKey) {
-            this.gatewaysPubKeys.set(gateway.id, gateway.pubKey);
+          if (gateway.identificationCredential) {
+            this.gatewaysPubKeys.set(
+              gateway.id,
+              gateway.identificationCredential.pubKey,
+            );
           }
         }
 
-        if (!this.orchestrator.ourGateway.pubKey) {
-          throw new Error("Our gateway pubKey not found!");
+        if (!this.orchestrator.ourGateway.identificationCredential) {
+          throw new Error(
+            "Our gateway identificationCredential with pubKey not found!",
+          );
         }
 
         this.gatewaysPubKeys.set(
           this.orchestrator.getSelfId(),
-          this.orchestrator.ourGateway.pubKey,
+          this.orchestrator.ourGateway.identificationCredential.pubKey,
         );
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
