@@ -30,6 +30,11 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
 import { Knex } from "knex";
+import {
+  ACQUIRE_CONNECTION_TIMEOUT,
+  SQLITE_POOL_CONFIG,
+  createSqliteAfterCreate,
+} from "./db-config";
 
 const envPath = process.env.ENV_PATH;
 dotenv.config({ path: envPath });
@@ -52,11 +57,20 @@ export const knexLocalInstance: { [key: string]: Knex.Config } = {
     client: "sqlite3",
     connection: {
       /** Unique SQLite file path to prevent instance conflicts */
-      filename: path.resolve(__dirname, `.dev.local-${uuidv4()}.sqlite3`),
+      filename: path.resolve(
+        __dirname,
+        "data",
+        `.dev.local-${uuidv4()}.sqlite3`,
+      ),
     },
     migrations: {
       /** Directory containing database migration files */
       directory: path.resolve(__dirname, "migrations"),
+    },
+    acquireConnectionTimeout: ACQUIRE_CONNECTION_TIMEOUT,
+    pool: {
+      ...SQLITE_POOL_CONFIG,
+      afterCreate: createSqliteAfterCreate(),
     },
     /** Allow NULL values as default for SQLite compatibility */
     useNullAsDefault: true,

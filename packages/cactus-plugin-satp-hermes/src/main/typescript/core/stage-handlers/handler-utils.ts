@@ -44,6 +44,10 @@
  */
 
 import { SessionIdNotFoundError } from "../errors/satp-handler-errors";
+import type { ExecutionPointAdapterPayload } from "../../adapters/adapter-manager";
+import type { StageExecutionStep } from "../../adapters/adapter-config";
+import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
+import { SATPSession } from "../satp-session";
 
 /**
  * Safely extracts the session ID from a SATP protocol message.
@@ -142,4 +146,104 @@ export function getSessionId(obj: any): string {
     throw new SessionIdNotFoundError("getSessionId");
   }
   return obj.common.sessionId;
+}
+
+/**
+ * Builds an ExecutionPointAdapterPayload for adapter execution.
+ *
+ * @description
+ * Constructs a standardized payload object containing all necessary context
+ * for adapter hook execution during SATP protocol stages. This helper ensures
+ * consistent payload creation across all stage handlers.
+ *
+ * **Payload Contents:**
+ * - Stage identifier (STAGE0, STAGE1, STAGE2, STAGE3)
+ * - Step tag identifying the specific protocol step
+ * - Execution order (before, after, during, rollback)
+ * - Session and gateway identifiers
+ * - Optional context ID for transfer tracking
+ * - Optional metadata and payload for adapter-specific data
+ *
+ * @function buildAdapterPayload
+ * @param {Stage} stage - The SATP protocol stage (SatpStageKey.Stage0, SatpStageKey.Stage1, etc.)
+ * @param {string} stepTag - The step identifier (e.g., "newSessionRequest", "checkNewSessionRequest")
+ * @param {StageExecutionStep} stepOrder - Execution order: "before" | "after" | "during" | "rollback"
+ * @param {SATPSession | undefined} session - The current SATP session
+ * @param {string} gatewayId - The gateway identifier
+ * @param {Record<string, unknown>} [metadata] - Optional metadata to pass to adapters (e.g., { operation, role })
+ * @param {Record<string, unknown>} [payload] - Optional payload data to pass to adapters
+ * @returns {ExecutionPointAdapterPayload | undefined} The constructed payload or undefined if session is invalid
+ *
+ * @example
+ * ```typescript
+ * const payload = buildAdapterPayload(
+ *   SatpStageKey.Stage0,
+ *   "newSessionRequest",
+ *   "before",
+ *   session,
+ *   this.gatewayId,
+ *   { operation: "newSession", role: "client" }
+ * );
+ * await this.executeAdapters(payload);
+ * ```
+ *
+ * @since 0.0.3-beta
+ */
+export function buildAdapterPayload(
+  stage: SatpStageKey,
+  stepTag: string,
+  stepOrder: StageExecutionStep,
+  session: SATPSession | undefined,
+  gatewayId: string,
+  metadata?: Record<string, unknown>,
+  payload?: Record<string, unknown>,
+): ExecutionPointAdapterPayload | undefined {
+  if (!session) {
+    return undefined;
+  }
+  const sessionId = session.getSessionId();
+  if (!sessionId) {
+    return undefined;
+  }
+  const contextId = getContextIdSafe(session);
+  return {
+    stage,
+    stepTag,
+    stepOrder,
+    order: stepOrder,
+    sessionId,
+    gatewayId,
+    contextId,
+    metadata,
+    payload,
+  };
+}
+
+/**
+ * Safely extracts the transfer context ID from a session.
+ *
+ * @description
+ * Attempts to retrieve the transferContextId from either server or client
+ * session data, returning undefined if not available or on error.
+ *
+ * @function getContextIdSafe
+ * @param {SATPSession} session - The SATP session to extract context ID from
+ * @returns {string | undefined} The transfer context ID or undefined
+ */
+export function getContextIdSafe(session: SATPSession): string | undefined {
+  try {
+    if (session.hasServerSessionData()) {
+      return session.getServerSessionData().transferContextId;
+    }
+  } catch {
+    // ignore
+  }
+  try {
+    if (session.hasClientSessionData()) {
+      return session.getClientSessionData().transferContextId;
+    }
+  } catch {
+    // ignore
+  }
+  return undefined;
 }

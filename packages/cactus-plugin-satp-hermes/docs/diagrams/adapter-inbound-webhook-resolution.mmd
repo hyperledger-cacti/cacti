@@ -1,0 +1,69 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#86efac','primaryTextColor':'#14532d','primaryBorderColor':'#166534','lineColor':'#22c55e','secondaryColor':'#dcfce7','tertiaryColor':'#f0fdf4', 'actorTextColor':'#14532d', 'actorBkg':'#bbf7d0', 'actorBorder':'#166534', 'signalColor':'#14532d', 'signalTextColor':'#14532d', 'noteBkgColor':'#fef9c3', 'noteTextColor':'#422006', 'noteBorderColor':'#ca8a04', 'labelBoxBkgColor':'#dcfce7', 'labelTextColor':'#14532d'}}}%%
+
+sequenceDiagram
+    autonumber
+    participant EC as External<br/>Controller
+    participant HTTP as HTTP Endpoint<br/>(decide-endpoint.ts)
+    participant DISP as BLODispatcher
+    participant AM as AdapterManager
+    participant AHS as AdapterHookService
+    participant MAP as pendingInboundDecisions<br/>Map
+    participant PROM as Waiting Promise<br/>(runInboundWebhook)
+
+    Note over EC,PROM: Inbound Webhook Resolution Flow - Unblocking a Paused SATP Session
+
+    rect rgb(254, 215, 170)
+        Note over AHS,PROM: 1. Initial State - Session is PAUSED
+        AHS->>MAP: pendingInboundDecisions.set(key, pending)
+        Note right of MAP: Map contains:<br/>key: "session123:compliance-adapter"<br/>value: { resolve, reject, startedAt, ... }
+        AHS->>PROM: await Promise.race([decisionPromise, timeoutPromise])
+        Note right of PROM: BLOCKED waiting for<br/>external decision...
+    end
+
+    rect rgb(220, 252, 231)
+        Note over EC,HTTP: 2. External Controller Posts Decision (Unblocker)
+        EC->>HTTP: POST /api/v1/.../webhook/inbound/decide<br/>{adapterId, sessionId, continue: true, reason}
+        HTTP->>HTTP: Validate required fields
+    end
+
+    rect rgb(187, 247, 208)
+        Note over HTTP,AM: 3. Route Through Dispatcher
+        HTTP->>DISP: decideInboundWebhook(req)
+        DISP->>DISP: Check !isShuttingDown
+        DISP->>DISP: Check adapterManager exists
+        DISP->>AM: decideInboundWebhook(input)
+    end
+
+    rect rgb(254, 249, 195)
+        Note over AM,AHS: 4. Validate and Delegate to Hook Service
+        AM->>AM: Validate adapterId exists
+        AM->>AM: Validate adapter has inboundWebhook
+        AM->>AHS: processInboundDecision({<br/>adapterId, sessionId, shouldContinue, reason})
+    end
+
+    rect rgb(134, 239, 172)
+        Note over AHS,PROM: 5. Resolve the Waiting Promise
+        AHS->>AHS: buildPendingKey(sessionId, adapterId)
+        AHS->>MAP: get("session123:compliance-adapter")
+        MAP-->>AHS: PendingInboundDecision { resolve, reject, ... }
+        AHS->>MAP: delete("session123:compliance-adapter")
+        AHS->>AHS: Build InboundWebhookDecisionResponse
+        AHS->>PROM: pending.resolve(decisionResponse)
+        Note over PROM: Promise resolves!<br/>Promise.race() returns decision
+    end
+
+    rect rgb(220, 252, 231)
+        Note over AHS,PROM: 6. runInboundWebhook() Unblocks
+        PROM-->>AHS: decision = { continue: true, reason: "..." }
+        AHS->>AHS: Check decision.continue === true
+        AHS-->>AM: AdapterHookStepResult { disposition: CONTINUE }
+    end
+
+    rect rgb(187, 247, 208)
+        Note over AM,EC: 7. Return Success to External Controller
+        AM-->>DISP: { accepted: true }
+        DISP-->>HTTP: DecideInboundWebhook200Response
+        HTTP-->>EC: 200 OK { accepted: true }
+    end
+
+    Note over EC,PROM: SATP Protocol Execution Resumes

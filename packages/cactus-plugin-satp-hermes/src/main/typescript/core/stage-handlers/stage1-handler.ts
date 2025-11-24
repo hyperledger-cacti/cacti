@@ -44,6 +44,14 @@
  * - Implements distributed tracing for cross-gateway operation correlation
  * - Provides comprehensive error tracking and diagnostic information
  *
+ * **Adapter Security:**
+ * - All Stage 1 adapter callbacks (outbound notifications and inbound
+ *   approvals) traverse mutually authenticated TLS connections.
+ * - The gateway rejects inbound approvals when the client certificate cannot
+ *   be chained to a configured trust anchor.
+ * - Outbound deliveries attach the caller certificate fingerprint for audit,
+ *   enabling downstream services to verify origin authenticity.
+ *
  * @example
  * Server-side stage 1 handler setup:
  * ```typescript
@@ -102,8 +110,8 @@ import {
   SATPHandler,
   SATPHandlerOptions,
   SATPHandlerType,
-  Stage,
 } from "../../types/satp-protocol";
+import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
@@ -111,7 +119,7 @@ import {
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
-import { getSessionId } from "./handler-utils";
+import { getSessionId, buildAdapterPayload } from "./handler-utils";
 import { PreSATPTransferResponse } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { getMessageTypeName } from "../satp-utils";
@@ -124,6 +132,7 @@ import {
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import type { AdapterManager } from "../../adapters/adapter-manager";
 
 /**
  * SATP Stage 1 Handler for Transfer Proposal and Commencement Operations.
@@ -284,6 +293,10 @@ export class Stage1SATPHandler implements SATPHandler {
    * @readonly
    */
   private readonly monitorService: MonitorService;
+  /** Adapter manager reference for invoking API3 hooks. */
+  private readonly adapterManager?: AdapterManager;
+  /** Unique identifier for the hosting gateway instance. */
+  private readonly gatewayId: string;
 
   /**
    * Creates a new Stage 1 SATP handler instance.
@@ -356,6 +369,8 @@ export class Stage1SATPHandler implements SATPHandler {
     this.clientService = ops.clientService as Stage1ClientService;
     this.bridgeManagerClient = ops.bridgeClient;
     this.monitorService = ops.monitorService;
+    this.adapterManager = ops.adapterManager;
+    this.gatewayId = ops.gatewayId;
     this.logger = LoggerProvider.getOrCreate(
       ops.loggerOptions,
       this.monitorService,
@@ -406,7 +421,7 @@ export class Stage1SATPHandler implements SATPHandler {
    * @returns {string} The SATP Stage 1 identifier
    */
   getStage(): string {
-    return Stage.STAGE1;
+    return SatpStageKey.Stage1;
   }
 
   /**
@@ -492,6 +507,17 @@ export class Stage1SATPHandler implements SATPHandler {
           throw new SessionNotFoundError(fnTag);
         }
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage1,
+            "checkTransferProposalRequestMessage",
+            "before",
+            session,
+            this.gatewayId,
+            { operation: "transferProposal", role: "server" },
+          ),
+        );
+
         span.setAttribute("sessionId", session.getSessionId() || "");
 
         await this.serverService.checkTransferProposalRequestMessage(
@@ -562,6 +588,17 @@ export class Stage1SATPHandler implements SATPHandler {
             `${fnTag}, Missing timestamps for operation duration calculation`,
           );
         }
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage1,
+            "transferProposalResponse",
+            "after",
+            session,
+            this.gatewayId,
+            { operation: "transferProposal", role: "server" },
+          ),
+        );
 
         return message;
       } catch (error) {
@@ -671,6 +708,17 @@ export class Stage1SATPHandler implements SATPHandler {
           throw new SessionNotFoundError(fnTag);
         }
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage1,
+            "checkTransferCommenceRequestMessage",
+            "before",
+            session,
+            this.gatewayId,
+            { operation: "transferCommence", role: "server" },
+          ),
+        );
+
         span.setAttribute("sessionId", session.getSessionId());
         span.setAttribute(
           "senderNetworkId",
@@ -738,6 +786,17 @@ export class Stage1SATPHandler implements SATPHandler {
             `${fnTag}, Missing timestamps for operation duration calculation`,
           );
         }
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage1,
+            "transferCommenceResponse",
+            "after",
+            session,
+            this.gatewayId,
+            { operation: "transferCommence", role: "server" },
+          ),
+        );
 
         return message;
       } catch (error) {
@@ -950,6 +1009,17 @@ export class Stage1SATPHandler implements SATPHandler {
             throw new Error(`${fnTag}, Session not found`);
           }
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage1,
+              "transferProposalRequest",
+              "before",
+              session,
+              this.gatewayId,
+              { operation: "transferProposal", role: "client" },
+            ),
+          );
+
           await this.clientService.checkPreSATPTransferResponse(
             response,
             session,
@@ -973,6 +1043,17 @@ export class Stage1SATPHandler implements SATPHandler {
           saveMessageInSessionData(
             session.getClientSessionData(),
             requestTransferProposal,
+          );
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage1,
+              "transferProposalRequest",
+              "after",
+              session,
+              this.gatewayId,
+              { operation: "transferProposal", role: "client" },
+            ),
           );
 
           return requestTransferProposal;
@@ -1118,6 +1199,17 @@ export class Stage1SATPHandler implements SATPHandler {
             throw new Error(`${fnTag}, Session not found`);
           }
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage1,
+              "transferCommenceRequest",
+              "before",
+              session,
+              this.gatewayId,
+              { operation: "transferCommence", role: "client" },
+            ),
+          );
+
           span.setAttribute("sessionId", session.getSessionId() || "");
 
           await this.clientService.checkTransferProposalResponse(
@@ -1140,6 +1232,17 @@ export class Stage1SATPHandler implements SATPHandler {
           saveMessageInSessionData(
             session.getClientSessionData(),
             requestTransferCommence,
+          );
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage1,
+              "transferCommenceRequest",
+              "after",
+              session,
+              this.gatewayId,
+              { operation: "transferCommence", role: "client" },
+            ),
           );
 
           return requestTransferCommence;

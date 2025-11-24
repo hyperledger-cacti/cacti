@@ -84,11 +84,21 @@ afterAll(async () => {
     }
   }
 
-  await gateway1.shutdown();
-  await gateway2.shutdown();
-  await besuEnv.tearDown();
-  await fabricEnv.tearDown();
-  await ethereumEnv.tearDown();
+  if (gateway1) {
+    await gateway1.shutdown();
+  }
+  if (gateway2) {
+    await gateway2.shutdown();
+  }
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (fabricEnv) {
+    await fabricEnv.tearDown();
+  }
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {

@@ -92,8 +92,8 @@ import {
   SATPHandler,
   SATPHandlerOptions,
   SATPHandlerType,
-  Stage,
 } from "../../types/satp-protocol";
+import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
@@ -107,7 +107,7 @@ import {
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
-import { getSessionId } from "./handler-utils";
+import { getSessionId, buildAdapterPayload } from "./handler-utils";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
 import {
@@ -117,6 +117,7 @@ import {
 } from "../session-utils";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import type { AdapterManager } from "../../adapters/adapter-manager";
 /**
  * SATP Stage 2 Handler for Lock Assertion and Asset Locking Operations.
  *
@@ -280,6 +281,8 @@ export class Stage2SATPHandler implements SATPHandler {
    * @readonly
    */
   private readonly monitorService: MonitorService;
+  private readonly adapterManager?: AdapterManager;
+  private readonly gatewayId: string;
 
   /**
    * Creates a new Stage 2 SATP handler instance.
@@ -357,6 +360,8 @@ export class Stage2SATPHandler implements SATPHandler {
     this.serverService = ops.serverService as Stage2ServerService;
     this.clientService = ops.clientService as Stage2ClientService;
     this.monitorService = ops.monitorService;
+    this.adapterManager = ops.adapterManager;
+    this.gatewayId = ops.gatewayId;
     this.logger = LoggerProvider.getOrCreate(
       ops.loggerOptions,
       this.monitorService,
@@ -422,7 +427,7 @@ export class Stage2SATPHandler implements SATPHandler {
    * @returns {string} The SATP Stage 2 identifier
    */
   getStage(): string {
-    return Stage.STAGE2;
+    return SatpStageKey.Stage2;
   }
 
   // ============================================================================
@@ -519,6 +524,17 @@ export class Stage2SATPHandler implements SATPHandler {
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage2,
+            "checkLockAssertionRequest",
+            "before",
+            session,
+            this.gatewayId,
+            { operation: "lockAssertion", role: "server" },
+          ),
+        );
+
         await this.serverService.checkLockAssertionRequest(req, session);
 
         saveMessageInSessionData(session.getServerSessionData(), req);
@@ -560,6 +576,17 @@ export class Stage2SATPHandler implements SATPHandler {
         }
 
         saveMessageInSessionData(session.getServerSessionData(), message);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage2,
+            "lockAssertionResponse",
+            "after",
+            session,
+            this.gatewayId,
+            { operation: "lockAssertion", role: "server" },
+          ),
+        );
 
         return message;
       } catch (error) {
@@ -800,6 +827,17 @@ export class Stage2SATPHandler implements SATPHandler {
 
           span.setAttribute("sessionId", session.getSessionId() || "");
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage2,
+              "checkTransferCommenceResponse",
+              "before",
+              session,
+              this.gatewayId,
+              { operation: "lockAssertion", role: "client" },
+            ),
+          );
+
           await this.clientService.checkTransferCommenceResponse(
             response,
             session,
@@ -822,6 +860,17 @@ export class Stage2SATPHandler implements SATPHandler {
           }
 
           saveMessageInSessionData(session.getClientSessionData(), request);
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage2,
+              "lockAssertionRequest",
+              "after",
+              session,
+              this.gatewayId,
+              { operation: "lockAssertion", role: "client" },
+            ),
+          );
 
           return request;
         } catch (error) {

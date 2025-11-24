@@ -19,6 +19,7 @@ import {
   createPGDatabase,
   setupDBTable,
   getTestConfigFilesDirectory,
+  createEnhancedTimeoutConfig,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -85,14 +86,24 @@ afterEach(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  await db_local.stop();
-  await db_local.remove();
-  await db_remote.stop();
-  await db_remote.remove();
+  if (db_local) {
+    await db_local.stop();
+    await db_local.remove();
+  }
+  if (db_remote) {
+    await db_remote.stop();
+    await db_remote.remove();
+  }
 
-  await besuEnv.tearDown();
-  await ethereumEnv.tearDown();
-  await fabricEnv.tearDown();
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
+  if (fabricEnv) {
+    await fabricEnv.tearDown();
+  }
 }, TIMEOUT);
 
 beforeAll(async () => {
@@ -110,12 +121,14 @@ beforeAll(async () => {
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_local_config = createEnhancedTimeoutConfig(db_local_config);
 
   ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_remote_config = createEnhancedTimeoutConfig(db_remote_config);
 
   await setupDBTable(db_remote_config);
 

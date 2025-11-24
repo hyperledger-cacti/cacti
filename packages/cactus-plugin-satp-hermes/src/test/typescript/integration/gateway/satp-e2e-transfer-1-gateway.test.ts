@@ -61,9 +61,15 @@ let gateway: SATPGateway;
 const TIMEOUT = 900000; // 15 minutes
 
 afterAll(async () => {
-  await ethereumEnv.tearDown();
-  await besuEnv.tearDown();
-  await fabricEnv.tearDown();
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (fabricEnv) {
+    await fabricEnv.tearDown();
+  }
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {

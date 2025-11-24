@@ -23,6 +23,8 @@ import {
   LedgerType,
   PluginImportType,
 } from "@hyperledger/cactus-core-api";
+import { createServer } from "node:http";
+import { AddressInfo } from "node:net";
 import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
@@ -62,6 +64,16 @@ beforeAll(async () => {
   };
   const factory = new PluginFactorySATPGateway(factoryOptions);
 
+  const server1 = createServer();
+  await new Promise<void>((resolve) => server1.listen(0, resolve));
+  const gatewayServerPort = (server1.address() as AddressInfo).port;
+  await new Promise<void>((resolve) => server1.close(() => resolve()));
+
+  const server2 = createServer();
+  await new Promise<void>((resolve) => server2.listen(0, resolve));
+  const gatewayClientPort = (server2.address() as AddressInfo).port;
+  await new Promise<void>((resolve) => server2.close(() => resolve()));
+
   const gatewayIdentity = {
     id: "mockID",
     name: "CustomGateway",
@@ -74,6 +86,8 @@ beforeAll(async () => {
     ],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
+    gatewayServerPort,
+    gatewayClientPort,
   } as GatewayIdentity;
 
   const options: SATPGatewayConfig = {
@@ -91,8 +105,8 @@ beforeAll(async () => {
 
   const identity = gateway.Identity;
   // default servers
-  expect(identity.gatewayServerPort).toBe(3010);
-  expect(identity.gatewayClientPort).toBe(3011);
+  expect(identity.gatewayServerPort).toBe(gatewayServerPort);
+  expect(identity.gatewayClientPort).toBe(gatewayClientPort);
   expect(identity.address).toBe("http://localhost");
   await gateway.startup();
 

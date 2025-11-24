@@ -215,6 +215,11 @@ export class Stage2ClientService extends SATPService {
     });
   }
 
+  /**
+   * Validates the TransferCommenceResponse from Stage 1.
+   * Note: This method validates a Stage 1 message but is implemented in Stage 2
+   * because it's called at the start of the Stage 2 client workflow.
+   */
   async checkTransferCommenceResponse(
     response: TransferCommenceResponse,
     session: SATPSession,

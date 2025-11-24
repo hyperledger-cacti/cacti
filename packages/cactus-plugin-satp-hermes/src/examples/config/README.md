@@ -1,14 +1,30 @@
 # SATP Gateway Configuration Examples
 
-This directory contains comprehensive configuration examples for the SATP Hermes gateway implementation. These configurations demonstrate various deployment scenarios and use cases for cross-chain asset transfers.
+This directory contains comprehensive configuration examples for the SATP Hermes gateway implementation. These configurations demonstrate various deployment scenarios and use cases for cross-chain asset transfers. Please check the [Cacti demo][https://github.com/AndreAugusto11/satp-gateway-demo](https://github.com/hyperledger-cacti/cacti-demos)  repository for updated examples.
 
 ## Source and Attribution
 
-These configuration examples are inspired by and derived from the [SATP Gateway Demo](https://github.com/RafaelAPB/satp-gateway-demo) repository, by André Augusto, which provides reference implementations and working examples of SATP gateway configurations in practice.
+These configuration examples are inspired by and derived from the [SATP Gateway Demo](https://github.com/AndreAugusto11/satp-gateway-demo) repository, by André Augusto, which provides reference implementations and working examples of SATP gateway configurations in practice.
+
+## Adapter Configuration Examples
+
+For API3 adapter webhook configuration examples (YAML format), see the test fixtures directory:
+
+**Location:** `src/test/yaml/fixtures/`
+
+**Available Fixtures:**
+- `adapter-configuration-newSessionRequest.yml` - Stage 0 newSessionRequest focused configuration
+- `adapter-configuration-simple.example.yml` - Simple adapter configuration example
+- `adapter-configuration-integration-test.yml` - Integration test configuration
+- `adapter-configuration-test-server.yml` - Test server configuration for E2E tests
+- `adapter-configuration-test-server-simple.yml` - Simplified test server configuration
+- `adapter-configuration.example.yml` - Full adapter configuration example
+
+These YAML fixtures demonstrate adapter webhook configurations for various SATP protocol execution points (stages 0-3) with both outbound and inbound webhook patterns.
 
 ## Available Configuration Templates
 
-These configurations are based on working examples from the [SATP Gateway Demo](https://github.com/RafaelAPB/satp-gateway-demo) repository and are known to work in practice.
+These configurations are based on working examples from the [SATP Gateway Demo](https://github.com/AndreAugusto11/satp-gateway-demo) repository and are known to work in practice.
 
 ### Oracle Configurations
 

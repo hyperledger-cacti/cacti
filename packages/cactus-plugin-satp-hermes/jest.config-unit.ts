@@ -17,6 +17,7 @@ module.exports = {
   },
   testMatch: ["**/src/test/typescript/unit/**/*.test.ts"],
   testPathIgnorePatterns: [],
+  modulePathIgnorePatterns: ["<rootDir>/dist/"],
   reporters: [
     "default",
     [
