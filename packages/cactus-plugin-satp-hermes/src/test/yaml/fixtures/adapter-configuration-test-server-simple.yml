@@ -1,0 +1,130 @@
+# =============================================================================
+# Full Test Server Configuration - Multi-Stage E2E Testing
+# =============================================================================
+#
+# PURPOSE:
+# Comprehensive configuration for testing adapters across all 4 SATP stages.
+# Used by adapter-e2e-test-server-*.test.ts for full protocol flow testing.
+#
+# STAGE COVERAGE:
+# - Stage 0: Session initialization (phase0-adapter-1, phase0-adapter-2)
+# - Stage 1: Transfer proposal (stage1-compliance-adapter)
+# - Stage 2: Lock operations (stage2-lock-monitor)
+# - Stage 3: Finalization (stage3-finalization-adapter)
+#
+# ADAPTER PATTERNS:
+# - Validation + Approval: outbound pre-check + inbound approval gate
+# - Notification Only: outbound fire-and-block for audit/dashboard
+# - Monitoring: outbound logging at completion points
+#
+# TEST SERVER ENDPOINTS:
+# All URLs point to localhost:9223 and are patched at runtime by
+# loadAndPatchTestServerConfig() to use dynamically assigned port.
+#
+# NOTE: Short timeouts (3-5 seconds) are used for fast test execution.
+# Production configurations should use longer timeouts (5+ minutes).
+# =============================================================================
+
+# Uses localhost:9223 endpoints from adapter-test-server.ts
+adapters:
+  - id: "phase0-adapter-1"
+    name: "Transfer Validation Webhook"
+    description: "Validates transfer initiation request"
+    executionPoints:
+      - stage: "stage0"
+        step: checkNewSessionRequest
+        point: "before"
+      - stage: "stage0"
+        step: checkPreSATPTransferRequest
+        point: "before"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 500
+    inboundWebhook:
+      timeoutMs: 3000
+    active: true
+    priority: 1
+
+  - id: "phase0-adapter-2"
+    name: "Business dashboard Webhook"
+    description: "Updates legacy business dashboard with transfer data"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionResponse
+        point: "after"
+      - stage: "stage0"
+        step: preSATPTransferResponse
+        point: "after"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/approve"
+      timeoutMs: 5000
+      retryAttempts: 2
+    active: true
+    priority: 2
+
+  - id: "stage1-compliance-adapter"
+    name: "Compliance Check Webhook"
+    description: "Performs compliance checks during transfer proposal"
+    executionPoints:
+      - stage: "stage1"
+        step: checkTransferProposalRequestMessage
+        point: "before"
+      - stage: "stage1"
+        step: checkTransferCommenceRequestMessage
+        point: "before"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound"
+      timeoutMs: 5000
+      retryAttempts: 2
+      retryDelayMs: 500
+    inboundWebhook:
+      timeoutMs: 3000
+    active: true
+    priority: 1
+
+  - id: "stage2-lock-monitor"
+    name: "Asset Lock Monitor"
+    description: "Monitors asset locking operations"
+    executionPoints:
+      - stage: "stage2"
+        step: checkLockAssertionRequest
+        point: "after"
+      - stage: "stage2"
+        step: checkLockAssertionResponse
+        point: "after"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound"
+      timeoutMs: 5000
+      retryAttempts: 3
+    active: true
+    priority: 1
+
+  - id: "stage3-finalization-adapter"
+    name: "Transfer Finalization Webhook"
+    description: "Handles final transfer completion notifications"
+    executionPoints:
+      - stage: "stage3"
+        step: commitReadyResponse
+        point: "after"
+      - stage: "stage3"
+        step: transferCompleteResponse
+        point: "after"
+      - stage: "stage3"
+        step: checkTransferCompleteResponse
+        point: "after"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 500
+    active: true
+    priority: 1
+
+# Global configuration
+global:
+  timeoutMs: 5000
+  retryAttempts: 3
+  retryDelayMs: 500
+  logLevel: "debug"

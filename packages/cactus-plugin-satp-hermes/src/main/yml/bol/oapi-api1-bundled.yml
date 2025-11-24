@@ -1,11 +1,42 @@
 openapi: 3.0.3
 info:
-  title: SATP Gateway Client (Business Logic Orchestrator)
+  title: SATP Gateway Client (API-Type 1)
   version: 0.0.2
   description: |-
-    SATP is a protocol operating between two gateways that conducts the transfer of a digital asset from one gateway to another. The protocol establishes a secure channel between the endpoints and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, isolation and durability.
+    SATP is a protocol operating between two gateways that conducts the transfer of a digital asset 
+    from one gateway to another. The protocol establishes a secure channel between the endpoints 
+    and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, 
+    isolation and durability.
 
-    This API defines the gateway client facing API (business logic orchestrator, or BLO), which is named API-Type 1 in the SATP-Core specification.
+    This API defines the gateway client facing API (API-Type 1 in the SATP-Core specification).
+
+    ## Adapter Layer
+
+    The SATP Hermes plugin includes an Adapter Layer that enables external systems to integrate 
+    with and control SATP transfers through webhook-based communication. This enables compliance 
+    systems, business logic, and human-in-the-loop workflows to participate in cross-chain asset 
+    transfers.
+
+    ### Webhook Types
+
+    | Type | Direction | Purpose |
+    |------|-----------|---------|
+    | **Outbound Webhooks** | Gateway → External System | Notify external systems about SATP events |
+    | **Inbound Webhooks** | External System → Gateway | Allow external systems to approve/reject transfers |
+
+    ### Key Concepts
+
+    - **Execution Points**: Adapters are triggered at specific points in the SATP protocol (stage + step + order)
+    - **Adapters**: Configuration units that define which webhooks to call and when
+    - **Session Control**: Inbound webhooks can pause transfers pending external approval
+
+    ### Inbound Webhook Approval Flow
+
+    1. Gateway reaches configured execution point with inbound adapter
+    2. Gateway pauses SATP execution and waits for external decision
+    3. External controller evaluates transfer (compliance, business rules, manual review)
+    4. Controller POSTs decision to `/webhook/inbound/decide` endpoint
+    5. Gateway validates decision and resumes or aborts transfer
 
     **Additional Resources**:
     - [Proposed SATP Charter](https://datatracker.ietf.org/doc/charter-ietf-satp/)
@@ -43,6 +74,8 @@ tags:
     description: API endpoint for adding a counterparty to the gateway
   - name: oracle
     description: API endpoints for oracle tasks management
+  - name: webhook
+    description: API endpoints for inbound webhook decisions from external approval controllers
 paths:
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact:
     post:
@@ -3110,6 +3143,280 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide:
+    post:
+      summary: Submit inbound webhook decision
+      description: |-
+        External approval controllers use this endpoint to submit decisions (approve/reject)
+        for paused SATP transfers. When an adapter with an inbound webhook executes, the 
+        gateway pauses and waits for an external decision via this endpoint.
+
+        **Inbound Webhook Workflow:**
+        1. SATP gateway reaches a stage/step with configured inbound adapter
+        2. Gateway pauses execution and waits for external decision POST
+        3. External controller evaluates business rules, compliance checks, or manual review
+        4. Controller POSTs decision payload to this endpoint
+        5. Gateway validates decision, logs justification, and resumes or aborts transfer
+
+        **Decision Semantics:**
+        - `continue: true` - Approve transfer continuation; gateway proceeds to next stage
+        - `continue: false` - Reject transfer; gateway aborts and may trigger rollback
+        - `reason` - Human-readable justification stored in audit logs
+
+        **Timeout Handling:**
+        Each inbound webhook declares a `timeoutMs` timeout. If no decision arrives
+        within this window, the gateway treats it as a rejection and aborts the transfer.
+
+        **Security Considerations:**
+        - Inbound endpoints should use authentication (API keys, mTLS, JWT validation)
+        - Decision payloads must include adapter ID to match the paused session state
+        - All decisions are logged with timestamps for non-repudiation
+      operationId: DecideInboundWebhook
+      tags:
+        - webhook
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: |-
+                Request payload posted by external approval controllers to approve or reject 
+                a paused SATP transfer. The gateway validates the adapterId matches the waiting 
+                adapter, then uses the continue field to determine whether to proceed or abort.
+
+                Inbound Webhook Workflow:
+                1. SATP gateway reaches a stage/step with configured inbound adapter
+                2. Gateway pauses execution and waits for external decision POST
+                3. External controller evaluates business rules, compliance checks, or manual review
+                4. Controller POSTs decision payload to gateway's inbound endpoint
+                5. Gateway validates decision, logs justification, and resumes or aborts transfer
+
+                Decision Semantics:
+                - continue=true: Approve transfer continuation; gateway proceeds to next stage
+                - continue=false: Reject transfer; gateway aborts and may trigger rollback
+                - reason: Human-readable justification stored in audit logs
+
+                Security Considerations:
+                - Inbound endpoints should use authentication (API keys, mTLS, JWT validation)
+                - Decision payloads must include adapter ID to match the paused session state
+                - All decisions are logged with timestamps for non-repudiation
+              x-category: request
+              required:
+                - adapterId
+                - sessionId
+                - continue
+              properties:
+                adapterId:
+                  type: string
+                  description: Adapter identifier that originally paused the SATP stage.
+                  example: compliance-check
+                sessionId:
+                  type: string
+                  description: Session identifier for the paused SATP transfer.
+                  example: session-123
+                contextId:
+                  type: string
+                  description: Optional transfer context identifier.
+                  example: ctx-456
+                continue:
+                  type: boolean
+                  description: |-
+                    When true, the gateway resumes the paused stage. When false, the transfer 
+                    is rejected and the provided reason is logged.
+                  example: true
+                reason:
+                  type: string
+                  description: Human-readable justification for auditing and operator visibility.
+                  example: Transfer approved after KYC verification
+                data:
+                  type: object
+                  description: Optional data payload from external system.
+                  additionalProperties: true
+      responses:
+        '200':
+          description: Decision accepted and applied to the session
+          content:
+            application/json:
+              schema:
+                type: object
+                description: |-
+                  Response returned by the gateway after processing an inbound webhook decision.
+                  Indicates whether the decision was accepted and the resulting session state.
+                x-category: response
+                required:
+                  - accepted
+                  - sessionId
+                properties:
+                  accepted:
+                    type: boolean
+                    description: Whether the decision was accepted and applied to the session.
+                    example: true
+                  sessionId:
+                    type: string
+                    description: Session identifier for the affected SATP transfer.
+                    example: session-123
+                  message:
+                    type: string
+                    description: Human-readable message describing the result.
+                    example: 'Decision accepted, transfer resumed'
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the decision was processed.
+                    example: '2024-01-15T10:30:00Z'
+        '400':
+          description: Bad request - invalid decision payload
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
+        '404':
+          description: 'Session or adapter not found, or no pending decision'
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
+        '409':
+          description: Decision conflict - session not in waiting state
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
 components:
   schemas:
     AuthzScope:
@@ -7831,3 +8138,1101 @@ components:
         status:
           type: boolean
           description: The status of the request.
+    AdapterRetryPolicy:
+      type: object
+      description: Common retry policy applied to outbound/inbound webhook invocations.
+      properties:
+        retryAttempts:
+          type: integer
+          description: Maximum number of attempts (initial + retries).
+          minimum: 0
+          default: 3
+          example: 3
+        retryDelayMs:
+          type: integer
+          description: Backoff delay between attempts in milliseconds.
+          minimum: 0
+          default: 1000
+          example: 1000
+    AdapterBaseWebhookConfig:
+      type: object
+      description: Common HTTP attributes shared by adapter webhook definitions.
+      properties:
+        timeoutMs:
+          type: integer
+          description: Maximum time the gateway waits for the remote endpoint before aborting.
+          minimum: 0
+          default: 5000
+          example: 5000
+        payloadTemplate:
+          type: string
+          description: Optional Mustache/Handlebars-style payload template rendered per invocation.
+          example: '{"sessionId": "{{sessionId}}", "stage": {{stage}}}'
+        retryAttempts:
+          type: integer
+          description: Maximum number of attempts (initial + retries).
+          minimum: 0
+          default: 3
+        retryDelayMs:
+          type: integer
+          description: Backoff delay between attempts in milliseconds.
+          minimum: 0
+          default: 1000
+    AdapterOutboundWebhookConfig:
+      type: object
+      description: |-
+        Outbound webhook configuration for notifying external systems about SATP protocol events.
+
+        **Purpose:**
+        Outbound webhooks enable fire-and-forget notifications to external monitoring, logging,
+        metrics collection, and audit systems. When SATP lifecycle events occur, the gateway
+        POSTs a standardized JSON payload to the configured URL.
+
+        **Execution Model:**
+        - Non-blocking: SATP execution continues regardless of webhook response
+        - Supports retry logic with exponential backoff for reliability
+        - Multiple outbound webhooks at the same execution point run concurrently
+        - Always uses POST method with application/json content-type
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Absolute HTTPS endpoint the gateway should call.
+          example: 'https://monitor.example.com/satp/lock-detected'
+        timeoutMs:
+          type: integer
+          description: Maximum time the gateway waits for the remote endpoint before aborting.
+          minimum: 0
+          default: 5000
+        payloadTemplate:
+          type: string
+          description: Optional payload template rendered per invocation.
+        retryAttempts:
+          type: integer
+          description: Maximum number of retry attempts.
+          minimum: 0
+          default: 3
+        retryDelayMs:
+          type: integer
+          description: Backoff delay between attempts in milliseconds.
+          minimum: 0
+          default: 1000
+        priority:
+          type: integer
+          description: |-
+            Priority for ordering multiple outbound webhooks within the same adapter.
+            Lower numbers execute first. Defaults to 1000 if not specified.
+          default: 1000
+          example: 1
+    AdapterInboundWebhookConfig:
+      type: object
+      description: |-
+        Inbound webhook configuration for blocking approval workflows during SATP execution.
+
+        **Purpose:**
+        Inbound webhooks enable external approval controllers, compliance systems, and human
+        operators to participate in SATP cross-chain transfers. When configured, the gateway
+        pauses protocol execution and waits for an external decision before proceeding.
+
+        **Execution Model:**
+        - Blocking: SATP transfer waits for external controller response or timeout
+        - Gateway exposes decision endpoint under API3 adapter base path
+        - Multiple inbound webhooks at the same point serialize for clear approval semantics
+        - Timeout triggers automatic rejection with configurable behavior
+
+        **Decision Flow:**
+        1. Gateway reaches configured execution point and pauses
+        2. External controller receives notification (via paired outbound webhook or polling)
+        3. Controller posts decision to `/api/v1/.../webhook/inbound/decide`
+        4. Gateway validates adapterId/sessionId and resumes or aborts based on `continue` field
+      properties:
+        timeoutMs:
+          type: integer
+          description: Maximum time the gateway waits for external decision before timing out.
+          minimum: 0
+          default: 300000
+          example: 300000
+        payloadTemplate:
+          type: string
+          description: Optional payload template for context data.
+        retryAttempts:
+          type: integer
+          description: Maximum number of retry attempts.
+          minimum: 0
+          default: 3
+        retryDelayMs:
+          type: integer
+          description: Backoff delay between attempts in milliseconds.
+          minimum: 0
+          default: 1000
+        priority:
+          type: integer
+          description: |-
+            Priority for ordering multiple inbound webhooks within the same adapter.
+            Lower numbers execute first. Defaults to 1000 if not specified.
+          default: 1000
+    AdapterExecutionPointDefinition:
+      type: object
+      description: |-
+        Execution point definition - specifies where an adapter should execute
+        within the SATP protocol flow.
+      required:
+        - stage
+        - step
+        - point
+      properties:
+        stage:
+          type: string
+          description: |-
+            Supported SATP stage identifiers that can host adapters.
+            Stage 0-3 represent the four phases of the SATP protocol,
+            while 'crash' is used for crash recovery scenarios.
+          enum:
+            - stage0
+            - stage1
+            - stage2
+            - stage3
+            - crash
+          example: stage1
+        step:
+          type: string
+          description: Stage-specific step identifier.
+          example: checkTransferProposalRequestMessage
+        point:
+          type: string
+          description: Execution steps inside a stage where adapters can hook into.
+          enum:
+            - before
+            - during
+            - after
+            - rollback
+          example: before
+    SatpStageKey:
+      type: string
+      description: |-
+        Supported SATP stage identifiers that can host adapters.
+        Stage 0-3 represent the four phases of the SATP protocol,
+        while 'crash' is used for crash recovery scenarios.
+      enum:
+        - stage0
+        - stage1
+        - stage2
+        - stage3
+        - crash
+      example: stage1
+    AdapterStageExecutionStep:
+      type: string
+      description: Execution steps inside a stage where adapters can hook into.
+      enum:
+        - before
+        - during
+        - after
+        - rollback
+      example: before
+    AdapterDefinition:
+      type: object
+      description: |-
+        Adapter definition - a configuration unit that defines webhooks for
+        specific execution points in the SATP protocol flow.
+      required:
+        - id
+        - name
+        - active
+        - executionPoints
+      properties:
+        id:
+          type: string
+          description: Stable identifier used for logging and inbound routing.
+          example: compliance-check
+        name:
+          type: string
+          description: Human-friendly adapter label.
+          example: AML/KYC Compliance Verification
+        description:
+          type: string
+          description: Optional textual description for operators.
+          example: Validates transfer against compliance rules before lock
+        active:
+          type: boolean
+          description: Enables/disables adapter without removing its configuration.
+          example: true
+        priority:
+          type: integer
+          description: |-
+            Priority ordering when multiple adapters are registered at the same
+            execution point. Lower numbers run earlier.
+          default: 1000
+          example: 1
+        executionPoints:
+          type: array
+          description: Execution points where this adapter should be invoked.
+          items:
+            type: object
+            description: |-
+              Execution point definition - specifies where an adapter should execute
+              within the SATP protocol flow.
+            required:
+              - stage
+              - step
+              - point
+            properties:
+              stage:
+                type: string
+                description: |-
+                  Supported SATP stage identifiers that can host adapters.
+                  Stage 0-3 represent the four phases of the SATP protocol,
+                  while 'crash' is used for crash recovery scenarios.
+                enum:
+                  - stage0
+                  - stage1
+                  - stage2
+                  - stage3
+                  - crash
+                example: stage1
+              step:
+                type: string
+                description: Stage-specific step identifier.
+                example: checkTransferProposalRequestMessage
+              point:
+                type: string
+                description: Execution steps inside a stage where adapters can hook into.
+                enum:
+                  - before
+                  - during
+                  - after
+                  - rollback
+                example: before
+          minItems: 1
+        outboundWebhook:
+          type: object
+          description: |-
+            Outbound webhook configuration for notifying external systems about SATP protocol events.
+
+            **Purpose:**
+            Outbound webhooks enable fire-and-forget notifications to external monitoring, logging,
+            metrics collection, and audit systems. When SATP lifecycle events occur, the gateway
+            POSTs a standardized JSON payload to the configured URL.
+
+            **Execution Model:**
+            - Non-blocking: SATP execution continues regardless of webhook response
+            - Supports retry logic with exponential backoff for reliability
+            - Multiple outbound webhooks at the same execution point run concurrently
+            - Always uses POST method with application/json content-type
+          required:
+            - url
+          properties:
+            url:
+              type: string
+              format: uri
+              description: Absolute HTTPS endpoint the gateway should call.
+              example: 'https://monitor.example.com/satp/lock-detected'
+            timeoutMs:
+              type: integer
+              description: Maximum time the gateway waits for the remote endpoint before aborting.
+              minimum: 0
+              default: 5000
+            payloadTemplate:
+              type: string
+              description: Optional payload template rendered per invocation.
+            retryAttempts:
+              type: integer
+              description: Maximum number of retry attempts.
+              minimum: 0
+              default: 3
+            retryDelayMs:
+              type: integer
+              description: Backoff delay between attempts in milliseconds.
+              minimum: 0
+              default: 1000
+            priority:
+              type: integer
+              description: |-
+                Priority for ordering multiple outbound webhooks within the same adapter.
+                Lower numbers execute first. Defaults to 1000 if not specified.
+              default: 1000
+              example: 1
+        outboundWebhooks:
+          type: array
+          description: Array of outbound webhooks when multiple notifications are needed.
+          items:
+            type: object
+            description: |-
+              Outbound webhook configuration for notifying external systems about SATP protocol events.
+
+              **Purpose:**
+              Outbound webhooks enable fire-and-forget notifications to external monitoring, logging,
+              metrics collection, and audit systems. When SATP lifecycle events occur, the gateway
+              POSTs a standardized JSON payload to the configured URL.
+
+              **Execution Model:**
+              - Non-blocking: SATP execution continues regardless of webhook response
+              - Supports retry logic with exponential backoff for reliability
+              - Multiple outbound webhooks at the same execution point run concurrently
+              - Always uses POST method with application/json content-type
+            required:
+              - url
+            properties:
+              url:
+                type: string
+                format: uri
+                description: Absolute HTTPS endpoint the gateway should call.
+                example: 'https://monitor.example.com/satp/lock-detected'
+              timeoutMs:
+                type: integer
+                description: Maximum time the gateway waits for the remote endpoint before aborting.
+                minimum: 0
+                default: 5000
+              payloadTemplate:
+                type: string
+                description: Optional payload template rendered per invocation.
+              retryAttempts:
+                type: integer
+                description: Maximum number of retry attempts.
+                minimum: 0
+                default: 3
+              retryDelayMs:
+                type: integer
+                description: Backoff delay between attempts in milliseconds.
+                minimum: 0
+                default: 1000
+              priority:
+                type: integer
+                description: |-
+                  Priority for ordering multiple outbound webhooks within the same adapter.
+                  Lower numbers execute first. Defaults to 1000 if not specified.
+                default: 1000
+                example: 1
+        inboundWebhook:
+          type: object
+          description: |-
+            Inbound webhook configuration for blocking approval workflows during SATP execution.
+
+            **Purpose:**
+            Inbound webhooks enable external approval controllers, compliance systems, and human
+            operators to participate in SATP cross-chain transfers. When configured, the gateway
+            pauses protocol execution and waits for an external decision before proceeding.
+
+            **Execution Model:**
+            - Blocking: SATP transfer waits for external controller response or timeout
+            - Gateway exposes decision endpoint under API3 adapter base path
+            - Multiple inbound webhooks at the same point serialize for clear approval semantics
+            - Timeout triggers automatic rejection with configurable behavior
+
+            **Decision Flow:**
+            1. Gateway reaches configured execution point and pauses
+            2. External controller receives notification (via paired outbound webhook or polling)
+            3. Controller posts decision to `/api/v1/.../webhook/inbound/decide`
+            4. Gateway validates adapterId/sessionId and resumes or aborts based on `continue` field
+          properties:
+            timeoutMs:
+              type: integer
+              description: Maximum time the gateway waits for external decision before timing out.
+              minimum: 0
+              default: 300000
+              example: 300000
+            payloadTemplate:
+              type: string
+              description: Optional payload template for context data.
+            retryAttempts:
+              type: integer
+              description: Maximum number of retry attempts.
+              minimum: 0
+              default: 3
+            retryDelayMs:
+              type: integer
+              description: Backoff delay between attempts in milliseconds.
+              minimum: 0
+              default: 1000
+            priority:
+              type: integer
+              description: |-
+                Priority for ordering multiple inbound webhooks within the same adapter.
+                Lower numbers execute first. Defaults to 1000 if not specified.
+              default: 1000
+        inboundWebhooks:
+          type: array
+          description: Array of inbound webhooks when multiple approvals are needed.
+          items:
+            type: object
+            description: |-
+              Inbound webhook configuration for blocking approval workflows during SATP execution.
+
+              **Purpose:**
+              Inbound webhooks enable external approval controllers, compliance systems, and human
+              operators to participate in SATP cross-chain transfers. When configured, the gateway
+              pauses protocol execution and waits for an external decision before proceeding.
+
+              **Execution Model:**
+              - Blocking: SATP transfer waits for external controller response or timeout
+              - Gateway exposes decision endpoint under API3 adapter base path
+              - Multiple inbound webhooks at the same point serialize for clear approval semantics
+              - Timeout triggers automatic rejection with configurable behavior
+
+              **Decision Flow:**
+              1. Gateway reaches configured execution point and pauses
+              2. External controller receives notification (via paired outbound webhook or polling)
+              3. Controller posts decision to `/api/v1/.../webhook/inbound/decide`
+              4. Gateway validates adapterId/sessionId and resumes or aborts based on `continue` field
+            properties:
+              timeoutMs:
+                type: integer
+                description: Maximum time the gateway waits for external decision before timing out.
+                minimum: 0
+                default: 300000
+                example: 300000
+              payloadTemplate:
+                type: string
+                description: Optional payload template for context data.
+              retryAttempts:
+                type: integer
+                description: Maximum number of retry attempts.
+                minimum: 0
+                default: 3
+              retryDelayMs:
+                type: integer
+                description: Backoff delay between attempts in milliseconds.
+                minimum: 0
+                default: 1000
+              priority:
+                type: integer
+                description: |-
+                  Priority for ordering multiple inbound webhooks within the same adapter.
+                  Lower numbers execute first. Defaults to 1000 if not specified.
+                default: 1000
+    AdapterGlobalDefaults:
+      type: object
+      description: |-
+        Global defaults for adapter execution. Applied to every adapter unless
+        overridden at the adapter level.
+      properties:
+        timeoutMs:
+          type: integer
+          description: Default timeout in milliseconds.
+          minimum: 0
+          default: 5000
+        retryAttempts:
+          type: integer
+          description: Default number of retry attempts.
+          minimum: 0
+          default: 3
+        retryDelayMs:
+          type: integer
+          description: Default backoff delay in milliseconds.
+          minimum: 0
+          default: 1000
+        logLevel:
+          type: string
+          description: Logging level for adapter operations.
+          enum:
+            - trace
+            - debug
+            - info
+            - warn
+            - error
+          default: info
+        headers:
+          type: object
+          description: Default HTTP headers to include in webhook requests.
+          additionalProperties:
+            type: string
+    AdapterLayerConfiguration:
+      type: object
+      description: |-
+        Root configuration structure for the adapter layer. Loaded from YAML
+        configuration files (e.g., adapter-config.yml) and used to configure
+        webhook-based integrations with external systems.
+      required:
+        - adapters
+      properties:
+        adapters:
+          type: array
+          description: 'Flat list of adapters, each defining their own execution points.'
+          items:
+            type: object
+            description: |-
+              Adapter definition - a configuration unit that defines webhooks for
+              specific execution points in the SATP protocol flow.
+            required:
+              - id
+              - name
+              - active
+              - executionPoints
+            properties:
+              id:
+                type: string
+                description: Stable identifier used for logging and inbound routing.
+                example: compliance-check
+              name:
+                type: string
+                description: Human-friendly adapter label.
+                example: AML/KYC Compliance Verification
+              description:
+                type: string
+                description: Optional textual description for operators.
+                example: Validates transfer against compliance rules before lock
+              active:
+                type: boolean
+                description: Enables/disables adapter without removing its configuration.
+                example: true
+              priority:
+                type: integer
+                description: |-
+                  Priority ordering when multiple adapters are registered at the same
+                  execution point. Lower numbers run earlier.
+                default: 1000
+                example: 1
+              executionPoints:
+                type: array
+                description: Execution points where this adapter should be invoked.
+                items:
+                  type: object
+                  description: |-
+                    Execution point definition - specifies where an adapter should execute
+                    within the SATP protocol flow.
+                  required:
+                    - stage
+                    - step
+                    - point
+                  properties:
+                    stage:
+                      type: string
+                      description: |-
+                        Supported SATP stage identifiers that can host adapters.
+                        Stage 0-3 represent the four phases of the SATP protocol,
+                        while 'crash' is used for crash recovery scenarios.
+                      enum:
+                        - stage0
+                        - stage1
+                        - stage2
+                        - stage3
+                        - crash
+                      example: stage1
+                    step:
+                      type: string
+                      description: Stage-specific step identifier.
+                      example: checkTransferProposalRequestMessage
+                    point:
+                      type: string
+                      description: Execution steps inside a stage where adapters can hook into.
+                      enum:
+                        - before
+                        - during
+                        - after
+                        - rollback
+                      example: before
+                minItems: 1
+              outboundWebhook:
+                type: object
+                description: |-
+                  Outbound webhook configuration for notifying external systems about SATP protocol events.
+
+                  **Purpose:**
+                  Outbound webhooks enable fire-and-forget notifications to external monitoring, logging,
+                  metrics collection, and audit systems. When SATP lifecycle events occur, the gateway
+                  POSTs a standardized JSON payload to the configured URL.
+
+                  **Execution Model:**
+                  - Non-blocking: SATP execution continues regardless of webhook response
+                  - Supports retry logic with exponential backoff for reliability
+                  - Multiple outbound webhooks at the same execution point run concurrently
+                  - Always uses POST method with application/json content-type
+                required:
+                  - url
+                properties:
+                  url:
+                    type: string
+                    format: uri
+                    description: Absolute HTTPS endpoint the gateway should call.
+                    example: 'https://monitor.example.com/satp/lock-detected'
+                  timeoutMs:
+                    type: integer
+                    description: Maximum time the gateway waits for the remote endpoint before aborting.
+                    minimum: 0
+                    default: 5000
+                  payloadTemplate:
+                    type: string
+                    description: Optional payload template rendered per invocation.
+                  retryAttempts:
+                    type: integer
+                    description: Maximum number of retry attempts.
+                    minimum: 0
+                    default: 3
+                  retryDelayMs:
+                    type: integer
+                    description: Backoff delay between attempts in milliseconds.
+                    minimum: 0
+                    default: 1000
+                  priority:
+                    type: integer
+                    description: |-
+                      Priority for ordering multiple outbound webhooks within the same adapter.
+                      Lower numbers execute first. Defaults to 1000 if not specified.
+                    default: 1000
+                    example: 1
+              outboundWebhooks:
+                type: array
+                description: Array of outbound webhooks when multiple notifications are needed.
+                items:
+                  type: object
+                  description: |-
+                    Outbound webhook configuration for notifying external systems about SATP protocol events.
+
+                    **Purpose:**
+                    Outbound webhooks enable fire-and-forget notifications to external monitoring, logging,
+                    metrics collection, and audit systems. When SATP lifecycle events occur, the gateway
+                    POSTs a standardized JSON payload to the configured URL.
+
+                    **Execution Model:**
+                    - Non-blocking: SATP execution continues regardless of webhook response
+                    - Supports retry logic with exponential backoff for reliability
+                    - Multiple outbound webhooks at the same execution point run concurrently
+                    - Always uses POST method with application/json content-type
+                  required:
+                    - url
+                  properties:
+                    url:
+                      type: string
+                      format: uri
+                      description: Absolute HTTPS endpoint the gateway should call.
+                      example: 'https://monitor.example.com/satp/lock-detected'
+                    timeoutMs:
+                      type: integer
+                      description: Maximum time the gateway waits for the remote endpoint before aborting.
+                      minimum: 0
+                      default: 5000
+                    payloadTemplate:
+                      type: string
+                      description: Optional payload template rendered per invocation.
+                    retryAttempts:
+                      type: integer
+                      description: Maximum number of retry attempts.
+                      minimum: 0
+                      default: 3
+                    retryDelayMs:
+                      type: integer
+                      description: Backoff delay between attempts in milliseconds.
+                      minimum: 0
+                      default: 1000
+                    priority:
+                      type: integer
+                      description: |-
+                        Priority for ordering multiple outbound webhooks within the same adapter.
+                        Lower numbers execute first. Defaults to 1000 if not specified.
+                      default: 1000
+                      example: 1
+              inboundWebhook:
+                type: object
+                description: |-
+                  Inbound webhook configuration for blocking approval workflows during SATP execution.
+
+                  **Purpose:**
+                  Inbound webhooks enable external approval controllers, compliance systems, and human
+                  operators to participate in SATP cross-chain transfers. When configured, the gateway
+                  pauses protocol execution and waits for an external decision before proceeding.
+
+                  **Execution Model:**
+                  - Blocking: SATP transfer waits for external controller response or timeout
+                  - Gateway exposes decision endpoint under API3 adapter base path
+                  - Multiple inbound webhooks at the same point serialize for clear approval semantics
+                  - Timeout triggers automatic rejection with configurable behavior
+
+                  **Decision Flow:**
+                  1. Gateway reaches configured execution point and pauses
+                  2. External controller receives notification (via paired outbound webhook or polling)
+                  3. Controller posts decision to `/api/v1/.../webhook/inbound/decide`
+                  4. Gateway validates adapterId/sessionId and resumes or aborts based on `continue` field
+                properties:
+                  timeoutMs:
+                    type: integer
+                    description: Maximum time the gateway waits for external decision before timing out.
+                    minimum: 0
+                    default: 300000
+                    example: 300000
+                  payloadTemplate:
+                    type: string
+                    description: Optional payload template for context data.
+                  retryAttempts:
+                    type: integer
+                    description: Maximum number of retry attempts.
+                    minimum: 0
+                    default: 3
+                  retryDelayMs:
+                    type: integer
+                    description: Backoff delay between attempts in milliseconds.
+                    minimum: 0
+                    default: 1000
+                  priority:
+                    type: integer
+                    description: |-
+                      Priority for ordering multiple inbound webhooks within the same adapter.
+                      Lower numbers execute first. Defaults to 1000 if not specified.
+                    default: 1000
+              inboundWebhooks:
+                type: array
+                description: Array of inbound webhooks when multiple approvals are needed.
+                items:
+                  type: object
+                  description: |-
+                    Inbound webhook configuration for blocking approval workflows during SATP execution.
+
+                    **Purpose:**
+                    Inbound webhooks enable external approval controllers, compliance systems, and human
+                    operators to participate in SATP cross-chain transfers. When configured, the gateway
+                    pauses protocol execution and waits for an external decision before proceeding.
+
+                    **Execution Model:**
+                    - Blocking: SATP transfer waits for external controller response or timeout
+                    - Gateway exposes decision endpoint under API3 adapter base path
+                    - Multiple inbound webhooks at the same point serialize for clear approval semantics
+                    - Timeout triggers automatic rejection with configurable behavior
+
+                    **Decision Flow:**
+                    1. Gateway reaches configured execution point and pauses
+                    2. External controller receives notification (via paired outbound webhook or polling)
+                    3. Controller posts decision to `/api/v1/.../webhook/inbound/decide`
+                    4. Gateway validates adapterId/sessionId and resumes or aborts based on `continue` field
+                  properties:
+                    timeoutMs:
+                      type: integer
+                      description: Maximum time the gateway waits for external decision before timing out.
+                      minimum: 0
+                      default: 300000
+                      example: 300000
+                    payloadTemplate:
+                      type: string
+                      description: Optional payload template for context data.
+                    retryAttempts:
+                      type: integer
+                      description: Maximum number of retry attempts.
+                      minimum: 0
+                      default: 3
+                    retryDelayMs:
+                      type: integer
+                      description: Backoff delay between attempts in milliseconds.
+                      minimum: 0
+                      default: 1000
+                    priority:
+                      type: integer
+                      description: |-
+                        Priority for ordering multiple inbound webhooks within the same adapter.
+                        Lower numbers execute first. Defaults to 1000 if not specified.
+                      default: 1000
+          minItems: 0
+        global:
+          type: object
+          description: |-
+            Global defaults for adapter execution. Applied to every adapter unless
+            overridden at the adapter level.
+          properties:
+            timeoutMs:
+              type: integer
+              description: Default timeout in milliseconds.
+              minimum: 0
+              default: 5000
+            retryAttempts:
+              type: integer
+              description: Default number of retry attempts.
+              minimum: 0
+              default: 3
+            retryDelayMs:
+              type: integer
+              description: Default backoff delay in milliseconds.
+              minimum: 0
+              default: 1000
+            logLevel:
+              type: string
+              description: Logging level for adapter operations.
+              enum:
+                - trace
+                - debug
+                - info
+                - warn
+                - error
+              default: info
+            headers:
+              type: object
+              description: Default HTTP headers to include in webhook requests.
+              additionalProperties:
+                type: string
+    OutboundWebhookEventType:
+      type: string
+      description: |-
+        Event type representing a distinct lifecycle moment in SATP protocol execution.
+        External systems can filter and route events based on type.
+
+        Event Types:
+        - stage.started: SATP stage has begun execution (outbound hooks at 'before' step)
+        - stage.completed: SATP stage finished successfully (outbound hooks at 'after' step)
+        - stage.failed: SATP stage encountered an error and may trigger rollback
+        - adapter.retry: Adapter webhook is retrying after transient failure
+        - adapter.skipped: Adapter was bypassed (inactive or condition not met)
+      enum:
+        - stage.started
+        - stage.completed
+        - stage.failed
+        - adapter.retry
+        - adapter.skipped
+      example: stage.completed
+    OutboundWebhookExecutionPoint:
+      type: object
+      description: |-
+        Execution point info embedded in outbound webhook payloads.
+        Includes a computed name for logging/display purposes.
+      required:
+        - name
+        - stage
+        - step
+        - point
+      properties:
+        name:
+          type: string
+          description: Computed name for the execution point (stepTag-point format).
+          example: newSessionRequest-before
+        stage:
+          type: integer
+          description: SATP stage number (0-3).
+          minimum: 0
+          maximum: 3
+          example: 0
+        step:
+          type: string
+          description: Stage-specific step identifier.
+          example: newSessionRequest
+        point:
+          type: string
+          description: Execution order within the step.
+          enum:
+            - before
+            - during
+            - after
+            - rollback
+          example: before
+    OutboundWebhookPayload:
+      type: object
+      description: |-
+        Outbound webhook payload delivering SATP transfer telemetry to external
+        monitoring or automation systems. All outbound payloads follow a consistent 
+        envelope containing event type, session identifiers, gateway identity, and
+        stage-specific payload data.
+
+        Payload Structure:
+        - Event type and schema version for client-side parsing logic
+        - SATP session/context identifiers for correlation across stages
+        - Gateway identity for multi-gateway deployment visibility
+        - ISO 8601 timestamp for precise event ordering
+        - Stage-specific payload with DLT proofs, transaction hashes, or error details
+
+        Integration Patterns:
+        - Monitoring Dashboards: Visualize transfer progress and latency metrics
+        - Audit Systems: Record immutable event logs for compliance and forensics
+        - Alerting Platforms: Trigger notifications on transfer failures or anomalies
+        - Analytics Pipelines: Aggregate events for performance analysis and reporting
+      x-category: request
+      required:
+        - eventType
+        - schemaVersion
+        - executionPoints
+        - adapterId
+        - sessionId
+        - gatewayId
+        - timestamp
+      properties:
+        eventType:
+          type: string
+          description: |-
+            Event type representing a distinct lifecycle moment in SATP protocol execution.
+            External systems can filter and route events based on type.
+
+            Event Types:
+            - stage.started: SATP stage has begun execution (outbound hooks at 'before' step)
+            - stage.completed: SATP stage finished successfully (outbound hooks at 'after' step)
+            - stage.failed: SATP stage encountered an error and may trigger rollback
+            - adapter.retry: Adapter webhook is retrying after transient failure
+            - adapter.skipped: Adapter was bypassed (inactive or condition not met)
+          enum:
+            - stage.started
+            - stage.completed
+            - stage.failed
+            - adapter.retry
+            - adapter.skipped
+          example: stage.completed
+        schemaVersion:
+          type: string
+          description: Semantic version of the payload contract.
+          example: v1.0.0
+        executionPoints:
+          type: object
+          description: |-
+            Execution point info embedded in outbound webhook payloads.
+            Includes a computed name for logging/display purposes.
+          required:
+            - name
+            - stage
+            - step
+            - point
+          properties:
+            name:
+              type: string
+              description: Computed name for the execution point (stepTag-point format).
+              example: newSessionRequest-before
+            stage:
+              type: integer
+              description: SATP stage number (0-3).
+              minimum: 0
+              maximum: 3
+              example: 0
+            step:
+              type: string
+              description: Stage-specific step identifier.
+              example: newSessionRequest
+            point:
+              type: string
+              description: Execution order within the step.
+              enum:
+                - before
+                - during
+                - after
+                - rollback
+              example: before
+        adapterId:
+          type: string
+          description: Adapter identifier (matches configuration id).
+          example: lock-monitor
+        sessionId:
+          type: string
+          description: SATP session identifier for correlation.
+          example: session-abc-123
+        contextId:
+          type: string
+          description: Optional transfer context identifier propagated from API1.
+          example: ctx-transfer-456
+        gatewayId:
+          type: string
+          description: Gateway identifier emitting the notification.
+          example: gateway-fabric-1
+        payload:
+          type: object
+          description: |-
+            Stage-specific metadata. For example, Stage 1 includes lock proofs while
+            Stage 3 may contain mint/burn receipts.
+          additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp for when the event was emitted.
+          example: '2025-12-06T10:30:45.123Z'
+        message:
+          type: string
+          description: Optional human-readable description or error message.
+          example: Asset locked successfully on source ledger
+    OutboundWebhookResponse:
+      type: object
+      description: |-
+        Expected response from external systems receiving outbound webhook payloads.
+        The gateway uses this response to determine whether to continue or abort.
+      x-category: response
+      properties:
+        received:
+          type: boolean
+          description: Whether the webhook was successfully received and processed.
+          example: true
+        status:
+          type: string
+          description: Status of the webhook processing.
+          enum:
+            - OK
+            - ERROR
+            - RETRY
+          example: OK
+        message:
+          type: string
+          description: Optional message from the external system.
+          example: Webhook processed successfully
+        data:
+          type: object
+          description: Optional response data from the external system.
+          additionalProperties: true
+    InboundWebhookDecisionRequest:
+      type: object
+      description: |-
+        Request payload posted by external approval controllers to approve or reject 
+        a paused SATP transfer. The gateway validates the adapterId matches the waiting 
+        adapter, then uses the continue field to determine whether to proceed or abort.
+
+        Inbound Webhook Workflow:
+        1. SATP gateway reaches a stage/step with configured inbound adapter
+        2. Gateway pauses execution and waits for external decision POST
+        3. External controller evaluates business rules, compliance checks, or manual review
+        4. Controller POSTs decision payload to gateway's inbound endpoint
+        5. Gateway validates decision, logs justification, and resumes or aborts transfer
+
+        Decision Semantics:
+        - continue=true: Approve transfer continuation; gateway proceeds to next stage
+        - continue=false: Reject transfer; gateway aborts and may trigger rollback
+        - reason: Human-readable justification stored in audit logs
+
+        Security Considerations:
+        - Inbound endpoints should use authentication (API keys, mTLS, JWT validation)
+        - Decision payloads must include adapter ID to match the paused session state
+        - All decisions are logged with timestamps for non-repudiation
+      x-category: request
+      required:
+        - adapterId
+        - sessionId
+        - continue
+      properties:
+        adapterId:
+          type: string
+          description: Adapter identifier that originally paused the SATP stage.
+          example: compliance-check
+        sessionId:
+          type: string
+          description: Session identifier for the paused SATP transfer.
+          example: session-123
+        contextId:
+          type: string
+          description: Optional transfer context identifier.
+          example: ctx-456
+        continue:
+          type: boolean
+          description: |-
+            When true, the gateway resumes the paused stage. When false, the transfer 
+            is rejected and the provided reason is logged.
+          example: true
+        reason:
+          type: string
+          description: Human-readable justification for auditing and operator visibility.
+          example: Transfer approved after KYC verification
+        data:
+          type: object
+          description: Optional data payload from external system.
+          additionalProperties: true
+    InboundWebhookDecisionResponse:
+      type: object
+      description: |-
+        Response returned by the gateway after processing an inbound webhook decision.
+        Indicates whether the decision was accepted and the resulting session state.
+      x-category: response
+      required:
+        - accepted
+        - sessionId
+      properties:
+        accepted:
+          type: boolean
+          description: Whether the decision was accepted and applied to the session.
+          example: true
+        sessionId:
+          type: string
+          description: Session identifier for the affected SATP transfer.
+          example: session-123
+        message:
+          type: string
+          description: Human-readable message describing the result.
+          example: 'Decision accepted, transfer resumed'
+        timestamp:
+          type: string
+          format: date-time
+          description: Timestamp when the decision was processed.
+          example: '2024-01-15T10:30:00Z'

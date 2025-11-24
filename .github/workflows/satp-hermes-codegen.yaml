@@ -72,8 +72,8 @@ jobs:
         with:
           name: satp-hermes-generated-openapi
           path: |
-            packages/cactus-plugin-satp-hermes/src/main/yml/bol/openapi-blo-bundled.yml
-            packages/cactus-plugin-satp-hermes/src/main/json/openapi-blo-bundled.json
+            packages/cactus-plugin-satp-hermes/src/main/yml/bol/oapi-api1-bundled.yml
+            packages/cactus-plugin-satp-hermes/src/main/json/oapi-api1-bundled.json
             packages/cactus-plugin-satp-hermes/src/main/typescript/generated/gateway-client/
 
       - name: Upload generated Solidity artifacts

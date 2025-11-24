@@ -1,0 +1,56 @@
+# =============================================================================
+# Test Server Configuration - Local HTTP Server for E2E Tests
+# =============================================================================
+#
+# PURPOSE:
+# Configuration for E2E tests using the local adapter-test-server.ts.
+# Provides deterministic HTTP endpoints for testing without external dependencies.
+#
+# USAGE:
+# - adapter-e2e-test-server-outbound.test.ts (outbound webhook flow)
+# - adapter-e2e-test-server-inbound.test.ts (inbound webhook configuration)
+#
+# TEST SERVER ENDPOINTS (localhost:9223):
+# - POST /webhook/outbound         → Returns { received: true }
+# - POST /webhook/outbound/approve → Returns { continue: true, reason: "..." }
+# - POST /webhook/outbound/reject  → Returns { continue: false, reason: "..." }
+# - POST /webhook/outbound/error/{code} → Returns HTTP error status
+#
+# EXECUTION FLOW:
+# 1. Stage 0, newSessionRequest, "before" → Outbound validator called
+# 2. Stage 0, newSessionRequest, "after"  → Inbound approval awaited
+
+adapters:
+  - id: "newSessionRequest-outbound-validator"
+    name: "New Session Request Validator"
+    description: "Validates new session request before processing"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionRequest
+        point: "before"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 500
+    active: true
+    priority: 1
+
+  - id: "newSessionRequest-inbound-approval"
+    name: "New Session Request Approval"
+    description: "Awaits external approval after session request processing"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionRequest
+        point: "after"
+    inboundWebhook:
+      timeoutMs: 3000
+    active: true
+    priority: 2
+
+# Global configuration
+global:
+  timeoutMs: 5000
+  retryAttempts: 3
+  retryDelayMs: 500
+  logLevel: "debug"

@@ -80,8 +80,9 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       };
 
       await adminApiClient.getStatus(statusRequest.sessionID);
-    } catch (error) {
-      expect(error.response.data.error).toContain("Session not found");
+    } catch (error: any) {
+      const errorMsg = error.response?.data?.error ?? JSON.stringify(error);
+      expect(errorMsg).toContain("Session not found");
     } finally {
       await gateway.shutdown();
     }

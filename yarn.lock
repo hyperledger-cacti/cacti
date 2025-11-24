@@ -9163,6 +9163,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/google-protobuf": "npm:3.15.12"
     "@types/jest": "npm:29"
+    "@types/js-yaml": "npm:4.0.9"
     "@types/node": "npm:18.18.2"
     "@types/node-schedule": "npm:2.1.7"
     "@types/pg": "npm:8.11.10"
@@ -9204,6 +9205,7 @@ __metadata:
     jest: "npm:29.5.0"
     jest-extended: "npm:7.0.0"
     jest-junit: "npm:16.0.0"
+    js-yaml: "npm:4.1.1"
     jsonc: "npm:2.0.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.4"
@@ -17489,7 +17491,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-yaml@npm:^4.0.5":
+"@types/js-yaml@npm:4.0.9, @types/js-yaml@npm:^4.0.5":
   version: 4.0.9
   resolution: "@types/js-yaml@npm:4.0.9"
   checksum: 10/a0ce595db8a987904badd21fc50f9f444cb73069f4b95a76cc222e0a17b3ff180669059c763ec314bc4c3ce284379177a9da80e83c5f650c6c1310cafbfaa8e6

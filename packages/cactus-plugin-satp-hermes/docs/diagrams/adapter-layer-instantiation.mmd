@@ -1,0 +1,75 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#86efac','primaryTextColor':'#14532d','primaryBorderColor':'#166534','lineColor':'#22c55e','secondaryColor':'#dcfce7','tertiaryColor':'#f0fdf4', 'nodeTextColor':'#14532d', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#166534', 'edgeLabelBackground':'#dcfce7'}}}%%
+
+flowchart TB
+    subgraph Config["YAML Configuration"]
+        YAML["adapter-configuration.yml (AdapterConfiguration)"]
+    end
+
+    subgraph Parsing["🔧 Configuration Parsing"]
+        Load["loadConfig()"]
+        Validate["validateAdapterConfig()"]
+    end
+
+    subgraph AdapterConfig["📋 AdapterLayerConfig"]
+        Global["global:<br/>timeoutMs: 5000<br/>retryAttempts: 3<br/>logLevel: debug"]
+        
+        subgraph Adapters["adapters[]"]
+            A1["Adapter 1<br/>id: newSessionRequest-outbound-validator<br/>priority: 1<br/>active: true"]
+            A2["Adapter 2<br/>id: newSessionRequest-inbound-approval<br/>priority: 2<br/>active: true"]
+        end
+    end
+
+    subgraph Manager["🎯 AdapterManager"]
+        Constructor["constructor(config)"]
+        BindMap["executionBindings<br/>Map&lt;stage:step:point, Adapter[]&gt;"]
+        
+        subgraph Bindings["Execution Bindings"]
+            B1["0:newSessionRequest:before<br/>→ outbound-validator"]
+            B2["0:newSessionRequest:after<br/>→ inbound-approval"]
+        end
+    end
+
+    subgraph Handlers["📡 Stage Handler"]
+        SH0["Stage0Handler"]
+        SH1["Stage1Handler"]
+        SH2["Stage2Handler"]
+        SH3["Stage3Handler"]
+    end
+
+    subgraph Services["⚙️ Stage Services<br/><i>stage0-server-service.ts, etc.</i>"]
+        SS["StageService.executeStep()"]
+        Hook["adapterManager.executeAdapters()"]
+    end
+
+    subgraph Runtime["⚡ Runtime Execution"]
+        Before["BEFORE: outbound webhooks"]
+        Execute["Step Logic"]
+        After["AFTER: inbound webhooks"]
+    end
+
+    YAML --> Load
+    Load --> Validate
+    Validate --> Global
+    Validate --> Adapters
+    
+    A1 -->|"executionPoints"| Constructor
+    A2 -->|"executionPoints"| Constructor
+    Global -->|"defaults"| Constructor
+    
+    Constructor --> BindMap
+    BindMap --> B1
+    BindMap --> B2
+    
+    SH0 --> SS
+    SH1 --> SS
+    SH2 --> SS
+    SH3 --> SS
+    
+    SS --> Hook
+    Hook -->|"stage:step:before"| Before
+    Before --> Execute
+    Execute --> After
+    After -->|"stage:step:after"| Hook
+    
+    B1 -.->|"bindings lookup"| Hook
+    B2 -.->|"bindings lookup"| Hook

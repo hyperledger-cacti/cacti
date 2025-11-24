@@ -1,0 +1,59 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#86efac','primaryTextColor':'#14532d','primaryBorderColor':'#166534','lineColor':'#22c55e','secondaryColor':'#dcfce7','tertiaryColor':'#f0fdf4', 'actorTextColor':'#14532d', 'actorBkg':'#bbf7d0', 'actorBorder':'#166534', 'signalColor':'#14532d', 'signalTextColor':'#14532d', 'noteBkgColor':'#fef9c3', 'noteTextColor':'#422006', 'noteBorderColor':'#ca8a04', 'labelBoxBkgColor':'#dcfce7', 'labelTextColor':'#14532d'}}}%%
+
+sequenceDiagram
+    autonumber
+    participant BLO as BLO Dispatcher
+    participant SM as SATP<br/>Manager
+    participant SH as Stage<br/>Handler
+    participant AM as Adapter<br/>Manager
+    participant SS as Stage<br/>Service
+    participant Ext as External<br/>Controller
+
+    Note over BLO,Ext: Stage 0 newSessionRequest - 2 Webhook Flow (Outbound + Inbound)
+
+    Note right of BLO: executeTransact()
+    BLO->>SM: transfer(session)
+    
+    rect rgb(220, 252, 231)
+        Note over SM,AM: Stage 0 - newSessionRequest
+        SM->>SH: handleStage0()
+        
+        SH->>AM: executeAdapters(stage:0, step:newSessionRequest, point:before)
+        
+        rect rgb(254, 249, 195)
+            Note over AM,Ext: Outbound Webhook - Fire & Block
+            AM->>AM: getBindingsForExecutionPoint(0:newSessionRequest:before)
+            AM->>Ext: POST /webhook/outbound (blocking)
+            Ext-->>AM: 200 OK + response body
+            AM-->>SH: disposition: CONTINUE, metrics
+        end
+        
+        SH->>SS: newSessionRequest()
+        SS->>SS: send request to counterparty gateway
+        SS-->>SH: NewSessionResponse
+        
+        SH->>AM: executeAdapters(stage:0, step:newSessionRequest, point:after)
+        
+        rect rgb(254, 215, 170)
+            Note over AM,Ext: Inbound Webhook - PAUSE & Wait
+            AM->>AM: getBindingsForExecutionPoint(0:newSessionRequest:after)
+            AM->>AM: Register pending decision
+            Note over AM: PAUSED - waiting for callback<br/>POST /api/v1/adapters/inbound/{sessionId}/{adapterId}
+            
+            alt Approved (within timeoutMs)
+                Ext->>AM: POST decision {continue: true}
+                AM->>AM: Resolve pending promise
+                AM-->>SH: disposition: CONTINUE
+            else Rejected
+                Ext->>AM: POST decision {continue: false}
+                AM--xSH: AdapterInboundWebhookRejectedError - ABORT
+            else Timeout (no decision)
+                AM--xSH: AdapterInboundWebhookTimeoutError - ABORT
+            end
+        end
+    end
+
+    SH-->>SM: stage0Complete
+    SM-->>BLO: transferInitiated
+
+    Note over BLO,Ext: Continue to Stage 1, 2, 3...

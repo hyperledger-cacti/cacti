@@ -43,7 +43,7 @@ import {
 } from "@hyperledger/cactus-core-api";
 import type { Express, Request, Response } from "express";
 import type { IRequestOptions } from "../../core/types";
-import OAS from "../../../json/openapi-blo-bundled.json";
+import OAS from "../../../json/oapi-api1-bundled.json";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,

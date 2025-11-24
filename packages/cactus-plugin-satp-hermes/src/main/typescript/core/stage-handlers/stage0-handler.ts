@@ -39,6 +39,14 @@
  * - Error tracking and diagnostic information capture
  * - Session lifecycle monitoring and audit trail creation
  *
+ * **Adapter Security:**
+ * - API3 adapters invoke outbound and inbound webhooks exclusively over
+ *   mutually authenticated TLS channels between gateways and operator systems.
+ * - Client certificates are validated before honoring inbound approvals,
+ *   ensuring only trusted controllers can resume paused sessions.
+ * - Outbound notifications inherit the same TLS requirement so that
+ *   intermediate systems cannot tamper with transfer telemetry.
+ *
  * @example
  * Server-side stage 0 handler setup:
  * ```typescript
@@ -119,6 +127,9 @@ import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message
 import { getMessageTypeName } from "../satp-utils";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import type { AdapterManager } from "../../adapters/adapter-manager";
+import type { SatpStageKey } from "../../adapters/adapter-config";
+import { buildAdapterPayload } from "./handler-utils";
 
 /**
  * SATP Stage 0 Handler for Transfer Initiation and Session Establishment.
@@ -247,6 +258,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * @readonly
    */
   public static readonly CLASS_NAME = SATPHandlerType.STAGE0;
+  private static readonly ADAPTER_STAGE_KEY: SatpStageKey = "stage0";
 
   /**
    * Active SATP transfer sessions managed by this handler.
@@ -290,6 +302,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * @readonly
    */
   private readonly monitorService: MonitorService;
+  private readonly adapterManager?: AdapterManager;
   /**
    * Creates a new Stage 0 SATP handler instance.
    *
@@ -359,6 +372,7 @@ export class Stage0SATPHandler implements SATPHandler {
     this.serverService = ops.serverService as Stage0ServerService;
     this.clientService = ops.clientService as Stage0ClientService;
     this.monitorService = ops.monitorService;
+    this.adapterManager = ops.adapterManager;
     this.logger = LoggerProvider.getOrCreate(
       ops.loggerOptions,
       this.monitorService,
@@ -432,6 +446,81 @@ export class Stage0SATPHandler implements SATPHandler {
    */
   public get Log(): Logger {
     return this.logger;
+  }
+
+  /**
+   * Configures the Connect RPC router with Stage 0 service endpoints.
+   *
+   * @description
+   * Sets up the Connect RPC router to handle incoming Stage 0 SATP protocol
+   * messages by registering the appropriate service methods. This enables
+   * the handler to receive and process NewSession and PreSATPTransfer requests
+   * from client gateways according to the IETF SATP Core v2 specification.
+   *
+   * **Registered Service Methods:**
+   * - **newSession**: Handles NewSessionRequest messages for session establishment
+   * - **preSATPTransfer**: Handles PreSATPTransferRequest messages for transfer preparation
+   *
+   * **Router Configuration:**
+   * - Registers SatpStage0Service with Connect RPC framework
+   * - Maps service methods to internal implementation functions
+   * - Enables distributed tracing for all incoming requests
+   * - Provides error handling and exception reporting
+   *
+   * **Distributed Tracing:**
+   * - Creates OpenTelemetry spans for router setup operations
+   * - Enables request correlation across gateway boundaries
+   * - Provides comprehensive error tracking and diagnostics
+   *
+   * @public
+   * @method setupRouter
+   * @param {ConnectRouter} router - The Connect RPC router to configure
+   * @returns {void}
+   *
+   * @example
+   * Router setup in gateway initialization:
+   * ```typescript
+   * import { createConnectRouter } from '@connectrpc/connect';
+   *
+   * const router = createConnectRouter();
+   * const stage0Handler = new Stage0SATPHandler(handlerOptions);
+   *
+   * // Register Stage 0 service endpoints
+   * stage0Handler.setupRouter(router);
+   *
+   * // Router is now ready to handle:
+   * // - NewSessionRequest -> newSession()
+   * // - PreSATPTransferRequest -> preSATPTransfer()
+   * ```
+   *
+   * @throws {Error} When router configuration fails or service registration errors occur
+   * @since 0.0.3-beta
+   * @see {@link SatpStage0Service} for service definition
+   * @see {@link ConnectRouter} for router interface
+   */
+  setupRouter(router: ConnectRouter): void {
+    const fnTag = `${this.getHandlerIdentifier()}#setupRouter()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this;
+        router.service(SatpStage0Service, {
+          async newSession(req): Promise<NewSessionResponse> {
+            return await that.NewSessionImplementation(req);
+          },
+          async preSATPTransfer(req): Promise<PreSATPTransferResponse> {
+            return await that.PreSATPTransferImplementation(req);
+          },
+        });
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
   }
 
   // ============================================================================
@@ -515,16 +604,47 @@ export class Stage0SATPHandler implements SATPHandler {
         if (!this.pubKeys.has(req.gatewayId)) {
           throw new PubKeyError(fnTag);
         }
-
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "checkNewSessionRequest",
+            "before",
+            session,
+            this.gatewayId,
+            { operation: "newSession", role: "server" },
+          ),
+        );
         session = await this.serverService.checkNewSessionRequest(
           req,
           session,
           this.pubKeys.get(req.gatewayId)!,
         );
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "checkNewSessionRequest",
+            "after",
+            session,
+            this.gatewayId,
+            { operation: "newSession", role: "server" },
+          ),
+        );
+
         this.sessions.set(session.getSessionId(), session);
 
         saveMessageInSessionData(session.getServerSessionData(), req);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "newSessionResponse",
+            "before",
+            session,
+            this.gatewayId,
+            { operation: "newSession", role: "server" },
+          ),
+        );
 
         const message = await this.serverService.newSessionResponse(
           req,
@@ -541,6 +661,17 @@ export class Stage0SATPHandler implements SATPHandler {
         this.Log.debug(`${fnTag}, Returning response: ${message}`);
 
         saveMessageInSessionData(session.getServerSessionData(), message);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "newSessionResponse",
+            "after",
+            session,
+            this.gatewayId,
+            { operation: "newSession", role: "server" },
+          ),
+        );
 
         const attributes: Record<
           string,
@@ -677,11 +808,44 @@ export class Stage0SATPHandler implements SATPHandler {
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "checkPreSATPTransferRequest",
+            "before",
+            session,
+            this.gatewayId,
+            { operation: "preSATPTransfer", role: "server" },
+          ),
+        );
+
         await this.serverService.checkPreSATPTransferRequest(req, session);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "checkPreSATPTransferRequest",
+            "after",
+            session,
+            this.gatewayId,
+            { operation: "preSATPTransfer", role: "server" },
+          ),
+        );
 
         saveMessageInSessionData(session.getServerSessionData(), req);
 
         await this.serverService.wrapToken(session);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "preSATPTransferResponse",
+            "before",
+            session,
+            this.gatewayId,
+            { operation: "preSATPTransfer", role: "server" },
+          ),
+        );
 
         const message = await this.serverService.preSATPTransferResponse(
           req,
@@ -698,6 +862,17 @@ export class Stage0SATPHandler implements SATPHandler {
         this.Log.debug(`${fnTag}, Returning response: ${message}`);
 
         saveMessageInSessionData(session.getServerSessionData(), message);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            Stage.STAGE0,
+            "preSATPTransferResponse",
+            "after",
+            session,
+            this.gatewayId,
+            { operation: "preSATPTransfer", role: "server" },
+          ),
+        );
 
         attributes = collectSessionAttributes(session, "server");
 
@@ -737,81 +912,6 @@ export class Stage0SATPHandler implements SATPHandler {
           error,
           session,
         );
-      } finally {
-        span.end();
-      }
-    });
-  }
-
-  /**
-   * Configures the Connect RPC router with Stage 0 service endpoints.
-   *
-   * @description
-   * Sets up the Connect RPC router to handle incoming Stage 0 SATP protocol
-   * messages by registering the appropriate service methods. This enables
-   * the handler to receive and process NewSession and PreSATPTransfer requests
-   * from client gateways according to the IETF SATP Core v2 specification.
-   *
-   * **Registered Service Methods:**
-   * - **newSession**: Handles NewSessionRequest messages for session establishment
-   * - **preSATPTransfer**: Handles PreSATPTransferRequest messages for transfer preparation
-   *
-   * **Router Configuration:**
-   * - Registers SatpStage0Service with Connect RPC framework
-   * - Maps service methods to internal implementation functions
-   * - Enables distributed tracing for all incoming requests
-   * - Provides error handling and exception reporting
-   *
-   * **Distributed Tracing:**
-   * - Creates OpenTelemetry spans for router setup operations
-   * - Enables request correlation across gateway boundaries
-   * - Provides comprehensive error tracking and diagnostics
-   *
-   * @public
-   * @method setupRouter
-   * @param {ConnectRouter} router - The Connect RPC router to configure
-   * @returns {void}
-   *
-   * @example
-   * Router setup in gateway initialization:
-   * ```typescript
-   * import { createConnectRouter } from '@connectrpc/connect';
-   *
-   * const router = createConnectRouter();
-   * const stage0Handler = new Stage0SATPHandler(handlerOptions);
-   *
-   * // Register Stage 0 service endpoints
-   * stage0Handler.setupRouter(router);
-   *
-   * // Router is now ready to handle:
-   * // - NewSessionRequest -> newSession()
-   * // - PreSATPTransferRequest -> preSATPTransfer()
-   * ```
-   *
-   * @throws {Error} When router configuration fails or service registration errors occur
-   * @since 0.0.3-beta
-   * @see {@link SatpStage0Service} for service definition
-   * @see {@link ConnectRouter} for router interface
-   */
-  setupRouter(router: ConnectRouter): void {
-    const fnTag = `${this.getHandlerIdentifier()}#setupRouter()`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const that = this;
-        router.service(SatpStage0Service, {
-          async newSession(req): Promise<NewSessionResponse> {
-            return await that.NewSessionImplementation(req);
-          },
-          async preSATPTransfer(req): Promise<PreSATPTransferResponse> {
-            return await that.PreSATPTransferImplementation(req);
-          },
-        });
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
       } finally {
         span.end();
       }
@@ -931,6 +1031,17 @@ export class Stage0SATPHandler implements SATPHandler {
 
           span.setAttribute("sessionId", session.getSessionId() || "");
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              Stage.STAGE0,
+              "newSessionRequest",
+              "before",
+              session,
+              this.gatewayId,
+              { operation: "newSession", role: "client" },
+            ),
+          );
+
           const message = await this.clientService.newSessionRequest(
             session,
             this.gatewayId,
@@ -944,6 +1055,17 @@ export class Stage0SATPHandler implements SATPHandler {
           }
 
           saveMessageInSessionData(session.getClientSessionData(), message);
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              Stage.STAGE0,
+              "newSessionRequest",
+              "after",
+              session,
+              this.gatewayId,
+              { operation: "newSession", role: "client" },
+            ),
+          );
 
           return message;
         } catch (error) {
@@ -1082,10 +1204,32 @@ export class Stage0SATPHandler implements SATPHandler {
 
           span.setAttribute("sessionId", session.getSessionId() || "");
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              Stage.STAGE0,
+              "checkNewSessionResponse",
+              "before",
+              session,
+              this.gatewayId,
+              { operation: "preSATPTransfer", role: "client" },
+            ),
+          );
+
           const newSession = await this.clientService.checkNewSessionResponse(
             response,
             session,
             Array.from(this.sessions.keys()),
+          );
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              Stage.STAGE0,
+              "checkNewSessionResponse",
+              "after",
+              session,
+              this.gatewayId,
+              { operation: "preSATPTransfer", role: "client" },
+            ),
           );
 
           if (newSession.getSessionId() != session.getSessionId()) {
@@ -1096,6 +1240,17 @@ export class Stage0SATPHandler implements SATPHandler {
           saveMessageInSessionData(session.getClientSessionData(), response);
 
           await this.clientService.wrapToken(session);
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              Stage.STAGE0,
+              "preSATPTransferRequest",
+              "before",
+              session,
+              this.gatewayId,
+              { operation: "preSATPTransfer", role: "client" },
+            ),
+          );
 
           const message =
             await this.clientService.preSATPTransferRequest(session);
@@ -1108,6 +1263,17 @@ export class Stage0SATPHandler implements SATPHandler {
           }
 
           saveMessageInSessionData(session.getClientSessionData(), message);
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              Stage.STAGE0,
+              "preSATPTransferRequest",
+              "after",
+              session,
+              this.gatewayId,
+              { operation: "preSATPTransfer", role: "client" },
+            ),
+          );
 
           return message;
         } catch (error) {

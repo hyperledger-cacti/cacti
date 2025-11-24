@@ -58,6 +58,12 @@ export const knexLocalInstance: { [key: string]: Knex.Config } = {
       /** Directory containing database migration files */
       directory: path.resolve(__dirname, "migrations"),
     },
+    acquireConnectionTimeout: 100000,
+    pool: {
+      min: 0,
+      max: 10,
+      acquireTimeoutMillis: 100000,
+    },
     /** Allow NULL values as default for SQLite compatibility */
     useNullAsDefault: true,
   },

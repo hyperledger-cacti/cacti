@@ -102,7 +102,6 @@ jobs:
             - Custom Version: ${{ inputs.custom_version || 'None (using package.json)' }}
             - Source Branch: ${{ inputs.release_branch || github.ref }}
             - Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            
-            Released on: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            - Release Time (github): ${{ github.run_started_at }}
           draft: false
           prerelease: ${{ contains(inputs.tag_version, 'alpha') || contains(inputs.tag_version, 'beta') || contains(inputs.tag_version, 'rc') }}

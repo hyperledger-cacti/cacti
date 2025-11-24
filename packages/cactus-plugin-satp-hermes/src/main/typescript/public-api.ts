@@ -195,6 +195,39 @@ export { IBesuNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-types
 export { GatewayIdentity } from "./core/types";
 
 /**
+ * SATP Protocol Mapping - Type-safe SATP protocol stage and step definitions.
+ *
+ * @description
+ * Provides a comprehensive type system and canonical mapping for SATP protocol execution order.
+ * Includes stage types (0-3), step tag unions for each stage, and a complete protocol map
+ * that defines the total order of execution including step metadata (description, role, sequence).
+ * This is used by adapter managers and services for validating execution points and ensuring
+ * adapters are configured for valid protocol positions.
+ *
+ * @see {@link AdapterManager} for adapter configuration validation using protocol map
+ * @see {@link AdapterHookService} for step execution validation
+ */
+export {
+  SatpStage,
+  Stage0StepTag,
+  Stage1StepTag,
+  Stage2StepTag,
+  Stage3StepTag,
+  SatpStepTag,
+  SATP_PROTOCOL_MAP,
+  getStepTagsForStage,
+  getStepByTag,
+  stageEnumToNumber,
+  stageNumberToEnum,
+  isValidStage,
+  isValidStepForStage,
+  assertValidStepForStage,
+  validateStepTagForStage,
+  type StepTagValidationResult,
+} from "./core/satp-protocol-map";
+
+/**
+/**
  * Fabric Network Validation - Hyperledger Fabric configuration validation utilities.
  *
  * @description
@@ -392,6 +425,61 @@ export { GatewayOrchestrator } from "./services/gateway/gateway-orchestrator";
 export { SATPManager } from "./services/gateway/satp-manager";
 export { CrashManager } from "./services/gateway/crash-manager";
 export { OracleManager } from "./cross-chain-mechanisms/oracle/oracle-manager";
+
+/**
+ * Adapter Hook Contracts - Configuration structures and execution results for adapters.
+ */
+export {
+  // OpenAPI spec re-exports
+  AdapterOutboundWebhookConfig,
+  AdapterInboundWebhookConfig,
+  AdapterDefinition,
+  AdapterLayerConfiguration,
+  InboundWebhookDecisionRequest,
+  InboundWebhookDecisionResponse,
+  OutboundWebhookEventType,
+  OutboundWebhookPayload,
+  // Local types
+  AdapterWebhookConfig,
+  SatpStageAdapterSet,
+  SatpStageKey,
+  StageExecutionStep,
+  GlobalAdapterDefaults,
+  AdapterExecutionBinding,
+  AdapterExecutionPlan,
+  // Stage key conversion utilities
+  stageKeyToNumber,
+  numberToStageKey,
+  isValidStageKey,
+} from "./adapters/adapter-config";
+export {
+  AdapterWebhookDisposition,
+  AdapterWebhookMetrics,
+  AdapterWebhookInputBase,
+  PreStageWebhookInput,
+  DuringStageWebhookInput,
+  PostStageWebhookInput,
+  AdapterWebhookOutputBase,
+  PreStageWebhookOutput,
+  DuringStageWebhookOutput,
+  PostStageWebhookOutput,
+  AdapterWebhookResult,
+  AdapterWebhookRetryDirective,
+  AdapterWebhookErrorOptions,
+  AdapterWebhookError,
+  AdapterWebhook,
+  PreStageWebhook,
+  DuringStageWebhook,
+  PostStageWebhook,
+} from "./adapters/adapter-webhook-contracts";
+export {
+  AdapterHookDirection,
+  AdapterInvocationContext,
+  OutboundWebhookInvocationResult,
+  AdapterHookStepResult,
+  AdapterHookResult,
+  AdapterHookExecutionParams,
+} from "./adapters/adapter-runtime-types";
 
 /**
  * Business Logic Operations Dispatcher - Central dispatcher for SATP business logic operations.

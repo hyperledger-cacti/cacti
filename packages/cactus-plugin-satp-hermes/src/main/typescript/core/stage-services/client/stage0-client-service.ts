@@ -124,6 +124,9 @@ import { buildAndCheckAsset, SessionSide } from "../../satp-utils";
  * - Uses BridgeManagerClientInterface for cross-chain bridge operations
  * - Integrates with database persistence for session and proof storage
  * - Implements comprehensive monitoring and logging capabilities
+ * - Relies on mutually authenticated TLS channels for API3 webhook
+ *   communication, validating server certificates prior to outbound
+ *   notifications and presenting a client certificate for inbound approvals.
  *
  * @public
  * @class Stage0ClientService

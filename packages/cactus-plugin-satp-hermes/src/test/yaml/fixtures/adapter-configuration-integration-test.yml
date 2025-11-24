@@ -1,0 +1,47 @@
+# =============================================================================
+# Integration Test Configuration - Real HTTP Endpoints
+# =============================================================================
+#
+# PURPOSE:
+# Configuration for adapter-e2e-mock-inbound.test.ts where outbound webhooks
+# call real external endpoints (jsonplaceholder.typicode.com) to validate
+# actual network behavior, HTTP client implementation, and response parsing.
+#
+# USAGE:
+# - Outbound adapter: Calls real jsonplaceholder.typicode.com/posts endpoint
+# - Inbound adapter: Mocked in tests (requires gateway callback infrastructure)
+
+adapters:
+  - id: "integration-outbound-test"
+    name: "Integration Test Outbound Adapter"
+    description: "Outbound adapter that calls real jsonplaceholder.typicode.com endpoint"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionRequest
+        point: "before"
+    outboundWebhook:
+      url: "https://jsonplaceholder.typicode.com/posts"
+      timeoutMs: 10000
+      retryAttempts: 2
+      retryDelayMs: 1000
+    active: true
+    priority: 1
+
+  - id: "integration-inbound-test"
+    name: "Integration Test Inbound Adapter"
+    description: "Inbound adapter with mocked response for after execution"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionRequest
+        point: "after"
+    inboundWebhook:
+      timeoutMs: 5000
+    active: true
+    priority: 2
+
+# Global configuration for integration tests
+global:
+  timeoutMs: 10000
+  retryAttempts: 2
+  retryDelayMs: 1000
+  logLevel: "debug"

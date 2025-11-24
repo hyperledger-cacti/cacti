@@ -21,12 +21,25 @@ The plugin supports both bidirectional and unidirectional asset transfers with t
 
 ## Table of Contents
 
+- [Assumptions](#assumptions)
+- [Getting Started](#getting-started)
+- [Architecture](#architecture)
+- [Protocol Flow](#protocol-flow)
+- [Application-to-Gateway API (API Type 1)](#application-to-gateway-api-api-type-1)
+- [Gateway-to-Gateway API (API Type 2)](#gateway-to-gateway-api-api-type-2)
+- [Adapter Layer (API Type 3)](#adapter-layer-api-type-3)
+- [Gateway Configuration](#gateway-configuration)
+- [Containerization](#containerization)
+- [Running local Gateway with Docker Compose](#running-local-gateway-with-docker-compose)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Assumptions
 Regarding the crash recovery procedure in place, at the moment we only support crashes of gateways under certain assumptions detailed as follows:
   - Gateways crash only after receiving a message (and before sending the next one)
   - Gateways crash only after logging to the Log Storage the previously received message
-  - Gateways never loose their long term keys
-  - Gateways do not have byzantine behavior
+  - Gateways never lose their long term keys
+  - Gateways do not have Byzantine behavior
   - Gateways are assumed to always recover from a crash
 
 We will be working on reducing these assumptions and making the system more resilient to faults.
@@ -106,7 +119,7 @@ The crash recovery protocol ensures session consistency across all stages of SAT
 Refer to the [Crash Recovery Sequence](https://datatracker.ietf.org/doc/html/draft-belchior-satp-gateway-recovery) for more details.
 
 ### Application-to-Gateway API (API Type 1)
-The gateway’s Business Layer Orchestrator (BLO) exposes an API with the following endpoints:
+The gateway exposes a REST API with the following endpoints:
 
 #### API Endpoints
 - **Transact**
@@ -120,7 +133,7 @@ The gateway’s Business Layer Orchestrator (BLO) exposes an API with the follow
 
 
 ### Gateway-to-Gateway API (API Type 2)
-This plugin in the Gateway-to-Gateway communication uses grpc.
+Gateway-to-gateway communication uses gRPC.
 
 There are Client and Server GRPC Endpoints for each type of message detailed in the SATP protocol:
 
@@ -144,7 +157,7 @@ There are Client and Server GRPC Endpoints for each type of message detailed in 
     - CommitFinalAcknowledgementReceiptResponseMessage
     - TransferCompleteRequestMessage
 
-There are also defined the endpoints for the crash recovery procedure (there is still missing the endpoint to receive the Rollback mesage):
+There are also defined the endpoints for the crash recovery procedure (the endpoint to receive the Rollback message is still pending):
   - RecoverV1Message
   - RecoverUpdateV1Message
   - RecoverUpdateAckV1Message
@@ -626,7 +639,7 @@ const leafConfig = {
     rpcApiHttpHost: "http://172.20.0.6:8545", // Besu JSON-RPC HTTP endpoint
     rpcApiWsHost: "ws://172.20.0.6:8546"      // Besu JSON-RPC WebSocket endpoint
   },
-  wrapperContractName: "exampleWrapperContractName", // Used if we want to use a costum name, if not given it will be provided by the leaf
+  wrapperContractName: "exampleWrapperContractName", // Used if we want to use a custom name, if not given it will be provided by the leaf
   wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // Only used if the contract was already deployed
   claimFormats: [1]                           // Claim format identifiers (application-specific)
 }
@@ -651,7 +664,7 @@ const leafConfig = {
     rpcApiHttpHost: "http://172.20.0.7:8545",     // Ethereum JSON-RPC HTTP endpoint
     rpcApiWsHost: "ws://172.20.0.7:8546"          // Ethereum JSON-RPC WebSocket endpoint
   },
-  wrapperContractName: "exampleWrapperContractName", // Used if we want to use a costum name, if not given it will be provided by the leaf
+  wrapperContractName: "exampleWrapperContractName", // Used if we want to use a custom name, if not given it will be provided by the leaf
   wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B", // Only used if the contract was already deployed
   claimFormats: [1]                               // Claim format identifiers (application-specific)
 }
@@ -710,6 +723,187 @@ const gatewayConfig = {
 - **Security**: Credentials and secret material (certificates, private keys, etc.) must be handled securely, never checked into version control, and managed via secure secrets management.
 - **claimFormats**: The claimFormats array may be customized according to the consuming application's expectations.
 - For detailed schema and supported options, refer to your platform's documentation for each supported ledger.
+
+## Adapter Layer (API Type 3)
+
+The SATP Hermes plugin includes an Adapter Layer (API Type 3) that enables external systems to integrate with and control SATP transfers through webhook-based communication. This layer facilitates observability, compliance enforcement, and custom business logic integration.
+
+### Architecture
+
+The Adapter Layer utilizes the `AdapterManager` to orchestrate webhooks based on the configured "Execution Points" within the SATP protocol.
+- **Outbound Webhooks**: Asynchronous notifications for monitoring/logging.
+- **Inbound Webhooks**: Blocking calls requiring external approval to proceed (e.g., AML/KYC checks).
+
+### Configuration
+
+Adapters are defined in the `adapterConfig` section of the Gateway configuration.
+For the complete schema, refer to [src/main/typescript/adapters/adapter-config.ts](src/main/typescript/adapters/adapter-config.ts).
+
+### Getting Started (Adapter Layer)
+
+- **Testing Guide**: [src/examples/docker-adapter-testing.md](src/examples/docker-adapter-testing.md)
+- **Test Runner (Makefile)**: [src/examples/docker-adapter-test.mk](src/examples/docker-adapter-test.mk)
+- **Example Configuration**: [src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml](src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml)
+
+### Adapter Layer Overview
+
+The adapter layer provides two types of webhook integrations:
+
+| Type | Direction | Purpose |
+|------|-----------|---------|
+| **Outbound Webhooks** | Gateway → External System | Notify external systems about SATP events |
+| **Inbound Webhooks** | External System → Gateway | Allow external systems to approve/reject transfers |
+
+### Key Concepts
+
+- **Execution Points**: Adapters are triggered at specific points in the SATP protocol (stage + step + order)
+- **Adapters**: Configuration units that define which webhooks to call and when
+- **Session Control**: Inbound webhooks can pause transfers pending external approval
+
+### Outbound Webhooks
+
+Outbound webhooks notify external systems about SATP activity. The gateway POSTs payload data to configured URLs and waits for a response before continuing.
+
+```yaml
+adapters:
+  - id: "notification-adapter"
+    name: "Transfer Notification"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionRequest
+        point: "before"
+    outboundWebhook:
+      url: "https://compliance.example.com/webhook/notify"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 1000
+    active: true
+    priority: 1
+```
+
+### Inbound Webhooks and Approval Workflow
+
+Inbound webhooks enable external systems to control SATP transfer flow. When an adapter with an inbound webhook executes, the gateway pauses and waits for an external decision.
+
+```yaml
+adapters:
+  - id: "compliance-approval"
+    name: "Compliance Approval"
+    executionPoints:
+      - stage: "stage1"
+        step: checkTransferProposalRequestMessage
+        point: "after"
+    inboundWebhook:
+      timeoutMs: 300000  # 5 minutes for manual review
+    active: true
+    priority: 1
+```
+
+#### Decision Endpoint
+
+External systems submit decisions to the gateway's inbound webhook decide endpoint:
+
+```
+POST /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide
+```
+
+**Request Body:**
+```json
+{
+  "adapterId": "compliance-approval",
+  "sessionId": "session-abc-123",
+  "continue": true,
+  "reason": "Compliance check passed - all KYC requirements met"
+}
+```
+
+**Response:**
+```json
+{
+  "accepted": true,
+  "sessionId": "session-abc-123",
+  "message": "Decision accepted, transfer resumed",
+  "timestamp": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### Decision Fields
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `adapterId` | string | Yes | Adapter that originally paused the transfer |
+| `sessionId` | string | Yes | Session identifier for the paused transfer |
+| `continue` | boolean | Yes | `true` to resume, `false` to abort |
+| `contextId` | string | No | Optional context identifier |
+| `reason` | string | No | Human-readable justification for audit |
+| `data` | object | No | Optional payload from external system |
+
+### Configuration Reference
+
+#### InboundWebhookConfig
+
+```typescript
+interface InboundWebhookConfig {
+  // Inherited from BaseWebhookConfig
+  timeoutMs?: number;       // Timeout for waiting for decision
+  payloadTemplate?: string; // Template for context data
+  retryAttempts?: number;   // Retry configuration
+  retryDelayMs?: number;
+  
+  // Inbound-specific
+  priority?: number;        // Order when multiple inbound webhooks
+}
+```
+
+#### OutboundWebhookConfig
+
+```typescript
+interface OutboundWebhookConfig {
+  url: string;              // Absolute HTTPS endpoint URL
+  timeoutMs?: number;       // HTTP request timeout
+  payloadTemplate?: string; // JSON/XML template for request body
+  retryAttempts?: number;   // Number of retry attempts
+  retryDelayMs?: number;    // Delay between retries
+  priority?: number;        // Order when multiple outbound webhooks
+}
+```
+
+### Execution Points
+
+Adapters can be configured to execute at any combination of:
+
+- **Stages**: stage0 (Initialization), stage1 (Transfer Agreement), stage2 (Lock Evidence), stage3 (Commitment)
+- **Steps**: Protocol-specific steps within each stage (e.g., `newSessionRequest`, `checkTransferProposalRequestMessage`)
+- **Points**: `before`, `during`, `after`, or `rollback`
+
+### Example: Complete Adapter Configuration
+
+```yaml
+adapters:
+  - id: "validation-adapter"
+    name: "Transfer Validation Webhook"
+    description: "Validates transfer requests and notifies compliance"
+    executionPoints:
+      - stage: "stage0"
+        step: checkNewSessionRequest
+        point: "before"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/validate"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 1000
+    inboundWebhook:
+      timeoutMs: 300000
+    active: true
+    priority: 1
+
+global:
+  timeoutMs: 3000
+  retryAttempts: 5
+  retryDelayMs: 500
+  logLevel: "debug"
+```
+
 ## Containerization
 
 ### Building the container image locally
@@ -768,29 +962,31 @@ docker build  \
 > The `--build` flag is going to save you 99% of the time from docker compose caching your image builds against your will or knowledge during development.
 
 ## Running local Gateway with Docker Compose
+```sh
 # Navigate to the directory containing the docker-compose file
-cd /Users/rafaelapb/Projects/blockchain-integration-framework/packages/cactus-plugin-satp-hermes/
+cd packages/cactus-plugin-satp-hermes/
 
-#### Build and start containers (interactive mode)
+# Build and start containers (interactive mode)
 docker-compose -f docker-compose-satp.yml up
 
-#### Build and start containers in background (detached mode)
+# Build and start containers in background (detached mode)
 docker-compose -f docker-compose-satp.yml up -d
 
-#### Stop and remove containers
+# Stop and remove containers
 docker-compose -f docker-compose-satp.yml down
 
-#### View container logs
+# View container logs
 docker-compose -f docker-compose-satp.yml logs
 
-#### Build or rebuild services
+# Build or rebuild services
 docker-compose -f docker-compose-satp.yml build
 
-#### List running containers
+# List running containers
 docker-compose -f docker-compose-satp.yml ps
+```
 
 ## Contributing
-We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
+We welcome contributions to Hyperledger Cacti in many forms, and there’s always interesting challenges!
 
 Please review [CONTRIBUTING.md](https://github.com/hyperledger/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
 

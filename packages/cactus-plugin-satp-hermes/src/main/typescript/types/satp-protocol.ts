@@ -55,6 +55,7 @@ import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { CrashRecoveryHandler } from "../core/crash-management/crash-handler";
 import { BridgeManagerClientInterface } from "../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { MonitorService } from "../services/monitoring/monitor";
+import type { AdapterManager } from "../adapters/adapter-manager";
 
 /**
  * Enumeration of SATP protocol handler types for different stages and crash recovery.
@@ -321,5 +322,7 @@ export interface SATPHandlerOptions {
   stage: string;
   /** Monitoring service for metrics and health checks */
   monitorService: MonitorService;
+  /** Optional adapter manager used for API3 hook orchestration */
+  adapterManager?: AdapterManager;
 }
 export { SATPService, SATPServiceType };
