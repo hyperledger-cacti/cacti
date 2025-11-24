@@ -143,7 +143,7 @@ jobs:
         (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) ||
         github.event_name == 'workflow_dispatch'
       )
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-latest
     outputs:
       package_version: ${{ steps.set_tags.outputs.package_version }}
       tag_suffix: ${{ steps.set_tags.outputs.tag_suffix }}
@@ -209,7 +209,7 @@ jobs:
     # Build NPM packages for pushes, PRs targeting the release branches, and manual workflow dispatch.
     # This job only builds, it does not publish to registries.
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.7
 
@@ -278,7 +278,7 @@ jobs:
   publish-satp-hermes-npm-package-npmjs:
     needs: [build-satp-hermes-npm-package, set-npm-tags]
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.7
 
@@ -354,15 +354,16 @@ jobs:
           npm whoami
           # Publish with latest tag (npm automatically tags with version)
           npm publish --tag latest --access public
-          # Also add version-specific tag for easier reference
+          # Also add version-specific dist-tag for easier reference (e.g. 0.0.3-beta)
           PACKAGE_VERSION=$(node -e "console.log(require('./package.json').version)")
-          echo "Published version ${PACKAGE_VERSION} with 'latest' tag"
+          echo "Published version ${PACKAGE_VERSION} with 'latest' and '${PACKAGE_VERSION}' tags"
+          npm dist-tag add "@hyperledger/cactus-plugin-satp-hermes@${PACKAGE_VERSION}" "${PACKAGE_VERSION}"
 
   # Stage: Publish NPM package to GitHub Package Registry
   publish-satp-hermes-npm-package-ghcr:
     needs: [build-satp-hermes-npm-package, set-npm-tags]
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-latest
     continue-on-error: true  # Don't fail the workflow if GitHub Package Registry push fails
     steps:
       - uses: actions/checkout@v4.1.7
