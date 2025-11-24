@@ -46,7 +46,7 @@ jobs:
     # npm ERR! this command with --force or --legacy-peer-deps
     # npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
     - name: wipe_non_yaml_sources
-      run: rm -rf packages/ examples/ extensions/ package.json weaver/
+      run: rm -rf packages/ examples/ extensions/ package.json weaver/ node_modules/
 
     # Shellcheck comlains that inside single quotes
     # the environment variables are not expanded, but that's exactly what we want here because

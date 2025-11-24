@@ -1,11 +1,42 @@
 openapi: 3.0.3
 info:
-  title: SATP Gateway Client (Business Logic Orchestrator)
+  title: SATP Gateway Client (API-Type 1)
   version: 0.0.2
   description: |-
-    SATP is a protocol operating between two gateways that conducts the transfer of a digital asset from one gateway to another. The protocol establishes a secure channel between the endpoints and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, isolation and durability.
+    SATP is a protocol operating between two gateways that conducts the transfer of a digital asset 
+    from one gateway to another. The protocol establishes a secure channel between the endpoints 
+    and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency, 
+    isolation and durability.
 
-    This API defines the gateway client facing API (business logic orchestrator, or BLO), which is named API-Type 1 in the SATP-Core specification.
+    This API defines the gateway client facing API (API-Type 1 in the SATP-Core specification).
+
+    ## Adapter Layer
+
+    The SATP Hermes plugin includes an Adapter Layer that enables external systems to integrate 
+    with and control SATP transfers through webhook-based communication. This enables compliance 
+    systems, business logic, and human-in-the-loop workflows to participate in cross-chain asset 
+    transfers.
+
+    ### Webhook Types
+
+    | Type | Direction | Purpose |
+    |------|-----------|---------|
+    | **Outbound Webhooks** | Gateway → External System | Notify external systems about SATP events |
+    | **Inbound Webhooks** | External System → Gateway | Allow external systems to approve/reject transfers |
+
+    ### Key Concepts
+
+    - **Execution Points**: Adapters are triggered at specific points in the SATP protocol (stage + step + order)
+    - **Adapters**: Configuration units that define which webhooks to call and when
+    - **Session Control**: Inbound webhooks can pause transfers pending external approval
+
+    ### Inbound Webhook Approval Flow
+
+    1. Gateway reaches configured execution point with inbound adapter
+    2. Gateway pauses SATP execution and waits for external decision
+    3. External controller evaluates transfer (compliance, business rules, manual review)
+    4. Controller POSTs decision to `/webhook/inbound/decide` endpoint
+    5. Gateway validates decision and resumes or aborts transfer
 
     **Additional Resources**:
     - [Proposed SATP Charter](https://datatracker.ietf.org/doc/charter-ietf-satp/)
@@ -43,6 +74,8 @@ tags:
     description: API endpoint for adding a counterparty to the gateway
   - name: oracle
     description: API endpoints for oracle tasks management
+  - name: webhook
+    description: API endpoints for inbound webhook decisions from external approval controllers
 paths:
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact:
     post:
@@ -570,6 +603,79 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
+
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide:
+    post:
+      summary: Submit inbound webhook decision
+      description: |-
+        External approval controllers use this endpoint to submit decisions (approve/reject)
+        for paused SATP transfers. When an adapter with an inbound webhook executes, the 
+        gateway pauses and waits for an external decision via this endpoint.
+
+        **Inbound Webhook Workflow:**
+        1. SATP gateway reaches a stage/step with configured inbound adapter
+        2. Gateway pauses execution and waits for external decision POST
+        3. External controller evaluates business rules, compliance checks, or manual review
+        4. Controller POSTs decision payload to this endpoint
+        5. Gateway validates decision, logs justification, and resumes or aborts transfer
+
+        **Decision Semantics:**
+        - `continue: true` - Approve transfer continuation; gateway proceeds to next stage
+        - `continue: false` - Reject transfer; gateway aborts and may trigger rollback
+        - `reason` - Human-readable justification stored in audit logs
+
+        **Timeout Handling:**
+        Each inbound webhook declares a `timeoutMs` timeout. If no decision arrives
+        within this window, the gateway treats it as a rejection and aborts the transfer.
+
+        **Security Considerations:**
+        - Inbound endpoints should use authentication (API keys, mTLS, JWT validation)
+        - Decision payloads must include adapter ID to match the paused session state
+        - All decisions are logged with timestamps for non-repudiation
+      operationId: DecideInboundWebhook
+      tags:
+        - webhook
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: post
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./schemas.yml#/InboundWebhookDecisionRequest
+      responses:
+        '200':
+          description: Decision accepted and applied to the session
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/InboundWebhookDecisionResponse
+        '400':
+          description: Bad request - invalid decision payload
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
+        '404':
+          description: Session or adapter not found, or no pending decision
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
+        '409':
+          description: Decision conflict - session not in waiting state
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
 components:
   schemas:
     $ref: ./schemas.yml

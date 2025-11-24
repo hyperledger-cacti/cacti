@@ -28,7 +28,7 @@
  *   pubkeys: new Map(),
  *   gatewayId: 'gateway-001',
  *   loggerOptions: { level: 'info' },
- *   stage: Stage.STAGE1,
+ *   stage: SatpStageKey.Stage1,
  *   monitorService: myMonitor
  * };
  * ```
@@ -55,69 +55,31 @@ import { Stage3SATPHandler } from "../core/stage-handlers/stage3-handler";
 import { CrashRecoveryHandler } from "../core/crash-management/crash-handler";
 import { BridgeManagerClientInterface } from "../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { MonitorService } from "../services/monitoring/monitor";
+import type { AdapterManager } from "../adapters/adapter-manager";
+import { SatpStageKey } from "../generated/gateway-client/typescript-axios";
 
 /**
- * Enumeration of SATP protocol handler types for different stages and crash recovery.
- *
- * Each handler type corresponds to a specific phase of the SATP protocol execution,
- * providing type-safe identification and routing of protocol messages. The crash
- * handler enables fault-tolerant operations following Hermes design patterns.
- *
- * @enum {string}
- * @since 0.0.3-beta
- * @example
- * ```typescript
- * const handlerType = SATPHandlerType.STAGE1;
- * if (handlerType === SATPHandlerType.STAGE1) {
- *   // Handle lock evidence verification
- * }
- * ```
+ * SATP protocol handler type derived from SatpStageKey.
+ * Each handler type is the stage key suffixed with "-handler".
  */
-export enum SATPHandlerType {
+export type SATPHandlerType = `${SatpStageKey}-handler`;
+
+/**
+ * SATPHandlerType constants for each stage.
+ * Provides named constants for handler type identification.
+ */
+export const SATPHandlerType = {
   /** Stage 0 handler for transfer initiation and gateway negotiation */
-  STAGE0 = "stage-0-handler",
+  STAGE0: `${SatpStageKey.Stage0}-handler` as SATPHandlerType,
   /** Stage 1 handler for lock evidence and asset commitment */
-  STAGE1 = "stage-1-handler",
+  STAGE1: `${SatpStageKey.Stage1}-handler` as SATPHandlerType,
   /** Stage 2 handler for asset transfer and confirmation */
-  STAGE2 = "stage-2-handler",
+  STAGE2: `${SatpStageKey.Stage2}-handler` as SATPHandlerType,
   /** Stage 3 handler for commitment establishment and finalization */
-  STAGE3 = "stage-3-handler",
+  STAGE3: `${SatpStageKey.Stage3}-handler` as SATPHandlerType,
   /** Crash recovery handler for fault-tolerant operations */
-  CRASH = "crash-handler",
-}
-
-/**
- * Enumeration of SATP protocol execution stages.
- *
- * Defines the four main stages of the SATP protocol execution flow, enabling
- * structured state management and progression tracking during cross-chain
- * asset transfers. Each stage has specific responsibilities and message types.
- *
- * @enum {string}
- * @since 0.0.3-beta
- * @example
- * ```typescript
- * const currentStage = Stage.STAGE1;
- * switch (currentStage) {
- *   case Stage.STAGE0:
- *     // Handle transfer initiation
- *     break;
- *   case Stage.STAGE1:
- *     // Handle lock evidence
- *     break;
- * }
- * ```
- */
-export enum Stage {
-  /** Transfer initiation and gateway negotiation phase */
-  STAGE0 = "stage-0",
-  /** Lock evidence and asset commitment phase */
-  STAGE1 = "stage-1",
-  /** Asset transfer and confirmation phase */
-  STAGE2 = "stage-2",
-  /** Commitment establishment and finalization phase */
-  STAGE3 = "stage-3",
-}
+  CRASH: `${SatpStageKey.Crash}-handler` as SATPHandlerType,
+} as const;
 
 /**
  * Static interface for SATP service constructors and metadata.
@@ -213,9 +175,9 @@ export interface ISATPHandler {
  * ```typescript
  * function createHandler(stage: Stage): SATPHandlerInstance {
  *   switch (stage) {
- *     case Stage.STAGE0:
+ *     case SatpStageKey.Stage0:
  *       return Stage0SATPHandler;
- *     case Stage.STAGE1:
+ *     case SatpStageKey.Stage1:
  *       return Stage1SATPHandler;
  *     // ... other stages
  *   }
@@ -258,7 +220,7 @@ export type SATPHandlerInstance =
  *   }
  *
  *   getStage(): string {
- *     return Stage.STAGE1;
+ *     return SatpStageKey.Stage1;
  *   }
  * }
  * ```
@@ -297,7 +259,7 @@ export interface SATPHandler {
  *   ]),
  *   gatewayId: 'gateway-001',
  *   loggerOptions: { level: 'info', label: 'satp-handler' },
- *   stage: Stage.STAGE1,
+ *   stage: SatpStageKey.Stage1,
  *   monitorService: new MetricsMonitorService()
  * };
  * ```
@@ -321,5 +283,7 @@ export interface SATPHandlerOptions {
   stage: string;
   /** Monitoring service for metrics and health checks */
   monitorService: MonitorService;
+  /** Optional adapter manager used for API3 hook orchestration */
+  adapterManager?: AdapterManager;
 }
 export { SATPService, SATPServiceType };

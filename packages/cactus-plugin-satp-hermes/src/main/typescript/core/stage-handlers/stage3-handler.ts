@@ -122,12 +122,12 @@ import {
   SATPHandler,
   SATPHandlerOptions,
   SATPHandlerType,
-  Stage,
 } from "../../types/satp-protocol";
+import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { Stage3ClientService } from "../stage-services/client/stage3-client-service";
-import { getSessionId } from "./handler-utils";
+import { getSessionId, buildAdapterPayload } from "./handler-utils";
 import {
   FailedToCreateMessageError,
   FailedToProcessError,
@@ -148,6 +148,7 @@ import {
   PriceManager,
   PriceManagerOptions,
 } from "../../services/token-price-check/price-manager";
+import type { AdapterManager } from "../../adapters/adapter-manager";
 
 /**
  * SATP Stage 3 Handler for Commit Preparation, Final Assertion, and Transfer Completion.
@@ -331,6 +332,8 @@ export class Stage3SATPHandler implements SATPHandler {
    */
   private readonly monitorService: MonitorService;
   private priceManager: PriceManager;
+  private readonly adapterManager?: AdapterManager;
+  private readonly gatewayId: string;
 
   /**
    * Creates a new Stage 3 SATP handler instance.
@@ -424,6 +427,8 @@ export class Stage3SATPHandler implements SATPHandler {
     this.serverService = ops.serverService as Stage3ServerService;
     this.clientService = ops.clientService as Stage3ClientService;
     this.monitorService = ops.monitorService;
+    this.adapterManager = ops.adapterManager;
+    this.gatewayId = ops.gatewayId;
     this.logger = LoggerProvider.getOrCreate(
       ops.loggerOptions,
       this.monitorService,
@@ -494,7 +499,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * @returns {string} The SATP Stage 3 identifier
    */
   getStage(): string {
-    return Stage.STAGE3;
+    return SatpStageKey.Stage3;
   }
 
   // ============================================================================
@@ -564,6 +569,20 @@ export class Stage3SATPHandler implements SATPHandler {
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage3,
+            "checkCommitPreparationRequest",
+            "before",
+            session,
+            this.gatewayId,
+            {
+              operation: "commitPreparation",
+              role: "server",
+            },
+          ),
+        );
+
         await this.serverService.checkCommitPreparationRequest(req, session);
 
         saveMessageInSessionData(session.getServerSessionData(), req);
@@ -585,6 +604,20 @@ export class Stage3SATPHandler implements SATPHandler {
         }
 
         saveMessageInSessionData(session.getServerSessionData(), message);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage3,
+            "commitReadyResponse",
+            "after",
+            session,
+            this.gatewayId,
+            {
+              operation: "commitPreparation",
+              role: "server",
+            },
+          ),
+        );
         attributes = collectSessionAttributes(session, "server");
 
         const startTimestamp =
@@ -713,6 +746,20 @@ export class Stage3SATPHandler implements SATPHandler {
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage3,
+            "checkCommitFinalAssertionRequest",
+            "before",
+            session,
+            this.gatewayId,
+            {
+              operation: "commitFinalAssertion",
+              role: "server",
+            },
+          ),
+        );
+
         await this.serverService.checkCommitFinalAssertionRequest(req, session);
 
         saveMessageInSessionData(session.getServerSessionData(), req);
@@ -735,6 +782,20 @@ export class Stage3SATPHandler implements SATPHandler {
         }
 
         saveMessageInSessionData(session.getServerSessionData(), message);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage3,
+            "commitFinalAcknowledgementReceiptResponse",
+            "after",
+            session,
+            this.gatewayId,
+            {
+              operation: "commitFinalAssertion",
+              role: "server",
+            },
+          ),
+        );
 
         attributes = collectSessionAttributes(session, "server");
 
@@ -856,6 +917,20 @@ export class Stage3SATPHandler implements SATPHandler {
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage3,
+            "checkTransferCompleteRequest",
+            "before",
+            session,
+            this.gatewayId,
+            {
+              operation: "transferComplete",
+              role: "server",
+            },
+          ),
+        );
+
         await this.serverService.checkTransferCompleteRequest(req, session);
 
         saveMessageInSessionData(session.getServerSessionData(), req);
@@ -873,6 +948,20 @@ export class Stage3SATPHandler implements SATPHandler {
         }
 
         saveMessageInSessionData(session.getServerSessionData(), message);
+
+        await this.adapterManager?.executeAdaptersOrSkip(
+          buildAdapterPayload(
+            SatpStageKey.Stage3,
+            "transferCompleteResponse",
+            "after",
+            session,
+            this.gatewayId,
+            {
+              operation: "transferComplete",
+              role: "server",
+            },
+          ),
+        );
 
         attributes = collectSessionAttributes(session, "server");
 
@@ -1123,6 +1212,20 @@ export class Stage3SATPHandler implements SATPHandler {
 
           span.setAttribute("sessionId", session.getSessionId() || "");
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage3,
+              "commitPreparation",
+              "before",
+              session,
+              this.gatewayId,
+              {
+                operation: "commitPreparation",
+                role: "client",
+              },
+            ),
+          );
+
           await this.clientService.checkLockAssertionResponse(
             response,
             session,
@@ -1143,6 +1246,20 @@ export class Stage3SATPHandler implements SATPHandler {
           }
 
           saveMessageInSessionData(session.getClientSessionData(), request);
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage3,
+              "commitPreparation",
+              "after",
+              session,
+              this.gatewayId,
+              {
+                operation: "commitPreparation",
+                role: "client",
+              },
+            ),
+          );
 
           return request;
         } catch (error) {
@@ -1269,6 +1386,20 @@ export class Stage3SATPHandler implements SATPHandler {
           attributes = collectSessionAttributes(session, "client");
           span.setAttribute("sessionId", session.getSessionId() || "");
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage3,
+              "commitFinalAssertion",
+              "before",
+              session,
+              this.gatewayId,
+              {
+                operation: "commitFinalAssertion",
+                role: "client",
+              },
+            ),
+          );
+
           await this.clientService.checkCommitPreparationResponse(
             response,
             session,
@@ -1291,6 +1422,20 @@ export class Stage3SATPHandler implements SATPHandler {
           }
 
           saveMessageInSessionData(session.getClientSessionData(), request);
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage3,
+              "commitFinalAssertion",
+              "after",
+              session,
+              this.gatewayId,
+              {
+                operation: "commitFinalAssertion",
+                role: "client",
+              },
+            ),
+          );
 
           const senderAssetAmount = Number(
             session.getClientSessionData().senderAsset?.amount,
@@ -1416,6 +1561,20 @@ export class Stage3SATPHandler implements SATPHandler {
 
           span.setAttribute("sessionId", session.getSessionId() || "");
 
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage3,
+              "checkCommitFinalAssertionResponse",
+              "before",
+              session,
+              this.gatewayId,
+              {
+                operation: "transferComplete",
+                role: "client",
+              },
+            ),
+          );
+
           await this.clientService.checkCommitFinalAssertionResponse(
             response,
             session,
@@ -1436,6 +1595,20 @@ export class Stage3SATPHandler implements SATPHandler {
           }
 
           saveMessageInSessionData(session.getClientSessionData(), request);
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage3,
+              "transferComplete",
+              "after",
+              session,
+              this.gatewayId,
+              {
+                operation: "transferComplete",
+                role: "client",
+              },
+            ),
+          );
 
           return request;
         } catch (error) {
@@ -1573,6 +1746,20 @@ export class Stage3SATPHandler implements SATPHandler {
           }
 
           span.setAttribute("sessionId", session.getSessionId() || "");
+
+          await this.adapterManager?.executeAdaptersOrSkip(
+            buildAdapterPayload(
+              SatpStageKey.Stage3,
+              "checkTransferCompleteResponse",
+              "before",
+              session,
+              this.gatewayId,
+              {
+                operation: "transferComplete",
+                role: "client",
+              },
+            ),
+          );
 
           await this.clientService.checkTransferCompleteResponse(
             response,

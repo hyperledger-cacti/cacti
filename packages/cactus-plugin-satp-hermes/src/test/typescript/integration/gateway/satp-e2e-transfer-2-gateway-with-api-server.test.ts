@@ -69,9 +69,15 @@ let gateway2: SATPGateway;
 const TIMEOUT = 900000; // 15 minutes
 
 afterAll(async () => {
-  await besuEnv.tearDown();
-  await fabricEnv.tearDown();
-  await ethereumEnv.tearDown();
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (fabricEnv) {
+    await fabricEnv.tearDown();
+  }
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
@@ -388,6 +394,21 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
     log.info(res.data.statusResponse);
     expect(res?.status).toBe(200);
 
+    // Verify session status using getStatus endpoint
+    const sessionId = res.data.sessionID;
+    expect(sessionId).toBeDefined();
+    log.info(`Session ID from transact response: ${sessionId}`);
+
+    const adminApi1 = new AdminApi(
+      new Configuration({ basePath: gateway1.getAddressOApiAddress() }),
+    );
+    const statusRes = await adminApi1.getStatus(sessionId);
+    expect(statusRes?.status).toBe(200);
+    expect(statusRes.data.status).toBeDefined();
+    log.info(
+      `Session status from getStatus endpoint: ${statusRes.data.status}`,
+    );
+
     await besuEnv.checkBalance(
       besuEnv.getTestFungibleContractName(),
       besuEnv.getTestFungibleContractAddress(),
@@ -624,6 +645,21 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
     log.info(res?.status);
     log.info(res.data.statusResponse);
     expect(res?.status).toBe(200);
+
+    // Verify session status using getStatus endpoint
+    const sessionId = res.data.sessionID;
+    expect(sessionId).toBeDefined();
+    log.info(`Session ID from transact response: ${sessionId}`);
+
+    const adminApi1 = new AdminApi(
+      new Configuration({ basePath: gateway1.getAddressOApiAddress() }),
+    );
+    const statusRes = await adminApi1.getStatus(sessionId);
+    expect(statusRes?.status).toBe(200);
+    expect(statusRes.data.status).toBeDefined();
+    log.info(
+      `Session status from getStatus endpoint: ${statusRes.data.status}`,
+    );
 
     await fabricEnv.checkBalance(
       fabricEnv.getTestContractName(),

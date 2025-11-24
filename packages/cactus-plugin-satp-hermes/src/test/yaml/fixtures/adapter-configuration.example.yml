@@ -1,0 +1,126 @@
+# =============================================================================
+# Full Example Configuration - Production-Style Adapter Setup
+# =============================================================================
+#
+# PURPOSE:
+# Comprehensive example demonstrating all adapter configuration options.
+# Shows multi-stage bindings, priority ordering, and timeout configuration.
+#
+# FEATURES DEMONSTRATED:
+# 1. Multiple execution points per adapter
+# 2. Both outbound and inbound webhooks on same adapter
+# 3. Priority ordering for execution sequence
+# 4. Stage-specific timeout and retry configuration
+#
+# USE CASES:
+# - phase0-adapter-1: Validation with approval gate
+# - phase0-adapter-2: Dashboard notification (outbound only)
+# - stage1-compliance-adapter: Compliance check with manual review gate
+# - stage2-lock-monitor: Asset lock event monitoring
+# - stage3-finalization-adapter: Transfer completion notifications
+# =============================================================================
+
+adapters:
+  - id: "phase0-adapter-1"
+    name: "Transfer Validation Webhook"
+    description: "Validates transfer initiation request"
+    executionPoints:
+      - stage: "stage-0"
+        step: checkNewSessionRequest
+        point: "before"
+      - stage: "stage-0"
+        step: checkPreSATPTransferRequest
+        point: "before"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/validate"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 1000
+    # if defined, the transaction will be automatically paused in SATP 
+    # until the inboundWebhook has been called for the specific contextId
+    inboundWebhook:
+      timeoutMs: 300000   # 5 minutes, if not called by then, transaction is cancelled
+    active: true
+    priority: 1
+
+  - id: "phase0-adapter-2"
+    name: "Business dashboard Webhook"
+    description: "Updates legacy business dashboard with transfer data"
+    executionPoints:
+      - stage: "stage-0"
+        step: newSessionResponse
+        point: "after"
+      - stage: "stage-0"
+        step: preSATPTransferResponse
+        point: "after"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/inform"
+      timeoutMs: 3000
+      retryAttempts: 2
+    active: true
+    priority: 2
+
+  - id: "stage1-compliance-adapter"
+    name: "Compliance Check Webhook"
+    description: "Performs compliance checks during transfer proposal"
+    executionPoints:
+      - stage: "stage-1"
+        step: checkTransferProposalRequestMessage
+        point: "before"
+      - stage: "stage-1"
+        step: checkTransferCommenceRequestMessage
+        point: "before"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/check"
+      timeoutMs: 10000
+      retryAttempts: 2
+      retryDelayMs: 2000
+    inboundWebhook:
+      timeoutMs: 600000   # 10 minutes for manual compliance review
+    active: true
+    priority: 1
+
+  - id: "stage2-lock-monitor"
+    name: "Asset Lock Monitor"
+    description: "Monitors asset locking operations"
+    executionPoints:
+      - stage: "stage-2"
+        step: checkLockAssertionRequest
+        point: "after"
+      - stage: "stage-2"
+        step: checkLockAssertionResponse
+        point: "after"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/lock-events"
+      timeoutMs: 3000
+      retryAttempts: 3
+    active: true
+    priority: 1
+
+  - id: "stage3-finalization-adapter"
+    name: "Transfer Finalization Webhook"
+    description: "Handles final transfer completion notifications"
+    executionPoints:
+      - stage: "stage-3"
+        step: commitReadyResponse
+        point: "after"
+      - stage: "stage-3"
+        step: transferCompleteResponse
+        point: "after"
+      - stage: "stage-3"
+        step: checkTransferCompleteResponse
+        point: "after"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/complete"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 1000
+    active: true
+    priority: 1
+
+# Global configuration
+global:
+  timeoutMs: 3000
+  retryAttempts: 5
+  retryDelayMs: 500
+  logLevel: "debug"

@@ -46,6 +46,8 @@ import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import { createServer } from "node:http";
+import { AddressInfo } from "node:net";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -135,6 +137,16 @@ beforeAll(async () => {
   };
   const factory = new PluginFactorySATPGateway(factoryOptions);
 
+  const server1 = createServer();
+  await new Promise<void>((resolve) => server1.listen(0, resolve));
+  const gatewayServerPort = (server1.address() as AddressInfo).port;
+  await new Promise<void>((resolve) => server1.close(() => resolve()));
+
+  const server2 = createServer();
+  await new Promise<void>((resolve) => server2.listen(0, resolve));
+  const gatewayClientPort = (server2.address() as AddressInfo).port;
+  await new Promise<void>((resolve) => server2.close(() => resolve()));
+
   const gatewayIdentity = {
     id: "mockID",
     name: "CustomGateway",
@@ -147,6 +159,8 @@ beforeAll(async () => {
     ],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
+    gatewayServerPort,
+    gatewayClientPort,
   } as GatewayIdentity;
 
   const evmNetworkOptions = ethereumEnv.createEthereumConfig();
@@ -172,8 +186,8 @@ beforeAll(async () => {
 
   const identity = gateway.Identity;
   // default servers
-  expect(identity.gatewayServerPort).toBe(3010);
-  expect(identity.gatewayClientPort).toBe(3011);
+  expect(identity.gatewayServerPort).toBe(gatewayServerPort);
+  expect(identity.gatewayClientPort).toBe(gatewayClientPort);
   expect(identity.address).toBe("http://localhost");
   await gateway.startup();
 

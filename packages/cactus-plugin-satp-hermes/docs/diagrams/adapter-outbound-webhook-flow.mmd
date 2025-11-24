@@ -1,0 +1,47 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#86efac','primaryTextColor':'#14532d','primaryBorderColor':'#166534','lineColor':'#22c55e','secondaryColor':'#dcfce7','tertiaryColor':'#f0fdf4', 'actorTextColor':'#14532d', 'actorBkg':'#bbf7d0', 'actorBorder':'#166534', 'signalColor':'#14532d', 'signalTextColor':'#14532d', 'noteBkgColor':'#fef9c3', 'noteTextColor':'#422006', 'noteBorderColor':'#ca8a04', 'labelBoxBkgColor':'#dcfce7', 'labelTextColor':'#14532d'}}}%%
+
+sequenceDiagram
+    autonumber
+    participant SH as StageHandler
+    participant AM as AdapterManager
+    participant WC as WebhookClient
+    participant EX as ExternalSystem
+
+    Note over SH,EX: Outbound Webhook - Fire-and-Block (waits for response)
+
+    rect rgb(220, 252, 231)
+        Note over SH,AM: 1. Trigger
+        SH->>AM: executeAdapters(0, newSessionRequest, before)
+        AM->>AM: getBindingsForExecutionPoint()
+    end
+
+    rect rgb(254, 249, 195)
+        Note over AM,WC: 2. Build Payload
+        AM->>AM: buildOutboundPayload(adapter, state)
+    end
+
+    rect rgb(187, 247, 208)
+        Note over WC,EX: 3. HTTP POST (blocking)
+        AM->>WC: post(url, payload, timeout)
+        WC->>EX: POST /webhooks
+        EX->>EX: Execute businesss logic
+        Note right of WC: Awaiting response...
+        
+        alt Success (2xx response)
+            EX-->>WC: 200 OK + response body
+            WC-->>AM: OutboundWebhookInvocationResult{status: OK, responseBody, latencyMs}
+            Note over AM: Log success context
+        else Error (non-2xx response)
+            EX-->>WC: 4xx/5xx Error
+            WC-->>AM: AdapterOutboundWebhookError
+            AM--xSH: throw error - ABORT protocol
+        else Timeout (no response within timeoutMs)
+            WC-->>AM: AdapterOutboundWebhookError (timeout)
+            AM--xSH: throw error - ABORT protocol
+        end
+    end
+
+    rect rgb(240, 253, 244)
+        Note over AM,SH: 4. Continue (only on success)
+        AM-->>SH: AdapterHookResult{disposition: continue}
+    end

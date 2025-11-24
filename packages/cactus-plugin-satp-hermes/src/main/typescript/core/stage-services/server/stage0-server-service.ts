@@ -28,6 +28,9 @@
  * - **Cryptographic Services**: Manages signature verification and proof validation
  * - **Database Persistence**: Stores session data, proofs, and audit information
  * - **Monitoring Integration**: Provides comprehensive logging and metrics collection
+ * - **Adapter Security**: Enforces mutually authenticated TLS for API3 webhook
+ *   communication so that only trusted operator systems can authorize paused
+ *   sessions or receive outbound notifications.
  *
  * **Protocol Compliance:**
  * This implementation follows the IETF SATP Core v2 specification for Stage 0
@@ -448,7 +451,9 @@ export class Stage0ServerService extends SATPService {
           data: safeStableStringify(sessionData),
           sequenceNumber: Number(sessionData.lastSequenceNumber),
         });
+
         try {
+          // todo execute before inbound / outbound hook here
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,

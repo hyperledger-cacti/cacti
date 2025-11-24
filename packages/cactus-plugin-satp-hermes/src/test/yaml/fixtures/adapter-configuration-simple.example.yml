@@ -1,0 +1,60 @@
+# =============================================================================
+# Example Configuration - Multi-Stage Adapter Setup
+# =============================================================================
+#
+# PURPOSE:
+# Reference example showing how to configure adapters with both outbound
+# and inbound webhooks across multiple SATP protocol stages.
+#
+# ADAPTER TYPES DEMONSTRATED:
+# 1. validation-adapter-1: Both outbound (notify) + inbound (await approval)
+# 2. phase0-adapter-2: Outbound only (dashboard notification)
+#
+# EXECUTION POINTS EXPLAINED:
+# - stage: SATP protocol stage (0=session, 1=transfer, 2=commit, 3=complete)
+# - step: Protocol step within stage (e.g., checkNewSessionRequest)
+# - point: When to execute (before/during/after/rollback)
+#
+# INBOUND WEBHOOK BEHAVIOR:
+# When inboundWebhook is defined, SATP execution PAUSES at that point until:
+# - External controller POSTs approval to /api/v1/adapters/inbound/{sessionId}/{adapterId}
+# - OR timeout expires (transaction cancelled)
+adapters:
+  - id: "validation-adapter-1"
+    name: "Transfer Validation Webhook"
+    description: "Validates transfer initiation request"
+    executionPoints:
+      - stage: "stage-0"
+        step: checkNewSessionRequest #session request received by the server
+        point: "before" # at the end of the execution
+        # https://gitkraken.dev/link/dnNjb2RlOi8vZWFtb2Rpby5naXRsZW5zL2xpbmsvci8xNGQ3YjRhNzA0YTNmZDY2ZTU5ODMyMGY5ZWFlODg3NzM1OGFkM2RjL2YvcGFja2FnZXMvY2FjdHVzLXBsdWdpbi1zYXRwLWhlcm1lcy9zcmMvbWFpbi90eXBlc2NyaXB0L2NvcmUvc3RhZ2Utc2VydmljZXMvc2VydmVyL3N0YWdlMC1zZXJ2ZXItc2VydmljZS50cz91cmw9Z2l0JTQwZ2l0aHViLmNvbSUzQVJhZmFlbEFQQiUyRmJsb2NrY2hhaW4taW50ZWdyYXRpb24tZnJhbWV3b3JrLmdpdCZsaW5lcz00NTc%3D?origin=gitlens
+      - stage: "stage-0"
+        step: newSessionResponse
+        point: "before" # right before the processing of the session response, output of session request processing by the server    
+        # executed here https://gitkraken.dev/link/dnNjb2RlOi8vZWFtb2Rpby5naXRsZW5zL2xpbmsvci8xNGQ3YjRhNzA0YTNmZDY2ZTU5ODMyMGY5ZWFlODg3NzM1OGFkM2RjL2YvcGFja2FnZXMvY2FjdHVzLXBsdWdpbi1zYXRwLWhlcm1lcy9zcmMvbWFpbi90eXBlc2NyaXB0L2NvcmUvc3RhZ2Utc2VydmljZXMvc2VydmVyL3N0YWdlMC1zZXJ2ZXItc2VydmljZS50cz91cmw9Z2l0JTQwZ2l0aHViLmNvbSUzQVJhZmFlbEFQQiUyRmJsb2NrY2hhaW4taW50ZWdyYXRpb24tZnJhbWV3b3JrLmdpdCZsaW5lcz00NTc%3D?origin=gitlens
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/validate"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 1000
+    # if defined, the transaction will be automatically paused in SATP 
+    # until the inboundWebhook has been called for the specific contextId
+    inboundWebhook:
+      timeoutMs: 300000   # 5 minutes, if not called by then, transaction is cancelled
+    active: true
+    priority: 1
+  - id: "phase0-adapter-2"
+    name: "Business dashboard Webhook"
+    description: "Updated some business dashboard with a value"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/inform"
+      timeoutMs: 3000
+      retryAttempts: 2
+    active: true
+    priority: 2
+# Global configuration
+global:
+  timeoutMs: 3000
+  retryAttempts: 5
+  retryDelayMs: 500
+  logLevel: "debug"

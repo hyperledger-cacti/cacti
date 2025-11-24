@@ -17,6 +17,13 @@ import knex, { type Knex } from "knex";
 import { knexLocalInstance } from "../knexfile";
 import { createMigrationSource } from "../knex-migration-source";
 
+/** Maximum number of retry attempts for database operations */
+const MAX_RETRIES = 3;
+/** Base delay in milliseconds for exponential backoff */
+const BASE_DELAY_MS = 200;
+/** Maximum delay in milliseconds for exponential backoff */
+const MAX_DELAY_MS = 3000;
+
 /**
  * Knex.js-based implementation of local SATP gateway log repository.
  *
@@ -152,13 +159,58 @@ export class KnexLocalLogRepository implements ILocalLogRepository {
   /**
    * Create a new local log entry in the database.
    *
+   * Uses retry logic with exponential backoff to handle SQLITE_BUSY errors
+   * that can occur during concurrent database access.
+   *
    * @param log - Local log entry to persist
-   * @returns Database insertion promise
+   * @returns Promise resolving to the created log entry
    * @since 0.0.3-beta
-   * @todo Fix return type annotation
    */
-  create(log: LocalLog): any {
-    return this.getLogsTable().insert(log);
+  async create(log: LocalLog): Promise<LocalLog> {
+    await this.executeWithRetry(() => this.getLogsTable().insert(log));
+    return log;
+  }
+
+  /**
+   * Execute a database operation with retry logic and exponential backoff.
+   *
+   * Handles SQLITE_BUSY errors by retrying the operation with increasing delays.
+   * Uses randomization to prevent thundering herd problems.
+   *
+   * @param operation - Database operation to execute
+   * @returns Promise resolving to operation result
+   * @private
+   * @since 0.0.3-beta
+   */
+  private async executeWithRetry<T>(operation: () => Promise<T>): Promise<T> {
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        return await operation();
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        const isSqliteBusy =
+          errorMessage.includes("SQLITE_BUSY") ||
+          errorMessage.includes("database is locked");
+
+        if (!isSqliteBusy || attempt === MAX_RETRIES) {
+          throw error;
+        }
+
+        lastError = error instanceof Error ? error : new Error(String(error));
+
+        // Exponential backoff with jitter
+        const delay = Math.min(
+          BASE_DELAY_MS * Math.pow(2, attempt - 1) + Math.random() * 100,
+          MAX_DELAY_MS,
+        );
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+
+    throw lastError;
   }
 
   /**

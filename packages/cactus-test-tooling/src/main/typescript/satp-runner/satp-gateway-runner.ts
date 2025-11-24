@@ -300,18 +300,115 @@ export class SATPGatewayRunner implements ITestLedger {
     const fnTag = "SATPGatewayRunner#waitForHealthCheck()";
     const startedAt = Date.now();
     let isHealthy = false;
+    let lastStatus = "";
+    let unhealthyCount = 0;
+    const lastExitStatus: string | null = null;
+
     do {
       if (Date.now() >= startedAt + timeoutMs) {
-        throw new Error(`${fnTag} timed out (${timeoutMs}ms)`);
+        // On timeout, attempt to collect diagnostic information
+        await this.logContainerDiagnostics();
+        throw new Error(
+          `${fnTag} timed out (${timeoutMs}ms). Last status: "${lastStatus}". ` +
+            `Container may have crashed ${unhealthyCount} times. ` +
+            `Last known exit status: ${lastExitStatus || "unknown"}. ` +
+            `Check container logs above for crash details.`,
+        );
       }
       const { Status, State } = await this.getContainerInfo();
-      this.log.debug(`ContainerInfo.Status=%o, State=O%`, Status, State);
+      lastStatus = Status;
+
+      // Detect if the status indicates the container has crashed/restarted
+      if (Status.includes("health: starting")) {
+        // Check if it's been restarting by looking at the uptime resetting
+        const uptimeMatch = Status.match(/Up (\d+) seconds?/);
+        if (uptimeMatch && parseInt(uptimeMatch[1], 10) < 5) {
+          unhealthyCount++;
+          this.log.warn(
+            `Container appears to have restarted (restart #${unhealthyCount}). ` +
+              `Status: ${Status}. This may indicate the gateway process is crashing.`,
+          );
+        }
+      }
+
+      // Check for unhealthy status
+      if (Status.includes("(unhealthy)")) {
+        this.log.error(`Container reported unhealthy status: ${Status}`);
+        await this.logContainerDiagnostics();
+      }
+
+      this.log.debug(`ContainerInfo.Status=%o, State=%o`, Status, State);
       isHealthy = Status.endsWith("(healthy)");
       if (!isHealthy) {
         await new Promise((resolve2) => setTimeout(resolve2, 1000));
       }
     } while (!isHealthy);
-    this.log.debug(`Left waitForHealthCheck`);
+    this.log.debug(`Left waitForHealthCheck - container is healthy`);
+  }
+
+  /**
+   * Logs diagnostic information about the container for debugging crashes.
+   * Captures container inspect data, recent logs, and process state.
+   */
+  private async logContainerDiagnostics(): Promise<void> {
+    const fnTag = "SATPGatewayRunner#logContainerDiagnostics()";
+    this.log.error(`${fnTag} Collecting container diagnostics...`);
+
+    try {
+      if (!this.container) {
+        this.log.error(`${fnTag} No container reference available`);
+        return;
+      }
+
+      // Get detailed container inspection
+      const inspection = await this.container.inspect();
+
+      this.log.error(`${fnTag} Container State:`, {
+        Status: inspection.State.Status,
+        Running: inspection.State.Running,
+        Paused: inspection.State.Paused,
+        Restarting: inspection.State.Restarting,
+        OOMKilled: inspection.State.OOMKilled,
+        Dead: inspection.State.Dead,
+        Pid: inspection.State.Pid,
+        ExitCode: inspection.State.ExitCode,
+        Error: inspection.State.Error,
+        StartedAt: inspection.State.StartedAt,
+        FinishedAt: inspection.State.FinishedAt,
+      });
+
+      if (inspection.State.Health) {
+        this.log.error(`${fnTag} Health Check Info:`, {
+          Status: inspection.State.Health.Status,
+          FailingStreak: inspection.State.Health.FailingStreak,
+          Log: inspection.State.Health.Log?.slice(-3), // Last 3 health check logs
+        });
+      }
+
+      try {
+        const logs = await this.container.logs({
+          stdout: true,
+          stderr: true,
+          tail: 50,
+          timestamps: true,
+        });
+        this.log.error(
+          `${fnTag} Recent container logs (last 50 lines):\n${logs.toString()}`,
+        );
+      } catch (logErr) {
+        this.log.error(`${fnTag} Failed to retrieve container logs:`, logErr);
+      }
+
+      this.log.error(`${fnTag} Container Config:`, {
+        Image: inspection.Config.Image,
+        Cmd: inspection.Config.Cmd,
+        Entrypoint: inspection.Config.Entrypoint,
+        WorkingDir: inspection.Config.WorkingDir,
+        RestartPolicy: inspection.HostConfig.RestartPolicy,
+      });
+    } catch (err) {
+      this.log.error(`${fnTag} Failed to collect diagnostics:`, err);
+    }
   }
 
   public stop(): Promise<unknown> {

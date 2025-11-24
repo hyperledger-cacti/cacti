@@ -43,7 +43,7 @@ const factoryOptions: IPluginFactoryOptions = {
 const factory = new PluginFactorySATPGateway(factoryOptions);
 
 let mockSession: SATPSession;
-let gateway: SATPGateway | undefined; //added
+let gateway: SATPGateway | undefined;
 const sessionIDs: string[] = [];
 
 beforeAll(async () => {
@@ -63,6 +63,11 @@ beforeAll(async () => {
   });
 
   sessionIDs.push(mockSession.getSessionId());
+});
+
+afterAll(async () => {
+  // Clean up the monitor service to prevent open handles
+  await monitorService.shutdown();
 });
 
 describe("Shutdown Verify State Tests", () => {
@@ -106,7 +111,7 @@ describe("Shutdown Verify State Tests", () => {
       monitorService: monitorService,
     };
 
-    const gateway = await factory.create(options);
+    gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     const verifySessionsStateSpy = jest.spyOn(
@@ -158,7 +163,7 @@ describe("Shutdown Verify State Tests", () => {
       monitorService: monitorService,
     };
 
-    const gateway = await factory.create(options);
+    gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     const satpManager = (gateway as any).BLODispatcher.manager;
@@ -225,7 +230,7 @@ describe("Shutdown Verify State Tests", () => {
       monitorService: monitorService,
     };
 
-    const gateway = await factory.create(options);
+    gateway = await factory.create(options);
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     await gateway.startup();
