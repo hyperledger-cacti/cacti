@@ -261,6 +261,7 @@
   ,"adress"
   ,"NFToken"
   ,"NFT"
+  ,"codegenv"
   ],
   "dictionaries": [
     "typescript,node,npm,go,rust"

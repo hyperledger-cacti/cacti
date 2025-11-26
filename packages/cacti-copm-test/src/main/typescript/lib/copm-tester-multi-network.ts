@@ -1,4 +1,4 @@
-import { PromiseClient } from "@connectrpc/connect";
+import { Client } from "@connectrpc/connect";
 import { DLAccount, DefaultService } from "@hyperledger-cacti/cacti-copm-core";
 import { CopmTester } from "../interfaces/copm-tester";
 import { copmTesterFactory } from "./copm-tester-factory";
@@ -65,7 +65,7 @@ export class CopmTestertMultiNetwork implements CopmTester {
     return this.getNetworkFor(account).assetsFor(account);
   }
 
-  clientFor(account: DLAccount): PromiseClient<typeof DefaultService> {
+  clientFor(account: DLAccount): Client<typeof DefaultService> {
     return this.getNetworkFor(account).clientFor(account);
   }
 

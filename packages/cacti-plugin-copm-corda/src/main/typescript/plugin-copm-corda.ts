@@ -9,11 +9,10 @@ import {
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
 import { ICrpcSvcRegistration } from "@hyperledger/cactus-core-api";
-import { ServiceType } from "@bufbuild/protobuf";
 import { DefaultService } from "@hyperledger-cacti/cacti-copm-core";
 import { CopmCordaImpl, DefaultApi } from "./service-implementation";
 import { createGrpcTransport } from "@connectrpc/connect-node";
-import { createPromiseClient } from "@connectrpc/connect";
+import { createClient } from "@connectrpc/connect";
 
 export interface IPluginCopmCordaOptions extends ICactusPluginOptions {
   logLevel?: LogLevelDesc;
@@ -37,25 +36,22 @@ export class PluginCopmCorda implements IPluginCrpcService, ICactusPlugin {
     this.instanceId = this.opts.instanceId;
   }
 
-  public async createCrpcSvcRegistrations(): Promise<
-    ICrpcSvcRegistration<ServiceType>[]
-  > {
-    const out: ICrpcSvcRegistration<ServiceType>[] = [];
+  public async createCrpcSvcRegistrations(): Promise<ICrpcSvcRegistration[]> {
+    const out: ICrpcSvcRegistration[] = [];
     //await this.copmCordaContainer.start();
 
     const transport = createGrpcTransport({
       // Requests will be made to <baseUrl>/<package>.<service>/method
       baseUrl: this.opts.copmKotlinServerBaseUrl,
-      httpVersion: "2",
     });
-    const containerApi = createPromiseClient(DefaultService, transport);
+    const containerApi = createClient(DefaultService, transport);
 
     const implementation = new CopmCordaImpl(
       this.log,
       containerApi as DefaultApi,
     );
 
-    const crpcSvcRegistration: ICrpcSvcRegistration<ServiceType> = {
+    const crpcSvcRegistration: ICrpcSvcRegistration = {
       definition: DefaultService,
       serviceName: DefaultService.typeName,
       implementation,

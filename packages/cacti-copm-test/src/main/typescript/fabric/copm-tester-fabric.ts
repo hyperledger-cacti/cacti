@@ -7,7 +7,7 @@ import { TestAssetsFabric } from "./test-assets-fabric";
 import { TestFabricConfiguration } from "./test-fabric-configuration";
 import { WeaverInteropConfiguration } from "../lib/weaver-interop-configuration";
 import { CopmTester } from "../interfaces/copm-tester";
-import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
+import { createClient, Client } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
 import http from "node:http";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -197,12 +197,12 @@ export class CopmTesterFabric implements CopmTester {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public clientFor(account: DLAccount): PromiseClient<typeof DefaultService> {
+  public clientFor(account: DLAccount): Client<typeof DefaultService> {
     const transport = createConnectTransport({
       baseUrl: this.serverAddress,
       httpVersion: "1.1",
     });
-    return createPromiseClient(DefaultService, transport);
+    return createClient(DefaultService, transport);
   }
 
   public networkNames(): string[] {

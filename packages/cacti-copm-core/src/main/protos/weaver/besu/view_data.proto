@@ -1,0 +1,45 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package besu;
+
+option java_package = "org.hyperledger.cacti.weaver.protos.besu";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/besu";
+
+
+// link below will take you to besu view rfc 
+// https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/views/besu.md
+//
+// take a view at BlockHeader in Besu
+// https://github.com/hyperledger/besu/blob/21.7.0/ethereum/core/src/main/java/org/hyperledger/besu/ethereum/core/BlockHeader.java#L199
+
+message BlockHeader {
+  // Fields representing the header of a block object
+  string parentHash = 1;
+  string sha3Uncles = 2;
+  string miner = 3;
+  string stateRoot = 4;
+  string transactionsRoot = 5;
+  string receiptsRoot = 6;
+  string logsBloom = 7;
+  string difficulty = 8;
+  string number = 9;
+  string gasLimit = 10;
+  string gasUsed = 11;
+  string timestamp = 12;
+  string extraData = 13;
+  string mixHash = 14;
+  string nonce = 15;
+}
+
+message BesuView {
+  bytes interop_payload = 1;
+  BlockHeader block_header = 2;
+  bytes merkle_proof = 3;
+  uint32 receipt_index = 4;
+  uint32 log_index = 5;
+  repeated bytes validator_signatures = 6;
+}

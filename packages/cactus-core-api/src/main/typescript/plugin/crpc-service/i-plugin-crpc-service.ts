@@ -1,6 +1,6 @@
-import type { ServiceType } from "@bufbuild/protobuf";
 import type { ServiceImpl } from "@connectrpc/connect";
 import type { UniversalHandlerOptions } from "@connectrpc/connect/protocol";
+import type { GenService } from "@bufbuild/protobuf/codegenv1";
 
 /**
  * Implementers of this interface are responsible for providing a Crpc service
@@ -23,13 +23,13 @@ export interface IPluginCrpcService {
    * definition and implementation objects are passed in to the `.addService()`
    * method of the `Server` object of the `@connectrpc/connect` library.
    *
-   * @see {ServiceDefinition}
+   * @see {GenService}
    * @see {ServiceType}
    * @see {ICrpcSvcRegistration}
    */
   createCrpcSvcRegistrations(
     opts: unknown,
-  ): Promise<Array<ICrpcSvcRegistration<ServiceType>>>;
+  ): Promise<Array<ICrpcSvcRegistration>>;
 }
 
 /**
@@ -40,9 +40,12 @@ export interface IPluginCrpcService {
  * @see {IPluginGrpcService}
  * @see {IGrpcSvcDefAndImplPair}
  */
-export interface ICrpcSvcRegistration<T extends ServiceType> {
-  readonly definition: T;
-  readonly implementation: Partial<ServiceImpl<T>>;
+export interface ICrpcSvcRegistration {
+  readonly definition: GenService<any>;
+
+  // ServiceImpl<TService> now matches because GenService
+  readonly implementation: Partial<ServiceImpl<GenService<any>>>;
+
   readonly serviceName: string;
   readonly options?: Partial<UniversalHandlerOptions>;
 }

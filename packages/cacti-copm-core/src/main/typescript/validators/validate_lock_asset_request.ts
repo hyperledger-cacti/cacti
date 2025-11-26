@@ -6,7 +6,7 @@ import {
   validateAssetAccount,
   validateHashInfo,
 } from "./common";
-import { LockAssetV1Request } from "../generated/services/default_service_pb";
+import { LockAssetV1Request } from "../generated/protos/services/default_service_pb";
 import { HashFunctions } from "@hyperledger/cacti-weaver-sdk-fabric";
 
 export function validateLockAssetRequest(request: LockAssetV1Request): {

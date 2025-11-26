@@ -4,15 +4,16 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import {
-  ClaimLockedAssetV1Request,
-  LockAssetV1Request,
-} from "@hyperledger-cacti/cacti-copm-core";
 import { copmTesterFactory } from "../../../main/typescript/lib/copm-tester-factory";
 import { CopmTester } from "../../../main/typescript/interfaces/copm-tester";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { CopmNetworkMode } from "../../../main/typescript/lib/types";
+import {
+  ClaimLockedAssetV1RequestSchema,
+  LockAssetV1RequestSchema,
+} from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/generated/protos/services/default_service_pb";
+import { create } from "@bufbuild/protobuf";
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -58,7 +59,7 @@ describe("Copm Lock and Claim", () => {
     await assetsPartyA.addNonFungibleAsset(assetType, lockAssetName);
 
     const lockResult = await copmTester.clientFor(partyA).lockAssetV1(
-      new LockAssetV1Request({
+      create(LockAssetV1RequestSchema, {
         assetLockV1PB: {
           asset: {
             assetType: assetType,
@@ -79,7 +80,7 @@ describe("Copm Lock and Claim", () => {
     expect(lockResult).toBeTruthy();
 
     const claimResult = await copmTester.clientFor(partyB).claimLockedAssetV1(
-      new ClaimLockedAssetV1Request({
+      create(ClaimLockedAssetV1RequestSchema, {
         assetLockClaimV1PB: {
           lockId: lockResult.lockId,
           asset: {
@@ -125,7 +126,7 @@ describe("Copm Lock and Claim", () => {
     const destCert = await copmTester.getCertificateString(partyB);
 
     const lockResult = await copmTester.clientFor(partyA).lockAssetV1(
-      new LockAssetV1Request({
+      create(LockAssetV1RequestSchema, {
         assetLockV1PB: {
           asset: {
             assetType: assetType,
@@ -148,7 +149,7 @@ describe("Copm Lock and Claim", () => {
     log.debug(lockResult.lockId);
 
     const claimResult = await copmTester.clientFor(partyB).claimLockedAssetV1(
-      new ClaimLockedAssetV1Request({
+      create(ClaimLockedAssetV1RequestSchema, {
         assetLockClaimV1PB: {
           lockId: lockResult.lockId,
           asset: {

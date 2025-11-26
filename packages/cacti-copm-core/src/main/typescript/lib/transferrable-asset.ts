@@ -1,4 +1,4 @@
-import { TransferrableAssetV1PB } from "../generated/models/transferrable_asset_v1_pb_pb";
+import { TransferrableAssetV1PB } from "../generated/protos/models/transferrable_asset_v1_pb_pb";
 export class TransferrableAsset {
   private asset: TransferrableAssetV1PB;
   public assetType: string;

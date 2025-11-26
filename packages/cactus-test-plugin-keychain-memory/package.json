@@ -46,8 +46,9 @@
     "watch": "npm-watch"
   },
   "devDependencies": {
-    "@connectrpc/connect": "1.4.0",
-    "@connectrpc/connect-node": "1.4.0",
+    "@bufbuild/protobuf": "2.10.1",
+    "@connectrpc/connect": "2.0.0",
+    "@connectrpc/connect-node": "2.1.1",
     "@connectrpc/connect-web": "1.4.0",
     "@hyperledger/cactus-cmd-api-server": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",

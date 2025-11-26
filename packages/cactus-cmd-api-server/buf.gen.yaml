@@ -1,0 +1,7 @@
+version: v2
+
+plugins:
+  - local: protoc-gen-ts
+    out: packages/cactus-cmd-api-server/src/main/typescript/generated/proto/protoc-gen-ts
+    opt:
+      - grpc_js

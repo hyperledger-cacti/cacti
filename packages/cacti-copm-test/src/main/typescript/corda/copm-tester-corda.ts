@@ -2,7 +2,7 @@ import { DLAccount, DefaultService } from "@hyperledger-cacti/cacti-copm-core";
 import { LogLevelDesc, Logger } from "@hyperledger/cactus-common";
 import * as fs from "fs";
 import * as path from "path";
-import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
+import { createClient, Client } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
 
 import { CopmTester } from "../interfaces/copm-tester";
@@ -154,12 +154,12 @@ export class CopmTesterCorda implements CopmTester {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public clientFor(account: DLAccount): PromiseClient<typeof DefaultService> {
+  public clientFor(account: DLAccount): Client<typeof DefaultService> {
     const transport = createConnectTransport({
       baseUrl: this.serverAddress,
       httpVersion: "1.1",
     });
-    return createPromiseClient(DefaultService, transport);
+    return createClient(DefaultService, transport);
   }
 
   public getVerifiedViewExpectedResult(): string {

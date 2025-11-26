@@ -35,7 +35,6 @@ import cors, { CorsOptionsDelegate, CorsRequest } from "cors";
 
 import { Server as SocketIoServer } from "socket.io";
 import { authorize as authorizeSocket } from "@thream/socketio-jwt";
-import { ServiceType } from "@bufbuild/protobuf";
 
 import {
   ICactusPlugin,
@@ -733,9 +732,9 @@ export class ApiServer {
     const { crpcRoutesHandler, svcCount } =
       await this.createCrpcRoutesHandler();
 
-    const crpcMiddlewareHandler = expressConnectMiddleware({
+    const crpcMiddlewareHandler: RequestHandler = expressConnectMiddleware({
       routes: crpcRoutesHandler,
-    }) as unknown as RequestHandler; // FIXME this cast is not safe
+    });
 
     return { svcCount, crpcMiddlewareHandler };
   }
@@ -757,6 +756,14 @@ export class ApiServer {
 
       crpcSvcRegistrations.forEach((it) => {
         log.debug("%s Registering %s", fnTag, it.serviceName);
+        const def: any = it.definition;
+        log.debug(
+          "definition.kind=%o name=%o file=%o methodFn=%s",
+          def?.kind,
+          def?.name,
+          def?.file,
+          typeof def?.method,
+        );
         router.service(it.definition, it.implementation, it.options);
       });
     };
@@ -875,9 +882,7 @@ export class ApiServer {
     });
   }
 
-  async createCrpcServicesOfPlugins(): Promise<
-    ICrpcSvcRegistration<ServiceType>[]
-  > {
+  async createCrpcServicesOfPlugins(): Promise<ICrpcSvcRegistration[]> {
     const fnTag = `${this.className}#startCrpcServer()`;
     const { log } = this;
     const { logLevel } = this.options.config;
@@ -885,7 +890,7 @@ export class ApiServer {
 
     log.debug("Installing crpc services of IPluginCrpcService instances...");
 
-    const out: ICrpcSvcRegistration<ServiceType>[] = [];
+    const out: ICrpcSvcRegistration[] = [];
 
     const plugins = pluginRegistry.getPlugins();
 

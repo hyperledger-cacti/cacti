@@ -1,0 +1,28 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package common.asset_transfer;
+
+option java_package = "org.hyperledger.cacti.weaver.protos.common.asset_transfer";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common";
+
+message AssetPledge {
+	bytes assetDetails = 1;
+	string localNetworkID = 2;
+	string remoteNetworkID = 3;
+	string recipient = 4;
+	uint64 expiryTimeSecs = 5;
+}
+
+message AssetClaimStatus {
+	bytes assetDetails = 1;
+	string localNetworkID = 2;
+	string remoteNetworkID = 3;
+	string recipient = 4;
+	bool claimStatus = 5;
+	uint64 expiryTimeSecs = 6;
+	bool expirationStatus = 7;
+}

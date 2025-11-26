@@ -1,0 +1,90 @@
+// Copyright IBM Corp. All Rights Reserved.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+syntax = "proto3";
+
+package networks.networks;
+
+import "common/ack.proto";
+import "common/state.proto";
+import "common/events.proto";
+
+option java_package = "org.hyperledger.cacti.weaver.protos.networks.networks";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/networks";
+
+// This service is the interface for how the network communicates with
+// its relay.
+service Network {
+  // Data Sharing endpoints
+  // endpoint for a network to request remote relay state via local relay
+  rpc RequestState(NetworkQuery) returns (common.ack.Ack) {}
+  // This rpc endpoint is for polling the local relay for request state.
+  rpc GetState(GetStateMessage) returns(common.state.RequestState) {}
+  // NOTE: This rpc is just for debugging.
+  rpc RequestDatabase(DbName) returns (RelayDatabase) {}
+  
+  // SATP endpoints
+  // endpoint for a network to request asset transfer to a receiving gateway via local gateway
+  rpc RequestAssetTransfer(NetworkAssetTransfer) returns (common.ack.Ack) {}
+
+  // Event endpoints
+  // endpoint for a client to subscribe to event via local relay initiating subscription flow.
+  rpc SubscribeEvent(NetworkEventSubscription) returns (common.ack.Ack) {}
+  // This rpc endpoint is for polling the local relay for subscription state.
+  rpc GetEventSubscriptionState(GetStateMessage) returns (common.events.EventSubscriptionState) {}
+  // endpoint for a client to subscribe to event via local relay initiating subscription flow.
+  rpc UnsubscribeEvent(NetworkEventUnsubscription) returns (common.ack.Ack) {}
+  // endpoint for a client to fetch received events. 
+  // Note: events are marked as deleted from relay database as soon as client fetches them.
+  rpc GetEventStates(GetStateMessage) returns(common.events.EventStates) {}
+}
+
+message DbName {
+  string name = 1;
+}
+
+message RelayDatabase {
+  map<string, string> pairs = 1;
+}
+
+message GetStateMessage {
+  string request_id = 1;
+}
+
+message NetworkQuery {
+  repeated string policy = 1;
+  string address = 2;
+  string requesting_relay = 3;
+  string requesting_network = 4;
+  string certificate = 5;
+  string requestor_signature = 6;
+  string nonce = 7;
+  string requesting_org = 8;
+  bool confidential = 9;
+}
+
+// Below message is used for network/client to dest-relay communication
+message NetworkEventSubscription {
+  common.events.EventMatcher event_matcher = 1;
+  NetworkQuery query = 2;
+  common.events.EventPublication event_publication_spec = 3;
+}
+
+message NetworkEventUnsubscription {
+  NetworkEventSubscription request = 1;
+  string request_id = 2;
+}
+
+message NetworkAssetTransfer {
+  string asset_type = 1;
+  string asset_id = 2;
+  string sender = 3;
+  string source_contract_id = 4;
+  string source_relay = 5;
+  string source_network = 6;
+  string destination_relay = 7;
+  string destination_network = 8;
+  string recipient = 9;
+  string destination_contract_id = 10;
+}

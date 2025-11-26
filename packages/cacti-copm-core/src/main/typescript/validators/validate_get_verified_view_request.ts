@@ -1,7 +1,7 @@
 import { DLAccount } from "../lib/types";
 import { ConnectError, Code } from "@connectrpc/connect";
 import { validateAssetAccount } from "./common";
-import { GetVerifiedViewV1Request } from "../generated/services/default_service_pb";
+import { GetVerifiedViewV1Request } from "../generated/protos/services/default_service_pb";
 
 export function validateGetVerifiedViewRequest(req: GetVerifiedViewV1Request): {
   account: DLAccount;

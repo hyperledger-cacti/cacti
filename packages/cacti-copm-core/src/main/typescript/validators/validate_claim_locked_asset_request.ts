@@ -8,7 +8,7 @@ import {
   validateAssetAccount,
   validateRequiredString,
 } from "./common";
-import { ClaimLockedAssetV1Request } from "../generated/services/default_service_pb";
+import { ClaimLockedAssetV1Request } from "../generated/protos/services/default_service_pb";
 
 export function validateClaimLockedAssetRequest(
   req: ClaimLockedAssetV1Request,
