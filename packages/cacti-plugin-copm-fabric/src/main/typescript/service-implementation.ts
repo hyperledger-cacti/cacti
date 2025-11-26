@@ -1,6 +1,5 @@
 import { Logger } from "@hyperledger/cactus-common";
 import { ServiceImpl } from "@connectrpc/connect";
-import type { ServiceType } from "@bufbuild/protobuf";
 import {
   DefaultService,
   PledgeAssetV1Request,
@@ -18,16 +17,23 @@ import * as Endpoints from "./endpoints";
 import { InteropConfiguration } from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/interfaces";
 import { FabricConfiguration } from "./public-api";
 import { FabricTransactionContextFactory } from "./lib/fabric-context-factory";
+import type { GenService } from "@bufbuild/protobuf/codegenv1";
+import { PledgeAssetV1200ResponsePBSchema } from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/generated/protos/models/pledge_asset_v1200_response_pb_pb";
+import { create } from "@bufbuild/protobuf";
+import { ClaimPledgedAssetV1200ResponsePBSchema } from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/generated/protos/models/claim_pledged_asset_v1200_response_pb_pb";
+import { LockAssetV1200ResponsePBSchema } from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/generated/protos/models/lock_asset_v1200_response_pb_pb";
+import { GetVerifiedViewV1200ResponsePBSchema } from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/generated/protos/models/get_verified_view_v1200_response_pb_pb";
 
 type DefaultServiceMethodDefinitions = typeof DefaultService.methods;
-type DefaultServiceMethodNames = keyof DefaultServiceMethodDefinitions;
+type DefaultServiceMethodNames =
+  DefaultServiceMethodDefinitions[number]["name"];
 
 type ICopmFabricApi = {
   [key in DefaultServiceMethodNames]: (...args: never[]) => unknown;
 };
 
 export class CopmFabricImpl
-  implements ICopmFabricApi, Partial<ServiceImpl<ServiceType>>
+  implements ICopmFabricApi, Partial<ServiceImpl<GenService<any>>>
 {
   // We cannot avoid this due to how the types of the upstream library are
   // structured/designed hence we just disable the linter on this particular line.
@@ -70,7 +76,9 @@ export class CopmFabricImpl
         this.contextFactory,
         this.fabricConfig,
       );
-      const res = new PledgeAssetV1200ResponsePB({ pledgeId: pledgeId });
+      const res = create(PledgeAssetV1200ResponsePBSchema, {
+        pledgeId: pledgeId,
+      });
       return res;
     } catch (ex) {
       this.log.error(ex.message);
@@ -89,7 +97,9 @@ export class CopmFabricImpl
         this.contextFactory,
         this.fabricConfig,
       );
-      const res = new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId });
+      const res = create(ClaimPledgedAssetV1200ResponsePBSchema, {
+        claimId: claimId,
+      });
       return res;
     } catch (ex) {
       this.log.error(ex.message);
@@ -114,7 +124,9 @@ export class CopmFabricImpl
       this.log.error(ex);
       throw ex;
     }
-    const res = new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId });
+    const res = create(ClaimPledgedAssetV1200ResponsePBSchema, {
+      claimId: claimId,
+    });
     return res;
   }
 
@@ -129,7 +141,7 @@ export class CopmFabricImpl
         this.contextFactory,
         this.fabricConfig,
       );
-      const res = new LockAssetV1200ResponsePB({ lockId: lockId });
+      const res = create(LockAssetV1200ResponsePBSchema, { lockId: lockId });
       return res;
     } catch (error) {
       this.log.error(error);
@@ -146,6 +158,6 @@ export class CopmFabricImpl
       this.contextFactory,
       this.log,
     );
-    return new GetVerifiedViewV1200ResponsePB({ data: data });
+    return create(GetVerifiedViewV1200ResponsePBSchema, { data: data });
   }
 }

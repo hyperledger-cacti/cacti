@@ -1,5 +1,4 @@
 import { ConnectError, Code, ServiceImpl } from "@connectrpc/connect";
-import { ServiceType } from "@bufbuild/protobuf";
 
 import {
   LogLevelDesc,
@@ -12,17 +11,31 @@ import { PluginKeychainMemory } from "../plugin-keychain-memory";
 
 import { DefaultService } from "../generated/crpc/services/default_service_connect";
 
-import { DeleteKeychainEntryResponseV1PB } from "../generated/crpc/models/delete_keychain_entry_response_v1_pb_pb";
+import {
+  DeleteKeychainEntryResponseV1PB,
+  DeleteKeychainEntryResponseV1PBSchema,
+} from "../generated/crpc/models/delete_keychain_entry_response_v1_pb_pb";
 import { DeleteKeychainEntryV1Request } from "../generated/crpc/services/default_service_pb";
 
-import { GetKeychainEntryResponseV1PB } from "../generated/crpc/models/get_keychain_entry_response_v1_pb_pb";
+import {
+  GetKeychainEntryResponseV1PB,
+  GetKeychainEntryResponseV1PBSchema,
+} from "../generated/crpc/models/get_keychain_entry_response_v1_pb_pb";
 import { GetKeychainEntryV1Request } from "../generated/crpc/services/default_service_pb";
 
 import { HasKeychainEntryV1Request } from "../generated/crpc/services/default_service_pb";
-import { HasKeychainEntryResponseV1PB } from "../generated/crpc/models/has_keychain_entry_response_v1_pb_pb";
+import {
+  HasKeychainEntryResponseV1PB,
+  HasKeychainEntryResponseV1PBSchema,
+} from "../generated/crpc/models/has_keychain_entry_response_v1_pb_pb";
 
 import { SetKeychainEntryV1Request } from "../generated/crpc/services/default_service_pb";
-import { SetKeychainEntryResponseV1PB } from "../generated/crpc/models/set_keychain_entry_response_v1_pb_pb";
+import {
+  SetKeychainEntryResponseV1PB,
+  SetKeychainEntryResponseV1PBSchema,
+} from "../generated/crpc/models/set_keychain_entry_response_v1_pb_pb";
+import { GenService } from "@bufbuild/protobuf/codegenv2";
+import { create } from "@bufbuild/protobuf";
 
 type DefaultServiceMethodDefinitions = typeof DefaultService.methods;
 type DefaultServiceMethodNames = keyof DefaultServiceMethodDefinitions;
@@ -37,7 +50,9 @@ export interface IKeychainMemoryCrpcSvcOpenApiOptions {
 }
 
 export class KeychainMemoryCrpcSvcOpenApi
-  implements IKeychainMemoryCrpcSvcOpenApi, Partial<ServiceImpl<ServiceType>>
+  implements
+    IKeychainMemoryCrpcSvcOpenApi,
+    Partial<ServiceImpl<GenService<any>>>
 {
   // We cannot avoid this due to how the types of the upstream library are
   // structured/designed hence we just disable the linter on this particular line.
@@ -103,7 +118,9 @@ export class KeychainMemoryCrpcSvcOpenApi
     await this.keychain.delete(key);
     this.log.debug("%s Deleted value for key=%s", fn, key);
 
-    const res = new DeleteKeychainEntryResponseV1PB({ key });
+    const res = create(DeleteKeychainEntryResponseV1PBSchema, {
+      key,
+    });
     this.log.debug("%s EXIT res=%o", fn, res);
     return res;
   }
@@ -143,7 +160,7 @@ export class KeychainMemoryCrpcSvcOpenApi
     const value = await this.keychain.get(key);
     this.log.debug("%s Got value=%s for key=%s", fn, value, key);
 
-    const res = new GetKeychainEntryResponseV1PB({ key, value });
+    const res = create(GetKeychainEntryResponseV1PBSchema, { key, value });
     this.log.debug("%s EXIT res=%o", fn, res);
     return res;
   }
@@ -185,7 +202,7 @@ export class KeychainMemoryCrpcSvcOpenApi
 
     const key = req.hasKeychainEntryRequestV1PB.key;
     const isPresent = await this.keychain.has(key);
-    const res = new HasKeychainEntryResponseV1PB({
+    const res = create(HasKeychainEntryResponseV1PBSchema, {
       checkedAt: new Date().toJSON(),
       isPresent,
       key,
@@ -228,7 +245,7 @@ export class KeychainMemoryCrpcSvcOpenApi
     const key = req.setKeychainEntryRequestV1PB.key;
     const value = req.setKeychainEntryRequestV1PB.value;
     await this.keychain.set(key, value);
-    const res = new SetKeychainEntryResponseV1PB({ key });
+    const res = create(SetKeychainEntryResponseV1PBSchema, { key });
     this.log.debug("%s EXIT res=%o", fn, res);
     return res;
   }

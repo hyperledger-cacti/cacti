@@ -6,7 +6,7 @@ import {
   validateAssetAccount,
   validateRequiredString,
 } from "./common";
-import { ClaimPledgedAssetV1Request } from "../generated/services/default_service_pb";
+import { ClaimPledgedAssetV1Request } from "../generated/protos/services/default_service_pb";
 
 export class ValidatedClaimPledgedAssetRequest {
   public asset: TransferrableAsset;

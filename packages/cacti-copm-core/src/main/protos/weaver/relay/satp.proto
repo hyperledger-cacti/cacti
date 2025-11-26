@@ -1,0 +1,173 @@
+syntax = "proto3";
+
+package relay.satp;
+
+import "common/ack.proto";
+
+option java_package = "org.hyperledger.cacti.weaver.protos.relay.datatransfer";
+option go_package = "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/relay";
+
+service SATP {
+  // Stage 1 endpoints
+
+  // The sender gateway sends a TransferProposalClaims request to initiate an asset transfer. 
+  // Depending on the proposal, multiple rounds of communication between the two gateways may happen.
+  rpc TransferProposalClaims(TransferProposalClaimsRequest) returns (common.ack.Ack) {};
+  
+  // The sender gateway sends a TransferProposalClaims request to signal to the receiver gateway 
+  // that the it is ready to start the transfer of the digital asset
+  rpc TransferProposalReceipt(TransferProposalReceiptRequest) returns (common.ack.Ack) {};
+
+  // The sender gateway sends a TransferCommence request to signal to the receiver gateway 
+  // that the it is ready to start the transfer of the digital asset
+  rpc TransferCommence(TransferCommenceRequest) returns (common.ack.Ack) {};
+
+  // The receiver gateway sends a AckCommence request to the sender gateway to indicate agreement
+  // to proceed with the asset transfe
+  rpc AckCommence(AckCommenceRequest) returns (common.ack.Ack) {};
+
+  // Stage 2 endpoints
+
+  rpc SendAssetStatus(SendAssetStatusRequest) returns (common.ack.Ack) {};
+
+  // The sender gateway sends a LockAssertion request to convey a signed claim to the receiver gateway 
+  // declaring that the asset in question has been locked or escrowed by the sender gateway in
+  // the origin network (e.g. to prevent double spending)
+  rpc LockAssertion(LockAssertionRequest) returns (common.ack.Ack) {};
+
+  // The receiver gateway sends a LockAssertionReceipt request to the sender gateway to indicate acceptance
+  // of the claim(s) delivered by the sender gateway in the previous message
+  rpc LockAssertionReceipt(LockAssertionReceiptRequest) returns (common.ack.Ack) {};
+
+  rpc CommitPrepare(CommitPrepareRequest) returns (common.ack.Ack) {};
+
+  rpc CommitReady(CommitReadyRequest) returns (common.ack.Ack) {};
+
+  rpc CommitFinalAssertion(CommitFinalAssertionRequest) returns (common.ack.Ack) {};
+
+  rpc AckFinalReceipt(AckFinalReceiptRequest) returns (common.ack.Ack) {};
+
+  rpc TransferCompleted(TransferCompletedRequest) returns (common.ack.Ack) {};
+}
+  
+message TransferProposalClaimsRequest {
+  string message_type = 1;
+  string asset_asset_id = 2;
+  string asset_profile_id = 3;
+  string verified_originator_entity_id = 4;
+  string verified_beneficiary_entity_id = 5;
+  string originator_pubkey = 6;
+  string beneficiary_pubkey = 7;
+  string sender_gateway_network_id = 8;
+  string recipient_gateway_network_id = 9;
+  string client_identity_pubkey = 10;
+  string server_identity_pubkey = 11;
+  string sender_gateway_owner_id = 12;
+  string receiver_gateway_owner_id = 13;
+}
+
+message TransferProposalReceiptRequest {
+  string message_type = 1;
+  string asset_asset_id = 2;
+  string asset_profile_id = 3;
+  string verified_originator_entity_id = 4;
+  string verified_beneficiary_entity_id = 5;
+  string originator_pubkey = 6;
+  string beneficiary_pubkey = 7;
+  string sender_gateway_network_id = 8;
+  string recipient_gateway_network_id = 9;
+  string client_identity_pubkey = 10;
+  string server_identity_pubkey = 11;
+  string sender_gateway_owner_id = 12;
+  string receiver_gateway_owner_id = 13;
+}
+
+message TransferCommenceRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+  string client_identity_pubkey = 4;
+  string server_identity_pubkey = 5;
+  string hash_transfer_init_claims = 6;
+  string hash_prev_message = 7;
+  string client_transfer_number = 8;
+  string client_signature = 9;
+}
+
+message AckCommenceRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+  string client_identity_pubkey = 4;
+  string server_identity_pubkey = 5;
+  string hash_prev_message = 6;
+  string server_transfer_number = 7;
+  string server_signature = 8;
+}
+
+message SendAssetStatusRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+  string client_identity_pubkey = 4;
+  string server_identity_pubkey = 5;
+  string hash_prev_message = 6;
+  string server_transfer_number = 7;
+  string server_signature = 8;
+  string status = 9;
+}
+
+message LockAssertionRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+  string client_identity_pubkey = 4;
+  string server_identity_pubkey = 5;
+  string lock_assertion_claim = 6;
+  string lock_assertion_claim_format = 7;
+  string lock_assertion_expiration = 8;
+  string hash_prev_message = 9;
+  string client_transfer_number = 10;
+  string client_signature = 11;  
+}
+
+message LockAssertionReceiptRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+  string client_identity_pubkey = 4;
+  string server_identity_pubkey = 5;
+  string hash_prev_message = 6;
+  string server_transfer_number = 7;
+  string server_signature = 8;
+}
+
+message CommitPrepareRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message CommitReadyRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message CommitFinalAssertionRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message AckFinalReceiptRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}
+
+message TransferCompletedRequest {
+  string message_type = 1;
+  string session_id = 2;
+  string transfer_context_id = 3;
+}

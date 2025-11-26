@@ -35,7 +35,6 @@ import cors, { CorsOptionsDelegate, CorsRequest } from "cors";
 
 import { Server as SocketIoServer } from "socket.io";
 import { authorize as authorizeSocket } from "@thream/socketio-jwt";
-import { ServiceType } from "@bufbuild/protobuf";
 
 import {
   ICactusPlugin,
@@ -75,7 +74,7 @@ import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { AuthorizerFactory } from "./authzn/authorizer-factory";
 import { WatchHealthcheckV1 } from "./generated/openapi/typescript-axios";
 import { WatchHealthcheckV1Endpoint } from "./web-services/watch-healthcheck-v1-endpoint";
-import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service";
+import * as default_service from "./generated/proto/protoc-gen-ts/services/default_service.js";
 import { GrpcServerApiServer } from "./web-services/grpc/grpc-server-api-server";
 import { determineAddressFamily } from "./common/determine-address-family";
 import {
@@ -872,9 +871,7 @@ export class ApiServer {
     });
   }
 
-  async createCrpcServicesOfPlugins(): Promise<
-    ICrpcSvcRegistration<ServiceType>[]
-  > {
+  async createCrpcServicesOfPlugins(): Promise<ICrpcSvcRegistration[]> {
     const fnTag = `${this.className}#startCrpcServer()`;
     const { log } = this;
     const { logLevel } = this.options.config;
@@ -882,7 +879,7 @@ export class ApiServer {
 
     log.debug("Installing crpc services of IPluginCrpcService instances...");
 
-    const out: ICrpcSvcRegistration<ServiceType>[] = [];
+    const out: ICrpcSvcRegistration[] = [];
 
     const plugins = pluginRegistry.getPlugins();
 
