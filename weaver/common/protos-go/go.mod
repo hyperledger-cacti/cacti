@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2
 
-go 1.20
+go 1.23
 
 require (
 	github.com/hyperledger/fabric-protos-go v0.3.3

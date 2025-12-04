@@ -4,6 +4,9 @@
 
 name: Secure Test Asset Transfer
 
+env:
+  GO_VERSION: 1.23.11
+
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -47,7 +50,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
         with:
-          go-version: '1.20.2'
+          go-version: ${{ env.GO_VERSION }}
 
       - name: Use Node.js 18.x
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3

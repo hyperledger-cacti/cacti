@@ -4,6 +4,9 @@
 
 name: Unit Test Fabric Interop CC and Sample Chaincode
 
+env:
+  GO_VERSION: 1.23.11
+
 on:
   workflow_call:
     inputs:
@@ -76,7 +79,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor || echo "If this steps fails and asks to run 'go mod tidy' then run the script 'tools/go-mod-tidy.sh' to update all go modules"
@@ -101,7 +104,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -125,7 +128,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -145,7 +148,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -165,7 +168,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -189,7 +192,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -209,7 +212,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -233,7 +236,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -257,7 +260,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -281,7 +284,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -305,7 +308,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
 
     - name: Vendor
       run: make run-vendor
@@ -329,7 +332,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
-        go-version: '1.20.2'
+        go-version: ${{ env.GO_VERSION }}
         
     # FABRIC NETWORK
     - name: Start Fabric Network

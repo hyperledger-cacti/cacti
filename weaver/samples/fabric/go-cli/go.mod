@@ -1,6 +1,8 @@
 module github.com/hyperledger-cacti/cacti/weaver/samples/fabric/go-cli
 
-go 1.20
+go 1.23.0
+
+toolchain go1.23.11
 
 require (
 	github.com/cloudflare/cfssl v1.4.1

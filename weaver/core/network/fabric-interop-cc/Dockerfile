@@ -1,4 +1,4 @@
-FROM golang:1.20 AS build
+FROM golang:1.23 AS build
 
 COPY .  /fabric-interop-cc
 WORKDIR /fabric-interop-cc
