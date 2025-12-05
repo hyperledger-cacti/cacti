@@ -37,7 +37,7 @@ class RedeemTokenFlow(val symbol: String,
         //get the RealEstateEvolvableTokenType object
         val evolvableTokenType = stateAndRef.state.data
 
-        //get the pointer pointer to the house
+        //get the pointer to the house
         val tokenPointer: TokenPointer<FungibleHouseTokenState> = evolvableTokenType.toPointer(evolvableTokenType.javaClass)
 
         //specify how much amount to issue to holder
