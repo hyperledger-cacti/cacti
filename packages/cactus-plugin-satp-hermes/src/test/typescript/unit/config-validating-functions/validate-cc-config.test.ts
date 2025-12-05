@@ -1,8 +1,10 @@
 import "jest-extended";
 import { validateCCConfig } from "../../../../main/typescript/services/validation/config-validating-functions/validate-cc-config";
-import { INetworkOptions } from "../../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
-import { IBesuLeafNeworkOptions } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
-import { IEthereumLeafNeworkOptions } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
+import {
+  IBesuNetworkConfig,
+  IEthereumNetworkConfig,
+  INetworkOptions,
+} from "../../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
@@ -173,7 +175,7 @@ const ethereumConfig = {
     ledgerType: "ETHEREUM",
   },
   signingCredential: {
-    ethAccount: "0x8230f81920ed354445d201222470ad6f92459D3f",
+    transactionSignerEthAccount: "0x8230f81920ed354445d201222470ad6f92459D3f",
     secret: "test",
     type: "GETH_KEYCHAIN_PASSWORD",
   },
@@ -195,7 +197,7 @@ const ethereumConfig = {
     gas: "6721975",
     gasPrice: "20000000000",
   },
-} as Partial<IEthereumLeafNeworkOptions> & INetworkOptions;
+} as Partial<IEthereumNetworkConfig> & INetworkOptions;
 
 const besuConfig = {
   networkIdentification: {
@@ -203,7 +205,7 @@ const besuConfig = {
     ledgerType: "BESU_2X",
   },
   signingCredential: {
-    ethAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
+    transactionSignerEthAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
     secret:
       "0xc31e76f70d6416337d3a7b7a8711a43e30a14963b5ba622fa6c9dbb5b4555986",
     type: "PRIVATE_KEY_HEX",
@@ -222,8 +224,10 @@ const besuConfig = {
   claimFormats: [1],
   wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B",
   wrapperContractName: "exampleWrapperContractName",
-  gas: 999999999999999,
-} as Partial<IBesuLeafNeworkOptions> & INetworkOptions;
+  gasConfig: {
+    gasLimit: "999999999999999",
+  },
+} as Partial<IBesuNetworkConfig> & INetworkOptions;
 
 const logger: Logger = new Logger({
   label: "ValidateCCConfigTest",
@@ -239,7 +243,8 @@ describe("Validate CC Config", () => {
           ledgerType: "ETHEREUM",
         },
         signingCredential: {
-          ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
+          transactionSignerEthAccount:
+            "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
           secret:
             "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
           type: "GETH_KEYCHAIN_PASSWORD",
@@ -323,13 +328,14 @@ describe("Validate CC Config", () => {
                   ledgerType: "ETHEREUM",
                 },
                 signingCredential: {
-                  ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
+                  bridgeOwnerAccount:
+                    "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
                   secret:
                     "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
                   type: "GETH_KEYCHAIN_PASSWORD",
                 },
                 gasConfig: {
-                  gas: "6721975",
+                  gasLimit: "6721975",
                   gasPrice: "20000000000",
                 },
                 connectorOptions: {
@@ -396,7 +402,8 @@ describe("Validate CC Config", () => {
           ledgerType: "ETHEREUM",
         },
         signingCredential: {
-          ethAccount: "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
+          transactionSignerEthAccount:
+            "0x4879B0F1532075A4C28Dab8FA561Aa7e9FE827d7",
           secret:
             "0x67d8ee51db366f84b3c479e105b7f5ef5f358332d027980880168c92764b6a5a",
           type: "GETH_KEYCHAIN_PASSWORD",
@@ -588,7 +595,8 @@ describe("Validate CC Config", () => {
         ledgerType: "ETHEREUM",
       },
       signingCredential: {
-        ethAccount: "0x8230f81920ed354445d201222470ad6f92459D3f",
+        transactionSignerEthAccount:
+          "0x8230f81920ed354445d201222470ad6f92459D3f",
         secret: "test",
         type: "GETH_KEYCHAIN_PASSWORD",
       },
@@ -607,7 +615,7 @@ describe("Validate CC Config", () => {
       wrapperContractAddress: "0x8230f81920ed354445d201222470ad6f92459D3f",
       wrapperContractName: 123, //should be a string
       gasConfig: {
-        gas: "6721975",
+        gasLimit: "6721975",
         gasPrice: "20000000000",
       },
     };
@@ -633,7 +641,8 @@ describe("Validate CC Config", () => {
         ledgerType: "ETHEREUM",
       },
       signingCredential: {
-        ethAccount: "0x8230f81920ed354445d201222470ad6f92459D3f",
+        transactionSignerEthAccount:
+          "0x8230f81920ed354445d201222470ad6f92459D3f",
         secret: "test",
         type: "GETH_KEYCHAIN_PASSWORD",
       },
@@ -652,7 +661,7 @@ describe("Validate CC Config", () => {
       wrapperContractAddress: "0x8230f81920ed354445d201222470ad6f92459D3f",
       wrapperContractName: "exampleWrapperContractName",
       gasConfig: {
-        gas: "6721975",
+        gasLimit: "6721975",
         gasPrice: "20000000000",
       },
     };
@@ -678,7 +687,8 @@ describe("Validate CC Config", () => {
         ledgerType: "BESU_2X",
       },
       signingCredential: {
-        ethAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
+        transactionSignerEthAccount:
+          "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
         secret:
           "0xc31e76f70d6416337d3a7b7a8711a43e30a14963b5ba622fa6c9dbb5b4555986",
         type: "PRIVATE_KEY_HEX",
@@ -697,7 +707,9 @@ describe("Validate CC Config", () => {
       claimFormats: [1],
       wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B",
       wrapperContractName: true, //should be a string
-      gas: 999999999999999,
+      gasConfig: {
+        gasLimit: "999999999999999",
+      },
     };
     const bridgeConfig = [badBesuConfig];
     expect(
@@ -721,7 +733,8 @@ describe("Validate CC Config", () => {
         ledgerType: "BESU_2X",
       },
       signingCredential: {
-        ethAccount: "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
+        transactionSignerEthAccount:
+          "0x736dC9B8258Ec5ab2419DDdffA9e1fa5C201D0b4",
         secret:
           "0xc31e76f70d6416337d3a7b7a8711a43e30a14963b5ba622fa6c9dbb5b4555986",
         type: "PRIVATE_KEY_HEX",
@@ -740,7 +753,9 @@ describe("Validate CC Config", () => {
       claimFormats: [1],
       wrapperContractAddress: "0x09D16c22216BC873e53c8D93A38420f48A81dF1B",
       wrapperContractName: "exampleWrapperContractName",
-      gas: 999999999999999,
+      gasConfig: {
+        gasLimit: "999999999999999",
+      },
     };
     const bridgeConfig = [badBesuConfig];
     expect(
