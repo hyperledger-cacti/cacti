@@ -62,11 +62,12 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "1.10.0",
-    "@connectrpc/connect": "1.4.0",
-    "@connectrpc/connect-express": "1.4.0",
-    "@connectrpc/connect-fastify": "1.4.0",
-    "@connectrpc/connect-node": "1.4.0",
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protobuf": "2.10.1",
+    "@connectrpc/connect": "2.1.1",
+    "@connectrpc/connect-express": "2.1.1",
+    "@connectrpc/connect-fastify": "2.1.1",
+    "@connectrpc/connect-node": "2.1.1",
     "@grpc/grpc-js": "1.13.3",
     "@grpc/proto-loader": "0.7.13",
     "@hyperledger/cactus-common": "2.1.0",
@@ -105,8 +106,8 @@
     "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@bufbuild/buf": "1.30.0",
-    "@bufbuild/protoc-gen-es": "1.8.0",
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protoc-gen-es": "^2.10.1",
     "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@hyperledger/cactus-plugin-keychain-vault": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
@@ -135,6 +136,7 @@
     "google-protobuf": "3.21.4",
     "grpc-tools": "1.12.4",
     "grpc_tools_node_protoc_ts": "5.3.3",
+    "npm-run-all": "^4.1.5",
     "protobufjs": ">=7.4.0",
     "tsx": "4.16.2"
   },

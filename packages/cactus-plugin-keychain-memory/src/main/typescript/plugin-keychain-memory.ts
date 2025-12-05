@@ -23,9 +23,8 @@ import { SetKeychainEntryV1Endpoint } from "./web-services/set-keychain-entry-en
 import { GetKeychainEntryV1Endpoint } from "./web-services/get-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryV1Endpoint } from "./web-services/delete-keychain-entry-endpoint-v1";
 import { HasKeychainEntryV1Endpoint } from "./web-services/has-keychain-entry-endpoint-v1";
-import { DefaultService } from "./generated/crpc/services/default_service_connect";
+import { DefaultService } from "./generated/crpc/services/default_service_pb";
 import { KeychainMemoryCrpcSvcOpenApi } from "./crpc-services/keychain-memory-crpc-svc-openapi";
-import { ServiceType } from "@bufbuild/protobuf";
 import { Observable, ReplaySubject, Subject } from "rxjs";
 
 export interface IPluginKeychainMemoryOptions extends ICactusPluginOptions {
@@ -136,17 +135,15 @@ export class PluginKeychainMemory
     return res;
   }
 
-  public async createCrpcSvcRegistrations(): Promise<
-    ICrpcSvcRegistration<ServiceType>[]
-  > {
-    const out: ICrpcSvcRegistration<ServiceType>[] = [];
+  public async createCrpcSvcRegistrations(): Promise<ICrpcSvcRegistration[]> {
+    const out: ICrpcSvcRegistration[] = [];
 
     const implementation = new KeychainMemoryCrpcSvcOpenApi({
       keychain: this,
       logLevel: this.opts.logLevel,
     });
 
-    const crpcSvcRegistration: ICrpcSvcRegistration<ServiceType> = {
+    const crpcSvcRegistration: ICrpcSvcRegistration = {
       definition: DefaultService,
       serviceName: DefaultService.typeName,
       implementation,

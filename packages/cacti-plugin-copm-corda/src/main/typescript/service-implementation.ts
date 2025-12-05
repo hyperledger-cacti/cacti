@@ -1,7 +1,6 @@
 import { Logger } from "@hyperledger/cactus-common";
-import { ServiceImpl, PromiseClient } from "@connectrpc/connect";
+import { Client, ServiceImpl } from "@connectrpc/connect";
 
-import type { ServiceType } from "@bufbuild/protobuf";
 import {
   DefaultService,
   PledgeAssetV1Request,
@@ -14,17 +13,20 @@ import {
   ClaimLockedAssetV1Request,
   ClaimPledgedAssetV1200ResponsePB,
 } from "@hyperledger-cacti/cacti-copm-core";
+import { GenService } from "@bufbuild/protobuf/dist/cjs/codegenv1/types";
 
 type DefaultServiceMethodDefinitions = typeof DefaultService.methods;
-type DefaultServiceMethodNames = keyof DefaultServiceMethodDefinitions;
-export type DefaultApi = PromiseClient<typeof DefaultService>;
+type DefaultServiceMethodNames =
+  DefaultServiceMethodDefinitions[number]["name"];
+
+export type DefaultApi = Client<typeof DefaultService>;
 
 type ICopmCordaApi = {
   [key in DefaultServiceMethodNames]: (...args: never[]) => unknown;
 };
 
 export class CopmCordaImpl
-  implements ICopmCordaApi, Partial<ServiceImpl<ServiceType>>
+  implements ICopmCordaApi, Partial<ServiceImpl<GenService<any>>>
 {
   // We cannot avoid this due to how the types of the upstream library are
   // structured/designed hence we just disable the linter on this particular line.

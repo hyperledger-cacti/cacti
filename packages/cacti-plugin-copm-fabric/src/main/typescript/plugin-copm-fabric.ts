@@ -9,7 +9,6 @@ import {
   ICrpcSvcRegistration,
   IPluginCrpcService,
 } from "@hyperledger/cactus-core-api";
-import { ServiceType } from "@bufbuild/protobuf";
 import {
   DefaultService,
   Interfaces as CopmIF,
@@ -40,10 +39,8 @@ export class PluginCopmFabric implements IPluginCrpcService, ICactusPlugin {
     this.instanceId = this.opts.instanceId;
   }
 
-  public async createCrpcSvcRegistrations(): Promise<
-    ICrpcSvcRegistration<ServiceType>[]
-  > {
-    const out: ICrpcSvcRegistration<ServiceType>[] = [];
+  public async createCrpcSvcRegistrations(): Promise<ICrpcSvcRegistration[]> {
+    const out: ICrpcSvcRegistration[] = [];
 
     const implementation = new CopmFabricImpl(
       this.log,
@@ -51,7 +48,7 @@ export class PluginCopmFabric implements IPluginCrpcService, ICactusPlugin {
       this.opts.fabricConfig,
     );
 
-    const crpcSvcRegistration: ICrpcSvcRegistration<ServiceType> = {
+    const crpcSvcRegistration: ICrpcSvcRegistration = {
       definition: DefaultService,
       serviceName: DefaultService.typeName,
       implementation,

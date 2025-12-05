@@ -1,7 +1,7 @@
 import { ConnectError, Code } from "@connectrpc/connect";
-import { AssetAccountV1PB } from "../generated/models/asset_account_v1_pb_pb";
-import { HashInfoV1PB } from "../generated/models/hash_info_v1_pb_pb";
-import { TransferrableAssetV1PB } from "../generated/models/transferrable_asset_v1_pb_pb";
+import { AssetAccountV1PB } from "../generated/protos/models/asset_account_v1_pb_pb";
+import { HashInfoV1PB } from "../generated/protos/models/hash_info_v1_pb_pb";
+import { TransferrableAssetV1PB } from "../generated/protos/models/transferrable_asset_v1_pb_pb";
 import { HashFunctions } from "@hyperledger/cacti-weaver-sdk-fabric";
 import { DLAccount } from "../lib/types";
 import { TransferrableAsset } from "../lib/transferrable-asset";
