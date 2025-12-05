@@ -261,6 +261,18 @@
   ,"adress"
   ,"NFToken"
   ,"NFT"
+  ,"FabricProto"
+  ,"bnum"
+  ,"Requestby"
+  ,"ecies"
+  ,"ECIESKDF"
+  ,"kbuf"
+  ,"sjcl"
+  ,"ECIES"
+  ,"driverdbs"
+  ,"driverdb"
+  ,"fabproto"
+  ,"unsubscription"
   ],
   "dictionaries": [
     "typescript,node,npm,go,rust"
