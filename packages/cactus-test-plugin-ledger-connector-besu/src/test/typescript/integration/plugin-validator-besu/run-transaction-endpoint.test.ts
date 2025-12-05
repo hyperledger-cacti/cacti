@@ -12,7 +12,7 @@ import {
 
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -34,7 +34,7 @@ describe("ApiServer:PluginLedgerConnectorBesu", () => {
   let ledger: BesuTestLedger;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
 
     // Initialize Besu test ledger

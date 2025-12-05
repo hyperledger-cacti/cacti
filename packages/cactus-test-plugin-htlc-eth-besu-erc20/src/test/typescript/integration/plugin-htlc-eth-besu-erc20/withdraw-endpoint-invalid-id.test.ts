@@ -30,7 +30,7 @@ import { PluginImportType } from "@hyperledger/cactus-core-api";
 import {
   BesuTestLedger,
   BESU_TEST_LEDGER_DEFAULT_OPTIONS,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import TestTokenJSON from "../../../solidity/token-erc20-contract/Test_Token.json";
 import DemoHelperJSON from "../../../solidity/token-erc20-contract/DemoHelpers.json";
@@ -75,7 +75,7 @@ describe(testCase, () => {
     api: BesuApi;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 
@@ -89,7 +89,7 @@ describe(testCase, () => {
   });
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 

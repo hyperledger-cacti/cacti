@@ -7,7 +7,7 @@ import { SubstrateTestLedger } from "../../../../../cactus-test-tooling/src/main
 import metadata from "../../rust/fixtures/ink/metadata.json";
 import fs from "fs-extra";
 import { v4 as uuidv4 } from "uuid";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import express from "express";
 import http from "http";
 import {
@@ -59,7 +59,7 @@ describe(testCase, () => {
     proofSize,
   };
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
   afterAll(async () => {
@@ -67,7 +67,7 @@ describe(testCase, () => {
     await plugin.shutdownConnectionToSubstrate();
   });
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
   afterAll(async () => await Servers.shutdown(server));

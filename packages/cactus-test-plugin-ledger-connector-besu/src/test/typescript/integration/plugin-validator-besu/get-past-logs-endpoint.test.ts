@@ -21,7 +21,7 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   BesuApiClientOptions,
@@ -55,7 +55,7 @@ describe("API client can call getPastLogs via network", () => {
   let web3: Web3;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
 
     await besuTestLedger.start();
@@ -142,7 +142,7 @@ describe("API client can call getPastLogs via network", () => {
   afterAll(tearDown);
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
 

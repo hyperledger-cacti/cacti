@@ -1,0 +1,49 @@
+name: "Pull & Cache Multiple Docker Images"
+description: "Pulls multiple Docker images, caches all of them, loads from cache."
+
+inputs:
+  images:
+    description: "A newline-separated list of Docker images to pull"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Normalize list and compute cache key
+      id: prep
+      shell: bash
+      run: |
+        # hash the list to create a stable cache key
+        echo "key=$(echo '${{ inputs.images }}' | sha256sum | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+    - name: Cache all docker image tars
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: docker-images
+        key: docker-images-${{ steps.prep.outputs.key }}
+
+    - name: Pull & save images (cache miss)
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        mkdir -p docker-images
+        echo "${{ inputs.images }}" | while read IMAGE; do
+          [ -z "$IMAGE" ] && continue
+          SAFE=$(echo "$IMAGE" | tr ":/" "_")
+          echo "Pulling $IMAGE"
+          docker pull "$IMAGE"
+          docker save "$IMAGE" -o "docker-images/$SAFE.tar"
+        done
+
+    - name: Load images (cache hit or after pulling)
+      shell: bash
+      run: |
+        for FILE in docker-images/*.tar; do
+          echo "Loading image from $FILE"
+          docker load -i "$FILE"
+        done
+
+    - name: Verify
+      shell: bash
+      run: docker images

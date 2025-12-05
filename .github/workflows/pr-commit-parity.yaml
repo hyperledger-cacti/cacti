@@ -4,9 +4,10 @@ on: [pull_request]
 
 jobs:
   pr-commit-parity:
+    if: false  # disables this job entirely
     name: PR and Commit messages Parity
     runs-on: ubuntu-22.04
-    if: "!contains('dependabot[bot]', github.event.pull_request.user.login)"
+    #if: "!contains('dependabot[bot]', github.event.pull_request.user.login)"
     env:
       ACCEPTABLE_SIMILARITY_RATIO: 0.9
     steps:

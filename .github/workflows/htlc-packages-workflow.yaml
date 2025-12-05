@@ -1,0 +1,196 @@
+name: Run HTLC Pacakges workflows
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_code_coverage:
+        required: true
+        type: string
+      run_trivy_scan:
+        required: true
+        type: string
+  
+concurrency:
+  group: htlc-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cp-htlc-coordinator-besu:
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-coordinator-besu
+      TAPE_TEST_PATTERN: >-
+        --files={./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/counterparty-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/own-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/refund.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/withdraw-counterparty-endpoint.test.ts}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-htlc-coordinator-besu-report
+ 
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-14
+          path: ./code-coverage-ts/**/
+          
+  cp-htlc-eth-besu:
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-htlc-eth-besu-report
+   
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-15
+          path: ./code-coverage-ts/**/
+  
+  cp-htlc-eth-besu-erc20:
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu-erc20
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-htlc-eth-besu-erc20-report
+   
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-16
+          path: ./code-coverage-ts/**/
+
+  ctp-htlc-eth-besu:
+    continue-on-error: false
+    env:
+      ETHERSCAN_KEY:  ${{ secrets.ETHERSCAN_KEY }}
+      JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-htlc-eth-besu
+      TAPE_TEST_PATTERN: '--files=./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: ctp-htlc-eth-besu-report
+ 
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-41
+          path: ./code-coverage-ts/**/
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@ca7e86820a6802e19349b5622e91976c4561c454 #v1
+
+      - name: Run solidity tests
+        run: cd packages/cactus-plugin-htlc-eth-besu && forge test -vvvvv
+
+  ctp-htlc-eth-besu-erc20:
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-htlc-eth-besu-erc20
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: ctp-htlc-eth-besu-erc20-report
+   
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-42
+          path: ./code-coverage-ts/**/

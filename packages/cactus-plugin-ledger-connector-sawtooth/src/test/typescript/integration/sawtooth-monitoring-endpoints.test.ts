@@ -21,7 +21,7 @@ import {
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
 import {
   SawtoothTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -155,7 +155,7 @@ describe("Sawtooth monitoring endpoints tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info(`Start Ledger ${containerImageName}:${containerImageVersion}...`);
     ledger = new SawtoothTestLedger({
@@ -216,7 +216,7 @@ describe("Sawtooth monitoring endpoints tests", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   });
 
   //////////////////////////////////

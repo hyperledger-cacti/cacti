@@ -113,3 +113,13 @@ weaver/sdks/fabric/interoperation-node-sdk/test/AssetManager.js
 weaver/sdks/fabric/interoperation-node-sdk/test/InteroperableHelper.js
 weaver/sdks/fabric/interoperation-node-sdk/test/Relay.js
 weaver/sdks/fabric/interoperation-node-sdk/protos-js/driver/driver_grpc_pb.js
+
+weaver/tests/network-setups/fabric/dev/fabric-samples/**
+
+packages/cacti-plugin-weaver-driver-fabric/src/main/typescript/protos-js/driver/**/*_pb.js
+
+weaver/core/drivers/fabric-driver/protos-js/driver/**/*_pb.js
+
+weaver/core/identity-management/iin-agent/protos-js/driver/**/*_pb.js
+
+weaver/sdks/besu/node/protos-js/driver/**/*_pb.js

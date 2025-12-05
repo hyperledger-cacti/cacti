@@ -28,7 +28,7 @@ import {
   Web3SigningCredentialType,
 } from "@hyperledger/cactus-plugin-ledger-connector-besu";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   BesuTestLedger,
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
@@ -74,7 +74,7 @@ describe(testCase, () => {
   };
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy;
   });
 
@@ -161,7 +161,7 @@ describe(testCase, () => {
     await besuTestLedger2.destroy();
     await apiServer1.shutdown();
     await apiServer2.shutdown();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   test(testCase1, async () => {

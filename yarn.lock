@@ -8712,7 +8712,7 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
     "@hyperledger/cactus-plugin-object-store-ipfs": "npm:2.1.0"
-    "@hyperledger/cactus-plugin-satp-hermes": "workspace:*"
+    "@hyperledger/cactus-plugin-satp-hermes": "npm:2.1.0"
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@openzeppelin/contracts": "npm:4.9.6"
     "@openzeppelin/contracts-upgradeable": "npm:4.9.6"
@@ -9732,7 +9732,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-plugin-satp-hermes@workspace:*, @hyperledger/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes":
+"@hyperledger/cactus-plugin-satp-hermes@npm:2.1.0, @hyperledger/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes"
   dependencies:
@@ -10242,6 +10242,7 @@ __metadata:
     inquirer: "npm:8.2.6"
     jest: "npm:29.6.2"
     jest-extended: "npm:4.0.1"
+    jest-junit: "npm:16.0.0"
     joi: "npm:17.13.3"
     json5: "npm:2.2.3"
     license-report: "npm:6.4.0"

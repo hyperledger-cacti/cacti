@@ -1,0 +1,56 @@
+name: Configure Action
+description: "Sets up the repository with necessary configurations, caching dependencies and build outputs."
+
+inputs:
+  node_version:
+    description: "Node.js version to use"
+    required: true
+  configure_desable:
+    description: "Whether to run the configure step"
+    required: false
+    default: "false"
+  yarn_hardened_mode:
+    description: >-
+      Whether to enable Yarn hardened mode,
+      '1' to enable, '0' to disable.
+      This is important to ensure cache integrity and defaults to '1'.
+      See https://yarnpkg.com/features/security;
+      it's recommended to enable it just once, when the CI pipeline runs multiple jobs.
+    required: false
+    default: "1"
+
+runs:
+  using: "composite"
+  steps:
+    # 1. Setup Node.js + yarn cache
+    - name: Use Node.js ${{ inputs.node_version }}
+      id: setup-node
+      uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903  # v6.0.0
+      with:
+        cache: yarn
+        cache-dependency-path: yarn.lock
+        node-version: ${{ inputs.node_version }}
+
+    # 2. Ensure Yarn exists (install only if it doesn't)
+    - name: Ensure Yarn available (auto-install if missing)
+      shell: bash
+      run: |
+        corepack enable
+
+    - uses: actions/cache@v4
+      with:
+        path: ~/.cache/yarn
+        key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    # 3. Install dependencies
+    - name: Install dependencies
+      run: YARN_ENABLE_HARDENED_MODE=${{ inputs.yarn_hardened_mode }} yarn install --immutable
+      shell: bash
+
+    # 4. Run configure command
+    - name: Run configure (only if build cache not hit)
+      if: ${{ inputs.configure_desable != 'true' }}
+      run: YARN_ENABLE_HARDENED_MODE=${{ inputs.yarn_hardened_mode }} yarn configure
+      shell: bash

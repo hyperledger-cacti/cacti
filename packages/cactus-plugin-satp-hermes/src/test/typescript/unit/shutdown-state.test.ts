@@ -1,7 +1,7 @@
 import "jest-extended";
 import {
   Containers,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
@@ -47,7 +47,7 @@ let gateway: SATPGateway | undefined; //added
 const sessionIDs: string[] = [];
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       logger.info("Pruning throw OK");
     })
