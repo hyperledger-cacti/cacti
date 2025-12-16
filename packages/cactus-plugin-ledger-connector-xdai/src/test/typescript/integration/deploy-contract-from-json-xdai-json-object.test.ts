@@ -12,7 +12,7 @@ import {
 import {
   Containers,
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   LogLevelDesc,
@@ -33,7 +33,7 @@ const logLevel: LogLevelDesc = "TRACE";
 // const contractName = "HelloWorld";
 
 test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
@@ -56,7 +56,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
   await ledger.start();
 

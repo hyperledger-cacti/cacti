@@ -19,7 +19,7 @@ import {
   PluginLedgerConnectorEthereum,
   Web3SigningCredentialType,
 } from "../../../main/typescript/index";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
@@ -52,7 +52,7 @@ describe("invokeRawWeb3EthContract Tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Start GethTestLedger...");
     // log.debug("Ethereum version:", containerImageVersion);
@@ -114,7 +114,7 @@ describe("invokeRawWeb3EthContract Tests", () => {
     await ethereumTestLedger.destroy();
 
     log.info("Prune docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   });
 
   test("invokeRawWeb3EthContract send and call to valid contract works correctly", async () => {

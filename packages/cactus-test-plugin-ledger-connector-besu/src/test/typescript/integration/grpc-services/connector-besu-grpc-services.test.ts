@@ -16,7 +16,7 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   PluginLedgerConnectorBesu,
@@ -62,7 +62,7 @@ describe("BesuGrpcSvcOpenApi", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
 
     log.info("Start BesuTestLedger...");
     ledger = new BesuTestLedger({});
@@ -274,6 +274,6 @@ describe("BesuGrpcSvcOpenApi", () => {
     }
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 });

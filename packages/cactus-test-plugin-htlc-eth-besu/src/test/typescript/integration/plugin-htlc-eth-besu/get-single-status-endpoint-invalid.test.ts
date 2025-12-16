@@ -30,7 +30,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
@@ -52,7 +52,7 @@ describe(testCase, () => {
   };
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 
@@ -61,11 +61,11 @@ describe(testCase, () => {
   afterAll(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 

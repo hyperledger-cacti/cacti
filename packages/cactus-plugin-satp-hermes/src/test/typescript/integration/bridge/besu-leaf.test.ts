@@ -1,6 +1,6 @@
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import path from "path";
@@ -48,7 +48,7 @@ let besuEnv: BesuTestEnvironment;
 const TIMEOUT = 60000;
 
 beforeAll(async () => {
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -96,7 +96,9 @@ afterAll(async () => {
 
   await monitorService.shutdown();
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  log.info("Besu Leaf connector shutdown successfully");
+
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -110,7 +112,7 @@ describe("Besu Leaf Test with Fungible Tokens", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     besuLeaf = new BesuLeaf(
-      besuEnv.createBesuLeafConfig(ontologyManager, "DEBUG"),
+      besuEnv.createBesuLeafConfig(ontologyManager, logLevel),
       ontologyManager,
       monitorService,
     );

@@ -21,7 +21,7 @@ import {
 
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -59,7 +59,7 @@ describe("PluginLedgerBesu-v21GetPastLogs", () => {
   let web3: Web3;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
 
@@ -134,7 +134,7 @@ describe("PluginLedgerBesu-v21GetPastLogs", () => {
     web3 = new Web3(web3Provider);
     web3JsQuorum = Web3JsQuorum(web3);
 
-    const besuKeyPair = await besuTestLedger.getBesuKeyPair();
+    const besuKeyPair = await besuTestLedger.getV21BesuKeyPair();
     besuPrivateKey = besuKeyPair.privateKey.toLowerCase().startsWith("0x")
       ? besuKeyPair.privateKey.substring(2)
       : besuKeyPair.privateKey;
@@ -152,12 +152,12 @@ describe("PluginLedgerBesu-v21GetPastLogs", () => {
   afterAll(tearDown);
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
 
   test(testCase, async () => {
-    const orionKeyPair = await besuTestLedger.getOrionKeyPair();
+    const orionKeyPair = await besuTestLedger.getV21OrionKeyPair();
     const contractOptions = {
       data: `0x123`,
       // privateFrom : Orion public key of the sender.

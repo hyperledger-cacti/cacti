@@ -13,7 +13,7 @@ const sutLogLevel: LogLevelDesc = "info";
 const setupTimeout = 1000 * 60 * 3; // 3 minutes timeout for setup
 
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   PostgresTestContainer,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -129,7 +129,7 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Run PostgresTestContainer...");
     postgresContainer = new PostgresTestContainer({
@@ -210,7 +210,7 @@ describe("Fabric persistence PostgreSQL PostgresDatabaseClient tests", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   }, setupTimeout);
 
   afterEach(async () => {

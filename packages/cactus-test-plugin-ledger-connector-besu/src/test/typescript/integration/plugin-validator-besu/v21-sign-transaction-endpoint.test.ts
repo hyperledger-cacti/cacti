@@ -24,7 +24,7 @@ import {
 
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -55,7 +55,7 @@ describe(testCase, () => {
   let apiServer: ApiServer;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
     await besuTestLedger.start();
   });
@@ -149,8 +149,8 @@ describe(testCase, () => {
     const web3 = new Web3(web3Provider);
     const web3JsQuorum: IWeb3Quorum = Web3JsQuorum(web3);
 
-    const orionKeyPair = await besuTestLedger.getOrionKeyPair();
-    const besuKeyPair = await besuTestLedger.getBesuKeyPair();
+    const orionKeyPair = await besuTestLedger.getV21OrionKeyPair();
+    const besuKeyPair = await besuTestLedger.getV21BesuKeyPair();
 
     const besuPrivateKey = besuKeyPair.privateKey.toLowerCase().startsWith("0x")
       ? besuKeyPair.privateKey.substring(2)

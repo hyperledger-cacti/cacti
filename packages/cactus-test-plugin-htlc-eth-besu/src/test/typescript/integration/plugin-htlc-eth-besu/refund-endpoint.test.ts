@@ -30,7 +30,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { PluginImportType } from "@hyperledger/cactus-core-api";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { DataTest } from "../data-test";
@@ -56,19 +56,19 @@ describe(testCase, () => {
   };
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 
   afterAll(async () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   afterAll(async () => await Servers.shutdown(server));

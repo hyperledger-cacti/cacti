@@ -29,7 +29,7 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   Logger,
@@ -73,7 +73,7 @@ describe("Verifier integration with besu connector tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Start BesuTestLedger...");
     log.debug("Besu image:", containerImageName);
@@ -157,7 +157,7 @@ describe("Verifier integration with besu connector tests", () => {
     await besuTestLedger.stop();
     await besuTestLedger.destroy();
     log.info("Prune docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   });
 
   //////////////////////////////////

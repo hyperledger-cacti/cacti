@@ -10,7 +10,7 @@ import {
   buildImageCordaAllInOneV412,
   Containers,
   CordaTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   SAMPLE_CORDAPP_DATA,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -78,7 +78,7 @@ describe("Corda V4 Connector", () => {
   });
 
   beforeAll(async () => {
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   beforeAll(async () => {
@@ -180,7 +180,7 @@ describe("Corda V4 Connector", () => {
     } finally {
       await ledger.destroy();
     }
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   afterAll(async () => {

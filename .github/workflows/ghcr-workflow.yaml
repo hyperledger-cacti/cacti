@@ -1,0 +1,152 @@
+name: Run All GHCR Workflows
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_trivy_scan:  
+        required: true
+        type: string
+      affected-packages:
+        required: false
+        type: string
+  
+concurrency:
+  group: ghcr-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+    ghcr-besu-all-in-one:
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+          with:
+            fetch-depth: 0
+        - id: changed
+          run: |
+            git fetch origin ${{ github.base_ref }}
+            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
+
+            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+        - name: ghcr.io/hyperledger/cactus-besu-all-in-one
+          if: contains(steps.changed.outputs.files, 'tools/docker/besu-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
+          run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
+    ghcr-connector-corda-server:
+      if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-corda')
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+        - name: ghcr.io/hyperledger/cactus-connector-corda-server
+          run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
+          
+    ghcr-corda-all-in-one-flowdb:
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+          with:
+            fetch-depth: 0
+        - id: changed
+          run: |
+            git fetch origin ${{ github.base_ref }}
+            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
+
+            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+        - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
+          if: contains(steps.changed.outputs.files, 'tools/docker/corda-all-in-one/corda-v4_8-flowdb/') || contains(steps.changed.outputs.files, '.github/workflows/')
+          run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
+
+    ghcr-dev-container-vscode:
+      runs-on: ubuntu-22.04
+      env:
+        IMAGE_NAME: cacti-dev-container-vscode
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+          with:
+            fetch-depth: 0
+        - id: changed
+          run: |
+            git fetch origin ${{ github.base_ref }}
+            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
+
+            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+        - name: Use Node.js ${{ inputs.node_version }}
+          if: contains(steps.changed.outputs.files, '.devcontainer/') || contains(steps.changed.outputs.files, '.github/workflows/')
+          uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
+          with:
+            node-version: ${{ inputs.node_version }}
+        - name: npm_install_@devcontainers/cli@0.44.0
+          if: contains(steps.changed.outputs.files, '.devcontainer/') || contains(steps.changed.outputs.files, '.github/workflows/')
+          run: npm install -g @devcontainers/cli@0.44.0
+        - name: npx_yes_devcontainers_cli_build
+          if: contains(steps.changed.outputs.files, '.devcontainer/') || contains(steps.changed.outputs.files, '.github/workflows/')
+          run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"
+
+    ghcr-example-supply-chain-app:
+      if: contains(fromJson(inputs.affected-packages), 'examples/cactus-example-supply-chain-backend')
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+        - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
+          run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
+
+    ghcr-fabric2-all-in-one:
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+          with:
+            fetch-depth: 0
+        - id: changed
+          run: |
+            git fetch origin ${{ github.base_ref }}
+            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
+
+            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+        - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
+          if: contains(steps.changed.outputs.files, 'tools/docker/fabric-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
+          run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
+
+    ghcr-daml-all-in-one:
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+          with:
+            fetch-depth: 0
+        - id: changed
+          run: |
+            git fetch origin ${{ github.base_ref }}
+            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
+
+            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+        - name: ghcr.io/hyperledger/daml-all-in-one
+          if: contains(steps.changed.outputs.files, 'tools/docker/daml-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
+          run: DOCKER_BUILDKIT=1 docker build ./tools/docker/daml-all-in-one/ -f ./tools/docker/daml-all-in-one/Dockerfile
+
+    ghcr-keychain-vault-server:
+      if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-keychain-vault')
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+        - name: ghcr.io/hyperledger/cactus-keychain-vault-server
+          run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile -t cactus-keychain-vault-server
+        - if: ${{ inputs.run_trivy_scan == 'true' && github.event.name == 'schedule' }}
+          name: Run Trivy vulnerability scan for cactus-keychain-vault-server
+          uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 #0.19.0
+          with:
+            image-ref: 'cactus-keychain-vault-server'
+            format: 'table'
+            exit-code: '1'
+            ignore-unfixed: false
+            vuln-type: 'os,library'
+            severity: 'CRITICAL,HIGH'
+
+
+

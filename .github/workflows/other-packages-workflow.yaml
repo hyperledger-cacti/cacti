@@ -1,0 +1,325 @@
+name: Run Other Pacakges workflows
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_code_coverage:
+        required: true
+        type: string
+      run_trivy_scan:
+        required: true
+        type: string
+      affected-packages:
+        required: false
+        type: string
+  
+concurrency:
+  group: other-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cp-copm:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cacti-plugin-copm-fabric') || contains(fromJson(inputs.affected-packages), 'packages/cacti-plugin-copm-corda') || contains(fromJson(inputs.affected-packages), 'packages/cacti-copm-test')
+    uses: ./.github/workflows/workflow-copm.yaml
+    with:
+      node_version: ${{ inputs.node_version }}
+      run_code_coverage:  ${{ inputs.run_code_coverage }}
+
+  cp-consortium-manual:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-consortium-manual')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-consortium-manual/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-manual
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-consortium-manual-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-13
+          path: ./code-coverage-ts/**/
+
+  cp-persistent-ethereum:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-persistence-ethereum')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-persistence-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-persistent-ethereum
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: postgres:15.12-alpine
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-persistent-ethereum-report
+              
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-34
+          path: ./code-coverage-ts/**/
+  
+  cp-persistent-fabric:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-persistence-fabric')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-persistence-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-persistent-fabric
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-persistent-fabric-report
+              
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-cp-persistent-fabric
+          path: ./code-coverage-ts/**/
+
+  cp-object-store-ipfs:
+    if: contains(fromJson(inputs.affected-packages), 'extensions/cactus-plugin-object-store-ipfs')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: extensions/cactus-plugin-object-store-ipfs/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-object-store-ipfs
+      TAPE_TEST_PATTERN: '--files={./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts,./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts}'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-object-store-ipfs-report
+      
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-35
+          path: ./code-coverage-ts/**/
+
+  cp-bungee-hermes:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-bungee-hermes')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-bungee-hermes
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/besu-all-in-one:v2.2.0-rc.2
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-bungee-hermes-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-36
+          path: ./code-coverage-ts/**/
+
+  ct-geth-ledger:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-test-geth-ledger')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-test-geth-ledger/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-geth-ledger
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: ct-geth-ledger-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-39
+          path: ./code-coverage-ts/**/
+
+  ctp-consortium-manual:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-test-plugin-consortium-manual')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-test-plugin-consortium-manual/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpt-consortium-manual
+      TAPE_TEST_PATTERN: ./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/openapi/openapi-validation.test.ts
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cpt-consortium-manual-report
+      
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-40
+          path: ./code-coverage-ts/**/
+
+  cp-consortium-static:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cacti-plugin-consortium-static')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cacti-plugin-consortium-static/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-static
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cp-consortium-static-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-47
+          path: ./code-coverage-ts/**/

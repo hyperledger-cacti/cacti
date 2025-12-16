@@ -15,7 +15,7 @@ import { DiscoveryOptions } from "fabric-network";
 import {
   Containers,
   FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   WsTestServer,
   WS_IDENTITY_HTTP_PORT,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
@@ -141,7 +141,7 @@ describe("PluginLedgerConnectorFabric", () => {
   afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
     await wsTestContainer.stop();
     await wsTestContainer.destroy();
     await wsAdmin.close();

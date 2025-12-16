@@ -16,7 +16,7 @@ import {
   K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
   K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
   OpenEthereumTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import HelloWorldContractJson from "../../../solidity/hello-world-contract/HelloWorld.json";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -38,7 +38,7 @@ const testCase = "xDai API";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });
@@ -423,7 +423,7 @@ test(testCase, async (t: Test) => {
 });
 
 test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });

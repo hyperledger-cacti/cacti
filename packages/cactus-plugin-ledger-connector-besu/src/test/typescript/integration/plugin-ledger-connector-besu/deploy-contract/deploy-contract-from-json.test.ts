@@ -16,7 +16,7 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   LogLevelDesc,
@@ -91,7 +91,7 @@ describe("PluginLedgerConnectorBesu", () => {
   let contractAddress: string;
 
   beforeAll(async () => {
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   beforeAll(async () => {
@@ -136,7 +136,7 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   afterAll(async () => {
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   test(testCase, async () => {

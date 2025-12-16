@@ -96,12 +96,12 @@
     "web3-utils": "1.6.1"
   },
   "devDependencies": {
-    "@aries-framework/askar": "0.5.0-alpha.58",
-    "@aries-framework/core": "0.5.0-alpha.58",
-    "@aries-framework/indy-vdr": "0.5.0-alpha.58",
-    "@aries-framework/node": "0.5.0-alpha.58",
-    "@hyperledger/aries-askar-nodejs": "0.2.0",
-    "@hyperledger/indy-vdr-nodejs": "0.2.0",
+    "@aries-framework/askar": "0.5.0-alpha.97",
+    "@aries-framework/core": "0.5.0-alpha.97",
+    "@aries-framework/indy-vdr": "0.5.0-alpha.97",
+    "@aries-framework/node": "0.5.0-alpha.97",
+    "@hyperledger/aries-askar-nodejs": "0.2.3",
+    "@hyperledger/indy-vdr-nodejs": "0.2.3",
     "@types/dockerode": "3.2.7",
     "@types/esm": "3.2.0",
     "@types/fs-extra": "11.0.4",

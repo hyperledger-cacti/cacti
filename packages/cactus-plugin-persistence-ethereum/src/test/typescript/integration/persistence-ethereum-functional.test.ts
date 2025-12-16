@@ -41,7 +41,7 @@ import {
   PluginLedgerConnectorEthereum,
   WatchBlocksV1BlockData,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 
 import "jest-extended";
 import http from "http";
@@ -249,7 +249,7 @@ describe("Ethereum persistence plugin tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     // Create test ledger
     log.info(`Start Ledger ${containerImageName}:${containerImageVersion}...`);
@@ -374,7 +374,7 @@ describe("Ethereum persistence plugin tests", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   }, setupTimeout);
 
   beforeEach(() => {

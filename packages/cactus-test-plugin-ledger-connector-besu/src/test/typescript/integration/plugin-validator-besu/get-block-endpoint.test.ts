@@ -18,7 +18,7 @@ import {
 
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -41,7 +41,7 @@ describe(testCase, () => {
   let apiServer: ApiServer;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
     await besuTestLedger.start();
   });
@@ -53,7 +53,7 @@ describe(testCase, () => {
   });
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 

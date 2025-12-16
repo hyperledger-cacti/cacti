@@ -1,7 +1,7 @@
 import "jest-extended";
 import {
   Containers,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { PluginFactorySATPGateway } from "../../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
@@ -30,7 +30,7 @@ const monitorService = MonitorService.createOrGetMonitorService({
 });
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       logger.info("Pruning throw OK");
     })
@@ -164,7 +164,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
 });
 
 afterAll(async () => {
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       logger.info("Pruning throw OK");
     })

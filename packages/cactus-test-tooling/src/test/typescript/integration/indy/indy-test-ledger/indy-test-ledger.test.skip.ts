@@ -21,7 +21,7 @@ const testLogLevel: LogLevelDesc = "info";
 
 import {
   IndyTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "../../../../../main/typescript/index";
 
 import {
@@ -103,7 +103,9 @@ async function importExistingIndyDidFromPrivateKey(
 /**
  * Main test suite
  */
-describe("Indy Test Ledger checks", () => {
+
+// TODO Upgrade form aries to credo-ts
+describe.skip("Indy Test Ledger checks", () => {
   const walletName = uuidv4();
   let ledger: IndyTestLedger;
 
@@ -113,7 +115,7 @@ describe("Indy Test Ledger checks", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Start IndyTestLedger...");
     ledger = new IndyTestLedger({
@@ -139,7 +141,7 @@ describe("Indy Test Ledger checks", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     try {
       await rm(TEST_WALLET_PATH, {

@@ -27,7 +27,7 @@ import {
   LoggerProvider,
   Servers,
 } from "@hyperledger/cactus-common";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
@@ -63,7 +63,7 @@ describe("invokeRawWeb3EthMethod Tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Start GethTestLedger...");
     // log.debug("Ethereum version:", containerImageVersion);
@@ -115,7 +115,7 @@ describe("invokeRawWeb3EthMethod Tests", () => {
     }
 
     log.info("Prune docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   });
 
   test("invoke method using json-rpc proxy", async () => {

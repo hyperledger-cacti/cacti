@@ -15,7 +15,7 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   LogLevelDesc,
@@ -35,7 +35,7 @@ const testCase = "get record locator";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
@@ -339,7 +339,7 @@ test(testCase, async (t: Test) => {
 });
 
 test("AFTER " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });

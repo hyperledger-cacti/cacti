@@ -194,3 +194,7 @@ Procfile    text
 ## EXECUTABLES
 *.exe binary
 *.pyc binary
+
+## This will ignore all files in any "generated" folder in the git diff, this will make the PRs cleaner, the code is still commited.
+**/generated/** diff=none
+

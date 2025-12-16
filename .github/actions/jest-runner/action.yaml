@@ -1,0 +1,68 @@
+name: Jest Runner action
+description: "Run Jest tests with optional code coverage"
+
+inputs:
+  run_code_coverage:
+    description: "Whether to run tests with code coverage, 'true' or 'false'"
+    required: true
+  jest_test_pattern:
+    description: "The Jest test pattern to run, e.g. 'packages/cactus-api-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts'"
+    required: true
+  jest_test_coverage_path:
+    description: "The path to output Jest code coverage reports to, e.g. './code-coverage-ts/cactus-api-client'"
+    required: false
+  report_name:
+    description: "The name of the report"
+    required: false
+    default: "jest-tests-report"
+  github_secret:
+    description: "GitHub secret for authentication"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Jest Tests (with coverage)
+      if: ${{ inputs.run_code_coverage == 'true' }}
+      shell: bash
+      run: |
+        yarn jest "${{ inputs.jest_test_pattern }}" \
+          --coverage \
+          --coverageDirectory="${{ inputs.jest_test_coverage_path }}" \
+          --reporters=default \
+          --reporters=jest-junit \
+          --outputFile="reports/${{ inputs.report_name }}.xml" \
+          --forceExit
+
+    - name: Run Jest Tests (with coverage)
+      if: ${{ inputs.run_code_coverage == 'true' }}
+      shell: bash
+      run: |
+        mkdir -p reports
+        export JEST_JUNIT_OUTPUT="reports/${{ inputs.report-name }}.xml"
+        yarn jest "${{ inputs.jest_test_pattern }}" \
+          --coverage \
+          --coverageDirectory="${{ inputs.jest_test_coverage_path }}" \
+          --reporters=default \
+          --reporters=jest-junit \
+          --forceExit
+  
+    - name: Report Jest test results
+      if: >
+        always() &&
+        inputs.run_code_coverage == 'true' &&
+        inputs.github_token != '' &&
+        github.event.pull_request.head.repo.fork != true
+      uses: dorny/test-reporter@v1
+      with:
+        name: "${{ inputs.report-name }}"
+        path: "reports/${{ inputs.report-name }}.xml"  # matches JEST_JUNIT_OUTPUT
+        reporter: jest-junit
+        max-annotations: 0
+        token: ${{ inputs.github_token }}              # passed in from the workflow
+        fail-on-error: false
+        fail-on-empty: true
+        only-summary: false
+        list-suites: failed
+        list-tests: failed
+        path-replace-backslashes: false

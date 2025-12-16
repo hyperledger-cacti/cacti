@@ -1,7 +1,7 @@
 import { v4 as uuidV4 } from "uuid";
 import test, { Test } from "tape-promise/tape";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import { AuthorizationProtocol } from "@hyperledger/cactus-cmd-api-server";
 import { IAuthorizationConfig } from "@hyperledger/cactus-cmd-api-server";
 import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
@@ -16,13 +16,11 @@ const testCase =
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });
 
-// FIXME: https://github.com/hyperledger/cactus/issues/1521
-// Skipping until test can be stabilized.
 test("Supply chain backend API calls can be executed", async (t: Test) => {
   t.ok(publicApi, "Public API of the package imported OK");
 
@@ -66,7 +64,7 @@ test("Supply chain backend API calls can be executed", async (t: Test) => {
   const app = new SupplyChainApp(appOptions);
   test.onFinish(async () => {
     await app.stop();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   // Node A => Besu

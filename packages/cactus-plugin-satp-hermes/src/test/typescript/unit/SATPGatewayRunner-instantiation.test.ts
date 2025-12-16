@@ -2,7 +2,7 @@ import "jest-extended";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
   ISATPGatewayRunnerConstructorOptions,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   SATPGatewayRunner,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -69,7 +69,7 @@ describe("Instantiate SATP Gateway Runner", () => {
       try {
         await gatewayRunner.stop();
         await gatewayRunner.destroy();
-        await pruneDockerAllIfGithubAction({ logLevel });
+        await pruneDockerContainersIfGithubAction({ logLevel });
       } catch (err) {
         console.error("Error shutting down gateway in afterAll:", err);
       }

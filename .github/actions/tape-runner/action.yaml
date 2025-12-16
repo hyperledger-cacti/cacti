@@ -1,0 +1,16 @@
+name: Tap Runner action
+description: "Run Tap tests"
+
+inputs:
+  tape_test_pattern:
+    description: "The Jest test pattern to run, e.g. '--files={./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts}'"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Tap Tests
+      run: yarn test:tap:all --bail "${{ inputs.tape_test_pattern }}"
+      shell: bash
+
+  
