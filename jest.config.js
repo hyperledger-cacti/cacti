@@ -17,6 +17,7 @@ module.exports = {
   testMatch: [
     `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
     `**/cacti-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
+    `**/tools/test/compute-affected-packages.test.ts`,
   ],
   // Ignore the tests that are still using tap/tape for as their test runner
   testPathIgnorePatterns: [

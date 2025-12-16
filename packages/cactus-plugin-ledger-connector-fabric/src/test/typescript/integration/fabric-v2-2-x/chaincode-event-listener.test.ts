@@ -16,7 +16,7 @@ import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import {
@@ -72,7 +72,7 @@ describe("PluginLedgerConnectorFabric", () => {
   let peer0Org2Certs: PeerCerts;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.not.toThrow();
   });
 
@@ -176,7 +176,7 @@ describe("PluginLedgerConnectorFabric", () => {
       await ledger.destroy();
     }
 
-    //await pruneDockerAllIfGithubAction({ logLevel });
+    //await pruneDockerContainersIfGithubAction({ logLevel });
     await Servers.shutdown(server);
   });
 

@@ -1,0 +1,95 @@
+
+name: Early Checks and Build
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+    outputs:
+      affected_packages:
+        description: "Changed packages"
+        value: ${{ jobs.compute-changed-packages.outputs.affected_packages }}
+
+concurrency:
+  group: checks-and-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs: 
+  ActionLint:
+    uses: ./.github/workflows/actionlint.yaml
+
+  DCI-Lint:
+      name: DCI-Lint
+      runs-on: ubuntu-22.04
+      steps:
+        - id: lint-git-repo
+          name: Lint Git Repo
+          uses: petermetz/gh-action-dci-lint@beb6ebd5c14241d27bca98e797606f20cb4b50d2 #v0.6.1
+          with:
+            lint-git-repo-request: >-
+              {
+                "cloneUrl": "${{ github.server_url }}/${{ github.repository }}.git",
+                "fetchArgs": [
+                  "--update-head-ok",
+                  "--no-tags",
+                  "--prune",
+                  "--progress",
+                  "--no-recurse-submodules",
+                  "--depth=1",
+                  "origin",
+                  "+${{ github.sha }}:${{ github.ref }}"
+                ],
+                "checkoutArgs": [
+                  "${{ github.ref }}"
+                ],
+                "targetPhrasePatterns": [],
+                "configDefaultsUrl": "https://inclusivenaming.org/json/dci-lint-config-recommended-v1.json",
+                "excludePatterns": [
+                  "packages/**/generated/**"
+                ]
+              }
+        - name: Get the output response
+          run: echo "${{ steps.lint-git-repo.outputs.lint-git-repo-response }}"
+
+  check-coverage:
+    outputs:
+      run-coverage: ${{ steps.set-output.outputs.run-coverage }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set output
+        id: set-output
+        run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
+  
+  build-dev:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: build
+        uses:  ./.github/actions/configure-repo/
+        with:
+          node_version:  ${{ inputs.node_version }}
+
+  compute-changed-packages:
+    runs-on: ubuntu-22.04
+    outputs:
+      affected_packages: ${{ steps.compute-affected-packages.outputs.affected_packages }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ inputs.node_version }}
+      - id: compute-affected-packages
+        name: Compute Affected Packages
+        run: |
+          node ./tools/compute-affected-packages.cjs origin/${{ github.base_ref }} > affected-packages.json
+          AFFECTED_PACKAGES=$(jq -c '.' affected-packages.json)
+          echo "affected_packages=$AFFECTED_PACKAGES" >> "$GITHUB_OUTPUT"
+    

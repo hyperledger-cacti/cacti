@@ -48,6 +48,9 @@ import {
   ISATPGatewayRunnerConstructorOptions,
   SATPGatewayRunner,
 } from "@hyperledger/cactus-test-tooling";
+
+import Docker from "dockerode";
+
 import http from "node:http";
 
 export interface ICbdcBridgingAppDummyInfrastructureOptions {
@@ -126,6 +129,19 @@ export class CbdcBridgingAppDummyInfrastructure {
     try {
       this.log.info(`Starting dummy infrastructure... (this can take a while)`);
       this.log.info(`Starting Ledgers...`);
+      // This is necessary because there is a race condition when creating networks
+      const docker = new Docker();
+      const networks = await docker.listNetworks();
+      const networkExists = networks.some(
+        (n) => n.Name === CbdcBridgingAppDummyInfrastructure.networkName,
+      );
+      if (!networkExists) {
+        await docker.createNetwork({
+          Name: CbdcBridgingAppDummyInfrastructure.networkName,
+          Driver: "bridge",
+        });
+      }
+
       await Promise.all([
         this.besuEnvironment.init(),
         this.fabricEnvironment.init(),

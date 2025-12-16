@@ -4,7 +4,7 @@ import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -15,7 +15,7 @@ const logLevel: LogLevelDesc = "TRACE";
 describe("Obtain configuration profiles test", () => {
   let ledger: FabricTestLedgerV1;
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.not.toThrow();
     ledger = new FabricTestLedgerV1({
       emitContainerLogs: true,

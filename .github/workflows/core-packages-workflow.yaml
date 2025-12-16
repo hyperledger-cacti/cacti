@@ -1,0 +1,363 @@
+name: Run Core Pacakges workflows
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_code_coverage:
+        required: true
+        type: string
+      run_trivy_scan:
+        required: true
+        type: string
+      affected-packages:
+        required: false
+        type: string
+  
+concurrency:
+  group: core-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cactus-api-client:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-api-client')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-api-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-api-client
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cactus-api-client-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-1
+          path: ./code-coverage-ts/**/
+
+  cactus-cmd-api-server:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-cmd-api-server')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-cmd-api-server
+      TAPE_TEST_PATTERN: >-
+        --files={./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: ct-cmd-api-server-report
+      
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-2
+          path: ./code-coverage-ts/**/
+      
+      - name: build_ncc_bundle
+        run: yarn lerna run build:bundle --scope=@hyperledger/cactus-cmd-api-server
+
+      - name: ghcr.io/hyperledger/cactus-cmd-api-server
+        run: |
+          DOCKER_BUILDKIT=1 docker build \
+            --file ./packages/cactus-cmd-api-server/cmd-api-server.Dockerfile \
+            ./packages/cactus-cmd-api-server \
+            --tag cas \
+            --tag cmd-api-server \
+            --tag "ghcr.io/hyperledger/cactus-cmd-api-server:$(date +"%Y-%m-%dT%H-%M-%S" --utc)-dev-$(git rev-parse --short HEAD)"
+
+      - if: ${{ inputs.run_trivy_scan == 'true' && github.event.name == 'schedule' }}
+        name: Run Trivy vulnerability scan for cmd-api-server
+        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 #0.19.0
+        with:
+          image-ref: 'cmd-api-server'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: false
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+          trivyignores: ./.trivyignore
+
+      - name: Ensure .tmp Directory Exists
+        run: mkdir -p .tmp/benchmark-results/cmd-api-server/
+
+     # Download previous benchmark result from cache (if exists)
+      - name: Download previous benchmark data
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
+        with:
+          path: .tmp/benchmark-results/cmd-api-server/
+          key: ${{ runner.os }}-benchmark
+      
+      - name: Run Benchmarks
+        working-directory: ./packages/cactus-cmd-api-server/
+        run: yarn run benchmark
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@4de1bed97a47495fc4c5404952da0499e31f5c29 #v1.20.3
+        with:
+          tool: 'benchmarkjs'
+          output-file-path: .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+          # Only push the benchmark results to gh-pages website if we are running on the main branch
+          # We do not want to clutter the benchmark results with intermediate results from PRs that could be drafts
+          auto-push: ${{ github.ref == 'refs/heads/main' }}
+
+          # Show alert with commit comment on detecting possible performance regression
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: true
+          alert-comment-cc-users: '@hyperledger/cacti-maintainers'
+
+  cactus-common:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-common')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-common/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cactus-common-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-4
+          path: ./code-coverage-ts/**/
+
+  cactus-core-api:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-core-api')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-core-api/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core-api
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cactus-core-api-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-6
+          path: ./code-coverage-ts/**/
+  
+  cactus-core:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-core')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-core/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cactus-core-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-5
+          path: ./code-coverage-ts/**/
+  
+  ct-api-client:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-test-api-client')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-test-api-client/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-api-client
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: ct-api-client-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-37
+          path: ./code-coverage-ts/**/
+
+  ct-cmd-api-server:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-test-cmd-api-server')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-test-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-cmd-api-server
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: ct-cmd-api-server-report
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-38
+          path: ./code-coverage-ts/**/
+
+  cactus-test-tooling:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-test-tooling')
+    continue-on-error: false
+    env:
+      JEST_TEST_PATTERN: packages/cactus-test-tooling/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-test-tooling
+      TTAPE_TEST_PATTERN: >-
+        --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cactus-iroha2-all-in-one:2023-07-29-f2bc772ee
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: stellar/quickstart:v425-latest
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: cactus-test-tooling-report
+      
+      - name: Run Tape Tests
+        uses: ./.github/actions/tape-runner/
+        with:
+          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
+        
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-45
+          path: ./code-coverage-ts/**/

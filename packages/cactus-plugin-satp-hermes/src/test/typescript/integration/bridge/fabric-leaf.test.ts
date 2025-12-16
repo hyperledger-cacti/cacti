@@ -5,7 +5,7 @@ import path from "path";
 
 import {
   Containers,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
@@ -37,7 +37,7 @@ let fabricEnv: FabricTestEnvironment;
 const TIMEOUT = 900000; // 15 minutes
 
 beforeAll(async () => {
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -79,9 +79,9 @@ afterAll(async () => {
     fail("Error shutting down Fabric Leaf connector");
   });
 
-  log.info("Ethereum Leaf connector shutdown successfully");
+  log.info("Fabric Leaf connector shutdown successfully");
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -95,7 +95,7 @@ describe("Fabric Bridge Test", () => {
   jest.setTimeout(900000);
   it("Should Initialize the bridge", async () => {
     fabricLeaf = new FabricLeaf(
-      fabricEnv.createFabricLeafConfig("DEBUG"),
+      fabricEnv.createFabricLeafConfig(logLevel),
       ontologyManager,
       monitorService,
     );

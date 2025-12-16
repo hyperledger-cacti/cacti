@@ -33,7 +33,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
 import {
   Containers,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
@@ -99,7 +99,7 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
   let networkDetailsList: EthereumNetworkDetails[];
 
   beforeEach(async () => {
-    pruneDockerAllIfGithubAction({ logLevel: testLogLevel })
+    pruneDockerContainersIfGithubAction({ logLevel: testLogLevel })
       .then(() => {
         log.info("Pruning throw OK");
       })
@@ -266,7 +266,7 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
     await ledger.stop();
     await ledger.destroy();
 
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel })
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel })
       .then(() => {
         log.info("Pruning throw OK");
       })

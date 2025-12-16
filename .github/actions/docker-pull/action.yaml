@@ -1,0 +1,44 @@
+name: "Pull & Cache Docker Image"
+description: "Pulls a Docker image, caches it, and loads from cache."
+
+inputs:
+  image:
+    description: "Docker image to pull"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Compute cache key
+      id: prep
+      shell: bash
+      run: |
+        # hash the image name to create a stable cache key
+        echo "key=$(echo '${{ inputs.image }}' | sha256sum | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+        SAFE=$(echo "${{ inputs.image }}" | tr ":/" "_")
+        echo "safe=$SAFE" >> $GITHUB_OUTPUT
+
+    - name: Cache docker image tar
+      id: cache
+      uses: actions/cache@v4
+      with:
+        path: docker-image-${{ steps.prep.outputs.safe }}.tar
+        key: docker-image-${{ steps.prep.outputs.key }}
+
+    - name: Pull & save image (cache miss)
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        echo "Pulling ${{ inputs.image }}"
+        docker pull "${{ inputs.image }}"
+        docker save "${{ inputs.image }}" -o "docker-image-${{ steps.prep.outputs.safe }}.tar"
+
+    - name: Load image (cache hit or after pulling)
+      shell: bash
+      run: |
+        echo "Loading image from docker-image-${{ steps.prep.outputs.safe }}.tar"
+        docker load -i "docker-image-${{ steps.prep.outputs.safe }}.tar"
+
+    - name: Verify
+      shell: bash
+      run: docker images

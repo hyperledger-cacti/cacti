@@ -17,7 +17,7 @@ import {
   LoggerProvider,
   Logger,
 } from "@hyperledger/cactus-common";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 
 import "jest-extended";
 import { Web3 } from "web3";
@@ -41,7 +41,7 @@ describe("Geth Test Ledger checks", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Start GethTestLedger...");
     ledger = new GethTestLedger({
@@ -66,7 +66,7 @@ describe("Geth Test Ledger checks", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   });
 
   //////////////////////////////////

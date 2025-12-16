@@ -22,13 +22,14 @@ import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
   FabricTestLedgerV1,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
 } from "@hyperledger/cactus-test-tooling";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
 import {
@@ -145,7 +146,7 @@ const FABRIC_STRATEGY = "FABRIC";
 const ETH_STRATEGY = "ETHEREUM";
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -329,7 +330,7 @@ afterAll(async () => {
   await fabricLedger.stop();
   await fabricLedger.destroy();
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -346,7 +347,7 @@ async function setupFabricTestLedger(): Promise<string> {
   fabricLedger = new FabricTestLedgerV1({
     emitContainerLogs: true,
     publishAllPorts: true,
-    imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
+    imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
     imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
     envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
     logLevel,

@@ -1,0 +1,67 @@
+name: Run All Pacakges workflows
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_code_coverage:
+        required: true
+        type: string
+      run_trivy_scan:
+        required: true
+        type: string
+      affected-packages:
+        required: false
+        type: string
+  
+concurrency:
+  group: packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  core-packages:
+    uses: ./.github/workflows/core-packages-workflow.yaml
+    with:
+      node_version: ${{ inputs.node_version }}
+      run_code_coverage:  ${{ inputs.run_code_coverage }}
+      run_trivy_scan:  ${{ inputs.run_trivy_scan }}
+      affected-packages: ${{ inputs.affected-packages }}
+
+  connector-packages:
+    uses: ./.github/workflows/connector-packages-workflow.yaml
+    with:
+      node_version: ${{ inputs.node_version }}
+      run_code_coverage:  ${{ inputs.run_code_coverage }}
+      run_trivy_scan:  ${{ inputs.run_trivy_scan }}
+      affected-packages: ${{ inputs.affected-packages }}
+
+  keychain-packages:
+    uses: ./.github/workflows/keychain-packages-workflow.yaml
+    with:
+      node_version: ${{ inputs.node_version }}
+      run_code_coverage:  ${{ inputs.run_code_coverage }}
+      run_trivy_scan:  ${{ inputs.run_trivy_scan }}
+      affected-packages: ${{ inputs.affected-packages }}
+
+  other-packages:
+    uses: ./.github/workflows/other-packages-workflow.yaml
+    with:
+      node_version: ${{ inputs.node_version }}
+      run_code_coverage:  ${{ inputs.run_code_coverage }}
+      run_trivy_scan:  ${{ inputs.run_trivy_scan }}
+      affected-packages: ${{ inputs.affected-packages }}
+      
+  satp-hermes-workflow:
+    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-satp-hermes')
+    uses: ./.github/workflows/satp-hermes-workflow.yaml
+    with:
+      node_version: ${{ inputs.node_version }}
+      run_code_coverage:  ${{ inputs.run_code_coverage }}
+  
+
+
+  

@@ -15,7 +15,7 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   LogLevelDesc,
@@ -66,7 +66,7 @@ describe(testCase, () => {
 
   beforeAll(async () => {
     firstHighNetWorthAccount = besuTestLedger.getGenesisAccountPubKey();
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 
@@ -78,7 +78,7 @@ describe(testCase, () => {
   afterAll(async () => await Servers.shutdown(server));
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
   beforeAll(async () => {

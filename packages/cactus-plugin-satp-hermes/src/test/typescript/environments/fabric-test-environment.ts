@@ -41,7 +41,10 @@ import { IFabricLeafOptions } from "../../../main/typescript/cross-chain-mechani
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-fabric.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
-import { PeerCerts } from "@hyperledger/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
+import {
+  DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
+  PeerCerts,
+} from "@hyperledger/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
 import {
   FabricConfigJSON,
   TargetOrganization,
@@ -120,7 +123,7 @@ export class FabricTestEnvironment {
     this.ledger = new FabricTestLedgerV1({
       emitContainerLogs: true,
       publishAllPorts: true,
-      imageName: "ghcr.io/hyperledger/cactus-fabric2-all-in-one",
+      imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
       imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       networkName: this.dockerNetwork,

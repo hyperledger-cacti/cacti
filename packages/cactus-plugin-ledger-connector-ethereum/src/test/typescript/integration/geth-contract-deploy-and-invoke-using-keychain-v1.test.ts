@@ -28,7 +28,7 @@ import {
 } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   GethTestLedger,
@@ -84,7 +84,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   //////////////////////////////////
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
 
     ledger = new GethTestLedger({
@@ -141,7 +143,9 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
     await ledger.destroy();
     await Servers.shutdown(server);
 
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
   });
 

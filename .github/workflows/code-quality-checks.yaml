@@ -1,0 +1,193 @@
+name: Code Quality Checks
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+  
+concurrency:
+  group: code-quality-checks-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  yarn_lint:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      
+      - name: build
+        with:
+          node_version:  ${{ inputs.node_version }}
+          configure_desable: 'true'
+          yarn_hardened_mode: '0'     
+        uses: ./.github/actions/configure-repo/
+
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+      - run: yarn lint
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: Set env.GIT_INDEX_FILE_COUNT
+        id: set_env_git_index_file_count
+        run: |
+            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> "$GITHUB_ENV"
+
+      - name: Print env.GIT_INDEX_FILE_COUNT
+        id: print_env_git_index_file_count
+        run: |
+            echo "${{ env.GIT_INDEX_FILE_COUNT }}"
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        id: set-result-git_index_file_count
+        with:
+          script: |
+            const { GIT_INDEX_FILE_COUNT } = process.env;
+            console.log(`env.GIT_INDEX_FILE_COUNT ${GIT_INDEX_FILE_COUNT}`);
+            return parseInt(GIT_INDEX_FILE_COUNT, 10);
+          result-encoding: string
+
+      - name: Get result Git Index File Count
+        id: get_result_git_index_file_count
+        run: echo "${{steps.set-result-git_index_file_count.outputs.result}}"
+
+      - name: Check Lint Side-effects
+        if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        with:
+          script: |
+            const failMsg = "yarn lint script produced version control " +
+              "side-effects: source files have been changed by it that are " +
+              "otherwise are under version control. " +
+              "This means (99% of the time) that you need to run the " +
+              "yarn lint script locally and then include the changes it " +
+              "makes in your own commit when submitting your pull request.";
+            core.setFailed(failMsg)
+
+  yarn_codegen:
+    continue-on-error: false
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: build
+        with:
+          node_version:  ${{ inputs.node_version }}
+          configure_desable: 'true'
+          yarn_hardened_mode: '0'     
+        uses: ./.github/actions/configure-repo/
+
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: Cache OpenAPI Generator JAR
+        id: cache-openapi-generator-jar
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar
+          key: openapi-generator-cli-${{ runner.os }}-6.6.0
+          restore-keys: |
+            openapi-generator-cli-${{ runner.os }}-
+      
+      - name: Codegen Warmup
+        if: steps.cache-openapi-generator-jar.outputs.cache-hit != 'true'
+        run: yarn codegen:warmup-mkdir && yarn tools:download-file-to-disk --url=https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar --output-file-path=./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar
+
+      - name: Link OpenAPI Generator JAR into subpackages
+        if: steps.cache-openapi-generator-jar.outputs.cache-hit == 'true'
+        run: |
+          for dir in packages/*/node_modules/@openapitools/openapi-generator-cli; do
+            if [ -d "$dir" ]; then
+              echo "Ensuring $dir/versions exists"
+              mkdir -p "$dir/versions"
+              echo "Linking cached jar into $dir/versions"
+              cp "node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar" \
+                "$dir/versions/6.6.0.jar"
+            fi
+          done
+
+      - name: Run codegen
+        run: yarn codegen
+      - run: git status --porcelain
+      - run: git status --porcelain | wc -l
+
+      - name: Set env.GIT_INDEX_FILE_COUNT
+        id: set_env_git_index_file_count
+        run: |
+            echo "GIT_INDEX_FILE_COUNT=$(git status --porcelain | wc -l)" >> "$GITHUB_ENV"
+
+      - name: Print env.GIT_INDEX_FILE_COUNT
+        id: print_env_git_index_file_count
+        run: |
+            echo "${{ env.GIT_INDEX_FILE_COUNT }}"
+
+      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        id: set-result-git_index_file_count
+        with:
+          script: |
+            const { GIT_INDEX_FILE_COUNT } = process.env;
+            console.log(`env.GIT_INDEX_FILE_COUNT ${GIT_INDEX_FILE_COUNT}`);
+            return parseInt(GIT_INDEX_FILE_COUNT, 10);
+          result-encoding: string
+
+      - name: Get result Git Index File Count
+        id: get_result_git_index_file_count
+        run: echo "${{steps.set-result-git_index_file_count.outputs.result}}"
+
+      - name: Check CodeGen Side-effects
+        if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        with:
+          script: |
+            const failMsg = "yarn codegen script produced version control " +
+              "side-effects: source files have been changed by it that are " +
+              "otherwise are under version control. " +
+              "This means (99% of the time) that you need to run the " +
+              "yarn codegen script locally and then include the changes it " +
+              "makes in your own commit when submitting your pull request.";
+            core.setFailed(failMsg)
+
+  yarn_custom_checks:
+    continue-on-error: false
+    env:
+      CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION: 3.0.3
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: build
+        with:
+          node_version:  ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'     
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Custom Checks
+        run: yarn custom-checks
+
+  yarn_tools_validate_bundle_names:
+    continue-on-error: true
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: build
+        with:
+          node_version:  ${{ inputs.node_version }}
+          configure_desable: 'true'
+          yarn_hardened_mode: '0'    
+        uses: ./.github/actions/configure-repo/
+      
+      - name: Run Bundle Names Validation
+        run: yarn tools:validate-bundle-names
+      

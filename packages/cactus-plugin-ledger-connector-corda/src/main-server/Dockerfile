@@ -8,7 +8,7 @@ WORKDIR /kotlin-spring/
 RUN gradle clean build
 WORKDIR /
 
-FROM openjdk:24-slim-bookworm
+FROM openjdk:26-ea-slim-bookworm
 
 ARG APP=/usr/src/app
 ENV APP=/usr/src/app

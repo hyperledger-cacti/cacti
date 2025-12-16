@@ -4,7 +4,7 @@ import { spawn, exec } from "child_process";
 import { v4 as uuidV4 } from "uuid";
 import test, { Test } from "tape-promise/tape";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import * as publicApi from "../../../main/typescript/public-api";
 import { SUPPLY_CHAIN_APP_OK_LOG_MSG_PATTERN } from "../../../main/typescript/public-api";
 
@@ -12,7 +12,7 @@ const testCase = "SupplyChainApp can launch via root package.json script";
 const logLevel: LogLevelDesc = "TRACE";
 
 test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning did not throw OK");
   t.end();
 });
@@ -44,7 +44,9 @@ async function psFilter(filter?: string): Promise<Map<number, string>> {
 
 test(testCase, async (t: Test) => {
   t.ok(publicApi, "Public API of the package imported OK");
-  test.onFinish(async () => await pruneDockerAllIfGithubAction({ logLevel }));
+  test.onFinish(
+    async () => await pruneDockerContainersIfGithubAction({ logLevel }),
+  );
 
   const uuid = uuidV4();
 

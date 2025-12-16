@@ -4,7 +4,7 @@ import {
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   DEFAULT_FABRIC_2_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 
 import { LogLevelDesc } from "@hyperledger/cactus-common";
@@ -18,12 +18,12 @@ const testCase = "adds org4 to the network";
 const logLevel: LogLevelDesc = "TRACE";
 let ledger: FabricTestLedgerV1;
 beforeAll(async () => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await expect(pruning).resolves.not.toThrow();
 });
 
 afterAll(async () => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await expect(pruning).resolves.not.toThrow();
   await ledger.stop();
   await ledger.destroy();

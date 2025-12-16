@@ -13,19 +13,7 @@ on:
 jobs:
   nuclei-scan:
     runs-on: ubuntu-22.04
-    steps:
-      - name: Install Indy SDK
-        run: >
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys CE7709D068DB5E88 \
-            && sudo add-apt-repository "deb https://repo.sovrin.org/sdk/deb bionic stable" \
-            && sudo apt-get update \
-            && sudo apt-get install -y \
-                libindy \
-                libnullpay \
-                libvcx \
-                indy-cli \
-            && sudo rm -f /etc/apt/sources.list.d/sovrin.list*
-
+    steps:        
       - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
@@ -38,6 +26,9 @@ jobs:
         run: jq --version
 
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
 
       - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
         with:

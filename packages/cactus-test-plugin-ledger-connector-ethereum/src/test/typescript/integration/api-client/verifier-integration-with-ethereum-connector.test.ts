@@ -39,7 +39,7 @@ import {
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
 import { Verifier, VerifierFactory } from "@hyperledger/cactus-verifier-client";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
@@ -73,7 +73,7 @@ describe("Verifier integration with ethereum connector tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     // Start Ledger
     log.info("Start GethTestLedger...");
@@ -171,7 +171,7 @@ describe("Verifier integration with ethereum connector tests", () => {
     }
 
     log.info("Prune docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   });
 
   //////////////////////////////////

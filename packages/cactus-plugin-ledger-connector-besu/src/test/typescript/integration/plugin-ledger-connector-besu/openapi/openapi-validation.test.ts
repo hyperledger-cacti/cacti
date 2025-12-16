@@ -22,7 +22,7 @@ import {
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import KeyEncoder from "key-encoder";
 import {
@@ -80,7 +80,7 @@ describe("PluginLedgerConnectorBesu", () => {
   let httpServer: http.Server;
 
   beforeAll(async () => {
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 
   afterAll(async () => {
@@ -814,6 +814,6 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   afterAll(async () => {
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
 });

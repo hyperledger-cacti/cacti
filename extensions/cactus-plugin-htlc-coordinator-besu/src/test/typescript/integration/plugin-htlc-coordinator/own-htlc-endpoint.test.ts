@@ -34,7 +34,7 @@ import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import HashTimeLockJSON from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
@@ -117,10 +117,10 @@ describe("PluginHtlcCoordinatorBesu", () => {
   });
 
   beforeAll(async () => {
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
   afterAll(async () => {
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
   beforeAll(async () => {
     await besuTestLedger.start();

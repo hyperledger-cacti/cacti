@@ -4,7 +4,7 @@ import { v4 as internalIpV4 } from "internal-ip";
 import {
   Containers,
   CordaTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import {
@@ -33,7 +33,7 @@ test.onFailure(async () => {
 });
 
 test("BEFORE " + testCase, async (t: Test) => {
-  const pruning = pruneDockerAllIfGithubAction({ logLevel });
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
@@ -49,7 +49,7 @@ test(testCase, async (t: Test) => {
   test.onFinish(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
   const ledgerContainer = await ledger.start();
   t.ok(ledgerContainer, "CordaTestLedger container truthy post-start() OK");

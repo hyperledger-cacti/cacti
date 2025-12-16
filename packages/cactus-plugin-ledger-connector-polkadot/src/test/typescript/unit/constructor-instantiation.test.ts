@@ -1,7 +1,7 @@
 import { PrometheusExporter } from "../../../main/typescript/prometheus-exporter/prometheus-exporter";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { SubstrateTestLedger } from "../../../../../cactus-test-tooling/src/main/typescript/substrate-test-ledger/substrate-test-ledger";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import {
   PluginLedgerConnectorPolkadot,
   IPluginLedgerConnectorPolkadotOptions,
@@ -39,13 +39,13 @@ describe(testCase, () => {
   });
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
   afterAll(async () => {
     await ledger.stop();
     await plugin.shutdownConnectionToSubstrate();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
   });
   test(testCase, async () => {
     await ledger.start();
