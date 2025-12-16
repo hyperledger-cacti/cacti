@@ -140,8 +140,8 @@ export {
   Address,
   DraftVersions,
   CurrentDrafts,
-  LocalLog,
-  RemoteLog,
+  Log,
+  SATPRemoteLog,
   ShutdownHook,
 } from "./core/types";
 
@@ -268,8 +268,8 @@ export {
  * @see {@link IRemoteLogRepository} for distributed logging interface
  * @see {@link KnexLocalLogRepository} for Knex.js-based local implementation
  * @see {@link KnexRemoteLogRepository} for Knex.js-based remote implementation
- * @see {@link LocalLog} for local log data structure
- * @see {@link RemoteLog} for remote log data structure
+ * @see {@link Log} for local log data structure
+ * @see {@link SATPRemoteLog} for remote log data structure
  *
  * @since 0.0.3-beta
  */
@@ -293,8 +293,8 @@ export {
  *
  * @see {@link KnexLocalLogRepository} for Knex.js-based local implementation
  * @see {@link KnexRemoteLogRepository} for Knex.js-based remote implementation
- * @see {@link LocalLog} for local log data structure
- * @see {@link RemoteLog} for remote log data structure
+ * @see {@link Log} for local log data structure
+ * @see {@link SATPRemoteLog} for remote log data structure
  *
  * @since 0.0.3-beta
  */
@@ -330,7 +330,7 @@ export {
  * @see {@link ILocalLogRepository} for local repository interface
  * @see {@link IRemoteLogRepository} for remote repository interface
  */
-export { KnexLocalLogRepository } from "./database/repository/knex-local-log-repository";
+export { KnexLocalLogRepository } from "./database/repository/knex-satp-local-log-repository";
 export { KnexRemoteLogRepository } from "./database/repository/knex-remote-log-repository";
 
 /**

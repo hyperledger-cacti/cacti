@@ -1,4 +1,4 @@
-import { Log, SATPLocalLog, SATPRemoteLog, OracleLocalLog } from "./core/types";
+import { Log, SATPLocalLog, SATPRemoteLog, OracleLocalLog } from "../core/types";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,

@@ -91,7 +91,7 @@ import {
 import {
   IGatewayPersistenceConfig,
   GatewayPersistence,
-} from "../../gateway-persistence";
+} from "../../database/gateway-persistence";
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;
