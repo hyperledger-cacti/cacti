@@ -14,14 +14,14 @@ import (
 	"fmt"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/corda"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/fabric"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric-protos-go/peer"
 	log "github.com/sirupsen/logrus"
-	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
-	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/corda"
-	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/fabric"
 	protoV2 "google.golang.org/protobuf/proto"
 )
 
@@ -184,7 +184,7 @@ func (s *SmartContract) WriteExternalState(ctx contractapi.TransactionContextInt
 			return err
 		}
 		// Substitute argument in list with view data
-		arr[argIndex + 1] = viewData        // First argument is the CC function name
+		arr[argIndex+1] = viewData // First argument is the CC function name
 	}
 
 	// 2. Call application chaincode with created state as the argument

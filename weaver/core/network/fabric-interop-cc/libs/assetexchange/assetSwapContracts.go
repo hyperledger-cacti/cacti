@@ -196,7 +196,7 @@ func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId,
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
-	
+
 	return claimAssetCommon(ctx, assetLockVal.LockInfo, assetLockVal.ExpiryTimeSecs, assetLockVal.Recipient, "", contractId, claimInfoBytesBase64)
 }
 
@@ -207,11 +207,11 @@ func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, cont
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
-	
+
 	return claimAssetCommon(ctx, assetLockVal.GetLockInfo(), assetLockVal.GetExpiryTimeSecs(), assetLockVal.GetRecipient(), assetLockKey, contractId, claimInfoBytesBase64)
 }
 
-// Common Claim function for both fungible and non-fungible assets, 
+// Common Claim function for both fungible and non-fungible assets,
 // with or without contractId
 func claimAssetCommon(ctx contractapi.TransactionContextInterface, lockInfo interface{}, expiryTimeSecs uint64, recipient, assetLockKey, contractId, claimInfoBytesBase64 string) error {
 
@@ -261,7 +261,7 @@ func claimAssetCommon(ctx contractapi.TransactionContextInterface, lockInfo inte
 		if err != nil {
 			return logThenErrorf("failed to delete lock for the asset associated with the contractId %s: %+v", contractId, err)
 		}
-		
+
 		err = ctx.GetStub().PutState(generateAssetLockMapKey(assetLockKey), []byte(contractId))
 		if err != nil {
 			return logThenErrorf("failed to write to the world state: %+v", err)
@@ -333,7 +333,7 @@ func UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
-	
+
 	return unlockAssetCommon(ctx, assetLockVal.ExpiryTimeSecs, assetLockVal.Locker, "", contractId)
 }
 
@@ -344,14 +344,14 @@ func UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, con
 	if err != nil {
 		return logThenErrorf(err.Error())
 	}
-	
+
 	return unlockAssetCommon(ctx, assetLockVal.GetExpiryTimeSecs(), assetLockVal.GetLocker(), assetLockKey, contractId)
 }
 
 // Common unlock functions for both fungible and non-fungible assets,
 // with or without contractId
 func unlockAssetCommon(ctx contractapi.TransactionContextInterface, expiryTimeSecs uint64, locker, assetLockKey, contractId string) error {
-	
+
 	txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
 	if err != nil {
 		return logThenErrorf("unable to get the transaction creator information: %+v", err)
@@ -470,7 +470,7 @@ func IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterfa
 	if err != nil {
 		errStr := fmt.Sprintf("no contractId %s exists on the ledger", contractId)
 		errStrFungible := fmt.Sprintf("contractId %s is not associated with any currently locked asset", contractId)
-		
+
 		// Reporting no error only if the lock contract doesn't exist at all
 		if err.Error() == errStr || err.Error() == errStrFungible {
 			return false, nil
@@ -486,5 +486,3 @@ func IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterfa
 
 	return true, nil
 }
-
-

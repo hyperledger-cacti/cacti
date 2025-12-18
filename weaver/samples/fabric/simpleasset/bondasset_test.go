@@ -12,18 +12,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleasset"
-	"github.com/stretchr/testify/require"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 	wtestmocks "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleasset"
+	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
+	"github.com/stretchr/testify/require"
 )
 
 const (
-	defaultAssetType    = "BearerBonds"
-	defaultAssetId      = "asset1"
-	defaultAssetOwner   = "Alice"
-	defaultAssetIssuer  = "Treasury"
+	defaultAssetType   = "BearerBonds"
+	defaultAssetId     = "asset1"
+	defaultAssetOwner  = "Alice"
+	defaultAssetIssuer = "Treasury"
 )
 
 func TestInitBondAssetLedger(t *testing.T) {

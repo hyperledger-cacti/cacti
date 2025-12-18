@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	helpers "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/helpers"
+	"github.com/stretchr/testify/require"
 )
 
 func TestParseAddress(t *testing.T) {

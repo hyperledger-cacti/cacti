@@ -10,8 +10,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	interoperablehelper "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/interoperablehelper"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidPatternString(t *testing.T) {

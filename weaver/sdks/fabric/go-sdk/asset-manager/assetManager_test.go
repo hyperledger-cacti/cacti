@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
 	assetmanager "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/asset-manager"
+	"github.com/stretchr/testify/require"
 )
 
 var submitTransactionMock func() ([]byte, error)
