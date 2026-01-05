@@ -180,6 +180,11 @@
         "description": "Enumerates the supported programming language runtimes of Hyperledger Fabric",
         "enum": ["golang", "node", "java"]
       },
+      "EventType": {
+        "type": "string",
+        "description": "Type of event to listen supported by Hyperledger Fabric",
+        "enum": ["Contract", "Block", "Commit"]
+      },
       "ConnectionProfile": {
         "type": "object",
         "required": ["name", "version", "organizations", "peers"],
@@ -373,6 +378,134 @@
           }
         }
       },
+      "FabricView": {
+        "type": "object",
+        "required": ["EndorsedProposalResponses"],
+        "properties": {
+          "endorsedProposalResponses": {
+            "type": "array",
+            "nullable": false,
+            "items": {
+              "$ref": "#/components/schemas/EndorsedProposalResponse"
+            },
+            "minItems": 1
+          }
+        }
+      },
+      "EndorsedProposalResponse": {
+        "type": "object",
+        "properties": {
+          "payload": {
+            "$ref": "#/components/schemas/ProposalResponsePayload",
+            "nullable": false
+          },
+          "endorsement": {
+            "$ref": "#/components/schemas/endorsement",
+            "nullable": false
+          }
+        }
+      },
+      "ProposalResponsePayload": {
+        "type": "object",
+        "properties": {
+          "proposalHash": {
+            "type": "string",
+            "format": "byte",
+            "nullable": false
+          },
+          "extension": {
+            "type": "string",
+            "format": "byte",
+            "nullable": false
+          }
+        }
+      },
+      "endorsement": {
+        "type": "object",
+        "properties": {
+          "endorser": {
+            "type": "string",
+            "format": "byte",
+            "nullable": false
+          },
+          "signature": {
+            "type": "string",
+            "format": "byte",
+            "nullable": false
+          }
+        }
+      },
+      "RunInvokeResponse": {
+        "type": "object",
+        "required": ["view"],
+        "properties": {
+          "view": {
+            "$ref": "#/components/schemas/FabricView",
+            "nullable": false
+          }
+        }
+      },
+      "RunInvokeRequest": {
+        "type": "object",
+        "required": [
+          "channelName",
+          "contractName",
+          "methodName",
+          "params"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "transientData": {
+            "type": "object",
+            "nullable": true
+          },
+          "gatewayOptions": {
+            "$ref": "#/components/schemas/GatewayOptions",
+            "nullable": false
+          },
+          "signingCredential": {
+            "$ref": "#/components/schemas/FabricSigningCredential",
+            "nullable": false
+          },
+          "channelName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "nullable": false
+          },
+          "contractName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "nullable": false
+          },
+          "methodName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "nullable": false
+          },
+          "params": {
+            "type": "array",
+            "nullable": false,
+            "default": [],
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          },
+          "policies": {
+            "type": "array",
+            "nullable": true,
+            "description": "List of endorsers",
+            "default": [],
+            "items": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        }
+      },
       "RunTransactionResponseType": {
         "type": "string",
         "description": "Response format from transaction / query execution",
@@ -385,7 +518,6 @@
       "RunTransactionRequest": {
         "type": "object",
         "required": [
-          "signingCredential",
           "channelName",
           "contractName",
           "invocationType",
@@ -933,6 +1065,37 @@
           "responseType": {
             "$ref": "#/components/schemas/GetBlockResponseTypeV1",
             "description": "Type of response block to return.",
+            "nullable": false
+          }
+        }
+      },
+      "GetLatestBlockNumberRequestV1": {
+        "description": "Request for GetBlockNumber endpoint.",
+        "type": "object",
+        "required": ["channelName", "gatewayOptions", "contractName", "methodName"],
+        "properties": {
+          "channelName": {
+            "type": "string",
+            "description": "Fabric channel which we want to query.",
+            "minLength": 1,
+            "maxLength": 100,
+            "nullable": false
+          },
+          "gatewayOptions": {
+            "$ref": "#/components/schemas/GatewayOptions",
+            "description": "Fabric SDK gateway options.",
+            "nullable": false
+          }
+        }
+      },
+      "GetLatestBlockNumberResponseV1": {
+        "type": "object",
+        "description": "Response from GetBlockNumber endpoint.",
+        "required": ["blockNumber"],
+        "properties": {
+          "blockNumber": {
+            "description": "Number of the block that was queried.",
+            "type": "number",
             "nullable": false
           }
         }
@@ -1893,6 +2056,50 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GetBlockResponseV1"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number": {
+      "post": {
+        "operationId": "getLatestBlockNumberV1",
+        "summary": "Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.",
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number"
+          }
+        },
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetLatestBlockNumberRequestV1"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetLatestBlockNumberResponseV1"
                 }
               }
             }

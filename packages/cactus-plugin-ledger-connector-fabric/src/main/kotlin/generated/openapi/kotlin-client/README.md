@@ -48,6 +48,7 @@ Class | Method | HTTP request | Description
 *DefaultApi* | [**getBlockV1**](docs/DefaultApi.md#getblockv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block | Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
 *DefaultApi* | [**getChainInfoV1**](docs/DefaultApi.md#getchaininfov1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info | Get fabric ledger chain info.
 *DefaultApi* | [**getDiscoveryResultsV1**](docs/DefaultApi.md#getdiscoveryresultsv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results | Get fabric ledger node structure (from the discovery service).
+*DefaultApi* | [**getLatestBlockNumberV1**](docs/DefaultApi.md#getlatestblocknumberv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number | Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
 *DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 *DefaultApi* | [**getTransactionReceiptByTxIDV1**](docs/DefaultApi.md#gettransactionreceiptbytxidv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid | get a transaction receipt by tx id on a Fabric ledger.
 *DefaultApi* | [**runDelegatedSignTransactionV1**](docs/DefaultApi.md#rundelegatedsigntransactionv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction | Runs a transaction on a Fabric ledger using user-provided signing callback.
@@ -73,11 +74,15 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.DeployContractV1Response](docs/DeployContractV1Response.md)
  - [org.openapitools.client.models.DeploymentTargetOrgFabric2x](docs/DeploymentTargetOrgFabric2x.md)
  - [org.openapitools.client.models.DeploymentTargetOrganization](docs/DeploymentTargetOrganization.md)
+ - [org.openapitools.client.models.EndorsedProposalResponse](docs/EndorsedProposalResponse.md)
+ - [org.openapitools.client.models.Endorsement](docs/Endorsement.md)
  - [org.openapitools.client.models.ErrorExceptionResponseV1](docs/ErrorExceptionResponseV1.md)
+ - [org.openapitools.client.models.EventType](docs/EventType.md)
  - [org.openapitools.client.models.FabricCertificateIdentityV1](docs/FabricCertificateIdentityV1.md)
  - [org.openapitools.client.models.FabricContractInvocationType](docs/FabricContractInvocationType.md)
  - [org.openapitools.client.models.FabricSigningCredential](docs/FabricSigningCredential.md)
  - [org.openapitools.client.models.FabricSigningCredentialType](docs/FabricSigningCredentialType.md)
+ - [org.openapitools.client.models.FabricView](docs/FabricView.md)
  - [org.openapitools.client.models.FabricX509CertificateV1](docs/FabricX509CertificateV1.md)
  - [org.openapitools.client.models.FileBase64](docs/FileBase64.md)
  - [org.openapitools.client.models.FullBlockTransactionActionV1](docs/FullBlockTransactionActionV1.md)
@@ -104,8 +109,13 @@ Class | Method | HTTP request | Description
  - [org.openapitools.client.models.GetDiscoveryResultsResponseV1PeersByMSPValue](docs/GetDiscoveryResultsResponseV1PeersByMSPValue.md)
  - [org.openapitools.client.models.GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner](docs/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner.md)
  - [org.openapitools.client.models.GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner](docs/GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner.md)
+ - [org.openapitools.client.models.GetLatestBlockNumberRequestV1](docs/GetLatestBlockNumberRequestV1.md)
+ - [org.openapitools.client.models.GetLatestBlockNumberResponseV1](docs/GetLatestBlockNumberResponseV1.md)
  - [org.openapitools.client.models.GetTransactionReceiptResponse](docs/GetTransactionReceiptResponse.md)
+ - [org.openapitools.client.models.ProposalResponsePayload](docs/ProposalResponsePayload.md)
  - [org.openapitools.client.models.RunDelegatedSignTransactionRequest](docs/RunDelegatedSignTransactionRequest.md)
+ - [org.openapitools.client.models.RunInvokeRequest](docs/RunInvokeRequest.md)
+ - [org.openapitools.client.models.RunInvokeResponse](docs/RunInvokeResponse.md)
  - [org.openapitools.client.models.RunTransactionRequest](docs/RunTransactionRequest.md)
  - [org.openapitools.client.models.RunTransactionResponse](docs/RunTransactionResponse.md)
  - [org.openapitools.client.models.RunTransactionResponseType](docs/RunTransactionResponseType.md)

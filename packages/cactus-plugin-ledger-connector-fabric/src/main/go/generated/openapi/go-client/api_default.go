@@ -482,6 +482,121 @@ func (a *DefaultApiService) GetDiscoveryResultsV1Execute(r ApiGetDiscoveryResult
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+type ApiGetLatestBlockNumberV1Request struct {
+	ctx context.Context
+	ApiService *DefaultApiService
+	getLatestBlockNumberRequestV1 *GetLatestBlockNumberRequestV1
+}
+
+func (r ApiGetLatestBlockNumberV1Request) GetLatestBlockNumberRequestV1(getLatestBlockNumberRequestV1 GetLatestBlockNumberRequestV1) ApiGetLatestBlockNumberV1Request {
+	r.getLatestBlockNumberRequestV1 = &getLatestBlockNumberRequestV1
+	return r
+}
+
+func (r ApiGetLatestBlockNumberV1Request) Execute() (*GetLatestBlockNumberResponseV1, *http.Response, error) {
+	return r.ApiService.GetLatestBlockNumberV1Execute(r)
+}
+
+/*
+GetLatestBlockNumberV1 Get block number from the channel using one of selectors from the input. Works only on Fabric 2.x.
+
+ @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ @return ApiGetLatestBlockNumberV1Request
+*/
+func (a *DefaultApiService) GetLatestBlockNumberV1(ctx context.Context) ApiGetLatestBlockNumberV1Request {
+	return ApiGetLatestBlockNumberV1Request{
+		ApiService: a,
+		ctx: ctx,
+	}
+}
+
+// Execute executes the request
+//  @return GetLatestBlockNumberResponseV1
+func (a *DefaultApiService) GetLatestBlockNumberV1Execute(r ApiGetLatestBlockNumberV1Request) (*GetLatestBlockNumberResponseV1, *http.Response, error) {
+	var (
+		localVarHTTPMethod   = http.MethodPost
+		localVarPostBody     interface{}
+		formFiles            []formFile
+		localVarReturnValue  *GetLatestBlockNumberResponseV1
+	)
+
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetLatestBlockNumberV1")
+	if err != nil {
+		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
+	}
+
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-latest-block-number"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = r.getLatestBlockNumberRequestV1
+	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(req)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	localVarBody, err := io.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	localVarHTTPResponse.Body = io.NopCloser(bytes.NewBuffer(localVarBody))
+	if err != nil {
+		return localVarReturnValue, localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 500 {
+			var v ErrorExceptionResponseV1
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+					newErr.error = formatErrorMessage(localVarHTTPResponse.Status, &v)
+					newErr.model = v
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+	if err != nil {
+		newErr := &GenericOpenAPIError{
+			body:  localVarBody,
+			error: err.Error(),
+		}
+		return localVarReturnValue, localVarHTTPResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHTTPResponse, nil
+}
+
 type ApiGetPrometheusMetricsV1Request struct {
 	ctx context.Context
 	ApiService *DefaultApiService

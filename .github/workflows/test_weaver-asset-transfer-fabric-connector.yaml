@@ -1,0 +1,725 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+# This is a basic workflow to help you get started with Actions
+
+name: Test Asset Transfer Using Fabric Connector as a Fabric Driver
+
+env:
+  NODEJS_VERSION: v22.18.0
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      run_all:
+        required: true
+        type: string
+
+concurrency:
+  group: asset-transfer-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  check_code_changed:
+    outputs:
+      status: ${{ steps.changes.outputs.weaver_code_changed }}
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 #v2.11.1
+        id: changes
+        with:
+          filters: |
+            weaver_code_changed:
+              - './weaver/**'
+              - '.github/workflows/test_weaver-asset-transfer.yaml'
+              - './packages/cactus-plugin-ledger-connector-fabric/**'
+
+  asset-transfer-local-fabric-connector:
+    needs: check_code_changed
+    if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.status == 'true'
+    # if: ${{ false }}
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      - name: Set up Go
+        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
+        with:
+          go-version: '1.20.2'
+
+      - name: Use Node.js ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - name: Install RUST Toolchain minimal stable with clippy and rustfmt
+        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Get Latest Relay Dependencies
+        run: |
+          make protos-local
+          cargo update -p nom
+          cargo update -p lexical-core
+        working-directory: weaver/core/relay
+
+      - name: Use Protoc 3.15
+        run: |
+          curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v3.15.6/protoc-3.15.6-linux-x86_64.zip
+          unzip protoc-3.15.6-linux-x86_64.zip -d protoc
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
+
+      # PROTOS
+      - name: Build GO Protos
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: weaver/common/protos-go
+
+      # PROTOS
+      - name: Build JS Protos
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
+        working-directory: weaver/common/protos-js
+
+      - name: Build Java Protos
+        run: make build
+        working-directory: weaver/common/protos-java-kt
+
+      # Build Dependencies
+      - name: Build Corda Interop App
+        run: make build-local
+        working-directory: weaver/core/network/corda-interop-app
+
+      - name: Build Corda Interop SDK
+        run: make build
+        working-directory: weaver/sdks/corda
+
+      - name: Build Corda SimpleApplication
+        run: make build-local
+        working-directory: weaver/samples/corda/corda-simple-application
+
+      - name: Build Fabric Interop SDK
+        run: make build-local
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
+      - name: Build Fabric CLI
+        run: make build-local
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Build Relay
+        run: make
+        working-directory: weaver/core/relay
+
+      - name: Build Fabric Driver
+        run: make build-local
+        working-directory: weaver/core/drivers/fabric-driver
+
+      - name: Build IIN Agent
+        run: make build-local
+        working-directory: weaver/core/identity-management/iin-agent
+
+      - name: Build Corda Driver
+        run: make build-local
+        working-directory: weaver/core/drivers/corda-driver
+
+      # CORDA NETWORK
+      - name: Start Corda Network
+        run: make start-local &> corda-net.out &
+        working-directory: weaver/tests/network-setups/corda
+
+      # FABRIC NETWORK
+
+      - name: Start Fabric Network
+        run: make start-interop-local CHAINCODE_NAME=simpleassettransfer
+        working-directory: weaver/tests/network-setups/fabric/dev
+
+      - name: Corda Network logs
+        run: |
+          cat tests/network-setups/corda/corda-net.out
+          docker logs corda_partya_1
+          docker logs corda_network2_partya_1
+        working-directory: weaver
+
+      # RELAY
+      - name: Start Relay for network1
+        run: RELAY_CONFIG=config/Fabric_Relay.toml cargo run --bin server &> relay-n1.out &
+        working-directory: weaver/core/relay
+
+      - name: Start Relay for network2
+        run: RELAY_CONFIG=config/Fabric_Relay2.toml cargo run --bin server &> relay-n2.out &
+        working-directory: weaver/core/relay
+
+      - name: Start Relay for Corda_Network
+        run: RELAY_CONFIG=config/Corda_Relay.toml cargo run --bin server &> relay-corda.out &
+        working-directory: weaver/core/relay
+
+      - name: Start Relay for Corda_Network2
+        run: RELAY_CONFIG=config/Corda_Relay2.toml cargo run --bin server &> relay-corda2.out &
+        working-directory: weaver/core/relay
+
+      # FABRIC DRIVER
+      - name: Setup Fabric Driver .env
+        run: |
+          cp .env.template .env
+          CCP_PATH=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
+          sed -i "s#path_to_connection_profile#${CCP_PATH}#g" .env
+        working-directory: packages/cactus-plugin-ledger-connector-fabric
+
+      - name: Start Fabric Driver for network1
+        run: yarn start-fabric-weaver-driver &> fdriver-n1.out &
+        working-directory: packages/cactus-plugin-ledger-connector-fabric
+
+      - name: Start Fabric Driver for network2
+        run: CONNECTION_PROFILE=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json NETWORK_NAME=network2 RELAY_ENDPOINT=localhost:9083 DRIVER_ENDPOINT=localhost:9095 yarn start-fabric-weaver-driver &> fdriver-n2.out &
+        working-directory: packages/cactus-plugin-ledger-connector-fabric
+
+      # IIN AGENT
+      - name: Setup Fabric IIN Config
+        run: |
+          # FABRIC CONFIG
+          cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n1.json
+          CCP_PATH=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json
+          sed -i "s#<path-to-connection-profile>#${CCP_PATH}#g" src/fabric-ledger/config-n1.json
+          cat src/fabric-ledger/config-n1.json
+          cp src/fabric-ledger/config.json.template src/fabric-ledger/config-n2.json
+          CCP_PATH=${GITHUB_WORKSPACE}/weaver/tests/network-setups/fabric/shared/network2/peerOrganizations/org1.network2.com/connection-org1.json
+          sed -i "s#<path-to-connection-profile>#${CCP_PATH}#g" src/fabric-ledger/config-n2.json
+          cat src/fabric-ledger/config-n2.json
+          # DNS CONFIG
+          sed -i "s#iin-agent-Org1MSP-network1#localhost#g" docker-testnet/configs/dnsconfig.json
+          sed -i "s#iin-agent-Org1MSP-network2#localhost#g" docker-testnet/configs/dnsconfig.json
+          cat docker-testnet/configs/dnsconfig.json
+        working-directory: weaver/core/identity-management/iin-agent
+
+      - name: Setup Fabric IIN Env
+        run: |
+          cp .env.template .env
+          sed -i "s#<name-of-iin-agent/org-name>#Org1MSP#g" .env
+          sed -i "s#^DLT_TYPE=.*#DLT_TYPE=fabric#g" .env
+          sed -i "s#<weaver-contract-name>#interop#g" .env
+          sed -i "s#^DNS_CONFIG_PATH=#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig.json#g" .env
+          sed -i "s#^SECURITY_DOMAIN_CONFIG_PATH=#SECURITY_DOMAIN_CONFIG_PATH=./docker-testnet/configs/security-domain-config.json#g" .env
+          sed -i "s#^CONFIG_PATH=#CONFIG_PATH=./src/fabric-ledger/config-n1.json#g" .env
+          sed -i "s#^AUTO_SYNC=#AUTO_SYNC=false#g" .env
+          cat .env
+        working-directory: weaver/core/identity-management/iin-agent
+
+      - name: Start Fabric IIN Agent for network1
+        run: npm run dev &> iinagent-n1.out &
+        working-directory: weaver/core/identity-management/iin-agent
+
+      - name: Start Fabric IIN Agent for network2
+        run: IIN_AGENT_ENDPOINT=localhost:9501 SECURITY_DOMAIN=network2 CONFIG_PATH=./src/fabric-ledger/config-n2.json npm run dev &> iinagent-n2.out &
+        working-directory: weaver/core/identity-management/iin-agent
+
+      # CORDA DRIVER
+      - name: Start Corda_Network Driver
+        run: ./build/install/driver-corda/bin/driver-corda &> corda-driver.out &
+        working-directory: weaver/core/drivers/corda-driver
+
+      - name: Start Corda_Network2 Driver
+        run: DRIVER_PORT=9098 ./build/install/driver-corda/bin/driver-corda &> corda2-driver.out &
+        working-directory: weaver/core/drivers/corda-driver
+
+      # FABRIC CLI
+      - name: Setup Fabric CLI ENV
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cp .env.template .env
+          ./bin/fabric-cli env set-file ./.env
+          ./bin/fabric-cli env set MEMBER_CREDENTIAL_FOLDER ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/src/data/credentials
+          ./bin/fabric-cli env set CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/config.json
+          ./bin/fabric-cli env set DEFAULT_APPLICATION_CHAINCODE simpleassettransfer
+          ./bin/fabric-cli env set REMOTE_CONFIG_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/remote-network-config.json
+          ./bin/fabric-cli env set CHAINCODE_PATH ${GITHUB_WORKSPACE}/weaver/samples/fabric/fabric-cli/chaincode.json
+          cat .env
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Setup Fabric CLI Config
+        run: |
+          echo ${GITHUB_WORKSPACE}
+          cp config.template.json config.json
+          sed -i "s#<PATH-TO-WEAVER>#${GITHUB_WORKSPACE}/weaver#g" config.json
+          ###### Change line number in following commands if config is modified #####
+          ./bin/fabric-cli config set network2 aclPolicyPrincipalType ca
+          ./bin/fabric-cli config set network1 chaincode simpleassettransfer
+          ./bin/fabric-cli config set network2 chaincode simpleassettransfer
+          cp chaincode.json.template chaincode.json
+          cp remote-network-config.json.template remote-network-config.json
+        working-directory: weaver/samples/fabric/fabric-cli
+
+
+      - name: Fabric CLI Init
+        run: |
+          ./bin/fabric-cli configure create all --local-network=network1
+          ./bin/fabric-cli configure create all --local-network=network2
+          ./bin/fabric-cli configure network --local-network=network1
+          ./bin/fabric-cli configure network --local-network=network2
+          ./scripts/initAssetsForTransfer.sh
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Fabric Sync Membership using IIN Agent
+        run: |
+          ./bin/fabric-cli configure membership --local-network=network1 --target-network=network2 --iin-agent-endpoint=localhost:9500
+          sleep 10
+          tail -10 ../../../core/identity-management/iin-agent/iinagent-n1.out
+          ./bin/fabric-cli configure membership --local-network=network2 --target-network=network1 --iin-agent-endpoint=localhost:9501
+          sleep 10
+          tail -10 ../../../core/identity-management/iin-agent/iinagent-n2.out
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      # CORDA CLIENT
+      - name: Corda CLI Setup
+        run: |
+          cp remote-network-config.json.template remote-network-config.json
+        working-directory: weaver/samples/corda/corda-simple-application/clients/src/main/resources/config
+
+      - name: Corda CLI Initialize Vault
+        run: make initialise-vault-asset-transfer
+        working-directory: weaver/samples/corda/corda-simple-application
+
+      - name: Asset Transfer Corda Client Tests
+        run: |
+          COUNT=0
+          TOTAL=9
+
+          # Issue t1:5 tokens to partyA
+          NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients issue-asset-state 5 t1 1> tmp.out
+          cat tmp.out | grep "AssetState(quantity=5, tokenType=t1, owner=O=PartyA" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # CORDA2-CORDA
+          # Pledge Asset
+          NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="3600" --import-network-id='Corda_Network2' --recipient='O=PartyA, L=London, C=GB' --param='t1:5' 1> tmp.out
+          cat tmp.out | grep "AssetPledgeState created with pledge-id" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          PID=$(cat tmp.out | grep "AssetPledgeState created with pledge-id " | awk -F "'" '{print $2}')
+
+          # Is Asset Pledged
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid $PID 1> tmp.out
+          cat tmp.out | grep "Is asset pledged for transfer response: true" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # Claim Remote Asset
+          NETWORK_NAME='Corda_Network2' CORDA_PORT=30006 ./clients/build/install/clients/bin/clients transfer claim-remote-asset --pledge-id=$PID --locker='O=PartyA, L=London, C=GB' --transfer-category='token.corda' --export-network-id='Corda_Network' --param='t1:5' --import-relay-address='localhost:9082' 1> tmp.out
+          cat tmp.out | grep "Pledged asset claim response: Right(b=SignedTransaction(id=" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type t1 1> tmp.out
+          cat tmp.out | grep "\[\]" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+          CORDA_PORT=30006 ./clients/build/install/clients/bin/clients get-asset-states-by-type t1 1> tmp.out
+          cat tmp.out | grep "AssetState(quantity=5, tokenType=t1, owner=O=PartyA, L=London, C=GB, " && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # CORDA-CORDA2
+
+          # Issue and Pledge t2:5 tokens
+          NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients issue-asset-state 5 t2 1> tmp.out
+          NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="20" --import-network-id='Corda_Network2' --recipient='O=PartyA, L=London, C=GB' --param='t2:5' 1> tmp.out
+          PID=$(cat tmp.out | grep "AssetPledgeState created with pledge-id " | awk -F "'" '{print $2}')
+          sleep 20
+
+          # Is Asset Pledged
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid $PID 1> tmp.out
+          cat tmp.out | grep "Is asset pledged for transfer response: false" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer reclaim-pledged-asset --pledge-id=$PID --export-relay-address='localhost:9081' --transfer-category='token.corda' --import-network-id='Corda_Network2' --param='t2:5' 1> tmp.out
+          cat tmp.out | grep "Pledged Asset Reclaim Response: Right(b=SignedTransaction(id=" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type t2 1> tmp.out
+          cat tmp.out | grep "AssetState(quantity=5, tokenType=t2, owner=O=PartyA, L=London, C=GB, " && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+        working-directory: weaver/samples/corda/corda-simple-application
+
+      # FABRIC CLI
+      - name: Asset Transfer Fabric CLI Non-Fungible Tests
+        run: |
+          COUNT=0
+          TOTAL=8
+
+          # FABRIC2 - FABRIC1
+          ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=bond --ref=a03 --data-file=src/data/assetsForTransfer.json &> tmp.out
+          tail -n 1 tmp.out | grep "Asset pledged with ID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
+
+          # FABRIC1 - FABRIC2
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a03 &> tmp.out
+          tail -n 1 tmp.out | grep "Called Function ClaimRemoteAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Error: the asset a03 does not exist" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a03"]' --local-network=network2 &> tmp.out
+          #tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | tr '\n' ' ' | grep "Result from network query: {     \"type\": \"bond01\",     \"id\": \"a03\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=20 --type=bond --ref=a04 --data-file=src/data/assetsForTransfer.json &> tmp.out
+          cat tmp.out
+
+          CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
+          sleep 20
+
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a04 &> tmp.out
+          tail -n 1 tmp.out | grep "cannot claim asset with pledgeId $CID as the expiry time has elapsed" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=bond.fabric --pledge-id=$CID --param=bond01:a04 &> tmp.out
+          tail -n 1 tmp.out | grep "Called Function ReclaimAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network1 &> tmp.out
+          #tail -n 1 tmp.out | grep "Result from network query: {\"type\":\"bond01\",\"id\":\"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out | tr '\n' ' ' | grep "Result from network query: {     \"type\": \"bond01\",     \"id\": \"a04\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer ReadAsset '["bond01","a04"]' --local-network=network2 &> tmp.out
+          tail -n 2 tmp.out | grep "Error: the asset a04 does not exist" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      # FABRIC CLI
+      - name: Asset Transfer Fabric CLI Fungible Tests
+        run: |
+          COUNT=0
+          TOTAL=8
+
+          # FABRIC2 - FABRIC1
+          ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=3600 --type=token --units=50 --owner=alice --data-file=src/data/tokensForTransfer.json &> tmp.out
+          tail -n 1 tmp.out | grep "Asset pledged with ID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
+
+          # FABRIC1 - FABRIC2
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token.fabric --pledge-id=$CID --param=token1:50 &> tmp.out
+          tail -n 1 tmp.out | grep "Called Function ClaimRemoteTokenAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer GetMyWallet '[]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"9950\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer GetMyWallet '[]' --local-network=network2 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"50\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli asset transfer pledge --source-network=network1 --dest-network=network2 --recipient=bob --expiry-secs=20 --type=token --units=100 --owner=alice --data-file=src/data/tokensForTransfer.json &> tmp.out
+          cat tmp.out
+
+          CID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
+          sleep 20
+
+          ./bin/fabric-cli asset transfer claim --source-network=network1 --dest-network=network2 --user=bob --owner=alice --type=token.fabric --pledge-id=$CID --param=token1:100 &> tmp.out
+          tail -n 1 tmp.out | grep "cannot claim asset with pledgeId $CID as the expiry time has elapsed" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli asset transfer reclaim --source-network=network1 --user=alice --type=token.fabric --pledge-id=$CID --param=token1:100 &> tmp.out
+          tail -n 1 tmp.out | grep "Called Function ReclaimTokenAsset. With Args: $CID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer GetMyWallet '[]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"9950\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=bob mychannel simpleassettransfer GetMyWallet '[]' --local-network=network2 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"50\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+        working-directory: weaver/samples/fabric/fabric-cli
+
+
+      # CORDA - FABRIC
+      - name: Corda - Fabric Asset Transfer test 1 - Pledge
+        run: |
+          COUNT=0
+          TOTAL=2
+
+          # CORDA - FABRIC1
+          # Issue and Pledge token1:5 tokens to partyA
+          NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients issue-asset-state 5 token1 1> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="3600" --import-network-id='network1' --recipient='alice' --param='token1:5' 1> tmp.out
+          cat tmp.out | grep "AssetPledgeState created with pledge-id" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          PID=$(cat tmp.out | grep "AssetPledgeState created with pledge-id " | awk -F "'" '{print $2}')
+
+          # Is Asset Pledged
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid $PID 1> tmp.out
+          cat tmp.out | grep "Is asset pledged for transfer response: true" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          echo "CF_PID=$PID" >> $GITHUB_ENV
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+
+        working-directory: weaver/samples/corda/corda-simple-application
+
+      - name: Corda - Fabric Asset Transfer test 2 - Claim
+        run: |
+          COUNT=0
+          TOTAL=3
+
+          PID=${{ env.CF_PID }}
+
+          # CORDA - FABRIC1
+          # Claim in Fabric (pledged in Corda)
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer GetMyWallet '[]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"9950\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli asset transfer claim --source-network='Corda_Network' --dest-network=network1 --user='alice' --owner='O=PartyA, L=London, C=GB' --type='token.corda' --pledge-id=$PID --param=token1:5 &> tmp.out
+          tail -n 1 tmp.out | grep "Called Function ClaimRemoteTokenAsset. With Args: $PID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer GetMyWallet '[]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"9955\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Corda - Fabric Asset Transfer test 3 - Reclaim
+        run: |
+          COUNT=0
+          TOTAL=3
+
+          # CORDA - FABRIC1
+          # Issue and Pledge token1:10 tokens to partyA
+          NETWORK_NAME='Corda_Network' CORDA_PORT=10006 ./clients/build/install/clients/bin/clients issue-asset-state 10 token1 1> tmp.out
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer pledge-asset --fungible --timeout="20" --import-network-id='network1' --recipient='alice' --param='token1:10' 1> tmp.out
+          sleep 20
+
+          PID=$(cat tmp.out | grep "AssetPledgeState created with pledge-id " | awk -F "'" '{print $2}')
+
+          # Is Asset Pledged
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer is-asset-pledged -pid $PID 1> tmp.out
+          cat tmp.out | grep "Is asset pledged for transfer response: false" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          NETWORK_NAME=Corda_Network CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer reclaim-pledged-asset --pledge-id=$PID --export-relay-address='localhost:9081' --transfer-category='token.fabric' --import-network-id='network1' --param='token1:10' 1> tmp.out
+          cat tmp.out | grep "Pledged Asset Reclaim Response: Right(b=SignedTransaction(id=" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1 1> tmp.out
+          cat tmp.out | grep "AssetState(quantity=10, tokenType=token1, owner=O=PartyA, L=London, C=GB, " && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+
+        working-directory: weaver/samples/corda/corda-simple-application
+
+      - name: Fabric - Corda Asset Transfer test 1 - Pledge
+        run: |
+          COUNT=0
+          TOTAL=1
+
+          ./bin/fabric-cli asset transfer pledge --source-network='network1' --dest-network='Corda_Network' --recipient='O=PartyA, L=London, C=GB' --expiry-secs=3600 --type='token' --units=50 --owner=alice --data-file=src/data/tokensForTransfer.json &> tmp.out
+
+          PID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer GetMyWallet '[]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"9905\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          sleep 30
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          echo "FC_PID=$PID" >> $GITHUB_ENV
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - name: Fabric - Corda Asset Transfer test 2 - Claim
+        run: |
+          COUNT=0
+          TOTAL=2
+
+          PID=${{ env.FC_PID }}
+
+          # FABRIC - CORDA
+          # Claim Remote Asset
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients transfer claim-remote-asset --pledge-id=$PID --locker='alice' --transfer-category='token.fabric' --export-network-id='network1' --param='token1:50' --import-relay-address='localhost:9082' 1> tmp.out
+          cat tmp.out | grep "Pledged asset claim response: Right(b=SignedTransaction(id=" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          CORDA_PORT=10006 ./clients/build/install/clients/bin/clients get-asset-states-by-type token1 1> tmp.out
+          cat tmp.out | grep "AssetState(quantity=50, tokenType=token1, owner=O=PartyA, L=London, C=GB, " && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+
+        working-directory: weaver/samples/corda/corda-simple-application
+
+      - name: Fabric - Corda Asset Transfer test 3 - Reclaim
+        run: |
+          COUNT=0
+          TOTAL=3
+
+          ./bin/fabric-cli asset transfer pledge --source-network='network1' --dest-network='Corda_Network' --recipient='O=PartyA, L=London, C=GB' --expiry-secs=30 --type='token' --units=50 --owner=alice --data-file=src/data/tokensForTransfer.json &> tmp.out
+          PID=$(cat tmp.out | grep "Asset pledged with ID " | sed -e 's/Asset pledged with ID //')
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer GetMyWallet '[]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"9855\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          sleep 30
+
+          ./bin/fabric-cli asset transfer reclaim --source-network='network1' --user='alice' --type='token.corda' --pledge-id=$PID --param=token1:50 &> tmp.out
+          tail -n 1 tmp.out | grep "Called Function ReclaimTokenAsset. With Args: $PID" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          ./bin/fabric-cli chaincode query --user=alice mychannel simpleassettransfer GetMyWallet '[]' --local-network=network1 &> tmp.out
+          tail -n 2 tmp.out | grep "Result from network query: token1=\"9905\"" && COUNT=$(( COUNT + 1 )) && echo "PASS"
+          cat tmp.out
+
+          # RESULT
+          echo "Passed $COUNT/$TOTAL Tests."
+
+          if [ $COUNT == $TOTAL ]; then
+              exit 0
+          else
+              exit 1
+          fi
+
+        working-directory: weaver/samples/fabric/fabric-cli
+
+      - if: failure()
+        name: DEBUG Logs - corda partya
+        run: docker logs corda_partya_1
+
+      - if: failure()
+        name: DEBUG Logs - corda network2 partya
+        run: docker logs corda_network2_partya_1
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 relay
+        run: cat weaver/core/relay/relay-n1.out
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 relay
+        run: cat weaver/core/relay/relay-n2.out
+
+      - if: failure()
+        name: DEBUG Logs - corda relay
+        run: cat weaver/core/relay/relay-corda.out
+
+      - if: failure()
+        name: DEBUG Logs - corda2 relay
+        run: cat weaver/core/relay/relay-corda2.out
+
+      - if: failure()
+        name: DEBUG Logs - fabric n1 driver
+        run: cat weaver/core/drivers/fabric-driver/fdriver-n1.out
+
+      - if: failure()
+        name: DEBUG Logs - fabric n2 driver
+        run: cat weaver/core/drivers/fabric-driver/fdriver-n2.out
+
+      - if: failure()
+        name: DEBUG Logs - corda driver
+        run: cat weaver/core/drivers/corda-driver/corda-driver.out
+
+      - if: failure()
+        name: DEBUG Logs - corda2 driver
+        run: cat weaver/core/drivers/corda-driver/corda2-driver.out
+
+      - if: failure()
+        name: DEBUG Logs - iin agent n1 org1
+        run: cat weaver/core/identity-management/iin-agent/iinagent-n1.out
+
+      - if: failure()
+        name: DEBUG Logs - iin agent n2 org1
+        run: cat weaver/core/identity-management/iin-agent/iinagent-n2.out

@@ -29,9 +29,14 @@
     - [4.3.1. response.type.ts](#431-responsetypets)
     - [4.3.2. data-fetcher.ts](#432-data-fetcherts)
     - [4.3.3. metrics.ts](#433-metricsts)
-- [5. Contributing](#5-contributing)
-- [6. License](#6-license)
-- [7. Acknowledgments](#7-acknowledgments)
+- [5. Deploying Fabric Driver for Weaver](#5-deploying-fabric-driver-for-weaver)
+  - [5.1 Setup](#51-setup)
+    - [5.1.1 Enabling TLS](#511-enabling-tls)
+    - [5.1.2 Environment variables](#512-environment-variables)
+  - [5.2 Running](#52-running)
+- [6. Contributing](#6-contributing)
+- [7. License](#7-license)
+- [8. Acknowledgments](#8-acknowledgments)
 
 
 ## 1. Usage
@@ -688,14 +693,67 @@ This file contains functions encasing the logic to process the data points
 #### 4.3.3. metrics.ts
 This file lists all the prometheus metrics and what they are used for.
 
-## 5. Contributing
+## 5. Deploying Fabric Driver for Weaver
+### 5.1 Setup
+
+Create a `.env` file using `.env.template` as the base and setting suitable environment variable values (see [here](#512-environment-variables)) and `config.json` files need to be checked and updated to match the network and relay that it will be connecting to.
+The .env contains information related to the network and relay. The config.json contains information about the ca admin, user and its org, that is used when connecting to the network.
+
+#### 5.1.1 Enabling TLS
+
+If the relay is TLS-enabled, set the following values in the `.env`:
+```
+RELAY_TLS=true
+RELAY_TLSCA_CERT_PATH=path_to_tls_ca_cert_pem_for_relay
+```
+- `path_to_tls_ca_cert_pem_for_relay` should be set to CA certificate file path
+
+To enforce secure communication over TLS with your driver, set the following values in the `.env`:
+```
+DRIVER_TLS=true
+DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
+DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver
+```
+- `path_to_tls_cert_pem_for_driver` should be set to driver's TLS certificate file path
+- `path_to_tls_key_pem_for_driver` should be set to driver's TLS private key file path
+
+#### 5.1.2 Environment variables
+
+The connection profile is required to set up the required material to communicate with the network. This should be supplied with the `CONNECTION_PROFILE` environment variable (ex: CONNECTION_PROFILE=path/to/con_profile.json)
+
+`<Hostname>:<Port>` for connecting relay: `RELAY_ENDPOINT` (ex: RELAY_ENDPOINT=localhost:9081 )
+
+Boolean for when to use mocked fabric communication: `MOCK` (ex: MOCK=true)
+
+`<Hostname>:<Port>` for the driver to be run on: `DRIVER_ENDPOINT` (ex: DRIVER_ENDPOINT=localhost:9093) (Not required for docker)
+
+Can pass in a variable 'local' for working with fabric and docker: `local` (ex: local=false)
+
+Can pass in a config file for the driver to be run with: `DRIVER_CONFIG` (ex: DRIVER_CONFIG=./config.json)
+
+`INTEROP_CHAINCODE` stores the name of the interop chaincode installed.
+
+`DB_PATH` stores the path hosting the database files containing the event subscription information.
+
+`WALLET_PATH` stores the path hosting the user wallets to access a network.
+
+NOTE: When specifying ensure that they match the config that the relay is using.
+
+### 5.2 Running
+Running the server: `yarn start-fabric-weaver-driver`
+
+Note: Can also be run in mocked mode by setting environment variable `MOCK=true`
+
+
+
+## 6. Contributing
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
 Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 6. License
+## 7. License
 
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
-## 7. Acknowledgments
+## 8. Acknowledgments
