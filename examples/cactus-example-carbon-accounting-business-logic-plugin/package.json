@@ -73,7 +73,8 @@
   "devDependencies": {
     "@types/express": "5.0.1",
     "@types/ssh2": "0.5.47",
-    "@types/uuid": "10.0.0"
+    "@types/uuid": "10.0.0",
+    "jest-extended": "7.0.0"
   },
   "engines": {
     "node": ">=18",

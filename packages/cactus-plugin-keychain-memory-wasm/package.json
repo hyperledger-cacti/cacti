@@ -74,7 +74,8 @@
     "@types/express": "5.0.1",
     "body-parser": "1.20.3",
     "cpy-cli": "4.2.0",
-    "del-cli": "5.1.0"
+    "del-cli": "5.1.0",
+    "jest-extended": "7.0.0"
   },
   "engines": {
     "node": ">=18",

@@ -73,9 +73,11 @@
     "express": "5.1.0",
     "ipfs-core-types": "0.14.1",
     "ipfs-unixfs": "9.0.1",
+    "jest-extended": "7.0.0",
     "kubo-rpc-client": "3.0.1",
     "kubo-rpc-client-esm-cjs": "3.0.1",
-    "multiformats": "11.0.2"
+    "multiformats": "11.0.2",
+    "tape-promise": "4.0.0"
   },
   "engines": {
     "node": ">=18",

@@ -84,10 +84,17 @@
     "@ionic/angular-toolkit": "10.0.0",
     "@types/uuid": "10.0.0",
     "browserify-fs": "1.0.0",
+    "browserify-zlib": "0.2.0",
+    "buffer": "6.0.3",
+    "constants-browserify": "1.0.0",
+    "crypto-browserify": "3.12.1",
     "https-browserify": "1.0.0",
     "net-browserify": "0.2.4",
     "os-browserify": "0.3.0",
     "path-browserify": "1.0.1",
+    "querystring-es3": "0.2.1",
+    "stream-browserify": "3.0.0",
+    "stream-http": "3.2.0",
     "tls-browserify": "0.2.2"
   },
   "engines": {

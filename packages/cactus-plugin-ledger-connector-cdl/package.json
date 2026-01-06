@@ -61,6 +61,7 @@
     "sanitize-html": "2.12.1"
   },
   "devDependencies": {
+    "@types/body-parser": "1.19.6",
     "@types/express": "5.0.1",
     "@types/node": "18.11.9",
     "@types/sanitize-html": "2.6.2",

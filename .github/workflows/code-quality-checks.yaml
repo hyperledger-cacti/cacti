@@ -104,19 +104,6 @@ jobs:
         if: steps.cache-openapi-generator-jar.outputs.cache-hit != 'true'
         run: yarn codegen:warmup-mkdir && yarn tools:download-file-to-disk --url=https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar --output-file-path=./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar
 
-      - name: Link OpenAPI Generator JAR into subpackages
-        if: steps.cache-openapi-generator-jar.outputs.cache-hit == 'true'
-        run: |
-          for dir in packages/*/node_modules/@openapitools/openapi-generator-cli; do
-            if [ -d "$dir" ]; then
-              echo "Ensuring $dir/versions exists"
-              mkdir -p "$dir/versions"
-              echo "Linking cached jar into $dir/versions"
-              cp "node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar" \
-                "$dir/versions/6.6.0.jar"
-            fi
-          done
-
       - name: Run codegen
         run: yarn codegen
       - run: git status --porcelain

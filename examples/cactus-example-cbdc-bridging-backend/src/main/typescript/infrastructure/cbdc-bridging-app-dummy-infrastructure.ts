@@ -453,8 +453,14 @@ export class CbdcBridgingAppDummyInfrastructure {
     this.fabricGatewayApproveAddress =
       reqApproveFabricAddress.data.approveAddress;
 
+    if (!this.fabricGatewayApproveAddress) {
+      throw new Error("Fabric approve address is undefined");
+    }
     this.fabricEnvironment.setApproveAddress(this.fabricGatewayApproveAddress);
 
+    if (!this.besuGatewayApproveAddress) {
+      throw new Error("Besu approve address is undefined");
+    }
     await this.besuEnvironment.giveRoleToBridge(this.besuGatewayApproveAddress);
 
     await this.fabricEnvironment.giveRoleToBridge("Org2MSP");

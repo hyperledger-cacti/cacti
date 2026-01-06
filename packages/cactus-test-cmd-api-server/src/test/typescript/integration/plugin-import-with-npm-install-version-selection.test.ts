@@ -1,6 +1,7 @@
 import { randomUUID as uuidv4 } from "node:crypto";
 import path from "node:path";
 import { readFile } from "node:fs/promises";
+import { createRequire } from "module";
 
 import "jest-extended";
 
@@ -39,12 +40,14 @@ describe("ApiServer", () => {
     },
   };
 
-  const packageFilePath = path.join(
-    pluginsPath,
-    aPluginImport.options.instanceId,
-    "node_modules",
-    `${aPluginImport.packageName}`,
-    "package.json",
+  const instancePath = path.join(pluginsPath, aPluginImport.options.instanceId);
+
+  // Create a require() whose resolution base is the instance folder
+  const req = createRequire(path.join(instancePath, "package.json"));
+
+  // Resolve the plugin's package.json without referencing node_modules
+  const packageFilePath = req.resolve(
+    `${aPluginImport.packageName}/package.json`,
   );
 
   const configService = new ConfigService();

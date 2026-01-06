@@ -35,7 +35,7 @@ describe("identity clients test", () => {
   // let wsPathPrefix: any;
   let wsUrl: string;
   beforeAll(async () => {
-    IpAdd = (await internalIpV4()) as string;
+    IpAdd = "127.0.0.1";
 
     // setup web-socket client
     wsTestContainer = new WsTestServer({

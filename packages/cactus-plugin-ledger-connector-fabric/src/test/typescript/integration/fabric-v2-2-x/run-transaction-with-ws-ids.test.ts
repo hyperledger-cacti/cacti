@@ -65,7 +65,7 @@ describe("PluginLedgerConnectorFabric", () => {
     await wsTestContainer.start();
 
     const ci = await Containers.getById(wsTestContainer.containerId);
-    const wsIpAddr = await internalIpV4();
+    const wsIpAddr = "127.0.0.1";
     const hostPort = await Containers.getPublicPort(WS_IDENTITY_HTTP_PORT, ci);
 
     await ledger.start({ omitPull: false });

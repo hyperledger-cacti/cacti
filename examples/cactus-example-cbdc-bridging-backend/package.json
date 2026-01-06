@@ -80,7 +80,7 @@
       "node"
     ],
     "moduleNameMapper": {
-      "^(\\.?\\.?/.*)\\.js$": "$1"
+      "(\\.?\\.?/.*)\\.js$": "$1"
     },
     "modulePathIgnorePatterns": [
       "<rootDir>/dist/"
@@ -89,7 +89,7 @@
     "testEnvironment": "node",
     "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      ".+\\.tsx?$": "ts-jest"
     }
   },
   "dependencies": {
@@ -138,6 +138,8 @@
   "devDependencies": {
     "@apidevtools/swagger-cli": "4.0.4",
     "@foundry-rs/hardhat-forge": "0.1.17",
+    "@types/body-parser": "1.19.6",
+    "@types/cors": "2.8.12",
     "@types/crypto-js": "4.1.1",
     "@types/cucumber": "4.0.4",
     "@types/dockerode": "3.2.7",
@@ -164,6 +166,7 @@
     "hardhat": "2.22.19",
     "http-status-codes": "2.1.4",
     "jest": "29.7.0",
+    "jest-extended": "7.0.0",
     "jose": "4.15.5",
     "npm-run-all": "4.1.5",
     "prettier": "3.2.5",

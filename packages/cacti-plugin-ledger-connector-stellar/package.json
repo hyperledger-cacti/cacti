@@ -82,6 +82,7 @@
     "@types/http-errors": "2.0.4",
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
+    "jest-extended": "7.0.0",
     "npm-run-all2": "6.1.2",
     "socket.io": "4.6.2",
     "uuid": "10.0.0"

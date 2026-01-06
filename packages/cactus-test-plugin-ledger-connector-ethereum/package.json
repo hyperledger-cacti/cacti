@@ -50,6 +50,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-cmd-api-server": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
@@ -64,6 +65,7 @@
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/lodash": "4.14.195",
     "@types/uuid": "10.0.0",
+    "jest-extended": "7.0.0",
     "lodash": "4.17.21",
     "uuid": "10.0.0",
     "web3": "4.4.0"
