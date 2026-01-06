@@ -59,7 +59,8 @@
     "web3-eth-accounts": "4.0.3"
   },
   "devDependencies": {
-    "@types/dockerode": "3.2.7"
+    "@types/dockerode": "3.2.7",
+    "jest-extended": "7.0.0"
   },
   "engines": {
     "node": ">=18",

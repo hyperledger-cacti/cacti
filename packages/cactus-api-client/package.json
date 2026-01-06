@@ -64,6 +64,7 @@
     "@types/lodash": "4.14.195",
     "@types/node": "18.19.0",
     "http-status-codes": "2.3.0",
+    "jest-extended": "7.0.0",
     "lodash": "4.17.21"
   },
   "engines": {

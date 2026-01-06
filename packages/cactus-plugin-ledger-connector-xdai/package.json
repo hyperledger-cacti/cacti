@@ -76,6 +76,9 @@
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.1",
     "body-parser": "1.20.3",
+    "jest-extended": "7.0.0",
+    "tape": "5.6.1",
+    "tape-promise": "4.0.0",
     "uuid": "10.0.0",
     "web3-core": "1.6.1",
     "web3-eth": "1.6.1"

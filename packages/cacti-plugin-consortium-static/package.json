@@ -77,7 +77,9 @@
     "@types/express": "5.0.1",
     "@types/json-stable-stringify": "1.2.0",
     "@types/uuid": "10.0.0",
-    "web3": "1.6.1"
+    "jest-extended": "7.0.0",
+    "web3": "1.6.1",
+    "web3-core": "1.6.1"
   },
   "engines": {
     "node": ">=18",

@@ -84,7 +84,9 @@
   "devDependencies": {
     "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",
-    "fs-extra": "11.2.0"
+    "fs-extra": "11.2.0",
+    "jest-extended": "7.0.0",
+    "tape-promise": "4.0.0"
   },
   "engines": {
     "node": ">=18",

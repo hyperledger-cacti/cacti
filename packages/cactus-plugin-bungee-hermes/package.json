@@ -95,6 +95,7 @@
     "@types/uuid": "10.0.0",
     "express": "5.1.0",
     "fabric-network": "2.2.20",
+    "jest-extended": "7.0.0",
     "socket.io": "4.6.2"
   },
   "engines": {

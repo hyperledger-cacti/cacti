@@ -75,6 +75,7 @@
     "express": "5.1.0",
     "google-gax": "4.0.5",
     "internal-ip": "6.2.0",
+    "jest-extended": "7.0.0",
     "openapi-types": "12.1.3"
   },
   "engines": {

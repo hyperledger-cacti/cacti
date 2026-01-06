@@ -7,7 +7,7 @@
       "name": "Jest: Current TS Test File",
       "cwd": "${workspaceFolder}",
       "args": [
-        "${workspaceRoot}/node_modules/.bin/jest",
+        "${workspaceRoot}/node_modules/jest/bin/jest.js",
         "${relativeFile}"
       ],
       "console": "integratedTerminal",

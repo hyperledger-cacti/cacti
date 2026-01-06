@@ -42,6 +42,7 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0"
   },
@@ -53,7 +54,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-iroha2": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.1.0",
-    "jest-extended": "4.0.1",
+    "jest-extended": "7.0.0",
     "rxjs": "7.8.1"
   },
   "peerDependencies": {

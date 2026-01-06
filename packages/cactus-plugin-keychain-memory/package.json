@@ -77,6 +77,7 @@
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.1",
     "body-parser": "1.20.3",
+    "jest-extended": "7.0.0",
     "npm-run-all2": "6.1.2"
   },
   "engines": {

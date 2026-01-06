@@ -79,9 +79,11 @@
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/body-parser": "1.19.6",
     "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",
     "express": "5.1.0",
+    "jest-extended": "7.0.0",
     "socket.io": "4.6.2",
     "web3-eth-abi": "4.2.1",
     "web3-utils": "4.2.1"

@@ -52,7 +52,7 @@
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "proto:protoc-gen-ts": "run-s proto:protoc-gen-ts:make-dir proto:protoc-gen-ts:grpc_tools_node_protoc",
     "proto:protoc-gen-ts:make-dir": "make-dir ./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/",
-    "proto:protoc-gen-ts:grpc_tools_node_protoc": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=../../node_modules/.bin/protoc-gen-ts --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
+    "proto:protoc-gen-ts:grpc_tools_node_protoc": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=$(yarn bin protoc-gen-ts) --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -66,6 +66,7 @@
     "ajv-draft-04": "1.0.0",
     "ajv-formats": "3.0.1",
     "axios": "1.8.4",
+    "express": "5.1.0",
     "google-protobuf": "3.21.4"
   },
   "devDependencies": {
@@ -76,6 +77,7 @@
     "@types/google-protobuf": "3.15.5",
     "grpc-tools": "1.12.4",
     "grpc_tools_node_protoc_ts": "5.3.3",
+    "jest-extended": "7.0.0",
     "make-dir-cli": "3.1.0",
     "npm-run-all": "4.1.5",
     "rxjs": "7.8.1",
