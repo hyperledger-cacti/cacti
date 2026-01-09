@@ -22,7 +22,6 @@ import {
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
-import { v4 as internalIpV4 } from "internal-ip";
 import { WsWallet } from "ws-wallet";
 import { WsIdentityClient } from "ws-identity-client";
 
