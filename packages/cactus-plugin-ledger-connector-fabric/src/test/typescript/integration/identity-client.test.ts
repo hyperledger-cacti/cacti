@@ -1,6 +1,5 @@
 import "jest-extended";
 import axios from "axios";
-import { v4 as internalIpV4 } from "internal-ip";
 import {
   Containers,
   VaultTestServer,

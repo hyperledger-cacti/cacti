@@ -60,7 +60,9 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
       this.ipfs = this.opts.ipfsClientOrOptions;
     } else if (this.opts.ipfsClientOrOptions) {
       const { create } = await import("kubo-rpc-client");
-      this.ipfs = create(this.opts.ipfsClientOrOptions) as unknown as LikeIpfsHttpClient;
+      this.ipfs = create(
+        this.opts.ipfsClientOrOptions,
+      ) as unknown as LikeIpfsHttpClient;
     } else {
       const errorMessage = `initIpfs Need either "ipfsClient" or "ipfsClientOptions" to construct ${this.className} Neither was provided.`;
       throw new RuntimeError(errorMessage);
