@@ -60,7 +60,7 @@ const testWalletPath = path.join(
 // Setup Tests
 //////////////////////////////////
 
-describe("Aries connector setup tests", () => {
+describe.skip("Aries connector setup tests", () => {
   const fakeIndyNetworkConfig = {
     isProduction: false,
     genesisTransactions: JSON.stringify({

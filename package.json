@@ -162,7 +162,8 @@
     "simple-swizzle": "0.2.2",
     "slice-ansi": "3.0.0",
     "supports-color": "7.2.0",
-    "supports-hyperlinks": "2.3.0"
+    "supports-hyperlinks": "2.3.0",
+    "request-promise-native": "1.0.9"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.16.4",
