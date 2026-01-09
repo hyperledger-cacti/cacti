@@ -9333,6 +9333,7 @@ __metadata:
     "@aries-framework/node": "npm:0.5.0-alpha.97"
     "@hyperledger/anoncreds-nodejs": "npm:0.3.4"
     "@hyperledger/aries-askar-nodejs": "npm:0.2.3"
+    "@hyperledger/aries-askar-shared": "npm:0.2.3"
     "@hyperledger/cactus-common": "npm:2.1.0"
     "@hyperledger/cactus-core": "npm:2.1.0"
     "@hyperledger/cactus-core-api": "npm:2.1.0"
@@ -49009,17 +49010,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"request-promise-core@npm:1.1.2":
-  version: 1.1.2
-  resolution: "request-promise-core@npm:1.1.2"
-  dependencies:
-    lodash: "npm:^4.17.11"
-  peerDependencies:
-    request: ^2.34
-  checksum: 10/e2b15b19fbefef78c0dd54430fd83e0bfa321b21a31df30beaec1dd2a525dd31d8ba48e64b16ecf4d3589f2b2c62abf9e7050c885df8fcefe6fefb602b472c5e
-  languageName: node
-  linkType: hard
-
 "request-promise-core@npm:1.1.4":
   version: 1.1.4
   resolution: "request-promise-core@npm:1.1.4"
@@ -49031,20 +49021,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"request-promise-native@npm:1.0.7":
-  version: 1.0.7
-  resolution: "request-promise-native@npm:1.0.7"
-  dependencies:
-    request-promise-core: "npm:1.1.2"
-    stealthy-require: "npm:^1.1.1"
-    tough-cookie: "npm:^2.3.3"
-  peerDependencies:
-    request: ^2.34
-  checksum: 10/74c4d9305eb821ae3200231bb41cf5370980d74b0c51ce39e6902006b0dd805f4d306d2a163907ab4018787a17eacb35d48377fef21fc09c6d79d15a3c38597b
-  languageName: node
-  linkType: hard
-
-"request-promise-native@npm:^1.0.9":
+"request-promise-native@npm:1.0.9":
   version: 1.0.9
   resolution: "request-promise-native@npm:1.0.9"
   dependencies:
