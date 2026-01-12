@@ -71,10 +71,12 @@ import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
+  IAuditEntryRepository,
 } from "../../../main/typescript/database/repository/interfaces/repository";
 import { Knex, knex } from "knex";
 import { KnexLocalLogRepository as LocalLogRepository } from "../../../main/typescript/database/repository/knex-local-log-repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "../../../main/typescript/database/repository/knex-remote-log-repository";
+import { KnexAuditEntryRepository as AuditLogRepository } from "../../../main/typescript/database/repository/knex-audit-repository";
 import { GatewayPersistence } from "../../../main/typescript/database/gateway-persistence";
 import { create, isMessage } from "@bufbuild/protobuf";
 
@@ -118,6 +120,7 @@ const connectedDLTs = [
 ];
 let localRepository: ILocalLogRepository;
 let remoteRepository: IRemoteLogRepository;
+let auditRepository: IAuditEntryRepository;
 let dbLogger: GatewayPersistence;
 let persistLogEntrySpy: jest.SpyInstance;
 let bridgeManager: BridgeManagerClientInterface;
@@ -192,9 +195,12 @@ beforeAll(async () => {
 
   localRepository = new LocalLogRepository(knexLocalInstance.default);
   remoteRepository = new RemoteLogRepository(knexRemoteInstance.default);
+  auditRepository = new AuditLogRepository(knexRemoteInstance.default);
+
   dbLogger = new GatewayPersistence({
     localRepository,
     remoteRepository,
+    auditRepository,
     signer,
     pubKey: Buffer.from(keyPairs.publicKey).toString("hex"),
     monitorService: monitorService,

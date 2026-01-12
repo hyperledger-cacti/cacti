@@ -57,9 +57,11 @@ import { bufArray2HexStr } from "./utils/gateway-utils";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
+  IAuditEntryRepository,
 } from "./database/repository/interfaces/repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "./database/repository/knex-remote-log-repository";
 import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-local-log-repository";
+import { KnexAuditEntryRepository as AuditEntryRepository } from "./database/repository/knex-audit-repository";
 import { BLODispatcher, type BLODispatcherOptions } from "./api1/dispatcher";
 import { type JsonObject } from "swagger-ui-express";
 import type {
@@ -284,6 +286,18 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
   remoteRepository?: Knex.Config;
 
   /**
+   * Local database configuration for audit entry persistence.
+   * @description
+   * Knex.js configuration for local database persistence of SATP session data,
+   * transaction logs, and recovery checkpoints. Essential for crash recovery
+   * and maintaining gateway state across restarts.
+   *
+   * @see {@link Knex.Config} for database configuration options
+   * @see {@link AuditEntryRepository} for local persistence implementation
+   */
+  auditRepository?: Knex.Config;
+
+  /**
    * Enable crash recovery mechanisms.
    * @description
    * Activates Hermes crash recovery features including checkpoint logging,
@@ -492,6 +506,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public claimFormat?: ClaimFormat;
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
+  public auditRepository: IAuditEntryRepository;
   private readonly shutdownHooks: ShutdownHook[];
   private crashManager?: CrashManager;
   private readonly monitorService: MonitorService;
@@ -606,6 +621,17 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.info("Remote repository is not defined");
     }
 
+    if (this.config.auditRepository) {
+      this.auditRepository = new AuditEntryRepository(
+        this.config.auditRepository,
+      );
+    } else {
+      this.logger.info("Audit entries repository is not defined");
+      this.auditRepository = new AuditEntryRepository(
+        knexLocalInstance.default,
+      );
+    }
+
     if (this.config.keyPair === undefined) {
       throw new Error("Key pair is undefined");
     }
@@ -671,8 +697,15 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         } else {
           throw new Error("GatewayIdentity is not defined");
         }
+        const hardcodedKnexConfig = {
+          client: "sqlite3",
+          connection: { filename: ":memory:" },
+          useNullAsDefault: true,
+        };
 
-        const oracleLogRepository = new KnexOracleLogRepository(undefined);
+        const oracleLogRepository = new KnexOracleLogRepository(
+          hardcodedKnexConfig,
+        );
         const oracleDbLogger = new OraclePersistence({
           oracleLogRepository,
           logLevel: this.config.logLevel,
@@ -722,6 +755,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           pubKey: this.pubKey,
           localRepository: this.localRepository,
           remoteRepository: this.remoteRepository,
+          auditRepository: this.auditRepository,
           claimFormat: this.claimFormat,
           monitorService: this.monitorService,
           adapterManager: this.adapterManager,

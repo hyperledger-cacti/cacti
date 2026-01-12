@@ -390,17 +390,17 @@ paths:
         - name: startTimestamp
           in: query
           description: The start timestamp for the audit period.
-          required: false
+          required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: date-time
         - name: endTimestamp
           in: query
           description: The end timestamp for the audit period.
-          required: false
+          required: true
           schema:
-            type: integer
-            format: int64
+            type: string
+            format: date-time 
       responses:
         '200':
           description: Audit results

@@ -39,6 +39,7 @@ import { Err, Ok, Result } from "ts-results";
 
 import * as create_logs_table from "./migrations/20220331132128_create_logs_table";
 import * as create_remote_logs_table from "./migrations/20240130234303_create_remote_logs_table";
+import * as create_audit_entries_table from "./migrations/20260118174651_create_audit_entries_table";
 import * as create_oracle_logs_table from "./migrations/20250323000000_create_oracle_logs_table";
 
 /**
@@ -139,6 +140,7 @@ export function createMigrationSource(): IKnexMigrationSource<IKnexMigration> {
 
   registerMigration(migrations, create_logs_table);
   registerMigration(migrations, create_remote_logs_table);
+  registerMigration(migrations, create_audit_entries_table);
   registerMigration(migrations, create_oracle_logs_table);
 
   const kms: IKnexMigrationSource<IKnexMigration> = {

@@ -103,6 +103,7 @@ import {
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
+  IAuditEntryRepository,
 } from "../../database/repository/interfaces/repository";
 import {
   IGatewayPersistenceConfig,
@@ -122,6 +123,7 @@ export interface ISATPManagerOptions {
   orchestrator: GatewayOrchestrator;
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
+  auditRepository: IAuditEntryRepository;
   claimFormat?: ClaimFormat;
   monitorService: MonitorService;
   adapterManager?: AdapterManager;
@@ -151,6 +153,7 @@ export class SATPManager {
   private gatewaysPubKeys: Map<string, string> = new Map();
   private localRepository: ILocalLogRepository;
   private remoteRepository: IRemoteLogRepository | undefined;
+  private auditRepository: IAuditEntryRepository;
   private readonly dbLogger: GatewayPersistence;
   private readonly monitorService: MonitorService;
 
@@ -178,10 +181,12 @@ export class SATPManager {
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
+    this.auditRepository = options.auditRepository;
     this.claimFormat = options.claimFormat || ClaimFormat.DEFAULT;
     const satpLoggerConfig: IGatewayPersistenceConfig = {
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
+      auditRepository: this.auditRepository,
       signer: this.signer,
       pubKey: this.pubKey,
       logLevel: level,

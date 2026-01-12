@@ -1,0 +1,43 @@
+sequenceDiagram
+    title Successful Audit Endpoint Invocation
+
+    actor Client
+
+    box rgb(173, 216, 230) API Layer
+    participant AuditEndpoint
+    end
+
+    box rgb(144, 238, 144) SATP Business Logic Layer
+    participant Dispatcher
+    participant AuditHandler
+    participant AuditRepository
+    end
+
+    box rgb(255, 255, 224) Database Layer
+    participant Database
+    end
+
+  
+    Client->>AuditEndpoint: GET /admin/audit?startTimestamp=...&endTimestamp=...
+    Note right of AuditEndpoint: HTTP request with query parameters
+
+    AuditEndpoint->>AuditEndpoint: parseRequiredIso(startTimestamp)
+    AuditEndpoint->>AuditEndpoint: parseRequiredIso(endTimestamp)
+    AuditEndpoint->>AuditEndpoint: validate(startDate <= endDate)
+
+    AuditEndpoint->>Dispatcher: PerformAudit(auditRequest)
+    Note right of Dispatcher: AuditRequest contains start/end timestamps
+
+    Dispatcher->>AuditHandler: executeAudit(logLevel, auditRepository, req)
+    AuditHandler->>AuditHandler: getAuditData(logLevel, auditRepository, req)
+
+    AuditHandler->>AuditRepository: readByTimeInterval(startTime, endTime)
+    AuditRepository->>Database: SELECT * FROM audit_entries<br/>WHERE timestamp BETWEEN ? AND ?
+    Database-->>AuditRepository: audit entries
+
+    AuditRepository-->>AuditHandler: Audit object with entries
+    AuditHandler-->>Dispatcher: AuditResponse with entries
+    Dispatcher-->>AuditEndpoint: AuditResponse
+
+    AuditEndpoint-->>Client: 200 OK<br/>{<br/>  "auditEntries": {...},<br/>  "startTimestamp": "...",<br/>  "endTimestamp": "..."<br/>}
+    Note left of Client: JSON response with audit data

@@ -45,6 +45,7 @@ import { MonitorService } from "../../../../main/typescript/services/monitoring/
 import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import fs from "fs";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -57,22 +58,24 @@ const monitorService = MonitorService.createOrGetMonitorService({
 
 let knexSourceRemoteClient: Knex;
 let knexLocalClient: Knex;
+let knexAuditClient: Knex;
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
 let fabricEnv: FabricTestEnvironment;
 let gateway: SATPGateway;
 
+const dbPath = path.join(__dirname, "audit-test.sqlite");
+const auditConfig: Knex.Config = {
+  client: "sqlite3",
+  connection: { filename: dbPath },
+  useNullAsDefault: true,
+};
+
 const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
-  if (besuEnv) {
-    await besuEnv.tearDown();
-  }
-  if (ethereumEnv) {
-    await ethereumEnv.tearDown();
-  }
-  if (fabricEnv) {
-    await fabricEnv.tearDown();
-  }
+  await besuEnv.tearDown();
+  await ethereumEnv.tearDown();
+  await fabricEnv.tearDown();
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
@@ -94,6 +97,15 @@ afterEach(async () => {
   if (knexSourceRemoteClient) {
     await knexSourceRemoteClient.destroy();
   }
+  if (knexAuditClient) {
+    await knexAuditClient.destroy();
+  }
+
+  // Clean up the audit database file to prevent UNIQUE constraint violations in subsequent test runs
+  if (fs.existsSync(dbPath)) {
+    fs.unlinkSync(dbPath);
+  }
+
   pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
@@ -522,6 +534,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     await gateway.shutdown();
   });
 });
+
 describe("SATPGateway sending a token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
@@ -560,6 +573,14 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     });
     await knexSourceRemoteClient.migrate.latest();
 
+    knexAuditClient = knex({
+      ...auditConfig,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexAuditClient.migrate.latest();
+
     const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
     const besuNetworkOptions = besuEnv.createBesuConfig();
 
@@ -574,6 +595,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
       },
       localRepository: knexLocalInstance.default,
       remoteRepository: knexRemoteInstance.default,
+      auditRepository: auditConfig,
       pluginRegistry: new PluginRegistry({
         plugins: [],
       }),
@@ -749,6 +771,14 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
     });
     await knexSourceRemoteClient.migrate.latest();
 
+    knexAuditClient = knex({
+      ...auditConfig,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexAuditClient.migrate.latest();
+
     const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
     const besuNetworkOptions = besuEnv.createBesuConfig();
 
@@ -763,6 +793,7 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
       },
       localRepository: knexLocalInstance.default,
       remoteRepository: knexRemoteInstance.default,
+      auditRepository: auditConfig,
       pluginRegistry: new PluginRegistry({
         plugins: [],
       }),
