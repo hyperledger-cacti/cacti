@@ -163,9 +163,15 @@
     "slice-ansi": "3.0.0",
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
-    "request-promise-native": "1.0.9"
+    "request-promise-native": "1.0.9",
+    "@angular/*": "17.3.11"
   },
   "devDependencies": {
+    "@angular/common": "17.3.11",
+    "@angular/core": "17.3.11",
+    "@angular/platform-browser": "17.3.11",
+    "@angular/platform-browser-dynamic": "17.3.11",
+    "@angular/router": "17.3.11",
     "@arethetypeswrong/cli": "0.16.4",
     "@babel/parser": "7.24.7",
     "@babel/types": "7.24.7",
@@ -253,6 +259,7 @@
     "request": "2.88.2",
     "run-time-error": "1.4.0",
     "run-time-error-cjs": "1.4.0",
+    "rxjs": "^7.8.2",
     "secp256k1": "5.0.1",
     "semver-parser": "4.1.4",
     "shebang-loader": "0.0.1",
@@ -278,7 +285,8 @@
     "webpack": "5.99.3",
     "webpack-cli": "4.10.0",
     "wget-improved": "3.4.0",
-    "yargs": "17.7.2"
+    "yargs": "17.7.2",
+    "zone.js": "^0.16.0"
   },
   "dependenciesMeta": {
     "@2060.io/ffi-napi": {
