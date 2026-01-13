@@ -38,7 +38,9 @@ jobs:
 
       - run: nuclei --version
 
-      - run: npm run configure
+      - run: yarn install 
+      
+      - run: yarn configure
 
       - name: Create URLs file for Nuclei
         run: |
