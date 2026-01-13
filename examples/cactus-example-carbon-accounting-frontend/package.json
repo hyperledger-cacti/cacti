@@ -48,12 +48,12 @@
     "start": "ng serve"
   },
   "dependencies": {
-    "@angular/common": "16.2.4",
-    "@angular/core": "16.2.4",
-    "@angular/forms": "16.2.4",
-    "@angular/platform-browser": "16.2.4",
-    "@angular/platform-browser-dynamic": "16.2.4",
-    "@angular/router": "16.2.4",
+    "@angular/common": "17.3.11",
+    "@angular/core": "17.3.11",
+    "@angular/forms": "17.3.11",
+    "@angular/platform-browser": "17.3.11",
+    "@angular/platform-browser-dynamic": "17.3.11",
+    "@angular/router": "17.3.11",
     "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
@@ -64,7 +64,7 @@
     "@ionic-native/core": "5.36.0",
     "@ionic-native/splash-screen": "patch:@ionic-native/splash-screen@npm%3A5.36.0#~/.yarn/patches/@ionic-native-splash-screen-npm-5.36.0-531cbbe0f8.patch",
     "@ionic-native/status-bar": "patch:@ionic-native/status-bar@npm%3A5.36.0#~/.yarn/patches/@ionic-native-status-bar-npm-5.36.0-1ca86cbaad.patch",
-    "@ionic/angular": "7.3.3",
+    "@ionic/angular": "8.2.5",
     "browserify-fs": "1.0.0",
     "net-browserify": "0.2.4",
     "rxjs": "7.8.1",
@@ -73,13 +73,14 @@
     "zone.js": "0.13.1"
   },
   "devDependencies": {
-    "@angular-builders/custom-webpack": "16.0.1",
-    "@angular-devkit/build-angular": "16.2.1",
-    "@angular/cli": "16.2.1",
-    "@angular/compiler": "16.2.4",
-    "@angular/compiler-cli": "16.2.4",
-    "@angular/language-service": "16.2.4",
+    "@angular-builders/custom-webpack": "17.0.2",
+    "@angular-devkit/build-angular": "17.3.11",
+    "@angular/cli": "17.3.11",
+    "@angular/compiler": "17.3.11",
+    "@angular/compiler-cli": "17.3.11",
+    "@angular/language-service": "17.3.11",
     "@ionic/angular-toolkit": "10.0.0",
+    "@types/node": "25.0.8",
     "browserify-fs": "1.0.0",
     "browserify-zlib": "0.2.0",
     "buffer": "6.0.3",
@@ -90,7 +91,8 @@
     "path-browserify": "1.0.1",
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
-    "tls-browserify": "0.2.2"
+    "tls-browserify": "0.2.2",
+    "typescript": "5.9.3"
   },
   "engines": {
     "node": ">=18",
