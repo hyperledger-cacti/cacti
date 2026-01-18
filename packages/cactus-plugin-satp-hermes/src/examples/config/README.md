@@ -67,7 +67,7 @@ SATP configurations use the `bridgeConfig` section and include additional gatewa
 
 **Features**:
 - Gateway ID: mockID-1
-- Connected to HardhatTestNetwork1
+- Connected to EthereumLedgerTestNetwork1
 - Counter-party gateway configuration (Gateway 2)
 - Full cryptographic key pair configuration
 - Bridge configuration with claim format type 1
@@ -81,7 +81,7 @@ SATP configurations use the `bridgeConfig` section and include additional gatewa
 
 **Features**:
 - Gateway ID: mockID-2
-- Connected to HardhatTestNetwork2  
+- Connected to EthereumLedgerTestNetwork2  
 - Counter-party gateway configuration (Gateway 1)
 - Different cryptographic key pair from Gateway 1
 - Bridge configuration for the second network
