@@ -43,8 +43,8 @@ function isWeb3SigningCredentialCactusKeychainRef(
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "transactionSignerEthAccount" in obj &&
-    typeof objRecord.transactionSignerEthAccount === "string" &&
+    "ethAccount" in obj &&
+    typeof objRecord.ethAccount === "string" &&
     "keychainEntryKey" in obj &&
     typeof objRecord.keychainEntryKey === "string" &&
     "keychainId" in obj &&
@@ -62,8 +62,8 @@ function isWeb3SigningCredentialPrivateKeyHex(
   return (
     typeof obj === "object" &&
     obj !== null &&
-    "transactionSignerEthAccount" in obj &&
-    typeof objRecord.transactionSignerEthAccount === "string" &&
+    "ethAccount" in obj &&
+    typeof objRecord.ethAccount === "string" &&
     "secret" in obj &&
     typeof objRecord.secret === "string" &&
     "type" in obj &&
@@ -92,6 +92,11 @@ function isWeb3SigningCredential(
   if (!obj || typeof obj !== "object") {
     log.error("isWeb3SigningCredential: obj is not an object or is null");
     return false;
+  }
+  const objRecord = obj as Record<string, unknown>;
+  if ("transactionSignerEthAccount" in objRecord) {
+    (obj as any).ethAccount = (obj as any).transactionSignerEthAccount;
+    delete (obj as any).transactionSignerEthAccount;
   }
   return (
     isWeb3SigningCredentialCactusKeychainRef(obj) ||
