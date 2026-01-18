@@ -31,7 +31,12 @@
  * @since 0.0.3-beta
  */
 
-import type { LocalLog, RemoteLog } from "../../../core/types";
+import type {
+  LocalLog,
+  RemoteLog,
+  AuditEntry,
+  Audit,
+} from "../../../core/types";
 
 /**
  * Base repository interface for generic data persistence operations.
@@ -160,6 +165,19 @@ export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
   readById(id: string): Promise<RemoteLog>;
   /** Create new remote log entry */
   create(log: RemoteLog): any;
+  /** Clean up repository resources and connections */
+  destroy(): any;
+  /** Reset repository to initial state */
+  reset(): any;
+}
+
+export interface IAuditEntryRepository extends IRepository<AuditEntry, string> {
+  readById(auditId: string): Promise<AuditEntry>;
+  readByTimeInterval(
+    startTimestamp: string,
+    endTimestamp: string,
+  ): Promise<Audit>;
+  create(auditEntryId: AuditEntry): any;
   /** Clean up repository resources and connections */
   destroy(): any;
   /** Reset repository to initial state */
