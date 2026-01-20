@@ -9,6 +9,8 @@ src/main/solidity/generated/build-info/
 src/main/typescript/database/*
 !src/main/typescript/database/*.ts
 !src/main/typescript/database/migrations/*.ts
+!src/main/typescript/database/repository/
+!src/main/typescript/database/repository/*.ts
 reports/junit/satp-hermes-tests-unit.xml
 reports/junit/satp-hermes-tests-integration.xml
 
