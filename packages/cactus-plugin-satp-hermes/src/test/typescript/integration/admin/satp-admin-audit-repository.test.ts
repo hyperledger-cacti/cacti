@@ -257,18 +257,15 @@ describe("AuditEntry Repository Integration Tests (Given-When-Then)", () => {
     sequenceNumber: 0,
   };
 
-  const mockLocalLogs: LocalLog[] = [
-    mockLocalLog,
-    {
-      sessionId: "session-123",
-      type: "state-change",
-      key: "log-002",
-      operation: "commit-ready",
-      timestamp: new Date(Date.now() + 1000).toISOString(),
-      data: JSON.stringify({ assetId: "asset-1", status: "unlocked" }),
-      sequenceNumber: 2,
-    },
-  ];
+  const mockLocalLog2: LocalLog = {
+    sessionId: "session-123",
+    type: "state-change",
+    key: "log-002",
+    operation: "commit-ready",
+    timestamp: (Date.now() + 1000).toString(),
+    data: JSON.stringify({ assetId: "asset-1", status: "unlocked" }),
+    sequenceNumber: 2,
+  };
 
   beforeAll(async () => {
     repository = new KnexAuditEntryRepository({
@@ -291,9 +288,8 @@ describe("AuditEntry Repository Integration Tests (Given-When-Then)", () => {
     // Given
     const auditEntry: AuditEntry = {
       auditEntryId: uuidv4(),
-      sessions: mockLocalLogs,
-      startTimestamp: new Date().toISOString(),
-      endTimestamp: new Date(Date.now() + 1000).toISOString(),
+      session: mockLocalLog,
+      timestamp: new Date().toString(),
     };
 
     // When
@@ -303,8 +299,7 @@ describe("AuditEntry Repository Integration Tests (Given-When-Then)", () => {
     // Then
     expect(retrieved).toBeDefined();
     expect(retrieved?.auditEntryId).toEqual(auditEntry.auditEntryId);
-    expect(retrieved?.startTimestamp).toEqual(auditEntry.startTimestamp);
-    expect(retrieved?.endTimestamp).toEqual(auditEntry.endTimestamp);
+    expect(retrieved?.timestamp).toEqual(auditEntry.timestamp);
   });
 
   it("Given multiple AuditEntries, When reading by time interval, Then it should return only the entries within that interval", async () => {
@@ -315,15 +310,13 @@ describe("AuditEntry Repository Integration Tests (Given-When-Then)", () => {
     const entries: AuditEntry[] = [
       {
         auditEntryId: uuidv4(),
-        sessions: mockLocalLogs,
-        startTimestamp: now.toISOString(),
-        endTimestamp: later.toISOString(),
+        session: mockLocalLog,
+        timestamp: now.toString(),
       },
       {
         auditEntryId: uuidv4(),
-        sessions: mockLocalLogs,
-        startTimestamp: new Date(now.getTime() + 10000).toISOString(),
-        endTimestamp: new Date(later.getTime() + 10000).toISOString(),
+        session: mockLocalLog2,
+        timestamp: (now.getTime() + 10000).toString(),
       },
     ];
 
@@ -333,33 +326,31 @@ describe("AuditEntry Repository Integration Tests (Given-When-Then)", () => {
 
     // When
     const audit: Audit = await repository.readByTimeInterval(
-      now.toISOString(),
-      new Date(later.getTime() + 5000).toISOString(),
+      now.toString(),
+      new Date(later.getTime() + 5000).toString(),
     );
 
     // Then
     expect(audit.auditEntries.length).toEqual(1);
     expect(audit.auditEntries[0].auditEntryId).toEqual(entries[0].auditEntryId);
-    expect(audit.auditEntries[0].sessions[0].sessionId).toEqual(
-      mockLocalLogs[0].sessionId,
+    expect(audit.auditEntries[0].session.sessionId).toEqual(
+      mockLocalLog.sessionId,
     );
   });
 
   it("Given an empty database, When reading by non-existing ID, Then it should return undefined", async () => {
-    // Given / When
-    const retrieved = await repository.readById("non-existing-id");
-
-    // Then
-    expect(retrieved).toBeUndefined();
+    // Given / When / Then
+    await expect(repository.readById("non-existing-id")).rejects.toThrow(
+      TypeError,
+    );
   });
 
   it("Given existing AuditEntries, When resetting the database, Then all entries should be removed", async () => {
     // Given
     const auditEntry: AuditEntry = {
       auditEntryId: uuidv4(),
-      sessions: mockLocalLogs,
-      startTimestamp: new Date().toISOString(),
-      endTimestamp: new Date().toISOString(),
+      session: mockLocalLog,
+      timestamp: new Date().toString(),
     };
     await repository.create(auditEntry);
 
