@@ -99,10 +99,6 @@ jobs:
           key: openapi-generator-cli-${{ runner.os }}-6.6.0
           restore-keys: |
             openapi-generator-cli-${{ runner.os }}-
-      
-      - name: Codegen Warmup
-        if: steps.cache-openapi-generator-jar.outputs.cache-hit != 'true'
-        run: yarn codegen:warmup-mkdir && yarn tools:download-file-to-disk --url=https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar --output-file-path=./node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar
 
       - name: Run codegen
         run: yarn codegen
