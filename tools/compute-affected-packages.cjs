@@ -9,6 +9,7 @@
  * 4. Finds directly changed packages and recursively adds their dependents.
  * 5. Outputs a JSON array of affected package directories (for CI matrix).
  */
+const os = require("os");
 
 const fs = require("fs");
 
@@ -75,10 +76,17 @@ function detectChangedPackages(packages) {
     throw err;
   }
 
-  const changedFiles = execSync(`git diff --name-only ${baseRef} HEAD`)
-    .toString()
+  const tmpFile = path.join(os.tmpdir(), `changed-files-${process.pid}.txt`);
+
+  execSync(`git diff --name-only origin/main...HEAD > "${tmpFile}"`, {
+    stdio: ["ignore", "inherit", "inherit"],
+  });
+
+  const changedFiles = fs
+    .readFileSync(tmpFile, "utf8")
     .split("\n")
     .filter(Boolean);
+  fs.unlinkSync(tmpFile);
 
   if (changedFiles.some((f) => f.startsWith(".github/"))) {
     return Object.keys(packages);
@@ -100,10 +108,15 @@ function detectChangedPackages(packages) {
     return [];
   }
 
-  // Full diff for comment detection
-  const diff = execSync(`git diff ${baseRef} HEAD`, {
-    encoding: "utf8",
+  // Full diff for comment detection (stream to file to avoid ENOBUFS)
+  const tmpDiffFile = path.join(os.tmpdir(), `full-diff-${process.pid}.txt`);
+
+  execSync(`git diff ${baseRef} HEAD > "${tmpDiffFile}"`, {
+    stdio: ["ignore", "inherit", "inherit"],
   });
+
+  const diff = fs.readFileSync(tmpDiffFile, "utf8");
+  fs.unlinkSync(tmpDiffFile);
 
   /**
    * Regex: identifies added/removed lines that are REAL CODE.
