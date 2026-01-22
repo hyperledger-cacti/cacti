@@ -31,7 +31,7 @@ router.get(
   "/api/v1/bl/logics/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render("Not Implemented (Show Business Logics)\n");
+      res.status(501).send("Not Implemented (Show Business Logics)\n");
     } catch (err) {
       next(err);
     }
@@ -43,12 +43,14 @@ router.get(
   "/api/v1/bl/logics/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render(
-        "Not Implemented (Show Specification of Business Logic" +
-          ", id=" +
-          escapeHtml(req.params.id) +
-          ")\n",
-      );
+      res
+        .status(501)
+        .send(
+          "Not Implemented (Show Specification of Business Logic" +
+            ", id=" +
+            escapeHtml(req.params.id as string) +
+            ")\n",
+        );
     } catch (err) {
       next(err);
     }
@@ -60,7 +62,7 @@ router.post(
   "/api/v1/bl/wallets/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render("Not Implemented (Register a Wallet)\n");
+      res.status(501).send("Not Implemented (Register a Wallet)\n");
     } catch (err) {
       next(err);
     }
@@ -72,7 +74,7 @@ router.get(
   "/api/v1/bl/wallets/",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render("Not Implemented (Show Wallet List)\n");
+      res.status(501).send("Not Implemented (Show Wallet List)\n");
     } catch (err) {
       next(err);
     }
@@ -84,12 +86,14 @@ router.put(
   "/api/v1/bl/wallets/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      res.render(
-        "Not Implemented (Update Existing Wallets" +
-          ", id=" +
-          escapeHtml(req.params.id) +
-          ")\n",
-      );
+      res
+        .status(501)
+        .send(
+          "Not Implemented (Update Existing Wallets" +
+            ", id=" +
+            escapeHtml(req.params.id as string) +
+            ")\n",
+        );
     } catch (err) {
       next(err);
     }
@@ -101,7 +105,7 @@ router.delete(
   "/api/v1/bl/wallets/:id",
   (req: Request, res: Response, next: NextFunction) => {
     try {
-      const walletIdEsc = escapeHtml(req.params.id);
+      const walletIdEsc = escapeHtml(req.params.id as string);
       const out = "Not Implemented (Delete a Wallet, id=" + walletIdEsc + ")\n";
       res.status(501).send(out);
     } catch (err) {

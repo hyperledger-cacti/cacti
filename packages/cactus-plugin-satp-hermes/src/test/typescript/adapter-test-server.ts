@@ -146,13 +146,27 @@ export function createTestApp(): {
   app.post("/webhook/trigger", async (req: Request, res: Response) => {
     const { url, payload } = req.body;
 
-    if (!url) {
-      res.status(400).json({ error: "Missing 'url' in body" });
+    if (!url || typeof url !== "string") {
+      res.status(400).json({ error: "Missing or invalid 'url' in body" });
+      return;
+    }
+
+    let parsedUrl: URL;
+
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      res.status(400).json({ error: "Invalid URL provided" });
+      return;
+    }
+
+    if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+      res.status(400).json({ error: "Protocol must be http or https" });
       return;
     }
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(parsedUrl.toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload ?? {}),
@@ -249,7 +263,14 @@ export function createTestApp(): {
   // POST /webhook/outbound/delay/:ms - Outbound target with configurable delay
   // Useful for testing timeout scenarios
   app.post("/webhook/outbound/delay/:ms", (req: Request, res: Response) => {
-    const delayMs = parseInt(req.params.ms as string, 10) || 1000;
+    let delayMs = parseInt(req.params.ms as string, 10);
+    if (isNaN(delayMs)) {
+      delayMs = 1000;
+    }
+    // Cap delay at 30 seconds to prevent resource exhaustion
+    if (delayMs > 30000) {
+      delayMs = 30000;
+    }
 
     setTimeout(() => {
       res.status(200).json({
