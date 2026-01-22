@@ -249,7 +249,7 @@ export function createTestApp(): {
   // POST /webhook/outbound/delay/:ms - Outbound target with configurable delay
   // Useful for testing timeout scenarios
   app.post("/webhook/outbound/delay/:ms", (req: Request, res: Response) => {
-    const delayMs = parseInt(req.params.ms, 10) || 1000;
+    const delayMs = parseInt(req.params.ms as string, 10) || 1000;
 
     setTimeout(() => {
       res.status(200).json({
@@ -263,7 +263,7 @@ export function createTestApp(): {
   // POST /webhook/outbound/error/:code - Return specific HTTP error code
   // Useful for testing error handling
   app.post("/webhook/outbound/error/:code", (req: Request, res: Response) => {
-    const errorCode = parseInt(req.params.code, 10) || 500;
+    const errorCode = parseInt(req.params.code as string, 10) || 500;
     res.status(errorCode).json({
       error: true,
       code: errorCode,
