@@ -13,7 +13,10 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { Address, GatewayIdentity } from "../../../../main/typescript/core/types";
+import {
+  Address,
+  GatewayIdentity,
+} from "../../../../main/typescript/core/types";
 import { setupGatewayDockerFiles } from "../../test-utils";
 import {
   SATP_DOCKER_IMAGE_VERSION,

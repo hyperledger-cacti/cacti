@@ -21,32 +21,35 @@ logger.level = config.logLevel;
 const router: Router = Router();
 
 /* GET balance. */
-router.get("/:ac    count", (req: Request, res: Response, next: NextFunction) => {
-  try {
-    getAccountBalance(req.params.account as string)
-      .then((result) => {
-        logger.debug(`#####[sample/balance.ts]`);
-        logger.debug("result(getBalance) = " + result);
-        res.status(200).json(result);
-      })
-      .catch((err) => {
-        logger.error(err);
-      });
-  } catch (err) {
-    if (err instanceof Error) {
-      logger.error(`##err name: ${err.constructor.name}`);
-    }
+router.get(
+  "/:ac    count",
+  (req: Request, res: Response, next: NextFunction) => {
+    try {
+      getAccountBalance(req.params.account as string)
+        .then((result) => {
+          logger.debug(`#####[sample/balance.ts]`);
+          logger.debug("result(getBalance) = " + result);
+          res.status(200).json(result);
+        })
+        .catch((err) => {
+          logger.error(err);
+        });
+    } catch (err) {
+      if (err instanceof Error) {
+        logger.error(`##err name: ${err.constructor.name}`);
+      }
 
-    if (err instanceof RIFError) {
-      logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
-      res.status(err.statusCode);
-      res.send(err.message);
-      return;
-    }
+      if (err instanceof RIFError) {
+        logger.debug(`##catch RIFError, ${err.statusCode}, ${err.message}`);
+        res.status(err.statusCode);
+        res.send(err.message);
+        return;
+      }
 
-    logger.error(`##err in balance: ${err}`);
-    next(err);
-  }
-});
+      logger.error(`##err in balance: ${err}`);
+      next(err);
+    }
+  },
+);
 
 export default router;

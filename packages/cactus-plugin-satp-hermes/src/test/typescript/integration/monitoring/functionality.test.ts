@@ -323,8 +323,12 @@ afterEach(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  await besuEnv.tearDown();
-  await ethereumEnv.tearDown();
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
 
   if (gateway) {
     await gateway.shutdown();

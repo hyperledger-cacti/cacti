@@ -72,14 +72,18 @@ beforeAll(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  await fabricEnv.tearDown();
+  if (fabricEnv) {
+    await fabricEnv.tearDown();
+  }
 
-  await fabricLeaf.shutdownConnection().catch((err) => {
-    log.error("Error shutting down Fabric Leaf connector:", err);
-    fail("Error shutting down Fabric Leaf connector");
-  });
+  if (fabricLeaf) {
+    await fabricLeaf.shutdownConnection().catch((err) => {
+      log.error("Error shutting down Fabric Leaf connector:", err);
+      fail("Error shutting down Fabric Leaf connector");
+    });
 
-  log.info("Fabric Leaf connector shutdown successfully");
+    log.info("Fabric Leaf connector shutdown successfully");
+  }
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
