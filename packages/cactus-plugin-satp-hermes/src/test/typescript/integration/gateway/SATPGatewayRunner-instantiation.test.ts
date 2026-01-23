@@ -12,13 +12,13 @@ import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
-} from "../../../main/typescript/core/constants";
-import { Address, GatewayIdentity } from "../../../main/typescript/core/types";
-import { setupGatewayDockerFiles } from "../test-utils";
+} from "../../../../main/typescript/core/constants";
+import { Address, GatewayIdentity } from "../../../../main/typescript/core/types";
+import { setupGatewayDockerFiles } from "../../test-utils";
 import {
   SATP_DOCKER_IMAGE_VERSION,
   SATP_DOCKER_IMAGE_NAME,
-} from "../constants";
+} from "../../constants";
 
 const logLevel: LogLevelDesc = "DEBUG";
 

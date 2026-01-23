@@ -21,7 +21,7 @@ const router: Router = Router();
 /* GET balance. */
 router.get("/:account", (req: Request, res: Response, next: NextFunction) => {
   try {
-    getAccountBalance(req.params.account)
+    getAccountBalance(req.params.account as string)
       .then((result) => {
         logger.debug(`#####[sample/balance.ts]`);
         logger.debug("result(getBalance) = " + result);
