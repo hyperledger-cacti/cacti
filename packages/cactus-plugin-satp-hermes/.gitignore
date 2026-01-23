@@ -8,9 +8,7 @@ src/test/solidity/generated/build-info/
 src/main/solidity/generated/build-info/
 src/main/typescript/database/*
 !src/main/typescript/database/*.ts
-reports/junit/satp-hermes-tests-unit.xml
-reports/junit/satp-hermes-tests-integration.xml
-reports/junit/satp-hermes-tests-integration.xml
+reports/**/*
 # TypeDoc generated documentation
 public/typedoc/
 
