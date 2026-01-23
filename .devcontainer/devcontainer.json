@@ -30,7 +30,8 @@
 		},
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,
-			"version": "18.19.0"
+			"version": "18.19.0",
+			"installYarnUsingApt": false
 		},
 		"ghcr.io/devcontainers/features/rust:1": {
 			"version": "1.74",
