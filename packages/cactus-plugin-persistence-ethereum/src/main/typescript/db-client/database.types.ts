@@ -90,6 +90,35 @@ export interface Database {
           last_owner_change?: string;
         };
       };
+      token_erc1155: {
+        Row: {
+          id: string;
+          account_address: string;
+          token_address: string;
+          token_id: number;
+          balance: number;
+          uri: string | null;
+          last_balance_change: string;
+        };
+        Insert: {
+          id?: string;
+          account_address: string;
+          token_address: string;
+          token_id: number;
+          balance: number;
+          uri?: string | null;
+          last_balance_change?: string;
+        };
+        Update: {
+          id?: string;
+          account_address?: string;
+          token_address?: string;
+          token_id?: number;
+          balance: number;
+          uri?: string | null;
+          last_balance_change?: string;
+        };
+      };
       token_metadata_erc20: {
         Row: {
           address: string;
@@ -130,6 +159,26 @@ export interface Database {
           address?: string;
           name?: string;
           symbol?: string;
+          created_at?: string;
+        };
+      };
+      token_metadata_erc1155: {
+        Row: {
+          address: string;
+          name: string | null;
+          symbol: string | null;
+          created_at: string;
+        };
+        Insert: {
+          address: string;
+          name: string | null;
+          symbol: string | null;
+          created_at?: string;
+        };
+        Update: {
+          address?: string;
+          name?: string | null;
+          symbol?: string | null;
           created_at?: string;
         };
       };

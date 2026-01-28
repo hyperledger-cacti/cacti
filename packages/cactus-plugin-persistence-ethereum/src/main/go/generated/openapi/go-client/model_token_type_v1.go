@@ -22,12 +22,14 @@ type TokenTypeV1 string
 const (
 	ERC20 TokenTypeV1 = "erc20"
 	ERC721 TokenTypeV1 = "erc721"
+	ERC1155 TokenTypeV1 = "erc1155"
 )
 
 // All allowed values of TokenTypeV1 enum
 var AllowedTokenTypeV1EnumValues = []TokenTypeV1{
 	"erc20",
 	"erc721",
+	"erc1155",
 }
 
 func (v *TokenTypeV1) UnmarshalJSON(src []byte) error {
