@@ -108,7 +108,28 @@ import {
   SATPGateway,
   type SATPGatewayConfig,
 } from "./plugin-satp-hermes-gateway";
-import fs from "fs-extra";
+
+// Process-level error handlers for container/CLI deployment
+// These ensure that unhandled errors are properly logged before exit
+if (require.main === module) {
+  process.on("uncaughtException", (err: Error) => {
+    console.error("[SATP Gateway] Uncaught Exception:", err);
+    process.exit(255);
+  });
+
+  process.on(
+    "unhandledRejection",
+    (reason: unknown, promise: Promise<unknown>) => {
+      console.error(
+        "[SATP Gateway] Unhandled Rejection at:",
+        promise,
+        "reason:",
+        reason,
+      );
+      process.exit(255);
+    },
+  );
+}
 
 import { validateSatpGatewayIdentity } from "./services/validation/config-validating-functions/validate-satp-gateway-identity";
 import { validateSatpCounterPartyGateways } from "./services/validation/config-validating-functions/validate-satp-counter-party-gateways";
@@ -119,7 +140,6 @@ import { validateSatpPrivacyPolicies } from "./services/validation/config-valida
 import { validateSatpMergePolicies } from "./services/validation/config-validating-functions/validate-satp-merge-policies";
 import { validateSatpKeyPairJSON } from "./services/validation/config-validating-functions/validate-key-pair-json";
 import { validateCCConfig } from "./services/validation/config-validating-functions/validate-cc-config";
-import path from "node:path";
 import { validateSatpEnableCrashRecovery } from "./services/validation/config-validating-functions/validate-satp-enable-crash-recovery";
 import { validateKnexRepositoryConfig } from "./services/validation/config-validating-functions/validate-knex-repository-config";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -127,11 +147,15 @@ import { validateInstanceId } from "./services/validation/config-validating-func
 import { v4 as uuidv4 } from "uuid";
 import { validateOntologyPath } from "./services/validation/config-validating-functions/validate-ontology-path";
 import { validateExtensions } from "./services/validation/config-validating-functions/validate-extensions";
-import {
-  loadAdapterConfigFromYaml,
-  validateAdapterConfig,
-} from "./services/validation/config-validating-functions/validate-adapter-config";
-import type { AdapterLayerConfiguration } from "./adapters/adapter-config";
+import { validateAdapterConfig } from "./services/validation/config-validating-functions/validate-adapter-config";
+import { loadGatewayConfig } from "./services/validation/load-gateway-config";
+
+// Re-export config loading utilities for external consumers
+export type {
+  LoadConfigOptions,
+  LoadConfigResult,
+} from "./services/validation/load-gateway-config";
+export { loadGatewayConfig } from "./services/validation/load-gateway-config";
 
 /**
  * Launch SATP Gateway - Main CLI function for gateway deployment and startup.
@@ -258,39 +282,10 @@ export async function launchGateway(
     label: "SATP-Gateway",
   });
 
-  const workDir = opts?.workDir ?? "/opt/cacti/satp-hermes";
-  const configPath =
-    opts?.configPath ?? path.join(workDir, "config/config.json");
-  const adapterConfigPath =
-    opts?.adapterConfigPath ?? path.join(workDir, "config/adapter-config.yml");
-
-  logger.debug("Checking for configuration file...");
-  if (!fs.existsSync(configPath)) {
-    throw new Error(`Could not find gateway-config.json at ${configPath}`);
-  }
-
-  logger.debug(`Reading configuration from: ${configPath}`);
-  const config = await fs.readJson(configPath);
-
-  logger.info("Configuration read OK");
-
-  logger.debug(`Config: ${JSON.stringify(config, null, 2)}`);
-
-  // Load adapter configuration from YAML file (optional - won't fail if file missing)
-  logger.debug(`Loading adapter configuration from: ${adapterConfigPath}`);
-  let adapterConfigRaw: AdapterLayerConfiguration | undefined;
-  try {
-    if (fs.existsSync(adapterConfigPath)) {
-      adapterConfigRaw = loadAdapterConfigFromYaml(adapterConfigPath);
-      logger.debug("Adapter configuration file loaded successfully");
-    } else {
-      logger.debug("No adapter configuration file found (optional)");
-    }
-  } catch (err) {
-    logger.error(`Failed to load adapter configuration: ${err}`);
-    throw err;
-  }
-  logger.debug(`Config: ${JSON.stringify(adapterConfigRaw, null, 2)}`);
+  const { config, adapterConfig: adapterConfigRaw } = await loadGatewayConfig(
+    opts,
+    logger,
+  );
 
   const instanceId = await runValidation(
     "SATP Gateway instanceId",
@@ -481,7 +476,15 @@ export async function launchGateway(
  * @since 0.0.3-beta
  */
 if (require.main === module) {
-  launchGateway();
+  launchGateway()
+    .then(() => {
+      console.log("[SATP Gateway] Gateway launched successfully");
+    })
+    .catch((error: Error) => {
+      console.error("[SATP Gateway] Failed to launch gateway:", error.message);
+      console.error("[SATP Gateway] Stack trace:", error.stack);
+      process.exit(1);
+    });
 }
 
 const runValidation = <T>(

@@ -12,7 +12,10 @@ import {
 
 import type { SATPGatewayConfig } from "../../../../main/typescript/plugin-satp-hermes-gateway";
 import { createClient } from "../../test-utils";
-import { HealthCheckResponseStatusEnum } from "../../../../main/typescript";
+import {
+  HealthCheckResponseStatusEnum,
+  StatusResponseStatusEnum,
+} from "../../../../main/typescript";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
@@ -63,7 +66,7 @@ const options: SATPGatewayConfig = {
 };
 
 describe("GetStatus Endpoint and Functionality testing", () => {
-  test("GetStatus endpoint works", async () => {
+  test("GetStatus endpoint returns error for non-existent session", async () => {
     const gateway = await factory.create(options);
 
     try {
@@ -79,10 +82,48 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         sessionID: "test-session-id",
       };
 
-      await adminApiClient.getStatus(statusRequest.sessionID);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.error ?? JSON.stringify(error);
-      expect(errorMsg).toContain("Session not found");
+      await expect(
+        adminApiClient.getStatus(statusRequest.sessionID),
+      ).rejects.toMatchObject({
+        response: {
+          data: {
+            error: expect.stringContaining("Session not found"),
+          },
+        },
+      });
+    } finally {
+      await gateway.shutdown();
+    }
+  });
+
+  test("GetStatus endpoint returns status for an existing session", async () => {
+    const gateway = await factory.create(options);
+
+    try {
+      await gateway.startup();
+      const address = options.gid!.address!;
+      const port = options.gid!.gatewayOapiPort!;
+
+      await gateway.getOrCreateHttpServer();
+
+      // Get the SATPManager and create a session
+      const dispatcher = gateway.BLODispatcherInstance;
+      expect(dispatcher).toBeDefined();
+      const manager = await dispatcher!.getManager();
+
+      // Create a new session using the manager's getOrCreateSession method
+      const session = manager.getOrCreateSession(undefined, "test-context-id");
+      const sessionId = session.getSessionId();
+      expect(sessionId).toBeDefined();
+      expect(sessionId.length).toBeGreaterThan(0);
+
+      const adminApiClient = createClient("AdminApi", address, port, logger);
+
+      // Now getStatus should succeed for this session
+      const result = await adminApiClient.getStatus(sessionId);
+      expect(result).toBeDefined();
+      expect(result.status).toBe(200);
+      expect(result.data.status).toBe(StatusResponseStatusEnum.Pending);
     } finally {
       await gateway.shutdown();
     }
@@ -136,7 +177,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
     }
   });
 
-  test("Oracle endpoints work", async () => {
+  test("Oracle endpoint returns error for non-existent task", async () => {
     const gateway = await factory.create(options);
 
     try {
@@ -148,16 +189,15 @@ describe("GetStatus Endpoint and Functionality testing", () => {
 
       const oracleApiClient = createClient("OracleApi", address, port, logger);
 
-      try {
-        const result =
-          await oracleApiClient.getOracleTaskStatus("test-task-id");
-
-        expect(result).toBeDefined();
-        expect(result.status).toBe(200);
-        expect(result.data.taskID).toBe("test-task-id");
-      } catch (error) {
-        expect(error.response.data.error).toContain("test-task-id not found");
-      }
+      await expect(
+        oracleApiClient.getOracleTaskStatus("test-task-id"),
+      ).rejects.toMatchObject({
+        response: {
+          data: {
+            error: expect.stringContaining("test-task-id not found"),
+          },
+        },
+      });
     } finally {
       await gateway.shutdown();
     }

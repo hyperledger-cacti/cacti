@@ -204,6 +204,20 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
   fs.writeFileSync(configFilePath, JSON.stringify(jsonObject, null, 2));
   expect(fs.existsSync(configFilePath)).toBe(true);
 
+  // Log the absolute path for debugging Docker mount issues
+  const absoluteConfigDir = path.resolve(configDir);
+  console.log(
+    `[setupGatewayDockerFiles] Config directory (absolute): ${absoluteConfigDir}`,
+  );
+  console.log(`[setupGatewayDockerFiles] Config file path: ${configFilePath}`);
+  console.log(
+    `[setupGatewayDockerFiles] Config file exists: ${fs.existsSync(configFilePath)}`,
+  );
+  // List the contents to verify
+  console.log(
+    `[setupGatewayDockerFiles] Config dir contents: ${JSON.stringify(fs.readdirSync(absoluteConfigDir))}`,
+  );
+
   const logDir = path.join(
     directory,
     `gateway-info-${gatewayIdentity.id}/logs`,
@@ -230,9 +244,9 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
   }
 
   return {
-    configPath: configDir,
-    logsPath: logDir,
-    ontologiesPath: ontologiesDir,
+    configPath: path.resolve(configDir),
+    logsPath: path.resolve(logDir),
+    ontologiesPath: path.resolve(ontologiesDir),
   };
 }
 
