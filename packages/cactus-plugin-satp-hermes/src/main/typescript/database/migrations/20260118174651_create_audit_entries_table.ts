@@ -3,9 +3,8 @@ import { Knex } from "knex";
 export function up(knex: Knex): Knex.SchemaBuilder {
   return knex.schema.createTable("audit_entries", (table) => {
     table.string("auditEntryId").notNullable().unique().primary();
-    table.string("sessions");
-    table.string("startTimestamp").notNullable();
-    table.string("endTimestamp").notNullable();
+    table.string("session");
+    table.string("timestamp").notNullable();
   });
 }
 
