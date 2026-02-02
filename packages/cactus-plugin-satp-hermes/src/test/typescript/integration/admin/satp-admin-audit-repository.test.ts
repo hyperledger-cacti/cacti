@@ -7,7 +7,7 @@ import type {
 } from "../../../../main/typescript/core/types";
 import { v4 as uuidv4 } from "uuid";
 
-describe("AuditEntry Repository Integration Tests (Given-When-Then)", () => {
+describe("AuditEntry Repository Integration Tests", () => {
   let repository: KnexAuditEntryRepository;
 
   const mockLocalLog: LocalLog = {
