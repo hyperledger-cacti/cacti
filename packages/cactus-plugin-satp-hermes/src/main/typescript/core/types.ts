@@ -249,9 +249,8 @@ export enum CrashStatus {
 
 export interface AuditEntry {
   auditEntryId: string;
-  sessions: LocalLog[];
-  startTimestamp: string;
-  endTimestamp: string;
+  session: LocalLog;
+  timestamp: string;
 }
 
 export interface Audit {
