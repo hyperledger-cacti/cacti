@@ -14,7 +14,7 @@
 import type { AuditEntry, Audit } from "../../core/types";
 import type { IAuditEntryRepository } from "./interfaces/repository";
 import knex, { type Knex } from "knex";
-import { knexLocalInstance } from "../knexfile";
+import { knexAuditInstance } from "../knexfile-audit";
 import { createMigrationSource } from "../knex-migration-source";
 
 /**
@@ -74,7 +74,7 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
    */
   public constructor(config: Knex.Config | undefined) {
     const envName = process.env.ENVIRONMENT || "development";
-    const configFile = knexLocalInstance[envName];
+    const configFile = knexAuditInstance[envName];
 
     config = config || configFile;
 
@@ -86,6 +86,9 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
         migrationSource: migrationSource,
       },
     } as Knex.Config;
+    console.log(
+      `KnexAuditEntryRepository using config: ${JSON.stringify(config)}`,
+    );
     this.database = knex(config);
   }
 
