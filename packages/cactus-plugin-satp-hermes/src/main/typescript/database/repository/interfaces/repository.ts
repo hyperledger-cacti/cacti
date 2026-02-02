@@ -177,7 +177,7 @@ export interface IAuditEntryRepository extends IRepository<AuditEntry, string> {
     startTimestamp: string,
     endTimestamp: string,
   ): Promise<Audit>;
-  create(auditEntryId: AuditEntry): any;
+  create(auditEntry: AuditEntry): any;
   /** Clean up repository resources and connections */
   destroy(): any;
   /** Reset repository to initial state */
