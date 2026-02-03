@@ -14,16 +14,16 @@ import {
   JWSGeneral,
   JWSRecipient,
   createIsJwsGeneralTypeGuard,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry, ConsortiumRepository } from "@hyperledger/cactus-core";
+import { PluginRegistry, ConsortiumRepository } from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { GetConsortiumEndpointV1 } from "./consortium/get-consortium-jws-endpoint-v1";
 import { GetNodeJwsEndpoint } from "./consortium/get-node-jws-endpoint-v1";
 
@@ -193,7 +193,7 @@ export class PluginConsortiumManual
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-consortium-manual`;
+    return `@hyperledger-cacti/cactus-plugin-consortium-manual`;
   }
 
   public async getNodeJws(): Promise<JWSGeneral> {

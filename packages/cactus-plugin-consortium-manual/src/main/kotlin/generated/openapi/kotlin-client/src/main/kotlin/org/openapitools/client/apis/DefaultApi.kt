@@ -110,7 +110,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -182,7 +182,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/node/jws",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -249,7 +249,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

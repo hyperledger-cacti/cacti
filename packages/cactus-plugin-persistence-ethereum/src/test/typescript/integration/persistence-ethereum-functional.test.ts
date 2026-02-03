@@ -30,20 +30,20 @@ import {
   Logger,
   Servers,
   bigIntToDecimalStringReplacer,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_PRIVATE_KEY,
-} from "@hyperledger/cactus-test-geth-ledger";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   EthereumApiClient,
   PluginLedgerConnectorEthereum,
   WatchBlocksV1BlockData,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 
 import "jest-extended";
 import http from "http";
@@ -439,7 +439,7 @@ describe("Ethereum persistence plugin tests", () => {
 
     // getPackageName()
     expect(persistence.getPackageName()).toEqual(
-      "@hyperledger/cactus-plugin-persistence-ethereum",
+      "@hyperledger-cacti/cactus-plugin-persistence-ethereum",
     );
 
     // getOpenApiSpec()

@@ -6,17 +6,17 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api/";
+} from "@hyperledger-cacti/cactus-core-api/";
 
 import OAS from "../../json/openapi.json";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import { PluginKeychainMemory } from "../plugin-keychain-memory";
 
@@ -58,9 +58,9 @@ export class GetPrometheusExporterMetricsEndpointV1
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics"
     ];
   }
 

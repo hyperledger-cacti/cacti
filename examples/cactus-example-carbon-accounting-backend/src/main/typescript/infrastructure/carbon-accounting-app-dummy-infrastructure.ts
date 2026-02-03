@@ -7,16 +7,16 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   PluginLedgerConnectorXdai,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai";
 import {
   FabricTestLedgerV1,
   OpenEthereumTestLedger,
-} from "@hyperledger/cactus-test-tooling";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 import DaoTokenContract from "../../json/generated/src/main/solidity/net-emissions-token-network/Governance/DAOToken.sol/DAOToken.json";
 import GovernorContract from "../../json/generated/src/main/solidity/net-emissions-token-network/Governance/Governor.sol/Governor.json";
@@ -26,11 +26,11 @@ import {
   ChainCodeProgrammingLanguage,
   FileBase64,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import {
   ICarbonAccountingFabricContractDeploymentInfo,
   ICarbonAccountingXdaiContractDeploymentInfo,
-} from "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin";
+} from "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin";
 
 export interface ICarbonAccountingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;

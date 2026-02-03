@@ -5,9 +5,9 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   CactusKeychainVaultServer,
@@ -15,17 +15,17 @@ import {
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
   K_DEFAULT_VAULT_HTTP_PORT,
   VaultTestServer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   DefaultApi,
   PluginFactoryKeychain,
-} from "@hyperledger/cactus-plugin-keychain-vault";
+} from "@hyperledger-cacti/cactus-plugin-keychain-vault";
 import {
   Configuration,
   IPluginKeychain,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 const testCase = "NodeJS API server + Rust plugin work together";
 

@@ -40,6 +40,6 @@ This file contains functions encasing the logic to process the data points
 
 This file lists all the prometheus metrics and what they are used for.
 
-[Previous](cactus-plugin-consortium-manual.md "@hyperledger/cactus-plugin-consortium-manual") [Next](cactus-plugin-ledger-connector-besu.md "@hyperledger/cactus-plugin-ledger-connector-besu")
+[Previous](cactus-plugin-consortium-manual.md "@hyperledger-cacti/cactus-plugin-consortium-manual") [Next](cactus-plugin-ledger-connector-besu.md "@hyperledger-cacti/cactus-plugin-ledger-connector-besu")
 
 * * *

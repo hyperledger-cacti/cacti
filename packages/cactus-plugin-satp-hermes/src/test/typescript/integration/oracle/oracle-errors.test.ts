@@ -1,9 +1,9 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   SATPGatewayConfig,
   SATPGateway,
@@ -22,7 +22,7 @@ import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { createServer } from "node:http";
 import { AddressInfo } from "node:net";
 import {
@@ -30,10 +30,10 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";

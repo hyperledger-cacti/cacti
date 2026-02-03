@@ -148,7 +148,7 @@ docker run \\
   \--rm \\
   \--publish 3000:3000 \\
   \--publish 4000:4000 \\
-  \--env PLUGINS\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
+  \--env PLUGINS\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
   cplcb
 
 Launch container with plugin configuration as a **CLI argument**:
@@ -159,11 +159,11 @@ docker run \\
    \--publish 4000:4000 \\
   cplcb \\
     ./node\_modules/.bin/cactusapi \\
-    \--plugins\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]'
+    \--plugins\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]'
 
 Launch container with **configuration file** mounted from host machine:
 
-echo '\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \> cactus.json
+echo '\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \> cactus.json
 
 docker run \\
   \--rm \\
@@ -198,7 +198,7 @@ docker run \\
   \--env AUTHORIZATION\_PROTOCOL\='NONE' \\
   \--env AUTHORIZATION\_CONFIG\_JSON\='{}' \\
   \--env GRPC\_TLS\_ENABLED\=false \\
-  \--env PLUGINS\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
+  \--env PLUGINS\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
   cplcb
 
 **Terminal Window 3 (curl - replace eth accounts as needed)**
@@ -309,6 +309,6 @@ This distribution is published under the Apache License Version 2.0 found in the
 Acknowledgments
 ----------------------------------------------------------------
 
-[Previous](cactus-plugin-keychain-vault.md "@hyperledger/cactus-plugin-keychain-vault") [Next](cactus-plugin-ledger-connector-corda.md "@hyperledger/cactus-plugin-ledger-connector-corda")
+[Previous](cactus-plugin-keychain-vault.md "@hyperledger-cacti/cactus-plugin-keychain-vault") [Next](cactus-plugin-ledger-connector-corda.md "@hyperledger-cacti/cactus-plugin-ledger-connector-corda")
 
 * * *

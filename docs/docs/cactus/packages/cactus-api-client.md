@@ -36,13 +36,13 @@ Let’s say you have a consortium with several members who all have their own le
 
 #### Leverage the `ConsortiumDatabase` for discovery
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
-import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 const mainFn \= async () \=> {
   const ledgerId \= "theIdOfYourLedgerInTheConsortiumDatabase";
@@ -66,13 +66,13 @@ mainFn();
 
 #### Use a provided `mainApiHost` and `ledgerId`
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
-import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 const mainFn \= async () \=> {
   const ledgerId \= "theIdOfYourLedgerInTheConsortiumDatabase";
@@ -89,13 +89,13 @@ mainFn();
 
 #### Use the API host of a node directly
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
-import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 const mainFn \= async () \=> {
   const nodeApiHost \= "https://my-node.cactus.example.com";
@@ -133,6 +133,6 @@ One such common trait is the client side component of the routing that decides w
 
 @see — https ://github.com/OpenAPITools/openapi-generator/blob/v5.0.0/docs/generators/typescript-axios.md
 
-[Previous](../packages.md "Cactus Components") [Next](cactus-cmd-api-server.md "@hyperledger/cactus-cmd-api-server")
+[Previous](../packages.md "Cactus Components") [Next](cactus-cmd-api-server.md "@hyperledger-cacti/cactus-cmd-api-server")
 
 * * *

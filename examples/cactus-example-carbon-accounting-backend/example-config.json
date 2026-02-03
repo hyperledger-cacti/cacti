@@ -16,7 +16,7 @@
     "apiTlsClientCaPem": "-",
     "cockpitHost": "127.0.0.1",
     "cockpitPort": 3000,
-    "cockpitWwwRoot": "packages/cactus-cmd-api-server/node_modules/@hyperledger/cactus-cockpit/www/",
+    "cockpitWwwRoot": "packages/cactus-cmd-api-server/node_modules/@hyperledger-cacti/cactus-cockpit/www/",
     "cockpitCorsDomainCsv": "",
     "cockpitMtlsEnabled": false,
     "cockpitTlsEnabled": true,
@@ -25,7 +25,7 @@
     "cockpitTlsClientCaPem": "-",
     "plugins": [
         {
-            "packageName": "@hyperledger/cactus-plugin-keychain-memory",
+            "packageName": "@hyperledger-cacti/cactus-plugin-keychain-memory",
             "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
             "options": {
                 "instanceId": "3ea23ac8-cf20-460a-99db-d56713c9c74e",
@@ -33,7 +33,7 @@
             }
         },
         {
-            "packageName": "@hyperledger/cactus-plugin-consortium-manual",
+            "packageName": "@hyperledger-cacti/cactus-plugin-consortium-manual",
             "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
             "options": {
                 "instanceId": "0b8c0ade-03d1-4cb6-a9dd-440633c4ca2a",

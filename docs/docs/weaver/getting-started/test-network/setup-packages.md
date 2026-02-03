@@ -46,7 +46,7 @@ Create a personal access token with `read:packages` access in GitHub in order to
 
 ## Getting the Code and Documentation
 
-Clone the [cacti](https://github.com/hyperledger/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
+Clone the [cacti](https://github.com/hyperledger-cacti/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
 ## Securing Components
 

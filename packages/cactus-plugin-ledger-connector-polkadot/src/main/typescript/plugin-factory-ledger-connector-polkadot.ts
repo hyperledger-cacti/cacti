@@ -1,7 +1,7 @@
 import {
   IPluginFactoryOptions,
   PluginFactory,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   IPluginLedgerConnectorPolkadotOptions,

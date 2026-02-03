@@ -4,12 +4,12 @@ import "jest-extended";
 import { v4 as uuidV4 } from "uuid";
 import { generateKeyPair, exportSPKI, exportPKCS8 } from "jose";
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import {
   CactusNode,
   Configuration,
@@ -18,15 +18,15 @@ import {
   ConsortiumMember,
   Ledger,
   LedgerType,
-} from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { DefaultApi as ConsortiumStaticApi } from "../../../main/typescript";
-import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { PluginLedgerConnectorBesu } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import {
   pruneDockerContainersIfGithubAction,
   BesuTestLedger,
-} from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc, Servers } from "@hyperledger-cacti/cactus-common";
 
 import {
   IPluginConsortiumStaticOptions,

@@ -31,7 +31,7 @@
  * @see {@link NetworkId} for network identification
  */
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { BLODispatcher } from "../api1/dispatcher";
 import { SATPSession } from "./satp-session";
 import { ConnectRouter } from "@connectrpc/connect";

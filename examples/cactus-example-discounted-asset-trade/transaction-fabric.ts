@@ -5,7 +5,7 @@
  * transaction-fabric.ts
  */
 
-import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
+import { ConfigUtil } from "@hyperledger-cacti/cactus-common-example-server";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";
@@ -14,7 +14,7 @@ import {
   getFabricConnector,
   getSignerIdentity,
 } from "./fabric-connector";
-import { FabricContractInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import { FabricContractInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 const moduleName = "TransactionFabric";
 const logger = getLogger(`${moduleName}`);

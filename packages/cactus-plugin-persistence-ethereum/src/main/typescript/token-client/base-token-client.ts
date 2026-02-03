@@ -8,13 +8,13 @@ import {
   EthContractInvocationType,
   EthereumApiClient,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { RuntimeError } from "run-time-error-cjs";
 import { getRuntimeErrorCause } from "../utils";
 

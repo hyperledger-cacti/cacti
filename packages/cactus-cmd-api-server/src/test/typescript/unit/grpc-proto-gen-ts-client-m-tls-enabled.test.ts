@@ -2,7 +2,7 @@ import test, { Test } from "tape-promise/tape";
 
 import * as grpc from "@grpc/grpc-js";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import { ApiServer, ConfigService } from "../../../main/typescript/public-api";
 import { SelfSignedPkiGenerator } from "../../../main/typescript/public-api";

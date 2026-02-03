@@ -1,7 +1,7 @@
 import { DLAccount } from "@hyperledger-cacti/cacti-copm-core";
 import { TestAssets } from "../interfaces/test-assets";
 import { CordaRPCConfig } from "./corda-rpc-config";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import { exec } from "child_process";
 
 const path = require("path");

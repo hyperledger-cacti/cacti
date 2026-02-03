@@ -166,7 +166,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         deleteKeychainEntryV1: async (deleteKeychainEntryRequestV1?: DeleteKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/delete-keychain-entry`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -202,7 +202,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getKeychainEntryV1: async (getKeychainEntryRequestV1: GetKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'getKeychainEntryRequestV1' is not null or undefined
             assertParamExists('getKeychainEntryV1', 'getKeychainEntryRequestV1', getKeychainEntryRequestV1)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-keychain-entry`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/get-keychain-entry`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -235,7 +235,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getPrometheusMetricsV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -266,7 +266,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         hasKeychainEntryV1: async (hasKeychainEntryRequestV1?: HasKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/has-keychain-entry`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/has-keychain-entry`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -302,7 +302,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         setKeychainEntryV1: async (setKeychainEntryRequestV1: SetKeychainEntryRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'setKeychainEntryRequestV1' is not null or undefined
             assertParamExists('setKeychainEntryV1', 'setKeychainEntryRequestV1', setKeychainEntryRequestV1)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/set-keychain-entry`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

@@ -6,7 +6,7 @@ export {
 } from "./plugin-ledger-connector-polkadot";
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector-polkadot";
 
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector-polkadot";
 
 export async function createPluginFactory(
