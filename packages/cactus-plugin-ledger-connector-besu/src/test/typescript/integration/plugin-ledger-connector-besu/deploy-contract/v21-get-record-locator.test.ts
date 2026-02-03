@@ -1,6 +1,6 @@
 import test, { Test } from "tape-promise/tape";
 import { v4 as uuidv4 } from "uuid";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   EthContractInvocationType,
   Web3SigningCredentialType,
@@ -12,19 +12,19 @@ import {
   BesuApiClient,
   GetBesuRecordV1Request,
 } from "../../../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
+import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import { AddressInfo } from "net";
 import express from "express";
 import bodyParser from "body-parser";
@@ -113,7 +113,7 @@ test(testCase, async (t: Test) => {
   const { address, port } = addressInfo;
   const apiHost = `http://${address}:${port}`;
   t.comment(
-    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
+    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
   );
 
   const wsBasePath = apiHost + Constants.SocketIoConnectionPathV1;

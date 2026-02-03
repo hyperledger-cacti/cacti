@@ -12,11 +12,11 @@ import {
   LoggerProvider,
   Logger,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_PRIVATE_KEY,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 import Web3, { ContractAbi, TransactionReceipt } from "web3";
 import { Web3Account } from "web3-eth-accounts";
 import TestERC721ContractJson from "../../solidity/TestERC721.json";

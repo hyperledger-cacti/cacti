@@ -19,15 +19,15 @@ import { v4 as uuidV4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
 import Web3, { DecodedParams, HexString } from "web3";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Constants } from "@hyperledger/cactus-core-api";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 
 import SayMessageContractJson from "../../solidity/say-message-contract/SayMessageContract.json";
 import {

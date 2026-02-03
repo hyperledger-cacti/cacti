@@ -7,24 +7,24 @@ import {
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
   Web3TransactionReceipt,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
+import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
+import { StrategyBesu } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
 import {
   EvmAsset,
   EvmFungibleAsset,
   EvmNonFungibleAsset,
 } from "../ontology/assets/evm-asset";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../../core/satp-logger";
 import {
   ClaimFormat,
   TokenType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { BridgeLeafFungible } from "../bridge-leaf-fungible";
 import { BridgeLeafNonFungible } from "../bridge-leaf-non-fungible";
 import { BridgeLeaf } from "../bridge-leaf";
@@ -46,7 +46,7 @@ import {
   ConnectorOptionsError,
   ApproveAddressError,
 } from "../../common/errors";
-import { ISignerKeyPair, Secp256k1Keys } from "@hyperledger/cactus-common";
+import { ISignerKeyPair, Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { OntologyManager } from "../ontology/ontology-manager";
 import { Asset, UniqueTokenID, Amount } from "../ontology/assets/asset";

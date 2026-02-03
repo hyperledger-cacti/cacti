@@ -1,4 +1,4 @@
-import { SATPGatewayConfig } from "@hyperledger/cactus-plugin-satp-hermes";
+import { SATPGatewayConfig } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import path from "path";
 import fs from "fs-extra";
 

@@ -3,18 +3,18 @@ import path from "node:path";
 
 import "jest-extended";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import {
   PluginImportType,
   PluginImportAction,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testcase = "can instal plugins at runtime based on imports";
@@ -36,7 +36,7 @@ describe(testcase, () => {
     const apiSrvOpts = await configService.newExampleConfig();
     apiSrvOpts.pluginManagerOptionsJson = pluginManagerOptionsJson;
     apiSrvOpts.openApiValidationOffPkgs = [
-      "@hyperledger/cactus-plugin-keychain-memory",
+      "@hyperledger-cacti/cactus-plugin-keychain-memory",
     ];
     apiSrvOpts.authorizationProtocol = AuthorizationProtocol.NONE;
     apiSrvOpts.configFile = "";
@@ -48,7 +48,7 @@ describe(testcase, () => {
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {
@@ -75,7 +75,7 @@ describe(testcase, () => {
     expect(openApiValidationOffPlugins.length).toBe(1);
     const [plugin] = openApiValidationOffPlugins;
     expect(plugin.getPackageName()).toBe(
-      "@hyperledger/cactus-plugin-keychain-memory",
+      "@hyperledger-cacti/cactus-plugin-keychain-memory",
     );
   });
 });

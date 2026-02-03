@@ -6,25 +6,25 @@
 
 import process from "process";
 import { v4 as uuidV4 } from "uuid";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
-import { Configuration } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import { DiscoveryOptions, X509Identity } from "fabric-network";
 import {
   DefaultEventHandlerStrategy,
   FabricApiClient,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import { PluginPersistenceFabric } from "../../../main/typescript";
 

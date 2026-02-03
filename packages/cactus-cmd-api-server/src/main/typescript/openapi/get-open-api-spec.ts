@@ -2,13 +2,13 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   ICactusPlugin,
   IPluginWebService,
   isIPluginWebService,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 
 export async function getOpenApiSpecV1(req: {

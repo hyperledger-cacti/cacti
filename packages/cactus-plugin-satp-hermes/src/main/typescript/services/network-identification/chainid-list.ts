@@ -10,7 +10,7 @@
  * @since 0.0.3-beta
  */
 
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
 /**
  * Network identification structure for blockchain networks in SATP operations.

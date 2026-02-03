@@ -17,7 +17,7 @@ import {
   Strings,
   ILoggerOptions,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { IDockerPullProgress } from "./i-docker-pull-progress";
 
 export interface IPruneDockerResourcesRequest {

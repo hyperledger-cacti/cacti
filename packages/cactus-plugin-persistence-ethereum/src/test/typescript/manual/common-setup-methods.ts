@@ -9,19 +9,19 @@ import {
   LoggerProvider,
   Logger,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration } from "@hyperledger/cactus-core-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   EthereumApiClient,
   PluginLedgerConnectorEthereum,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
 import { PluginPersistenceEthereum } from "../../../main/typescript/plugin-persistence-ethereum";
 

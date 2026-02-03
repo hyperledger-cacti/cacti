@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import ack_pb from "@hyperledger/cacti-weaver-protos-js/common/ack_pb";
-import eventsPb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
-import events_grpc_pb from "@hyperledger/cacti-weaver-protos-js/relay/events_grpc_pb";
-import queryPb from "@hyperledger/cacti-weaver-protos-js/common/query_pb";
-import { InteroperableHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
+import ack_pb from "@hyperledger-cacti/cacti-weaver-protos-js/common/ack_pb";
+import eventsPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/events_pb";
+import events_grpc_pb from "@hyperledger-cacti/cacti-weaver-protos-js/relay/events_grpc_pb";
+import queryPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/query_pb";
+import { InteroperableHelper } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import { getDriverKeyCert } from "./walletSetup";
 import {
   DBConnector,
@@ -22,8 +22,8 @@ import {
 } from "./listener";
 import { getNetworkGateway } from "./fabric-code";
 import { Gateway, Network, Contract } from "fabric-network";
-import state_pb from "@hyperledger/cacti-weaver-protos-js/common/state_pb";
-import driverPb from "@hyperledger/cacti-weaver-protos-js/driver/driver_pb";
+import state_pb from "@hyperledger-cacti/cacti-weaver-protos-js/common/state_pb";
+import driverPb from "@hyperledger-cacti/cacti-weaver-protos-js/driver/driver_pb";
 import logger from "./logger";
 
 import fs from "fs";

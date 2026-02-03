@@ -5,7 +5,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 export interface EvmAsset extends Asset {
   contractAddress: string;

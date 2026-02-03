@@ -13,7 +13,7 @@ import log4js from "log4js";
 import { v4 as uuidv4 } from "uuid";
 import { ICryptoKey } from "fabric-common";
 import { Contract } from "fabric-network";
-import eventsPb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
+import eventsPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/events_pb";
 import { Relay } from "./Relay";
 import { InteropJSON } from "./types";
 import {

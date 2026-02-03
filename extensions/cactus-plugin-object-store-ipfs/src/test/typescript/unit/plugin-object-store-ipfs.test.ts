@@ -5,9 +5,9 @@ import { v4 as uuidv4 } from "uuid";
 import express from "express";
 import bodyParser from "body-parser";
 
-import { Servers } from "@hyperledger/cactus-common";
-import type { IListenOptions, LogLevelDesc } from "@hyperledger/cactus-common";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Servers } from "@hyperledger-cacti/cactus-common";
+import type { IListenOptions, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 import { PluginObjectStoreIpfs } from "../../../main/typescript";
 import type { IPluginObjectStoreIpfsOptions } from "../../../main/typescript";

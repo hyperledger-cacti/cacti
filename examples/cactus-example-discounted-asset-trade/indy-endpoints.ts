@@ -5,7 +5,7 @@
 import { Router, NextFunction, Request, Response } from "express";
 import escapeHtml from "escape-html";
 import { getLogger } from "log4js";
-import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
+import { ConfigUtil } from "@hyperledger-cacti/cactus-common-example-server";
 import { connectToClientAgent } from "./transaction-indy";
 
 const config: any = ConfigUtil.getConfig();

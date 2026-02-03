@@ -1,5 +1,5 @@
 import { getLogger } from "log4js";
-import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
+import { ConfigUtil } from "@hyperledger-cacti/cactus-common-example-server";
 import { getAriesApiClient, getBlpAgentName } from "./aries-connector";
 
 const config: any = ConfigUtil.getConfig();

@@ -1,7 +1,7 @@
 import {
   IMergePolicyValue,
   isMergePolicyValueArray,
-} from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
+} from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 
 export function validateSatpMergePolicies(opts: {
   readonly configValue: unknown;

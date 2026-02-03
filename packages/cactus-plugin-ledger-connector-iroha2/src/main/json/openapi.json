@@ -535,12 +535,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/transact": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/transact"
           }
         },
         "operationId": "TransactV1",
@@ -579,12 +579,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/generate-transaction": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/generate-transaction"
           }
         },
         "operationId": "generateTransactionV1",
@@ -623,12 +623,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/query": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/query"
           }
         },
         "operationId": "QueryV1",

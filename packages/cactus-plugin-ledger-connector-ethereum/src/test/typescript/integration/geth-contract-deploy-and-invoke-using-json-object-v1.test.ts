@@ -24,15 +24,15 @@ import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import HelloWorldWithArgContractJson from "../../solidity/hello-world-with-arg-contract/HelloWorldWithArg.json";

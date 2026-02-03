@@ -10,11 +10,11 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/get-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/get-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -43,11 +43,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/set-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/set-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/set-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/set-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -73,11 +73,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/delete-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/delete-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/delete-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/delete-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -103,11 +103,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/has-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/has-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/has-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/has-keychain-entry",
             "verbLowerCase": "post"
           }
         },

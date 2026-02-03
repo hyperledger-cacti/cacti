@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-plugin-htlc-eth-besu",
+  "name": "@hyperledger-cacti/cactus-plugin-htlc-eth-besu",
   "version": "2.1.0",
   "description": "Allows Cactus nodes to interact with HTLC ETH contracts",
   "keywords": [
@@ -57,7 +57,7 @@
     "codegen:openapi": "npm run generate-sdk",
     "compile-contracts": "forge build",
     "generate-sdk": "run-s 'generate-sdk:*'",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "lint": "solhint --fix",
     "watch": "npm-watch",
@@ -67,12 +67,12 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "2.1.0",
+    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
     "axios": "1.8.4",
     "bn.js": "5.2.2",
     "dotenv": "16.3.1",
@@ -84,8 +84,8 @@
     "web3js-quorum": "22.4.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
     "@types/bn.js": "5.2.0",
     "@types/express": "5.0.1",
     "ds-test": "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0",

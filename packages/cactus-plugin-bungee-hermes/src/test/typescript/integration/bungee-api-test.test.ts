@@ -5,13 +5,13 @@ import {
   LoggerProvider,
   Secp256k1Keys,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import "jest-extended";
 import LockAssetContractJson from "../solidity/lock-asset-contract/LockAsset.json";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import bodyParser from "body-parser";
 
 import http, { Server } from "http";
@@ -30,8 +30,8 @@ import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-} from "@hyperledger/cactus-test-tooling";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
 import {
   Web3SigningCredentialType,
   PluginLedgerConnectorBesu,
@@ -39,7 +39,7 @@ import {
   ReceiptType,
   IPluginLedgerConnectorBesuOptions,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import Web3 from "web3";
 import { Account } from "web3-core";
 import {
@@ -56,17 +56,17 @@ import {
   ChainCodeProgrammingLanguage,
   FabricContractInvocationType,
   FileBase64,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import path from "path";
 import { DiscoveryOptions } from "fabric-network";
 import {
   PluginLedgerConnectorEthereum,
   DefaultApi as EthereumApi,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 import { StrategyEthereum } from "../../../main/typescript/strategy/strategy-ethereum";
 import { StrategyFabric } from "../../../main/typescript/strategy/strategy-fabric";
 import { StrategyBesu } from "../../../main/typescript/strategy/strategy-besu";

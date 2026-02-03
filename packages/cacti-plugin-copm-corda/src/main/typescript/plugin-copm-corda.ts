@@ -2,13 +2,13 @@ import {
   IPluginCrpcService,
   ICactusPluginOptions,
   ICactusPlugin,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { ICrpcSvcRegistration } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { ICrpcSvcRegistration } from "@hyperledger-cacti/cactus-core-api";
 import { ServiceType } from "@bufbuild/protobuf";
 import { DefaultService } from "@hyperledger-cacti/cacti-copm-core";
 import { CopmCordaImpl, DefaultApi } from "./service-implementation";

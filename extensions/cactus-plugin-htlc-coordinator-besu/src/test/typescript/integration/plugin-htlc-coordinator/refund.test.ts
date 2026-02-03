@@ -19,7 +19,7 @@ import {
   IPluginHtlcEthBesuErc20Options,
   PluginFactoryHtlcEthBesuErc20,
   PluginHtlcEthBesuErc20,
-} from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20";
+} from "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20";
 import {
   DefaultApi as BesuApi,
   EthContractInvocationType,
@@ -27,22 +27,22 @@ import {
   PluginLedgerConnectorBesu,
   Web3SigningCredentialType,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import HashTimeLockJSON from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
-import TestTokenJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/Test_Token.json";
-import DemoHelperJSON from "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/DemoHelpers.json";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import HashTimeLockJSON from "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
+import TestTokenJSON from "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/Test_Token.json";
+import DemoHelperJSON from "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20/src/test/solidity/token-erc20-contract/DemoHelpers.json";
 
 describe("HTLC Coordinator Besu", () => {
   const logLevel: LogLevelDesc = "DEBUG";

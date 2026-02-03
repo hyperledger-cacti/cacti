@@ -3,7 +3,7 @@
  * @description This file contains the mock implementation of the PriceManager class, which is responsible for managing token prices for different ledger types.
  * It provides methods to check token prices.
  */
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { MonitorService } from "../monitoring/monitor";

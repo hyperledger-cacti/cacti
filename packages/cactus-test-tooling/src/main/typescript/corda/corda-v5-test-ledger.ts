@@ -14,7 +14,7 @@ import {
   LoggerProvider,
   Checks,
   Bools,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 /*
  * Contains options for Corda container

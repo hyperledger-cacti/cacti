@@ -1,4 +1,4 @@
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 
 export {
   PluginLedgerConnectorSawtooth,

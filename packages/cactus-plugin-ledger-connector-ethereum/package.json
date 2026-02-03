@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-plugin-ledger-connector-ethereum",
+  "name": "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum",
   "version": "2.1.0",
   "description": "Allows Cactus nodes to connect to a Ethereum ledger.",
   "keywords": [
@@ -56,7 +56,7 @@
     "codegen:openapi": "npm run generate-sdk",
     "copy-artillery-config": "cp -af  ./src/test/typescript/benchmark/setup/geth-benchmark-config.yaml ./src/test/typescript/benchmark/setup/artillery-helper-functions.js ./dist/lib/test/typescript/benchmark/setup",
     "generate-sdk": "run-s 'generate-sdk:*'",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
@@ -67,9 +67,9 @@
   "dependencies": {
     "@ethereumjs/common": "4.0.0",
     "@ethereumjs/tx": "5.0.0",
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "ethers": "6.8.1",
     "express": "5.1.0",
@@ -87,9 +87,9 @@
   },
   "devDependencies": {
     "@ethereumjs/util": "9.1.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-test-geth-ledger": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-test-geth-ledger": "2.1.0",
+    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.1",
     "@types/js-yaml": "4.0.5",

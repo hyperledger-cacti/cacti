@@ -1,12 +1,12 @@
 import { Express, Request, Response } from "express";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   LogLevelDesc,
@@ -14,7 +14,7 @@ import {
   LoggerProvider,
   Checks,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { SignTransactionRequest } from "../generated/openapi/typescript-axios/api";
 
@@ -54,9 +54,9 @@ export class BesuSignTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/sign-transaction"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/sign-transaction"
     ];
   }
 

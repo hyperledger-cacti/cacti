@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cacti-plugin-ledger-connector-stellar",
+  "name": "@hyperledger-cacti/cacti-plugin-ledger-connector-stellar",
   "version": "2.1.0",
   "description": "Allows Cacti nodes to connect to a Stellar ledger.",
   "keywords": [
@@ -59,9 +59,9 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "express": "5.1.0",
     "http-errors-enhanced-cjs": "2.0.1",
@@ -75,8 +75,8 @@
     "typescript-optional": "2.0.1"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.1",
     "@types/http-errors": "2.0.4",

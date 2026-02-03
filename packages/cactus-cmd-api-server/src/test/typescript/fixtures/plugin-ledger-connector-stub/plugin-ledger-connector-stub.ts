@@ -7,19 +7,19 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   PluginRegistry,
   consensusHasTransactionFinality,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { DeployContractEndpoint } from "./web-services/deploy-contract-endpoint";
 import { RunTransactionEndpoint } from "./web-services/run-transaction-endpoint";
@@ -119,7 +119,7 @@ export class PluginLedgerConnectorStub
   public getPackageName(): string {
     // Note: this package does not exist on npm since this plugin only
     // exists for testing purposes
-    return `@hyperledger/cactus-plugin-ledger-connector-stub`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-stub`;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {

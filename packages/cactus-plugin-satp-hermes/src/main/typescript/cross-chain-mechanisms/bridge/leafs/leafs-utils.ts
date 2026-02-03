@@ -29,7 +29,7 @@
  * @license Apache-2.0
  */
 
-import { ISignerKeyPair } from "@hyperledger/cactus-common";
+import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
 
 /**
  * Converts signer key pair to Uint8Array format for cryptographic operations.

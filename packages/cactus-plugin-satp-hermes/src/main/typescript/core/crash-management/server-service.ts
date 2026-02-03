@@ -11,7 +11,7 @@ import {
 } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
 import type { SATPSession } from "../satp-session";
 import type { ILocalLogRepository } from "../../database/repository/interfaces/repository";
-import type { JsObjectSigner } from "@hyperledger/cactus-common";
+import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import type { SATPLogger as Logger } from "../../core/satp-logger";
 import { RollbackStrategyFactory } from "./rollback/rollback-strategy-factory";
 import { create } from "@bufbuild/protobuf";

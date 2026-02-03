@@ -17,12 +17,12 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   consensusHasTransactionFinality,
   PluginRegistry,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   bigIntToDecimalStringReplacer,
@@ -30,7 +30,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   IrohaInstruction,
@@ -272,7 +272,7 @@ export class PluginLedgerConnectorIroha2
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-iroha2`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2`;
   }
 
   /**

@@ -1230,12 +1230,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query": {
       "post": {
         "operationId": "vaultQueryV1",
         "x-hyperledger-cactus": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query",
             "verbLowerCase": "post"
           }
         },
@@ -1265,12 +1265,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars": {
       "post": {
         "operationId": "deployContractJarsV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars",
             "verbLowerCase": "post"
           }
         },
@@ -1310,12 +1310,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract": {
       "post": {
         "operationId": "invokeContractV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract",
             "verbLowerCase": "post"
           }
         },
@@ -1345,12 +1345,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor": {
       "post": {
         "operationId": "startMonitorV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor",
             "verbLowerCase": "post"
           }
         },
@@ -1380,12 +1380,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions": {
       "get": {
         "operationId": "GetMonitorTransactionsV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions",
             "verbLowerCase": "get"
           }
         },
@@ -1415,12 +1415,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions": {
       "delete": {
         "operationId": "ClearMonitorTransactionsV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions",
             "verbLowerCase": "delete"
           }
         },
@@ -1450,12 +1450,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor": {
       "delete": {
         "operationId": "stopMonitorV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor",
             "verbLowerCase": "delete"
           }
         },
@@ -1485,12 +1485,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map": {
       "post": {
         "operationId": "networkMapV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map",
             "verbLowerCase": "post"
           }
         },
@@ -1520,12 +1520,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows": {
       "post": {
         "operationId": "listFlowsV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows",
             "verbLowerCase": "post"
           }
         },
@@ -1555,12 +1555,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node": {
       "post": {
         "operationId": "diagnoseNodeV1",
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node",
             "verbLowerCase": "post"
           }
         },
@@ -1590,12 +1590,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics"
           }
         },
         "operationId": "getPrometheusMetricsV1",
@@ -1615,12 +1615,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi": {
       "get": {
         "x-hyperledger-cactus": {
           "https": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi"
           }
         },
         "operationId": "listCpiV1",
@@ -1649,12 +1649,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow": {
       "get": {
         "x-hyperledger-cactus": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow"
           }
         },
         "operationId": "listFlowV1",
@@ -1691,12 +1691,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid": {
       "get": {
         "x-hyperledger-cactus": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid"
           }
         },
         "operationId": "getFlowV1",
@@ -1733,12 +1733,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow": {
       "post": {
         "x-hyperledger-cactus": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow"
           }
         },
         "operationId": "startFlowV1",

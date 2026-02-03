@@ -344,7 +344,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         counterpartyHtlcV1: async (counterpartyHTLCRequest?: CounterpartyHTLCRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/counterparty-htlc`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -378,7 +378,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         ownHtlcV1: async (ownHTLCRequest?: OwnHTLCRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/own-htlc`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -412,7 +412,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         withdrawCounterpartyV1: async (withdrawCounterpartyRequest?: WithdrawCounterpartyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

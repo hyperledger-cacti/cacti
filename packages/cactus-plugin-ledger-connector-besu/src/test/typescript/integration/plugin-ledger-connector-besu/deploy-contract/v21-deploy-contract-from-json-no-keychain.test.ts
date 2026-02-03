@@ -1,7 +1,7 @@
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   EthContractInvocationType,
   Web3SigningCredentialType,
@@ -13,19 +13,19 @@ import {
   WatchBlocksV1Progress,
   Web3BlockHeader,
 } from "../../../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
+import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";

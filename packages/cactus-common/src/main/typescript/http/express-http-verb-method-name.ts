@@ -30,7 +30,7 @@ export type ExpressHttpVerbMethodName =
  *
  * ```typescript
  * import express from "express";
- * import { isExpressHttpVerbMethodName } from "@hyperledger/cactus-core-api-server";
+ * import { isExpressHttpVerbMethodName } from "@hyperledger-cacti/cactus-core-api-server";
  * const app = express();
  * const methodName = "get";
  * if (isExpressHttpVerbMethodName(methodName)) {

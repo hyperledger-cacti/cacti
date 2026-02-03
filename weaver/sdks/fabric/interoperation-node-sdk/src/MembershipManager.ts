@@ -10,10 +10,10 @@ import * as path from "path";
 import * as fs from "fs";
 import { credentials } from "@grpc/grpc-js";
 
-import membership_pb from "@hyperledger/cacti-weaver-protos-js/common/membership_pb";
-import agent_grpc_pb from "@hyperledger/cacti-weaver-protos-js/identity/agent_grpc_pb";
-import agent_pb from "@hyperledger/cacti-weaver-protos-js/identity/agent_pb";
-import common_ack_pb from "@hyperledger/cacti-weaver-protos-js/common/ack_pb";
+import membership_pb from "@hyperledger-cacti/cacti-weaver-protos-js/common/membership_pb";
+import agent_grpc_pb from "@hyperledger-cacti/cacti-weaver-protos-js/identity/agent_grpc_pb";
+import agent_pb from "@hyperledger-cacti/cacti-weaver-protos-js/identity/agent_pb";
+import common_ack_pb from "@hyperledger-cacti/cacti-weaver-protos-js/common/ack_pb";
 
 import { handlePromise, promisifyAll } from "./helpers";
 

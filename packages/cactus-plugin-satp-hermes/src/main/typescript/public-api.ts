@@ -26,7 +26,7 @@
  *   SATPGateway,
  *   SATPGatewayConfig,
  *   DEFAULT_PORT_GATEWAY_SERVER
- * } from '@hyperledger/cactus-plugin-satp-hermes';
+ * } from '@hyperledger-cacti/cactus-plugin-satp-hermes';
  *
  * const gateway = new SATPGateway({
  *   gatewayId: 'gateway-fabric',
@@ -38,7 +38,7 @@
  * @example
  * Cross-chain bridge configuration:
  * ```typescript
- * import { IBesuLeafNeworkOptions, INetworkOptions } from '@hyperledger/cactus-plugin-satp-hermes';
+ * import { IBesuLeafNeworkOptions, INetworkOptions } from '@hyperledger-cacti/cactus-plugin-satp-hermes';
  *
  * const besuConfig: IBesuLeafNeworkOptions = {
  *   networkId: 'besu-testnet',

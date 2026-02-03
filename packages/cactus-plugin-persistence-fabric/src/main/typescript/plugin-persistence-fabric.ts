@@ -12,13 +12,13 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IPluginWebService,
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   CactiBlockFullEventV1,
   FabricApiClient,
@@ -26,7 +26,7 @@ import {
   GetBlockResponseTypeV1,
   GetChainInfoResponseV1,
   WatchBlocksListenerTypeV1,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import OAS from "../json/openapi.json";
 import { StatusEndpointV1 } from "./web-services/status-endpoint-v1";
@@ -297,7 +297,7 @@ export class PluginPersistenceFabric
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-persistence-fabric`;
+    return `@hyperledger-cacti/cactus-plugin-persistence-fabric`;
   }
 
   /**

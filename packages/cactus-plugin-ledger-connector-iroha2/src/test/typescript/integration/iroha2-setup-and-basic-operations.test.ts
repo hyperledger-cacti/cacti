@@ -13,7 +13,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
@@ -25,7 +25,7 @@ import {
   PluginLedgerConnectorIroha2,
   TransactionStatusV1,
 } from "../../../main/typescript/public-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { crypto } from "@iroha2/crypto-target-node";
 import { setCrypto } from "@iroha2/client";
 

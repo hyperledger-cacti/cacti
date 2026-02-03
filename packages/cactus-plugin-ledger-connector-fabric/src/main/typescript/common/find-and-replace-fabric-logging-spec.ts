@@ -1,4 +1,4 @@
-import { Checks } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
 
 const PATTERN_FABRIC_CORE_LOGGING_LEVEL = new RegExp(
   `\\s+(-e|--env)\\s+CORE_LOGGING_LEVEL='?"?\\w+'?"?\\s+`,

@@ -1,5 +1,5 @@
-import { Logger } from "@hyperledger/cactus-common";
-import { AssetManager } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { Logger } from "@hyperledger-cacti/cactus-common";
+import { AssetManager } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import {
   Validators,
   ClaimLockedAssetV1Request,
