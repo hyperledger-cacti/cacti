@@ -65,7 +65,7 @@ func (a *DefaultApiService) CounterpartyHtlcV1Execute(r ApiCounterpartyHtlcV1Req
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/counterparty-htlc"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -170,7 +170,7 @@ func (a *DefaultApiService) OwnHtlcV1Execute(r ApiOwnHtlcV1Request) (interface{}
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/own-htlc"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -275,7 +275,7 @@ func (a *DefaultApiService) WithdrawCounterpartyV1Execute(r ApiWithdrawCounterpa
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

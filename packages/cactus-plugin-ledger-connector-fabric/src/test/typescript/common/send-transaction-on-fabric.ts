@@ -1,4 +1,4 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 import { FabricSigningCredential } from "../../../main/typescript/generated/openapi/typescript-axios/api";
 import { FabricContractInvocationType } from "../../../main/typescript/generated/openapi/typescript-axios/api";

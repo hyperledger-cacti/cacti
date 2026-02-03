@@ -14,7 +14,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   IrohaInstruction,

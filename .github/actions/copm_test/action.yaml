@@ -58,12 +58,12 @@ runs:
             { 
               echo "username=${{ inputs.github-actor }}" 
               echo "password=${{ inputs.github-token }}" 
-              echo "url=https://maven.pkg.github.com/hyperledger/cacti"
+              echo "url=https://maven.pkg.github.com/hyperledger-cacti/cacti"
             } >> github.properties
             {
               echo "username=${{ inputs.github-actor }}"
               echo "password=${{ inputs.github-token }}"
-              echo "url=https://maven.pkg.github.com/hyperledger/cacti" 
+              echo "url=https://maven.pkg.github.com/hyperledger-cacti/cacti" 
             } >> github.main.properties
       working-directory: weaver/tests/network-setups/corda
 

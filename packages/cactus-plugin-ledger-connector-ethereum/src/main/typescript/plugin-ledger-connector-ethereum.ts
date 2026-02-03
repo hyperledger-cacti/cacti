@@ -27,19 +27,19 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   PluginRegistry,
   consensusHasTransactionFinality,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { DeployContractEndpoint } from "./web-services/deploy-contract-v1-endpoint";
 
@@ -358,7 +358,7 @@ export class PluginLedgerConnectorEthereum
     // Register JSON-RPC proxy to pass requests directly to ethereum node
     if (this.options.rpcApiHttpHost) {
       const proxyUrl =
-        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc";
+        "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/json-rpc";
       const targetUrl = this.options.rpcApiHttpHost;
       app.use(
         proxyUrl,
@@ -430,7 +430,7 @@ export class PluginLedgerConnectorEthereum
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-ethereum`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum`;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {

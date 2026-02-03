@@ -33,7 +33,7 @@
  * @since 0.0.3-beta
  */
 
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { InteractionsRequest as EvmInteractionSignature } from "../../../generated/SATPWrapperContract";
 import {
   fabricInteractionList,
@@ -48,7 +48,7 @@ import {
   Secp256k1Keys,
   LogLevelDesc,
   ISignerKeyPair,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { MonitorService } from "../../../services/monitoring/monitor";

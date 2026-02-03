@@ -10,7 +10,7 @@
  * @since 0.0.3-beta
  */
 
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import fs from "fs-extra";
 import path from "node:path";
 import { loadAdapterConfigFromYaml } from "./config-validating-functions/validate-adapter-config";

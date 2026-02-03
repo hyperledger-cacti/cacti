@@ -7,7 +7,7 @@ import {
   validateHashInfo,
 } from "./common";
 import { LockAssetV1Request } from "../generated/services/default_service_pb";
-import { HashFunctions } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { HashFunctions } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 
 export function validateLockAssetRequest(request: LockAssetV1Request): {
   sourceAccount: DLAccount;

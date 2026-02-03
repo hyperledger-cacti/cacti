@@ -9,9 +9,9 @@ import {
   IVaultConfig,
   IWebSocketConfig,
   SignPayloadCallback,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import { isFabricSigningCredentialType } from "./validate-fabric-config";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 export interface FabricOptionsJSON {
   instanceId: string;

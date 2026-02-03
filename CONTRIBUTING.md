@@ -108,7 +108,7 @@ including concrete examples.
 ## PR Checklist - Contributor/Developer
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
-1. Fork [hyperledger/cacti](https://github.com/hyperledger/cacti) via Github UI
+1. Fork [hyperledger/cacti](https://github.com/hyperledger-cacti/cacti) via Github UI
    - If you are using the Git client on the Windows operating system, you will need to enable long paths for git
      which you can do in PowerShell by executing the command below.
      To clarify, this may also apply if you are using any Git GUI application on Windows such as `Github Desktop` or others.
@@ -176,7 +176,7 @@ To protect the Hyperledger Cacti source code, GitHub pull requests are accepted 
 2. Setup your local fork to keep up-to-date (optional)
    ```
    # Add 'upstream' repo to list of remotes
-   git remote add upstream https://github.com/hyperledger/cacti.git
+   git remote add upstream https://github.com/hyperledger-cacti/cacti.git
 
    # Verify the new remote named 'upstream'
    git remote -v
@@ -302,7 +302,7 @@ Example (cacti-plugin-satp-hermes):
 > - jest.config-unit.ts
 > - jest.config-integration.ts
 
-4. In the `package.json` file, change the name to `@hyperledger/<your-package-name>`. Example: `@hyperledger/cacti-plugin-satp-hermes`;
+4. In the `package.json` file, change the name to `@hyperledger-cacti/<your-package-name>`. Example: `@hyperledger-cacti/cacti-plugin-satp-hermes`;
 5. In the `tsconfig.json` file, ensure it extends the Hyperledger Cacti base `tsconfig.ts` file. You can do it by following this example:
    ``` 
    { 
@@ -631,7 +631,7 @@ compiled. It is all part of the `npm run build:dev:backend` task which you can r
 or as part of the CI script (`./tools/ci.sh`).
 
 The API client code is automatically generated from the respective `openapi.json` file of each package that exposes ay web serices (REST/SocketIO/gRPC/etc.) and can be dependend on by
-other packages where applicable. There's a dedicated `@hyperledger/cactus-api-client` package that is meant to contain common functionality among the rest of API clients. The concept here is similar to abstract classes and their sub-class implementations. 
+other packages where applicable. There's a dedicated `@hyperledger-cacti/cactus-api-client` package that is meant to contain common functionality among the rest of API clients. The concept here is similar to abstract classes and their sub-class implementations. 
 
 Each `openapi.json` produces its own API client via the code generator that also contains relevant model definitions, such as interfaces describing the request/response bodies of all possible operations and validation constraints as well. 
 
@@ -648,7 +648,7 @@ Example:
 # Adds "got" as a dependency to the `cactus-common` package
 # Note that you must specify the fully qualified package name as present in
 # the package.json file
-yarn workspace @hyperledger/cactus-common add got --save-exact
+yarn workspace @hyperledger-cacti/cactus-common add got --save-exact
 ```
 
 You need to know which package of the monorepo will be using the package and then

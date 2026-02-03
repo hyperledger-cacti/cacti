@@ -4,15 +4,15 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   Logger,
   Checks,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi-bundled.json";
 import { IRequestOptions } from "../types";
@@ -39,7 +39,7 @@ export class GetSessionsDataEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references"
+        "/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-sessions-references"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
@@ -47,14 +47,14 @@ export class GetSessionsDataEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references"
+        "/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-sessions-references"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references"
+      "/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-sessions-references"
     ].get.operationId;
   }
 
