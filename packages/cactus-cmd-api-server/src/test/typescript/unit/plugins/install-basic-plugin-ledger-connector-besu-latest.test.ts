@@ -2,13 +2,13 @@ import path from "path";
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import {
   Configuration,
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   ApiServer,
@@ -52,7 +52,7 @@ describe("ApiServer", () => {
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [
       {
-        packageName: "@hyperledger/cactus-plugin-ledger-connector-besu",
+        packageName: "@hyperledger-cacti/cactus-plugin-ledger-connector-besu",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {

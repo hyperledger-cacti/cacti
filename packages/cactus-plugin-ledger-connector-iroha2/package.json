@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-plugin-ledger-connector-iroha2",
+  "name": "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2",
   "version": "2.1.0",
   "description": "Allows Cactus nodes to connect to an Iroha V2 ledger.",
   "keywords": [
@@ -43,13 +43,13 @@
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "generate-sdk": "run-s 'generate-sdk:*'",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
     "@iroha2/client": "4.0.0",
     "@iroha2/crypto-core": "0.1.1",
     "@iroha2/crypto-target-node": "0.4.0",
@@ -65,8 +65,8 @@
     "undici": "7.8.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.6",
     "@types/express": "5.0.1",
     "@types/sanitize-html": "2.9.5",

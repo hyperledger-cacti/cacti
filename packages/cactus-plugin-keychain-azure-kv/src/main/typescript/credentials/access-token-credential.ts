@@ -1,9 +1,9 @@
-import type { Logger, LogLevelDesc } from "@hyperledger/cactus-common";
+import type { Logger, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import type { AccessToken, TokenCredential } from "@azure/identity";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { RefreshTokenCredential } from "./refresh-token-credential";
 
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 export interface IAccessTokenCredentialOptions {
   readonly logLevel?: Readonly<LogLevelDesc>;

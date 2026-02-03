@@ -1,6 +1,6 @@
 import knex, { Knex } from "knex";
 import Docker, { Container, ContainerInfo } from "dockerode";
-import { Containers } from "@hyperledger/cactus-test-tooling";
+import { Containers } from "@hyperledger-cacti/cactus-test-tooling";
 import { EventEmitter } from "events";
 import { createMigrationSource } from "./knex/knex-migration-source";
 

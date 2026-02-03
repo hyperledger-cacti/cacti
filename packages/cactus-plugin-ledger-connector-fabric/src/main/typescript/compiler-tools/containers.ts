@@ -1,4 +1,4 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import { Container } from "dockerode";
 export interface IStreamLogsRequest {
   readonly container: Container;

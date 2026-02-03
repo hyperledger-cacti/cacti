@@ -23,7 +23,7 @@ import {
   JsObjectSigner,
   type LogLevelDesc,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import {
   Address,

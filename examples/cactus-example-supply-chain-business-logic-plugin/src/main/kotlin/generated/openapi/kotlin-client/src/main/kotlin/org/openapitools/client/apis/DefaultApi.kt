@@ -117,7 +117,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bamboo-harvest",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -189,7 +189,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bookshelf",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -261,7 +261,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-shipment",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -329,7 +329,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bamboo-harvest",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -397,7 +397,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bookshelf",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -465,7 +465,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-shipment",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

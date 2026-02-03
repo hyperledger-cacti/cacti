@@ -65,7 +65,7 @@ func (a *DefaultApiService) DeployContractExecute(r ApiDeployContractRequest) (*
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/deploy-contract"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -174,7 +174,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -277,7 +277,7 @@ func (a *DefaultApiService) InvokeContractV1Execute(r ApiInvokeContractV1Request
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-contract"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -392,7 +392,7 @@ func (a *DefaultApiService) InvokeRawWeb3EthContractV1Execute(r ApiInvokeRawWeb3
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -507,7 +507,7 @@ func (a *DefaultApiService) InvokeWeb3EthMethodV1Execute(r ApiInvokeWeb3EthMetho
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -622,7 +622,7 @@ func (a *DefaultApiService) RunTransactionV1Execute(r ApiRunTransactionV1Request
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/run-transaction"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

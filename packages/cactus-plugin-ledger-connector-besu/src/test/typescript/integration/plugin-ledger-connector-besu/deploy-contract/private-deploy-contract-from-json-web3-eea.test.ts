@@ -2,9 +2,9 @@ import test, { Test } from "tape-promise/tape";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import Web3JsQuorum, { IPrivateTransactionReceipt } from "web3js-quorum";
-import { BesuMpTestLedger } from "@hyperledger/cactus-test-tooling";
+import { BesuMpTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
 import { AbiItem } from "web3-utils";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 const containerImageName =
   "ghcr.io/hyperledger/cactus-besu-all-in-one-multi-party";

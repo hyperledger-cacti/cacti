@@ -6,11 +6,11 @@ import "jest-extended";
 import lmify from "lmify";
 import fs from "fs-extra";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { ConfigService } from "../../../main/typescript/config/config-service";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
@@ -45,7 +45,7 @@ describe("ApiServer", () => {
     apiSrvOpts.apiTlsEnabled = false;
 
     const plugin = {
-      packageName: "@hyperledger/cactus-plugin-keychain-memory",
+      packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
       action: PluginImportAction.Instantiate,
       options: {
@@ -106,7 +106,7 @@ describe("ApiServer", () => {
     const instanceId = randomUUID();
     const keychainId = randomUUID();
     const plugin = {
-      packageName: "@hyperledger/cactus-plugin-keychain-memory",
+      packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
       type: PluginImportType.Local,
       action: PluginImportAction.Instantiate,
       options: {
@@ -187,7 +187,7 @@ describe("ApiServer", () => {
     const versionToInstall = "0.8.0";
     apiSrvOpts.plugins = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {

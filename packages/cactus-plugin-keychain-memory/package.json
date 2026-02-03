@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-plugin-keychain-memory",
+  "name": "@hyperledger-cacti/cactus-plugin-keychain-memory",
   "version": "2.1.0",
   "description": "Dummy keychain implementation doing NO encryption and storing everything in-memory. Only suitable for development and testing.",
   "keywords": [
@@ -47,7 +47,7 @@
     "codegen:openapi": "npm run generate-sdk",
     "codegen:proto": "run-s proto:openapi proto:crpc",
     "generate-sdk": "run-s 'generate-sdk:*'",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "proto:crpc": "yarn run --top-level buf generate --debug --verbose --template=./buf.gen.yaml --output ./src/main/typescript/generated/proto/crpc/ ./src/main/proto/generated/openapi/",
@@ -61,9 +61,9 @@
   "dependencies": {
     "@bufbuild/protobuf": "1.10.0",
     "@connectrpc/connect": "1.4.0",
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
     "axios": "1.8.4",
     "express": "5.1.0",
     "prom-client": "15.1.3",

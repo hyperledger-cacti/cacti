@@ -17,12 +17,12 @@ import {
   Logger,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
 import {
   SawtoothTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   isWatchBlocksV1CactiTransactionsResponse,

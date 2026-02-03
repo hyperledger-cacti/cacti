@@ -12,18 +12,18 @@ import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { cleanupApiServer, setupApiServer } from "./common-setup-methods";
 import {
   FabricApiClient,
   FabricContractInvocationType,
   FabricSigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 //////////////////////////////////
 // Constants

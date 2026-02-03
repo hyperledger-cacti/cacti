@@ -5,8 +5,8 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Checks,
-} from "@hyperledger/cactus-common";
-import { ISocketApiClient } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { ISocketApiClient } from "@hyperledger-cacti/cactus-core-api";
 import {
   DefaultApi,
   GetMonitorTransactionsV1ResponseTxInner,

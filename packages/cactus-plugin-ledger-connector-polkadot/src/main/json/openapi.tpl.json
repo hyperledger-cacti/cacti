@@ -531,12 +531,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics"
           }
         },
         "operationId": "getPrometheusMetrics",
@@ -566,12 +566,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-transaction-info": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-transaction-info"
           }
         },
         "operationId": "getTransactionInfo",
@@ -610,12 +610,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-raw-transaction": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-raw-transaction"
           }
         },
         "operationId": "getRawTransaction",
@@ -654,12 +654,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction"
           }
         },
         "operationId": "signRawTransaction",
@@ -698,12 +698,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/run-transaction": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/run-transaction"
           }
         },
         "operationId": "runTransaction",
@@ -742,12 +742,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink"
           }
         },
         "operationId": "deployContractInk",
@@ -786,12 +786,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/invoke-contract": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/invoke-contract"
           }
         },
         "operationId": "invokeContract",

@@ -4,7 +4,7 @@ export {
   LikeIpfsHttpClientFile,
   LikeIpfsHttpClient,
 } from "./kubo-rpc-client-types";
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 export {
   PluginObjectStoreIpfs,
   IPluginObjectStoreIpfsOptions,

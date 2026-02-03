@@ -12,22 +12,22 @@ const sutLogLevel = "info";
 
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   EthContractInvocationWeb3Method,
   InvokeRawWeb3EthContractV1Request,
   PluginLedgerConnectorEthereum,
   Web3SigningCredentialType,
 } from "../../../main/typescript/index";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import { ContractAbi } from "web3";
 
 // Unit Test logger setup

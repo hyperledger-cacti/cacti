@@ -15,16 +15,16 @@ import {
   Iroha2ClientConfig,
   Iroha2TestLedger,
   pruneDockerAllIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   LogLevelDesc,
   Logger,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 import {
   Iroha2BaseConfig,

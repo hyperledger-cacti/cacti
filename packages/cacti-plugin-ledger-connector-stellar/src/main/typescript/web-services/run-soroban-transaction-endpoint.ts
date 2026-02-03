@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Logger,
@@ -12,12 +12,12 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import { PluginLedgerConnectorStellar } from "../plugin-ledger-connector-stellar";
 import OAS from "../../json/openapi.json";
@@ -47,9 +47,9 @@ export class RunSorobanTransactionEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-soroban-transaction"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/run-soroban-transaction"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-soroban-transaction"
+      "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/run-soroban-transaction"
     ];
   }
 

@@ -1,5 +1,5 @@
 import { Gateway } from "fabric-network";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import {
   DLTransactionParams,
   Interfaces as CopmIF,

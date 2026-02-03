@@ -9,7 +9,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { ITestLedger } from "../i-test-ledger";
 import { Containers } from "../common/containers";
 import { v4 as internalIpV4 } from "internal-ip";

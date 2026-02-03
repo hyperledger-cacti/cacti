@@ -13,7 +13,7 @@ import {
   BusinessLogicBase,
   json2str,
   ConfigUtil,
-} from "@hyperledger/cactus-common-example-server";
+} from "@hyperledger-cacti/cactus-common-example-server";
 import { sendEthereumTransaction } from "./TransactionEthereum";
 
 const config: any = ConfigUtil.getConfig() as any;
@@ -23,7 +23,7 @@ import {
   isWatchBlocksV1CactiTransactionsResponse,
   WatchBlocksV1ListenerType,
   WatchBlocksV1Progress,
-} from "@hyperledger/cactus-plugin-ledger-connector-sawtooth";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth";
 
 const moduleName = "BusinessLogicElectricityTrade";
 const logger = getLogger(`${moduleName}`);

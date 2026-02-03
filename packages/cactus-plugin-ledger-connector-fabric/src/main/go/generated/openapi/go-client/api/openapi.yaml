@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction:
     post:
       description: ""
       operationId: runTransactionV1
@@ -37,8 +37,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction:
     post:
       description: ""
       operationId: runDelegatedSignTransactionV1
@@ -66,8 +66,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid:
     post:
       description: ""
       operationId: getTransactionReceiptByTxIDV1
@@ -91,8 +91,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract:
     post:
       operationId: deployContractV1
       parameters: []
@@ -120,8 +120,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block:
     post:
       operationId: getBlockV1
       parameters: []
@@ -148,8 +148,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info:
     post:
       operationId: getChainInfoV1
       parameters: []
@@ -175,8 +175,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results:
     post:
       operationId: getDiscoveryResultsV1
       parameters: []
@@ -202,8 +202,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetricsV1
       parameters: []
@@ -218,7 +218,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
 components:
   schemas:
     TransactReceiptTransactionEndorsement:

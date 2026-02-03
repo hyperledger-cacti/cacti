@@ -1,7 +1,7 @@
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { isLogLevelDesc } from "../validate-satp-log-level";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 export interface KeychainBackendEntry {
   keychainEntry: string;

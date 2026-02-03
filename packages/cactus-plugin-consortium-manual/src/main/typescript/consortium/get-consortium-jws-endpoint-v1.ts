@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { GetConsortiumJwsResponse } from "../generated/openapi/typescript-axios";
 
@@ -14,12 +14,12 @@ import {
   LoggerProvider,
   IAsyncProvider,
   Checks,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   registerWebServiceEndpoint,
   ConsortiumRepository,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginConsortiumManual } from "../plugin-consortium-manual";
@@ -72,9 +72,9 @@ export class GetConsortiumEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws"
     ];
   }
 

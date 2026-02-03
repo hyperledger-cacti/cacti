@@ -7,7 +7,7 @@ import {
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
   K_DEFAULT_VAULT_HTTP_PORT,
   VaultTestServer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import { Configuration, DefaultApi } from "../../../main/typescript/public-api";
 

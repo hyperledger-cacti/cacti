@@ -2,7 +2,7 @@ import {
   ConsensusAlgorithmFamily,
   ConsensusAlgorithmFamiliesWithTxFinality,
   ConsensusAlgorithmFamiliesWithOutTxFinality,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { BadRequestError } from "http-errors-enhanced-cjs";
 

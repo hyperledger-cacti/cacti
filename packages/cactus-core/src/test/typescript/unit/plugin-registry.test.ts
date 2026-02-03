@@ -3,7 +3,7 @@ import "jest-extended";
 
 import { PluginRegistry } from "../../../main/typescript/public-api";
 
-import { ICactusPlugin, IPluginKeychain } from "@hyperledger/cactus-core-api";
+import { ICactusPlugin, IPluginKeychain } from "@hyperledger-cacti/cactus-core-api";
 
 describe("PluginRegistry", () => {
   const keychainId = uuidv4();
@@ -24,7 +24,7 @@ describe("PluginRegistry", () => {
     set: async () => {
       throw new Error("This is a mock. Not implemented.");
     },
-    getPackageName: () => "@hyperledger/cactus-plugin-keychain-mock",
+    getPackageName: () => "@hyperledger-cacti/cactus-plugin-keychain-mock",
 
     onPluginInit: async () => {
       throw new Error("not sure how this works");

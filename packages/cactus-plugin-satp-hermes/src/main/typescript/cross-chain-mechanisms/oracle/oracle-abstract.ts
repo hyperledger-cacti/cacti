@@ -18,13 +18,13 @@
  * @since 0.0.3-beta
  */
 
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
-import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
+import type { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
 import { IOracleEntryBase, IOracleListenerBase } from "./oracle-types";
 import {
   IPluginLedgerConnector,
   LedgerType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { v4 as uuidv4 } from "uuid";
 import { NetworkId, OracleOperation, OracleResponse } from "../../public-api";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";

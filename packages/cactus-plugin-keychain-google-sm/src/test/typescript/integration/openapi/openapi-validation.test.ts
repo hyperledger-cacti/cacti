@@ -10,14 +10,14 @@ import {
   IListenOptions,
   Servers,
   hasKey,
-} from "@hyperledger/cactus-common";
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
-import { DeleteKeychainEntryRequestV1 } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
+import { DeleteKeychainEntryRequestV1 } from "@hyperledger-cacti/cactus-core-api";
 import {
   GetKeychainEntryRequestV1,
   HasKeychainEntryRequestV1,
   SetKeychainEntryRequestV1,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { DefaultApi as KeychainGoogleSmApi } from "../../../../main/typescript/generated/openapi/typescript-axios/index";
 import { Configuration } from "../../../../main/typescript/generated/openapi/typescript-axios/index";

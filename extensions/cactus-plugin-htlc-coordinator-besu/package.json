@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-plugin-htlc-coordinator-besu",
+  "name": "@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu",
   "version": "2.1.0",
   "description": "HTLC Coordinator to exchange tokens between networks.",
   "keywords": [
@@ -46,7 +46,7 @@
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "run-p generate-sdk",
     "generate-sdk": "run-s 'generate-sdk:*'",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z) --ignore-file-override=../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z) --ignore-file-override=../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev webpack:prod",
@@ -58,13 +58,13 @@
     "webpack:prod:web": "webpack --env=prod --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "@hyperledger/cactus-plugin-htlc-eth-besu": "2.1.0",
-    "@hyperledger/cactus-plugin-htlc-eth-besu-erc20": "2.1.0",
-    "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
-    "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "2.1.0",
+    "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20": "2.1.0",
     "axios": "1.8.4",
     "body-parser": "1.20.3",
     "fast-safe-stringify": "2.1.1",
@@ -77,8 +77,8 @@
     "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
     "@types/body-parser": "1.19.6",
     "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",

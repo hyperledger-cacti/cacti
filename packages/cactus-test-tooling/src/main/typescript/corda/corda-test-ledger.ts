@@ -14,7 +14,7 @@ import {
   LoggerProvider,
   Checks,
   Bools,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { SampleCordappEnum, SAMPLE_CORDAPP_DATA } from "./sample-cordapp-enum";
 import { ICordappJarFile } from "./cordapp-jar-file";

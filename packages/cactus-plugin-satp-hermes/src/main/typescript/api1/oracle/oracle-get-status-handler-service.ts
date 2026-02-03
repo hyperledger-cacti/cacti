@@ -1,4 +1,4 @@
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { OracleManager } from "../../cross-chain-mechanisms/oracle/oracle-manager";
 import {
   OracleOperation,

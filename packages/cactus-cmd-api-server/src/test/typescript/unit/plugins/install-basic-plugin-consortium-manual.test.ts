@@ -5,7 +5,7 @@ import "jest-extended";
 import { generateKeyPair, exportPKCS8 } from "jose";
 import { StatusCodes } from "http-status-codes";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   ConsortiumDatabase,
   ICactusPlugin,
@@ -13,7 +13,7 @@ import {
   PluginImport,
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { ApiServer } from "../../../../main/typescript/api-server";
 import { K_CACTUS_API_SERVER_TOTAL_PLUGIN_IMPORTS } from "../../../../main/typescript/prometheus-exporter/metrics";
@@ -57,7 +57,7 @@ describe("ApiServer", () => {
 
     pluginImports = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {
@@ -67,7 +67,7 @@ describe("ApiServer", () => {
         },
       },
       {
-        packageName: "@hyperledger/cactus-plugin-consortium-manual",
+        packageName: "@hyperledger-cacti/cactus-plugin-consortium-manual",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {

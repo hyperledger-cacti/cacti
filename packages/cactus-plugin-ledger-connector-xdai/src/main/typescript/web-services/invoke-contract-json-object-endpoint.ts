@@ -6,13 +6,13 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import { PluginLedgerConnectorXdai } from "../plugin-ledger-connector-xdai";
 
@@ -45,9 +45,9 @@ export class InvokeContractJsonObjectEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object"
     ];
   }
 

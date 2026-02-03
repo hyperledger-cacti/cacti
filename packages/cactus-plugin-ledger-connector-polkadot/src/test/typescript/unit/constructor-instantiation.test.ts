@@ -1,15 +1,15 @@
 import { PrometheusExporter } from "../../../main/typescript/prometheus-exporter/prometheus-exporter";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SubstrateTestLedger } from "../../../../../cactus-test-tooling/src/main/typescript/substrate-test-ledger/substrate-test-ledger";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   PluginLedgerConnectorPolkadot,
   IPluginLedgerConnectorPolkadotOptions,
   PluginFactoryLedgerConnector,
 } from "../../../main/typescript";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import "jest-extended";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 
 const testCase = "Instantiate plugin";
 const logLevel: LogLevelDesc = "TRACE";

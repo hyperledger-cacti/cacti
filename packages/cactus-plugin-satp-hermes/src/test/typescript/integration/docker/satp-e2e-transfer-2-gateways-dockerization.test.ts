@@ -3,13 +3,13 @@ import {
   LogLevelDesc,
   Secp256k1Keys,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { GatewayIdentity } from "../../../../main/typescript/core/types";
 import {
   setupGatewayDockerFiles,
@@ -32,7 +32,7 @@ import {
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
-import { Configuration, LedgerType } from "@hyperledger/cactus-core-api";
+import { Configuration, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   AdminApi,
   GetApproveAddressApi,

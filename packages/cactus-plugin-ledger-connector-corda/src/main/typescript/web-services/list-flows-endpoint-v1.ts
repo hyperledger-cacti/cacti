@@ -6,18 +6,18 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
   Configuration,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../../json/openapi.json";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import {
   DefaultApi,
   ListFlowsV1Request,
@@ -66,9 +66,9 @@ export class ListFlowsEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows"
     ];
   }
 

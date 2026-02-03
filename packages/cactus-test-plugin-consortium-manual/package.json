@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-test-plugin-consortium-manual",
+  "name": "@hyperledger-cacti/cactus-test-plugin-consortium-manual",
   "version": "2.1.0",
   "description": "Integration tests for the manual consortium plugin using the Besu ledger and the API server.",
   "keywords": [
@@ -50,12 +50,12 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-cmd-api-server": "2.1.0",
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "@hyperledger/cactus-plugin-consortium-manual": "2.1.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-consortium-manual": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
     "axios": "1.8.4",
     "jose": "4.15.5"
   },

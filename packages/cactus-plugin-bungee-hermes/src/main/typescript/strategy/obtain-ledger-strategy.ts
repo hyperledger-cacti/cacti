@@ -1,6 +1,6 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import { State } from "../view-creation/state";
-import { IPluginLedgerConnector } from "@hyperledger/cactus-core-api/src/main/typescript/plugin/ledger-connector/i-plugin-ledger-connector";
+import { IPluginLedgerConnector } from "@hyperledger-cacti/cactus-core-api/src/main/typescript/plugin/ledger-connector/i-plugin-ledger-connector";
 
 export interface NetworkDetails {
   connectorApiPath?: string;

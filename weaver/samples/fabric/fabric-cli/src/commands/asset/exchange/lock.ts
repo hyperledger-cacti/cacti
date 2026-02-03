@@ -15,7 +15,7 @@ import {
 import {
   AssetManager,
   HashFunctions,
-} from "@hyperledger/cacti-weaver-sdk-fabric";
+} from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 
 const command: GluegunCommand = {
   name: "lock",

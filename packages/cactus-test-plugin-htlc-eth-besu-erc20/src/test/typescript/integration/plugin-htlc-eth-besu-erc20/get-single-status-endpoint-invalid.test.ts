@@ -11,29 +11,29 @@ import {
   IPluginHtlcEthBesuErc20Options,
   NewContractRequest,
   PluginFactoryHtlcEthBesuErc20,
-} from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20";
+} from "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20";
 import {
   EthContractInvocationType,
   PluginFactoryLedgerConnector,
   PluginLedgerConnectorBesu,
   Web3SigningCredential,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import TestTokenJSON from "../../../solidity/token-erc20-contract/Test_Token.json";
 import DemoHelperJSON from "../../../solidity/token-erc20-contract/DemoHelpers.json";
 import HashTimeLockJSON from "../../../../../../cactus-plugin-htlc-eth-besu-erc20/src/main/solidity/contracts/HashedTimeLockContract.json";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 const logLevel: LogLevelDesc = "TRACE";
 const estimatedGas = 6721975;

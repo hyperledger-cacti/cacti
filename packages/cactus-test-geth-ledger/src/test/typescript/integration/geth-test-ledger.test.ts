@@ -16,8 +16,8 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-common";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 
 import "jest-extended";
 import { Web3 } from "web3";

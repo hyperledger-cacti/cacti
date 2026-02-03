@@ -17,33 +17,33 @@ import "jest-extended";
 import lodash from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import Web3, { ContractAbi } from "web3";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   PluginLedgerConnectorEthereum,
   EthereumApiClient,
   WatchBlocksV1Progress,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   ISendRequestResultV1,
   IVerifierEventListener,
   LedgerEvent,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { AddressInfo } from "net";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
-import { Verifier, VerifierFactory } from "@hyperledger/cactus-verifier-client";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
+import { Verifier, VerifierFactory } from "@hyperledger-cacti/cactus-verifier-client";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 import { PayableMethodObject } from "web3-eth-contract";
 
 import HelloWorldContractJson from "../../../solidity/hello-world-contract/HelloWorld.json";

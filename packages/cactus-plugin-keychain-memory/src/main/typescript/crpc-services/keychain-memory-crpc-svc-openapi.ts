@@ -6,7 +6,7 @@ import {
   Logger,
   LoggerProvider,
   Strings,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { PluginKeychainMemory } from "../plugin-keychain-memory";
 

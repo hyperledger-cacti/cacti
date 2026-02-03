@@ -8,16 +8,16 @@ import { createConnectTransport } from "@connectrpc/connect-node";
 import { createGrpcTransport } from "@connectrpc/connect-node";
 import { createGrpcWebTransport } from "@connectrpc/connect-node";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
   Servers,
-} from "@hyperledger/cactus-common";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
-import { AuthorizationProtocol } from "@hyperledger/cactus-cmd-api-server";
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-common";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { AuthorizationProtocol } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
 import {
   DeleteKeychainEntryRequestV1PB,
   DeleteKeychainEntryV1Request,
@@ -28,8 +28,8 @@ import {
   PluginKeychainMemory,
   SetKeychainEntryRequestV1PB,
   SetKeychainEntryV1Request,
-} from "@hyperledger/cactus-plugin-keychain-memory";
-import { DefaultService } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { DefaultService } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 const logLevel: LogLevelDesc = "DEBUG";
 

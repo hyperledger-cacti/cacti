@@ -12,7 +12,7 @@ import {
   getNetworkConfig,
   handlePromise,
 } from "../../../helpers/helpers";
-import { AssetManager } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { AssetManager } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 
 const command: GluegunCommand = {
   name: "unlock",

@@ -65,7 +65,7 @@ func (a *DefaultApiService) GetLineageV1Execute(r ApiGetLineageV1Request) (*GetL
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/get-lineage"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -180,7 +180,7 @@ func (a *DefaultApiService) RegisterHistoryDataV1Execute(r ApiRegisterHistoryDat
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/register-history-data"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/register-history-data"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -295,7 +295,7 @@ func (a *DefaultApiService) SearchLineageByGlobalDataV1Execute(r ApiSearchLineag
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -410,7 +410,7 @@ func (a *DefaultApiService) SearchLineageByHeaderV1Execute(r ApiSearchLineageByH
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-header"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-header"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

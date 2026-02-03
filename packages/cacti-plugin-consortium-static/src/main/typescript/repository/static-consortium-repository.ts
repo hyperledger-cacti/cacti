@@ -3,7 +3,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   CactusNode,
@@ -11,7 +11,7 @@ import {
   ICactusPluginOptions,
   Ledger,
   PluginInstance,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { PolicyGroup } from "../policy-model/policy-group";
 import MerkleTree from "merkletreejs";
 import { JWK } from "jose";

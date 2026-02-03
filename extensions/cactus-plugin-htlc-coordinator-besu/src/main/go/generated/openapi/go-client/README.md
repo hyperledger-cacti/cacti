@@ -77,9 +77,9 @@ All URIs are relative to *https://www.cactus.stream*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**CounterpartyHtlcV1**](docs/DefaultApi.md#counterpartyhtlcv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/counterparty-htlc | Create an instance to interact with the counterparty HTLC
-*DefaultApi* | [**OwnHtlcV1**](docs/DefaultApi.md#ownhtlcv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc | Create an instance to interact with the own HTLC.
-*DefaultApi* | [**WithdrawCounterpartyV1**](docs/DefaultApi.md#withdrawcounterpartyv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty | Withdraw funds of the counterparty HTLC
+*DefaultApi* | [**CounterpartyHtlcV1**](docs/DefaultApi.md#counterpartyhtlcv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/counterparty-htlc | Create an instance to interact with the counterparty HTLC
+*DefaultApi* | [**OwnHtlcV1**](docs/DefaultApi.md#ownhtlcv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/own-htlc | Create an instance to interact with the own HTLC.
+*DefaultApi* | [**WithdrawCounterpartyV1**](docs/DefaultApi.md#withdrawcounterpartyv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty | Withdraw funds of the counterparty HTLC
 
 
 ## Documentation For Models

@@ -5,17 +5,17 @@ import {
   FileBase64,
   type IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
   ISignerKeyPair,
   type LogLevelDesc,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../../core/satp-logger";
-import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { StrategyFabric } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
+import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
+import { StrategyFabric } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
 import { OracleAbstract, type OracleAbstractOptions } from "../oracle-abstract";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -24,7 +24,7 @@ import {
   OracleOperation,
   OracleResponse,
 } from "../../../public-api";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { X509Identity } from "fabric-network";
 import { getUint8Key } from "../../bridge/leafs/leafs-utils";
 import {

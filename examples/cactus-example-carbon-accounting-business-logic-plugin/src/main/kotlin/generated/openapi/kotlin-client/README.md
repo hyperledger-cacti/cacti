@@ -44,7 +44,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**daoTokenGetAllowanceV1**](docs/DefaultApi.md#daotokengetallowancev1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance | Get the number of tokens `spender` is approved to spend on behalf of `account`
+*DefaultApi* | [**daoTokenGetAllowanceV1**](docs/DefaultApi.md#daotokengetallowancev1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-example-carbon-accounting-backend/dao-token/get-allowance | Get the number of tokens `spender` is approved to spend on behalf of `account`
 *DefaultApi* | [**enrollAdminV1**](docs/DefaultApi.md#enrolladminv1) | **POST** /api/v1/utilityemissionchannel/registerEnroll/admin | Registers an admin account within the Fabric organization specified.
 
 

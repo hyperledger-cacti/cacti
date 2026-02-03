@@ -18,38 +18,38 @@ const containerImageVersion = "2021-08-24--feat-1244";
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   Web3SigningCredentialType,
   PluginLedgerConnectorBesu,
   ReceiptType,
   BesuApiClient,
   WatchBlocksV1Progress,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import Web3 from "web3";
 import { Account } from "web3-core";
-import { Constants } from "@hyperledger/cactus-core-api";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import express from "express";
 import http from "http";
 import { AddressInfo } from "net";
-import { BesuApiClientOptions } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { BesuApiClientOptions } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import {
   Verifier,
   IVerifierEventListener,
   LedgerEvent,
-} from "@hyperledger/cactus-verifier-client";
+} from "@hyperledger-cacti/cactus-verifier-client";
 
 // Unit Test logger setup
 const log: Logger = LoggerProvider.getOrCreate({
@@ -136,7 +136,7 @@ describe("Verifier integration with besu connector tests", () => {
     const { address, port } = addressInfo;
     const apiHost = `http://${address}:${port}`;
     log.info(
-      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
+      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
     );
     await connector.getOrCreateWebServices();
     await connector.registerWebServices(expressApp, wsApi);

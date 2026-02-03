@@ -59,7 +59,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { bytesToHex, hexToBytes } from "hada";
 

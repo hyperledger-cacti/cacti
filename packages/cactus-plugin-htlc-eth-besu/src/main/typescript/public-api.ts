@@ -3,7 +3,7 @@ export { HashTimeLockJson };
 
 export * from "./generated/openapi/typescript-axios/index";
 
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 
 import { PluginFactoryHtlcEthBesu } from "./plugin-factory-htlc-eth-besu";
 export {

@@ -66,7 +66,7 @@ func (a *DefaultApiService) GetObjectV1Execute(r ApiGetObjectV1Request) (*GetObj
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -175,7 +175,7 @@ func (a *DefaultApiService) HasObjectV1Execute(r ApiHasObjectV1Request) (*HasObj
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -284,7 +284,7 @@ func (a *DefaultApiService) SetObjectV1Execute(r ApiSetObjectV1Request) (*SetObj
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

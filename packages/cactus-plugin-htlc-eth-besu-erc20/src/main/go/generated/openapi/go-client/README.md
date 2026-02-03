@@ -77,12 +77,12 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GetSingleStatusV1**](docs/DefaultApi.md#getsinglestatusv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status | 
-*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status | 
-*DefaultApi* | [**InitializeV1**](docs/DefaultApi.md#initializev1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize | Initialize contract
-*DefaultApi* | [**NewContractV1**](docs/DefaultApi.md#newcontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract | Create a new hashtimelock contract
-*DefaultApi* | [**RefundV1**](docs/DefaultApi.md#refundv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund | Refund a hashtimelock contract
-*DefaultApi* | [**WithdrawV1**](docs/DefaultApi.md#withdrawv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw | Withdraw a hashtimelock contract
+*DefaultApi* | [**GetSingleStatusV1**](docs/DefaultApi.md#getsinglestatusv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status | 
+*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status | 
+*DefaultApi* | [**InitializeV1**](docs/DefaultApi.md#initializev1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize | Initialize contract
+*DefaultApi* | [**NewContractV1**](docs/DefaultApi.md#newcontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract | Create a new hashtimelock contract
+*DefaultApi* | [**RefundV1**](docs/DefaultApi.md#refundv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund | Refund a hashtimelock contract
+*DefaultApi* | [**WithdrawV1**](docs/DefaultApi.md#withdrawv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw | Withdraw a hashtimelock contract
 
 
 ## Documentation For Models

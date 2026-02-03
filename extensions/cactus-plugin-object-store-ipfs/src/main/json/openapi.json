@@ -206,12 +206,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object"
           }
         },
         "operationId": "getObjectV1",
@@ -227,12 +227,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object"
           }
         },
         "operationId": "setObjectV1",
@@ -248,12 +248,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object"
           }
         },
         "operationId": "hasObjectV1",

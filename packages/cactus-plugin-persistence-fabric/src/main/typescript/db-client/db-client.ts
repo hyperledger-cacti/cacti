@@ -11,7 +11,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   CactiBlockFullEventV1,
   FabricX509CertificateV1,
@@ -22,7 +22,7 @@ import {
   GetDiscoveryResultsResponseV1MspsValue,
   GetDiscoveryResultsResponseV1OrderersValueEndpointsInner,
   GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric/src/main/typescript/generated/openapi/typescript-axios/api";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/src/main/typescript/generated/openapi/typescript-axios/api";
 import { Database as DatabaseSchemaType } from "./database.types";
 
 //////////////////////////////////

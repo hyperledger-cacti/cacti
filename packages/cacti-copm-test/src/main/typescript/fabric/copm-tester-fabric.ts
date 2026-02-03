@@ -1,7 +1,7 @@
 import { Identity } from "fabric-network";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { DLAccount, DefaultService } from "@hyperledger-cacti/cacti-copm-core";
-import { LogLevelDesc, Logger } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Logger } from "@hyperledger-cacti/cactus-common";
 import { TestAssets } from "../interfaces/test-assets";
 import { TestAssetsFabric } from "./test-assets-fabric";
 import { TestFabricConfiguration } from "./test-fabric-configuration";
@@ -10,12 +10,12 @@ import { CopmTester } from "../interfaces/copm-tester";
 import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
 import { createConnectTransport } from "@connectrpc/connect-node";
 import http from "node:http";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { AuthorizationProtocol } from "@hyperledger/cactus-cmd-api-server";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { AuthorizationProtocol } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { v4 as uuidV4 } from "uuid";
 import { AddressInfo } from "node:net";
-import { Servers } from "@hyperledger/cactus-common";
+import { Servers } from "@hyperledger-cacti/cactus-common";
 import {
   PluginCopmFabric,
   FabricTransactionContextFactory,

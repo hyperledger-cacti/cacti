@@ -65,7 +65,7 @@ func (a *DefaultApiService) DeployContractInkExecute(r ApiDeployContractInkReque
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -174,7 +174,7 @@ func (a *DefaultApiService) GetPrometheusMetricsExecute(r ApiGetPrometheusMetric
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -287,7 +287,7 @@ func (a *DefaultApiService) GetRawTransactionExecute(r ApiGetRawTransactionReque
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-raw-transaction"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -402,7 +402,7 @@ func (a *DefaultApiService) GetTransactionInfoExecute(r ApiGetTransactionInfoReq
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-transaction-info"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -517,7 +517,7 @@ func (a *DefaultApiService) InvokeContractExecute(r ApiInvokeContractRequest) (*
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/invoke-contract"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -632,7 +632,7 @@ func (a *DefaultApiService) RunTransactionExecute(r ApiRunTransactionRequest) (*
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/run-transaction"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -747,7 +747,7 @@ func (a *DefaultApiService) SignRawTransactionExecute(r ApiSignRawTransactionReq
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

@@ -2,8 +2,8 @@ import "jest-extended";
 import {
   Containers,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   SATPGateway,
   SATPGatewayConfig,
@@ -13,7 +13,7 @@ import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
@@ -24,7 +24,7 @@ import {
   TransactRequest,
   TransactRequestSourceAsset,
 } from "../../../main/typescript";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";

@@ -1288,12 +1288,12 @@
     }
   },
   "paths": {
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationrequest": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase1/transferinitiationrequest": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationrequest"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase1/transferinitiationrequest"
           }
         },
         "operationId": "phase1TransferInitiationRequestV1",
@@ -1314,12 +1314,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommencerequest": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/transfercommencerequest": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommencerequest"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/transfercommencerequest"
           }
         },
         "operationId": "phase2TransferCommenceRequestV1",
@@ -1340,12 +1340,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidencerequest": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/lockevidencerequest": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidencerequest"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/lockevidencerequest"
           }
         },
         "operationId": "phase2LockEvidenceRequestV1",
@@ -1366,12 +1366,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationrequest": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitpreparationrequest": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationrequest"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitpreparationrequest"
           }
         },
         "operationId": "phase3CommitPreparationRequestV1",
@@ -1392,12 +1392,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalrequest": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitfinalrequest": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalrequest"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitfinalrequest"
           }
         },
         "operationId": "phase3CommitFinalRequestV1",
@@ -1418,12 +1418,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/transfercompleterequest": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/transfercompleterequest": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/transfercompleterequest"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/transfercompleterequest"
           }
         },
         "operationId": "phase3TransferCompleteRequestV1",
@@ -1444,12 +1444,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/clientrequest": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/clientrequest": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/clientrequest"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/clientrequest"
           }
         },
         "operationId": "clientRequestV1",
@@ -1475,12 +1475,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase1/transferinitiationresponse": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase1/transferinitiationresponse"
           }
         },
         "operationId": "phase1TransferInitiationResponseV1",
@@ -1501,12 +1501,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/transfercommenceresponse": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/transfercommenceresponse"
           }
         },
         "operationId": "phase2TransferCommenceResponseV1",
@@ -1527,12 +1527,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/lockevidenceresponse": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase2/lockevidenceresponse"
           }
         },
         "operationId": "phase2LockEvidenceResponseV1",
@@ -1553,12 +1553,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationresponse": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitpreparationresponse": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationresponse"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitpreparationresponse"
           }
         },
         "operationId": "phase3CommitPreparationResponseV1",
@@ -1579,12 +1579,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalresponse": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitfinalresponse": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalresponse"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/phase3/commitfinalresponse"
           }
         },
         "operationId": "phase3CommitFinalResponseV1",
@@ -1605,12 +1605,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recovermessage": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recovermessage": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recovermessage"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recovermessage"
           }
         },
         "operationId": "RecoverV1Message",
@@ -1631,12 +1631,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdatemessage": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recoverupdatemessage": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdatemessage"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recoverupdatemessage"
           }
         },
         "operationId": "RecoverUpdateV1Message",
@@ -1657,12 +1657,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdateackmessage": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recoverupdateackmessage": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdateackmessage"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recoverupdateackmessage"
           }
         },
         "operationId": "RecoverUpdateAckV1Message",
@@ -1683,12 +1683,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoversuccessmessage": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recoversuccessmessage": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoversuccessmessage"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/recoversuccessmessage"
           }
         },
         "operationId": "RecoverV1Success",
@@ -1709,12 +1709,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackmessage": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/rollbackmessage": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackmessage"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/rollbackmessage"
           }
         },
         "operationId": "RollbackV1Message",
@@ -1735,12 +1735,12 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackackmessage": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/rollbackackmessage": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackackmessage"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/rollbackackmessage"
           }
         },
         "operationId": "RollbackAckV1Message",

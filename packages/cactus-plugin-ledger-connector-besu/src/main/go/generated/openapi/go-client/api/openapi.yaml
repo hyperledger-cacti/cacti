@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec:
     get:
       operationId: getOpenApiSpecV1
       parameters: []
@@ -31,8 +31,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode:
     post:
       operationId: deployContractSolBytecodeV1
       parameters: []
@@ -58,8 +58,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain:
     post:
       operationId: deployContractSolBytecodeNoKeychainV1
       parameters: []
@@ -85,8 +85,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-balance:
     post:
       operationId: getBalanceV1
       parameters: []
@@ -112,8 +112,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-balance
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-block:
     post:
       operationId: getBlockV1
       parameters: []
@@ -139,8 +139,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-block
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/run-transaction:
     post:
       operationId: runTransactionV1
       parameters: []
@@ -166,8 +166,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/run-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-transaction:
     post:
       operationId: getTransactionV1
       parameters: []
@@ -193,8 +193,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-past-logs:
     post:
       operationId: getPastLogsV1
       parameters: []
@@ -220,8 +220,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-past-logs
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/invoke-contract:
     post:
       operationId: invokeContractV1
       parameters: []
@@ -247,8 +247,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/invoke-contract
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/sign-transaction:
     post:
       description: Obtain signatures of ledger from the corresponding transaction
         hash.
@@ -280,8 +280,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/sign-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetricsV1
       parameters: []
@@ -302,8 +302,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-besu-record:
     post:
       operationId: getBesuRecordV1
       parameters: []
@@ -330,7 +330,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-besu-record
 components:
   schemas:
     GetBalanceV1Response:

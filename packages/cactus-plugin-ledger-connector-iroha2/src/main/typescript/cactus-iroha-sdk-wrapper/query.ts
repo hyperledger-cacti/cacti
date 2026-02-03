@@ -33,7 +33,7 @@ import {
   AccountId,
 } from "@iroha2/data-model";
 
-import { Checks, Logger } from "@hyperledger/cactus-common";
+import { Checks, Logger } from "@hyperledger-cacti/cactus-common";
 
 import safeStringify from "fast-safe-stringify";
 import { hexToBytes } from "hada";

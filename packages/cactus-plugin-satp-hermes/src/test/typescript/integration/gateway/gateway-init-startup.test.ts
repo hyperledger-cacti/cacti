@@ -2,10 +2,10 @@ import "jest-extended";
 import {
   Containers,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
-import { ApiClient } from "@hyperledger/cactus-api-client";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { type LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
 import {
   SATPGateway,
@@ -17,7 +17,7 @@ import {
   type IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { ShutdownHook } from "../../../../main/typescript/core/types";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -26,7 +26,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { AdminApi, OracleApi } from "../../../../main/typescript";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 

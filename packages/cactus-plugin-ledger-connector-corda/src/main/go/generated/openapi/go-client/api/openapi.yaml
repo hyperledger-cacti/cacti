@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query:
     post:
       description: Queryes the vault service for state references based on JVM class
         names. Custom filters are not supported by this endpoint.
@@ -30,9 +30,9 @@ paths:
           description: OK
       x-hyperledger-cactus:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars:
     post:
       operationId: deployContractJarsV1
       parameters: []
@@ -59,9 +59,9 @@ paths:
         \ speak)."
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract:
     post:
       operationId: invokeContractV1
       parameters: []
@@ -81,9 +81,9 @@ paths:
       summary: Invokes a contract on a Corda ledger (e.g. a flow)
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor:
     post:
       operationId: startMonitorV1
       parameters: []
@@ -103,9 +103,9 @@ paths:
       summary: Start monitoring corda changes (transactions) of given state class
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions:
     get:
       operationId: GetMonitorTransactionsV1
       parameters: []
@@ -125,9 +125,9 @@ paths:
       summary: Get transactions for monitored state classes.
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions
           verbLowerCase: get
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions:
     delete:
       operationId: ClearMonitorTransactionsV1
       parameters: []
@@ -148,9 +148,9 @@ paths:
         by GetMonitorTransactionsV1 anymore.
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions
           verbLowerCase: delete
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor:
     delete:
       operationId: stopMonitorV1
       parameters: []
@@ -170,9 +170,9 @@ paths:
       summary: Stop monitoring corda changes (transactions) of given state class
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor
           verbLowerCase: delete
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map:
     post:
       description: "Responds with a snapshot of the network map as provided by the\
         \ Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun\
@@ -194,9 +194,9 @@ paths:
           description: OK
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows:
     post:
       description: Responds with a list of the flows on the Corda node.
       operationId: listFlowsV1
@@ -216,9 +216,9 @@ paths:
           description: OK
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node:
     post:
       description: Responds with diagnostic information about the Corda node
       operationId: diagnoseNodeV1
@@ -238,9 +238,9 @@ paths:
           description: OK
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetricsV1
       parameters: []
@@ -255,8 +255,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi:
     get:
       operationId: listCpiV1
       requestBody:
@@ -276,8 +276,8 @@ paths:
       x-hyperledger-cactus:
         https:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow:
     get:
       operationId: listFlowV1
       parameters: []
@@ -305,8 +305,8 @@ paths:
       x-hyperledger-cactus:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid:
     get:
       operationId: getFlowV1
       parameters: []
@@ -332,8 +332,8 @@ paths:
       x-hyperledger-cactus:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow:
     post:
       operationId: startFlowV1
       parameters: []
@@ -356,7 +356,7 @@ paths:
       x-hyperledger-cactus:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow
 components:
   schemas:
     SHA256:

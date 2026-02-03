@@ -77,12 +77,12 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DeployContract**](docs/DefaultApi.md#deploycontract) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract | Deploys the contract to ethereum ledger.
-*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**InvokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract | Invokes a contract on an ethereum ledger
-*DefaultApi* | [**InvokeRawWeb3EthContractV1**](docs/DefaultApi.md#invokerawweb3ethcontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract | Low-level endpoint to invoke a method on deployed contract.
-*DefaultApi* | [**InvokeWeb3EthMethodV1**](docs/DefaultApi.md#invokeweb3ethmethodv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method | Invoke any method from web3.eth (low-level)
-*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction | Executes a transaction on a ethereum ledger
+*DefaultApi* | [**DeployContract**](docs/DefaultApi.md#deploycontract) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/deploy-contract | Deploys the contract to ethereum ledger.
+*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**InvokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-contract | Invokes a contract on an ethereum ledger
+*DefaultApi* | [**InvokeRawWeb3EthContractV1**](docs/DefaultApi.md#invokerawweb3ethcontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract | Low-level endpoint to invoke a method on deployed contract.
+*DefaultApi* | [**InvokeWeb3EthMethodV1**](docs/DefaultApi.md#invokeweb3ethmethodv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method | Invoke any method from web3.eth (low-level)
+*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/run-transaction | Executes a transaction on a ethereum ledger
 
 
 ## Documentation For Models

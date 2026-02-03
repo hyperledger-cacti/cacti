@@ -44,9 +44,9 @@ All URIs are relative to *https://www.cactus.stream*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**getObjectV1**](docs/DefaultApi.md#getobjectv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object | Retrieves an object from the object store.
-*DefaultApi* | [**hasObjectV1**](docs/DefaultApi.md#hasobjectv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object | Checks the presence of an object in the object store.
-*DefaultApi* | [**setObjectV1**](docs/DefaultApi.md#setobjectv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object | Sets an object in the object store under the specified key.
+*DefaultApi* | [**getObjectV1**](docs/DefaultApi.md#getobjectv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object | Retrieves an object from the object store.
+*DefaultApi* | [**hasObjectV1**](docs/DefaultApi.md#hasobjectv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object | Checks the presence of an object in the object store.
+*DefaultApi* | [**setObjectV1**](docs/DefaultApi.md#setobjectv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object | Sets an object in the object store under the specified key.
 
 
 <a id="documentation-for-models"></a>

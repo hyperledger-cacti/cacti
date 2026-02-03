@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-test-plugin-keychain-memory",
+  "name": "@hyperledger-cacti/cactus-test-plugin-keychain-memory",
   "version": "2.1.0",
   "description": "Tests with API server integration for the dummy keychain implementation. Private package not meant to be released.",
   "keywords": [
@@ -49,11 +49,11 @@
     "@connectrpc/connect": "1.4.0",
     "@connectrpc/connect-node": "1.4.0",
     "@connectrpc/connect-web": "1.4.0",
-    "@hyperledger/cactus-cmd-api-server": "2.1.0",
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-cmd-api-server": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
     "express": "5.1.0",
     "jest-extended": "7.0.0",
     "uuid": "10.0.0"

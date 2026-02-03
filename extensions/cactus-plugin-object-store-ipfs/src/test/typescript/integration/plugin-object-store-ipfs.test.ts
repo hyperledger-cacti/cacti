@@ -10,12 +10,12 @@ import {
   IListenOptions,
   Servers,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { Configuration } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import {
   GoIpfsTestContainer,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import { PluginObjectStoreIpfs } from "../../../main/typescript";
 import { DefaultApi as ObjectStoreIpfsApi } from "../../../main/typescript/public-api";

@@ -2,13 +2,13 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   ICactusPluginOptions,
   ICrpcSvcRegistration,
   IPluginCrpcService,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { ServiceType } from "@bufbuild/protobuf";
 import {
   DefaultService,

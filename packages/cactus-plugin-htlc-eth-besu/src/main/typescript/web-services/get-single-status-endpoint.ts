@@ -5,13 +5,13 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import { PluginHtlcEthBesu } from "../plugin-htlc-eth-besu";
 import OAS from "../../json/openapi.json";
 
@@ -35,9 +35,9 @@ export class GetSingleStatusEndpoint implements IWebServiceEndpoint {
     return GetSingleStatusEndpoint.CLASS_NAME;
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/get-single-status"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/get-single-status"
     ];
   }
 

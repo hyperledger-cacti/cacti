@@ -27,16 +27,16 @@ import {
   CactusNode,
   Ledger,
   PluginInstance,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { GetConsortiumEndpointV1 } from "./consortium/get-consortium-jws-endpoint-v1";
 import { GetNodeJwsEndpoint } from "./consortium/get-node-jws-endpoint-v1";
 
@@ -246,7 +246,7 @@ export class PluginConsortiumStatic
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cacti-plugin-consortium-static`;
+    return `@hyperledger-cacti/cacti-plugin-consortium-static`;
   }
 
   public async getNodeJws(): Promise<JWSGeneral> {

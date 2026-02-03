@@ -6,15 +6,15 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-common";
+import { consensusHasTransactionFinality } from "@hyperledger-cacti/cactus-core";
 import {
   ConsensusAlgorithmFamily,
   IWebServiceEndpoint,
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { RegisterHistoryDataEndpoint } from "./web-services/register-history-data-v1-endpoint";
 import { GetLineageDataEndpoint } from "./web-services/get-lineage-v1-endpoint";
@@ -153,7 +153,7 @@ export class PluginLedgerConnectorCDL
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-cdl`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-cdl`;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {

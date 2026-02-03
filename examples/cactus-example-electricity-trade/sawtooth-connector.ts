@@ -1,11 +1,11 @@
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
-import { Constants, Configuration } from "@hyperledger/cactus-core-api";
-import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
+import { IListenOptions, Servers } from "@hyperledger-cacti/cactus-common";
+import { Constants, Configuration } from "@hyperledger-cacti/cactus-core-api";
+import { ConfigUtil } from "@hyperledger-cacti/cactus-common-example-server";
 import {
   PluginLedgerConnectorSawtooth,
   SawtoothApiClient,
   StatusResponseV1,
-} from "@hyperledger/cactus-plugin-ledger-connector-sawtooth";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth";
 
 import http from "http";
 import express from "express";

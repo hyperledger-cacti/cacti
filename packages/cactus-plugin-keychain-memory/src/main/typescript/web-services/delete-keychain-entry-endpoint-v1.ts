@@ -6,17 +6,17 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
-import { DeleteKeychainEntryRequestV1 } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core";
+import { DeleteKeychainEntryRequestV1 } from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../../json/openapi.json";
 import { PluginKeychainMemory } from "../plugin-keychain-memory";
@@ -45,9 +45,9 @@ export class DeleteKeychainEntryV1Endpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/delete-keychain-entry"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/delete-keychain-entry"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/delete-keychain-entry"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/delete-keychain-entry"
     ];
   }
 

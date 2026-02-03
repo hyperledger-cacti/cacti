@@ -3,20 +3,20 @@ import {
   IAsyncProvider,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
   LedgerType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { Express, Request, Response } from "express";
 import type { IRequestOptions } from "../../core/types";
 import OAS from "../../../json/openapi-blo-bundled.json";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 import { SATPInternalError } from "../../core/errors/satp-errors";
 import { getEnumKeyByValue } from "../../services/utils";
 import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -41,9 +41,9 @@ export class GetApproveAddressEndpointV1 implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address"
     ];
   }
 
@@ -65,7 +65,7 @@ export class GetApproveAddressEndpointV1 implements IWebServiceEndpoint {
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address"
     ].get.operationId;
   }
 

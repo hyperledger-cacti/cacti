@@ -5,11 +5,11 @@
  * transaction-ethereum.ts
  */
 
-import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
+import { ConfigUtil } from "@hyperledger-cacti/cactus-common-example-server";
 import {
   Web3SigningCredentialType,
   signTransaction,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";

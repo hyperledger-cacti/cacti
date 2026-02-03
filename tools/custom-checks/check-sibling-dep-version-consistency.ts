@@ -105,7 +105,7 @@ export async function checkSiblingDepVersionConsistency(
 
     if (isStdLibRecord(dependencies)) {
       Object.entries(dependencies).forEach(([depName, depVersion]) => {
-        if (!depName.startsWith("@hyperledger/cactus-")) {
+        if (!depName.startsWith("@hyperledger-cacti/cactus-")) {
           return;
         }
         if (depVersion !== correctVersion) {
@@ -119,7 +119,7 @@ export async function checkSiblingDepVersionConsistency(
 
     if (isStdLibRecord(devDependencies)) {
       Object.entries(devDependencies).forEach(([depName, depVersion]) => {
-        if (!depName.startsWith("@hyperledger/cactus-")) {
+        if (!depName.startsWith("@hyperledger-cacti/cactus-")) {
           return;
         }
         if (depVersion !== correctVersion) {

@@ -21,7 +21,7 @@ import {
 } from "../../helpers/fabric-functions";
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
-import { RelayHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { RelayHelper } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 const command: GluegunCommand = {
   name: "send",
   description: "Sends a query to the local relay.",

@@ -1,8 +1,8 @@
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   IPluginFactoryOptions,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import test, { Test } from "tape-promise/tape";
 import { PluginFactoryKeychain } from "../../../main/typescript/plugin-factory-keychain";
 import {

@@ -12,14 +12,14 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   DeployContractV1Request,
@@ -36,7 +36,7 @@ import {
   IGetOpenApiSpecV1EndpointOptions,
 } from "./web-services/get-open-api-spec-v1-endpoint";
 import { NetworkConfig } from "stellar-plus/lib/stellar-plus/network";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { deployContract, invokeContract } from "./core/contract-engine";
 import { convertApiTransactionInvocationToStellarPlus } from "./utils";
 import {
@@ -244,7 +244,7 @@ export class PluginLedgerConnectorStellar
     {
       const oasPath =
         OAS.paths[
-          "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-open-api-spec"
+          "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-open-api-spec"
         ];
 
       const operationId = oasPath.get.operationId;
@@ -266,6 +266,6 @@ export class PluginLedgerConnectorStellar
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cacti-plugin-ledger-connector-stellar`;
+    return `@hyperledger-cacti/cacti-plugin-ledger-connector-stellar`;
   }
 }

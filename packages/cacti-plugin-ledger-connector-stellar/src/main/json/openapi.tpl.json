@@ -209,12 +209,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-open-api-spec": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-open-api-spec": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-open-api-spec"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-open-api-spec"
           }
         },
         "operationId": "getOpenApiSpecV1",
@@ -234,12 +234,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/deploy-contract": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/deploy-contract": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/deploy-contract"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/deploy-contract"
           }
         },
         "operationId": "deployContractV1",
@@ -268,12 +268,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-soroban-transaction": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/run-soroban-transaction": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/run-soroban-transaction"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/run-soroban-transaction"
           }
         },
         "operationId": "runSorobanTransactionV1",
@@ -302,12 +302,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics"
           }
         },
         "operationId": "getPrometheusMetricsV1",

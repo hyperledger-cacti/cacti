@@ -65,7 +65,7 @@ func (a *DefaultApiService) AcceptInvitationV1Execute(r ApiAcceptInvitationV1Req
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/accept-invitation"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/accept-invitation"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -180,7 +180,7 @@ func (a *DefaultApiService) CreateNewConnectionInvitationV1Execute(r ApiCreateNe
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/create-new-connection-invitation"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/create-new-connection-invitation"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -289,7 +289,7 @@ func (a *DefaultApiService) GetAgentsV1Execute(r ApiGetAgentsV1Request) ([]Aries
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-agents"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/get-agents"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -402,7 +402,7 @@ func (a *DefaultApiService) GetConnectionsV1Execute(r ApiGetConnectionsV1Request
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/get-connections"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -517,7 +517,7 @@ func (a *DefaultApiService) RequestProofV1Execute(r ApiRequestProofV1Request) (*
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/request-proof"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/request-proof"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

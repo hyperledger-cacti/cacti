@@ -7,8 +7,8 @@
 import * as fabproto6 from "fabric-protos";
 import { BlockDecoder } from "fabric-common/index";
 import { Gateway, Network, BlockListener, BlockEvent } from "fabric-network";
-import query_pb from "@hyperledger/cacti-weaver-protos-js/common/query_pb";
-import events_pb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
+import query_pb from "@hyperledger-cacti/cacti-weaver-protos-js/common/query_pb";
+import events_pb from "@hyperledger-cacti/cacti-weaver-protos-js/common/events_pb";
 import { lookupEventSubscriptions, readAllEventMatchers } from "./events";
 import { invoke, getNetworkGateway, packageFabricView } from "./fabric-code";
 import {

@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-core-api",
+  "name": "@hyperledger-cacti/cactus-core-api",
   "version": "2.1.0",
   "description": "Contains type definitions/interfaces for the kernel of the codebase. Kept separate from the implementation so that it is easier to use it as a dependency.",
   "keywords": [
@@ -49,7 +49,7 @@
     "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger-cacti/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "proto:protoc-gen-ts": "run-s proto:protoc-gen-ts:make-dir proto:protoc-gen-ts:grpc_tools_node_protoc",
     "proto:protoc-gen-ts:make-dir": "make-dir ./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/",
     "proto:protoc-gen-ts:grpc_tools_node_protoc": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=$(yarn bin protoc-gen-ts) --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
     "ajv": "8.17.1",
     "ajv-draft-04": "1.0.0",
     "ajv-formats": "3.0.1",

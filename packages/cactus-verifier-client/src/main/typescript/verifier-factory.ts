@@ -12,9 +12,9 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { ISocketApiClient } from "@hyperledger/cactus-core-api";
+import { ISocketApiClient } from "@hyperledger-cacti/cactus-core-api";
 
 import {
   ClientApiConfig,

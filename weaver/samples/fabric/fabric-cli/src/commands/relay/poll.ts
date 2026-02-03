@@ -16,7 +16,7 @@ import {
   fabricHelper,
   getKeyAndCertForRemoteRequestbyUserName,
 } from "../../helpers/fabric-functions";
-import { RelayHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { RelayHelper } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import * as path from "path";
 import * as dotenv from "dotenv";
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });

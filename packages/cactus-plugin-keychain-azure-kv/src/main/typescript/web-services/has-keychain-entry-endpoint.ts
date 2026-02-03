@@ -6,15 +6,15 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   HasKeychainEntryRequestV1,
   HasKeychainEntryResponseV1,
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import { PluginKeychainAzureKv } from "../plugin-keychain-azure-kv";
 
@@ -46,7 +46,7 @@ export class HasKeychainEntryEndpoint implements IWebServiceEndpoint {
 
   public getOasPath() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/has-keychain-entry"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/has-keychain-entry"
     ];
   }
 

@@ -1,6 +1,6 @@
 import { TransferrableAsset } from "../lib/transferrable-asset";
 import { DLAccount } from "../lib/types";
-import { HashFunctions } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { HashFunctions } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import { ConnectError, Code } from "@connectrpc/connect";
 import {
   validateTransferrableAsset,

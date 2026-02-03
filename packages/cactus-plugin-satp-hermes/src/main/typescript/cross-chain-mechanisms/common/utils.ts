@@ -19,7 +19,7 @@
 import {
   Web3SigningCredentialType,
   Web3SigningCredentialNone,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 /**
  * Type guard function to check if a credential is of type None.

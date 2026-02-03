@@ -5,7 +5,7 @@ import {
 } from "node-ssh";
 import { RuntimeError } from "run-time-error-cjs";
 
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 import { isSshExecOk } from "./is-ssh-exec-ok";
 

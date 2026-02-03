@@ -4,12 +4,12 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   registerWebServiceEndpoint,
   handleRestEndpointException,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
@@ -17,7 +17,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { InternalServerError } from "http-errors-enhanced-cjs";
 import OAS from "../../json/openapi.json";
 import { PluginLedgerConnectorCorda } from "../plugin-ledger-connector-corda";
@@ -68,9 +68,9 @@ export class FlowStatusResponseEndpointV1 implements IWebServiceEndpoint {
     };
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid"
     ];
   }
 

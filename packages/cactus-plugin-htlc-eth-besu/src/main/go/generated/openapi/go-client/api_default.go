@@ -65,7 +65,7 @@ func (a *DefaultApiService) GetSingleStatusV1Execute(r ApiGetSingleStatusV1Reque
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/get-single-status"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -170,7 +170,7 @@ func (a *DefaultApiService) GetStatusV1Execute(r ApiGetStatusV1Request) ([]int32
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/get-status"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -275,7 +275,7 @@ func (a *DefaultApiService) InitializeV1Execute(r ApiInitializeV1Request) (*RunT
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/initialize"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -380,7 +380,7 @@ func (a *DefaultApiService) NewContractV1Execute(r ApiNewContractV1Request) (*In
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/new-contract"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -485,7 +485,7 @@ func (a *DefaultApiService) RefundV1Execute(r ApiRefundV1Request) (*InvokeContra
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/refund"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -590,7 +590,7 @@ func (a *DefaultApiService) WithdrawV1Execute(r ApiWithdrawV1Request) (*InvokeCo
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/withdraw"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

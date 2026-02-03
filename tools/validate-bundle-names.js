@@ -8,7 +8,7 @@ const main = async () => {
   const errors = [];
 
   const checksDone = packageInfoList.map(async (pi) => {
-    const nameNoScope = pi.name.replace("@hyperledger/", "");
+    const nameNoScope = pi.name.replace("@hyperledger-cacti/", "");
 
     const targetMain = `dist/lib/main/typescript/index.js`;
     const targetMainMinified = `dist/${nameNoScope}.node.umd.min.js`;

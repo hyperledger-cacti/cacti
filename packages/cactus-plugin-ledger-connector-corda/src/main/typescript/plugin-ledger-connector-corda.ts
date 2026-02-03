@@ -20,14 +20,14 @@ import {
   IPluginWebService,
   ICactusPluginOptions,
   ConsensusAlgorithmFamily,
-} from "@hyperledger/cactus-core-api";
-import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { consensusHasTransactionFinality } from "@hyperledger-cacti/cactus-core";
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { DeployContractJarsEndpoint } from "./web-services/deploy-contract-jars-endpoint";
 
@@ -177,7 +177,7 @@ export class PluginLedgerConnectorCorda
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-plugin-ledger-connector-corda";
+    return "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
   }
 
   public async onPluginInit(): Promise<unknown> {

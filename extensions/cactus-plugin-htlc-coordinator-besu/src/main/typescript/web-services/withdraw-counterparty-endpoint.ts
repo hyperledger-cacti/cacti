@@ -5,7 +5,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Logger,
@@ -13,11 +13,11 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   registerWebServiceEndpoint,
   PluginRegistry,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 import { WithdrawCounterpartyRequest } from "../generated/openapi/typescript-axios";
 import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu";
 import { WithdrawCounterpartyTxReverted } from "../plugin-htlc-coordinator-besu";
@@ -51,7 +51,7 @@ export class WithdrawCounterpartyEndpoint implements IWebServiceEndpoint {
 
   public getOasPath() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/withdraw-counterparty"
     ];
   }
 
@@ -99,7 +99,7 @@ export class WithdrawCounterpartyEndpoint implements IWebServiceEndpoint {
       const connector = this.options.pluginRegistry.plugins.find((plugin) => {
         return (
           plugin.getPackageName() ==
-          "@hyperledger/cactus-plugin-htlc-coordinator-besu"
+          "@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu"
         );
       }) as unknown as PluginHTLCCoordinatorBesu;
       const resBody = await connector.withdrawCounterparty(request);

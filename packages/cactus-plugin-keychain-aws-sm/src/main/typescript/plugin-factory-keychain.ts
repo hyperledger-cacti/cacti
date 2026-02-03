@@ -1,10 +1,10 @@
-import { Checks } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
 import {
   IPluginFactoryOptions,
   IPluginKeychain,
   PluginFactory,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   IPluginKeychainAwsSmOptions,

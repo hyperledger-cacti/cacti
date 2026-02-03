@@ -56,7 +56,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.DELETE],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -67,7 +67,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -78,7 +78,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -89,7 +89,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid"],
         produces = ["text/plain"],
         consumes = ["application/json"]
     )
@@ -100,7 +100,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -111,7 +111,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics"],
         produces = ["text/plain"]
     )
     open fun getPrometheusMetricsV1(): ResponseEntity<kotlin.String> {
@@ -121,7 +121,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -132,7 +132,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -143,7 +143,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.GET],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow"],
         produces = ["text/plain"],
         consumes = ["application/json"]
     )
@@ -154,7 +154,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -165,7 +165,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -176,7 +176,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -187,7 +187,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -198,7 +198,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.DELETE],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )
@@ -209,7 +209,7 @@ open class ApiPluginLedgerConnectorCordaController(@Autowired(required = true) v
 
     @RequestMapping(
         method = [RequestMethod.POST],
-        value = ["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query"],
+        value = ["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query"],
         produces = ["application/json"],
         consumes = ["application/json"]
     )

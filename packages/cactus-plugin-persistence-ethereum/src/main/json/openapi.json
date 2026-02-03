@@ -126,12 +126,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status"
           }
         },
         "operationId": "getStatusV1",

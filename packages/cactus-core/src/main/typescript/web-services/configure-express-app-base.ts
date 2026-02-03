@@ -6,7 +6,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 export const CACTI_CORE_CONFIGURE_EXPRESS_APP_BASE_MARKER =
   "CACTI_CORE_CONFIGURE_EXPRESS_APP_BASE_MARKER";

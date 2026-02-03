@@ -14,18 +14,18 @@ import {
   IListenOptions,
   LoggerProvider,
   Servers,
-} from "@hyperledger/cactus-common";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   installOpenapiValidationMiddleware,
   PluginRegistry,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Containers,
   LocalStackContainer,
   K_DEFAULT_LOCALSTACK_HTTP_PORT,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import OAS from "../../../main/json/openapi.json";
 import {
@@ -138,7 +138,7 @@ describe("PluginKeychainAwsSm", () => {
 
       const metricsPath =
         OAS.paths[
-          "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics"
+          "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics"
         ].get["x-hyperledger-cacti"].http.path;
       const metricsUrl = `${apiHost}${metricsPath}`;
 

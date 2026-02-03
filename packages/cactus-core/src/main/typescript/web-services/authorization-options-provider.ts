@@ -3,13 +3,13 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { IAsyncProvider } from "@hyperledger/cactus-common";
+import { IAsyncProvider } from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   isIEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 export interface IEndpointAuthzOptionsProviderOptions {
   logLevel?: LogLevelDesc;
