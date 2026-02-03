@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-core",
+  "name": "@hyperledger-cacti/cactus-core",
   "version": "2.1.0",
   "description": "Contains lower level abstractions/implementation that is to be shared by multiple other, higher level packages of the project.",
   "keywords": [
@@ -50,8 +50,8 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
     "body-parser": "1.20.3",
     "express": "5.1.0",
     "express-jwt-authz": "2.4.1",

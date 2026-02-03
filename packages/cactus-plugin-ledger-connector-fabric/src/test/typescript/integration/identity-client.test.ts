@@ -6,11 +6,11 @@ import {
   K_DEFAULT_VAULT_HTTP_PORT,
   WsTestServer,
   WS_IDENTITY_HTTP_PORT,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { InternalIdentityClient } from "../../../main/typescript/identity/internal/client";
 import { VaultTransitClient } from "../../../main/typescript/identity/vault-client";
 import { WebSocketClient } from "../../../main/typescript/identity/web-socket-client";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { createHash } from "crypto";
 import { ECCurveType } from "../../../main/typescript/identity/internal/crypto-util";
 import { KJUR } from "jsrsasign";

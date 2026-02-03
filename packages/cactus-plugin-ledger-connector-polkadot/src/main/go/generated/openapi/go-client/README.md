@@ -77,13 +77,13 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DeployContractInk**](docs/DefaultApi.md#deploycontractink) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink | Deploys the ink! contract
-*DefaultApi* | [**GetPrometheusMetrics**](docs/DefaultApi.md#getprometheusmetrics) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**GetRawTransaction**](docs/DefaultApi.md#getrawtransaction) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction | Get raw unsigned transaction
-*DefaultApi* | [**GetTransactionInfo**](docs/DefaultApi.md#gettransactioninfo) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info | Get the necessary Transaction Info for a account
-*DefaultApi* | [**InvokeContract**](docs/DefaultApi.md#invokecontract) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract | Invokes a contract on a polkadot ledger
-*DefaultApi* | [**RunTransaction**](docs/DefaultApi.md#runtransaction) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction | Executes a transaction on a Polkadot ledger
-*DefaultApi* | [**SignRawTransaction**](docs/DefaultApi.md#signrawtransaction) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction | sign the raw transaction
+*DefaultApi* | [**DeployContractInk**](docs/DefaultApi.md#deploycontractink) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink | Deploys the ink! contract
+*DefaultApi* | [**GetPrometheusMetrics**](docs/DefaultApi.md#getprometheusmetrics) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**GetRawTransaction**](docs/DefaultApi.md#getrawtransaction) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-raw-transaction | Get raw unsigned transaction
+*DefaultApi* | [**GetTransactionInfo**](docs/DefaultApi.md#gettransactioninfo) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-transaction-info | Get the necessary Transaction Info for a account
+*DefaultApi* | [**InvokeContract**](docs/DefaultApi.md#invokecontract) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/invoke-contract | Invokes a contract on a polkadot ledger
+*DefaultApi* | [**RunTransaction**](docs/DefaultApi.md#runtransaction) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/run-transaction | Executes a transaction on a Polkadot ledger
+*DefaultApi* | [**SignRawTransaction**](docs/DefaultApi.md#signrawtransaction) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction | sign the raw transaction
 
 
 ## Documentation For Models

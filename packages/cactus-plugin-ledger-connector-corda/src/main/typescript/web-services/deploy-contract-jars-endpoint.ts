@@ -5,12 +5,12 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   Configuration,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   AuthorizationOptionsProvider,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
@@ -18,9 +18,9 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import type { IEndpointAuthzOptions } from "@hyperledger/cactus-core-api";
+import type { IEndpointAuthzOptions } from "@hyperledger-cacti/cactus-core-api";
 
 import {
   DefaultApi,
@@ -78,9 +78,9 @@ export class DeployContractJarsEndpoint implements IWebServiceEndpoint {
     return this.authorizationOptionsProvider;
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars"
     ];
   }
 

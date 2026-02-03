@@ -6,20 +6,20 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginKeychainMemory } from "../plugin-keychain-memory";
-import { SetKeychainEntryRequestV1 } from "@hyperledger/cactus-core-api";
+import { SetKeychainEntryRequestV1 } from "@hyperledger-cacti/cactus-core-api";
 
 export interface ISetKeychainEntryEndpointOptions {
   logLevel?: LogLevelDesc;
@@ -45,9 +45,9 @@ export class SetKeychainEntryV1Endpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/set-keychain-entry"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/set-keychain-entry"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/set-keychain-entry"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/set-keychain-entry"
     ];
   }
 

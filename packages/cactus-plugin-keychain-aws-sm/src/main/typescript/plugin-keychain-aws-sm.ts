@@ -14,20 +14,20 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   ICactusPluginOptions,
   IPluginWebService,
   IWebServiceEndpoint,
   IPluginKeychain,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 import { GetPrometheusExporterMetricsEndpointV1 } from "./webservices/get-prometheus-exporter-metrics-endpoint-v1";
 
 import { homedir } from "os";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
 import { GetKeychainEntryV1Endpoint } from "./webservices/get-keychain-entry-endpoint-v1";
 import { DeleteKeychainEntryV1Endpoint } from "./webservices/delete-keychain-entry-endpoint-v1";
@@ -237,7 +237,7 @@ export class PluginKeychainAwsSm
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-aws-sm`;
+    return `@hyperledger-cacti/cactus-plugin-keychain-aws-sm`;
   }
 
   public getEncryptionAlgorithm(): string {

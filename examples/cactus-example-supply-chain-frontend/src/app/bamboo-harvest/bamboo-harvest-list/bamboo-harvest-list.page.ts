@@ -1,11 +1,11 @@
 import { Component, Inject, OnInit } from "@angular/core";
 
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 import {
   BambooHarvest,
   DefaultApi as SupplyChainApi,
-} from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+} from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
 
 import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
 import { BambooHarvestDetailPage } from "../bamboo-harvest-detail/bamboo-harvest-detail.page";

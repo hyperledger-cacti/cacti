@@ -116,7 +116,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/delete-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/delete-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -188,7 +188,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -255,7 +255,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -327,7 +327,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/has-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/has-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -399,7 +399,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/set-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/set-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

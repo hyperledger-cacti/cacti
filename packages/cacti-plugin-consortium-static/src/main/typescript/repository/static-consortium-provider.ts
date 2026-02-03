@@ -2,10 +2,10 @@ import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { Checks, IAsyncProvider } from "@hyperledger/cactus-common";
-import { ConsortiumDatabase } from "@hyperledger/cactus-core-api";
+import { Checks, IAsyncProvider } from "@hyperledger-cacti/cactus-common";
+import { ConsortiumDatabase } from "@hyperledger-cacti/cactus-core-api";
 
 import {
   DefaultApi as ConsortiumStaticApi,

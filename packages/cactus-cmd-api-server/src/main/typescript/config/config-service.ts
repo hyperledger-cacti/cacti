@@ -9,14 +9,14 @@ import {
   LoggerProvider,
   Logger,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ConsortiumDatabase,
   Constants,
   PluginImport,
   PluginImportType,
   PluginImportAction,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
 import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
@@ -107,7 +107,7 @@ export class ConfigService {
           "This option is optional and defaults to an empty array which means that" +
           "all of the plugins will have the OpenAPI request validation enabled by default." +
           "   @example Setting this configuration parameter to" +
-          '["@hyperledger/cactus-plugin-ledger-connector-ethereum"]' +
+          '["@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum"]' +
           "will disable OpenAPI validation for the Ethereum connector plugin.",
       },
       crpcHost: {
@@ -264,7 +264,7 @@ export class ConfigService {
         env: "COCKPIT_WWW_ROOT",
         arg: "cockpit-www-root",
         default:
-          "packages/cactus-cmd-api-server/node_modules/@hyperledger/cactus-cockpit/www/",
+          "packages/cactus-cmd-api-server/node_modules/@hyperledger-cacti/cactus-cockpit/www/",
       },
       cockpitCorsDomainCsv: {
         doc:
@@ -549,7 +549,7 @@ export class ConfigService {
 
     const plugins: PluginImport[] = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {
@@ -558,7 +558,7 @@ export class ConfigService {
         },
       },
       {
-        packageName: "@hyperledger/cactus-plugin-consortium-manual",
+        packageName: "@hyperledger-cacti/cactus-plugin-consortium-manual",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {

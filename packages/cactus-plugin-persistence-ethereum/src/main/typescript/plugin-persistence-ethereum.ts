@@ -7,17 +7,17 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IPluginWebService,
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   EthereumApiClient,
   WatchBlocksV1BlockData,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 
 import ERC20 from "../json/contract-abi/ERC20.json";
 import TokenClientERC20 from "./token-client/token-client-erc20";
@@ -587,7 +587,7 @@ export class PluginPersistenceEthereum
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-persistence-ethereum`;
+    return `@hyperledger-cacti/cactus-plugin-persistence-ethereum`;
   }
 
   /**

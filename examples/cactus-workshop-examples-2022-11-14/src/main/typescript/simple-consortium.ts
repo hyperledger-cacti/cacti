@@ -2,13 +2,13 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   ConsortiumRepository,
   IConsortiumRepositoryOptions,
-} from "@hyperledger/cactus-core";
-import { ConsortiumDatabase } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core";
+import { ConsortiumDatabase } from "@hyperledger-cacti/cactus-core-api";
 
 const logLevelConsortium: LogLevelDesc = "INFO";
 const loggerLevel: LogLevelDesc = "INFO";

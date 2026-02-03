@@ -1,5 +1,5 @@
-import { Logger } from "@hyperledger/cactus-common/";
-import { IPluginLedgerConnectorBesuOptions } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { Logger } from "@hyperledger-cacti/cactus-common/";
+import { IPluginLedgerConnectorBesuOptions } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 export interface BesuOptionsJSON {
   instanceId: string;

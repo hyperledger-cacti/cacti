@@ -8,7 +8,7 @@
  * This file provides helper functions for interoperability operations.
  **/
 /** End file docs */
-import * as assetLocksPb from "@hyperledger/cacti-weaver-protos-js/common/asset_locks_pb";
+import * as assetLocksPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/asset_locks_pb";
 import * as Web3 from "web3-utils";
 import { Hash, SHA256 } from "./HashFunctions";
 

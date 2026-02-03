@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-dummy-package",
+  "name": "@hyperledger-cacti/cactus-dummy-package",
   "version": "2.1.0",
   "license": "Apache-2.0",
   "description": "Dummy package for testing.",

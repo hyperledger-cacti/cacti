@@ -8,8 +8,8 @@ import { Contract } from "fabric-network";
 import * as path from "path";
 import * as fs from "fs";
 
-import iin_agent_pb from "@hyperledger/cacti-weaver-protos-js/identity/agent_pb";
-import { InteroperableHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
+import iin_agent_pb from "@hyperledger-cacti/cacti-weaver-protos-js/identity/agent_pb";
+import { InteroperableHelper } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 
 import { LedgerBase } from "../common/ledgerBase";
 import { handlePromise, signMessage } from "../common/utils";

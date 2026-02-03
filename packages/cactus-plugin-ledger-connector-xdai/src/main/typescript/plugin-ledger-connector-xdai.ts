@@ -16,17 +16,17 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
-import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { consensusHasTransactionFinality } from "@hyperledger-cacti/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
 
@@ -220,7 +220,7 @@ export class PluginLedgerConnectorXdai
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-xdai`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-xdai`;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {

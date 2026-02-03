@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-example-discounted-asset-trade-client",
+  "name": "@hyperledger-cacti/cactus-example-discounted-asset-trade-client",
   "version": "2.1.0",
   "description": "Client for interacting with discounted asset trade sample app and some tools for setting up indy enviroment",
   "keywords": [

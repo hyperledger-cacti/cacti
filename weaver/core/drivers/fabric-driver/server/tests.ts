@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import eventsPb from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
-import queryPb from "@hyperledger/cacti-weaver-protos-js/common/query_pb";
+import eventsPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/events_pb";
+import queryPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/query_pb";
 import {
   addEventSubscription,
   deleteEventSubscription,

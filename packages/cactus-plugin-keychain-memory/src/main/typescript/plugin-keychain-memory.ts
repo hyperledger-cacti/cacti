@@ -3,7 +3,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPluginOptions,
   ICrpcSvcRegistration,
@@ -11,7 +11,7 @@ import {
   IPluginKeychain,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../json/openapi.json";
 
@@ -213,7 +213,7 @@ export class PluginKeychainMemory
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-memory`;
+    return `@hyperledger-cacti/cactus-plugin-keychain-memory`;
   }
 
   public async onPluginInit(): Promise<unknown> {

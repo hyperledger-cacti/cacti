@@ -4,13 +4,13 @@ import {
   CordaV5TestLedger,
   Containers,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   IListenOptions,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   PluginLedgerConnectorCorda,
   CordaVersion,
@@ -24,7 +24,7 @@ import { extractShortHash } from "./../../../../../../cactus-test-tooling/src/ma
 import express from "express";
 import bodyParser from "body-parser";
 import { AddressInfo } from "net";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 describe("Corda Test Case", () => {
   const cordaV5TestLedger = new CordaV5TestLedger();

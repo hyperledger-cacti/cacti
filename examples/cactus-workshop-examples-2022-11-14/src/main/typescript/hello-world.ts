@@ -1,13 +1,13 @@
 // WARNING: This code IS NOT production-ready nor secure! Namely, cross-site scripting is possible if user input is not sanitized.
-import { ApiServer, ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { GoIpfsTestContainer } from "@hyperledger/cactus-test-tooling";
+import { ApiServer, ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import { GoIpfsTestContainer } from "@hyperledger-cacti/cactus-test-tooling";
 import { createServer } from "http";
 import { v4 as uuidv4 } from "uuid";
 import {
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "cacti-node-ipfs-example",
@@ -41,7 +41,7 @@ const main = async () => {
   apiServerOptions.plugins = [
     //add plugins that will be exposed by the API Server
     {
-      packageName: "@hyperledger/cactus-plugin-object-store-ipfs",
+      packageName: "@hyperledger-cacti/cactus-plugin-object-store-ipfs",
       type: PluginImportType.Remote,
       action: PluginImportAction.Install,
       options: {

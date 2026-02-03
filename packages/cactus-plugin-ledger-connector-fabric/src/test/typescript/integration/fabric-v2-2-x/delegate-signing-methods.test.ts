@@ -38,10 +38,10 @@ import {
   Logger,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-common";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   Containers,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
@@ -49,7 +49,7 @@ import {
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   PluginLedgerConnectorFabric,

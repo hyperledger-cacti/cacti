@@ -1,7 +1,7 @@
 import { Socket as SocketIoSocket } from "socket.io";
 
-import { Logger, Checks } from "@hyperledger/cactus-common";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, Checks } from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { HealthCheckResponse } from "../generated/openapi/typescript-axios";
 import { WatchHealthcheckV1 } from "../generated/openapi/typescript-axios";
 

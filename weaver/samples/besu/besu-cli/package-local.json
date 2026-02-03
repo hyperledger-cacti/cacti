@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cacti-weaver-besu-cli",
+  "name": "@hyperledger-cacti/cacti-weaver-besu-cli",
   "version": "2.1.0",
   "description": "besu-cli CLI",
   "license": "Apache-2.0",
@@ -33,8 +33,8 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@hyperledger/cacti-weaver-sdk-besu": "file:../../../sdks/besu/node",
-    "@hyperledger/cacti-weaver-protos-js": "file:../../../common/protos-js",
+    "@hyperledger-cacti/cacti-weaver-sdk-besu": "file:../../../sdks/besu/node",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "file:../../../common/protos-js",
     "@truffle/contract": "4.6.28",
     "gluegun": "5.1.6",
     "web3": "1.10.0",

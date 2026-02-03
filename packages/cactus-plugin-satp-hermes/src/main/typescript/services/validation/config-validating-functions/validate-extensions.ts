@@ -1,7 +1,7 @@
 import {
   isWeb3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialPrivateKeyHex,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { ExtensionType } from "../../../extensions/extensions-utils";
 
 export interface ExtensionConfig {

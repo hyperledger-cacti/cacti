@@ -1,7 +1,7 @@
-import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import { getInteractionType, InteractionType } from "./assets/interact-types";
 import { isObject, isString } from "class-validator";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   AssetParameterIdentifier as EvmVarType,
   getAssetParameterIdentifier as getEvmVarType,

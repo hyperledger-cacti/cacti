@@ -77,11 +77,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DeleteKeychainEntryV1**](docs/DefaultApi.md#deletekeychainentryv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/delete-keychain-entry | Deletes an entry under a key on the keychain backend.
-*DefaultApi* | [**GetKeychainEntryV1**](docs/DefaultApi.md#getkeychainentryv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
-*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**HasKeychainEntryV1**](docs/DefaultApi.md#haskeychainentryv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/has-keychain-entry | Checks that an entry exists under a key on the keychain backend
-*DefaultApi* | [**SetKeychainEntryV1**](docs/DefaultApi.md#setkeychainentryv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/set-keychain-entry | Sets a value under a key on the keychain backend.
+*DefaultApi* | [**DeleteKeychainEntryV1**](docs/DefaultApi.md#deletekeychainentryv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/delete-keychain-entry | Deletes an entry under a key on the keychain backend.
+*DefaultApi* | [**GetKeychainEntryV1**](docs/DefaultApi.md#getkeychainentryv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
+*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**HasKeychainEntryV1**](docs/DefaultApi.md#haskeychainentryv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/has-keychain-entry | Checks that an entry exists under a key on the keychain backend
+*DefaultApi* | [**SetKeychainEntryV1**](docs/DefaultApi.md#setkeychainentryv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/set-keychain-entry | Sets a value under a key on the keychain backend.
 
 
 ## Documentation For Models

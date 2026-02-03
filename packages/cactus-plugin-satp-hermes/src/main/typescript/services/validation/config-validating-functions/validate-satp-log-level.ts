@@ -1,4 +1,4 @@
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 // Type guard for LogLevelDesc
 export function isLogLevelDesc(input: unknown): input is LogLevelDesc {

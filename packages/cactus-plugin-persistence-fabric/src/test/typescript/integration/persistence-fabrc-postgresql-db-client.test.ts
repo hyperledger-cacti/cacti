@@ -15,12 +15,12 @@ const setupTimeout = 1000 * 60 * 3; // 3 minutes timeout for setup
 import {
   pruneDockerContainersIfGithubAction,
   PostgresTestContainer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import PostgresDatabaseClient from "../../../main/typescript/db-client/db-client";
 

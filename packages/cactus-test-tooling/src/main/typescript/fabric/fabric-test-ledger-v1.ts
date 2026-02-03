@@ -22,7 +22,7 @@ import {
   LoggerProvider,
   Bools,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import Dockerode from "dockerode";
 import {
   NodeSSH,

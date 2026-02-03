@@ -11,17 +11,17 @@ import {
   Logger,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ISocketApiClient,
   IVerifier,
   IVerifierEventListener,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 export {
   IVerifierEventListener,
   LedgerEvent,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 /**
  * Utility type for retrieving monitoring event / new block type from generic ISocketApiClient interface.

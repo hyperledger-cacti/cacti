@@ -46,7 +46,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
+import { Checks, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import { SATPLoggerProvider as LoggerProvider } from "./satp-logger-provider";
 import { SATPLogger as Logger } from "./satp-logger";

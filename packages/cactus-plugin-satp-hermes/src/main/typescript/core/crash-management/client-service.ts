@@ -7,7 +7,7 @@ import {
   RollbackRequestSchema,
   RollbackState,
 } from "../../../typescript/generated/proto/cacti/satp/v02/service/crash_recovery_pb";
-import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";

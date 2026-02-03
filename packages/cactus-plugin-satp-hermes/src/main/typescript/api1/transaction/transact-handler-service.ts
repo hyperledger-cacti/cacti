@@ -6,7 +6,7 @@ import {
   LockType,
   SignatureAlgorithm,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { GatewayOrchestrator } from "../../services/gateway/gateway-orchestrator";
 import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";

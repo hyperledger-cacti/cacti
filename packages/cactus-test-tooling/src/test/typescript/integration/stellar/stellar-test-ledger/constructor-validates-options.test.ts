@@ -2,7 +2,7 @@ import "jest-extended";
 import { Container } from "dockerode";
 import { StellarTestLedger } from "../../../../../main/typescript/public-api";
 import axios from "axios";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SupportedImageVersions } from "../../../../../main/typescript/stellar/supported-image-versions";
 
 describe("StellarTestLEdger", () => {

@@ -6,8 +6,8 @@ import bodyParser from "body-parser";
 import http from "http";
 import { StatusCodes } from "http-status-codes";
 
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { IListenOptions, Servers } from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import {
   IPluginKeychainGoogleSmOptions,

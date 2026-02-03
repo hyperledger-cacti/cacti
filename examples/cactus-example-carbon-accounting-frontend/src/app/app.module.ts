@@ -8,14 +8,14 @@ import { StatusBar } from "@ionic-native/status-bar/ngx";
 
 import { AppComponent } from "./app.component";
 import { AppRoutingModule } from "./app-routing.module";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import {
   BESU_DEMO_LEDGER_ID,
   CACTUS_API_URL,
   FABRIC_DEMO_LEDGER_ID,
 } from "../constants";
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
 LoggerProvider.setLogLevel("TRACE");
 

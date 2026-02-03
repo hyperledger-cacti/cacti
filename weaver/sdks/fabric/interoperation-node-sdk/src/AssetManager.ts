@@ -13,7 +13,7 @@ import log4js from "log4js";
 import crypto from "crypto";
 import fabproto6 from "fabric-protos";
 import * as helpers from "./helpers";
-import assetLocksPb from "@hyperledger/cacti-weaver-protos-js/common/asset_locks_pb";
+import assetLocksPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/asset_locks_pb";
 import { Contract, ContractListener } from "fabric-network";
 import { Hash, SHA256, SHA512 } from "./HashFunctions";
 const logger = log4js.getLogger("InteroperableHelper");

@@ -5,7 +5,7 @@
   ],
   "compilerOptions": {
     "paths": {
-      "@hyperledger/cactus-*": ["./*/src"]
+      "@hyperledger-cacti/cactus-*": ["./*/src"]
     },
     /* Basic Options */
     "incremental": true,                   /* Enable incremental compilation */

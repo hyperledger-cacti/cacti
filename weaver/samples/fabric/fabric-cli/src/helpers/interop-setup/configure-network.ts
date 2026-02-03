@@ -13,7 +13,7 @@ import {
   fabricHelper,
 } from "../fabric-functions";
 import { handlePromise, getNetworkConfig } from "../helpers";
-import { MembershipManager } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { MembershipManager } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 
 const helperInvoke = async (userId, ccFunc, ccArg, ...args) => {
   const [contractName, channelName, connProfilePath, networkName, logger] =

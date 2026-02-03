@@ -18,7 +18,7 @@ import {
   type IJsObjectSignerOptions,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { type SATPLogger as Logger } from "./core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
@@ -67,7 +67,7 @@ import type {
   ICactusPlugin,
   IWebServiceEndpoint,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   ICrossChainMechanismsOptions,
   type ISATPCrossChainManagerOptions,
@@ -84,17 +84,17 @@ import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
 import { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
 import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
-import { ISignerKeyPair } from "@hyperledger/cactus-common";
-import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
-import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
+import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
+import { IPrivacyPolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
+import { IMergePolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 import knex, { Knex } from "knex";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { NetworkId } from "./public-api";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
 import { createMigrationSource } from "./database/knex-migration-source";
 import { ExtensionsManager } from "./extensions/extensions-manager";
@@ -736,7 +736,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-plugin-satp-hermes";
+    return "@hyperledger-cacti/cactus-plugin-satp-hermes";
   }
 
   public async onPluginInit(): Promise<undefined> {

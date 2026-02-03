@@ -15,7 +15,7 @@
  *
  * @example
  * ```typescript
- * // GET /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck
+ * // GET /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck
  * const response = await fetch('/api/v1/healthcheck', {
  *   method: 'GET'
  * });
@@ -36,19 +36,19 @@ import {
   type IAsyncProvider,
   type Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { Express, Request, Response } from "express";
 import type { IRequestOptions } from "../../core/types";
 import OAS from "../../../json/openapi-blo-bundled.json";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 /**
  * Web service endpoint for SATP gateway health monitoring.
@@ -100,9 +100,9 @@ export class HealthCheckEndpointV1 implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"
     ];
   }
 
@@ -115,19 +115,19 @@ export class HealthCheckEndpointV1 implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck"];
+      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck"];
+      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"
     ].get.operationId;
   }
 

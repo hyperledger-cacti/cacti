@@ -19,9 +19,9 @@ const sutLogLevel = "info";
 
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   EthContractInvocationType,
   PluginLedgerConnectorEthereum,

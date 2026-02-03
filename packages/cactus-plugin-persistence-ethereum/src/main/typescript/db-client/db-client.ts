@@ -7,7 +7,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { Database as DatabaseSchemaType } from "./database.types";
 import { getRuntimeErrorCause } from "../utils";

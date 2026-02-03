@@ -10,15 +10,15 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   Configuration,
   GetApproveAddressApi,
   SATPGatewayConfig,
   TokenType,
-} from "@hyperledger/cactus-plugin-satp-hermes";
-import { IWebServiceEndpoint, LedgerType } from "@hyperledger/cactus-core-api";
-import { GatewayIdentity } from "@hyperledger/cactus-plugin-satp-hermes";
+} from "@hyperledger-cacti/cactus-plugin-satp-hermes";
+import { IWebServiceEndpoint, LedgerType } from "@hyperledger-cacti/cactus-core-api";
+import { GatewayIdentity } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import { SessionReference } from "../types";
 
 import { ApproveEndpointV1 } from "../web-services/approve-endpoint";
@@ -33,7 +33,7 @@ import {
   AdminApi,
   TransactionApi,
   TransactRequest,
-} from "@hyperledger/cactus-plugin-satp-hermes";
+} from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import { FabricEnvironment } from "./cbdc-fabric-environment";
 import { BesuEnvironment } from "./cbdc-besu-environment";
 import { Container } from "dockerode";
@@ -42,12 +42,12 @@ import {
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_SERVER,
   DEFAULT_PORT_GATEWAY_OAPI,
-} from "@hyperledger/cactus-plugin-satp-hermes";
+} from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import { getTestConfigFilesDirectory, setupGatewayDockerFiles } from "./utils";
 import {
   ISATPGatewayRunnerConstructorOptions,
   SATPGatewayRunner,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import Docker from "dockerode";
 

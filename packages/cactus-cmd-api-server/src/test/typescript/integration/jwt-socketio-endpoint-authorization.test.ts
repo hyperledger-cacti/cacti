@@ -4,8 +4,8 @@ import { generateKeyPair, exportSPKI, SignJWT } from "jose";
 import type { Params as ExpressJwtOptions } from "express-jwt";
 import type { AuthorizeOptions as SocketIoJwtOptions } from "@thream/socketio-jwt";
 
-import { Constants } from "@hyperledger/cactus-core-api";
-import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
+import { IJoseFittingJwtParams } from "@hyperledger-cacti/cactus-common";
 
 import {
   ApiServer,
@@ -15,7 +15,7 @@ import {
 } from "../../../main/typescript/public-api";
 import { ApiServerApiClient } from "../../../main/typescript/public-api";
 import { ApiServerApiClientConfiguration } from "../../../main/typescript/public-api";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { IAuthorizationConfig } from "../../../main/typescript/authzn/i-authorization-config";
 import { lastValueFrom } from "rxjs";

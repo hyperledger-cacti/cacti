@@ -2,8 +2,8 @@
  * Client for calling methods on ERC721 token contract.
  */
 
-import { EthereumApiClient } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
+import { EthereumApiClient } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
+import type { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import TokenClient from "./base-token-client";
 import ERC721 from "../../json/contract-abi/ERC721.json";
 import { RuntimeError } from "run-time-error-cjs";

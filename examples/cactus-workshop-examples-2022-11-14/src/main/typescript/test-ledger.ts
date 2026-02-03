@@ -2,11 +2,11 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   SubstrateTestLedger,
   ISubstrateTestLedgerOptions,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 const logLevelLedger: LogLevelDesc = "DEBUG";
 const loggerLevel: LogLevelDesc = "INFO";

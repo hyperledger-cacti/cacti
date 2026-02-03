@@ -4,11 +4,11 @@ import {
   LoggerProvider,
   Secp256k1Keys,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import "jest-extended";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import { DiscoveryOptions } from "fabric-network";
 import bodyParser from "body-parser";
 import path from "path";
@@ -27,7 +27,7 @@ import {
   FileBase64,
   ChainCodeProgrammingLanguage,
   FabricContractInvocationType,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import {
   Containers,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
@@ -37,7 +37,7 @@ import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import express from "express";
 import { AddressInfo } from "net";
 

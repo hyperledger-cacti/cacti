@@ -268,7 +268,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         createViewV1: async (createViewRequest: CreateViewRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createViewRequest' is not null or undefined
             assertParamExists('createViewV1', 'createViewRequest', createViewRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/create-view`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/create-view`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -301,7 +301,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getAvailableStrategies: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-available-strategies`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-available-strategies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -331,7 +331,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getPublicKey: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -364,7 +364,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         mergeViewsV1: async (mergeViewsRequest: MergeViewsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'mergeViewsRequest' is not null or undefined
             assertParamExists('mergeViewsV1', 'mergeViewsRequest', mergeViewsRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/merge-views`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -400,7 +400,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         processViewV1: async (processViewRequest: ProcessViewRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'processViewRequest' is not null or undefined
             assertParamExists('processViewV1', 'processViewRequest', processViewRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/process-view`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -436,7 +436,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         verifyMerkleRoot: async (verifyMerkleRootRequest: VerifyMerkleRootRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'verifyMerkleRootRequest' is not null or undefined
             assertParamExists('verifyMerkleRoot', 'verifyMerkleRootRequest', verifyMerkleRootRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/verify-merkle-root`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

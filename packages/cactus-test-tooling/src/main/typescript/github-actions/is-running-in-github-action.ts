@@ -1,4 +1,4 @@
-import { Checks } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
 
 /**
  * Utility/helper function that examines if the current code is running on Github Actions

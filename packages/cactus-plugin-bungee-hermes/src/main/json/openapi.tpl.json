@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "servers": [
     {
-      "url": "http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes",
+      "url": "http://{host}:{port}/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes",
       "description": "Development server",
       "variables": {
         "host": {
@@ -240,12 +240,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/create-view": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/create-view": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/create-view"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/create-view"
           }
         },
         "operationId": "createViewV1",
@@ -284,12 +284,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key"
           }
         },
         "operationId": "GetPublicKey",
@@ -316,12 +316,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-available-strategies": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-available-strategies": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-available-strategies"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-available-strategies"
           }
         },
         "operationId": "GetAvailableStrategies",
@@ -346,12 +346,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/verify-merkle-root": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/verify-merkle-root"
           }
         },
         "operationId": "verifyMerkleRoot",
@@ -389,12 +389,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/merge-views": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/merge-views"
           }
         },
         "operationId": "mergeViewsV1",
@@ -429,12 +429,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/process-view": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/process-view"
           }
         },
         "operationId": "processViewV1",

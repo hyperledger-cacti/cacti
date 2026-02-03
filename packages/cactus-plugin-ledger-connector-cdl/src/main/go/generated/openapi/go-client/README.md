@@ -77,10 +77,10 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GetLineageV1**](docs/DefaultApi.md#getlineagev1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage | Get lineage trail from CDL.
-*DefaultApi* | [**RegisterHistoryDataV1**](docs/DefaultApi.md#registerhistorydatav1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/register-history-data | Register new data trail on CDL
-*DefaultApi* | [**SearchLineageByGlobalDataV1**](docs/DefaultApi.md#searchlineagebyglobaldatav1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata | Search lineage using global data fields.
-*DefaultApi* | [**SearchLineageByHeaderV1**](docs/DefaultApi.md#searchlineagebyheaderv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-header | Search lineage using header fields.
+*DefaultApi* | [**GetLineageV1**](docs/DefaultApi.md#getlineagev1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/get-lineage | Get lineage trail from CDL.
+*DefaultApi* | [**RegisterHistoryDataV1**](docs/DefaultApi.md#registerhistorydatav1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/register-history-data | Register new data trail on CDL
+*DefaultApi* | [**SearchLineageByGlobalDataV1**](docs/DefaultApi.md#searchlineagebyglobaldatav1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata | Search lineage using global data fields.
+*DefaultApi* | [**SearchLineageByHeaderV1**](docs/DefaultApi.md#searchlineagebyheaderv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-header | Search lineage using header fields.
 
 
 ## Documentation For Models

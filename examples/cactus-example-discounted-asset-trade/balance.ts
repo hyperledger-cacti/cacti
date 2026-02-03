@@ -6,8 +6,8 @@
  */
 
 import { Router, NextFunction, Request, Response } from "express";
-import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
-import { RIFError } from "@hyperledger/cactus-common-example-server";
+import { ConfigUtil } from "@hyperledger-cacti/cactus-common-example-server";
+import { RIFError } from "@hyperledger-cacti/cactus-common-example-server";
 
 const config: any = ConfigUtil.getConfig();
 import { getLogger } from "log4js";

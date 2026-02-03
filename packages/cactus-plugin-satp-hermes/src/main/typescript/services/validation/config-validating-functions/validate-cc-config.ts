@@ -23,9 +23,9 @@ import { IFabricLeafNeworkOptions } from "../../../cross-chain-mechanisms/bridge
 import {
   DeploymentTargetOrganization,
   FileBase64,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import path from "path";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import { NetworkId } from "../../../public-api";
 
 function isNetworkId(obj: unknown): obj is NetworkId {

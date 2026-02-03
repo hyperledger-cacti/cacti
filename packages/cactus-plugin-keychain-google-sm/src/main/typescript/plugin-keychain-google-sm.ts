@@ -7,14 +7,14 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   ICactusPluginOptions,
   IPluginKeychain,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
@@ -132,7 +132,7 @@ export class PluginKeychainGoogleSm
   public getPackageName(): string {
     // TODO: Add custom validation to the CI so that package names in plugin
     // code are guaranteed to be correct (e.g. matching the one in package.json)
-    return "@hyperledger/cactus-plugin-keychain-google-sm";
+    return "@hyperledger-cacti/cactus-plugin-keychain-google-sm";
   }
 
   public getEncryptionAlgorithm(): string {

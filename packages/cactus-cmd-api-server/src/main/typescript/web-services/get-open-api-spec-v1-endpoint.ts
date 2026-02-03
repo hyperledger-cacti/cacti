@@ -1,17 +1,17 @@
 import {
   GetOpenApiSpecV1EndpointBase,
   IGetOpenApiSpecV1EndpointBaseOptions,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
   IAsyncProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../../json/openapi.json";
 

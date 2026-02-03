@@ -5,19 +5,19 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   DefaultApi as XdaiApi,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import { InsertBambooHarvestEndpoint } from "./web-services/insert-bamboo-harvest-endpoint";
-import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import { DefaultApi as FabricApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import { ListBambooHarvestEndpoint } from "./web-services/list-bamboo-harvest-endpoint";
 import { ISupplyChainContractDeploymentInfo } from "../i-supply-chain-contract-deployment-info";
@@ -156,7 +156,7 @@ export class SupplyChainCactusPlugin
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-example-supply-chain-backend";
+    return "@hyperledger-cacti/cactus-example-supply-chain-backend";
   }
 
   public async onPluginInit(): Promise<unknown> {

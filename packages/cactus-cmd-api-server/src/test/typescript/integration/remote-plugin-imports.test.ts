@@ -6,20 +6,20 @@ import {
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
   K_DEFAULT_VAULT_HTTP_PORT,
   VaultTestServer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
-import { DefaultApi } from "@hyperledger/cactus-plugin-keychain-vault";
+import { DefaultApi } from "@hyperledger-cacti/cactus-plugin-keychain-vault";
 import {
   Configuration,
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import path from "path";
 import { randomUUID } from "crypto";
 import { ConfigService } from "../../../main/typescript/config/config-service";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { ApiServer } from "../../../main/typescript/api-server";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 describe("ApiServer", () => {
   const key = randomUUID();
@@ -103,7 +103,7 @@ describe("ApiServer", () => {
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-vault",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-vault",
         type: PluginImportType.Remote,
         action: PluginImportAction.Install,
         options: {

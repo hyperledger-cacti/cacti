@@ -3,7 +3,7 @@ import {
   FabricSigningCredentialType,
   type VaultTransitKey,
   type WebSocketKey,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import {
   type FabricOptionsJSON,
@@ -14,12 +14,12 @@ import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/com
 import { isNetworkId } from "../validate-satp-gateway-identity";
 import { isKeyPairJSON, KeyPairJSON } from "../validate-key-pair-json";
 import { X509Identity } from "fabric-network";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import {
   chainConfigElement,
   identifyAndCheckConfigFormat,
 } from "../../../utils";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { INetworkOptions } from "../../../../cross-chain-mechanisms/bridge/bridge-types";
 import { NetworkId } from "../../../../public-api";
 

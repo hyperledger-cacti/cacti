@@ -56,7 +56,7 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
   const pkgNameToPath = new Map();
   const pkgPathToName = new Map();
   tsConfigPaths.forEach((it) => {
-    const pkgName = "@hyperledger/".concat(path.basename(path.dirname(it)));
+    const pkgName = "@hyperledger-cacti/".concat(path.basename(path.dirname(it)));
     pkgNameToPath.set(pkgName, it);
     pkgPathToName.set(it, pkgName);
   });
@@ -77,11 +77,11 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
     const pkg = await fs.readJson(pkgJsonPath);
 
     const deps = Object.keys(pkg.dependencies || {}).filter((it) =>
-      it.startsWith("@hyperledger/cactus-"),
+      it.startsWith("@hyperledger-cacti/cactus-"),
     );
 
     const devDeps = Object.keys(pkg.devDependencies || {}).filter((it) =>
-      it.startsWith("@hyperledger/cactus-"),
+      it.startsWith("@hyperledger-cacti/cactus-"),
     );
 
     const allDepsOfPkg = new Set([...deps, ...devDeps]);

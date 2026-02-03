@@ -12,21 +12,21 @@ import {
   ICactusPluginOptions,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   InitializeRequest as InitializeRequestBesuERC20,
   NewContractRequest as NewContractRequestBesuERC20,
   PluginHtlcEthBesuErc20,
   WithdrawRequest as WithdrawRequestBesuERC20,
-} from "@hyperledger/cactus-plugin-htlc-eth-besu-erc20";
+} from "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20";
 import {
   InitializeRequest as InitializeRequestBesu,
   NewContractObj,
@@ -34,8 +34,8 @@ import {
   IPluginHtlcEthBesuOptions,
   PluginFactoryHtlcEthBesu,
   WithdrawReq,
-} from "@hyperledger/cactus-plugin-htlc-eth-besu";
-import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-htlc-eth-besu";
+import { PluginLedgerConnectorBesu } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import { OwnHTLCEndpoint } from "./web-services/own-htlc-endpoint";
 import { CounterpartyHTLCEndpoint } from "./web-services/counterparty-htlc-endpoint";
 import { WithdrawCounterpartyEndpoint } from "./web-services/withdraw-counterparty-endpoint";
@@ -94,7 +94,7 @@ export class PluginHTLCCoordinatorBesu
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-htlc-coordinator-besu`;
+    return `@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu`;
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {
@@ -163,7 +163,7 @@ export class PluginHTLCCoordinatorBesu
         const pluginHtlc = this.pluginRegistry.plugins.find((plugin) => {
           return (
             plugin.getPackageName() ==
-            "@hyperledger/cactus-plugin-htlc-eth-besu-erc20" /*&&
+            "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20" /*&&
             ((plugin as unknown) as PluginHtlcEthBesuErc20).getKeychainId() ==
               ownHTLCRequest.keychainId*/
           );
@@ -259,7 +259,7 @@ export class PluginHTLCCoordinatorBesu
         const pluginHtlc = this.pluginRegistry.plugins.find((plugin) => {
           return (
             plugin.getPackageName() ==
-            "@hyperledger/cactus-plugin-htlc-eth-besu-erc20" /*&&
+            "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20" /*&&
             ((plugin as unknown) as PluginHtlcEthBesuErc20).getKeychainId() ==
               counterpartyHTLCRequest.keychainId*/
           );
@@ -318,7 +318,7 @@ export class PluginHTLCCoordinatorBesu
         const pluginHtlc = this.pluginRegistry.plugins.find((plugin) => {
           return (
             plugin.getPackageName() ==
-            "@hyperledger/cactus-plugin-htlc-eth-besu-erc20" /*&&
+            "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20" /*&&
             ((plugin as unknown) as PluginHtlcEthBesuErc20).getKeychainId() ==
               withdrawCounterpartyRequest.keychainId*/
           );

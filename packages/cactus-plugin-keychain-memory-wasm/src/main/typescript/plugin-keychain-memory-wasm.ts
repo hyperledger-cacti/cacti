@@ -1,15 +1,15 @@
 import { Express } from "express";
 
-import { Checks } from "@hyperledger/cactus-common";
-import { Logger, LogLevelDesc } from "@hyperledger/cactus-common";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
+import { Logger, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 import {
   ICactusPluginOptions,
   IPluginKeychain,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../json/openapi.json";
 import { SetKeychainEntryV1Endpoint } from "./webservices/set-keychain-entry-endpoint-v1";
@@ -112,7 +112,7 @@ export class PluginKeychainMemoryWasm
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-memory-wasm`;
+    return `@hyperledger-cacti/cactus-plugin-keychain-memory-wasm`;
   }
 
   public async onPluginInit(): Promise<unknown> {

@@ -1,8 +1,8 @@
 {
-  "name": "@hyperledger/cactus",
+  "name": "@hyperledger-cacti/cactus",
   "license": "Apache-2.0",
   "private": true,
-  "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
+  "description": "Root project for Cacti which contains all core components and plugins developed by the project.",
   "workspaces": {
     "packages": [
       "packages/cactus-*",
@@ -79,7 +79,7 @@
     "build:prod:frontend": "lerna run build:prod:frontend",
     "build:dev": "yarn build:dev:backend && yarn webpack:dev:web && yarn build:dev:frontend",
     "build:dev:backend": "NODE_OPTIONS=\"--max_old_space_size=3072\" yarn tsc && yarn build:dev:backend:postbuild",
-    "build:dev:frontend": "NODE_OPTIONS=\"--max_old_space_size=3072\" lerna run build:dev:frontend --scope='@hyperledger/cactus-example-*-frontend' --scope='@hyperledger/cacti-ledger-browser'",
+    "build:dev:frontend": "NODE_OPTIONS=\"--max_old_space_size=3072\" lerna run build:dev:frontend --scope='@hyperledger-cacti/cactus-example-*-frontend' --scope='@hyperledger-cacti/cacti-ledger-browser'",
     "build:dev:common": "lerna exec --stream --scope '*/*common' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:backend:postbuild": "lerna run build:dev:backend:postbuild",
     "test:cmd-api-server": "tap --ts --timeout=600 \"packages/cactus-*cmd-api-server/src/test/typescript/{unit,integration}/\"",

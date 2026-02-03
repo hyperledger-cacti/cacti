@@ -1,15 +1,15 @@
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
-import { Constants, Configuration } from "@hyperledger/cactus-core-api";
-import { ConfigUtil } from "@hyperledger/cactus-common-example-server";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { IListenOptions, Servers } from "@hyperledger-cacti/cactus-common";
+import { Constants, Configuration } from "@hyperledger-cacti/cactus-core-api";
+import { ConfigUtil } from "@hyperledger-cacti/cactus-common-example-server";
 import {
   PluginLedgerConnectorFabric,
   FabricApiClient,
   signProposal,
   FabricContractInvocationType,
   RunTransactionResponse,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 import fs from "fs";
 import http from "http";

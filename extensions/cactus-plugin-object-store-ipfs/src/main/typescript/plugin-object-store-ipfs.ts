@@ -6,7 +6,7 @@ import {
   Checks,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IPluginObjectStore,
   ICactusPluginOptions,
@@ -17,7 +17,7 @@ import type {
   HasObjectResponseV1,
   SetObjectRequestV1,
   SetObjectResponseV1,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../json/openapi.json";
 
@@ -149,7 +149,7 @@ export class PluginObjectStoreIpfs implements IPluginObjectStore {
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-object-store-ipfs`;
+    return `@hyperledger-cacti/cactus-plugin-object-store-ipfs`;
   }
 
   public getKeyPath(req: { key: string }): string {

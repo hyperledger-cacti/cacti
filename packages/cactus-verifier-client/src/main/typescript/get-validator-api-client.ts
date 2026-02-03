@@ -8,27 +8,27 @@
 import type {
   BesuApiClient,
   BesuApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import type {
   EthereumApiClient,
   EthereumApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import type {
   CordaApiClient,
   CordaApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-corda";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
 import type {
   Iroha2ApiClient,
   Iroha2ApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-iroha2";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2";
 import type {
   FabricApiClient,
   FabricApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import type {
   SawtoothApiClient,
   SawtoothApiClientOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-sawtooth";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth";
 
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
@@ -82,28 +82,28 @@ export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
     case "BESU_1X":
     case "BESU_2X":
       // TODO - replace with dynamic imports once ESM is supported
-      const besuPackage = require("@hyperledger/cactus-plugin-ledger-connector-besu");
+      const besuPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-besu");
       return new besuPackage.BesuApiClient(options as BesuApiClientOptions);
     case "ETH_1X":
-      const ethereumPackage = require("@hyperledger/cactus-plugin-ledger-connector-ethereum");
+      const ethereumPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum");
       return new ethereumPackage.EthereumApiClient(
         options as EthereumApiClientOptions,
       );
     case "CORDA_4X":
-      const cordaPackage = require("@hyperledger/cactus-plugin-ledger-connector-corda");
+      const cordaPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-corda");
       return new cordaPackage.CordaApiClient(options as CordaApiClientOptions);
     case "IROHA_2X":
-      const iroha2Package = require("@hyperledger/cactus-plugin-ledger-connector-iroha2");
+      const iroha2Package = require("@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2");
       return new iroha2Package.Iroha2ApiClient(
         options as Iroha2ApiClientOptions,
       );
     case "FABRIC_2X":
-      const fabricPackage = require("@hyperledger/cactus-plugin-ledger-connector-fabric");
+      const fabricPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-fabric");
       return new fabricPackage.FabricApiClient(
         options as FabricApiClientOptions,
       );
     case "SAWTOOTH_1X":
-      const sawtoothPackage = require("@hyperledger/cactus-plugin-ledger-connector-sawtooth");
+      const sawtoothPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth");
       return new sawtoothPackage.SawtoothApiClient(
         options as SawtoothApiClientOptions,
       );

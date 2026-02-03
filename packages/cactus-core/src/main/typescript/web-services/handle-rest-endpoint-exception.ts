@@ -10,7 +10,7 @@ import {
   Logger,
   createRuntimeErrorWithCause,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 /**
  * An interface describing the object containing the contextual information needed by the

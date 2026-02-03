@@ -6,7 +6,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import * as watch_blocks_v1_progress_pb from "../generated/proto/protoc-gen-ts/models/watch_blocks_v1_progress_pb";
 import * as watch_blocks_v1_request_pb from "../generated/proto/protoc-gen-ts/models/watch_blocks_v1_request_pb";

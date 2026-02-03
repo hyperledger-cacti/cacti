@@ -1,7 +1,7 @@
 import "jest-extended";
 import { validateSatpPrivacyPolicies } from "../../../../main/typescript/services/validation/config-validating-functions/validate-satp-privacy-policies";
-import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
-import { PrivacyPolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/src/main/typescript/generated/openapi/typescript-axios";
+import { IPrivacyPolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
+import { PrivacyPolicyOpts } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/src/main/typescript/generated/openapi/typescript-axios";
 
 describe("validateSatpPrivacyPolicies", () => {
   it("should pass with an array", () => {

@@ -4,7 +4,7 @@ import "jest-extended";
 
 import { getValidatorApiClient } from "../../../main/typescript/get-validator-api-client";
 
-import { BesuApiClientOptions } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { BesuApiClientOptions } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 test("Create besu client", async () => {
   const clientOptions = new BesuApiClientOptions({ basePath: "foo" });

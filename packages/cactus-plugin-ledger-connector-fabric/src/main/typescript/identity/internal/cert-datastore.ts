@@ -1,4 +1,4 @@
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { FabricSigningCredentialType } from "../../generated/openapi/typescript-axios/api";
 
 // IIdentityData : data that will be stored with cert datastore

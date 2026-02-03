@@ -9,13 +9,13 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPluginOptions,
   IPluginKeychain,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { PrometheusExporter } from "./prometheus-exporter/prometheus-exporter";
 
@@ -199,7 +199,7 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-vault`;
+    return `@hyperledger-cacti/cactus-plugin-keychain-vault`;
   }
 
   public async onPluginInit(): Promise<unknown> {

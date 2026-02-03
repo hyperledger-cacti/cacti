@@ -7,8 +7,8 @@ import {
   pruneDockerContainersIfGithubAction,
   CordaConnectorContainer,
   SampleCordappEnum,
-} from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import {
   CordappDeploymentConfig,
@@ -17,7 +17,7 @@ import {
   FlowInvocationType,
   InvokeContractV1Request,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import { createJvmString } from "../../../main/typescript/jvm/serde/factory/create-jvm-string";
 import { createJvmInt } from "../../../main/typescript";
 

@@ -14,17 +14,17 @@ import {
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   IListenOptions,
   LogLevelDesc,
   Servers,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 import {
   PluginLedgerConnectorFabric,
@@ -39,7 +39,7 @@ import { K_CACTUS_FABRIC_TOTAL_TX_COUNT } from "../../../../main/typescript/prom
 
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { DiscoveryOptions } from "fabric-network";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 /**
  * Use this to debug issues with the fabric node SDK

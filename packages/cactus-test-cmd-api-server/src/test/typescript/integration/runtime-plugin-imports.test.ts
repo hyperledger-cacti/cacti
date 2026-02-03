@@ -1,16 +1,16 @@
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import {
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 const logLevel: LogLevelDesc = "TRACE";
 const testCase = "can import plugins at runtime (CLI)";
@@ -42,7 +42,7 @@ describe(testCase, () => {
     apiServerOptions.apiTlsEnabled = false;
     apiServerOptions.plugins = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {
@@ -60,7 +60,7 @@ describe(testCase, () => {
     });
     apiServerOptions.plugins = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {

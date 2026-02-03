@@ -6,7 +6,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { Key } from "./internal/key";
 import { InternalCryptoSuite } from "./internal/crypto-suite";
 import { VaultTransitClient } from "./vault-client";

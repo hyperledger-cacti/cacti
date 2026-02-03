@@ -4,7 +4,7 @@ import "jest-extended";
 import type { IncomingMessage } from "http";
 import { v4 as uuidV4 } from "uuid";
 import fs from "fs-extra";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   HttpEchoContainer,
   Containers,

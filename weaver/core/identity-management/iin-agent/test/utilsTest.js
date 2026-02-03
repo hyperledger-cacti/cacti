@@ -19,8 +19,8 @@ chai.should();
 const { Wallets } = require("fabric-network");
 const { ContractImpl } = require("fabric-network/lib/contract");
 const { NetworkImpl } = require("fabric-network/lib/network");
-const membershipPb = require("@hyperledger/cacti-weaver-protos-js/common/membership_pb");
-const agent_pb = require("@hyperledger/cacti-weaver-protos-js/identity/agent_pb");
+const membershipPb = require("@hyperledger-cacti/cacti-weaver-protos-js/common/membership_pb");
+const agent_pb = require("@hyperledger-cacti/cacti-weaver-protos-js/identity/agent_pb");
 
 const utils = require("../out/common/utils.js");
 

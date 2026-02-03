@@ -7,7 +7,7 @@ import { IMergePolicy, IMergePolicyValue } from "./merge-policies";
 import { Transaction } from "../view-creation/transaction";
 import { IViewMetadata } from "../view-creation/view";
 import { MergePolicyOpts } from "../generated/openapi/typescript-axios";
-import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export class IntegratedView {

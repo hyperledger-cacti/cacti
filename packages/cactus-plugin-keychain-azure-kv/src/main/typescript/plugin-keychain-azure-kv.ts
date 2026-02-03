@@ -12,14 +12,14 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   ICactusPluginOptions,
   IPluginKeychain,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { SetKeychainEntryEndpoint } from "./web-services/set-keychain-entry-endpoint";
 import { GetKeychainEntryEndpoint } from "./web-services/get-keychain-entry-endpoint";
@@ -224,7 +224,7 @@ export class PluginKeychainAzureKv
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-vault`;
+    return `@hyperledger-cacti/cactus-plugin-keychain-vault`;
   }
 
   public getEncryptionAlgorithm(): string {

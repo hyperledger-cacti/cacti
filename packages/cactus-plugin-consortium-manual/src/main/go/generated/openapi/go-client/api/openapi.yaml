@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws:
     post:
       description: The JWS asserting the consortium metadata (pub keys and hosts of
         nodes)
@@ -31,8 +31,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws
-  /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/node/jws:
     post:
       operationId: getNodeJwsV1
       parameters: []
@@ -52,8 +52,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws
-  /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/node/jws
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetricsV1
       parameters: []
@@ -68,7 +68,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics
 components:
   schemas:
     GetNodeJwsResponse:

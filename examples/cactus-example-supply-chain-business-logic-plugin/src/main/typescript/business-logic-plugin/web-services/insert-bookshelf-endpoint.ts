@@ -7,18 +7,18 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import {
   DefaultApi as BesuApi,
   EthContractInvocationType,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 import OAS from "../../../json/openapi.json";
 import { InsertBookshelfRequest } from "../../generated/openapi/typescript-axios/index";
@@ -57,9 +57,9 @@ export class InsertBookshelfEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bookshelf"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bookshelf"
     ];
   }
 

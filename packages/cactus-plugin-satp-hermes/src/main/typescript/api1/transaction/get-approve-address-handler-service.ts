@@ -1,4 +1,4 @@
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   GetApproveAddressError,
   GetStatusError,

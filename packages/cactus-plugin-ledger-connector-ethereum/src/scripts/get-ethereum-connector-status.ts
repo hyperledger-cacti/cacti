@@ -6,7 +6,7 @@
  *
  * Usage:
  *  After installing the connector package...
- *    `npm install -g` in it's dir or directly from NPM - `npm install @hyperledger/cactus-plugin-ledger-connector-ethereum`
+ *    `npm install -g` in it's dir or directly from NPM - `npm install @hyperledger-cacti/cactus-plugin-ledger-connector-ethereum`
  *  ...you can start the command line tool with npx:
  *    `npx cacti-ethereum-connector-status <URL>:<PORT>`
  *

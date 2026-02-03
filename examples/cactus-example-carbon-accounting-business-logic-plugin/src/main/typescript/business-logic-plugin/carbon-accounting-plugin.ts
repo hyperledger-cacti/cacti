@@ -8,27 +8,27 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   ICactusPlugin,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   DefaultApi as XdaiApi,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai";
 
 import {
   DefaultApi as FabricApi,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 import {
   ICarbonAccountingFabricContractDeploymentInfo,
@@ -138,7 +138,7 @@ export class CarbonAccountingPlugin
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-example-carbon-accounting-backend";
+    return "@hyperledger-cacti/cactus-example-carbon-accounting-backend";
   }
 
   public async onPluginInit(): Promise<unknown> {

@@ -28,18 +28,18 @@ import {
   Logger,
   LoggerProvider,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
 import {
   Containers,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 
 import LockAssetContractJson from "../../typescript/solidity/lock-asset-contract/LockAsset.json";
 import {
@@ -48,7 +48,7 @@ import {
   Web3SigningCredentialType,
   DefaultApi as EthereumApi,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { Account } from "web3-core";
 import {
   IPluginBungeeHermesOptions,

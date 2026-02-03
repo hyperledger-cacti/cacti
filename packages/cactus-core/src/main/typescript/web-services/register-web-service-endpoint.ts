@@ -1,9 +1,9 @@
 import expressJwtAuthz, { AuthzOptions } from "express-jwt-authz";
 import { Express } from "express";
 
-import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
+import { IWebServiceEndpoint } from "@hyperledger-cacti/cactus-core-api";
 
-import { createRuntimeErrorWithCause } from "@hyperledger/cactus-common";
+import { createRuntimeErrorWithCause } from "@hyperledger-cacti/cactus-common";
 
 /**
  * Hooks up an endpoint instance to an ExpressJS web app object.

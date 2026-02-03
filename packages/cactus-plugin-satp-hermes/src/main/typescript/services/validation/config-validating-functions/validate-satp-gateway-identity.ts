@@ -1,4 +1,4 @@
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   type Address,
   CurrentDrafts,
@@ -6,7 +6,7 @@ import {
   type GatewayIdentity,
 } from "../../../core/types";
 import { NetworkId } from "../../../public-api";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 // Type guard for Address
 function isAddress(input: unknown): input is Address {

@@ -142,7 +142,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getObjectV1: async (getObjectRequestV1: GetObjectRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'getObjectRequestV1' is not null or undefined
             assertParamExists('getObjectV1', 'getObjectRequestV1', getObjectRequestV1)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -178,7 +178,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         hasObjectV1: async (hasObjectRequestV1: HasObjectRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'hasObjectRequestV1' is not null or undefined
             assertParamExists('hasObjectV1', 'hasObjectRequestV1', hasObjectRequestV1)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -214,7 +214,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         setObjectV1: async (setObjectRequestV1: SetObjectRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'setObjectRequestV1' is not null or undefined
             assertParamExists('setObjectV1', 'setObjectRequestV1', setObjectRequestV1)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
