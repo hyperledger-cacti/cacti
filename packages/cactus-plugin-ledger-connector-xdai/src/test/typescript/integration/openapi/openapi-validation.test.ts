@@ -10,28 +10,28 @@ import {
   InvokeContractV1Request,
   RunTransactionV1Request,
 } from "../../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   Containers,
   K_DEV_WHALE_ACCOUNT_PRIVATE_KEY,
   K_DEV_WHALE_ACCOUNT_PUBLIC_KEY,
   OpenEthereumTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import HelloWorldContractJson from "../../../solidity/hello-world-contract/HelloWorld.json";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
 
 const testCase = "xDai API";

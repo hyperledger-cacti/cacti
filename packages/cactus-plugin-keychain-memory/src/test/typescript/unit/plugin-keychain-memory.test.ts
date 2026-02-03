@@ -4,7 +4,7 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
+import { IListenOptions, Servers } from "@hyperledger-cacti/cactus-common";
 
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -15,7 +15,7 @@ import {
 import { K_CACTUS_KEYCHAIN_MEMORY_TOTAL_KEY_COUNT } from "../../../main/typescript/prometheus-exporter/metrics";
 
 import { DefaultApi as KeychainMemoryApi } from "../../../main/typescript/public-api";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 const testcase = "PluginKeychainMemory";
 describe(testcase, () => {

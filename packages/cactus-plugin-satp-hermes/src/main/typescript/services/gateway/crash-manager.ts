@@ -2,7 +2,7 @@ import {
   Checks,
   type LogLevelDesc,
   type JsObjectSigner,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { type SATPLogger as Logger } from "../../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import {

@@ -77,12 +77,12 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DeployContractJsonObjectV1**](docs/DefaultApi.md#deploycontractjsonobjectv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object | Deploys the bytecode of a Solidity contract.
-*DefaultApi* | [**DeployContractV1**](docs/DefaultApi.md#deploycontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode | Deploys the bytecode of a Solidity contract.
-*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**InvokeContractJsonObject**](docs/DefaultApi.md#invokecontractjsonobject) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object | Invokes a contract on a besu ledger
-*DefaultApi* | [**InvokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract | Invokes a contract on a xdai ledger
-*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/run-transaction | Executes a transaction on a xdai ledger
+*DefaultApi* | [**DeployContractJsonObjectV1**](docs/DefaultApi.md#deploycontractjsonobjectv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object | Deploys the bytecode of a Solidity contract.
+*DefaultApi* | [**DeployContractV1**](docs/DefaultApi.md#deploycontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode | Deploys the bytecode of a Solidity contract.
+*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**InvokeContractJsonObject**](docs/DefaultApi.md#invokecontractjsonobject) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object | Invokes a contract on a besu ledger
+*DefaultApi* | [**InvokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract | Invokes a contract on a xdai ledger
+*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/run-transaction | Executes a transaction on a xdai ledger
 
 
 ## Documentation For Models

@@ -36,7 +36,7 @@
  * Web application integration pattern:
  * ```typescript
  * // Instead of direct SATP gateway usage, use REST API clients:
- * import { DefaultApi as SatpApi, Configuration } from '@hyperledger/cactus-plugin-satp-hermes/gateway-client';
+ * import { DefaultApi as SatpApi, Configuration } from '@hyperledger-cacti/cactus-plugin-satp-hermes/gateway-client';
  *
  * const config = new Configuration({
  *   basePath: 'https://gateway.example.com:3010'

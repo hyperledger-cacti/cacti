@@ -9,9 +9,9 @@ import {
 import expressJwt from "express-jwt";
 import "jest-extended";
 
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { IJoseFittingJwtParams } from "@hyperledger-cacti/cactus-common";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 import {
   ApiServer,

@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cacti-ledger-browser",
+  "name": "@hyperledger-cacti/cacti-ledger-browser",
   "version": "2.1.0",
   "description": "Cacti GUI for visualizing ledger data build on react.",
   "keywords": [

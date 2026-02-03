@@ -21,9 +21,9 @@ import {
   IPluginKeychain,
   Ledger,
   LedgerType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   LogLevelDesc,
@@ -31,43 +31,43 @@ import {
   LoggerProvider,
   Servers,
   IJoseFittingJwtParams,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
   IAuthorizationConfig,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
-import { PluginConsortiumManual } from "@hyperledger/cactus-plugin-consortium-manual";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginConsortiumManual } from "@hyperledger-cacti/cactus-plugin-consortium-manual";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 import {
   PluginLedgerConnectorXdai,
   Web3SigningCredentialType,
   DefaultApi as XdaiApi,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai";
 
 import {
   PluginLedgerConnectorBesu,
   DefaultApi as BesuApi,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 import {
   PluginLedgerConnectorFabric,
   DefaultApi as FabricApi,
   DefaultEventHandlerStrategy,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
-import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger/cactus-test-tooling";
+import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger-cacti/cactus-test-tooling";
 
 import { SupplyChainAppDummyInfrastructure } from "./infrastructure/supply-chain-app-dummy-infrastructure";
 import {
   Configuration,
   DefaultApi as SupplyChainApi,
-} from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
-import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+} from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
+import { SupplyChainCactusPlugin } from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
 import { DiscoveryOptions } from "fabric-network";
 
 /**

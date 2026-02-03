@@ -7,7 +7,7 @@ import {
   VerifierFactory,
   VerifierFactoryConfig,
 } from "../../../main/typescript/verifier-factory";
-import { BesuApiClient } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { BesuApiClient } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 describe("Constructor Tests", () => {
   test("Basic construction", () => {

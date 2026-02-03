@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cactus-example-electricity-trade",
+  "name": "@hyperledger-cacti/cactus-example-electricity-trade",
   "version": "2.1.0",
   "description": "Sample application presenting electricity trade tracked on Sawtooth and charged on Ethereum.",
   "keywords": [
@@ -34,13 +34,13 @@
     "start-dockerless": "node ./dist/www.js"
   },
   "dependencies": {
-    "@hyperledger/cactus-common": "2.1.0",
-    "@hyperledger/cactus-common-example-server": "2.1.0",
-    "@hyperledger/cactus-core": "2.1.0",
-    "@hyperledger/cactus-core-api": "2.1.0",
-    "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger/cactus-plugin-ledger-connector-ethereum": "2.1.0",
-    "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0",
+    "@hyperledger-cacti/cactus-common-example-server": "2.1.0",
+    "@hyperledger-cacti/cactus-core": "2.1.0",
+    "@hyperledger-cacti/cactus-core-api": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth": "2.1.0",
     "@types/node": "18.11.9",
     "body-parser": "1.20.3",
     "cookie-parser": "1.4.6",

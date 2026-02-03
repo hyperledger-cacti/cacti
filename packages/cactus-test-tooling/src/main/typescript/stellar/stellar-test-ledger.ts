@@ -9,7 +9,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { Containers } from "../common/containers";
 import EventEmitter from "events";
 import { SupportedImageVersions } from "./supported-image-versions";

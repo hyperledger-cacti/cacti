@@ -12,7 +12,7 @@ import {
   SATPStage,
   type SessionData,
 } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
 import { FungibleAsset } from "../../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { protoToAsset } from "../../stage-services/service-utils";

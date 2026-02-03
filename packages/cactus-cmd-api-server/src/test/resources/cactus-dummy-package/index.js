@@ -9,7 +9,7 @@ class DummyPlugin {
   }
   getPackageName() {
     console.log("DummyPlugin#getPackageName() OK");
-    return "@hyperledger/cactus-dummy-package";
+    return "@hyperledger-cacti/cactus-dummy-package";
   }
 }
 

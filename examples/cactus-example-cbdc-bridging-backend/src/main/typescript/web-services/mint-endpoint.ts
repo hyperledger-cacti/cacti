@@ -3,19 +3,19 @@ import {
   IAsyncProvider,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { Express, Request, Response } from "express";
 import { IRequestOptions } from "../types";
 import OAS from "../../json/openapi-bundled.json";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 import {
   MintRequest,
   TransactRequestSourceChainAssetTypeEnum,
@@ -40,8 +40,8 @@ export class MintEndpointV1 implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-example-cbdc/mint-tokens"] {
-    return OAS.paths["/api/v1/@hyperledger/cactus-example-cbdc/mint-tokens"];
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-example-cbdc/mint-tokens"] {
+    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/mint-tokens"];
   }
 
   public async registerExpress(
@@ -61,7 +61,7 @@ export class MintEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger/cactus-example-cbdc/mint-tokens"]
+    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/mint-tokens"]
       .post.operationId;
   }
 

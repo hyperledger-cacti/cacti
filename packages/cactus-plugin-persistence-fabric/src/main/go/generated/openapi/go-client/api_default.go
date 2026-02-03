@@ -59,7 +59,7 @@ func (a *DefaultApiService) DiscoverNetworkV1Execute(r ApiDiscoverNetworkV1Reque
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/discover-network"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -166,7 +166,7 @@ func (a *DefaultApiService) GetStatusV1Execute(r ApiGetStatusV1Request) (*Status
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/status"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/status"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

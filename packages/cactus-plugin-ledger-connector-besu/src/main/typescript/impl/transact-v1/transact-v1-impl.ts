@@ -3,11 +3,11 @@ import {
   RunTransactionResponse,
   Web3SigningCredentialType,
 } from "../../generated/openapi/typescript-axios";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { transactV1CactusKeychainRef } from "./transact-v1-cactus-keychain-ref";
 import Web3 from "web3";
 import { transactV1PrivateKey } from "./transact-v1-private-key";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { transactV1Signed } from "./transact-v1-signed";
 import { PrometheusExporter } from "../../prometheus-exporter/prometheus-exporter";
 

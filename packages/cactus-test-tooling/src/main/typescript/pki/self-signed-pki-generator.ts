@@ -1,6 +1,6 @@
 import { pki, md } from "node-forge";
 import { v4 as uuidV4 } from "uuid";
-import { Strings } from "@hyperledger/cactus-common";
+import { Strings } from "@hyperledger-cacti/cactus-common";
 
 export type ForgeKeyPair = pki.rsa.KeyPair;
 export type ForgePrivateKey = pki.rsa.PrivateKey;

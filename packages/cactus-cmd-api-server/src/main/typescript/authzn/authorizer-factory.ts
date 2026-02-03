@@ -7,13 +7,13 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IPluginWebService,
   isIPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import { AuthorizationProtocol } from "../config/authorization-protocol";
 import { ICactusApiServerOptions } from "../config/config-service";

@@ -1,5 +1,5 @@
-import { Logger } from "@hyperledger/cactus-common";
-import { IPluginLedgerConnectorEthereumOptions } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { Logger } from "@hyperledger-cacti/cactus-common";
+import { IPluginLedgerConnectorEthereumOptions } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 
 export interface EthereumOptionsJSON {
   instanceId: string;

@@ -2,7 +2,7 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 import {
   IAuthorizationConfig,

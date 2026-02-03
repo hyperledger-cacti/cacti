@@ -439,7 +439,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getLineageV1: async (getLineageRequestV1?: GetLineageRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/get-lineage`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -473,7 +473,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         registerHistoryDataV1: async (registerHistoryDataRequestV1?: RegisterHistoryDataRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/register-history-data`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/register-history-data`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -507,7 +507,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         searchLineageByGlobalDataV1: async (searchLineageRequestV1?: SearchLineageRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -541,7 +541,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         searchLineageByHeaderV1: async (searchLineageRequestV1?: SearchLineageRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-header`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-header`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

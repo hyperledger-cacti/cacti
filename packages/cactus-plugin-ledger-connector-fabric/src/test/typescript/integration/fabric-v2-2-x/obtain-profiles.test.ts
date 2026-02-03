@@ -5,9 +5,9 @@ import {
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 const testCase = "obtains configuration profiles from Fabric 2.x ledger";
 const logLevel: LogLevelDesc = "TRACE";

@@ -77,12 +77,12 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GetSingleStatusV1**](docs/DefaultApi.md#getsinglestatusv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-single-status | 
-*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/get-status | 
-*DefaultApi* | [**InitializeV1**](docs/DefaultApi.md#initializev1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize | 
-*DefaultApi* | [**NewContractV1**](docs/DefaultApi.md#newcontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/new-contract | 
-*DefaultApi* | [**RefundV1**](docs/DefaultApi.md#refundv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/refund | 
-*DefaultApi* | [**WithdrawV1**](docs/DefaultApi.md#withdrawv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/withdraw | 
+*DefaultApi* | [**GetSingleStatusV1**](docs/DefaultApi.md#getsinglestatusv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/get-single-status | 
+*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/get-status | 
+*DefaultApi* | [**InitializeV1**](docs/DefaultApi.md#initializev1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/initialize | 
+*DefaultApi* | [**NewContractV1**](docs/DefaultApi.md#newcontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/new-contract | 
+*DefaultApi* | [**RefundV1**](docs/DefaultApi.md#refundv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/refund | 
+*DefaultApi* | [**WithdrawV1**](docs/DefaultApi.md#withdrawv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/withdraw | 
 
 
 ## Documentation For Models

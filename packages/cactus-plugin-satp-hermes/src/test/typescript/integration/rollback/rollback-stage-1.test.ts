@@ -1,5 +1,5 @@
 import "jest-extended";
-import { Secp256k1Keys } from "@hyperledger/cactus-common";
+import { Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   LocalLog,
@@ -10,7 +10,7 @@ import {
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   AssetSchema,
   TokenType,
@@ -28,9 +28,9 @@ import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import { Knex, knex } from "knex";
 import { create } from "@bufbuild/protobuf";
@@ -41,7 +41,7 @@ import {
   Stage1HashesSchema,
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";

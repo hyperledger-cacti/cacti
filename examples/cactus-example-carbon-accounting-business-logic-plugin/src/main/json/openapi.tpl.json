@@ -188,14 +188,14 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-example-carbon-accounting-backend/dao-token/get-allowance": {
       "post": {
         "operationId": "daoTokenGetAllowanceV1",
         "summary": "Get the number of tokens `spender` is approved to spend on behalf of `account`",
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
           }
         },
         "requestBody": {

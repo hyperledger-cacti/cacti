@@ -324,12 +324,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth/status": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth/status"
           }
         },
         "operationId": "getStatusV1",

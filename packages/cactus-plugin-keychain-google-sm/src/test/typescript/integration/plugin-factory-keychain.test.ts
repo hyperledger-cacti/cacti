@@ -1,10 +1,10 @@
 import "jest-extended";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   IPluginFactoryOptions,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryKeychain } from "../../../main/typescript/plugin-factory-keychain";
 import { PluginKeychainGoogleSm } from "../../../main/typescript/plugin-keychain-google-sm";
 import { randomUUID } from "crypto";

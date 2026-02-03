@@ -6,28 +6,28 @@
  */
 
 import { Request } from "express";
-import { RequestInfo } from "@hyperledger/cactus-common-example-server";
-import { TradeInfo } from "@hyperledger/cactus-common-example-server";
+import { RequestInfo } from "@hyperledger-cacti/cactus-common-example-server";
+import { TradeInfo } from "@hyperledger-cacti/cactus-common-example-server";
 import { TransactionInfoManagement } from "./transaction-info-management";
 import { TransactionInfo } from "./transaction-info";
 import { TransactionData } from "./transaction-data";
 import { BusinessLogicInquireAssetTradeStatus } from "./business-logic-inquire-asset-trade-status";
 import { TxInfoData } from "./tx-info-data";
-import { BusinessLogicBase } from "@hyperledger/cactus-common-example-server";
+import { BusinessLogicBase } from "@hyperledger-cacti/cactus-common-example-server";
 import { transferOwnership } from "./transaction-fabric";
 import { isEmploymentCredentialProofValid } from "./transaction-indy";
 import {
   LedgerEvent,
   ConfigUtil,
-} from "@hyperledger/cactus-common-example-server";
-import { json2str } from "@hyperledger/cactus-common-example-server";
+} from "@hyperledger-cacti/cactus-common-example-server";
+import { json2str } from "@hyperledger-cacti/cactus-common-example-server";
 import { AssetTradeStatus } from "./define";
 import {
   CactiBlockTransactionEventV1,
   WatchBlocksListenerTypeV1 as FabricWatchBlocksListenerTypeV1,
   WatchBlocksResponseV1 as FabricWatchBlocksResponseV1,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-import { Web3TransactionReceipt } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
+import { Web3TransactionReceipt } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 const config: any = ConfigUtil.getConfig();
 
 import { getLogger } from "log4js";
@@ -37,7 +37,7 @@ import {
   getSignerIdentity,
 } from "./fabric-connector";
 import { sendEthereumTransaction } from "./transaction-ethereum";
-import { hasKey } from "@hyperledger/cactus-common";
+import { hasKey } from "@hyperledger-cacti/cactus-common";
 import { RuntimeError } from "run-time-error-cjs";
 
 const moduleName = "BusinessLogicAssetTrade";

@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cacti-weaver-iin-agent",
+  "name": "@hyperledger-cacti/cacti-weaver-iin-agent",
   "version": "2.1.0",
   "description": "",
   "repository": {
@@ -20,8 +20,8 @@
   "dependencies": {
     "@fidm/x509": "1.2.1",
     "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cacti-weaver-protos-js": "file:./protos-js",
-    "@hyperledger/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "file:./protos-js",
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "file:./cacti-weaver-sdk-fabric",
     "dotenv": "8.6.0",
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",

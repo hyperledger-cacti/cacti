@@ -7,17 +7,17 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   handleRestEndpointException,
   IHandleRestEndpointExceptionOptions,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 

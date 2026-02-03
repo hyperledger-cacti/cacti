@@ -1,9 +1,9 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { io } from "socket.io-client-fixed-types";
-import { Logger, Checks } from "@hyperledger/cactus-common";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
+import { Logger, Checks } from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import { Constants, ISocketApiClient } from "@hyperledger-cacti/cactus-core-api";
 import {
   DefaultApi,
   EthContractInvocationWeb3Method,

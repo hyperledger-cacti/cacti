@@ -11,7 +11,7 @@ import { TxInfoData } from "./tx-info-data";
 import {
   TradeInfo,
   ConfigUtil,
-} from "@hyperledger/cactus-common-example-server";
+} from "@hyperledger-cacti/cactus-common-example-server";
 import { AssetTradeStatus } from "./define";
 
 const fs = require("fs");

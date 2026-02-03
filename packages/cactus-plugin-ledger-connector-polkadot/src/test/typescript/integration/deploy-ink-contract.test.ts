@@ -2,12 +2,12 @@ import {
   IListenOptions,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SubstrateTestLedger } from "../../../../../cactus-test-tooling/src/main/typescript/substrate-test-ledger/substrate-test-ledger";
 import metadata from "../../rust/fixtures/ink/metadata.json";
 import fs from "fs-extra";
 import { v4 as uuidv4 } from "uuid";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import express from "express";
 import http from "http";
 import {
@@ -17,10 +17,10 @@ import {
   Web3SigningCredentialType,
   PluginFactoryLedgerConnector,
 } from "../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { AddressInfo } from "net";
-import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
+import { Configuration, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import "jest-extended";
 
 const testCase = "deploy contract through all available methods";

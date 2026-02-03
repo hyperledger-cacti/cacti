@@ -5,7 +5,7 @@
  */
 
 import crypto from "crypto";
-import { HashMechanism } from "@hyperledger/cacti-weaver-protos-js/common/asset_locks_pb";
+import { HashMechanism } from "@hyperledger-cacti/cacti-weaver-protos-js/common/asset_locks_pb";
 
 /*
  * Interface for all hash functions to be used for HTLC

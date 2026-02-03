@@ -4,12 +4,12 @@ import {
   LoggerProvider,
   Secp256k1Keys,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import "jest-extended";
 import LockAssetContractJson from "../solidity/lock-asset-contract/LockAsset.json";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import bodyParser from "body-parser";
 
 import http, { Server } from "http";
@@ -22,8 +22,8 @@ import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
-import { Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import {
   Web3SigningCredentialType,
   PluginLedgerConnectorBesu,
@@ -31,7 +31,7 @@ import {
   ReceiptType,
   IPluginLedgerConnectorBesuOptions,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import Web3 from "web3";
 import { Account } from "web3-core";
 import {

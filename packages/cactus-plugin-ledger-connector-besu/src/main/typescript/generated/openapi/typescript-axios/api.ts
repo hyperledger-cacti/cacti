@@ -1384,7 +1384,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         deployContractSolBytecodeNoKeychainV1: async (deployContractSolidityBytecodeNoKeychainV1Request?: DeployContractSolidityBytecodeNoKeychainV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1418,7 +1418,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         deployContractSolBytecodeV1: async (deployContractSolidityBytecodeV1Request?: DeployContractSolidityBytecodeV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1452,7 +1452,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getBalanceV1: async (getBalanceV1Request?: GetBalanceV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-balance`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1486,7 +1486,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getBesuRecordV1: async (getBesuRecordV1Request?: GetBesuRecordV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-besu-record`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1520,7 +1520,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getBlockV1: async (getBlockV1Request?: GetBlockV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-block`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1553,7 +1553,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getOpenApiSpecV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1584,7 +1584,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getPastLogsV1: async (getPastLogsV1Request?: GetPastLogsV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-past-logs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1617,7 +1617,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getPrometheusMetricsV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1648,7 +1648,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getTransactionV1: async (getTransactionV1Request?: GetTransactionV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1682,7 +1682,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         invokeContractV1: async (invokeContractV1Request?: InvokeContractV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/invoke-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1716,7 +1716,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         runTransactionV1: async (runTransactionRequest?: RunTransactionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1752,7 +1752,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         signTransactionV1: async (signTransactionRequest: SignTransactionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'signTransactionRequest' is not null or undefined
             assertParamExists('signTransactionV1', 'signTransactionRequest', signTransactionRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/sign-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

@@ -3,10 +3,10 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { LedgerType } from "@hyperledger/cactus-core-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   ChainCodeProgrammingLanguage,
   ConnectionProfile,
@@ -16,7 +16,7 @@ import {
   FileBase64,
   IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import {
   ClaimFormat,
   INetworkOptions,
@@ -24,14 +24,14 @@ import {
   NetworkIdLedgerTypeEnum,
   TokenType,
   TransactRequestSourceAsset,
-} from "@hyperledger/cactus-plugin-satp-hermes";
+} from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { DiscoveryOptions, X509Identity } from "fabric-network";
 import { Config } from "node-ssh";
 import { randomUUID as uuidv4 } from "node:crypto";
@@ -43,11 +43,11 @@ import ExampleOntology from "../../json/ontologies/ontology-satp-erc20-interact-
 import {
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   PeerCerts,
-} from "@hyperledger/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
+} from "@hyperledger-cacti/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
 import {
   TargetOrganization,
   FabricConfigJSON,
-} from "@hyperledger/cactus-plugin-satp-hermes";
+} from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 
 export class FabricEnvironment {
   public static readonly FABRIC_NETWORK_ID: string = "FabricLedgerNetwork";

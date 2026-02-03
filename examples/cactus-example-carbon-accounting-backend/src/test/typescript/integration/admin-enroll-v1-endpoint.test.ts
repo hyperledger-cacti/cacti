@@ -18,21 +18,21 @@ import {
   ConfigService,
   Configuration,
   IAuthorizationConfig,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
 import {
   IJoseFittingJwtParams,
   LoggerProvider,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   AuthzScope,
   DefaultApi as CarbonAccountingApi,
-} from "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin";
+} from "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin";
 
 import {
   CarbonAccountingApp,

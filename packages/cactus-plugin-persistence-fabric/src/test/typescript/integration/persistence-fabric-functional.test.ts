@@ -34,24 +34,24 @@ import {
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Constants, Configuration } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-common";
+import { Constants, Configuration } from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   DefaultEventHandlerStrategy,
   FabricApiClient,
   FabricContractInvocationType,
   FabricSigningCredential,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import DatabaseClient from "../../../main/typescript/db-client/db-client";
 jest.mock("../../../main/typescript/db-client/db-client");
@@ -303,7 +303,7 @@ describe("Fabric persistence plugin tests", () => {
 
     // getPackageName()
     expect(persistence.getPackageName()).toEqual(
-      "@hyperledger/cactus-plugin-persistence-fabric",
+      "@hyperledger-cacti/cactus-plugin-persistence-fabric",
     );
 
     // getOpenApiSpec()

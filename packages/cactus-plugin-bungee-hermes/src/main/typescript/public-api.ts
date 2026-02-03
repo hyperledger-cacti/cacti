@@ -1,4 +1,4 @@
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryBungeeHermes } from "./plugin-factory-bungee-hermes";
 
 export { isMergePolicyValueArray } from "./view-merging/merge-policies";

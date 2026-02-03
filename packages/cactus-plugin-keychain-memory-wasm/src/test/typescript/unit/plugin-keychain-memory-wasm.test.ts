@@ -5,7 +5,7 @@ import "jest-extended";
 import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 
-import { Bools, IListenOptions, Servers } from "@hyperledger/cactus-common";
+import { Bools, IListenOptions, Servers } from "@hyperledger-cacti/cactus-common";
 
 import {
   Configuration,

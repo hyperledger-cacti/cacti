@@ -30,12 +30,12 @@ import {
   ICactusPluginOptions,
   IPluginGrpcService,
   IGrpcSvcDefAndImplPair,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   PluginRegistry,
   consensusHasTransactionFinality,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,
@@ -47,7 +47,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { DeployContractSolidityBytecodeEndpoint } from "./web-services/deploy-contract-solidity-bytecode-endpoint";
 import { DeployContractSolidityBytecodeNoKeychainEndpoint } from "./web-services/deploy-contract-solidity-bytecode-no-keychain-endpoint";
@@ -376,7 +376,7 @@ export class PluginLedgerConnectorBesu
     {
       const oasPath =
         OAS.paths[
-          "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"
+          "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec"
         ];
 
       const operationId = oasPath.get.operationId;
@@ -398,7 +398,7 @@ export class PluginLedgerConnectorBesu
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-besu`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-besu`;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {

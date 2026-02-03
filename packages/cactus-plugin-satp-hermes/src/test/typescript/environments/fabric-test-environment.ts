@@ -2,7 +2,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   AssetTokenTypeEnum,
   Configuration,
@@ -14,9 +14,9 @@ import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
-} from "@hyperledger/cactus-test-tooling";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   ConnectionProfile,
   DefaultEventHandlerStrategy,
@@ -27,7 +27,7 @@ import {
   ChainCodeProgrammingLanguage,
   RunTransactionResponse,
   IPluginLedgerConnectorFabricOptions,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import { DiscoveryOptions, X509Identity } from "fabric-network";
 import { Config } from "node-ssh";
 import { randomUUID as uuidv4 } from "node:crypto";
@@ -36,7 +36,7 @@ import path from "path";
 import { expect } from "@jest/globals";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Asset, NetworkId } from "../../../main/typescript";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { IFabricLeafOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
 import ExampleOntology from "../../ontologies/ontology-satp-erc20-interact-fabric.json";
 import { INetworkOptions } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
@@ -44,7 +44,7 @@ import Docker from "dockerode";
 import {
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   PeerCerts,
-} from "@hyperledger/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
+} from "@hyperledger-cacti/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
 import {
   FabricConfigJSON,
   TargetOrganization,

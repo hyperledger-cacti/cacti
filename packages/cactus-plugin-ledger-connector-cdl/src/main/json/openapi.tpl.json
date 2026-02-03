@@ -325,12 +325,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/register-history-data": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/register-history-data": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/register-history-data"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/register-history-data"
           }
         },
         "operationId": "registerHistoryDataV1",
@@ -369,12 +369,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/get-lineage": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/get-lineage"
           }
         },
         "operationId": "getLineageV1",
@@ -413,12 +413,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-header": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-header": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-header"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-header"
           }
         },
         "operationId": "searchLineageByHeaderV1",
@@ -457,12 +457,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/search-lineage-by-globaldata"
           }
         },
         "operationId": "searchLineageByGlobalDataV1",

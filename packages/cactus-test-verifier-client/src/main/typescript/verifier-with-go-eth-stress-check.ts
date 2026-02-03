@@ -13,7 +13,7 @@ const sutLogLevel: LogLevelDesc = "info";
 const containerImageName = "ghcr.io/hyperledger/cacti-geth-all-in-one";
 const containerImageVersion = "2023-07-27-2a8c48ed6";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   bigIntToDecimalStringReplacer,
   LogLevelDesc,
@@ -21,15 +21,15 @@ import {
   Logger,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Constants } from "@hyperledger/cactus-core-api";
-import { GethTestLedger } from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-common";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
+import { GethTestLedger } from "@hyperledger-cacti/cactus-test-geth-ledger";
 import {
   EthereumApiClient,
   PluginLedgerConnectorEthereum,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import { Verifier, VerifierFactory } from "@hyperledger/cactus-verifier-client";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
+import { pruneDockerAllIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
+import { Verifier, VerifierFactory } from "@hyperledger-cacti/cactus-verifier-client";
 
 import http from "http";
 import express from "express";

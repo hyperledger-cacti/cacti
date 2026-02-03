@@ -4,7 +4,7 @@ import fabricProtos from "fabric-protos";
 import {
   LoggerProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   CactiBlockFullResponseV1,

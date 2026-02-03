@@ -52,7 +52,7 @@
 import {
   type JsObjectSigner,
   type ILoggerOptions,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../satp-logger-provider";
 import type { SATPLogger as Logger } from "../satp-logger";
 import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";

@@ -2,14 +2,14 @@ import "jest-extended";
 import createHttpError from "http-errors";
 import { createResponse } from "node-mocks-http";
 
-import { safeStringifyException } from "@hyperledger/cactus-common";
+import { safeStringifyException } from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   IHandleRestEndpointExceptionOptions,
 } from "../../../main/typescript/public-api"; // replace with the correct path to your module
 
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   identifierByCodes,
   INTERNAL_SERVER_ERROR,

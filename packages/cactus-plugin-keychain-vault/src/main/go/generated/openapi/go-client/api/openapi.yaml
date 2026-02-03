@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-keychain-entry:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/get-keychain-entry:
     post:
       operationId: getKeychainEntryV1
       parameters: []
@@ -34,9 +34,9 @@ paths:
       summary: Retrieves the contents of a keychain entry from the backend.
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-keychain-entry
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/get-keychain-entry
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/delete-keychain-entry:
     post:
       operationId: deleteKeychainEntryV1
       parameters: []
@@ -55,9 +55,9 @@ paths:
       summary: Deletes an entry from the keychain stored under the provided key.
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/delete-keychain-entry
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/delete-keychain-entry
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/has-keychain-entry:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/has-keychain-entry:
     post:
       operationId: hasKeychainEntryV1
       parameters: []
@@ -77,9 +77,9 @@ paths:
         or not.
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/has-keychain-entry
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/has-keychain-entry
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/set-keychain-entry:
     post:
       operationId: setKeychainEntryV1
       parameters: []
@@ -102,9 +102,9 @@ paths:
       summary: Sets a value under a key on the keychain backend.
       x-hyperledger-cacti:
         http:
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/set-keychain-entry
           verbLowerCase: post
-  /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetricsV1
       parameters: []
@@ -119,7 +119,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics
 components:
   requestBodies:
     keychain_get_entry_request_body:

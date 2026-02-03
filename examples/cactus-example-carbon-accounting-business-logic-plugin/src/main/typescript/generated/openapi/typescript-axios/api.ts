@@ -208,7 +208,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         daoTokenGetAllowanceV1: async (daoTokenGetAllowanceRequest?: DaoTokenGetAllowanceRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-example-carbon-accounting-backend/dao-token/get-allowance`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

@@ -31,12 +31,12 @@ import {
   SampleCordappEnum,
   CordaConnectorContainer,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   CordappDeploymentConfig,
   FlowInvocationType,
@@ -45,7 +45,7 @@ import {
   PublicKey,
 } from "../../../main/typescript/generated/openapi/typescript-axios/index";
 import { CordaApiClient } from "../../../main/typescript/api-client/corda-api-client";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import { Subscription } from "rxjs";
 
 // Unit Test logger setup

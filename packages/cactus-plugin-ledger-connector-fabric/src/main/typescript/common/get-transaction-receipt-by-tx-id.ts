@@ -1,4 +1,4 @@
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { Gateway } from "fabric-network";
 import { common } from "fabric-protos";
 // BlockDecoder is not exported in ts definition so we need to use legacy import.

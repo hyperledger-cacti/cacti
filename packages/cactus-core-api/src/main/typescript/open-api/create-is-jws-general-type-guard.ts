@@ -10,8 +10,8 @@ import { createAjvTypeGuard } from "./create-ajv-type-guard";
  * @example
  *
  * ```typescript
- * import { JWSGeneral } from "@hyperledger/cactus-core-api";
- * import { createIsJwsGeneralTypeGuard } from "@hyperledger/cactus-core-api";
+ * import { JWSGeneral } from "@hyperledger-cacti/cactus-core-api";
+ * import { createIsJwsGeneralTypeGuard } from "@hyperledger-cacti/cactus-core-api";
  *
  * export class PluginConsortiumManual {
  *   private readonly isJwsGeneral: (x: unknown) => x is JWSGeneral;

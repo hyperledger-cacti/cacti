@@ -12,7 +12,7 @@ export {
   IRunTxReqWithTxId,
 } from "./plugin-ledger-connector-fabric";
 
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 export async function createPluginFactory(

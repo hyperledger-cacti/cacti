@@ -6,8 +6,8 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
-import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Constants, ISocketApiClient } from "@hyperledger-cacti/cactus-core-api";
 import {
   DefaultApi,
   WatchBlocksV1,
