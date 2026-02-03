@@ -29,7 +29,7 @@ Always consult these before acting. Path-specific rules override this file.
 
 - **Monorepo**: Yarn 4 + Lerna; packages in `packages/`, `examples/`, `extensions/`, `weaver/`.
 - **Language**: TypeScript, ES2022, CommonJS, strict mode. Prettier: 2-space, double quotes, semicolons, 80 cols.
-- **Scope**: `@hyperledger/cacti-*` (new) or `@hyperledger/cactus-*` (legacy).
+- **Scope**: `@hyperledger-cacti/cacti-*` (new) or `@hyperledger-cacti/cactus-*` (legacy).
 - **Tests**: Jest, `src/test/typescript/{unit,integration}/`, `*.test.ts`.
 - **APIs**: OpenAPI 3.x at `src/main/json/openapi.json`, generated Axios clients.
 - **Commits**: Conventional Commits, signed, max 72-char header.

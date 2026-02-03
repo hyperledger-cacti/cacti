@@ -1,4 +1,4 @@
-import { Checks } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
 import { PolicyRule } from "./policy-rule";
 import { IPolicyItemOptions, PolicyItem } from "./polity-item";
 import MerkleTree from "merkletreejs";

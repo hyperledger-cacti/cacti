@@ -35,11 +35,11 @@
  * @since 0.0.3-beta
  */
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { BridgeLeaf } from "./bridge-leaf";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { BesuLeaf } from "./leafs/besu-leaf";
 import {
   DeployLeafError,
@@ -66,9 +66,9 @@ import {
   IOntologyManagerOptions,
   OntologyManager,
 } from "./ontology/ontology-manager";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import { v4 as uuidv4 } from "uuid";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { NetworkId } from "../../public-api";
 import { MonitorService } from "../../services/monitoring/monitor";

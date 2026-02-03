@@ -19,7 +19,7 @@ chai.should();
 const { Wallets } = require("fabric-network");
 const { ContractImpl } = require("fabric-network/lib/contract");
 const { NetworkImpl } = require("fabric-network/lib/network");
-const membershipPb = require("@hyperledger/cacti-weaver-protos-js/common/membership_pb");
+const membershipPb = require("@hyperledger-cacti/cacti-weaver-protos-js/common/membership_pb");
 
 describe("Membership", () => {
   const mspId = "mspId";

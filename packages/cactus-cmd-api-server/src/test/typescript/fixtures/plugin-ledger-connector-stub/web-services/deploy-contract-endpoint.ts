@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Logger,
@@ -12,9 +12,9 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import { PluginLedgerConnectorStub } from "../plugin-ledger-connector-stub";
 
@@ -49,7 +49,7 @@ export class DeployContractEndpoint implements IWebServiceEndpoint {
         operationId: "deployContractV1",
         "x-hyperledger-cacti": {
           http: {
-            path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/deploy-contract-stub",
+            path: "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-stub/deploy-contract-stub",
             verbLowerCase: "post",
           },
         },

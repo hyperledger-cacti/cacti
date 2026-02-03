@@ -21,7 +21,7 @@ import OAS from "../json/openapi.json";
 import {
   consensusHasTransactionFinality,
   PluginRegistry,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   IPluginLedgerConnector,
@@ -30,7 +30,7 @@ import {
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Logger,
@@ -38,7 +38,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   newRex,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { promisify } from "util";
 import {
   DeployContractInkRequest,
@@ -256,7 +256,7 @@ export class PluginLedgerConnectorPolkadot
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-polkadot`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot`;
   }
 
   public getHttpServer(): Optional<Server | SecureServer> {
