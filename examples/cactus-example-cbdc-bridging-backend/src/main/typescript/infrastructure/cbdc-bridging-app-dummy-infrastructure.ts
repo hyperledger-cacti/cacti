@@ -52,6 +52,7 @@ import {
 import Docker from "dockerode";
 
 import http from "node:http";
+import { createMonitorSystem } from "./monitoring-infrastructure";
 
 export interface ICbdcBridgingAppDummyInfrastructureOptions {
   logLevel?: LogLevelDesc;
@@ -80,6 +81,7 @@ export class CbdcBridgingAppDummyInfrastructure {
   private db_remote1?: Container;
   private db_local2?: Container;
   private db_remote2?: Container;
+  private monitorService?: Container;
 
   private besuGatewayRunner?: SATPGatewayRunner;
   private fabricGatewayRunner?: SATPGatewayRunner;
@@ -153,6 +155,8 @@ export class CbdcBridgingAppDummyInfrastructure {
       ]);
       this.log.info(`Creating databases...`);
       await this.createDBs();
+      this.log.info(`Creating Monitoring Service...`);
+      await this.createMonitorSystem();
       this.log.info(`Creating SATP Gateways...`);
       await this.createSATPGateways();
       this.log.debug("creating api server...");
@@ -242,6 +246,10 @@ export class CbdcBridgingAppDummyInfrastructure {
 
     await setupDBTable(this.db_remote_config1);
     await setupDBTable(this.db_remote_config2);
+  }
+
+  private async createMonitorSystem(): Promise<void> {
+    this.monitorService = await createMonitorSystem({});
   }
 
   public async createSATPGateways(): Promise<void> {

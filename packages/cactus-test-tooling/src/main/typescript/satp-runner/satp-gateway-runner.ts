@@ -30,8 +30,9 @@ export interface ISATPGatewayRunnerConstructorOptions {
 }
 
 export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageVersion: "2024-10-30T19-54-20-dev-5e06263e0",
-  containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
+  containerImageVersion: "2026-01-13-dev-472a4a761",
+  // cspell: disable-next-line
+  containerImageName: "jjsantos22/cacti-satp-hermes-gateway",
   serverPort: 3010,
   clientPort: 3011,
   oapiPort: 4010,
@@ -227,6 +228,10 @@ export class SATPGatewayRunner implements ITestLedger {
     const hostConfig: Docker.HostConfig = this.createDockerHostConfig();
 
     const createOptions: ContainerCreateOptions = {
+      Env: [
+        "OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-lgtm:4318",
+        "OTEL_SERVICE_NAME=satp-gateway",
+      ],
       ExposedPorts: {
         [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.serverPort}/tcp`]: {}, // SERVER_PORT
         [`${SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.clientPort}/tcp`]: {}, // CLIENT_PORT

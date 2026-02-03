@@ -54,6 +54,8 @@
     "start:example-supply-chain": "yarn build:dev && cd ./examples/cactus-example-supply-chain-backend/ && yarn start",
     "start:example-carbon-accounting": "CONFIG_FILE=examples/cactus-example-carbon-accounting-backend/example-config.json node examples/cactus-example-carbon-accounting-backend/dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "start:example-cbdc-bridging-app": "node -r ts-node/register examples/cactus-example-cbdc-bridging-backend/dist/lib/main/typescript/cbdc-bridging-app-cli.js dotenv_config_path=examples/cactus-example-cbdc-bridging-backend/process.env",
+    "start:example-cbdc-frontend": "cd ./examples/cactus-example-cbdc-bridging-frontend/ && yarn start",
+    "start:example-cbdc": "run-p start:example-cbdc-bridging-app start:example-cbdc-frontend",
     "purge-build-cache": "del-cli .build-cache/*",
     "clean": "yarn purge-build-cache && del-cli \"./{packages,examples,extensions}/cactus-*/{dist,.nyc_output,src/main/kotlin/generated/openapi/kotlin-client/*,src/main/proto/generated/*,src/main/typescript/generated/openapi/typescript-axios/*,src/main-server/kotlin/gen/kotlin-spring/src/**/{model,api}/*}\" \"!**/.openapi-generator-ignore\"",
     "lint": "run-s format:eslint format:prettier spellcheck",
