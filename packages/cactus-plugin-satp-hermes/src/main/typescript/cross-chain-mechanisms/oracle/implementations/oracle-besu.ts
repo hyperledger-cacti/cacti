@@ -4,13 +4,13 @@ import {
   ISignerKeyPair,
   type LogLevelDesc,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../../core/satp-logger";
-import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
+import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
 
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   ClaimFormatError,
   NoSigningCredentialError,
@@ -33,9 +33,9 @@ import {
   PluginLedgerConnectorBesu,
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialPrivateKeyHex,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import { isWeb3SigningCredentialNone } from "../../common/utils";
-import { StrategyBesu } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
+import { StrategyBesu } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-besu";
 import { MonitorService } from "../../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 

@@ -39,7 +39,7 @@
  * @since 0.0.3-beta
  */
 
-import { type LogLevelDesc } from "@hyperledger/cactus-common";
+import { type LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import type { SATPLogger as Logger } from "../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import { BridgeManager } from "./bridge/bridge-manager";

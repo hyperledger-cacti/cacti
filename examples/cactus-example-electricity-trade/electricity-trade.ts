@@ -10,7 +10,7 @@ import {
   TransactionManagement,
   RIFError,
   ConfigUtil,
-} from "@hyperledger/cactus-common-example-server";
+} from "@hyperledger-cacti/cactus-common-example-server";
 import escapeHtml from "escape-html";
 
 const config: any = ConfigUtil.getConfig();

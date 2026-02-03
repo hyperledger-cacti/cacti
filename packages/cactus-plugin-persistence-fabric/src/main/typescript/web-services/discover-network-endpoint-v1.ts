@@ -8,16 +8,16 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import { PluginPersistenceFabric } from "../plugin-persistence-fabric";
 import OAS from "../../json/openapi.json";
@@ -53,7 +53,7 @@ export class DiscoverNetworkEndpointV1 implements IWebServiceEndpoint {
 
   public getOasPath(): any {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/discover-network"
     ];
   }
 

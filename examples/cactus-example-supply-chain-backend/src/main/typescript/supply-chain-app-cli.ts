@@ -1,5 +1,5 @@
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { ISupplyChainAppOptions, SupplyChainApp } from "./supply-chain-app";
 
 export async function launchApp(

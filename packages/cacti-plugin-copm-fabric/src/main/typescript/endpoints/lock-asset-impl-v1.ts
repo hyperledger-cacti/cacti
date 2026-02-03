@@ -3,8 +3,8 @@ import {
   Validators,
   Interfaces as CopmIF,
 } from "@hyperledger-cacti/cacti-copm-core";
-import { Logger } from "@hyperledger/cactus-common";
-import { AssetManager } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { Logger } from "@hyperledger-cacti/cactus-common";
+import { AssetManager } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import { FabricConfiguration } from "../lib/fabric-configuration";
 
 export async function lockAssetV1Impl(

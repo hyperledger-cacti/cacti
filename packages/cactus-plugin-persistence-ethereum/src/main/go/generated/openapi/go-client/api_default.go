@@ -59,7 +59,7 @@ func (a *DefaultApiService) GetStatusV1Execute(r ApiGetStatusV1Request) (*Status
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

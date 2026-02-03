@@ -2,7 +2,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { KJUR, KEYUTIL } from "jsrsasign";
 import { InternalIdentityClient, ISignatureResponse } from "./internal/client";
 import { ECCurveType } from "./internal/crypto-util";

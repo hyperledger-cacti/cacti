@@ -19,8 +19,8 @@
  * @since 0.0.3-beta
  */
 
-import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger/cactus-plugin-object-store-ipfs";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { DefaultApi as ObjectStoreIpfsApi } from "@hyperledger-cacti/cactus-plugin-object-store-ipfs";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import { IRemoteLogRepository } from "./interfaces/repository";
 import { RemoteLog } from "../../core/types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";

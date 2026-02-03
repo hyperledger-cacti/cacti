@@ -51,12 +51,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws"
           }
         },
         "operationId": "getConsortiumJwsV1",
@@ -86,12 +86,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/node/jws": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/node/jws"
           }
         },
         "operationId": "getNodeJwsV1",
@@ -120,12 +120,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics"
           }
         },
         "operationId": "getPrometheusMetricsV1",

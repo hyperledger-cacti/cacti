@@ -3,16 +3,16 @@ import { v4 as uuidv4 } from "uuid";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
 import Web3JsQuorum, { IPrivateTransactionReceipt } from "web3js-quorum";
-import { BesuMpTestLedger } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { BesuMpTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   EthContractInvocationType,
   PluginFactoryLedgerConnector,
   Web3SigningCredentialType,
 } from "../../../../../main/typescript";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 describe("PluginLedgerConnectorBesu", () => {
   const containerImageName =

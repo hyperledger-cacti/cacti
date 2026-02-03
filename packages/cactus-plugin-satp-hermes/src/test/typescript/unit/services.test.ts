@@ -2,7 +2,7 @@ import {
   JsObjectSigner,
   type LogLevelDesc,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   type ISATPServiceOptions,
   type SATPService,
@@ -80,7 +80,7 @@ import { create, isMessage } from "@bufbuild/protobuf";
 
 let knexInstanceClient: Knex; // test as a client
 let knexInstanceRemote: Knex;
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { BridgeManagerClientInterface } from "../../../main/typescript/cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { BridgeManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-manager";
 import { createMigrationSource } from "../../../main/typescript/database/knex-migration-source";

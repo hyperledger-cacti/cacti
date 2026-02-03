@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize:
     post:
       operationId: initializeV1
       parameters: []
@@ -29,8 +29,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize
-  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw:
     post:
       operationId: withdrawV1
       parameters: []
@@ -50,8 +50,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw
-  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status:
     post:
       operationId: getStatusV1
       requestBody:
@@ -72,8 +72,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status
-  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status:
     post:
       operationId: getSingleStatusV1
       requestBody:
@@ -92,8 +92,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status
-  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund:
     post:
       operationId: refundV1
       parameters: []
@@ -113,8 +113,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund
-  /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract:
     post:
       operationId: newContractV1
       parameters: []
@@ -134,7 +134,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract
 components:
   responses:
     GetStatusResponse:

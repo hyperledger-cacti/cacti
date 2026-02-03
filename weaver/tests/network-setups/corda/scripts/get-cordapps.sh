@@ -102,7 +102,7 @@ else
     username=`sed '/^\#/d' $file | grep 'username=' | cut -d "=" -f2-`
     password=`sed '/^\#/d' $file | grep 'password=' | cut -d "=" -f2-`
     pkgurl=`sed '/^\#/d' $file | grep 'url=' | cut -d "=" -f2-`
-    baseUrl="$pkgurl/org/hyperledger/cacti/weaver"
+    baseUrl="$pkgurl/org/hyperledger-cacti/cacti/weaver"
     echo "Downloading Corda Interop App from $baseUrl ..."
     (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/imodule/corda/interop-contracts/$cactiVersion/interop-contracts-$cactiVersion.jar) || exit 1
     (cd $directory/../shared/artifacts && curl --location -u $username:$password -O $baseUrl/imodule/corda//interop-workflows/$cactiVersion/interop-workflows-$cactiVersion.jar) || exit 1

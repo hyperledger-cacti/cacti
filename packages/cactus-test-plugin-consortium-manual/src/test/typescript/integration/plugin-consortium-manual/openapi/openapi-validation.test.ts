@@ -9,20 +9,20 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import {
   IPluginConsortiumManualOptions,
   PluginConsortiumManual,
   DefaultApi,
   Configuration,
-} from "@hyperledger/cactus-plugin-consortium-manual";
+} from "@hyperledger-cacti/cactus-plugin-consortium-manual";
 import {
   CactusNode,
   Consortium,
   ConsortiumDatabase,
   ConsortiumMember,
-} from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 const testCase = "cactus-plugin-consortium-manual API";
 

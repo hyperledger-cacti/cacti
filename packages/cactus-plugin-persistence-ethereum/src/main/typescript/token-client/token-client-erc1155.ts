@@ -2,8 +2,8 @@
  * Client for calling methods on ERC1155 token contract.
  */
 
-import { EthereumApiClient } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
+import { EthereumApiClient } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
+import type { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import TokenClient from "./base-token-client";
 import ERC1155 from "../../json/contract-abi/ERC1155.json";
 import { RuntimeError } from "run-time-error-cjs";
