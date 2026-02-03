@@ -1,6 +1,6 @@
 import type { OracleLog } from "../core/types";
 import type { IOracleLogRepository } from "./repository/interfaces/repository";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
+import type { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLogger as Logger } from "../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import { MonitorService } from "../services/monitoring/monitor";

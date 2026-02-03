@@ -5,12 +5,12 @@ import {
   Containers,
   CordaTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   SampleCordappEnum,
   CordaConnectorContainer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   CordappDeploymentConfig,
@@ -23,7 +23,7 @@ import {
   ListFlowsV1Request,
   PublicKey,
 } from "../../../../main/typescript/generated/openapi/typescript-axios/index";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 const testCase = "openapi validation on corda JVM implementation";
 const logLevel: LogLevelDesc = "TRACE";

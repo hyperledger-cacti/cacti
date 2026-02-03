@@ -6,8 +6,8 @@ import {
   Checks,
   LogLevelDesc,
   Bools,
-} from "@hyperledger/cactus-common";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { Containers } from "../common/containers";
 import { RuntimeError } from "run-time-error-cjs";
 import { EventEmitter } from "events";

@@ -8,10 +8,10 @@ import {
 import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { FabricConfigJSON } from "../../../../main/typescript/services/validation/config-validating-functions/bridges-config-validating-functions/validate-fabric-config";
 import path from "path";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 const connectionProfile = {
   name: "test-network-org1",

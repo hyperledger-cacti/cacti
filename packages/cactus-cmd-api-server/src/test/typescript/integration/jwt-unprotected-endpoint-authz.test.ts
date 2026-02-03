@@ -5,9 +5,9 @@ import expressJwt from "express-jwt";
 import axios, { Method } from "axios";
 import { StatusCodes } from "http-status-codes";
 
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { IJoseFittingJwtParams } from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   ApiServer,

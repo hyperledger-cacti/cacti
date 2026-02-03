@@ -4,7 +4,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
@@ -19,10 +19,10 @@ import {
   InvokeContractV1Request,
   PluginLedgerConnectorBesu,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import { State } from "../view-creation/state";
 import { StateProof } from "../view-creation/state-proof";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import { Transaction } from "../view-creation/transaction";
 import Web3 from "web3";
 import { Proof } from "../view-creation/proof";

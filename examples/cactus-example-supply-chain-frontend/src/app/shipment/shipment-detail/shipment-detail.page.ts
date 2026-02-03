@@ -8,15 +8,15 @@ import {
 } from "@angular/forms";
 import { ModalController } from "@ionic/angular";
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
 import {
   Shipment,
   Bookshelf,
   DefaultApi as SupplyChainApi,
-} from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+} from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
 
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
 
 import { AuthConfig } from "../../common/auth-config";

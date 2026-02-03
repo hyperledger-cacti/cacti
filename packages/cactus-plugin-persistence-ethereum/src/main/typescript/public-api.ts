@@ -1,4 +1,4 @@
-import type { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import type { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryLedgerPersistence } from "./plugin-factory-persistence-ethereum";
 
 export { PluginFactoryLedgerPersistence } from "./plugin-factory-persistence-ethereum";

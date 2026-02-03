@@ -1,8 +1,8 @@
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { CbdcBridgingApp } from "../../../main/typescript";
 import { ICbdcBridgingApp } from "../../../main/typescript/cbdc-bridging-app";
 
