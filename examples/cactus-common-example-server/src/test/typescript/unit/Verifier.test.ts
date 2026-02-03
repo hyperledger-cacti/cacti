@@ -59,7 +59,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 const logLevel: LogLevelDesc = "info";
 const log: Logger = LoggerProvider.getOrCreate({
@@ -74,7 +74,7 @@ import {
   IVerifierEventListener,
 } from "../../../main/typescript/verifier/LedgerPlugin";
 
-import { SocketIOTestSetupHelpers } from "@hyperledger/cactus-test-tooling";
+import { SocketIOTestSetupHelpers } from "@hyperledger-cacti/cactus-test-tooling";
 
 //////////////////////////////
 // TEST TIMEOUT

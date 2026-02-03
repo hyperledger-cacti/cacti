@@ -2,15 +2,15 @@ import {
   IListenOptions,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
-import { StellarTestLedger } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-common";
+import { StellarTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
 import { Network } from "stellar-plus/lib/stellar-plus";
 import { NetworkConfig } from "stellar-plus/lib/stellar-plus/network";
 import { pluginName } from "..";
 import { PluginFactoryLedgerConnector } from "../../../../../main/typescript/plugin-factory-ledger-connector";
-import { Constants, PluginImportType } from "@hyperledger/cactus-core-api";
+import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import { PluginLedgerConnectorStellar } from "../../../../../main/typescript/plugin-ledger-connector-stellar";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { v4 as uuidV4 } from "uuid";
 import { loadWasmFile } from "../../../../../main/typescript/utils";
 import express from "express";
@@ -89,7 +89,7 @@ describe(testCaseName, () => {
     const { address, port } = addressInfo;
     const apiHost = `http://${address}:${port}`;
     console.log(
-      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
+      `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`,
     );
     const stellarApiClientOptions = new StellarApiClientOptions({
       basePath: apiHost,

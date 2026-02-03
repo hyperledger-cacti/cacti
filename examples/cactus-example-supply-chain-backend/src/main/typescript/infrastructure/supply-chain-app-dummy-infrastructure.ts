@@ -6,34 +6,34 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginLedgerConnectorBesu } from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginLedgerConnectorBesu } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   PluginLedgerConnectorXdai,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
-import { IPluginKeychain } from "@hyperledger/cactus-core-api";
-import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger/cactus-test-tooling";
-import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2 } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai";
+import { IPluginKeychain } from "@hyperledger-cacti/cactus-core-api";
+import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1 } from "@hyperledger-cacti/cactus-test-tooling";
+import { FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2 } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   BesuTestLedger,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FabricTestLedgerV1,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   IEthContractDeployment,
   ISupplyChainContractDeploymentInfo,
   IFabricContractDeployment,
-} from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+} from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
 import {
   PluginLedgerConnectorFabric,
   DefaultEventHandlerStrategy,
   ChainCodeProgrammingLanguage,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import fs from "fs-extra";
 import path from "path";
 

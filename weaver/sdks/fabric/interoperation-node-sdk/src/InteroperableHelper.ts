@@ -23,13 +23,13 @@ import {
   deserializeRemoteProposalResponseBase64,
   serializeRemoteProposalResponse,
 } from "./decoders";
-import statePb from "@hyperledger/cacti-weaver-protos-js/common/state_pb";
-import fabricViewPb from "@hyperledger/cacti-weaver-protos-js/fabric/view_data_pb";
-import cordaViewPb from "@hyperledger/cacti-weaver-protos-js/corda/view_data_pb";
-import interopPayloadPb from "@hyperledger/cacti-weaver-protos-js/common/interop_payload_pb";
-import proposalPb from "@hyperledger/cacti-weaver-protos-js/peer/proposal_pb";
-import proposalResponsePb from "@hyperledger/cacti-weaver-protos-js/peer/proposal_response_pb";
-import identitiesPb from "@hyperledger/cacti-weaver-protos-js/msp/identities_pb";
+import statePb from "@hyperledger-cacti/cacti-weaver-protos-js/common/state_pb";
+import fabricViewPb from "@hyperledger-cacti/cacti-weaver-protos-js/fabric/view_data_pb";
+import cordaViewPb from "@hyperledger-cacti/cacti-weaver-protos-js/corda/view_data_pb";
+import interopPayloadPb from "@hyperledger-cacti/cacti-weaver-protos-js/common/interop_payload_pb";
+import proposalPb from "@hyperledger-cacti/cacti-weaver-protos-js/peer/proposal_pb";
+import proposalResponsePb from "@hyperledger-cacti/cacti-weaver-protos-js/peer/proposal_response_pb";
+import identitiesPb from "@hyperledger-cacti/cacti-weaver-protos-js/msp/identities_pb";
 import { Relay } from "./Relay";
 import { Gateway, Contract } from "fabric-network";
 import { v4 as uuidv4 } from "uuid";

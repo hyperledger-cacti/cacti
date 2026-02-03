@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import iin_agent_pb from "@hyperledger/cacti-weaver-protos-js/identity/agent_pb";
+import iin_agent_pb from "@hyperledger-cacti/cacti-weaver-protos-js/identity/agent_pb";
 
 export class LedgerBase {
   ledgerId: string; // Unique ID of a ledger in which the Weaver interoperation module is installed

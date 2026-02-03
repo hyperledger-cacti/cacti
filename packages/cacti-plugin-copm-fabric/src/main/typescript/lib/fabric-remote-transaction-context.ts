@@ -1,4 +1,4 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import {
   RemoteOrgConfig,
   LocalRelayConfig,
@@ -8,7 +8,7 @@ import {
   Interfaces as CopmIF,
 } from "@hyperledger-cacti/cacti-copm-core";
 import { FabricContractContext } from "./fabric-types";
-import { InteroperableHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { InteroperableHelper } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import { Gateway, Contract } from "fabric-network";
 import { ICryptoKey, Utils } from "fabric-common";
 

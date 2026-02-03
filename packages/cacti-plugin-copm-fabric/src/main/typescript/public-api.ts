@@ -1,4 +1,4 @@
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryCopmFabric } from "./plugin-factory-copm-fabric";
 
 export async function createPluginFactory(

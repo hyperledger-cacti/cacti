@@ -77,8 +77,8 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DiscoverNetworkV1**](docs/DefaultApi.md#discovernetworkv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network | Refresh Fabric network structure in the database through discovery.
-*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/status | Get the status of persistence plugin for fabric
+*DefaultApi* | [**DiscoverNetworkV1**](docs/DefaultApi.md#discovernetworkv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/discover-network | Refresh Fabric network structure in the database through discovery.
+*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/status | Get the status of persistence plugin for fabric
 
 
 ## Documentation For Models

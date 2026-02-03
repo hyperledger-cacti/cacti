@@ -113,7 +113,7 @@ You also need to add the following to your application's `build.gradle` file:
 ```groovy
 repositories {
   maven {
-      url https://maven.pkg.github.com/hyperledger/cacti
+      url https://maven.pkg.github.com/hyperledger-cacti/cacti
       credentials {
           username <github-email>
           password <github-personal-access-token>
@@ -444,7 +444,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   RELAY_NAME=<"name" in config.toml>
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-relay-server
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-relay-server
   DOCKER_TAG=2.1.0
   ```
     - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
@@ -535,7 +535,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   DRIVER_RPC_USERNAME=<driver-rpc-username>
   DRIVER_RPC_PASSWORD=<driver-rpc-username>
   EXTERNAL_NETWORK=<docker-bridge-network>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-driver-corda
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-driver-corda
   DOCKER_TAG=2.1.0
   RELAY_TLS=<true|false>
   RELAY_TLSCA_TRUST_STORE=<truststore-jks-file-path>

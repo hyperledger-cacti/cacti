@@ -44,10 +44,10 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**deleteKeychainEntryV1**](docs/DefaultApi.md#deletekeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/delete-keychain-entry | Deletes an entry under a key on the keychain backend.
-*DefaultApi* | [**getKeychainEntryV1**](docs/DefaultApi.md#getkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
-*DefaultApi* | [**hasKeychainEntryV1**](docs/DefaultApi.md#haskeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/has-keychain-entry | Checks that an entry exists under a key on the keychain backend.
-*DefaultApi* | [**setKeychainEntryV1**](docs/DefaultApi.md#setkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/set-keychain-entry | Sets a value under a key on the keychain backend.
+*DefaultApi* | [**deleteKeychainEntryV1**](docs/DefaultApi.md#deletekeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/delete-keychain-entry | Deletes an entry under a key on the keychain backend.
+*DefaultApi* | [**getKeychainEntryV1**](docs/DefaultApi.md#getkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
+*DefaultApi* | [**hasKeychainEntryV1**](docs/DefaultApi.md#haskeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/has-keychain-entry | Checks that an entry exists under a key on the keychain backend.
+*DefaultApi* | [**setKeychainEntryV1**](docs/DefaultApi.md#setkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/set-keychain-entry | Sets a value under a key on the keychain backend.
 
 
 <a id="documentation-for-models"></a>

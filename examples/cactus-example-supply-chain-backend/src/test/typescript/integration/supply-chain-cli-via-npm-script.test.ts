@@ -3,8 +3,8 @@ import { promisify } from "util";
 import { spawn, exec } from "child_process";
 import { v4 as uuidV4 } from "uuid";
 import test, { Test } from "tape-promise/tape";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import * as publicApi from "../../../main/typescript/public-api";
 import { SUPPLY_CHAIN_APP_OK_LOG_MSG_PATTERN } from "../../../main/typescript/public-api";
 

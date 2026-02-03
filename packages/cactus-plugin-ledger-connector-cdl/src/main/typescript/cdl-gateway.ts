@@ -6,7 +6,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { getAuthorizationHeaders } from "./type-defs";
 import {
   AuthInfoV1,

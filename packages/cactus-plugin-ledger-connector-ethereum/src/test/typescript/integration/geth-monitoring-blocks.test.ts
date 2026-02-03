@@ -24,11 +24,11 @@ import {
   Servers,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import { GethTestLedger } from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
+import { GethTestLedger } from "@hyperledger-cacti/cactus-test-geth-ledger";
 
 import {
   PluginLedgerConnectorEthereum,

@@ -77,7 +77,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status | Get the status of persistence plugin for ethereum
+*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status | Get the status of persistence plugin for ethereum
 
 
 ## Documentation For Models

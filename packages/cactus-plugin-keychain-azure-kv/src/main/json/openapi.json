@@ -281,11 +281,11 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/get-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/get-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/get-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/get-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -314,11 +314,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/set-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/set-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/set-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/set-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -344,11 +344,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/delete-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/delete-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/delete-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/delete-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -374,11 +374,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/has-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/has-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/has-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/has-keychain-entry",
             "verbLowerCase": "post"
           }
         },
