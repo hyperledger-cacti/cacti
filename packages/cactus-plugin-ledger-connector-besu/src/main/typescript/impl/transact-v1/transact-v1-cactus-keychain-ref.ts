@@ -1,4 +1,4 @@
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   ReceiptType,
   RunTransactionRequest,
@@ -6,7 +6,7 @@ import {
   Web3SigningCredentialCactusKeychainRef,
   Web3SigningCredentialType,
 } from "../../generated/openapi/typescript-axios";
-import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
+import { Checks, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import Web3 from "web3";
 import { transactV1PrivateKey } from "./transact-v1-private-key";
 import { PrometheusExporter } from "../../prometheus-exporter/prometheus-exporter";

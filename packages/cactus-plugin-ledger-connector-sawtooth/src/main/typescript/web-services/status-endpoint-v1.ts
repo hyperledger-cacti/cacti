@@ -9,13 +9,13 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginLedgerConnectorSawtooth } from "../plugin-ledger-connector-sawtooth";
@@ -49,7 +49,7 @@ export class StatusEndpointV1 implements IWebServiceEndpoint {
 
   public getOasPath(): any {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth/status"
     ];
   }
 

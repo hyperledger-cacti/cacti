@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import "jest-extended";
 
 import {
@@ -8,12 +8,12 @@ import {
   ReceiptType,
   Web3SigningCredentialType,
 } from "../../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { BesuTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import HelloWorldContractJson from "../../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+import { PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import { GetTransactionV1Request } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 
 const testCase = "PluginLedgerConnectorBesu";

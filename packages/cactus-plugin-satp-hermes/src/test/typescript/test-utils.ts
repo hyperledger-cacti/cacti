@@ -1,4 +1,4 @@
-import { LogLevelDesc, Logger } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Logger } from "@hyperledger-cacti/cactus-common";
 import {
   AdminApi,
   OracleApi,
@@ -16,7 +16,7 @@ import { EthereumTestEnvironment } from "./environments/ethereum-test-environmen
 import { FabricTestEnvironment } from "./environments/fabric-test-environment";
 import knex, { Knex } from "knex";
 import Docker, { Container, ContainerInfo } from "dockerode";
-import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript/common/containers";
+import { Containers } from "@hyperledger-cacti/cactus-test-tooling/src/main/typescript/common/containers";
 import { EventEmitter } from "events";
 import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { createMigrationSource } from "../../main/typescript/database/knex-migration-source";

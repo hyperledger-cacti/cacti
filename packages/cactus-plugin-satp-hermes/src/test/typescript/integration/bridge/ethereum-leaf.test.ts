@@ -1,15 +1,15 @@
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   TokenType,
   ERCTokenStandard,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import { WHALE_ACCOUNT_ADDRESS } from "@hyperledger/cactus-test-geth-ledger";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { WHALE_ACCOUNT_ADDRESS } from "@hyperledger-cacti/cactus-test-geth-ledger";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { EthereumLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
 import path from "path";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";

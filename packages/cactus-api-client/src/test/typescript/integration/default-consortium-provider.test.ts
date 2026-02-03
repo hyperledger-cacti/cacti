@@ -4,14 +4,14 @@ import { AddressInfo } from "node:net";
 import "jest-extended";
 import { StatusCodes } from "http-status-codes";
 
-import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cactus-plugin-consortium-manual";
+import { DefaultApi as ConsortiumManualApi } from "@hyperledger-cacti/cactus-plugin-consortium-manual";
 import {
   LoggerProvider,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { DefaultConsortiumProvider } from "../../../main/typescript";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 describe("DefaultConsortiumProvider", () => {
   const logLevel: LogLevelDesc = "SILENT";

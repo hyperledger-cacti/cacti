@@ -5,13 +5,13 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 
-import { IListenOptions, Servers } from "@hyperledger/cactus-common";
+import { IListenOptions, Servers } from "@hyperledger-cacti/cactus-common";
 
 import {
   ConsortiumDatabase,
   CactusNode,
   Configuration,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   PluginConsortiumManual,

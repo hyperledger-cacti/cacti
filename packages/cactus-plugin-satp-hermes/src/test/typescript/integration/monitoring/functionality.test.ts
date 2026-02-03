@@ -10,8 +10,8 @@ import {
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { Knex, knex } from "knex";
 import {
   SATPGatewayConfig,
@@ -28,14 +28,14 @@ import {
 import {
   IPluginFactoryOptions,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   Address,
   GatewayIdentity,
 } from "../../../../main/typescript/core/types";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import axios from "axios";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";

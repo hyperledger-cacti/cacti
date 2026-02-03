@@ -38,7 +38,7 @@ import {
   AuditRequest,
   AuditResponse,
 } from "../../generated/gateway-client/typescript-axios/api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPManager } from "../../services/gateway/satp-manager";
 import { SATPSession } from "../../core/satp-session";
 

@@ -9,9 +9,9 @@ import {
 } from "@angular/forms";
 import { ModalController } from "@ionic/angular";
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
-import { BambooHarvest } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
+import { BambooHarvest } from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 import { XDAI_BESU_DEMO_LEDGER_ID } from "../../../constants";
 import { isBambooHarvest } from "../is-bamboo-harvest";

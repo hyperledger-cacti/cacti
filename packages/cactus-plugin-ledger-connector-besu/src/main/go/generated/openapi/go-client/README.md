@@ -77,18 +77,18 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DeployContractSolBytecodeNoKeychainV1**](docs/DefaultApi.md#deploycontractsolbytecodenokeychainv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain | Deploys the bytecode of a Solidity contract without the need of keychain
-*DefaultApi* | [**DeployContractSolBytecodeV1**](docs/DefaultApi.md#deploycontractsolbytecodev1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode | Deploys the bytecode of a Solidity contract.
-*DefaultApi* | [**GetBalanceV1**](docs/DefaultApi.md#getbalancev1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance | Return balance of an address of a given block
-*DefaultApi* | [**GetBesuRecordV1**](docs/DefaultApi.md#getbesurecordv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record | Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.
-*DefaultApi* | [**GetBlockV1**](docs/DefaultApi.md#getblockv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block | Returns a block matching the block
-*DefaultApi* | [**GetOpenApiSpecV1**](docs/DefaultApi.md#getopenapispecv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec | Retrieves the .json file that contains the OpenAPI specification for the plugin.
-*DefaultApi* | [**GetPastLogsV1**](docs/DefaultApi.md#getpastlogsv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs | Gets past logs, matching the given options.
-*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**GetTransactionV1**](docs/DefaultApi.md#gettransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction | Executes a transaction on a besu ledger
-*DefaultApi* | [**InvokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract | Invokes a contract on a besu ledger
-*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction | Executes a transaction on a besu ledger
-*DefaultApi* | [**SignTransactionV1**](docs/DefaultApi.md#signtransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction | Obtain signatures of ledger from the corresponding transaction hash.
+*DefaultApi* | [**DeployContractSolBytecodeNoKeychainV1**](docs/DefaultApi.md#deploycontractsolbytecodenokeychainv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain | Deploys the bytecode of a Solidity contract without the need of keychain
+*DefaultApi* | [**DeployContractSolBytecodeV1**](docs/DefaultApi.md#deploycontractsolbytecodev1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode | Deploys the bytecode of a Solidity contract.
+*DefaultApi* | [**GetBalanceV1**](docs/DefaultApi.md#getbalancev1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-balance | Return balance of an address of a given block
+*DefaultApi* | [**GetBesuRecordV1**](docs/DefaultApi.md#getbesurecordv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-besu-record | Retrieves an arbitrary record (any piece of information) from the ledger. Ledger records can be call outputs, transaction input, etc.
+*DefaultApi* | [**GetBlockV1**](docs/DefaultApi.md#getblockv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-block | Returns a block matching the block
+*DefaultApi* | [**GetOpenApiSpecV1**](docs/DefaultApi.md#getopenapispecv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec | Retrieves the .json file that contains the OpenAPI specification for the plugin.
+*DefaultApi* | [**GetPastLogsV1**](docs/DefaultApi.md#getpastlogsv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-past-logs | Gets past logs, matching the given options.
+*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**GetTransactionV1**](docs/DefaultApi.md#gettransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-transaction | Executes a transaction on a besu ledger
+*DefaultApi* | [**InvokeContractV1**](docs/DefaultApi.md#invokecontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/invoke-contract | Invokes a contract on a besu ledger
+*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/run-transaction | Executes a transaction on a besu ledger
+*DefaultApi* | [**SignTransactionV1**](docs/DefaultApi.md#signtransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/sign-transaction | Obtain signatures of ledger from the corresponding transaction hash.
 
 
 ## Documentation For Models

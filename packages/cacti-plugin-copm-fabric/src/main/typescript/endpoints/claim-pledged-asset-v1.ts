@@ -1,4 +1,4 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import {
   ClaimPledgedAssetV1Request,
   Interfaces as CopmIF,

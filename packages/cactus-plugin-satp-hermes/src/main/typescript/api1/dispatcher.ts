@@ -47,12 +47,12 @@ import {
   Checks,
   type LogLevelDesc,
   type JsObjectSigner,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../core/satp-logger";
 
-import { type IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
+import { type IWebServiceEndpoint } from "@hyperledger-cacti/cactus-core-api";
 
 //import { GatewayIdentity, GatewayChannel } from "../core/types";
 //import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";

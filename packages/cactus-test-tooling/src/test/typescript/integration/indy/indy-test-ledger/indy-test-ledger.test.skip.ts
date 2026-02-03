@@ -28,7 +28,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import * as path from "node:path";
 import * as os from "node:os";

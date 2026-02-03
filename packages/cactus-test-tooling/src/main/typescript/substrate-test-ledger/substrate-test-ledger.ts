@@ -7,9 +7,9 @@ import type {
   ContainerInfo,
 } from "dockerode";
 import Docker from "dockerode";
-import { Logger, Checks, Bools } from "@hyperledger/cactus-common";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, Checks, Bools } from "@hyperledger-cacti/cactus-common";
+import type { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { Containers } from "../common/containers";
 
 export interface ISubstrateTestLedgerOptions {

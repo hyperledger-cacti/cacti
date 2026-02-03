@@ -2,20 +2,20 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   INetworkOptions,
   NetworkIdLedgerTypeEnum,
   TokenType,
   TransactRequestSourceAsset,
-} from "@hyperledger/cactus-plugin-satp-hermes";
-import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-plugin-satp-hermes";
+import { BesuTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
 import Docker from "dockerode";
 import { Account } from "web3-core";
 import { randomUUID as uuidv4 } from "node:crypto";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   EthContractInvocationType as BesuContractInvocationType,
   EthContractInvocationType,
@@ -23,9 +23,9 @@ import {
   PluginLedgerConnectorBesu,
   Web3SigningCredentialType,
   Web3SigningCredentialType as Web3SigningCredentialTypeBesu,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { NetworkId, ClaimFormat } from "@hyperledger/cactus-plugin-satp-hermes";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
+import { NetworkId, ClaimFormat } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
 import { getUserFromPseudonim } from "./utils";
 import ExampleOntology from "../../json/ontologies/ontology-satp-erc20-interact-besu.json";

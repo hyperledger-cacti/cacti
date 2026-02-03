@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api/";
+} from "@hyperledger-cacti/cactus-core-api/";
 
 import {
   Logger,
@@ -12,12 +12,12 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginBungeeHermes } from "../plugin-bungee-hermes";
@@ -53,7 +53,7 @@ export class GetPublicKeyEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key"
+        "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
@@ -61,14 +61,14 @@ export class GetPublicKeyEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key"
+        "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key"
     ].get.operationId;
   }
 
