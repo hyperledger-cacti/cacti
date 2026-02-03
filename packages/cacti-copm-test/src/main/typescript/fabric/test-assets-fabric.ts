@@ -3,7 +3,7 @@ import {
   DLAccount,
 } from "@hyperledger-cacti/cacti-copm-core";
 import { TestAssets } from "../interfaces/test-assets";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 export interface CertificateFactoryFunc {
   (account: DLAccount): Promise<string>;

@@ -77,11 +77,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**AcceptInvitationV1**](docs/DefaultApi.md#acceptinvitationv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/accept-invitation | Connect to another agent using it&#39;s invitation URL
-*DefaultApi* | [**CreateNewConnectionInvitationV1**](docs/DefaultApi.md#createnewconnectioninvitationv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/create-new-connection-invitation | Create new aries agent invitation that other agents can use to connect.
-*DefaultApi* | [**GetAgentsV1**](docs/DefaultApi.md#getagentsv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-agents | Get all Aries agents configured in this connector plugin.
-*DefaultApi* | [**GetConnectionsV1**](docs/DefaultApi.md#getconnectionsv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections | Get all connections of given aries agent.
-*DefaultApi* | [**RequestProofV1**](docs/DefaultApi.md#requestproofv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/request-proof | Request proof matching provided requriements from connected peer agent.
+*DefaultApi* | [**AcceptInvitationV1**](docs/DefaultApi.md#acceptinvitationv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/accept-invitation | Connect to another agent using it&#39;s invitation URL
+*DefaultApi* | [**CreateNewConnectionInvitationV1**](docs/DefaultApi.md#createnewconnectioninvitationv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/create-new-connection-invitation | Create new aries agent invitation that other agents can use to connect.
+*DefaultApi* | [**GetAgentsV1**](docs/DefaultApi.md#getagentsv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/get-agents | Get all Aries agents configured in this connector plugin.
+*DefaultApi* | [**GetConnectionsV1**](docs/DefaultApi.md#getconnectionsv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/get-connections | Get all connections of given aries agent.
+*DefaultApi* | [**RequestProofV1**](docs/DefaultApi.md#requestproofv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/request-proof | Request proof matching provided requriements from connected peer agent.
 
 
 ## Documentation For Models

@@ -38,13 +38,13 @@
 import {
   type ILoggerOptions,
   type LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../core/satp-logger";
 // import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
 
 import { IOracleEntryBase, IOracleListenerBase } from "./oracle-types";
-import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
+import { IPluginBungeeHermesOptions } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
 import { INetworkOptions } from "../bridge/bridge-types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
@@ -54,11 +54,11 @@ import {
   TaskNotFoundError,
   UnsupportedNetworkError,
 } from "../common/errors";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { v4 as uuidv4 } from "uuid";
 import { IOracleEVMOptions, OracleEVM } from "./implementations/oracle-evm";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   IOracleFabricOptions,
   OracleFabric,

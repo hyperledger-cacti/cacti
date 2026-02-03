@@ -44,12 +44,12 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**insertBambooHarvestV1**](docs/DefaultApi.md#insertbambooharvestv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest | Inserts the provided BambooHarvest entity to the ledger.
-*DefaultApi* | [**insertBookshelfV1**](docs/DefaultApi.md#insertbookshelfv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf | Inserts the provided Bookshelf entity to the ledger.
-*DefaultApi* | [**insertShipmentV1**](docs/DefaultApi.md#insertshipmentv1) | **POST** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment | Inserts the provided Shipment entity to the ledger.
-*DefaultApi* | [**listBambooHarvestV1**](docs/DefaultApi.md#listbambooharvestv1) | **GET** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest | Lists all the BambooHarvest entities stored on the ledger.
-*DefaultApi* | [**listBookshelfV1**](docs/DefaultApi.md#listbookshelfv1) | **GET** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf | Lists all the Bookshelf entities stored on the ledger.
-*DefaultApi* | [**listShipmentV1**](docs/DefaultApi.md#listshipmentv1) | **GET** /api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment | Lists all the Shipments entities stored on the ledger.
+*DefaultApi* | [**insertBambooHarvestV1**](docs/DefaultApi.md#insertbambooharvestv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bamboo-harvest | Inserts the provided BambooHarvest entity to the ledger.
+*DefaultApi* | [**insertBookshelfV1**](docs/DefaultApi.md#insertbookshelfv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bookshelf | Inserts the provided Bookshelf entity to the ledger.
+*DefaultApi* | [**insertShipmentV1**](docs/DefaultApi.md#insertshipmentv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-shipment | Inserts the provided Shipment entity to the ledger.
+*DefaultApi* | [**listBambooHarvestV1**](docs/DefaultApi.md#listbambooharvestv1) | **GET** /api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bamboo-harvest | Lists all the BambooHarvest entities stored on the ledger.
+*DefaultApi* | [**listBookshelfV1**](docs/DefaultApi.md#listbookshelfv1) | **GET** /api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bookshelf | Lists all the Bookshelf entities stored on the ledger.
+*DefaultApi* | [**listShipmentV1**](docs/DefaultApi.md#listshipmentv1) | **GET** /api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-shipment | Lists all the Shipments entities stored on the ledger.
 
 
 <a id="documentation-for-models"></a>

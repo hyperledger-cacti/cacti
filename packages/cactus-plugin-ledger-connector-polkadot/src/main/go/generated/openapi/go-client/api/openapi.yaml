@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetrics
       parameters: []
@@ -30,8 +30,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-transaction-info:
     post:
       operationId: getTransactionInfo
       parameters: []
@@ -57,8 +57,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-transaction-info
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-raw-transaction:
     post:
       operationId: getRawTransaction
       parameters: []
@@ -84,8 +84,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/get-raw-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction:
     post:
       operationId: signRawTransaction
       parameters: []
@@ -111,8 +111,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/run-transaction:
     post:
       operationId: runTransaction
       parameters: []
@@ -138,8 +138,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/run-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink:
     post:
       operationId: deployContractInk
       parameters: []
@@ -165,8 +165,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/invoke-contract:
     post:
       operationId: invokeContract
       parameters: []
@@ -192,7 +192,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot/invoke-contract
 components:
   schemas:
     PrometheusExporterMetricsResponse:

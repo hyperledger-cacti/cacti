@@ -1,4 +1,4 @@
-import { BambooHarvest } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+import { BambooHarvest } from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
 
 export function isBambooHarvest(x: unknown): x is BambooHarvest {
   return (

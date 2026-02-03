@@ -4,27 +4,27 @@
 
 import { pki, md } from "node-forge";
 import { v4 as uuidV4 } from "uuid";
-import { Strings } from "@hyperledger/cactus-common";
+import { Strings } from "@hyperledger-cacti/cactus-common";
 
 /**
- * @deprecated Moved to \@hyperledger/cactus-test-tooling
+ * @deprecated Moved to \@hyperledger-cacti/cactus-test-tooling
  */
 export type ForgeKeyPair = pki.rsa.KeyPair;
 /**
- * @deprecated Moved to \@hyperledger/cactus-test-tooling
+ * @deprecated Moved to \@hyperledger-cacti/cactus-test-tooling
  */
 export type ForgePrivateKey = pki.rsa.PrivateKey;
 /**
- * @deprecated Moved to \@hyperledger/cactus-test-tooling
+ * @deprecated Moved to \@hyperledger-cacti/cactus-test-tooling
  */
 export type ForgeCertificate = pki.Certificate;
 /**
- * @deprecated Moved to \@hyperledger/cactus-test-tooling
+ * @deprecated Moved to \@hyperledger-cacti/cactus-test-tooling
  */
 export type ForgeCertificateField = pki.CertificateField;
 
 /**
- * @deprecated Moved to \@hyperledger/cactus-test-tooling
+ * @deprecated Moved to \@hyperledger-cacti/cactus-test-tooling
  *
  * PKI as in public key infrastructure and x509 certificates.
  */
@@ -36,7 +36,7 @@ export interface IPki {
 }
 
 /**
- * @deprecated Moved to \@hyperledger/cactus-test-tooling
+ * @deprecated Moved to \@hyperledger-cacti/cactus-test-tooling
  *
  * Do not use this for anything in a production deployment. It's meant as a helper
  * class for development and testing purposes (enhancing developer experience).

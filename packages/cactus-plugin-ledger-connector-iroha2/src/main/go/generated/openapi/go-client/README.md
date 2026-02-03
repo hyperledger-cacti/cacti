@@ -77,9 +77,9 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GenerateTransactionV1**](docs/DefaultApi.md#generatetransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction | Generate transaction that can be signed locally.
-*DefaultApi* | [**QueryV1**](docs/DefaultApi.md#queryv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query | Executes a query on a Iroha V2 ledger and returns it&#39;s results.
-*DefaultApi* | [**TransactV1**](docs/DefaultApi.md#transactv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact | Executes a transaction on a Iroha V2 ledger (by sending some instructions)
+*DefaultApi* | [**GenerateTransactionV1**](docs/DefaultApi.md#generatetransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/generate-transaction | Generate transaction that can be signed locally.
+*DefaultApi* | [**QueryV1**](docs/DefaultApi.md#queryv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/query | Executes a query on a Iroha V2 ledger and returns it&#39;s results.
+*DefaultApi* | [**TransactV1**](docs/DefaultApi.md#transactv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/transact | Executes a transaction on a Iroha V2 ledger (by sending some instructions)
 
 
 ## Documentation For Models

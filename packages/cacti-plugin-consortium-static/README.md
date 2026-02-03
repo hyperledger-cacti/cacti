@@ -1,4 +1,4 @@
-# `@hyperledger/cacti-plugin-consortium-static`
+# `@hyperledger-cacti/cacti-plugin-consortium-static`
 
 ## Cacti Consortium Static
 

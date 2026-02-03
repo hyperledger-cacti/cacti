@@ -5,7 +5,7 @@ import {
   LoggerProvider,
   LogLevelDesc,
   Strings,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { EvmBlock } from "../../public-api";
 

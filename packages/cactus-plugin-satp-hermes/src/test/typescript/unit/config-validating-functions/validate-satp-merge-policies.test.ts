@@ -1,7 +1,7 @@
 import "jest-extended";
 import { validateSatpMergePolicies } from "../../../../main/typescript/services/validation/config-validating-functions/validate-satp-merge-policies";
-import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
-import { MergePolicyOpts } from "@hyperledger/cactus-plugin-bungee-hermes/src/main/typescript/generated/openapi/typescript-axios/api";
+import { IMergePolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
+import { MergePolicyOpts } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/src/main/typescript/generated/openapi/typescript-axios/api";
 
 describe("validateSatpMergePolicies", () => {
   it("should pass with a valid array", () => {

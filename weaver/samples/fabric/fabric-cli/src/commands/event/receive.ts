@@ -16,11 +16,11 @@ import {
   getNetworkConfig,
   handlePromise,
 } from "../../helpers/helpers";
-import { EventsManager } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { EventsManager } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import {
   EventSubscriptionState,
   EventType,
-} from "@hyperledger/cacti-weaver-protos-js/common/events_pb";
+} from "@hyperledger-cacti/cacti-weaver-protos-js/common/events_pb";
 import * as fs from "fs";
 import * as path from "path";
 import * as express from "express";

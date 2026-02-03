@@ -988,7 +988,7 @@ docker-compose -f docker-compose-satp.yml ps
 ## Contributing
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always interesting challenges!
 
-Please review [CONTRIBUTING.md](https://github.com/hyperledger/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
+Please review [CONTRIBUTING.md](https://github.com/hyperledger-cacti/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
 
 ## Release process
 TBD. For each release, a commit in the form: "chore(satp-hermes): version X release" will be made.

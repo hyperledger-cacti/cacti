@@ -114,7 +114,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -186,7 +186,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -258,7 +258,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

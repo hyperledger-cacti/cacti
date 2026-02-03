@@ -1,7 +1,7 @@
 import "jest-extended";
 import Docker from "dockerode";
 import { Container } from "dockerode";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   safeStopAndRemoveContainer,
   runCleanup,

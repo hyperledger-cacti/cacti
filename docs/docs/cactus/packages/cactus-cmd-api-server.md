@@ -79,7 +79,7 @@ One of our design principles for the framework is **secure by default** which me
 
 import { ApiServer } from "../api-server";
 import { ConfigService } from "../config/config-service";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const log: Logger \= LoggerProvider.getOrCreate({
   label: "cactus-api",
@@ -122,10 +122,10 @@ if (require.main \=== module) {
 ### Remote Plugin Imports at Runtime Example
 
 ```js
-import { PluginImportType, PluginImportAction } from "@hyperledger/cactus-core-api";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { PluginImportType, PluginImportAction } from "@hyperledger-cacti/cactus-core-api";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const main \= async () \=> {
 
@@ -145,7 +145,7 @@ const main \= async () \=> {
       // npm package name of the plugin you are installing
       // Since this will be imported at runtime, you are responsible for
       // installing the package yourself prior to launching the API server.
-      packageName: "@hyperledger/cactus-plugin-keychain-memory",
+      packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
       // The LOCAL value means that the plugin factory will be imported and
       // called to obtain the plugin instance.
       type: PluginImportType.LOCAL,
@@ -187,7 +187,7 @@ if (require.main \=== module) {
 
 For a complete example of how to use the API server, read all the code of the supply chain example’s backend package:
 
-https://github.com/hyperledger/cactus/tree/main/examples/cactus-example-supply-chain-backend/src/main/typescript
+https://github.com/hyperledger-cacti/cactus/tree/main/examples/cactus-example-supply-chain-backend/src/main/typescript
 
 Deployment Scenarios
 --------------------------------------------------------------------------
@@ -196,7 +196,7 @@ There’s a set of building blocks (members, nodes, API server processes, plugin
 
 > Consortium management does not relate to achieving consensus on data/transactions involving individual ledgers, merely about consensus on the metadata of a consortium.
 
-![deployment-entity-relationship-diagram.png](https://github.com/hyperledger/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-entity-relationship-diagram.png)
+![deployment-entity-relationship-diagram.png](https://github.com/hyperledger-cacti/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-entity-relationship-diagram.png)
 
 Now, with these composability rules in mind, let us demonstrate a few different deployment scenarios (both expected and exotic ones) to showcase the framework’s flexibility in this regard.
 
@@ -204,7 +204,7 @@ Now, with these composability rules in mind, let us demonstrate a few different 
 
 Many different configurations are possible here as well. One way to have two members form a consortium and both of those members provide highly available, high throughput services is to have a deployment as shown on the below figure. What is important to note here is that this consortium has 2 nodes, 1 for each member and it is irrelevant how many API servers those nodes have internally because they all respond to requests through the network host/web domain that is tied to the node. One could say that API servers do not have a distinguishable identity relative to their peer API servers, only the higher-level nodes do.
 
-![deployment-production-example.png](https://github.com/hyperledger/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-production-example.png)
+![deployment-production-example.png](https://github.com/hyperledger-cacti/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-production-example.png)
 
 ### Low Resource Deployment Example
 
@@ -212,7 +212,7 @@ This is an example to showcase how you can pull up a full consortium even from w
 
 The individual nodes/API servers are isolated by listening on separate TCP ports of the machine they are hosted on:
 
-![deployment-low-resource-example.png](https://github.com/hyperledger/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-low-resource-example.png)
+![deployment-low-resource-example.png](https://github.com/hyperledger-cacti/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-low-resource-example.png)
 
 Containerization
 ------------------------------------------------------------------
@@ -255,7 +255,7 @@ Once you’ve built the container, the following commands should work:
       \--env GRPC\_TLS\_ENABLED\=false \\
       cas \\
         ./node\_modules/.bin/cactusapi \\
-        \--plugins\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": { "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}\]'
+        \--plugins\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": { "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}\]'
     
 *   Launch container with plugin configuration as an **environment variable**:
     
@@ -266,7 +266,7 @@ Once you’ve built the container, the following commands should work:
       \--env AUTHORIZATION\_PROTOCOL\='NONE' \\
       \--env AUTHORIZATION\_CONFIG\_JSON\='{}' \\
       \--env GRPC\_TLS\_ENABLED\=false \\
-      \--env PLUGINS\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
+      \--env PLUGINS\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
       cas
     
 *   Launch container with plugin configuration as a **CLI argument**:
@@ -280,11 +280,11 @@ Once you’ve built the container, the following commands should work:
       \--env GRPC\_TLS\_ENABLED\=false \\
       cas \\
         ./node\_modules/.bin/cactusapi \\
-        \--plugins\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]'
+        \--plugins\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]'
     
 *   Launch container with **configuration file** mounted from host machine:
     
-    echo '\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \> cactus.json
+    echo '\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \> cactus.json
     
     docker run \\
       \--rm \\
@@ -305,7 +305,7 @@ Don’t have a Besu network on hand to test with? Test or develop against our Be
 
 1.  Terminal Window 1 (Ledger)
     
-    docker run \--publish 8545:8545 hyperledger/cactus-besu-all-in-one:latest
+    docker run \--publish 8545:8545 hyperledger-cacti/cactus-besu-all-in-one:latest
     
 2.  Terminal Window 2 (Cactus API Server)
     
@@ -317,7 +317,7 @@ Don’t have a Besu network on hand to test with? Test or develop against our Be
       \--env AUTHORIZATION\_PROTOCOL\='NONE' \\
       \--env AUTHORIZATION\_CONFIG\_JSON\='{}' \\
       \--env GRPC\_TLS\_ENABLED\=false \\
-      \--env PLUGINS\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
+      \--env PLUGINS\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
       cas
     
 3.  Terminal Window 3 (curl - replace eth accounts as needed)
@@ -433,6 +433,6 @@ The node is what has an identity within your PKI and can be made up of 1-N API s
 
 **Yes.** You can deploy your plugin written in any language, anywhere as long as it is accessible over the network and does come with a Typescript API client that you can use to install into the API server as a proxy for an in-process plugin implementation.
 
-[Previous](cactus-api-client.md "@hyperledger/cactus-api-client") [Next](cactus-common.md "@hyperledger/cactus-common")
+[Previous](cactus-api-client.md "@hyperledger-cacti/cactus-api-client") [Next](cactus-common.md "@hyperledger-cacti/cactus-common")
 
 * * *

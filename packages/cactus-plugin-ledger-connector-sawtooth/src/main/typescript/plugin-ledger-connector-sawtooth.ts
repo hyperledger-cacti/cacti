@@ -9,8 +9,8 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { consensusHasTransactionFinality } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-common";
+import { consensusHasTransactionFinality } from "@hyperledger-cacti/cactus-core";
 import {
   ConsensusAlgorithmFamily,
   IPluginLedgerConnector,
@@ -18,7 +18,7 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   StatusResponseV1,
@@ -149,7 +149,7 @@ export class PluginLedgerConnectorSawtooth
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-sawtooth`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth`;
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {

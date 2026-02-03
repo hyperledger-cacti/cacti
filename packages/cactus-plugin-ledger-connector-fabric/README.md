@@ -67,7 +67,7 @@ yarn add @hyperledger/cactus-plugin-ledger-connector-fabric
 import {
   PluginLedgerConnectorFabric,
   DefaultEventHandlerStrategy,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 const plugin = new PluginLedgerConnectorFabric({
   // See test cases for exact details on what parameters are needed
@@ -97,7 +97,7 @@ import {
   PluginLedgerConnectorFabric,
   DefaultApi as FabricApi,
   DefaultEventHandlerStrategy,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 // Step zero is to deploy your Fabric ledger and the Cactus API server
 const apiUrl = `https://${HOST}:${PORT}`;
@@ -419,7 +419,7 @@ docker run \
   --env LOG_LEVEL=INFO \
   --env PLUGINS='[
   {
-    "packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric",
+    "packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
     "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
     "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",
     "options": {
@@ -469,7 +469,7 @@ docker run \
     node index.js \
     --plugins='[
       {
-        "packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric",
+        "packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
         "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
         "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",
         "options": {
@@ -502,7 +502,7 @@ Launch container with **configuration file** mounted from host machine:
 ```sh
 echo '{"plugins": [
   {
-    "packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric",
+    "packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
     "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
     "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",
     "options": {
@@ -588,7 +588,7 @@ docker run \
   --env LOG_LEVEL=INFO \
   --env PLUGINS='[
   {
-    "packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric",
+    "packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
     "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
     "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",
     "options": {

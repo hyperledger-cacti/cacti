@@ -16,7 +16,7 @@
  * @since 0.0.3-beta
  */
 
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { GatewayIdentity } from "../../core/types";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 
