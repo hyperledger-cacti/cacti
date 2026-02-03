@@ -18,7 +18,7 @@ servers:
     basePath:
       default: ""
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object:
     post:
       operationId: getObjectV1
       parameters: []
@@ -35,8 +35,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/get-object
-  /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object:
     post:
       operationId: setObjectV1
       parameters: []
@@ -53,8 +53,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object
-  /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object:
     post:
       operationId: hasObjectV1
       parameters: []
@@ -71,7 +71,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/has-object
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object
 components:
   requestBodies:
     object_store_get_object_v1_request_body:

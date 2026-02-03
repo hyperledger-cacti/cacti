@@ -7,9 +7,9 @@ import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const io = require("socket.io-client-fixed-types");
-import { Logger, Checks } from "@hyperledger/cactus-common";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { Constants, ISocketApiClient } from "@hyperledger/cactus-core-api";
+import { Logger, Checks } from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import { Constants, ISocketApiClient } from "@hyperledger-cacti/cactus-core-api";
 import {
   DefaultApi,
   WatchBlocksV1,

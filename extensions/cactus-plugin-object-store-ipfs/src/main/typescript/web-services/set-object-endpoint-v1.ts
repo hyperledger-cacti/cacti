@@ -6,7 +6,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   SetObjectRequestV1,
@@ -14,9 +14,9 @@ import {
   IExpressRequestHandler,
   IPluginObjectStore,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 
@@ -50,7 +50,7 @@ export class SetObjectEndpointV1 implements IWebServiceEndpoint {
 
   private getOperation() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-object-store-ipfs/set-object"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object"
     ].post;
   }
 

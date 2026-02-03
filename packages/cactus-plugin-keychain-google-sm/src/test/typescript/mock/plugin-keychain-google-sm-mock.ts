@@ -11,7 +11,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 export interface ISecretManagerServiceClientMock {
   logLevel?: LogLevelDesc;

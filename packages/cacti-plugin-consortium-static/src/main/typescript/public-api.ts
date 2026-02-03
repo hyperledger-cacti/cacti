@@ -35,7 +35,7 @@ export { K_CACTUS_CONSORTIUM_STATIC_TOTAL_NODE_COUNT } from "./prometheus-export
  * @deprecated Use K_CACTUS_CONSORTIUM_STATIC_TOTAL_NODE_COUNT instead.
  */
 
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryWebService } from "./plugin-factory-consortium-static";
 
 export async function createPluginFactory(

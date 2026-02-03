@@ -212,13 +212,13 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bookshelf": {
       "post": {
         "operationId": "insertBookshelfV1",
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bookshelf"
           }
         },
         "summary": "Inserts the provided Bookshelf entity to the ledger.",
@@ -246,13 +246,13 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bookshelf": {
       "get": {
         "operationId": "listBookshelfV1",
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bookshelf"
           }
         },
         "summary": "Lists all the Bookshelf entities stored on the ledger.",
@@ -271,12 +271,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-shipment": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-shipment"
           }
         },
         "operationId": "insertShipmentV1",
@@ -305,12 +305,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-shipment": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-shipment"
           }
         },
         "operationId": "listShipmentV1",
@@ -330,13 +330,13 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bamboo-harvest": {
       "post": {
         "operationId": "insertBambooHarvestV1",
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bamboo-harvest"
           }
         },
         "summary": "Inserts the provided BambooHarvest entity to the ledger.",
@@ -364,13 +364,13 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bamboo-harvest": {
       "get": {
         "operationId": "listBambooHarvestV1",
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bamboo-harvest"
           }
         },
         "summary": "Lists all the BambooHarvest entities stored on the ledger.",

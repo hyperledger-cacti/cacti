@@ -28,12 +28,12 @@ import {
   LoggerProvider,
   Logger,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Configuration, Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Configuration, Constants } from "@hyperledger-cacti/cactus-core-api";
 import {
   IndyTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import * as path from "node:path";
 import * as os from "node:os";
 import { rm } from "node:fs/promises";

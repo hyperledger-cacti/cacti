@@ -47,13 +47,13 @@ you have a couple of different ways of obtaining an API client to do just that:
 #### Leverage the `ConsortiumDatabase` for discovery
 
 ```typescript
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
-import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 const mainFn = async () => {
   const ledgerId = "theIdOfYourLedgerInTheConsortiumDatabase";
@@ -79,13 +79,13 @@ mainFn();
 #### Use a provided `mainApiHost` and `ledgerId`
 
 ```typescript
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
-import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 const mainFn = async () => {
   const ledgerId = "theIdOfYourLedgerInTheConsortiumDatabase";
@@ -104,13 +104,13 @@ mainFn();
 #### Use the API host of a node directly
 
 ```typescript
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 
-import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger/cactus-core-api";
+import { ConsortiumDatabase, Ledger, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 const mainFn = async () => {
   const nodeApiHost = "https://my-node.cactus.example.com";

@@ -46,7 +46,7 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
     key: "home",
     path: `*`,
     element: (
-      <HeaderBar appDocumentationURL="https://github.com/hyperledger/cacti" />
+      <HeaderBar appDocumentationURL="https://github.com/hyperledger-cacti/cacti" />
     ),
   });
   return useRoutes(headerRoutesConfig);

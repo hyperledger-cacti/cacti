@@ -77,14 +77,14 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**DeployContractV1**](docs/DefaultApi.md#deploycontractv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract | Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The &#39;v1&#39; suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
-*DefaultApi* | [**GetBlockV1**](docs/DefaultApi.md#getblockv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block | Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
-*DefaultApi* | [**GetChainInfoV1**](docs/DefaultApi.md#getchaininfov1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info | Get fabric ledger chain info.
-*DefaultApi* | [**GetDiscoveryResultsV1**](docs/DefaultApi.md#getdiscoveryresultsv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results | Get fabric ledger node structure (from the discovery service).
-*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**GetTransactionReceiptByTxIDV1**](docs/DefaultApi.md#gettransactionreceiptbytxidv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid | get a transaction receipt by tx id on a Fabric ledger.
-*DefaultApi* | [**RunDelegatedSignTransactionV1**](docs/DefaultApi.md#rundelegatedsigntransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction | Runs a transaction on a Fabric ledger using user-provided signing callback.
-*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction | Runs a transaction on a Fabric ledger.
+*DefaultApi* | [**DeployContractV1**](docs/DefaultApi.md#deploycontractv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract | Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The &#39;v1&#39; suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
+*DefaultApi* | [**GetBlockV1**](docs/DefaultApi.md#getblockv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block | Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
+*DefaultApi* | [**GetChainInfoV1**](docs/DefaultApi.md#getchaininfov1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info | Get fabric ledger chain info.
+*DefaultApi* | [**GetDiscoveryResultsV1**](docs/DefaultApi.md#getdiscoveryresultsv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results | Get fabric ledger node structure (from the discovery service).
+*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**GetTransactionReceiptByTxIDV1**](docs/DefaultApi.md#gettransactionreceiptbytxidv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid | get a transaction receipt by tx id on a Fabric ledger.
+*DefaultApi* | [**RunDelegatedSignTransactionV1**](docs/DefaultApi.md#rundelegatedsigntransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction | Runs a transaction on a Fabric ledger using user-provided signing callback.
+*DefaultApi* | [**RunTransactionV1**](docs/DefaultApi.md#runtransactionv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction | Runs a transaction on a Fabric ledger.
 
 
 ## Documentation For Models

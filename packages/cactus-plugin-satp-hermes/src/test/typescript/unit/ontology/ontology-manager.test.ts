@@ -2,7 +2,7 @@ import {
   OntologyManager,
   IOntologyManagerOptions,
 } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   InteractionWithoutFunctionError,
   InvalidOntologyHash,
