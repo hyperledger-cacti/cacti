@@ -5,7 +5,7 @@ import {
   SelfSignedPkiGenerator,
   IPki,
 } from "../../../../../main/typescript/public-api";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "test-generates-working-certificates",

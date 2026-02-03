@@ -1,7 +1,7 @@
 import "jest-extended";
 import { validateSatpKeyPairJSON } from "../../../../main/typescript/services/validation/config-validating-functions/validate-key-pair-json";
 import { KeyPairJSON } from "../../../../main/typescript/services/validation/config-validating-functions/validate-key-pair-json";
-import { LoggerProvider } from "@hyperledger/cactus-common/";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common/";
 
 describe("validateKeyPairJson", () => {
   const logger = LoggerProvider.getOrCreate({

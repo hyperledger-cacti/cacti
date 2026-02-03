@@ -1,7 +1,7 @@
 import { CopmTester } from "../interfaces/copm-tester";
 import { CopmTesterFabric } from "../fabric/copm-tester-fabric";
 import { CopmNetworkMode } from "../lib/types";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import { CopmTesterCorda } from "../corda/copm-tester-corda";
 
 export function copmTesterFactory(

@@ -8,7 +8,7 @@
 4) Run `npm publish` to publish package to github packages.
 
 **NOTE:** Always publish to your fork first, and only after testing it well, then 
-after PR approval, publish it to `hyperledger/cacti`.
+after PR approval, publish it to `hyperledger-cacti/cacti`.
 To publish to your fork, modify in `package.json`:
 ```
 ...
@@ -23,4 +23,4 @@ and then follow above 4 steps.
 2) Create a copy of `.npmrc.template` as `.npmrc`.
 3) Replace <personal-access-token> in copied `.npmrc` file with your personal access token.
 4) Now put this `.npmrc` file in your application in same level as package.json.
-5) Now you can run `npm install @hyperledger/cacti-weaver-protos-js` in your application directory to install the latest version.
+5) Now you can run `npm install @hyperledger-cacti/cacti-weaver-protos-js` in your application directory to install the latest version.

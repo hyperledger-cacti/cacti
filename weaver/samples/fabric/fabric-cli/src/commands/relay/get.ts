@@ -5,7 +5,7 @@
  */
 
 import { GluegunCommand } from "gluegun";
-import { RelayHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
+import { RelayHelper } from "@hyperledger-cacti/cacti-weaver-sdk-fabric";
 import { commandHelp, getNetworkConfig } from "../../helpers/helpers";
 import logger from "../../helpers/logger";
 

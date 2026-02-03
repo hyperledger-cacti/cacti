@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Logger,
@@ -12,11 +12,11 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   registerWebServiceEndpoint,
   PluginRegistry,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 import { PluginHTLCCoordinatorBesu } from "../plugin-htlc-coordinator-besu";
 import { OwnHTLCRequest } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
@@ -49,7 +49,7 @@ export class OwnHTLCEndpoint implements IWebServiceEndpoint {
 
   public getOasPath() {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-coordinator-besu/own-htlc"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu/own-htlc"
     ];
   }
 
@@ -96,7 +96,7 @@ export class OwnHTLCEndpoint implements IWebServiceEndpoint {
       const connector = this.options.pluginRegistry.plugins.find((plugin) => {
         return (
           plugin.getPackageName() ==
-          "@hyperledger/cactus-plugin-htlc-coordinator-besu"
+          "@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu"
         );
       }) as unknown as PluginHTLCCoordinatorBesu;
       const resBody = await connector.ownHTLC(request);

@@ -66,7 +66,7 @@ func (a *DefaultApiService) DeleteKeychainEntryV1Execute(r ApiDeleteKeychainEntr
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/delete-keychain-entry"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/delete-keychain-entry"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -175,7 +175,7 @@ func (a *DefaultApiService) GetKeychainEntryV1Execute(r ApiGetKeychainEntryV1Req
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/get-keychain-entry"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/get-keychain-entry"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -284,7 +284,7 @@ func (a *DefaultApiService) HasKeychainEntryV1Execute(r ApiHasKeychainEntryV1Req
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/has-keychain-entry"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/has-keychain-entry"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -393,7 +393,7 @@ func (a *DefaultApiService) SetKeychainEntryV1Execute(r ApiSetKeychainEntryV1Req
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-azure-kv/set-keychain-entry"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-azure-kv/set-keychain-entry"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

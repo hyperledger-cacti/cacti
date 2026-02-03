@@ -51,8 +51,8 @@
     "@bufbuild/buf": "1.30.0",
     "@bufbuild/protobuf": "1.10.0",
     "@connectrpc/connect": "1.4.0",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
-    "@hyperledger/cactus-common": "2.1.0"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "2.1.0"
   },
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "1.8.0",

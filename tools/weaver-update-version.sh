@@ -3,12 +3,8 @@
 # Root of repo
 ROOT_DIR=${2:-'..'}
 
-# Repo full go path
-REPO='github.com/hyperledger/cacti'
-
 VERSION=${1:-"2.1.0"}
 
-echo "REPO: $REPO"
 echo "VERSION: $VERSION"
 
 # Core package verions

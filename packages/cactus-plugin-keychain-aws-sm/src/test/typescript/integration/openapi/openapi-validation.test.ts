@@ -3,13 +3,13 @@ import {
   Containers,
   LocalStackContainer,
   K_DEFAULT_LOCALSTACK_HTTP_PORT,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { v4 as uuidv4 } from "uuid";
 import {
   IListenOptions,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IPluginKeychainAwsSmOptions,
   PluginKeychainAwsSm,
@@ -30,7 +30,7 @@ import http from "http";
 import {
   installOpenapiValidationMiddleware,
   PluginRegistry,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
 import { AddressInfo } from "net";
 

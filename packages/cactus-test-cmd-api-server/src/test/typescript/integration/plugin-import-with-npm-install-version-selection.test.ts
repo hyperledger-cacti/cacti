@@ -4,17 +4,17 @@ import { readFile } from "node:fs/promises";
 
 import "jest-extended";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   PluginImport,
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -28,7 +28,7 @@ describe("ApiServer", () => {
   const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
   const aPluginImport: PluginImport = {
-    packageName: "@hyperledger/cactus-plugin-keychain-memory",
+    packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
     type: PluginImportType.Local,
     action: PluginImportAction.Install,
     options: {
