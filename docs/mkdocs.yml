@@ -191,6 +191,7 @@ nav:
     - Roadmap: weaver/roadmap.md
     - Publications: weaver/publications.md
   - Guides:
+    - Getting Started: guides/getting-started.md
     - Operations: guides/operations.md
     - Developers: guides/developers.md
     - Upgrading: guides/upgrading.md

@@ -196,65 +196,82 @@ NOTE: You can refer original tutorial ['GitHub Standard Fork & Pull Request Work
 Whenever you begin to use your codes on Hyperledger Cacti, you should follow the directory structure on Hyperledger Cacti.
 The current directory structure is described as the following:
 
-> - contrib/ : Contributions from each participants, which are not directly dependent on Cacti code.
->   - Fujitsu-ConnectionChain/
->   - Accenture-BIF/
->   - IBM-Weaver/
-> - docs/
->   - API/
->     - business-logic-plugin.md
->     - ledger-plugin.md
->     - routing-interface.md
-> - examples/
->   - example01-car-trade/
->     - src/
-> - plugins/
->     - business-logic-plugin/
->       - lib/ : libraries for building Business Logic Plugin
->     - ledger-plugin/ : Codes of Ledger Plugin
->       - (ledger-name)/ : Including the ledger name (e.g. Ethereum, Fabric, ...)
->         - verifier/
->           - src/ : Source codes of Verifier on Ledger Plugin
->           - unit-test/ : Unit test codes of Verifier on Ledger Plugin (single driver / driver and docker env / ...)
->         - validator/
->           - src/ : Source codes of Validator on Ledger Plugin
->           - unit-test/ : Unit test codes of Validator on Ledger Plugin (single driver / driver and docker env / ...)
->     - routing-interface/
-> - whitepaper/
-> - test/
->   - docker-env/
->   - kubernetes-env/
+> - docs/ : Project documentation (MkDocs-based)
+>   - docs/ : Documentation source files
+>   - assets/ : Static assets for documentation
+> - examples/ : Example applications and demos
+>   - cactus-example-carbon-accounting-backend/
+>   - cactus-example-cbdc-bridging/
+>   - cactus-example-supply-chain-backend/
+>   - cactus-example-discounted-asset-trade/
+>   - ... (additional examples)
+> - extensions/ : Optional extensions and plugins
+> - packages/ : Core packages (monorepo structure)
+>   - cactus-api-client/ : API client utilities
+>   - cactus-cmd-api-server/ : API server command
+>   - cactus-common/ : Common utilities and shared code
+>   - cactus-core/ : Core framework functionality
+>   - cactus-core-api/ : Core API definitions
+>   - cacti-plugin-ledger-connector-*/ : Ledger connector plugins
+>     - cacti-plugin-ledger-connector-besu/
+>     - cacti-plugin-ledger-connector-fabric/
+>     - cacti-plugin-ledger-connector-ethereum/
+>     - cacti-plugin-ledger-connector-corda/
+>     - ... (additional connectors)
+>   - cacti-plugin-keychain-*/ : Keychain plugins
+>   - cacti-plugin-satp-hermes/ : SATP (Secure Asset Transfer Protocol) implementation
+>   - cacti-test-*/ : Test packages for integration testing
+>   - cacti-copm-*/ : COPM (Cross-chain Operation Protocol) packages
+>   - cacti-plugin-weaver-*/ : Weaver integration plugins
+> - tools/ : Build and CI/CD tooling
+>   - docker/ : Docker images (all-in-one ledger images)
+>   - ci.sh : Main CI script
+> - weaver/ : Weaver interoperability framework
+>   - common/ : Shared Weaver components
+>   - core/ : Core Weaver implementation
+>   - rfcs/ : Weaver RFCs and specifications
+>   - samples/ : Weaver sample applications
+>   - sdks/ : Weaver SDKs
+> - whitepaper/ : Project whitepaper
 
 ## Create a new package
 
 To create a new package in Hyperledger Cacti:
 1. Create a new subfolder under the `/packages` folder;
 2. Name the folder according to the convention: `cacti-$PLUGIN_TYPE-$PLUGIN_FLAVOR`. Example: `cacti-plugin-satp-hermes`;
+   > **Note**: Legacy packages may use the `cactus-` prefix, but all new packages should use `cacti-`.
 3. Inside the new package folder, follow the base directory structure of the current packages (NOTE: the `dist` and `node_modules` are generated folders. As such, there is no need to create them previously):
 > - CHANGELOG.md
-> -  README.md
-> -  package.json
-> -  src
->     - main
->        - $language
->        - $language
->     - test
->        - $language
->        - $language
+> - CONTRIBUTING.md (optional, for package-specific guidelines)
+> - README.md
+> - package.json
+> - src/
+>   - main/
+>     - typescript/
+>   - test/
+>     - typescript/
+>       - unit/
+>       - integration/
 > - tsconfig.json
 
-Example:
+Example (cacti-plugin-satp-hermes):
 > - CHANGELOG.md
-> -  README.md
-> -  package.json
-> -  src
->     - main
->        - typescript
->        - yml
->     - test
->        - typescript
->        - solidity
+> - README.md
+> - package.json
+> - src/
+>   - main/
+>     - typescript/
+>     - solidity/ (for smart contracts)
+>     - yml/ (for OpenAPI specs)
+>   - test/
+>     - typescript/
+>       - unit/
+>       - integration/
+>     - solidity/ (for contract tests)
+>     - cucumber/ (for BDD tests)
 > - tsconfig.json
+> - jest.config-unit.ts
+> - jest.config-integration.ts
 
 4. In the `package.json` file, change the name to `@hyperledger/<your-package-name>`. Example: `@hyperledger/cacti-plugin-satp-hermes`;
 5. In the `tsconfig.json` file, ensure it extends the Hyperledger Cacti base `tsconfig.ts` file. You can do it by following this example:
@@ -292,7 +309,7 @@ Example:
 NOTE: Sequence order matters. The packages are built sequentially which can raise some issues if there are dependencies between packages. More specialized packages (i.e. with more dependencies) should be inserted down the list.
 
 7. At base Hyperledger Cacti scope, run `yarn configure`. If it runs successfully, the new package was added!
-8. When testing, make sure to have a separate test package which is able to depend on the api-server package without causing circular dependencies. The name `cacti-test-$PLUGIN_TYPE-$PLUGIN_FLAVOR`, is recommended. Example: `cacti-test-plugin-satp-hermes`.
+8. When testing, make sure to have a separate test package which is able to depend on the api-server package without causing circular dependencies. The name `cacti-test-$PLUGIN_TYPE-$PLUGIN_FLAVOR` is recommended. Example: `cacti-test-plugin-satp-hermes`.
 
 
 ## Test Automation
