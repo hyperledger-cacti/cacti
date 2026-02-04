@@ -193,6 +193,7 @@ nav:
   - SATP Hermes:
     - Architecture: satp-hermes/architecture/satp-hermes.md
   - Guides:
+    - Getting Started: guides/getting-started.md
     - Operations: guides/operations.md
     - Developers: guides/developers.md
     - Upgrading: guides/upgrading.md
