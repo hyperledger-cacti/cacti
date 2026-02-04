@@ -49,7 +49,7 @@ import {
   AssetSchema as ProtoAssetSchema,
   type Asset as ProtoAsset,
   TokenType,
-} from "../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   EvmFungibleAsset,
@@ -64,6 +64,19 @@ import {
   UniqueTokenID,
 } from "../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { NetworkId } from "../../public-api";
+import { DEFAULT_TLS13_CIPHER_SUITE } from "../constants";
+
+export const TLS13_CIPHER_SUITES: ReadonlySet<string> = new Set([
+  DEFAULT_TLS13_CIPHER_SUITE,
+  "TLS_AES_256_GCM_SHA384",
+  "TLS_CHACHA20_POLY1305_SHA256",
+  "TLS_AES_128_CCM_SHA256",
+  "TLS_AES_128_CCM_8_SHA256",
+]);
+
+export function isTLS13Suite(scheme: string | undefined): boolean {
+  return scheme !== undefined && TLS13_CIPHER_SUITES.has(scheme);
+}
 
 /**
  * Converts a bigint or numeric string to a number, throwing if the result

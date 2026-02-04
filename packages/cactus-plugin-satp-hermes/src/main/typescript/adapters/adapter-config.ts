@@ -104,7 +104,7 @@
  * @see {@link AdapterHookService} for webhook execution orchestration
  * @see {@link OutboundWebhookPayload} for outbound event schema
  * @see {@link InboundWebhookDecisionResponse} for inbound decision schema
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  *
  * @module adapter-config
  * @remarks File name retained for compatibility; types correspond to API Type 3 (Adapter Layer).

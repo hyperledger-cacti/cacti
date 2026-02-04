@@ -4,7 +4,7 @@
  * @fileoverview
  * Primary entry point for the SATP-Hermes plugin in Node.js and server environments.
  * Exports the complete public API for implementing fault-tolerant cross-chain asset
- * transfers using the IETF SATP v2 specification with Hermes crash recovery mechanisms.
+ * transfers using the IETF SATP v13 specification with Hermes crash recovery mechanisms.
  *
  * **Usage Context:**
  * This entry point is intended for server-side and Node.js applications requiring
@@ -49,7 +49,7 @@
  * import { SATPGateway, ClientV1Request } from '@hyperledger-cacti/cactus-plugin-satp-hermes';
  *
  * const transferRequest: ClientV1Request = {
- *   version: 'v02',
+ *   version: 'v13',
  *   sourceGatewayDltSystem: 'fabric-network-1',
  *   recipientGatewayDltSystem: 'besu-testnet',
  *   sourceLedgerAssetID: 'asset-123',
@@ -59,7 +59,7 @@
  * await gateway.runSatp(transferRequest);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGateway} for main gateway implementation
  * @see {@link PluginFactorySATPGateway} for gateway factory and configuration

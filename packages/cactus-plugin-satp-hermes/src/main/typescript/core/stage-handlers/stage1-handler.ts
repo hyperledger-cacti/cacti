@@ -3,7 +3,7 @@
  * SATP Stage 1 Handler for Transfer Proposal and Commencement Operations.
  *
  * @description
- * This module implements the Stage 1 handler of the IETF SATP Core v2 protocol,
+ * This module implements the Stage 1 handler of the IETF SATP Core v13 protocol,
  * responsible for managing the transfer proposal and commencement phases of
  * cross-chain asset transfers. Stage 1 establishes the formal transfer agreement
  * between gateways and initiates the actual cross-chain asset movement process.
@@ -84,7 +84,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage1ServerService} for server-side business logic
  * @see {@link Stage1ClientService} for client-side business logic
@@ -96,13 +96,13 @@
  */
 
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   TransferCommenceRequest,
   TransferCommenceResponse,
   TransferProposalResponse,
   TransferProposalRequest,
-} from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import { SATPSession } from "../satp-session";
 import { Stage1ServerService } from "../stage-services/server/stage1-server-service";
 import { Stage1ClientService } from "../stage-services/client/stage1-client-service";
@@ -120,10 +120,10 @@ import {
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
 import { getSessionId, buildAdapterPayload } from "./handler-utils";
-import { PreSATPTransferResponse } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import { PreSATPTransferResponse } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { getMessageTypeName } from "../satp-utils";
-import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   collectSessionAttributes,
   saveMessageInSessionData,
@@ -138,7 +138,7 @@ import type { AdapterManager } from "../../adapters/adapter-manager";
  * SATP Stage 1 Handler for Transfer Proposal and Commencement Operations.
  *
  * @description
- * Implements the Stage 1 phase of the IETF SATP Core v2 protocol, managing
+ * Implements the Stage 1 phase of the IETF SATP Core v13 protocol, managing
  * the critical transfer proposal and commencement operations that establish
  * formal agreements between gateways and initiate actual cross-chain asset
  * movements. This handler coordinates between client and server gateways to
@@ -413,7 +413,7 @@ export class Stage1SATPHandler implements SATPHandler {
    * Returns the SATP protocol stage identifier for this handler.
    *
    * @description
-   * Provides the stage identifier as defined in the IETF SATP Core v2
+   * Provides the stage identifier as defined in the IETF SATP Core v13
    * specification, used for protocol compliance and message routing.
    *
    * @public
@@ -450,7 +450,7 @@ export class Stage1SATPHandler implements SATPHandler {
    * Processes incoming TransferProposalRequest messages from client gateways
    * to evaluate and respond to transfer proposals. This method implements the
    * server-side logic for proposal validation, bridge endpoint verification,
-   * and decision making according to the IETF SATP Core v2 specification.
+   * and decision making according to the IETF SATP Core v13 specification.
    *
    * **Processing Steps:**
    * 1. **Session Validation**: Ensures session exists and is in valid state
@@ -840,7 +840,7 @@ export class Stage1SATPHandler implements SATPHandler {
    * Sets up the Connect RPC router to handle incoming Stage 1 SATP protocol
    * messages by registering the appropriate service methods. This enables
    * the handler to receive and process TransferProposal and TransferCommence
-   * requests from client gateways according to the IETF SATP Core v2 specification.
+   * requests from client gateways according to the IETF SATP Core v13 specification.
    *
    * **Registered Service Methods:**
    * - **transferProposal**: Handles TransferProposalRequest messages for transfer negotiation

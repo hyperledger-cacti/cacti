@@ -236,8 +236,57 @@ All documentation files from the `docs/` folder are available in the generated T
 - Architecture diagrams are available at `/assets/diagrams/`
 - PDF and supplementary materials are included in their respective subdirectories
 
+## 🔄 v13 Migration Changes
+
+This implementation targets **IETF SATP Core draft-13**
+(`draft-ietf-satp-core-13`). Key architectural changes from the earlier v02
+draft include:
+
+### New Message Types
+- **`error-msg`**: Structured protocol error reporting with IANA-registered
+  error codes (73 codes across stages 1-3).
+- **`session-abort-msg`**: Explicit session termination with reason codes.
+- **`reject-msg`**: Proposal rejection with typed rejection reasons.
+
+### Removed v02 Concepts
+- **Counter-proposals**: The multi-round negotiation model from v02
+  (`TransferProposalClaimsRequest` / `TransferProposalClaimsResponse` loops)
+  has been replaced with a single-round accept/reject model.
+- **Per-message signatures**: Individual message `signature` fields have been
+  removed. All messages are now wrapped in a **JWS envelope** that signs the
+  entire serialized payload.
+- **`PayloadProfile`**: Removed from session negotiation.
+- **`CredentialProfile`**: Removed from session negotiation.
+
+### Simplified Session Data
+The `CommonSatp` session object has been streamlined from ~15 fields to 4 core
+fields: `version`, `digitalAssetId`, `originatorPubkey`, `beneficiaryPubkey`.
+Stage-specific data is carried in dedicated message types rather than a shared
+mutable session bag.
+
+### JWS Envelope Signing Model
+All gateway-to-gateway messages are wrapped in a JWS (JSON Web Signature)
+envelope. The signing key is the gateway's long-term key pair. Verification
+uses the counterparty gateway's public key. This replaces the v02 model where
+each message had an individual `signature` field.
+
+### IANA Error Code Registry
+Error handling uses the IANA-registered SATP error code registry:
+- **Stage 1** (Transfer Agreement): 39 error codes
+- **Stage 2** (Lock Evidence): 10 error codes
+- **Stage 3** (Commitment): 24 error codes
+
+Each error code maps to a specific `SatpStage` and `ErrorType` enum,
+enabling programmatic error classification and recovery decisions.
+
+### Crash Recovery
+Crash recovery is preserved as a protocol extension under the v13 namespace.
+The recovery message types (`RecoverV1Message`, `RecoverUpdateV1Message`, etc.)
+remain unchanged but are documented as an extension rather than a core protocol
+requirement, per the v13 specification structure.
+
 ---
 
 **Version**: 0.0.3-beta  
-**SATP Draft**: core-02, architecture-02, crash-02  
+**SATP Draft**: core-13, architecture-02, crash-02  
 **License**: Apache-2.0

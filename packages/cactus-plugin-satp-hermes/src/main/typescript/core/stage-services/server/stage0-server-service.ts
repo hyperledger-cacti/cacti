@@ -33,7 +33,7 @@
  *   sessions or receive outbound notifications.
  *
  * **Protocol Compliance:**
- * This implementation follows the IETF SATP Core v2 specification for Stage 0
+ * This implementation follows the IETF SATP Core v13 specification for Stage 0
  * server operations, ensuring interoperability and standards compliance across
  * different SATP gateway implementations and blockchain networks.
  *
@@ -56,7 +56,7 @@ import {
   ClaimFormat,
   MessageType,
   WrapAssertionClaimSchema,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   type NewSessionRequest,
   type NewSessionResponse,
@@ -65,7 +65,7 @@ import {
   type PreSATPTransferResponse,
   PreSATPTransferResponseSchema,
   STATUS,
-} from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
@@ -830,14 +830,14 @@ export class Stage0ServerService extends SATPService {
   }
   private setError(
     message: NewSessionResponse | PreSATPTransferResponse,
-    error: SATPInternalError,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _error: SATPInternalError,
   ): NewSessionResponse | PreSATPTransferResponse {
     const fnTag = `${this.getServiceIdentifier()}#setError()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, () => {
       try {
         message.error = true;
-        message.errorCode = error.getSATPErrorType();
         return message;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });

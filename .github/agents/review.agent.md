@@ -166,7 +166,6 @@ For each slop finding, add it to the Tech Debt table with category
 | 1 | [description] | 2 | 4 | 3 | Dead Code |
 
 ### Detailed Findings
-
 #### 1. [Issue Title]
 - **File**: path/to/file.ts
 - **Category**: [category]

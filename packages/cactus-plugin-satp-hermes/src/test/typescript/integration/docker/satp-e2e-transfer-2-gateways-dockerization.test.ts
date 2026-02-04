@@ -36,7 +36,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
 import { Configuration, LedgerType } from "@hyperledger-cacti/cactus-core-api";
@@ -51,7 +51,7 @@ import {
   SATP_DOCKER_IMAGE_VERSION,
 } from "../../constants";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
-import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 

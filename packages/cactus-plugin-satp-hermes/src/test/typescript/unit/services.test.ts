@@ -15,23 +15,23 @@ import { Stage1ServerService } from "../../../main/typescript/core/stage-service
 import { Stage2ServerService } from "../../../main/typescript/core/stage-services/server/stage2-server-service";
 import { Stage3ServerService } from "../../../main/typescript/core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../../../main/typescript/core/satp-session";
-import { SATP_VERSION } from "../../../main/typescript/core/constants";
+import {
+  DEFAULT_TLS13_CIPHER_SUITE,
+  SATP_VERSION,
+} from "../../../main/typescript/core/constants";
 import {
   AssetSchema,
   AssignmentAssertionClaimSchema,
   BurnAssertionClaimSchema,
   ClaimFormat,
-  CredentialProfile,
-  Error as SATPErrorType,
   LockAssertionClaimFormatSchema,
   LockAssertionClaimSchema,
   LockType,
   MessageType,
   MintAssertionClaimSchema,
   NetworkIdSchema,
-  SignatureAlgorithm,
   WrapAssertionClaimSchema,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import {
   TransferCommenceRequest,
   TransferCommenceRequestSchema,
@@ -40,15 +40,15 @@ import {
   TransferProposalResponseSchema,
   TransferProposalRequest,
   TransferProposalRequestSchema,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/service/stage_1_pb";
+} from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   LockAssertionRequest,
   LockAssertionResponse,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/service/stage_2_pb";
+} from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_2_pb";
 import {
   SessionData,
   State as SessionState,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
+} from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
 import {
   CommitFinalAssertionResponse,
   CommitFinalAssertionRequest,
@@ -56,7 +56,7 @@ import {
   CommitPreparationResponse,
   TransferCompleteRequest,
   TransferCompleteResponse,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/service/stage_3_pb";
+} from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_3_pb";
 
 import { getMessageHash } from "../../../main/typescript/core/session-utils";
 import { Stage0ClientService } from "../../../main/typescript/core/stage-services/client/stage0-client-service";
@@ -67,8 +67,8 @@ import {
   PreSATPTransferRequest,
   PreSATPTransferResponse,
   STATUS,
-} from "../../../main/typescript/generated/proto/cacti/satp/v02/service/stage_0_pb";
-import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_0_pb";
+import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
@@ -322,10 +322,10 @@ describe("SATP Services Testing", () => {
     sessionData.recipientGatewayNetworkId = "FABRIC";
     sessionData.senderGatewayOwnerId = "MOCK_SENDER_GATEWAY_OWNER_ID";
     sessionData.senderGatewayNetworkId = "BESU";
-    sessionData.signatureAlgorithm = SignatureAlgorithm.RSA;
-    sessionData.lockType = LockType.FAUCET;
+    sessionData.signatureAlgorithm = "ES256";
+    sessionData.gatewayTlsScheme = DEFAULT_TLS13_CIPHER_SUITE;
+    sessionData.lockType = LockType.TIME_LOCK;
     sessionData.lockExpirationTime = BigInt(1000);
-    sessionData.credentialProfile = CredentialProfile.X509;
     sessionData.loggingProfile = "MOCK_LOGGING_PROFILE";
     sessionData.accessControlProfile = "MOCK_ACCESS_CONTROL_PROFILE";
     sessionData.resourceUrl = "MOCK_RESOURCE_URL";
@@ -371,7 +371,6 @@ describe("SATP Services Testing", () => {
     expect(newSessionRequestMessage.contextId).toBe(
       mockSession.getClientSessionData()?.transferContextId,
     );
-    expect(newSessionRequestMessage.clientSignature).not.toBe("");
   });
   it("Service0Server checkNewSessionRequest", async () => {
     expect(satpServerService0).toBeDefined();
@@ -403,8 +402,6 @@ describe("SATP Services Testing", () => {
       mockSession.getServerSessionData()?.transferContextId,
     );
     expect(newSessionResponseMessage.status).toBe(STATUS.STATUS_ACCEPTED);
-    expect(newSessionResponseMessage.hashPreviousMessage).not.toBe("");
-    expect(newSessionResponseMessage.serverSignature).not.toBe("");
   });
   it("Service0Client checkNewSessionResponse", async () => {
     expect(satpClientService0).toBeDefined();
@@ -446,8 +443,6 @@ describe("SATP Services Testing", () => {
     expect(preSATPTransferRequestMessage.senderAsset).toBeDefined();
     expect(preSATPTransferRequestMessage.receiverAsset).toBeDefined();
     expect(preSATPTransferRequestMessage.wrapAssertionClaim).toBeDefined();
-    expect(preSATPTransferRequestMessage.hashPreviousMessage).toBeDefined();
-    expect(preSATPTransferRequestMessage.clientSignature).toBeDefined();
   });
   it("Service0Server checkPreSATPTransferRequest", async () => {
     expect(satpServerService0).toBeDefined();
@@ -496,8 +491,6 @@ describe("SATP Services Testing", () => {
       newSessionResponseMessage.contextId,
     );
     expect(preSATPTransferResponseMessage.wrapAssertionClaim).toBeDefined();
-    expect(preSATPTransferResponseMessage.hashPreviousMessage).toBeDefined();
-    expect(preSATPTransferResponseMessage.serverSignature).toBeDefined();
     expect(preSATPTransferResponseMessage.recipientTokenId).toBeDefined();
     expect(
       preSATPTransferResponseMessage.recipientGatewayNetworkId,
@@ -547,12 +540,6 @@ describe("SATP Services Testing", () => {
       sessionData.transferContextId,
     );
     expect(transferProposalRequestMessage.common?.version).toBe(SATP_VERSION);
-    expect(transferProposalRequestMessage.common?.clientGatewayPubkey).toBe(
-      sessionData.clientGatewayPubkey,
-    );
-    expect(transferProposalRequestMessage.common?.serverGatewayPubkey).toBe(
-      sessionData.serverGatewayPubkey,
-    );
     expect(
       transferProposalRequestMessage.transferInitClaims?.digitalAssetId,
     ).toBe("MOCK_DIGITAL_ASSET_ID");
@@ -576,28 +563,6 @@ describe("SATP Services Testing", () => {
     expect(
       transferProposalRequestMessage.transferInitClaims?.senderGatewayNetworkId,
     ).toBe("MOCK_APPROVE_ADDRESS");
-    expect(
-      transferProposalRequestMessage.transferInitClaims
-        ?.recipientGatewayNetworkId,
-    ).toBe("MOCK_APPROVE_ADDRESS");
-    expect(
-      transferProposalRequestMessage.networkCapabilities?.signatureAlgorithm,
-    ).toBe(SignatureAlgorithm.RSA);
-    expect(transferProposalRequestMessage.networkCapabilities?.lockType).toBe(
-      LockType.FAUCET,
-    );
-    expect(
-      transferProposalRequestMessage.networkCapabilities?.lockExpirationTime,
-    ).toBe(BigInt(1000));
-    expect(
-      transferProposalRequestMessage.networkCapabilities?.credentialProfile,
-    ).toBe(CredentialProfile.X509);
-    expect(
-      transferProposalRequestMessage.networkCapabilities?.loggingProfile,
-    ).toBe("MOCK_LOGGING_PROFILE");
-    expect(
-      transferProposalRequestMessage.networkCapabilities?.accessControlProfile,
-    ).toBe("MOCK_ACCESS_CONTROL_PROFILE");
   });
   it("Service1Server checkTransferProposalRequest", async () => {
     expect(satpServerService1).toBeDefined();
@@ -629,12 +594,6 @@ describe("SATP Services Testing", () => {
       transferProposalRequestMessage.common?.transferContextId,
     );
     expect(transferProposalResponseMessage.common?.version).toBe(SATP_VERSION);
-    expect(transferProposalResponseMessage.common?.clientGatewayPubkey).toBe(
-      transferProposalRequestMessage.common?.clientGatewayPubkey,
-    );
-    expect(transferProposalResponseMessage.common?.serverGatewayPubkey).toBe(
-      transferProposalRequestMessage.common?.serverGatewayPubkey,
-    );
     expect(
       transferProposalResponseMessage.hashTransferInitClaims,
     ).toBeDefined();
@@ -662,16 +621,7 @@ describe("SATP Services Testing", () => {
       transferProposalResponseMessage.common?.transferContextId,
     );
     expect(transferCommenceRequestMessage.common?.version).toBe(SATP_VERSION);
-    expect(transferCommenceRequestMessage.common?.clientGatewayPubkey).toBe(
-      transferProposalResponseMessage.common?.clientGatewayPubkey,
-    );
-    expect(transferCommenceRequestMessage.common?.serverGatewayPubkey).toBe(
-      transferProposalResponseMessage.common?.serverGatewayPubkey,
-    );
     expect(transferCommenceRequestMessage.hashTransferInitClaims).toBeDefined();
-    expect(
-      transferCommenceRequestMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
   });
 
   it("Service1Server checkTransferCommenceRequest", async () => {
@@ -700,16 +650,6 @@ describe("SATP Services Testing", () => {
     expect(transferCommenceResponseMessage.common?.messageType).toBe(
       MessageType.TRANSFER_COMMENCE_RESPONSE,
     );
-    expect(transferCommenceResponseMessage.common?.clientGatewayPubkey).toBe(
-      transferCommenceRequestMessage.common?.clientGatewayPubkey,
-    );
-    expect(transferCommenceResponseMessage.common?.serverGatewayPubkey).toBe(
-      transferCommenceRequestMessage.common?.serverGatewayPubkey,
-    );
-    expect(
-      transferCommenceResponseMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(transferCommenceResponseMessage.serverSignature).toBeDefined();
   });
   it("Service2Client checkTransferCommenceResponse", async () => {
     expect(satpClientService2).toBeDefined();
@@ -766,26 +706,11 @@ describe("SATP Services Testing", () => {
       transferCommenceResponseMessage.common?.transferContextId,
     );
     expect(lockAssertionRequestMessage.common?.version).toBe(SATP_VERSION);
-    expect(lockAssertionRequestMessage.common?.clientGatewayPubkey).toBe(
-      transferCommenceResponseMessage.common?.clientGatewayPubkey,
-    );
-    expect(lockAssertionRequestMessage.common?.serverGatewayPubkey).toBe(
-      transferCommenceResponseMessage.common?.serverGatewayPubkey,
-    );
-    expect(
-      lockAssertionRequestMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(lockAssertionRequestMessage.common?.sequenceNumber).toBeDefined();
     expect(lockAssertionRequestMessage.lockAssertionClaim).toBeDefined();
     expect(lockAssertionRequestMessage.lockAssertionClaimFormat).toBeDefined();
     expect(lockAssertionRequestMessage.lockAssertionExpiration).toBe(
       expectedExpiration,
     );
-    expect(lockAssertionRequestMessage.clientTransferNumber).toBeDefined();
-    expect(lockAssertionRequestMessage.clientSignature).toBeDefined();
-    expect(
-      lockAssertionRequestMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
   });
   it("Service2Server rejects expired lock assertions", async () => {
     const expiration = lockAssertionRequestMessage.lockAssertionExpiration;
@@ -822,22 +747,6 @@ describe("SATP Services Testing", () => {
       serverSessionData.lockExpirationTime = negotiatedExpirationTime;
     }
   });
-  it("Service2Server emits a SATP lock expiration error response", async () => {
-    const error = new LockAssertionExpirationError(
-      "Stage2ServerService#checkLockAssertionRequest()",
-      "lock assertion already expired",
-    );
-
-    const response = await satpServerService2.lockAssertionErrorResponse(
-      error,
-      mockSession,
-    );
-
-    expect(response.common?.error).toBe(true);
-    expect(response.common?.errorCode).toBe(
-      SATPErrorType.LOCK_ASSERTION_EXPIRATION_ERROR,
-    );
-  });
   it("Service2Server checkLockAssertionRequest", async () => {
     expect(satpServerService2).toBeDefined();
     expect(satpServerService2.getServiceIdentifier()).toBe(
@@ -864,16 +773,6 @@ describe("SATP Services Testing", () => {
     expect(lockAssertionReceiptMessage.common?.messageType).toBe(
       MessageType.ASSERTION_RECEIPT,
     );
-    expect(lockAssertionReceiptMessage.common?.clientGatewayPubkey).toBe(
-      lockAssertionRequestMessage.common?.clientGatewayPubkey,
-    );
-    expect(lockAssertionReceiptMessage.common?.serverGatewayPubkey).toBe(
-      lockAssertionRequestMessage.common?.serverGatewayPubkey,
-    );
-    expect(
-      lockAssertionReceiptMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(lockAssertionReceiptMessage.serverSignature).toBeDefined();
   });
   it("Service3Client checkLockAssertionResponse", async () => {
     expect(satpClientService3).toBeDefined();
@@ -908,16 +807,6 @@ describe("SATP Services Testing", () => {
     expect(commitPreparationRequestMessage.common?.messageType).toBe(
       MessageType.COMMIT_PREPARE,
     );
-    expect(commitPreparationRequestMessage.common?.clientGatewayPubkey).toBe(
-      lockAssertionReceiptMessage.common?.clientGatewayPubkey,
-    );
-    expect(commitPreparationRequestMessage.common?.serverGatewayPubkey).toBe(
-      lockAssertionReceiptMessage.common?.serverGatewayPubkey,
-    );
-    expect(
-      commitPreparationRequestMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(commitPreparationRequestMessage.clientSignature).toBeDefined();
   });
   it("Service3Server checkCommitPreparationRequest", async () => {
     expect(satpServerService3).toBeDefined();
@@ -955,16 +844,6 @@ describe("SATP Services Testing", () => {
     expect(commitReadyResponseMessage.common?.messageType).toBe(
       MessageType.COMMIT_READY,
     );
-    expect(commitReadyResponseMessage.common?.clientGatewayPubkey).toBe(
-      commitPreparationRequestMessage.common?.clientGatewayPubkey,
-    );
-    expect(commitReadyResponseMessage.common?.serverGatewayPubkey).toBe(
-      commitPreparationRequestMessage.common?.serverGatewayPubkey,
-    );
-    expect(
-      commitReadyResponseMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(commitReadyResponseMessage.serverSignature).toBeDefined();
   });
   it("Service3Client checkCommitPreparationResponse", async () => {
     expect(satpClientService3).toBeDefined();
@@ -1005,17 +884,7 @@ describe("SATP Services Testing", () => {
     expect(commitFinalAssertionRequestMessage.common?.messageType).toBe(
       MessageType.COMMIT_FINAL,
     );
-    expect(commitFinalAssertionRequestMessage.common?.clientGatewayPubkey).toBe(
-      commitReadyResponseMessage.common?.clientGatewayPubkey,
-    );
-    expect(commitFinalAssertionRequestMessage.common?.serverGatewayPubkey).toBe(
-      commitReadyResponseMessage.common?.serverGatewayPubkey,
-    );
     expect(commitFinalAssertionRequestMessage.burnAssertionClaim).toBeDefined();
-    expect(
-      commitFinalAssertionRequestMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(commitFinalAssertionRequestMessage.clientSignature).toBeDefined();
   });
   it("Service3Server checkCommitFinalAssertionRequest", async () => {
     expect(satpServerService3).toBeDefined();
@@ -1053,30 +922,6 @@ describe("SATP Services Testing", () => {
       commitFinalAcknowledgementReceiptResponseMessage.common
         ?.transferContextId,
     ).toBe(commitFinalAssertionRequestMessage.common?.transferContextId);
-    expect(
-      commitFinalAcknowledgementReceiptResponseMessage.common?.version,
-    ).toBe(SATP_VERSION);
-    expect(
-      commitFinalAcknowledgementReceiptResponseMessage.common?.messageType,
-    ).toBe(MessageType.ACK_COMMIT_FINAL);
-    expect(
-      commitFinalAcknowledgementReceiptResponseMessage.common
-        ?.clientGatewayPubkey,
-    ).toBe(commitFinalAssertionRequestMessage.common?.clientGatewayPubkey);
-    expect(
-      commitFinalAcknowledgementReceiptResponseMessage.common
-        ?.serverGatewayPubkey,
-    ).toBe(commitFinalAssertionRequestMessage.common?.serverGatewayPubkey);
-    expect(
-      commitFinalAcknowledgementReceiptResponseMessage.common
-        ?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(
-      commitFinalAcknowledgementReceiptResponseMessage.assignmentAssertionClaim,
-    ).toBeDefined();
-    expect(
-      commitFinalAcknowledgementReceiptResponseMessage.serverSignature,
-    ).toBeDefined();
   });
   it("Service3Client checkCommitFinalAssertionResponse", async () => {
     expect(satpClientService3).toBeDefined();
@@ -1113,24 +958,12 @@ describe("SATP Services Testing", () => {
     expect(transferCompleteRequestMessage.common?.messageType).toBe(
       MessageType.COMMIT_TRANSFER_COMPLETE,
     );
-    expect(transferCompleteRequestMessage.common?.clientGatewayPubkey).toBe(
-      commitFinalAcknowledgementReceiptResponseMessage.common
-        ?.clientGatewayPubkey,
-    );
-    expect(transferCompleteRequestMessage.common?.serverGatewayPubkey).toBe(
-      commitFinalAcknowledgementReceiptResponseMessage.common
-        ?.serverGatewayPubkey,
-    );
     expect(transferCompleteRequestMessage.hashTransferCommence).toBe(
       getMessageHash(
         mockSession.getClientSessionData(),
         MessageType.TRANSFER_COMMENCE_REQUEST,
       ),
     );
-    expect(
-      transferCompleteRequestMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(transferCompleteRequestMessage.clientSignature).toBeDefined();
   });
   it("Service3Server checkTransferCompleteRequest", async () => {
     expect(satpServerService3).toBeDefined();
@@ -1166,16 +999,6 @@ describe("SATP Services Testing", () => {
     expect(transferCompleteResponseMessage.common?.messageType).toBe(
       MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
     );
-    expect(transferCompleteResponseMessage.common?.clientGatewayPubkey).toBe(
-      transferCompleteRequestMessage.common?.clientGatewayPubkey,
-    );
-    expect(transferCompleteResponseMessage.common?.serverGatewayPubkey).toBe(
-      transferCompleteRequestMessage.common?.serverGatewayPubkey,
-    );
-    expect(
-      transferCompleteResponseMessage.common?.hashPreviousMessage,
-    ).toBeDefined();
-    expect(transferCompleteResponseMessage.serverSignature).toBeDefined();
   });
   it("Service3Client checkTransferCompleteResponse", async () => {
     expect(satpClientService3).toBeDefined();

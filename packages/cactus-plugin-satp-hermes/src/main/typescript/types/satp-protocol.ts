@@ -2,7 +2,7 @@
  * @fileoverview SATP Protocol Type Definitions and Interfaces
  *
  * This module defines the core type system for SATP (Secure Asset Transfer Protocol)
- * implementation following the IETF SATP v2 specification. Provides comprehensive type
+ * implementation following the IETF SATP v13 specification. Provides comprehensive type
  * definitions for handlers, services, and protocol stages enabling type-safe cross-chain
  * asset transfers with fault-tolerant capabilities.
  *
@@ -33,7 +33,7 @@
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
@@ -110,7 +110,7 @@ export const SATPHandlerType = {
  */
 export interface SATPServiceStatic {
   /** Constructor for creating new service instances */
-  new (options: ISATPServiceOptions): SATPService;
+  new(options: ISATPServiceOptions): SATPService;
   /** Service type classification (SERVER or CLIENT) */
   readonly SERVICE_TYPE: SATPServiceType;
   /** SATP protocol stage this service handles */
@@ -153,7 +153,7 @@ export interface SATPServiceStatic {
  */
 export interface ISATPHandler {
   /** Constructor for creating new handler instances */
-  new (options: SATPHandlerOptions): SATPHandler;
+  new(options: SATPHandlerOptions): SATPHandler;
   /** Retrieve list of active session identifiers */
   getHandlerSessions(): string[];
   /** Get the handler type identifier */

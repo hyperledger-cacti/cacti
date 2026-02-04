@@ -36,7 +36,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
 import { Configuration } from "@hyperledger-cacti/cactus-core-api";

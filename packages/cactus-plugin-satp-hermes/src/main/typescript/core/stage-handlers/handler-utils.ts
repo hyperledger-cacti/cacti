@@ -6,7 +6,7 @@
  * This module provides common utility functions used across all SATP protocol stage handlers
  * for consistent message processing, session management, and protocol compliance validation.
  * These utilities ensure standardized handling of SATP message structures and session data
- * according to the IETF SATP Core v2 specification.
+ * according to the IETF SATP Core v13 specification.
  *
  * **Core Utilities:**
  * - **Session ID Extraction**: Safe extraction of session identifiers from SATP messages
@@ -35,7 +35,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SessionIdNotFoundError} for session validation error handling
  *
  * @author SATP Hermes Development Team
@@ -65,7 +65,7 @@ import { SATPSession } from "../satp-session";
  * - Critical for maintaining transfer state consistency
  *
  * **Protocol Compliance:**
- * According to the IETF SATP Core v2 specification, all protocol messages must
+ * According to the IETF SATP Core v13 specification, all protocol messages must
  * include a session identifier in their common message fields to enable proper
  * session management and message correlation across the transfer workflow.
  *

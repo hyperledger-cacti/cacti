@@ -4,14 +4,14 @@ import {
   TransferProposalResponse,
   TransferProposalRequestSchema,
   TransferCommenceRequestSchema,
-} from "../../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   MessageType,
   TransferClaims,
   CommonSatpSchema,
   TransferClaimsSchema,
   NetworkCapabilitiesSchema,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   getMessageHash,
@@ -31,7 +31,7 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
-import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import {
   HashError,
   MessageTypeError,
@@ -40,7 +40,7 @@ import {
   TransferContextIdError,
   WrapAssertionClaimError,
 } from "../../errors/satp-service-errors";
-import { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
 import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -126,19 +126,8 @@ export class Stage1ClientService extends SATPService {
             version: sessionData.version,
             messageType: MessageType.INIT_PROPOSAL,
             sessionId: sessionData.id,
-            sequenceNumber: sessionData.lastSequenceNumber,
-            resourceUrl: sessionData.resourceUrl,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.PRE_SATP_TRANSFER_RESPONSE,
-            ),
+            transferContextId: sessionData.transferContextId ?? "",
           });
-
-          if (sessionData.transferContextId != undefined) {
-            commonBody.transferContextId = sessionData.transferContextId;
-          }
 
           const transferInitClaims = create(TransferClaimsSchema, {
             digitalAssetId: sessionData.digitalAssetId,
@@ -148,8 +137,8 @@ export class Stage1ClientService extends SATPService {
               sessionData.verifiedBeneficiaryEntityId,
             senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
             recipientGatewayNetworkId: sessionData.recipientGatewayNetworkId,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
+            senderGatewaySignaturePublicKey: sessionData.clientGatewayPubkey,
+            receiverGatewaySignaturePublicKey: sessionData.serverGatewayPubkey,
             senderGatewayOwnerId: sessionData.senderGatewayOwnerId,
             receiverGatewayOwnerId: sessionData.receiverGatewayOwnerId,
           });
@@ -157,46 +146,11 @@ export class Stage1ClientService extends SATPService {
           sessionData.hashTransferInitClaims = getHash(transferInitClaims);
 
           const networkCapabilities = create(NetworkCapabilitiesSchema, {
-            senderGatewayNetworkId: sessionData.senderGatewayNetworkId,
-            signatureAlgorithm: sessionData.signatureAlgorithm,
-            lockType: sessionData.lockType,
-            lockExpirationTime: sessionData.lockExpirationTime,
-            credentialProfile: sessionData.credentialProfile,
-            loggingProfile: sessionData.loggingProfile,
-            accessControlProfile: sessionData.accessControlProfile,
+            gatewayDefaultSignatureAlgorithm: sessionData.signatureAlgorithm,
+            networkLockType: sessionData.lockType,
+            networkLockExpirationTime: sessionData.lockExpirationTime,
+            gatewayTlsScheme: sessionData.gatewayTlsScheme ?? "",
           });
-
-          if (sessionData.permissions != undefined) {
-            this.Log.info(`${fnTag}, Optional variable loaded: permissions...`);
-            networkCapabilities.permissions = sessionData.permissions;
-          }
-
-          if (sessionData.developerUrn != "") {
-            this.Log.info(
-              `${fnTag}, Optional variable loaded: developerUrn...`,
-            );
-            networkCapabilities.developerUrn = sessionData.developerUrn;
-          }
-
-          if (sessionData.applicationProfile != "") {
-            this.Log.info(
-              `${fnTag}, Optional variable loaded: applicationProfile...`,
-            );
-            networkCapabilities.applicationProfile =
-              sessionData.applicationProfile;
-          }
-
-          if (sessionData.subsequentCalls != undefined) {
-            this.Log.info(
-              `${fnTag}, Optional variable loaded: subsequentCalls...`,
-            );
-            networkCapabilities.subsequentCalls = sessionData.subsequentCalls;
-          }
-
-          if (sessionData.history.length > 0) {
-            this.Log.info(`${fnTag}, Optional variable loaded: history...`);
-            networkCapabilities.history = sessionData.history;
-          }
 
           const transferProposalRequestMessage = create(
             TransferProposalRequestSchema,
@@ -214,20 +168,6 @@ export class Stage1ClientService extends SATPService {
             transferProposalRequestMessage.transferInitClaimsFormat =
               sessionData.transferClaimsFormat;
           }
-          if (sessionData.multipleCancelsAllowed) {
-            this.Log.info(
-              `${fnTag}, Optional variable loaded: multipleCancelsAllowed...`,
-            );
-            transferProposalRequestMessage.multipleCancelsAllowed =
-              sessionData.multipleCancelsAllowed;
-          }
-          if (sessionData.multipleClaimsAllowed) {
-            this.Log.info(
-              `${fnTag}, Optional variable loaded: multipleClaimsAllowed...`,
-            );
-            transferProposalRequestMessage.multipleClaimsAllowed =
-              sessionData.multipleClaimsAllowed;
-          }
 
           const messageSignature = bufArray2HexStr(
             sign(
@@ -235,8 +175,6 @@ export class Stage1ClientService extends SATPService {
               safeStableStringify(transferProposalRequestMessage),
             ),
           );
-
-          transferProposalRequestMessage.clientSignature = messageSignature;
 
           saveSignature(
             sessionData,
@@ -329,24 +267,21 @@ export class Stage1ClientService extends SATPService {
             version: sessionData.version,
             messageType: MessageType.TRANSFER_COMMENCE_REQUEST,
             sessionId: sessionData.id,
-            sequenceNumber: response.common!.sequenceNumber + BigInt(1),
-            resourceUrl: sessionData.resourceUrl,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.INIT_RECEIPT,
-            ),
             transferContextId: sessionData.transferContextId,
           });
 
-          sessionData.lastSequenceNumber = commonBody.sequenceNumber;
+          sessionData.lastSequenceNumber =
+            sessionData.lastSequenceNumber + BigInt(1);
 
           const transferCommenceRequestMessage = create(
             TransferCommenceRequestSchema,
             {
               common: commonBody,
               hashTransferInitClaims: sessionData.hashTransferInitClaims,
+              hashPrevMessage: getMessageHash(
+                sessionData,
+                MessageType.INIT_RECEIPT,
+              ),
             },
           );
 
@@ -357,8 +292,7 @@ export class Stage1ClientService extends SATPService {
             ),
           );
 
-          transferCommenceRequestMessage.clientSignature = messageSignature;
-
+          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(
             sessionData,
             MessageType.TRANSFER_COMMENCE_REQUEST,
@@ -535,37 +469,13 @@ export class Stage1ClientService extends SATPService {
           TimestampType.RECEIVED,
         );
 
-        if (
-          response.common!.messageType == MessageType.INIT_REJECT &&
-          response.transferCounterClaims == undefined
-        ) {
+        if (response.common!.messageType == MessageType.INIT_REJECT) {
           this.Log.info(
             `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
           );
           sessionData.state = State.REJECTED;
           saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
           return false;
-        } else if (
-          response.common!.messageType == MessageType.INIT_REJECT &&
-          response.transferCounterClaims != undefined
-        ) {
-          saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
-          if (
-            await this.checkProposedTransferClaims(
-              response.transferCounterClaims,
-            )
-          ) {
-            sessionData.proposedTransferInitClaims = getHash(
-              response.transferCounterClaims,
-            );
-            return true;
-          } else {
-            this.Log.info(
-              `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected conditional`,
-            );
-            sessionData.state = State.REJECTED;
-            return false;
-          }
         }
 
         saveHash(sessionData, MessageType.INIT_RECEIPT, getHash(response));

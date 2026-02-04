@@ -30,14 +30,14 @@
  * throw new GatewayShuttingDownError('TransactionHandler');
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Error Handling
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} IETF SATP Core v13 Error Handling
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
 
 import { asError } from "@hyperledger-cacti/cactus-common";
 import { RuntimeError } from "run-time-error-cjs";
-import { Error as GatewayErrorType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType as GatewayErrorType } from "../core/errors/satp-error-type";
 
 /**
  * Base error class for SATP gateway operations.

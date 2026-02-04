@@ -145,11 +145,60 @@ export type Address =
  *
  * @description
  * Defines the cryptographic signing algorithms supported for
- * gateway identification credentials.
+ * gateway identification credentials. v13 mandates ECDSA P-256
+ * (ES256) as the minimum; SECP256K1 is retained for backward
+ * compatibility with legacy deployments.
  */
 export enum SupportedSigningAlgorithms {
   SECP256K1 = "SECP256K1",
+  /** ECDSA P-256 — REQUIRED by v13 [FIPS 186-5] */
+  ES256 = "ES256",
 }
+
+/**
+ * Gateway key purpose classification per SATP v13.
+ *
+ * v13 Section 5.3.3 requires gateways to maintain four distinct
+ * key pairs, each serving a specific purpose. Keys are expressed
+ * in JWK format [RFC7517].
+ *
+ * @see https://datatracker.ietf.org/doc/draft-ietf-satp-core/13/
+ */
+export enum GatewayKeyPurpose {
+  /** Signs SATP protocol messages (JWS envelope). */
+  SIGNATURE = "SIGNATURE",
+  /** Establishes secure channels (e.g., TLS client cert). */
+  SECURE_CHANNEL = "SECURE_CHANNEL",
+  /** Identifies the gateway itself. */
+  IDENTITY = "IDENTITY",
+  /** Identifies the gateway owner / organization. */
+  OWNER_IDENTITY = "OWNER_IDENTITY",
+}
+
+/**
+ * A single classified gateway key.
+ *
+ * Represents a public (and optionally private) key annotated with
+ * its intended purpose and the algorithm it was generated with.
+ * The key material can be a JWK object, a PEM string, or a raw
+ * hex-encoded public key depending on the deployment.
+ */
+export type GatewayKey = {
+  /** What this key is used for. */
+  purpose: GatewayKeyPurpose;
+  /** Algorithm family (must be from SupportedSigningAlgorithms). */
+  algorithm: SupportedSigningAlgorithms;
+  /**
+   * Public key material.
+   * Accepts JWK object, PEM string, or hex-encoded key.
+   */
+  publicKey: string | Record<string, unknown>;
+  /**
+   * Private key material — only present on the owning gateway.
+   * MUST NOT be shared or transmitted.
+   */
+  privateKey?: string | Record<string, unknown>;
+};
 
 /**
  * Identification credential structure for gateways.
@@ -174,8 +223,17 @@ export type IdentificationCredential = {
 export type GatewayIdentity = {
   /** Unique gateway identifier */
   id: string;
-  /** Optional identification credential for the gateway*/
+  /**
+   * Legacy identification credential (single key).
+   * @deprecated Use `keys` for v13 classified key model.
+   */
   identificationCredential?: IdentificationCredential;
+  /**
+   * v13 classified key set.
+   * Maps each {@link GatewayKeyPurpose} to its key material.
+   * When present, takes precedence over `identificationCredential`.
+   */
+  keys?: Partial<Record<GatewayKeyPurpose, GatewayKey>>;
   /** Optional human-readable gateway name */
   name?: string;
   /** Supported SATP draft versions */

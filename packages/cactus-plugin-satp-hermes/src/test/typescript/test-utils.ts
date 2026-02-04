@@ -27,7 +27,7 @@ import { EventEmitter } from "events";
 import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { createMigrationSource } from "../../main/typescript/database/knex-migration-source";
 import { ExtensionConfig } from "../../main/typescript/services/validation/config-validating-functions/validate-extensions";
-import { TokenType as TransactAssetType } from "../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType as TransactAssetType } from "../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 
 // Re-export centralized database configuration for tests
 export {

@@ -78,10 +78,7 @@ import {
   type ISATPCrossChainManagerOptions,
   SATPCrossChainManager,
 } from "./cross-chain-mechanisms/satp-cc-manager";
-import {
-  CrashManager,
-  type ICrashRecoveryManagerOptions,
-} from "./services/gateway/crash-manager";
+import { CrashManager } from "./services/gateway/crash-manager";
 import { OraclePersistence } from "./database/oracle-persistence";
 import * as OAS from "../json/oapi-api1-bundled.json";
 import {
@@ -91,7 +88,7 @@ import {
 import { knexAuditInstance } from "./database/knexfile-audit";
 import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
-import { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "./generated/proto/cacti/satp/v13/common/message_pb";
 import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
 import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
 import { IPrivacyPolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
@@ -117,7 +114,7 @@ import type { AdapterLayerConfiguration } from "./adapters/adapter-config";
  * SATP Gateway Configuration Interface - Complete configuration for fault-tolerant gateway.
  *
  * @description
- * Configuration interface for SATP gateway instances implementing the IETF SATP v2 specification
+ * Configuration interface for SATP gateway instances implementing the IETF SATP v13 specification
  * with Hermes crash recovery mechanisms. Provides comprehensive setup for cross-chain asset
  * transfers with gateway-to-gateway communication, persistence, and fault tolerance.
  *
@@ -168,7 +165,7 @@ import type { AdapterLayerConfiguration } from "./adapters/adapter-config";
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @see {@link SATPGateway} for the main gateway implementation
  * @see {@link GatewayIdentity} for gateway identity structure
  * @see {@link ICrossChainMechanismsOptions} for bridge configuration
@@ -316,11 +313,14 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
   /**
    * Enable crash recovery mechanisms.
    * @description
-   * Activates Hermes crash recovery features including checkpoint logging,
-   * session recovery, and rollback mechanisms. When enabled, the gateway
-   * can recover from crashes and continue interrupted asset transfers.
+   * **NOT YET SUPPORTED.** Crash recovery and rollback are defined in the
+   * IETF SATP Crash Recovery draft
+   * ({@link https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/})
+   * and will be supported in a future release.
    *
-   * @see {@link CrashManager} for crash recovery implementation
+   * Setting this option to `true` will throw an error at gateway startup.
+   *
+   * @deprecated Not yet implemented — will throw if set to `true`.
    */
   enableCrashRecovery?: boolean;
 
@@ -404,7 +404,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
  *
  * @description
  * Core implementation of the Secure Asset Transfer Protocol (SATP) gateway following the
- * IETF SATP v2 specification with Hermes crash recovery mechanisms. Provides fault-tolerant
+ * IETF SATP v13 specification with Hermes crash recovery mechanisms. Provides fault-tolerant
  * cross-chain asset transfers through gateway-to-gateway communication with atomic transaction
  * guarantees and crash recovery capabilities.
  *
@@ -484,7 +484,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
  * await gateway.shutdown();
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGatewayConfig} for configuration options
  * @see {@link BLODispatcher} for protocol message dispatching
@@ -823,18 +823,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.BLODispatcher = new BLODispatcher(dispatcherOps);
 
         if (this.config.enableCrashRecovery) {
-          const crashOptions: ICrashRecoveryManagerOptions = {
-            instanceId: this.instanceId,
-            logLevel: this.config.logLevel,
-            ccManager: this.SATPCCManager,
-            orchestrator: this.gatewayOrchestrator,
-            localRepository: this.localRepository,
-            remoteRepository: this.remoteRepository,
-            signer: this.signer,
-            monitorService: this.monitorService,
-          };
-          this.crashManager = new CrashManager(crashOptions);
-          this.logger.info("CrashManager has been initialized.");
+          throw new Error(
+            "Crash recovery and rollback are not yet supported. " +
+            "They are defined in the IETF SATP Crash Recovery draft " +
+            "(https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/) " +
+            "and will be supported in a future release.",
+          );
         } else {
           this.logger.info("CrashManager is disabled!");
         }
@@ -1200,7 +1194,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         const address =
           this.options.gid?.address?.includes("localhost") ||
-          this.options.gid?.address?.includes("127.0.0.1")
+            this.options.gid?.address?.includes("127.0.0.1")
             ? "localhost"
             : "0.0.0.0";
 
@@ -1313,7 +1307,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             this.GOLServer = http.createServer(this.GOLApplication);
             const address =
               this.options.gid?.address?.includes("localhost") || // When running a gateway in localhost we don't want to bind it to 0.0.0.0 because if we do it will be accessible from the outside network
-              this.options.gid?.address?.includes("127.0.0.1")
+                this.options.gid?.address?.includes("127.0.0.1")
                 ? "localhost"
                 : "0.0.0.0";
 

@@ -30,7 +30,7 @@
  * ]);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -54,7 +54,7 @@ import { BridgeManagerClientInterface } from "./interfaces/bridge-manager-client
 import {
   ClaimFormat,
   TokenType,
-} from "../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { SATPBridgeExecutionLayer } from "./satp-bridge-execution-layer";
 import { SATPBridgeExecutionLayerImpl } from "./satp-bridge-execution-layer-implementation";
 import {
@@ -92,8 +92,7 @@ interface IBridgeManagerOptions {
  * @class BridgeManager
  */
 export class BridgeManager
-  implements BridgeManagerAdminInterface, BridgeManagerClientInterface
-{
+  implements BridgeManagerAdminInterface, BridgeManagerClientInterface {
   public static readonly CLASS_NAME = "BridgeManager";
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;

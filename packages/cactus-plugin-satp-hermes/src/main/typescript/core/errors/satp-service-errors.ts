@@ -48,7 +48,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType} for protocol error type enumeration
  *
@@ -58,7 +58,7 @@
  */
 
 import { SATPInternalError } from "./satp-errors";
-import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType } from "./satp-error-type";
 
 /**
  * Error thrown when SATP message common body is missing or malformed.
@@ -1407,5 +1407,55 @@ export class PubKeyError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
     super(`${tag}, PubKey is missing`, cause ?? null, 400);
     this.errorType = SATPErrorType.PUBLIC_KEY_NOT_FOUND;
+  }
+}
+
+/**
+ * Error thrown when per-message hashPrevMessage does not match expected value.
+ *
+ * In v13, `hashPrevMessage` is a per-message field (not in CommonSatp).
+ * Each incoming message must carry the SHA-256 hash of the previous
+ * message in the session to ensure chain integrity.
+ *
+ * @class HashPrevMessageError
+ * @extends SATPInternalError
+ * @since 2.1.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} Sections 8–10
+ */
+export class HashPrevMessageError extends SATPInternalError {
+  constructor(
+    tag: string,
+    received: string,
+    expected: string,
+    cause?: string | Error | null,
+  ) {
+    super(
+      `${tag}, hashPrevMessage mismatch\n received: ${received}\n expected: ${expected}`,
+      cause ?? null,
+      400,
+    );
+    this.errorType = SATPErrorType.BADLY_FORMATED_MESSAGE_MISMATCH_HASH_VALUES;
+  }
+}
+
+/**
+ * Error thrown when a required transferContextId is missing from a v13 message.
+ *
+ * In v13, `transferContextId` is REQUIRED in CommonSatp and is validated
+ * as a mandatory field — an empty or missing value is a protocol violation.
+ *
+ * @class MissingTransferContextIdError
+ * @extends SATPInternalError
+ * @since 2.1.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} Section 7
+ */
+export class MissingTransferContextIdError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(
+      `${tag}, transferContextId is REQUIRED but missing or empty`,
+      cause ?? null,
+      400,
+    );
+    this.errorType = SATPErrorType.CONTEXT_ID_MISS_MATCH;
   }
 }

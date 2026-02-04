@@ -27,7 +27,7 @@
  * console.log('Audit period:', auditResponse.auditPeriod);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */

@@ -29,16 +29,16 @@ import {
   Transport as ConnectTransport,
 } from "@connectrpc/connect";
 
-import { Express } from "express";
+import { ErrorRequestHandler, Express } from "express";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
-import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
-import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
+import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 
 export interface IGatewayOrchestratorOptions {
@@ -62,6 +62,24 @@ import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridg
 import { NetworkId } from "../../public-api";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { SATPInternalError } from "../../core/errors/satp-errors";
+
+export const satpProblemDetailsErrorMiddleware: ErrorRequestHandler = (
+  error: unknown,
+  _request,
+  response,
+  next,
+) => {
+  if (!(error instanceof SATPInternalError)) {
+    next(error);
+    return;
+  }
+
+  response
+    .status(error.code)
+    .type("application/problem+json")
+    .json(error.toProblemDetails());
+};
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -195,6 +213,8 @@ export class GatewayOrchestrator {
             }),
           );
         }
+
+        this.expressServer.use(satpProblemDetailsErrorMiddleware);
       } catch (error) {
         span.setStatus({
           code: SpanStatusCode.ERROR,
@@ -420,10 +440,10 @@ export class GatewayOrchestrator {
 
         this.logger.debug(
           "Transport:" +
-            identity.address +
-            ":" +
-            identity.gatewayServerPort +
-            `/${SatpStageKey.Stage0}`,
+          identity.address +
+          ":" +
+          identity.gatewayServerPort +
+          `/${SatpStageKey.Stage0}`,
         );
 
         const transport1 = createGrpcWebTransport({

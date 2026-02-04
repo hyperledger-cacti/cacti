@@ -18,7 +18,7 @@
  * - Facilitate atomic cross-chain transaction execution
  *
  * **SATP Protocol Integration:**
- * The execution layer interface follows IETF SATP Core v2 specification requirements
+ * The execution layer interface follows IETF SATP Core v13 specification requirements
  * for cross-chain asset operations, including standardized transaction receipts,
  * cryptographic proof generation, and asset lifecycle management.
  *
@@ -46,7 +46,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SATPBridgeExecutionLayerImpl} for concrete implementation
  * @see {@link Asset} for asset data structures
  * @see {@link TransactionReceipt} for receipt format
@@ -134,7 +134,7 @@ export interface TransactionReceipt {
  *
  * @abstract
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4
  * @see {@link TransactionReceipt} for receipt format
  * @see {@link Asset} for asset data structures
  */
@@ -163,7 +163,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
    */
   public abstract wrapAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -190,7 +190,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
    */
   public abstract unwrapAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -218,7 +218,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.2
    */
   public abstract lockAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -247,7 +247,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.2
    */
   public abstract unlockAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -275,7 +275,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.3
    */
   public abstract mintAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -303,7 +303,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.3
    */
   public abstract burnAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -331,7 +331,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.4
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.4
    */
   public abstract assignAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -358,7 +358,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {ContractQueryError} When contract query fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.5
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.5
    */
   public abstract verifyAssetExistence(
     assetId: string,
@@ -388,7 +388,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {ContractQueryError} When wrapper contract query fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.5
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.5
    */
   public abstract verifyLockAsset(
     assetId: string,

@@ -5,17 +5,16 @@ import {
   TransferProposalResponse,
   TransferProposalResponseSchema,
   TransferCommenceResponseSchema,
-} from "../../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   MessageType,
   NetworkCapabilities,
-  SignatureAlgorithm,
   LockType,
   CommonSatpSchema,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 // eslint-disable-next-line prettier/prettier
 import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
-import { TransferClaims } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { TransferClaims } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   SessionType,
   TimestampType,
@@ -44,10 +43,11 @@ import {
 } from "../../errors/satp-service-errors";
 import { SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
-import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { isTLS13Suite } from "../service-utils";
 export class Stage1ServerService extends SATPService {
   public static readonly SATP_STAGE = "1";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
@@ -120,19 +120,11 @@ export class Stage1ServerService extends SATPService {
           const commonBody = create(CommonSatpSchema, {
             version: sessionData.version,
             sessionId: sessionData.id,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
             transferContextId: sessionData.transferContextId,
-            resourceUrl: sessionData.resourceUrl,
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.INIT_PROPOSAL,
-            ),
-            sequenceNumber: request.common!.sequenceNumber + BigInt(1),
           });
 
           sessionData.lastSequenceNumber =
-            request.common!.sequenceNumber + BigInt(1);
+            sessionData.lastSequenceNumber + BigInt(1);
 
           const transferProposalReceiptMessage = create(
             TransferProposalResponseSchema,
@@ -161,6 +153,11 @@ export class Stage1ServerService extends SATPService {
             );
           }
 
+          transferProposalReceiptMessage.hashPrevMessage = getMessageHash(
+            sessionData,
+            MessageType.INIT_PROPOSAL,
+          );
+
           //TODO implement conditional reject
 
           const messageSignature = bufArray2HexStr(
@@ -170,8 +167,7 @@ export class Stage1ServerService extends SATPService {
             ),
           );
 
-          transferProposalReceiptMessage.serverSignature = messageSignature;
-
+          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(sessionData, commonBody.messageType, messageSignature);
 
           saveHash(
@@ -228,8 +224,6 @@ export class Stage1ServerService extends SATPService {
         const errorResponse = create(TransferProposalResponseSchema, {});
         const commonBody = create(CommonSatpSchema, {
           messageType: MessageType.PRE_INIT_RECEIPT,
-          error: true,
-          errorCode: error.getSATPErrorType(),
         });
 
         if (!(error instanceof SessionNotFoundError) && session != undefined) {
@@ -237,12 +231,7 @@ export class Stage1ServerService extends SATPService {
         }
         errorResponse.common = commonBody;
 
-        const messageSignature = bufArray2HexStr(
-          sign(this.Signer, safeStableStringify(errorResponse)),
-        );
-
-        errorResponse.serverSignature = messageSignature;
-
+        // v13: per-message signatures removed; JWS wrapping used instead
         return errorResponse;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
@@ -265,8 +254,6 @@ export class Stage1ServerService extends SATPService {
         const errorResponse = create(TransferCommenceResponseSchema, {});
         const commonBody = create(CommonSatpSchema, {
           messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
-          error: true,
-          errorCode: error.getSATPErrorType(),
         });
 
         if (!(error instanceof SessionNotFoundError) && session != undefined) {
@@ -274,12 +261,7 @@ export class Stage1ServerService extends SATPService {
         }
         errorResponse.common = commonBody;
 
-        const messageSignature = bufArray2HexStr(
-          sign(this.Signer, safeStableStringify(errorResponse)),
-        );
-
-        errorResponse.serverSignature = messageSignature;
-
+        // v13: per-message signatures removed; JWS wrapping used instead
         return errorResponse;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
@@ -330,24 +312,20 @@ export class Stage1ServerService extends SATPService {
           const commonBody = create(CommonSatpSchema, {
             version: sessionData.version,
             sessionId: sessionData.id,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
             transferContextId: sessionData.transferContextId,
-            resourceUrl: sessionData.resourceUrl,
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.TRANSFER_COMMENCE_REQUEST,
-            ),
-            sequenceNumber: request.common!.sequenceNumber + BigInt(1),
             messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
           });
-          sessionData.lastSequenceNumber = commonBody.sequenceNumber =
-            request.common!.sequenceNumber + BigInt(1);
+          sessionData.lastSequenceNumber =
+            sessionData.lastSequenceNumber + BigInt(1);
 
           const transferCommenceResponseMessage = create(
             TransferCommenceResponseSchema,
             {
               common: commonBody,
+              hashPrevMessage: getMessageHash(
+                sessionData,
+                MessageType.TRANSFER_COMMENCE_REQUEST,
+              ),
             },
           );
 
@@ -358,8 +336,7 @@ export class Stage1ServerService extends SATPService {
             ),
           );
 
-          transferCommenceResponseMessage.serverSignature = messageSignature;
-
+          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(
             sessionData,
             MessageType.TRANSFER_COMMENCE_RESPONSE,
@@ -467,25 +444,20 @@ export class Stage1ServerService extends SATPService {
         sessionData.recipientGatewayNetworkId =
           request.transferInitClaims!.recipientGatewayNetworkId;
         sessionData.clientGatewayPubkey =
-          request.transferInitClaims!.clientGatewayPubkey;
+          request.transferInitClaims!.senderGatewaySignaturePublicKey;
         sessionData.serverGatewayPubkey =
-          request.transferInitClaims!.serverGatewayPubkey;
+          request.transferInitClaims!.receiverGatewaySignaturePublicKey;
         sessionData.receiverGatewayOwnerId =
           request.transferInitClaims!.receiverGatewayOwnerId;
         sessionData.senderGatewayOwnerId =
           request.transferInitClaims!.senderGatewayOwnerId;
         sessionData.signatureAlgorithm =
-          request.networkCapabilities!.signatureAlgorithm;
-        sessionData.lockType = request.networkCapabilities!.lockType;
+          request.networkCapabilities!.gatewayDefaultSignatureAlgorithm;
+        sessionData.lockType = request.networkCapabilities!.networkLockType;
         sessionData.lockExpirationTime =
-          request.networkCapabilities!.lockExpirationTime;
-        sessionData.credentialProfile =
-          request.networkCapabilities!.credentialProfile;
-        sessionData.loggingProfile =
-          request.networkCapabilities!.loggingProfile;
-        sessionData.accessControlProfile =
-          request.networkCapabilities!.accessControlProfile;
-        sessionData.resourceUrl = request.common!.resourceUrl;
+          request.networkCapabilities!.networkLockExpirationTime;
+        sessionData.gatewayTlsScheme =
+          request.networkCapabilities!.gatewayTlsScheme;
 
         session.verify(fnTag, SessionType.SERVER);
 
@@ -554,13 +526,6 @@ export class Stage1ServerService extends SATPService {
           throw new TransferInitClaimsHashError(fnTag);
         }
 
-        if (request.clientTransferNumber != "") {
-          this.Log.info(
-            `${fnTag}, Optional variable loaded: clientTransferNumber...`,
-          );
-          sessionData.clientTransferNumber = request.clientTransferNumber;
-        }
-
         saveHash(
           sessionData,
           MessageType.TRANSFER_COMMENCE_REQUEST,
@@ -625,12 +590,14 @@ export class Stage1ServerService extends SATPService {
             `${tag}, optional variable recipientGatewayNetworkId loaded`,
           );
         }
-        if (transferClaims.clientGatewayPubkey == "") {
-          this.Log.error(`${tag}, clientGatewayPubkey is missing`);
+        if (transferClaims.senderGatewaySignaturePublicKey == "") {
+          this.Log.error(`${tag}, senderGatewaySignaturePublicKey is missing`);
           return false;
         }
-        if (transferClaims.serverGatewayPubkey == "") {
-          this.Log.error(`${tag}, serverGatewayPubkey is missing`);
+        if (transferClaims.receiverGatewaySignaturePublicKey == "") {
+          this.Log.error(
+            `${tag}, receiverGatewaySignaturePublicKey is missing`,
+          );
           return false;
         }
         if (transferClaims.senderGatewayOwnerId != "") {
@@ -668,34 +635,21 @@ export class Stage1ServerService extends SATPService {
         if (networkCapabilities == undefined) {
           throw new NetworkCapabilitiesError(tag);
         }
-        if (networkCapabilities.senderGatewayNetworkId == "") {
+        if (networkCapabilities.gatewayDefaultSignatureAlgorithm == "") {
         }
         if (
-          networkCapabilities.signatureAlgorithm ==
-          SignatureAlgorithm.UNSPECIFIED
+          networkCapabilities.gatewaySupportedSignatureAlgorithms.length == 0
         ) {
         }
-        if (networkCapabilities.supportedSignatureAlgorithms.length == 0) {
+        if (networkCapabilities.networkLockType == LockType.UNSPECIFIED) {
         }
-        if (networkCapabilities.lockType == LockType.UNSPECIFIED) {
+        if (networkCapabilities.networkLockExpirationTime == BigInt(0)) {
         }
-        if (networkCapabilities.lockExpirationTime == BigInt(0)) {
-        }
-        if (networkCapabilities.permissions == undefined) {
-        }
-        if (networkCapabilities.developerUrn == "") {
-        }
-        if (networkCapabilities.credentialProfile == undefined) {
-        }
-        if (networkCapabilities.applicationProfile == "") {
-        }
-        if (networkCapabilities.loggingProfile == "") {
-        }
-        if (networkCapabilities.accessControlProfile == "") {
-        }
-        if (networkCapabilities.subsequentCalls == undefined) {
-        }
-        if (networkCapabilities.history == undefined) {
+        if (!isTLS13Suite(networkCapabilities.gatewayTlsScheme)) {
+          throw new NetworkCapabilitiesError(
+            tag,
+            `Unsupported TLS scheme: ${networkCapabilities.gatewayTlsScheme}`,
+          );
         }
         //todo
         return true;
