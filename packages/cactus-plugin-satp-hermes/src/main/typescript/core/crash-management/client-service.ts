@@ -6,13 +6,13 @@ import {
   RollbackRequest,
   RollbackRequestSchema,
   RollbackState,
-} from "../../../typescript/generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+} from "../../../typescript/generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, sign } from "../../utils/gateway-utils";
-import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
 import { getCrashedStage } from "../session-utils";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { MonitorService } from "../../services/monitoring/monitor";

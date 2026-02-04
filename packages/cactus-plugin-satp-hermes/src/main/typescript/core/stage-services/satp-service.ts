@@ -55,13 +55,13 @@ import {
 } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../satp-logger-provider";
 import type { SATPLogger as Logger } from "../satp-logger";
-import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
-import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
+import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
+import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
+import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
+import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
 import type { GatewayPersistence } from "../../database/gateway-persistence";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
-import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { MonitorService } from "../../services/monitoring/monitor";
 
 /**
@@ -100,7 +100,7 @@ export enum SATPServiceType {
  * @public
  * @since 0.0.3-beta
  */
-export type SATPStagesV02 = "0" | "1" | "2" | "3";
+export type SATPStages = "0" | "1" | "2" | "3";
 
 /**
  * Configuration options for SATP service initialization.
@@ -129,13 +129,13 @@ export type SATPStagesV02 = "0" | "1" | "2" | "3";
  * @since 0.0.3-beta
  * @see {@link SATPService} for service implementation
  * @see {@link SATPServiceType} for service type options
- * @see {@link SATPStagesV02} for supported protocol stages
+ * @see {@link SATPStages} for supported protocol stages
  */
 export type ISATPServiceOptions = {
   /** Human-readable service name for identification and logging */
   serviceName: string;
   /** SATP protocol stage (0-3) this service implementation handles */
-  stage: SATPStagesV02;
+  stage: SATPStages;
   /** Logger configuration options including level and output settings */
   loggerOptions: ILoggerOptions;
   /** Cryptographic signer instance for message signing and verification */
@@ -180,7 +180,7 @@ export type ISATPServiceOptions = {
  */
 export interface SATPServiceStatic {
   /** Constructor signature for creating new service instances */
-  new (options: ISATPServiceOptions): SATPService;
+  new(options: ISATPServiceOptions): SATPService;
   /** Immutable service type designation (Client or Server) */
   readonly SERVICE_TYPE: SATPServiceType;
   /** SATP protocol stage identifier (0-3) */
@@ -304,7 +304,7 @@ export type ISATPClientServiceOptions = ISATPServiceOptions;
  * @since 0.0.3-beta
  * @see {@link ISATPServiceOptions} for constructor options
  * @see {@link SATPServiceType} for service type enumeration
- * @see {@link SATPStagesV02} for supported protocol stages
+ * @see {@link SATPStages} for supported protocol stages
  */
 export abstract class SATPService {
   /** SATP protocol stage identifier (0-3) this service handles */

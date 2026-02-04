@@ -40,6 +40,185 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **satp-hermes:** add get ledgers endpoint ([d57fce3](https://github.com/hyperledger-cacti/cacti/commit/d57fce30fb92345343d3a3078a56d5dbc5ce7b6e))
 * **satp-hermes:** improve satp gateway configuration object ([4b614f1](https://github.com/hyperledger-cacti/cacti/commit/4b614f1992931ef1778d65e0efd5321abb41bd7c))
 * **satp-hermes:** persist oracle logs ([#4156](https://github.com/hyperledger-cacti/cacti/issues/4156)) ([f352040](https://github.com/hyperledger-cacti/cacti/commit/f35204030c052a71b3f6c53ba252a8d40b16fcd3)), closes [#3946](https://github.com/hyperledger-cacti/cacti/issues/3946)
+## [Unreleased] — IETF SATP Core v02 → v13 Migration
+
+Upgrades the SATP Hermes plugin from **IETF SATP Core draft-02** to
+**[draft-13](https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-13)**.
+
+161 files changed, 9 626 insertions, 5 388 deletions.
+
+For the full migration plan, rationale, and per-task details see
+[`docs/plans/update-v2-to-v13/upgrade-satp-core-v02-to-v13.md`](./docs/plans/update-v2-to-v13/upgrade-satp-core-v02-to-v13.md).
+
+### What Changed
+
+#### Protobuf & Generated Code
+- Added v13 proto definitions under `src/main/proto/cacti/satp/v13/` for all
+  stages (0–3), crash recovery, session, health, and bungee view.
+- Regenerated TypeScript bindings under `generated/proto/cacti/satp/v13/`.
+- All runtime imports now reference the `v13` namespace; no source file imports
+  the `v02` namespace.
+
+#### Protocol Constants & Types
+- `SATP_VERSION` → `"v13"`, `SATP_CORE_VERSION` → `"v13"`.
+- Added `SATP_PROTOCOL_VERSION = "1.0"` (v13 Section 5.3.1 wire format).
+- `CurrentDrafts` enum and `DraftVersions` type updated with v13 values.
+- `SATPStagesV02` type alias renamed to `SATPStages`.
+
+#### Message Formats
+- `CommonSatp` reduced from ~15 fields to 4 core fields
+  (`version`, `messageType`, `sessionId`, `transferContextId`).
+- `TransferClaims` field renames: `originator_pubkey` →
+  `originatorPublicKey`, `client_gateway_pubkey` →
+  `senderGatewaySignaturePublicKey`, etc.
+- Removed fields: `max_retries`, `max_timeout`, `amount_from_originator`,
+  `amount_to_beneficiary`, `PayloadProfile`, `CredentialProfile`,
+  `sequence_number`, `resource_url`, `action_response`.
+
+#### New Message Types
+- **`reject-msg`**: Generic session rejection with IANA `reasonCode`,
+  replaces the v02 counter-proposal model.
+- **`error-msg`**: Structured protocol errors with `errorMsgType`,
+  `errorType`, `errorSeverity`.
+- **`session-abort-msg`**: Explicit session termination with
+  pre/post-commit-final effectiveness semantics.
+
+#### IANA Error Code Registry
+- Added `core/errors/iana-error-codes.ts` with all 73 IANA-registered
+  error codes (39 Stage 1 + 10 Stage 2 + 24 Stage 3).
+- Added `core/errors/satp-error-type.ts` with `SatpErrorType` enum and
+  `satpErrorTypeToV13Code()` mapping.
+- Service error classes updated to set `.errorType` to protocol-compliant
+  enum values.
+
+#### JWS Envelope Signing
+- Added `core/jws-utils.ts` with `jwsSign()` / `jwsVerify()` stubs for
+  JWS envelope signing (replacing per-message `signature` fields).
+- Stub implementation signs/verifies; real ECDSA P-256 signing is deferred
+  (see Deferred Work below).
+
+#### IANA Message Type URN Mapping
+- Added `core/iana-message-types.ts` with bidirectional
+  `messageTypeToUrn()` / `urnToMessageType()` for all 14 SATP message
+  types plus crash-recovery extensions.
+
+#### Protocol Message Service
+- Added `core/stage-services/protocol-message-service.ts` with
+  `createRejectMessage()`, `createErrorMessage()`,
+  `createSessionAbortMessage()`, and `checkAbortEffectiveness()`.
+
+#### Stage Services
+- All four stage client/server service pairs updated for v13 field names,
+  removed v02-era fields, and updated `@see` JSDoc URLs.
+- `data-verifier.ts` updated: removed v02 field checks (`sequenceNumber`,
+  `resourceUrl`, pubkeys, `hashPreviousMessage`), added
+  `transferContextId` validation.
+- `session-utils.ts` updated for v13 `CommonSatp` structure.
+
+#### Documentation & References
+- All `@see` URLs updated from `draft-ietf-satp-core-02` to
+  `draft-ietf-satp-core-13` (80 references across 45 files).
+- All JSDoc text updated from "SATP v2" / "SATP Core v2" to v13
+  equivalents (81 additional references).
+- `ARCHITECTURE.md` updated with v13 changes section.
+- `README.md` updated with v13 spec link and version references.
+
+#### Exports (`public-api.ts`)
+- New exports: `SATPStages`, `SatpErrorType`, `satpErrorTypeToV13Code`,
+  `ErrorCode`, `V13_ERROR_DESCRIPTIONS`, `ALL_V13_ERROR_CODES`,
+  Stage-specific error code arrays, `messageTypeToUrn`, `urnToMessageType`,
+  `IANA_SATP_MESSAGE_TYPES`, `jwsSign`, `jwsVerify`,
+  `createRejectMessage`, `createErrorMessage`,
+  `createSessionAbortMessage`, `checkAbortEffectiveness`.
+
+#### Test Suite
+- 8 new unit test files covering v13 protocol structures, IANA error
+  codes, message types, JWS utils, data verifier, protocol message
+  service, protocol map, and error handling.
+- Updated `services.test.ts` for v13 field names and structures.
+- Updated `config-validation.test.ts` fixture to use `Core: "v13"`.
+- All unit tests passing.
+
+### BREAKING CHANGES
+
+- **Protobuf namespace**: All proto imports moved from `cacti/satp/v02/` to
+  `cacti/satp/v13/`. Any code importing generated proto types must update
+  import paths.
+- **`CommonSatp` fields removed**: `sequenceNumber`, `resourceUrl`,
+  `actionResponse`, `credentialBlock`, `payloadProfile`, `payload`,
+  `payloadHash`, `clientGatewayPubkey`, `serverGatewayPubkey`, `error`,
+  `errorCode`. Code reading these fields will get `undefined`.
+- **`TransferClaims` fields removed**: `maxRetries`, `maxTimeout`,
+  `amountFromOriginator`, `amountToBeneficiary`.
+- **`TransferClaims` fields renamed**: `originatorPubkey` →
+  `originatorPublicKey`, `beneficiaryPubkey` → `beneficiaryPublicKey`,
+  `clientGatewayPubkey` → `senderGatewaySignaturePublicKey`,
+  `serverGatewayPubkey` → `receiverGatewaySignaturePublicKey`.
+- **Per-message signatures removed**: Individual message `signature`
+  fields replaced by JWS envelope wrapping.
+- **Counter-proposals removed**: Multi-round negotiation replaced with
+  single-round accept/reject model.
+- **`SATPStagesV02` renamed**: Type alias renamed to `SATPStages`.
+- **Error handling**: `error` (bool) and `error_code` (enum) fields on
+  `CommonSatp` replaced by dedicated `error-msg`, `reject-msg`, and
+  `session-abort-msg` message types with IANA-registered error codes.
+- **`LockType` enum**: Removed `FAUCET`, `MULTICLAIM`, `DESTROYBURN`;
+  only `LOCK`, `DLTT`, `ESCROW` remain (plus `UNSPECIFIED`).
+- **Version constants**: `SATP_VERSION` changed from `"v02"` to `"v13"`,
+  `SATP_CORE_VERSION` from `"v02"` to `"v13"`.
+- **Gateway config**: `version` field in `gid` should use
+  `{ Core: "v13", Architecture: "v02", Crash: "v02" }`.
+
+### Migration Guide
+
+1. **Update proto imports**: Change all imports from
+   `generated/proto/cacti/satp/v02/` to `generated/proto/cacti/satp/v13/`.
+
+2. **Update `CommonSatp` usage**: The envelope now only carries `version`,
+   `messageType`, `sessionId`, and `transferContextId`. Fields like
+   `sequenceNumber`, `resourceUrl`, `payloadProfile`, and pubkeys are
+   either removed or moved to per-message types.
+
+3. **Update `TransferClaims` field names**: Rename `originatorPubkey` →
+   `originatorPublicKey`, `beneficiaryPubkey` → `beneficiaryPublicKey`,
+   `clientGatewayPubkey` → `senderGatewaySignaturePublicKey`,
+   `serverGatewayPubkey` → `receiverGatewaySignaturePublicKey`.
+
+4. **Remove references to deleted fields**: `maxRetries`, `maxTimeout`,
+   `amountFromOriginator`, `amountToBeneficiary` no longer exist on
+   `TransferClaims`.
+
+5. **Update error handling**: Replace checks on `common.error` /
+   `common.errorCode` with the new `error-msg`, `reject-msg`, and
+   `session-abort-msg` message types. Use `SatpErrorType` enum and
+   `satpErrorTypeToV13Code()` for IANA error code mapping.
+
+6. **Update signing logic**: Per-message `signature` fields are gone.
+   Use `jwsSign()` / `jwsVerify()` from `core/jws-utils.ts` to wrap
+   and verify entire messages in JWS envelopes.
+
+7. **Update type references**: `SATPStagesV02` → `SATPStages`.
+
+8. **Update gateway config**: Set `version` to
+   `[{ Core: "v13", Architecture: "v02", Crash: "v02" }]` in gateway
+   identity configuration.
+
+9. **Update `LockType` usage**: Remove references to `FAUCET`,
+   `MULTICLAIM`, `DESTROYBURN`. Only `LOCK`, `DLTT`, `ESCROW`
+   (and `UNSPECIFIED`) are valid.
+
+### Deferred Work
+
+These items are tracked but not blocking the v13 migration:
+
+| Item | Priority | Description |
+|------|----------|-------------|
+| Real JWS signing (ECDSA P-256) | High | Replace stub `jwsSign()`/`jwsVerify()` with actual ECDSA P-256 + SHA-256 signing. |
+| Gateway key classification | Medium | Wire `GatewayKeyPurpose`/`GatewayKey` types into gateway config for 4 distinct key types. |
+| ConnectRPC handler dispatch | Medium | Route incoming `reject-msg`, `error-msg`, `session-abort-msg` to `protocol-message-service.ts`. |
+| TLS 1.3 enforcement | Medium | Enforce TLS 1.3 minimum with `TLS_AES_128_GCM_SHA256` cipher suite in gateway config. |
+| JWT/OAuth2 auth | Low | Implement JWT + OAuth 2.0 for Client Application API authentication. |
+| Remove v02 proto directory | Low | Delete `src/main/proto/cacti/satp/v02/` and generated output after all v13 tests pass. |
 
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 

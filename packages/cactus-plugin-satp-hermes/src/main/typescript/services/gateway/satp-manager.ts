@@ -43,23 +43,23 @@ import {
 import {
   ISATPServiceOptions,
   SATPServiceInstance,
-  SATPStagesV02,
+  SATPStages,
 } from "../../core/stage-services/satp-service";
 import { Stage2SATPHandler } from "../../core/stage-handlers/stage2-handler";
 import { Stage3SATPHandler } from "../../core/stage-handlers/stage3-handler";
 import { SATPCrossChainManager } from "../../cross-chain-mechanisms/satp-cc-manager";
 import { GatewayOrchestrator } from "./gateway-orchestrator";
-import { State } from "../../generated/proto/cacti/satp/v02/session/session_pb";
-import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
-import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
-import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
+import { State } from "../../generated/proto/cacti/satp/v13/session/session_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
+import type { SatpStage0Service } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
+import type { SatpStage1Service } from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
+import type { SatpStage2Service } from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
+import type { SatpStage3Service } from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
 import type { Client as ConnectClient } from "@connectrpc/connect";
 import {
   ClaimFormat,
   MessageType,
-} from "../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   getMessageInSessionData,
   saveTimestamp,
@@ -70,11 +70,11 @@ import {
   TransferProposalResponse,
   TransferCommenceRequest,
   TransferCommenceResponse,
-} from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   LockAssertionRequest,
   LockAssertionResponse,
-} from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import {
   CommitPreparationRequest,
   CommitPreparationResponse,
@@ -82,13 +82,13 @@ import {
   CommitFinalAssertionResponse,
   TransferCompleteRequest,
   TransferCompleteResponse,
-} from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
 import {
   NewSessionRequest,
   NewSessionResponse,
   PreSATPTransferRequest,
   PreSATPTransferResponse,
-} from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import {
   CreateSATPRequestError,
   RecoverMessageError,
@@ -444,7 +444,7 @@ export class SATPManager {
         );
         return serviceClasses.map((serviceClass) => ({
           signer: this.signer,
-          stage: serviceClass.SATP_STAGE as SATPStagesV02,
+          stage: serviceClass.SATP_STAGE as SATPStages,
           loggerOptions: { level: logLevel, label },
           // we can pass whatever name we wish; in this case we are using the internal service name
           serviceType: serviceClass.SERVICE_TYPE,
@@ -533,7 +533,7 @@ export class SATPManager {
         }
         try {
           for (let i = 0; i <= serviceClasses.length / 2 - 1; i++) {
-            const serviceIndex = i.toString() as SATPStagesV02;
+            const serviceIndex = i.toString() as SATPStages;
             const serverService = this.getServiceByStage(
               SATPServiceType.Server,
               serviceIndex,

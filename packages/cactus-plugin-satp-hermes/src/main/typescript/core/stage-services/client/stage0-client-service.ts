@@ -30,7 +30,7 @@
  * - **Database Persistence**: Stores session data, proofs, and audit trails
  *
  * **Protocol Compliance:**
- * This implementation follows the IETF SATP Core v2 specification for Stage 0
+ * This implementation follows the IETF SATP Core v13 specification for Stage 0
  * operations, ensuring interoperability with compliant SATP implementations
  * across different gateway vendors and blockchain networks.
  *
@@ -48,14 +48,14 @@ import {
   ClaimFormat,
   MessageType,
   WrapAssertionClaimSchema,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   NewSessionRequest,
   NewSessionResponse,
   PreSATPTransferRequest,
   NewSessionRequestSchema,
   PreSATPTransferRequestSchema,
-} from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 

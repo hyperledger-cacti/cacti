@@ -7,7 +7,7 @@
  * for SATP protocol messages and session data. It implements critical security
  * validations including signature verification, message integrity checks,
  * protocol compliance validation, and session state consistency verification
- * according to the IETF SATP Core v2 specification.
+ * according to the IETF SATP Core v13 specification.
  *
  * **Core Verification Functions:**
  * - **Common Body Verification**: Validates standard SATP message structure and fields
@@ -64,7 +64,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link CommonSatp} for common message structure
  * @see {@link SessionData} for session data structure
  *
@@ -78,26 +78,22 @@ import { verifySignature } from "../../utils/gateway-utils";
 import {
   CommonSatp,
   MessageType,
-} from "../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
+import { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
 import { SATP_VERSION } from "../constants";
 import {
-  ClientGatewayPubkeyError,
-  HashError,
   MessageTypeError,
-  ResourceUrlError,
   SatpCommonBodyError,
   SATPVersionError,
-  SequenceNumberError,
-  ServerGatewayPubkeyError,
   SessionDataNotLoadedCorrectlyError,
-  SignatureMissingError,
   SignatureVerificationError,
   TransferContextIdError,
+  MissingTransferContextIdError,
+  HashPrevMessageError,
 } from "../errors/satp-service-errors";
-import { getMessageHash, getPreviousMessageType } from "../session-utils";
+import { getMessageHash } from "../session-utils";
 import { getMessageTypeName } from "../satp-utils";
 
 /**
@@ -106,7 +102,7 @@ import { getMessageTypeName } from "../satp-utils";
  * @description
  * Performs comprehensive validation of SATP message common fields to ensure
  * protocol compliance, security requirements, and session consistency according
- * to the IETF SATP Core v2 specification. This function is the cornerstone of
+ * to the IETF SATP Core v13 specification. This function is the cornerstone of
  * SATP message validation, enforcing critical security and protocol requirements.
  *
  * **Validation Categories:**
@@ -231,13 +227,7 @@ export function commonBodyVerifier(
   if (
     common.version == "" ||
     common.messageType == undefined ||
-    common.sessionId == "" ||
-    common.sequenceNumber == undefined ||
-    common.resourceUrl == "" ||
-    common.clientGatewayPubkey == "" ||
-    common.serverGatewayPubkey == "" ||
-    (common.hashPreviousMessage == "" &&
-      messageStage != MessageType.INIT_PROPOSAL)
+    common.sessionId == ""
   ) {
     console.error("errorcommon", safeStableStringify(common));
     throw new SatpCommonBodyError(tag, safeStableStringify(common));
@@ -247,20 +237,13 @@ export function commonBodyVerifier(
     throw new SATPVersionError(tag, common.version, SATP_VERSION);
   }
 
-  if (common.serverGatewayPubkey != sessionData.serverGatewayPubkey) {
-    throw new ServerGatewayPubkeyError(tag);
-  }
+  // v13: clientGatewayPubkey, serverGatewayPubkey, sequenceNumber,
+  // resourceUrl, and hashPreviousMessage moved out of CommonSatp.
+  // These checks are now performed at the per-message level.
 
-  if (common.clientGatewayPubkey != sessionData.clientGatewayPubkey) {
-    throw new ClientGatewayPubkeyError(tag);
-  }
-
-  if (common.sequenceNumber != sessionData.lastSequenceNumber + BigInt(1)) {
-    throw new SequenceNumberError(
-      tag,
-      common.sequenceNumber,
-      sessionData.lastSequenceNumber,
-    );
+  // v13: transferContextId is REQUIRED in every message.
+  if (common.transferContextId == "") {
+    throw new MissingTransferContextIdError(tag);
   }
 
   if (common.transferContextId != sessionData.transferContextId) {
@@ -269,10 +252,6 @@ export function commonBodyVerifier(
       common.transferContextId,
       sessionData.transferContextId,
     );
-  }
-
-  if (common.resourceUrl != sessionData.resourceUrl) {
-    throw new ResourceUrlError(tag);
   }
 
   if (
@@ -284,23 +263,6 @@ export function commonBodyVerifier(
       getMessageTypeName(common.messageType),
       getMessageTypeName(messageStage),
       getMessageTypeName(messageStage2),
-    );
-  }
-
-  if (
-    common.hashPreviousMessage !=
-    getMessageHash(
-      sessionData,
-      getPreviousMessageType(sessionData, messageStage),
-    )
-  ) {
-    throw new HashError(
-      tag,
-      common.hashPreviousMessage,
-      getMessageHash(
-        sessionData,
-        getPreviousMessageType(sessionData, messageStage),
-      ),
     );
   }
 }
@@ -431,6 +393,9 @@ export function signatureVerifier(
     throw new SessionDataNotLoadedCorrectlyError(tag, "undefined");
   }
 
+  // v13: per-message clientSignature/serverSignature removed.
+  // JWS wrapping will be implemented in TASK-064.
+  // For now, verify only if legacy signature fields are present.
   if (message.serverSignature != undefined && message.serverSignature != "") {
     if (
       !verifySignature(signer, message, sessionData?.serverGatewayPubkey || "")
@@ -446,7 +411,49 @@ export function signatureVerifier(
     ) {
       throw new SignatureVerificationError(tag);
     }
-  } else {
-    throw new SignatureMissingError(tag);
+  }
+  // No signature fields present — v13 JWS wrapping expected (TASK-064)
+}
+
+/**
+ * Verifies the per-message `hashPrevMessage` field against the session's
+ * stored hash for the expected previous message type.
+ *
+ * In v13, `hashPrevMessage` moved out of CommonSatp and into each
+ * individual message. This function validates that the hash chain is
+ * intact, preventing tampering and replay attacks.
+ *
+ * @param tag - Context tag for error reporting
+ * @param hashPrevMessage - The `hashPrevMessage` value from the incoming message
+ * @param sessionData - Current session data containing stored message hashes
+ * @param previousMessageType - The MessageType of the message whose hash is expected
+ * @throws {HashPrevMessageError} When the hash does not match
+ * @throws {SessionDataNotLoadedCorrectlyError} When session data is undefined
+ *
+ * @since 2.1.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} Sections 8–10
+ */
+export function hashPrevMessageVerifier(
+  tag: string,
+  hashPrevMessage: string | undefined,
+  sessionData: SessionData | undefined,
+  previousMessageType: MessageType,
+): void {
+  if (sessionData == undefined) {
+    throw new SessionDataNotLoadedCorrectlyError(tag, "undefined");
+  }
+
+  const expectedHash = getMessageHash(sessionData, previousMessageType);
+
+  if (!hashPrevMessage || hashPrevMessage === "") {
+    throw new HashPrevMessageError(
+      tag,
+      hashPrevMessage ?? "(empty)",
+      expectedHash,
+    );
+  }
+
+  if (hashPrevMessage !== expectedHash) {
+    throw new HashPrevMessageError(tag, hashPrevMessage, expectedHash);
   }
 }

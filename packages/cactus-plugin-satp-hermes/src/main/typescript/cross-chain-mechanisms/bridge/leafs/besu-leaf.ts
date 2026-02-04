@@ -23,7 +23,7 @@ import { SATPLogger as Logger } from "../../../core/satp-logger";
 import {
   ClaimFormat,
   TokenType,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { BridgeLeafFungible } from "../bridge-leaf-fungible";
 import { BridgeLeafNonFungible } from "../bridge-leaf-non-fungible";
@@ -134,7 +134,7 @@ interface BesuResponse {
  * - OpenTelemetry monitoring and distributed tracing
  *
  * **SATP Protocol Compliance:**
- * The implementation follows IETF SATP Core v2 specification requirements for
+ * The implementation follows IETF SATP Core v13 specification requirements for
  * Besu-based cross-chain asset transfers, including atomic operations,
  * cryptographic proof generation, and secure asset custody management.
  *
@@ -193,7 +193,7 @@ interface BesuResponse {
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link https://besu.hyperledger.org/} Hyperledger Besu Documentation
  * @see {@link BridgeLeafFungible} for fungible asset interface
  * @see {@link BridgeLeafNonFungible} for non-fungible asset interface
@@ -206,8 +206,7 @@ interface BesuResponse {
 
 export class BesuLeaf
   extends BridgeLeaf
-  implements BridgeLeafFungible, BridgeLeafNonFungible
-{
+  implements BridgeLeafFungible, BridgeLeafNonFungible {
   public static readonly CLASS_NAME = "BesuLeaf";
 
   protected readonly log: Logger;

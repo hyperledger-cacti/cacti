@@ -5,7 +5,7 @@ import {
   CommonSatpSchema,
   MessageType,
   //TokenType,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { SATP_VERSION } from "../../constants";
 import {
   CommitFinalAssertionResponse,
@@ -17,7 +17,7 @@ import {
   TransferCompleteRequest,
   TransferCompleteRequestSchema,
   TransferCompleteResponse,
-} from "../../../generated/proto/cacti/satp/v02/service/stage_3_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/stage_3_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   getMessageHash,
@@ -36,7 +36,7 @@ import {
   SATPServiceType,
 } from "../satp-service";
 import { SATPSession } from "../../satp-session";
-import { LockAssertionResponse } from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import { LockAssertionResponse } from "../../../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
   AssignmentAssertionClaimError,
@@ -46,7 +46,7 @@ import {
   SessionError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
-import { State } from "../../../generated/proto/cacti/satp/v02/session/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -124,36 +124,23 @@ export class Stage3ClientService extends SATPService {
           const commonBody = create(CommonSatpSchema, {
             version: SATP_VERSION,
             messageType: MessageType.COMMIT_PREPARE,
-            sequenceNumber: response.common!.sequenceNumber + BigInt(1),
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.ASSERTION_RECEIPT,
-            ),
             sessionId: response.common!.sessionId,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
-            resourceUrl: sessionData.resourceUrl,
+            transferContextId: sessionData.transferContextId ?? "",
           });
 
-          sessionData.lastSequenceNumber = commonBody.sequenceNumber =
-            response.common!.sequenceNumber + BigInt(1);
+          sessionData.lastSequenceNumber =
+            sessionData.lastSequenceNumber + BigInt(1);
 
           const commitPreparationRequestMessage = create(
             CommitPreparationRequestSchema,
             {
               common: commonBody,
+              hashPrevMessage: getMessageHash(
+                sessionData,
+                MessageType.ASSERTION_RECEIPT,
+              ),
             },
           );
-
-          if (sessionData.transferContextId != undefined) {
-            commitPreparationRequestMessage.common!.transferContextId =
-              sessionData.transferContextId;
-          }
-
-          if (sessionData.clientTransferNumber != undefined) {
-            commitPreparationRequestMessage.clientTransferNumber =
-              sessionData.clientTransferNumber;
-          }
 
           const messageSignature = bufArray2HexStr(
             sign(
@@ -162,8 +149,7 @@ export class Stage3ClientService extends SATPService {
             ),
           );
 
-          commitPreparationRequestMessage.clientSignature = messageSignature;
-
+          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(
             sessionData,
             MessageType.COMMIT_PREPARE,
@@ -254,28 +240,20 @@ export class Stage3ClientService extends SATPService {
           const commonBody = create(CommonSatpSchema, {
             version: SATP_VERSION,
             messageType: MessageType.COMMIT_FINAL,
-            sequenceNumber: response.common!.sequenceNumber + BigInt(1),
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.COMMIT_READY,
-            ),
             sessionId: response.common!.sessionId,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
-            resourceUrl: sessionData.resourceUrl,
+            transferContextId: sessionData.transferContextId ?? "",
           });
-          sessionData.lastSequenceNumber = commonBody.sequenceNumber =
-            response.common!.sequenceNumber + BigInt(1);
-
-          commonBody.sessionId = response.common!.sessionId;
-          commonBody.clientGatewayPubkey = sessionData.clientGatewayPubkey;
-          commonBody.serverGatewayPubkey = sessionData.serverGatewayPubkey;
-          commonBody.resourceUrl = sessionData.resourceUrl;
+          sessionData.lastSequenceNumber =
+            sessionData.lastSequenceNumber + BigInt(1);
 
           const commitFinalAssertionRequestMessage = create(
             CommitFinalAssertionRequestSchema,
             {
               common: commonBody,
+              hashPrevMessage: getMessageHash(
+                sessionData,
+                MessageType.COMMIT_READY,
+              ),
             },
           );
 
@@ -291,16 +269,6 @@ export class Stage3ClientService extends SATPService {
               sessionData.burnAssertionClaimFormat;
           }
 
-          if (sessionData.transferContextId != undefined) {
-            commitFinalAssertionRequestMessage.common!.transferContextId =
-              sessionData.transferContextId;
-          }
-
-          if (sessionData.clientTransferNumber != undefined) {
-            commitFinalAssertionRequestMessage.clientTransferNumber =
-              sessionData.clientTransferNumber;
-          }
-
           const messageSignature = bufArray2HexStr(
             sign(
               this.Signer,
@@ -308,8 +276,7 @@ export class Stage3ClientService extends SATPService {
             ),
           );
 
-          commitFinalAssertionRequestMessage.clientSignature = messageSignature;
-
+          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(
             sessionData,
             MessageType.COMMIT_FINAL,
@@ -399,36 +366,23 @@ export class Stage3ClientService extends SATPService {
           const commonBody = create(CommonSatpSchema, {
             version: SATP_VERSION,
             messageType: MessageType.COMMIT_TRANSFER_COMPLETE,
-            sequenceNumber: response.common!.sequenceNumber + BigInt(1),
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.ACK_COMMIT_FINAL,
-            ),
             sessionId: response.common!.sessionId,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
-            resourceUrl: sessionData.resourceUrl,
+            transferContextId: sessionData.transferContextId ?? "",
           });
 
-          sessionData.lastSequenceNumber = commonBody.sequenceNumber =
-            response.common!.sequenceNumber + BigInt(1);
+          sessionData.lastSequenceNumber =
+            sessionData.lastSequenceNumber + BigInt(1);
 
           const transferCompleteRequestMessage = create(
             TransferCompleteRequestSchema,
             {
               common: commonBody,
+              hashPrevMessage: getMessageHash(
+                sessionData,
+                MessageType.ACK_COMMIT_FINAL,
+              ),
             },
           );
-
-          if (sessionData.transferContextId != undefined) {
-            transferCompleteRequestMessage.common!.transferContextId =
-              sessionData.transferContextId;
-          }
-
-          if (sessionData.clientTransferNumber != undefined) {
-            transferCompleteRequestMessage.clientTransferNumber =
-              sessionData.clientTransferNumber;
-          }
 
           transferCompleteRequestMessage.hashTransferCommence = getMessageHash(
             sessionData,
@@ -442,7 +396,7 @@ export class Stage3ClientService extends SATPService {
             ),
           );
 
-          transferCompleteRequestMessage.clientSignature = messageSignature;
+          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(
             sessionData,
             MessageType.COMMIT_TRANSFER_COMPLETE,
@@ -526,16 +480,6 @@ export class Stage3ClientService extends SATPService {
 
         signatureVerifier(fnTag, this.Signer, response, sessionData);
 
-        if (
-          sessionData.serverTransferNumber != undefined &&
-          response.serverTransferNumber != sessionData.serverTransferNumber
-        ) {
-          // This does not throw an error because the serverTransferNumber is only meaningful to the server.
-          this.Log.info(
-            `${fnTag}, serverTransferNumber does not match the one that was sent`,
-          );
-        }
-
         saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
 
         saveTimestamp(
@@ -599,16 +543,6 @@ export class Stage3ClientService extends SATPService {
 
         sessionData.mintAssertionClaim = response.mintAssertionClaim;
 
-        if (
-          sessionData.serverTransferNumber != undefined &&
-          response.serverTransferNumber != sessionData.serverTransferNumber
-        ) {
-          // This does not throw an error because the serverTransferNumber is only meaningful to the server.
-          this.Log.info(
-            `${fnTag}, serverTransferNumber does not match the one that was sent`,
-          );
-        }
-
         saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
 
         saveTimestamp(
@@ -671,16 +605,6 @@ export class Stage3ClientService extends SATPService {
             response.assignmentAssertionClaimFormat;
         }
 
-        if (
-          sessionData.serverTransferNumber != "" &&
-          response.serverTransferNumber != sessionData.serverTransferNumber
-        ) {
-          // This does not throw an error because the serverTransferNumber is only meaningful to the server.
-          this.Log.info(
-            `${fnTag}, serverTransferNumber does not match the one that was sent`,
-          );
-        }
-
         saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
 
         saveTimestamp(
@@ -729,16 +653,6 @@ export class Stage3ClientService extends SATPService {
         );
 
         signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        if (
-          sessionData.serverTransferNumber != "" &&
-          response.serverTransferNumber != sessionData.serverTransferNumber
-        ) {
-          // This does not throw an error because the serverTransferNumber is only meaningful to the server.
-          this.Log.info(
-            `${fnTag}, serverTransferNumber does not match the one that was sent`,
-          );
-        }
 
         sessionData.state = State.COMPLETED;
 

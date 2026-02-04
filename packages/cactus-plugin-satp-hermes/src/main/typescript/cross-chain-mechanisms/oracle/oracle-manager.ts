@@ -30,7 +30,7 @@
  * ]);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -64,7 +64,7 @@ import {
   OracleFabric,
 } from "./implementations/oracle-fabric";
 import { OracleAbstract } from "./oracle-abstract";
-import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   NetworkId,
   OracleOperation,
@@ -870,7 +870,7 @@ export class OracleManager {
               ...task.dstContract,
               params:
                 task.dstContract.params !== undefined &&
-                task.dstContract.params?.length !== 0 // if params are empty, use the read response
+                  task.dstContract.params?.length !== 0 // if params are empty, use the read response
                   ? task.dstContract.params
                   : writeContent,
             },

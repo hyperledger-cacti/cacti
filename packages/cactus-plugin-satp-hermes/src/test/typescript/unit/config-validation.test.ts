@@ -51,7 +51,7 @@ describe("SATP Gateway Configuration Loading", () => {
         gid: {
           id: "${GATEWAY_ID}",
           name: "TestGateway",
-          version: [{ Core: "v02", Architecture: "v02", Crash: "v02" }],
+          version: [{ Core: "v13", Architecture: "v02", Crash: "v02" }],
           address: "${GATEWAY_ADDRESS}",
           gatewayClientPort: 3011,
           gatewayServerPort: 3010,

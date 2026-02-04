@@ -14,7 +14,7 @@
  * - data: JSON-serialized log payload
  * - sequenceNumber: Monotonic sequence for crash recovery
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} IETF SATP Core v13
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */

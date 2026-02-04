@@ -4,7 +4,7 @@
  * This module provides a factory implementation for creating and validating SATP
  * gateway plugin instances. Extends the Hyperledger Cacti PluginFactory pattern
  * to ensure proper initialization and configuration validation of SATP gateways
- * following the IETF SATP v2 specification.
+ * following the IETF SATP v13 specification.
  *
  * The factory handles:
  * - SATP gateway instance creation with type safety
@@ -28,7 +28,7 @@
  * const gateway = await factory.create(gatewayConfig);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */

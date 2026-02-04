@@ -12,7 +12,7 @@
  * - signerPubKey: Public key of the signing gateway for verification
  * - key: Unique log entry identifier (primary key)
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} IETF SATP Core v13
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */

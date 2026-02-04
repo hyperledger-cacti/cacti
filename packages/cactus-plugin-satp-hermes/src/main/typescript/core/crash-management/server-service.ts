@@ -8,7 +8,7 @@ import {
   RollbackResponseSchema,
   type RecoverSuccessResponse,
   RecoverSuccessResponseSchema,
-} from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+} from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import type { SATPSession } from "../satp-session";
 import type { ILocalLogRepository } from "../../database/repository/interfaces/repository";
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
@@ -22,7 +22,7 @@ import {
   verifySignature,
 } from "../../utils/gateway-utils";
 import { SignatureVerificationError } from "../errors/satp-service-errors";
-import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
+import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { MonitorService } from "../../services/monitoring/monitor";

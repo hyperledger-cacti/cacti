@@ -10,7 +10,7 @@ import {
   isFabricOptionsJSON,
 } from "./validate-fabric-options";
 import { isClaimFormat } from "./validate-bungee-options";
-import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
+import type { ClaimFormat } from "../../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { isNetworkId } from "../validate-satp-gateway-identity";
 import { isKeyPairJSON, KeyPairJSON } from "../validate-key-pair-json";
 import { X509Identity } from "fabric-network";

@@ -50,20 +50,17 @@
 import { create, isMessage } from "@bufbuild/protobuf";
 import {
   AssetSchema,
-  CredentialProfile,
   ERCTokenStandard,
-  Error as SATPError,
   LockType,
   MessageType,
-  SignatureAlgorithm,
   NetworkIdSchema,
-} from "../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   MessageStagesTimestamps,
   SATPStage,
   SessionData,
   State,
-} from "../generated/proto/cacti/satp/v02/session/session_pb";
+} from "../generated/proto/cacti/satp/v13/session/session_pb";
 import {
   NewSessionRequest,
   NewSessionRequestSchema,
@@ -73,7 +70,7 @@ import {
   PreSATPTransferRequestSchema,
   PreSATPTransferResponse,
   PreSATPTransferResponseSchema,
-} from "../generated/proto/cacti/satp/v02/service/stage_0_pb";
+} from "../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import {
   TransferProposalRequest,
   TransferProposalResponse,
@@ -83,13 +80,13 @@ import {
   TransferProposalResponseSchema,
   TransferCommenceRequestSchema,
   TransferCommenceResponseSchema,
-} from "../generated/proto/cacti/satp/v02/service/stage_1_pb";
+} from "../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   LockAssertionRequest,
   LockAssertionResponse,
   LockAssertionRequestSchema,
   LockAssertionResponseSchema,
-} from "../generated/proto/cacti/satp/v02/service/stage_2_pb";
+} from "../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import {
   CommitPreparationRequest,
   CommitPreparationResponse,
@@ -103,14 +100,14 @@ import {
   CommitPreparationResponseSchema,
   TransferCompleteRequestSchema,
   TransferCompleteResponseSchema,
-} from "../generated/proto/cacti/satp/v02/service/stage_3_pb";
+} from "../generated/proto/cacti/satp/v13/service/stage_3_pb";
 import { getEnumKeyByValue, getEnumValueByKey } from "../services/utils";
 import { SATPInternalError } from "./errors/satp-errors";
 import { SATPSession } from "./satp-session";
 
 import { v4 as uuidv4 } from "uuid";
 import { TokenType, TransactRequest } from "../public-api";
-import { TokenType as ProtoTokenType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType as ProtoTokenType } from "../generated/proto/cacti/satp/v13/common/message_pb";
 
 /**
  * Validates the required fields of a TransactRequest.
@@ -258,10 +255,10 @@ export function populateClientSessionData(
   serverGatewayPubkey: string,
   receiverGatewayOwnerId: string,
   senderGatewayOwnerId: string,
-  signatureAlgorithm: SignatureAlgorithm,
+  signatureAlgorithm: string,
+  gatewayTlsScheme: string,
   lockType: LockType,
   lockExpirationTime: bigint,
-  credentialProfile: CredentialProfile,
   loggingProfile: string,
   accessControlProfile: string,
   fromAmount: string | undefined,
@@ -299,9 +296,9 @@ export function populateClientSessionData(
   sessionData.receiverGatewayOwnerId = receiverGatewayOwnerId;
   sessionData.senderGatewayOwnerId = senderGatewayOwnerId;
   sessionData.signatureAlgorithm = signatureAlgorithm;
+  sessionData.gatewayTlsScheme = gatewayTlsScheme;
   sessionData.lockType = lockType;
   sessionData.lockExpirationTime = lockExpirationTime;
-  sessionData.credentialProfile = credentialProfile;
   sessionData.loggingProfile = loggingProfile;
   sessionData.accessControlProfile = accessControlProfile;
   sessionData.senderAsset = create(AssetSchema, {
@@ -359,7 +356,6 @@ export function copySessionDataAttributes(
   destSessionData.transferContextId =
     contextId || srcSessionData.transferContextId;
   destSessionData.hashes = srcSessionData.hashes;
-  destSessionData.payloadProfile = srcSessionData.payloadProfile;
   destSessionData.signatures = srcSessionData.signatures;
   destSessionData.maxRetries = srcSessionData.maxRetries;
   destSessionData.maxTimeout = srcSessionData.maxTimeout;
@@ -395,11 +391,6 @@ export function copySessionDataAttributes(
   destSessionData.signatureAlgorithm = srcSessionData.signatureAlgorithm;
   destSessionData.lockType = srcSessionData.lockType;
   destSessionData.lockExpirationTime = srcSessionData.lockExpirationTime;
-  destSessionData.permissions = srcSessionData.permissions;
-  destSessionData.developerUrn = srcSessionData.developerUrn;
-  destSessionData.credentialProfile = srcSessionData.credentialProfile;
-  destSessionData.subsequentCalls = srcSessionData.subsequentCalls;
-  destSessionData.history = srcSessionData.history;
   destSessionData.multipleClaimsAllowed = srcSessionData.multipleClaimsAllowed;
   destSessionData.multipleCancelsAllowed =
     srcSessionData.multipleCancelsAllowed;
@@ -435,10 +426,15 @@ export function copySessionDataAttributes(
   destSessionData.senderAsset = srcSessionData.senderAsset;
   destSessionData.receiverAsset = srcSessionData.receiverAsset;
   destSessionData.state = srcSessionData.state;
-  destSessionData.errorCode = srcSessionData.errorCode;
   destSessionData.phaseError = srcSessionData.phaseError;
   destSessionData.recoveredTried = srcSessionData.recoveredTried;
   destSessionData.satpMessages = srcSessionData.satpMessages;
+  // v13 new fields
+  destSessionData.senderGatewayId = srcSessionData.senderGatewayId;
+  destSessionData.recipientGatewayId = srcSessionData.recipientGatewayId;
+  destSessionData.gatewayDefaultSignatureAlgorithm =
+    srcSessionData.gatewayDefaultSignatureAlgorithm;
+  destSessionData.gatewayTlsScheme = srcSessionData.gatewayTlsScheme;
 }
 
 /**
@@ -904,7 +900,8 @@ export function getMessageTimestamp(
 export function setError(
   session: SATPSession | undefined,
   stageMessage: MessageType,
-  error: SATPInternalError,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _error: SATPInternalError,
 ) {
   if (session == undefined) {
     return;
@@ -939,11 +936,6 @@ export function setError(
 
   sessionData.state = State.ERROR;
 
-  try {
-    sessionData.errorCode = error.getSATPErrorType();
-  } catch (e) {
-    sessionData.errorCode = SATPError.UNSPECIFIED;
-  }
   sessionData.phaseError = stageMessage;
 }
 
@@ -951,7 +943,8 @@ export function setError(
 export function setErrorChecking(
   session: SATPSession | undefined,
   stageMessage: MessageType,
-  error: SATPInternalError,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _error: SATPInternalError,
 ) {
   if (session == undefined) {
     return;
@@ -984,13 +977,7 @@ export function setErrorChecking(
       return;
   }
 
-  const errorReformat = new SATPInternalError(
-    error.message,
-    error.cause,
-    error.code,
-  );
   sessionData.state = State.ERROR;
-  sessionData.errorCode = errorReformat.getSATPErrorType();
   sessionData.phaseError = stageMessage;
 }
 

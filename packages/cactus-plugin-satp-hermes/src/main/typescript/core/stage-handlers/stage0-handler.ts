@@ -3,7 +3,7 @@
  * SATP Stage 0 Handler for Transfer Initiation and Session Establishment.
  *
  * @description
- * This module implements the Stage 0 handler of the IETF SATP Core v2 protocol,
+ * This module implements the Stage 0 handler of the IETF SATP Core v13 protocol,
  * responsible for managing the initial phase of cross-chain asset transfers.
  * Stage 0 encompasses session establishment, gateway authentication, asset
  * validation, and pre-transfer preparations required before the actual
@@ -80,7 +80,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage0ServerService} for server-side business logic
  * @see {@link Stage0ClientService} for client-side business logic
@@ -103,13 +103,13 @@ import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import {
   NewSessionRequest,
   NewSessionResponse,
   PreSATPTransferRequest,
   PreSATPTransferResponse,
-} from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { Stage0ClientService } from "../stage-services/client/stage0-client-service";
 import {
   FailedToCreateMessageError,
@@ -123,7 +123,7 @@ import {
   saveMessageInSessionData,
   setError,
 } from "../session-utils";
-import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { getMessageTypeName } from "../satp-utils";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -134,7 +134,7 @@ import { buildAdapterPayload } from "./handler-utils";
  * SATP Stage 0 Handler for Transfer Initiation and Session Establishment.
  *
  * @description
- * Implements the Stage 0 phase of the IETF SATP Core v2 protocol, managing
+ * Implements the Stage 0 phase of the IETF SATP Core v13 protocol, managing
  * the critical initial steps of cross-chain asset transfers. This handler
  * orchestrates session establishment, gateway authentication, asset validation,
  * and pre-transfer preparations that lay the foundation for secure and
@@ -420,7 +420,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * Returns the SATP protocol stage identifier for this handler.
    *
    * @description
-   * Provides the stage identifier as defined in the IETF SATP Core v2
+   * Provides the stage identifier as defined in the IETF SATP Core v13
    * specification, used for protocol compliance and message routing.
    *
    * @public
@@ -453,7 +453,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * Sets up the Connect RPC router to handle incoming Stage 0 SATP protocol
    * messages by registering the appropriate service methods. This enables
    * the handler to receive and process NewSession and PreSATPTransfer requests
-   * from client gateways according to the IETF SATP Core v2 specification.
+   * from client gateways according to the IETF SATP Core v13 specification.
    *
    * **Registered Service Methods:**
    * - **newSession**: Handles NewSessionRequest messages for session establishment
@@ -532,7 +532,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * Processes incoming NewSessionRequest messages from client gateways to
    * establish new SATP transfer sessions. This method implements the server-side
    * logic for session creation, gateway authentication, and initial transfer
-   * validation according to the IETF SATP Core v2 specification.
+   * validation according to the IETF SATP Core v13 specification.
    *
    * **Processing Steps:**
    * 1. **Request Validation**: Validates message structure and required fields
@@ -728,7 +728,7 @@ export class Stage0SATPHandler implements SATPHandler {
    * Processes incoming PreSATPTransferRequest messages from client gateways
    * to prepare for cross-chain asset transfers. This method implements the
    * server-side logic for asset validation, token wrapping, and transfer
-   * preparation according to the IETF SATP Core v2 specification.
+   * preparation according to the IETF SATP Core v13 specification.
    *
    * **Processing Steps:**
    * 1. **Session Validation**: Ensures session exists and is in valid state

@@ -44,19 +44,40 @@ The plugin supports both bidirectional and unidirectional asset transfers with t
 
 ## Table of Contents
 
-- [Assumptions](#assumptions)
-- [Getting Started](#getting-started)
-- [Architecture](#architecture)
-- [Protocol Flow](#protocol-flow)
-- [Application-to-Gateway API (API Type 1)](#application-to-gateway-api-api-type-1)
-- [Gateway-to-Gateway API (API Type 2)](#gateway-to-gateway-api-api-type-2)
-- [Adapter Layer (API Type 3)](#adapter-layer-api-type-3)
-- [Gateway Configuration](#gateway-configuration)
-- [Containerization](#containerization)
-- [Running local Gateway with Docker Compose](#running-local-gateway-with-docker-compose)
-- [Contributing](#contributing)
-- [Release Process](#release-process)
-- [License](#license)
+- [`@hyperledger-cacti/cactus-plugin-satp-hermes`](#hyperledger-cacticactus-plugin-satp-hermes)
+  - [Overview](#overview)
+  - [Install](#install)
+  - [API Summary](#api-summary)
+  - [Key Features](#key-features)
+  - [Table of Contents](#table-of-contents)
+  - [Assumptions](#assumptions)
+  - [Usage](#usage)
+    - [Prerequisites](#prerequisites)
+  - [Architecture](#architecture)
+    - [Core Components](#core-components)
+      - [Gateway Layer](#gateway-layer)
+      - [Ledger Integration Layer](#ledger-integration-layer)
+      - [Persistence Layer](#persistence-layer)
+      - [Security Layer](#security-layer)
+    - [Protocol Flow](#protocol-flow)
+    - [Asset Identifier Fields: `token_id` vs `unique_descriptor`](#asset-identifier-fields-token_id-vs-unique_descriptor)
+    - [Crash Recovery Integration](#crash-recovery-integration)
+    - [Application-to-Gateway API (API Type 1)](#application-to-gateway-api-api-type-1)
+      - [API Endpoints](#api-endpoints)
+    - [Gateway-to-Gateway API (API Type 2)](#gateway-to-gateway-api-api-type-2)
+  - [Use case](#use-case)
+    - [Role of Crash Recovery in SATP](#role-of-crash-recovery-in-satp)
+    - [Future Work](#future-work)
+  - [Gateway Configuration](#gateway-configuration)
+  - [Adapter Layer (API Type 3)](#adapter-layer-api-type-3)
+  - [Containerization](#containerization)
+    - [Building the container image locally](#building-the-container-image-locally)
+    - [Build the image:](#build-the-image)
+  - [Running local Gateway with Docker Compose](#running-local-gateway-with-docker-compose)
+  - [Testing](#testing)
+  - [Contributing](#contributing)
+  - [Release Process](#release-process)
+  - [License](#license)
 
 ## Assumptions
 Regarding the crash recovery procedure in place, at the moment we only support crashes of gateways under certain assumptions detailed as follows:
@@ -129,7 +150,7 @@ The SATP protocol operates in four distinct stages:
 3. **Stage 2 (Lock Evidence)**: Asset locking and proof generation/verification
 4. **Stage 3 (Commitment)**: Final asset transfer completion and confirmation
 
-The SATP protocol follows a standardized sequence of cross-chain asset transfer operations as defined in the IETF SATP v2 specification.
+The SATP protocol follows a standardized sequence of cross-chain asset transfer operations as defined in the [IETF SATP v13 specification](https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-13).
 
 ### Asset Identifier Fields: `token_id` vs `unique_descriptor`
 

@@ -42,21 +42,25 @@ export const DEFAULT_PORT_GATEWAY_UI = DEFAULT_PORT_GATEWAY_SERVER + 2;
 /** Default port for SATP gateway OpenAPI documentation */
 export const DEFAULT_PORT_GATEWAY_OAPI = 4010;
 /** Current SATP protocol version identifier */
-export const SATP_VERSION = "v02";
+export const SATP_VERSION = "v13";
 /** SATP Core specification version */
-export const SATP_CORE_VERSION = "v02";
+export const SATP_CORE_VERSION = "v13";
 /** SATP Architecture specification version */
-export const SATP_ARCHITECTURE_VERSION = "v02";
+export const SATP_ARCHITECTURE_VERSION = "v13";
 /** SATP Crash Recovery specification version */
-export const SATP_CRASH_VERSION = "v02";
-
+export const SATP_CRASH_VERSION = "v13";
 /**
- * Hardcoded map of ledger types that SATP has implemented support for.
- * This represents the gateway's actual bridge capabilities.
+ * SATP protocol wire version string per v13 Section 5.3.1.
+ * Carried in the `version` field of CommonSatp.
  */
-export const SATP_IMPLEMENTED_LEDGERS: ReadonlySet<LedgerType> = new Set([
-  LedgerType.Fabric2,
+export const SATP_PROTOCOL_VERSION = "1.0";
+/** Mandatory-to-implement TLS 1.3 cipher suite from RFC 8446 Section 9.1. */
+export const DEFAULT_TLS13_CIPHER_SUITE = "TLS_AES_128_GCM_SHA256";
+
+/** Ledger types with bridge implementations available to SATP. */
+export const SATP_IMPLEMENTED_LEDGERS = new Set<LedgerType>([
   LedgerType.Besu1X,
   LedgerType.Besu2X,
   LedgerType.Ethereum,
+  LedgerType.Fabric2,
 ]);

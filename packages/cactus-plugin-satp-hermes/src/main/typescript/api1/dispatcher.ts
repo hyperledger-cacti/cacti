@@ -4,7 +4,7 @@
  * This module provides the main BLODispatcher class which serves as the central
  * request dispatcher for all SATP gateway API endpoints. It coordinates between
  * different service layers including admin operations, transaction handling,
- * oracle management, and cross-chain operations following the IETF SATP v2
+ * oracle management, and cross-chain operations following the IETF SATP v13
  * specification.
  *
  * The dispatcher manages:
@@ -38,7 +38,7 @@
  * const endpoints = await dispatcher.getOrCreateWebServices();
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -105,7 +105,7 @@ import { GatewayShuttingDownError } from "./gateway-errors";
 import {
   ClaimFormat,
   TokenType,
-} from "../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../generated/proto/cacti/satp/v13/common/message_pb";
 import { GetApproveAddressEndpointV1 } from "./transaction/get-approve-address-endpoint";
 import { getEnumValueByKey } from "../services/utils";
 import { GatewayIdentity } from "../core/types";
@@ -1011,7 +1011,7 @@ export class BLODispatcher {
       try {
         this.logger.info(
           `Inbound webhook decision request: adapter="${req.adapterId}" ` +
-            `session="${req.sessionId}" continue=${req.continue}`,
+          `session="${req.sessionId}" continue=${req.continue}`,
         );
         if (this.isShuttingDown) {
           throw new GatewayShuttingDownError(

@@ -19,7 +19,7 @@ import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger-cacti/cactus-core-api";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import {
   BesuTestEnvironment,
   EthereumTestEnvironment,
@@ -35,7 +35,7 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
-import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 import fs from "fs";

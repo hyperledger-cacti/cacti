@@ -1,0 +1,7 @@
+syntax = "proto3";
+package cacti.satp.v13.view;
+
+// TODO
+message CommonProof {
+    string message = 1;
+}

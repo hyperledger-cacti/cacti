@@ -26,7 +26,7 @@ import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger-cacti/cactus-core-api";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import {
   BesuTestEnvironment,
   EthereumTestEnvironment,

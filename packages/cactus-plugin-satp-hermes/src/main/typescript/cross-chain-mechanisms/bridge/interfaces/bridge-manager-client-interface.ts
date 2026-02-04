@@ -50,7 +50,7 @@
  * );
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
  * @see {@link BridgeLeaf} for bridge endpoint implementation details
  * @see {@link SATPBridgeExecutionLayer} for execution layer capabilities
  * @see {@link BridgeManagerAdminInterface} for administrative bridge operations
@@ -59,7 +59,7 @@
 import {
   ClaimFormat,
   TokenType,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { NetworkId } from "../../../public-api";
 import { BridgeLeaf } from "../bridge-leaf";
 import { SATPBridgeExecutionLayer } from "../satp-bridge-execution-layer";
@@ -102,7 +102,7 @@ import { SATPBridgeExecutionLayer } from "../satp-bridge-execution-layer";
  * }
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 3.2
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 3.2
  * @see {@link BridgeLeaf} for bridge endpoint implementation
  * @see {@link SATPBridgeExecutionLayer} for execution layer interface
  * @see {@link NetworkId} for network identification structure
@@ -157,7 +157,7 @@ export abstract class BridgeManagerClientInterface {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.2
    * @see {@link BridgeLeaf} for bridge endpoint implementation details
    * @see {@link ClaimFormat} for supported proof formats
    * @see {@link NetworkId} for network identification structure
@@ -214,7 +214,7 @@ export abstract class BridgeManagerClientInterface {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 3.3
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 3.3
    * @see {@link NetworkId} for network identification details
    * @see {@link getBridgeEndPoint} for accessing specific network bridges
    * @see {@link SATPGatewayRegistry} for gateway registration and discovery
@@ -271,7 +271,7 @@ export abstract class BridgeManagerClientInterface {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.3
    * @see {@link SATPBridgeExecutionLayer} for execution layer interface details
    * @see {@link getBridgeEndPoint} for underlying bridge endpoint access
    * @see {@link ClaimFormat} for supported proof generation formats
@@ -331,7 +331,7 @@ export abstract class BridgeManagerClientInterface {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
    * @see {@link TokenType} for supported asset type enumeration
    * @see {@link NetworkId} for network identification structure
    * @see {@link BridgeLeaf.getApproveAddress} for implementation details
