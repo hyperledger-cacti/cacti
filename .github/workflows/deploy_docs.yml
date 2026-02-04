@@ -10,6 +10,7 @@ on:
       - main
 
     paths:
+      - 'mkdocs/**'
       - 'docs/**'
       - 'packages/cactus-plugin-satp-hermes/docs/**'
 
@@ -45,7 +46,7 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-        working-directory: docs
+        working-directory: mkdocs
 
       - name: Install system dependencies for Mermaid diagrams
         run: |
@@ -76,8 +77,8 @@ jobs:
           cp -r packages/cactus-plugin-satp-hermes/assets/diagrams docs/docs/satp-hermes/assets/
 
       - name: Build markdown for openapi specs
-        run: 'python3 docs/scripts/publish_openapi.py'
+        run: 'python3 mkdocs/scripts/publish_openapi.py'
         
       - name: Build and publish
         run: git pull && mkdocs gh-deploy
-        working-directory: docs
+        working-directory: mkdocs

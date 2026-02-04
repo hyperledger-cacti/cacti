@@ -7,13 +7,13 @@ import shutil
 
 # Package openapi markdown for publishing as documentation
 #
-# - Copies any package openapi.json file in the dist directory to docs/docs/openapi/json 
-# - Generates an openapi .md file to view the openapi.json file in docs/docs/openapi
+# - Copies any package openapi.json file in the dist directory to docs/openapi/json 
+# - Generates an openapi .md file to view the openapi.json file in docs/openapi
 # - Generates an index file of all openapi markdown files, grouped by base directory
 
 apis_by_group = {}
 
-doc_dir = "docs/docs/references/openapi"
+doc_dir = "docs/references/openapi"
 json_dir = f"{doc_dir}/json"
 
 def write_mdfile(component, src):

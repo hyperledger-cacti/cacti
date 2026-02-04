@@ -149,8 +149,8 @@ jobs:
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-        working-directory: docs
+        working-directory: mkdocs
 
       - name: Build
         run: mkdocs build
-        working-directory: docs
+        working-directory: mkdocs

@@ -8,7 +8,7 @@ tools/docker/besu-all-in-one/supervisord.conf
 docs-cactus/source/conf.py
 
 # Links would be broken if we refactored the offending lines
-docs/docs/contributing/requesting-a-change.md
+docs/contributing/requesting-a-change.md
 
 # Cannot be edited due to configuration schema of third party software
 packages/cactus-test-tooling/src/main/typescript/keycloak/keycloak-container.ts
