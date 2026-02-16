@@ -38,10 +38,9 @@ import {
   AuditResponse,
 } from "../../generated/gateway-client/typescript-axios/api";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import { KnexAuditEntryRepository } from "../../database/repository/knex-audit-repository";
 import type { IAuditEntryRepository } from "../../database/repository/interfaces/repository";
 
-import type { AuditEntry, Audit } from "../../core/types";
+import type { Audit } from "../../core/types";
 
 /**
  * Execute audit operations for SATP sessions and transactions.
@@ -137,15 +136,19 @@ export async function getAuditData(
   //);
 
   const audit: Audit = await auditRepository.readByTimeInterval(
-    new Date(req.startTimestamp).toISOString(),
-    new Date(req.endTimestamp).toISOString(),
+    Date.parse(new Date(req.startTimestamp).toISOString()),
+    Date.parse(new Date(req.endTimestamp).toISOString()),
   );
 
   logger.info(`${fnTag}, Fetched audit entries: ${audit.auditEntries.length}`);
-
-  //TODO: must update so that it matches the AuditResponse data type
   return {
-    sessions: audit.auditEntries.map((entry) => entry.session.toString()),
+    auditEntries: {
+      entries: audit.auditEntries.map((entry) => ({
+        auditEntryId: entry.auditEntryId,
+        session: entry.session,
+        timestamp: entry.timestamp,
+      })),
+    },
     startTimestamp: req.startTimestamp,
     endTimestamp: req.endTimestamp,
   };
