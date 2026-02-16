@@ -132,13 +132,13 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
   /**
    * Retrieve all audit entries that fall within a specified time interval.
    *
-   * @param startTimestamp - ISO string representing the start of the interval
-   * @param endTimestamp - ISO string representing the end of the interval
+   * @param startTimestamp - epoch timestamp representing the start of the interval
+   * @param endTimestamp - epoch timestamp representing the end of the interval
    * @returns Promise resolving to an Audit object containing all matching audit entries
    */
   readByTimeInterval(
-    startTimestamp: string,
-    endTimestamp: string,
+    startTimestamp: number,
+    endTimestamp: number,
   ): Promise<Audit> {
     return this.getAuditEntriesTable()
       .where("timestamp", ">=", startTimestamp)
@@ -164,6 +164,7 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
    * @returns A promise resolving when the database insertion completes.
    */
   create(auditEntry: AuditEntry): any {
+    console.log(`Creating audit entry with ID: ${auditEntry.auditEntryId}`);
     return this.getAuditEntriesTable().insert(auditEntry);
   }
 

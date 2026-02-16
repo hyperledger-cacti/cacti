@@ -174,8 +174,8 @@ export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
 export interface IAuditEntryRepository extends IRepository<AuditEntry, string> {
   readById(auditId: string): Promise<AuditEntry>;
   readByTimeInterval(
-    startTimestamp: string,
-    endTimestamp: string,
+    startTimestamp: number,
+    endTimestamp: number,
   ): Promise<Audit>;
   create(auditEntry: AuditEntry): any;
   /** Clean up repository resources and connections */

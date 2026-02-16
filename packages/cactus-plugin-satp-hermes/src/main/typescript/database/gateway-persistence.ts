@@ -105,7 +105,7 @@ export class GatewayPersistence {
         const auditEntry: AuditEntry = {
           auditEntryId: `audit-${Date.now()}-${logEntry.sessionId}`,
           session: localLog,
-          timestamp: Date.now().toString(),
+          timestamp: Date.now(),
         };
 
         await this.storeInDatabase(localLog, auditEntry);

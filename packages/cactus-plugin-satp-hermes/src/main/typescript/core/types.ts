@@ -250,7 +250,7 @@ export enum CrashStatus {
 export interface AuditEntry {
   auditEntryId: string;
   session: LocalLog;
-  timestamp: string;
+  timestamp: number;
 }
 
 export interface Audit {

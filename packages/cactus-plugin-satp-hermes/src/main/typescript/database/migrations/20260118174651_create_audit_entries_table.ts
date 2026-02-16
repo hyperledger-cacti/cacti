@@ -4,7 +4,7 @@ export function up(knex: Knex): Knex.SchemaBuilder {
   return knex.schema.createTable("audit_entries", (table) => {
     table.string("auditEntryId").notNullable().unique().primary();
     table.string("session");
-    table.string("timestamp").notNullable();
+    table.bigInteger("timestamp").notNullable();
   });
 }
 
