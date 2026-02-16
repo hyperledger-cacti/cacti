@@ -343,48 +343,86 @@ export const AssetErcTokenStandardEnum = {
 export type AssetErcTokenStandardEnum = typeof AssetErcTokenStandardEnum[keyof typeof AssetErcTokenStandardEnum];
 
 /**
+ * Collection of audit entries.
+ * @export
+ * @interface Audit
+ */
+export interface Audit {
+    /**
+     * List of audit entries.
+     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInner>}
+     * @memberof Audit
+     */
+    'entries': Array<PerformAudit200ResponseAuditEntriesEntriesInner>;
+}
+/**
+ * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
+ * @export
+ * @interface AuditEntry
+ */
+export interface AuditEntry {
+    /**
+     * The unique identifier for the audit entry.
+     * @type {string}
+     * @memberof AuditEntry
+     */
+    'auditEntryId'?: string;
+    /**
+     * 
+     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerSession}
+     * @memberof AuditEntry
+     */
+    'session': PerformAudit200ResponseAuditEntriesEntriesInnerSession;
+    /**
+     * The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof AuditEntry
+     */
+    'timestamp': number;
+}
+/**
  * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
  * @export
  * @interface AuditRequest
  */
 export interface AuditRequest {
     /**
-     * The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
+     * The start of the audit period, in ISO 8601 format (e.g., \"2026-02-16T10:33:30.639Z\").
+     * @type {string}
      * @memberof AuditRequest
      */
-    'startTimestamp': number;
+    'startTimestamp': string;
     /**
-     * The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
+     * The end of the audit period, in ISO 8601 format (e.g., \"2026-02-16T11:00:00.000Z\").
+     * @type {string}
      * @memberof AuditRequest
      */
-    'endTimestamp': number;
+    'endTimestamp': string;
 }
 /**
- * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
+ * Response schema for an audit request.
  * @export
  * @interface AuditResponse
  */
 export interface AuditResponse {
     /**
      * 
-     * @type {Array<string>}
+     * @type {PerformAudit200ResponseAuditEntries}
      * @memberof AuditResponse
      */
-    'sessions'?: Array<string>;
+    'auditEntries': PerformAudit200ResponseAuditEntries;
     /**
-     * The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
+     * The start of the audit period, in ISO 8601 format (e.g., \"2026-02-16T10:33:30.639Z\").
+     * @type {string}
      * @memberof AuditResponse
      */
-    'startTimestamp'?: number;
+    'startTimestamp': string;
     /**
-     * The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
+     * The end of the audit period, in ISO 8601 format (e.g., \"2026-02-16T11:00:00.000Z\").
+     * @type {string}
      * @memberof AuditResponse
      */
-    'endTimestamp'?: number;
+    'endTimestamp': string;
 }
 /**
  * Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1
@@ -2255,6 +2293,55 @@ export interface IntegrationsResponse {
     'integrations': Array<GetIntegrations200ResponseIntegrationsInner>;
 }
 /**
+ * Represents a persisted local audit/log record generated during the lifecycle of a SATP transfer session. Each entry captures the operation performed, its contextual identifiers, serialized session state data, and ordering metadata. 
+ * @export
+ * @interface LocalLog
+ */
+export interface LocalLog {
+    /**
+     * Unique identifier of the SATP session associated with this log entry. Typically composed of the transfer context ID plus additional correlation suffixes used for tracing within the gateway. 
+     * @type {string}
+     * @memberof LocalLog
+     */
+    'sessionId': string;
+    /**
+     * High-level classification of the log event corresponding to a SATP protocol stage or message artifact (e.g., INIT_RECEIPT, TRANSFER_PROPOSAL, LOCK_ASSERTION). 
+     * @type {string}
+     * @memberof LocalLog
+     */
+    'type': string;
+    /**
+     * Composite storage key uniquely identifying the log entry within the persistence layer. Commonly derived from the session ID, log type, and operation name. 
+     * @type {string}
+     * @memberof LocalLog
+     */
+    'key': string;
+    /**
+     * Specific operation that produced the log entry. Represents the action executed within the SATP workflow (e.g., init, propose, lock, commit). 
+     * @type {string}
+     * @memberof LocalLog
+     */
+    'operation': string;
+    /**
+     * Unix timestamp in milliseconds (encoded as a string) indicating when the log entry was generated by the gateway. 
+     * @type {string}
+     * @memberof LocalLog
+     */
+    'timestamp'?: string;
+    /**
+     * JSON-serialized payload containing the full SATP session state snapshot at the time of logging. This includes transfer metadata, message hashes, signatures, asset details, protocol stage timestamps, and gateway identifiers. 
+     * @type {string}
+     * @memberof LocalLog
+     */
+    'data': string;
+    /**
+     * Monotonically increasing sequence number used to preserve the chronological ordering of log entries within a session. 
+     * @type {number}
+     * @memberof LocalLog
+     */
+    'sequenceNumber': number;
+}
+/**
  * The network of the DLT being interacted with.
  * @export
  * @interface NetworkId
@@ -2914,29 +3001,116 @@ export interface PauseResponse {
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
- * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
+ * Response schema for an audit request.
  * @export
  * @interface PerformAudit200Response
  */
 export interface PerformAudit200Response {
     /**
      * 
-     * @type {Array<string>}
+     * @type {PerformAudit200ResponseAuditEntries}
      * @memberof PerformAudit200Response
      */
-    'sessions'?: Array<string>;
+    'auditEntries': PerformAudit200ResponseAuditEntries;
     /**
-     * The start timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
+     * The start of the audit period, in ISO 8601 format (e.g., \"2026-02-16T10:33:30.639Z\").
+     * @type {string}
      * @memberof PerformAudit200Response
      */
-    'startTimestamp'?: number;
+    'startTimestamp': string;
     /**
-     * The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
+     * The end of the audit period, in ISO 8601 format (e.g., \"2026-02-16T11:00:00.000Z\").
+     * @type {string}
      * @memberof PerformAudit200Response
      */
-    'endTimestamp'?: number;
+    'endTimestamp': string;
+}
+/**
+ * Collection of audit entries.
+ * @export
+ * @interface PerformAudit200ResponseAuditEntries
+ */
+export interface PerformAudit200ResponseAuditEntries {
+    /**
+     * List of audit entries.
+     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInner>}
+     * @memberof PerformAudit200ResponseAuditEntries
+     */
+    'entries': Array<PerformAudit200ResponseAuditEntriesEntriesInner>;
+}
+/**
+ * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
+ * @export
+ * @interface PerformAudit200ResponseAuditEntriesEntriesInner
+ */
+export interface PerformAudit200ResponseAuditEntriesEntriesInner {
+    /**
+     * The unique identifier for the audit entry.
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
+     */
+    'auditEntryId'?: string;
+    /**
+     * 
+     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerSession}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
+     */
+    'session': PerformAudit200ResponseAuditEntriesEntriesInnerSession;
+    /**
+     * The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).
+     * @type {number}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
+     */
+    'timestamp': number;
+}
+/**
+ * Represents a persisted local audit/log record generated during the lifecycle of a SATP transfer session. Each entry captures the operation performed, its contextual identifiers, serialized session state data, and ordering metadata. 
+ * @export
+ * @interface PerformAudit200ResponseAuditEntriesEntriesInnerSession
+ */
+export interface PerformAudit200ResponseAuditEntriesEntriesInnerSession {
+    /**
+     * Unique identifier of the SATP session associated with this log entry. Typically composed of the transfer context ID plus additional correlation suffixes used for tracing within the gateway. 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
+     */
+    'sessionId': string;
+    /**
+     * High-level classification of the log event corresponding to a SATP protocol stage or message artifact (e.g., INIT_RECEIPT, TRANSFER_PROPOSAL, LOCK_ASSERTION). 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
+     */
+    'type': string;
+    /**
+     * Composite storage key uniquely identifying the log entry within the persistence layer. Commonly derived from the session ID, log type, and operation name. 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
+     */
+    'key': string;
+    /**
+     * Specific operation that produced the log entry. Represents the action executed within the SATP workflow (e.g., init, propose, lock, commit). 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
+     */
+    'operation': string;
+    /**
+     * Unix timestamp in milliseconds (encoded as a string) indicating when the log entry was generated by the gateway. 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
+     */
+    'timestamp'?: string;
+    /**
+     * JSON-serialized payload containing the full SATP session state snapshot at the time of logging. This includes transfer metadata, message hashes, signatures, asset details, protocol stage timestamps, and gateway identifiers. 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
+     */
+    'data': string;
+    /**
+     * Monotonically increasing sequence number used to preserve the chronological ordering of log entries within a session. 
+     * @type {number}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
+     */
+    'sequenceNumber': number;
 }
 /**
  * Response schema for registering a repeatable task. Includes the task ID and status of the registration.
