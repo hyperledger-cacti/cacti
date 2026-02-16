@@ -1,28 +1,16 @@
 import { KnexAuditEntryRepository } from "../../../../main/typescript/database/repository/knex-audit-repository";
-import { knexAuditInstance } from "../../../../main/typescript/database/knexfile-audit";
-import { BLODispatcher } from "../../../../main/typescript/api1/dispatcher";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
-import { GatewayOrchestrator } from "../../../../main/typescript/services/gateway/gateway-orchestrator";
-import { JsObjectSigner } from "@hyperledger/cactus-common";
-import { SATPCrossChainManager } from "../../../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
-import type { SATPLogger as Logger } from "../../../../main/typescript/core/satp-logger";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-
-import type {
-  AuditRequest,
-  AuditResponse,
-} from "../../../../main/typescript/generated/gateway-client/typescript-axios/api";
+import path from "path";
+import fs from "fs";
+import type { AuditRequest } from "../../../../main/typescript/generated/gateway-client/typescript-axios/api";
 import { SATPGateway } from "../../../../main/typescript";
 import type {
   Address,
   AuditEntry,
-  Audit,
   LocalLog,
   GatewayIdentity,
-  SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import { v4 as uuidv4 } from "uuid";
-import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   type IPluginFactoryOptions,
   PluginImportType,
@@ -35,8 +23,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { Knex, knex } from "knex";
-import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
+import { Knex } from "knex";
 
 describe("Admin Audit Service Integration Tests", () => {
   let repository: KnexAuditEntryRepository;
@@ -56,15 +43,14 @@ describe("Admin Audit Service Integration Tests", () => {
     sequenceNumber: 2,
   };
 
+  const dbPath = path.join(__dirname, "audit-test.sqlite");
+
   beforeAll(async () => {
-    const migrationSource = await createMigrationSource();
+    process.env.ENVIRONMENT = "test";
     const config: Knex.Config = {
       client: "sqlite3",
-      connection: { filename: ":memory:" },
+      connection: { filename: dbPath },
       useNullAsDefault: true,
-      migrations: {
-        migrationSource,
-      },
     };
 
     repository = new KnexAuditEntryRepository(config);
@@ -93,7 +79,7 @@ describe("Admin Audit Service Integration Tests", () => {
       instanceId: uuidv4(),
       logLevel: "DEBUG",
       gid: gatewayIdentity,
-      auditRepository: knexAuditInstance.default,
+      auditRepository: config,
       pluginRegistry: new PluginRegistry({
         plugins: [],
       }),
@@ -111,22 +97,23 @@ describe("Admin Audit Service Integration Tests", () => {
       await gateway.shutdown();
     }
     await repository.destroy();
+    fs.unlinkSync(dbPath);
   });
 
   it("Given a valid AuditRequest, When calling performAudit, Then it should return a valid AuditResponse", async () => {
     // Given
-    const timestamp = new Date().getTime();
+    const timestamp = Date.now();
 
     const auditEntry: AuditEntry = {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
-      timestamp: timestamp.toString(),
+      timestamp: timestamp,
     };
     await repository.create(auditEntry);
 
     const auditRequest: AuditRequest = {
-      startTimestamp: timestamp,
-      endTimestamp: Date.now(),
+      startTimestamp: new Date(timestamp).toISOString(),
+      endTimestamp: new Date(Date.now()).toISOString(),
     };
 
     // When
@@ -134,11 +121,18 @@ describe("Admin Audit Service Integration Tests", () => {
       await gateway.BLODispatcherInstance?.PerformAudit(auditRequest);
 
     // Then
+    expect(await repository.database.schema.hasTable("audit_entries")).toBe(
+      true,
+    );
     expect(auditResponse).toBeDefined();
     expect(auditResponse!.startTimestamp).toEqual(auditRequest.startTimestamp);
     expect(auditResponse!.endTimestamp).toEqual(auditRequest.endTimestamp);
-    expect(auditResponse!.sessions).toBeDefined();
-    expect(auditResponse!.sessions![0]).toEqual(auditEntry.session.toString());
+    expect(auditResponse!.auditEntries).toBeDefined();
+
+    const entry = auditResponse!.auditEntries?.entries![0];
+    expect(entry.auditEntryId).toEqual(auditEntry.auditEntryId);
+    expect(entry.timestamp).toEqual(auditEntry.timestamp);
+    expect(entry.session).toEqual(auditEntry.session);
   });
 
   it("Given a invalid AuditRequest, When calling performAudit, Then it should return an empty AuditResponse", async () => {

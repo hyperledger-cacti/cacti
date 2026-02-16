@@ -289,7 +289,7 @@ describe("AuditEntry Repository Integration Tests", () => {
     const auditEntry: AuditEntry = {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
-      timestamp: new Date().toString(),
+      timestamp: Date.now(),
     };
 
     // When
@@ -304,19 +304,19 @@ describe("AuditEntry Repository Integration Tests", () => {
 
   it("Given multiple AuditEntries, When reading by time interval, Then it should return only the entries within that interval", async () => {
     // Given
-    const now = new Date();
-    const later = new Date(now.getTime() + 5000);
+    const now = Date.now();
+    const later = now + 5000;
 
     const entries: AuditEntry[] = [
       {
         auditEntryId: uuidv4(),
         session: mockLocalLog,
-        timestamp: now.toString(),
+        timestamp: now,
       },
       {
         auditEntryId: uuidv4(),
         session: mockLocalLog2,
-        timestamp: (now.getTime() + 10000).toString(),
+        timestamp: now + 10000,
       },
     ];
 
@@ -325,10 +325,7 @@ describe("AuditEntry Repository Integration Tests", () => {
     }
 
     // When
-    const audit: Audit = await repository.readByTimeInterval(
-      now.toString(),
-      new Date(later.getTime() + 5000).toString(),
-    );
+    const audit: Audit = await repository.readByTimeInterval(now, later);
 
     // Then
     expect(audit.auditEntries.length).toEqual(1);
@@ -350,7 +347,7 @@ describe("AuditEntry Repository Integration Tests", () => {
     const auditEntry: AuditEntry = {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
-      timestamp: new Date().toString(),
+      timestamp: Date.now(),
     };
     await repository.create(auditEntry);
 
