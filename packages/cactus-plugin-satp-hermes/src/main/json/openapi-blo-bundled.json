@@ -2578,8 +2578,8 @@
             "description": "The start timestamp for the audit period.",
             "required": false,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "format": "date-time"
             }
           },
           {
@@ -2588,8 +2588,8 @@
             "description": "The end timestamp for the audit period.",
             "required": false,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "format": "date-time"
             }
           }
         ],
