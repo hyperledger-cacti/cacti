@@ -133,7 +133,7 @@
     "web3": "1.6.1",
     "web3-core": "1.6.1",
     "web3-utils": "1.6.1",
-    "webpack": "5.94.0"
+    "webpack": "5.104.1"
   },
   "devDependencies": {
     "@apidevtools/swagger-cli": "4.0.4",

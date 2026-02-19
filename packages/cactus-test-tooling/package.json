@@ -80,7 +80,7 @@
     "joi": "17.13.3",
     "js-yaml": "4.1.0",
     "keycloak-admin": "1.14.22",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "node-forge": "1.3.0",
     "node-ssh": "13.1.0",
     "p-retry": "4.6.1",
