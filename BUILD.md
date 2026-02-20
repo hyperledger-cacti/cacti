@@ -68,7 +68,7 @@ The `npm run watch` script in action:
 
     ```
     docker volume create cacti_volume
-    docker run -v cacti_volume:/workspace -w /workspace -it node:18.19.0 bash
+    docker run -v cacti_volume:/workspace -w /workspace -it node:20.20.0 bash
     ```
   * Add Docker volume configuration to devcontainer.json
     ```
@@ -84,14 +84,14 @@ The `npm run watch` script in action:
 _Unless explicitly stated otherwise, each bullet will apply to both Intel and ARM Macs. In bullets where there is a difference in the installation process it will be noted._
 * Git
   * https://github.com/git-guides/install-git#install-git-on-mac
-* NodeJS v18.19.0, npm v10.2.3 (we recommend using the Node Version Manager (nvm) if available for your OS)
+* NodeJS v20.20.0, npm v10.8.2 (we recommend using the Node Version Manager (nvm) if available for your OS)
   * [Download nvm using script](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
     * _See the Section "Macs with Apple Silicon Chips" under [macOS Troubleshooting](https://github.com/nvm-sh/nvm?tab=readme-ov-file#macos-troubleshooting) for ARM Mac specific instructions_
   * [Download nvm using homebrew](https://sukiphan.medium.com/how-to-install-nvm-node-version-manager-on-macos-d9fe432cc7db)
   * Using nvm install and use specific version of node: 
     ```
-    nvm install 18.19.0
-    nvm use 18.19.0
+    nvm install 20.20.0
+    nvm use 20.20.0
     ```
 * Yarn
   * `npm run enable-corepack` (from within the project directory)

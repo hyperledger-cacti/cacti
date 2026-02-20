@@ -43,7 +43,7 @@
     "dist/*"
   ],
   "scripts": {
-    "benchmark": "tsx ./src/test/typescript/benchmark/run-cmd-api-server-benchmark.ts .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log",
+    "benchmark": "ts-node ./src/test/typescript/benchmark/run-cmd-api-server-benchmark.ts .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log",
     "build:bundle": "ncc build ./dist/lib/main/typescript/cmd/cactus-api.js --minify --out=./dist/bundle/ncc/",
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
@@ -141,7 +141,7 @@
     "protobufjs": ">=7.4.0",
     "tap": "16.3.8",
     "tape-promise": "4.0.0",
-    "tsx": "4.16.2"
+    "ts-node": "10.9.2"
   },
   "engines": {
     "node": ">=18",

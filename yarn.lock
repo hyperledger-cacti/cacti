@@ -7769,7 +7769,7 @@ __metadata:
     socket.io-client-fixed-types: "npm:4.5.4"
     tap: "npm:16.3.8"
     tape-promise: "npm:4.0.0"
-    tsx: "npm:4.16.2"
+    ts-node: "npm:10.9.2"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
   languageName: unknown
