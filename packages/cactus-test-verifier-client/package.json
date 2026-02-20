@@ -54,7 +54,7 @@
     "@hyperledger/cactus-test-geth-ledger": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@hyperledger/cactus-verifier-client": "2.1.0",
-    "body-parser": "1.20.3",
+    "body-parser": "2.2.1",
     "express": "5.1.0",
     "log4js": "6.4.1",
     "socket.io": "4.6.2",

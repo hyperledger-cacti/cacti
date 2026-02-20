@@ -48,8 +48,8 @@
     "start": "ng serve"
   },
   "dependencies": {
-    "@angular/common": "17.3.11",
-    "@angular/core": "17.3.11",
+    "@angular/common": "19.2.16",
+    "@angular/core": "21.1.5",
     "@angular/forms": "17.3.11",
     "@angular/platform-browser": "17.3.11",
     "@angular/platform-browser-dynamic": "17.3.11",
@@ -76,7 +76,7 @@
     "@angular-builders/custom-webpack": "17.0.2",
     "@angular-devkit/build-angular": "17.3.11",
     "@angular/cli": "17.3.11",
-    "@angular/compiler": "17.3.11",
+    "@angular/compiler": "19.2.18",
     "@angular/compiler-cli": "17.3.11",
     "@angular/language-service": "17.3.11",
     "@ionic/angular-toolkit": "10.0.0",
