@@ -58,7 +58,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "cbor": "9.0.1",
     "rxjs": "7.8.1",
     "socket.io-client-fixed-types": "4.5.4"
