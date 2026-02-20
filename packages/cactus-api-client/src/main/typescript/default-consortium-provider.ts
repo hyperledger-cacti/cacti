@@ -10,7 +10,7 @@ import { ConsortiumDatabase } from "@hyperledger/cactus-core-api";
 import {
   DefaultApi as ConsortiumManualApi,
   GetConsortiumJwsResponse,
-} from "@hyperledger/cactus-plugin-consortium-manual";
+} from "@hyperledger/cacti-plugin-consortium-static";
 
 export interface IDefaultConsortiumProviderOptions {
   logLevel?: LogLevelDesc;

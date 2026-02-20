@@ -36,7 +36,7 @@ This finalizes the list of packages reviewed.
 | Outcome | Count |
 |---------|-------|
 | **Retain** | 30 |
-| **Remove/Archive** | 7 |
+| **Remove/Archive** | 7 ✅ (completed) |
 | **No Vote** | 22 |
 
 ---
@@ -47,20 +47,23 @@ The following packages have been approved for removal based on community vote:
 
 ### Packages (3)
 
-| Package | Path |
-|---------|------|
-| `cactus-plugin-ccmodel-hephaestus` | `packages/cactus-plugin-ccmodel-hephaestus` |
-| `cactus-plugin-consortium-manual` | `packages/cactus-plugin-consortium-manual` |
-| `cactus-plugin-keychain-vault` | `packages/cactus-plugin-keychain-vault` |
+| Package | Path | Status |
+|---------|------|--------|
+| `cactus-plugin-ccmodel-hephaestus` | `packages/cactus-plugin-ccmodel-hephaestus` | ✅ Removed |
+| `cactus-plugin-consortium-manual` | `packages/cactus-plugin-consortium-manual` | ✅ Removed |
+| `cactus-plugin-keychain-vault` | `packages/cactus-plugin-keychain-vault` | ✅ Removed |
 
 ### Examples (4)
 
-| Package | Path |
-|---------|------|
-| `cactus-example-discounted-asset-trade` | `examples/cactus-example-discounted-asset-trade` |
-| `cactus-example-discounted-asset-trade-client` | `examples/cactus-example-discounted-asset-trade-client` |
-| `cactus-example-electricity-trade` | `examples/cactus-example-electricity-trade` |
-| `test-run-transaction` | `examples/test-run-transaction` |
+| Package | Path | Status |
+|---------|------|--------|
+| `cactus-example-discounted-asset-trade` | `examples/cactus-example-discounted-asset-trade` | ✅ Removed |
+| `cactus-example-discounted-asset-trade-client` | `examples/cactus-example-discounted-asset-trade-client` | ✅ Removed |
+| `cactus-example-electricity-trade` | `examples/cactus-example-electricity-trade` | ✅ Removed |
+| `test-run-transaction` | `examples/test-run-transaction` | ✅ Removed |
+
+**Removal Completed:** March 2026  
+**Branch:** `chore/cleanup-4025-package-removal`
 
 ---
 

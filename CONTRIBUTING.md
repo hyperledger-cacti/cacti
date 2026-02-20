@@ -392,7 +392,7 @@ below applies to all tests regardless of their nature.
          t.end(); // yaay, test coverage
       });
       ```
-  - An [end to end test case](./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/security-isolation-via-api-server-ports.ts) showcasing everything in action
+  - An end to end test case showcasing everything in action
   that is being preached in this document about test automation
 - Focus/verify a single bug-fix/feature/etc.
 - Clearly separated from non-test (aka `main`) source code.
@@ -457,7 +457,7 @@ for both them separately anyway:
   - An integration test:
 
       ```sh
-      yarn jest packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/get-consortium-jws-endpoint.test.ts
+      yarn jest packages/cacti-plugin-consortium-static/src/test/typescript/integration/get-consortium-jws-endpoint.test.ts
       ```
 
   - A unit test:

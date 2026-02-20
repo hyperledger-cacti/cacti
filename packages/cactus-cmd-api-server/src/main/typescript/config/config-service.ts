@@ -558,7 +558,7 @@ export class ConfigService {
         },
       },
       {
-        packageName: "@hyperledger/cactus-plugin-consortium-manual",
+        packageName: "@hyperledger/cacti-plugin-consortium-static",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {

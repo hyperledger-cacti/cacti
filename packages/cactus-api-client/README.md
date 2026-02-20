@@ -15,12 +15,12 @@
 The Hyperledger Cactus API Client package is designed to be a generic extension with convenience features wrapped around the
 [**typescript-axios** flavored API clients][(https://github.com/OpenAPITools/openapi-generator/blob/v5.2.1/docs/generators/typescript-axios.md](https://github.com/OpenAPITools/openapi-generator/blob/v5.2.1/docs/generators/typescript-axios.md)) that we auto-generate and ship with each web service-enabled
 plugin such as the API clients of the
-* [**Manual Consortium Plugin** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-consortium-manual/src/main/typescript/generated/openapi/typescript-axios)
+* [**Consortium Static Plugin** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cacti-plugin-consortium-static/src/main/typescript/generated/openapi/typescript-axios)
 * [**Besu Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu/src/main/typescript/generated/openapi/typescript-axios)
 * [**Corda Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-corda/src/main/typescript/generated/openapi/typescript-axios)
 * [**Fabric Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-fabric/src/main/typescript/generated/openapi/typescript-axios)
 * [**API Server** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-cmd-api-server/src/main/typescript/generated/openapi/typescript-axios)
-* [**Vault Keychain Plugin** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-keychain-vault/src/main/typescript/generated/openapi/typescript-axios)
+* [**Memory Keychain Plugin** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-keychain-memory/src/main/typescript/generated/openapi/typescript-axios)
 
 The code generation for the listed code folders above is done by the [OpenAPI Generator](https://github.com/OpenAPITools/openapi-generator) tool that can convert OpenAPI V3 json specifications of ours straight into the program code of the API clients.
 
@@ -130,7 +130,7 @@ mainFn();
 
 Builds the default Consortium provider that can be used by this object to retrieve the Cactus Consortium metadata object when necessary (one such case is when we need information about the consortium nodes to perform routing requests to a specific ledger via a connector plugin, but later other uses could be added as well).
 
-The DefaultConsortiumProvider class leverages the simplest consortium plugin that we have at the time of this writing: @hyperledger/cactus-plugin-consortium-manual which holds the consortium metadata as pre-configured by the consortium operators.
+The DefaultConsortiumProvider class leverages the simplest consortium plugin that we have at the time of this writing: @hyperledger/cacti-plugin-consortium-static which holds the consortium metadata as pre-configured by the consortium operators.
 
 The pattern we use in the ApiClient class is that you can inject your own `IAsyncProvider<Consortium>` implementation which then will be used for routing information and in theory you can implement completely arbitrary consortium management in your own consortium plugins which then Cactus can use and leverage for the routing. This allows us to support any exotic consortium management algorithms that people may come up with such as storing the consortium definition in a multi-sig smart contract or have the list of consortium nodes be powered by some sort of automatic service discovery or anything else that people might think of.
 
