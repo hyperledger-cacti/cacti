@@ -190,6 +190,8 @@ nav:
     - Specifications: weaver/specifications.md
     - Roadmap: weaver/roadmap.md
     - Publications: weaver/publications.md
+  - SATP Hermes:
+    - Architecture: satp-hermes/architecture/satp-hermes.md
   - Guides:
     - Operations: guides/operations.md
     - Developers: guides/developers.md
