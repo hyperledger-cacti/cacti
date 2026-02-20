@@ -1,0 +1,42 @@
+---
+title: Cacti Technology Stack
+---
+flowchart TB
+    subgraph YOUR_APP["YOUR APPLICATION"]
+        direction TB
+        FE["Frontend - React, Vue, Angular<br/>───────────<br/>NOT CACTI"]
+        BL["Business Logic / REST API<br/>───────────<br/>YOUR code OR Cacti Plugin"]
+        FE --> BL
+    end
+
+    subgraph LEVELS["CACTI INTEGRATION LEVELS"]
+        direction LR
+        L1["LEVEL 1<br/>─────────<br/>Connector<br/>Library Only"]
+        L2["LEVEL 2<br/>─────────<br/>API Server<br/>+ Plugins"]
+        L3["LEVEL 3<br/>─────────<br/>Full Framework<br/>+ BL Plugin"]
+    end
+
+    subgraph CORE["CACTI CORE COMPONENTS"]
+        direction LR
+        LC["Ledger<br/>Connectors"]
+        KC["Keychain<br/>Plugins"]
+        CP["Consortium<br/>Plugins"]
+        CC["Cross-Chain<br/>SATP, Weaver"]
+    end
+
+    subgraph LEDGERS["BLOCKCHAIN NETWORKS - NOT CACTI"]
+        direction LR
+        Fabric["Fabric"]
+        Besu["Besu"]
+        ETH["Ethereum"]
+        Corda["Corda"]
+    end
+
+    YOUR_APP --> LEVELS
+    LEVELS --> CORE
+    CORE --> LEDGERS
+
+    style YOUR_APP fill:#e1f5fe,stroke:#0277bd
+    style LEVELS fill:#fff3e0,stroke:#ef6c00
+    style CORE fill:#e8f5e9,stroke:#2e7d32
+    style LEDGERS fill:#fce4ec,stroke:#c2185b

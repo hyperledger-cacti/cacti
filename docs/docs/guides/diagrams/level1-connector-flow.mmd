@@ -1,0 +1,23 @@
+---
+title: Level 1 - Connector as Library
+---
+sequenceDiagram
+    participant App as Your Node.js App
+    participant Svc as Your Service Layer
+    participant Conn as Cacti Connector<br/>(npm dependency)
+    participant BC as Blockchain Network
+
+    App->>Svc: Business Operation Request
+    activate Svc
+    Svc->>Conn: connector.invokeContract()
+    activate Conn
+    Conn->>BC: JSON-RPC / gRPC Call
+    activate BC
+    BC-->>Conn: Transaction Result
+    deactivate BC
+    Conn-->>Svc: InvokeContractResponse
+    deactivate Conn
+    Svc-->>App: Business Response
+    deactivate Svc
+    
+    Note over App,BC: Your code owns the entire stack.<br/>Cacti is just an npm dependency.
