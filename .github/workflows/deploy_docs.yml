@@ -11,6 +11,7 @@ on:
 
     paths:
       - 'docs/**'
+      - 'packages/cactus-plugin-satp-hermes/docs/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -46,8 +47,33 @@ jobs:
         run: pip install -r requirements.txt
         working-directory: docs
 
+      - name: Install system dependencies for Mermaid diagrams
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libnss3 \
+            libatk-bridge2.0-0 \
+            libdrm2 \
+            libxkbcommon0 \
+            libxcomposite1 \
+            libxdamage1 \
+            libxfixes3 \
+            libxrandr2 \
+            libgbm1 \
+            libasound2
+
       - name: Build packages
         run: npm run configure
+
+      - name: Build SATP Hermes diagrams
+        run: yarn docs:diagrams
+        working-directory: packages/cactus-plugin-satp-hermes
+
+      - name: Copy SATP Hermes docs to mkdocs
+        run: |
+          mkdir -p docs/docs/satp-hermes/assets
+          cp -r packages/cactus-plugin-satp-hermes/docs/architecture docs/docs/satp-hermes/
+          cp -r packages/cactus-plugin-satp-hermes/assets/diagrams docs/docs/satp-hermes/assets/
 
       - name: Build markdown for openapi specs
         run: 'python3 docs/scripts/publish_openapi.py'
