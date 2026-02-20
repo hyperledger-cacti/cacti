@@ -17,10 +17,10 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
+	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassetandinterop"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/stretchr/testify/require"
-	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 )
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator() in locker/recipient context
@@ -136,7 +136,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfo)
 	bondAgreement := &common.AssetExchangeAgreement{
-		AssetType:      bondType,
+		AssetType: bondType,
 		Id:        bondId,
 		Locker:    bondLocker,
 		Recipient: bondRecipient,
@@ -167,7 +167,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	fmt.Println("*** Lock token asset in network2 by Bob ***")
 	tokensContractId := "tokens-contract"
 	tokensAgreement := &common.FungibleAssetExchangeAgreement{
-		AssetType:      tokenType,
+		AssetType: tokenType,
 		NumUnits:  numTokens,
 		Locker:    tokensLocker,
 		Recipient: tokensRecipient,
@@ -263,7 +263,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	chaincodeStub.GetCreatorReturnsOnCall(8, []byte(getCreatorInContext("recipient")), nil) // 4->7
 	chaincodeStub.GetStateReturnsOnCall(17, bondAssetBytes, nil)                            // 12->17
 	chaincodeStub.GetStateReturnsOnCall(18, []byte(bondContractId), nil)                    // 13->18
-	chaincodeStub.GetStateReturnsOnCall(19, assetLockValBytes, nil) // <<-- new
+	chaincodeStub.GetStateReturnsOnCall(19, assetLockValBytes, nil)                         // <<-- new
 	isClaimed, err = sc.ClaimAsset(ctx, base64.StdEncoding.EncodeToString(bondAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.NoError(t, err)
 	require.True(t, isClaimed)

@@ -235,7 +235,7 @@ func (s *SmartContract) FetchAssetIdFromContractIdAssetLookupMap(ctx contractapi
 }
 
 type AssetExchangeAgreement struct {
-	AssetType      string `json:"type"`
+	AssetType string `json:"type"`
 	Id        string `json:"id"`
 	Locker    string `json:"locker"`
 	Recipient string `json:"recipient"`
@@ -266,7 +266,7 @@ func (s *SmartContract) ValidateAndExtractAssetAgreement(assetAgreementSerialize
 }
 
 type FungibleAssetExchangeAgreement struct {
-	AssetType      string `json:"type"`
+	AssetType string `json:"type"`
 	NumUnits  uint64 `json:"numUnits"`
 	Locker    string `json:"locker"`
 	Recipient string `json:"recipient"`

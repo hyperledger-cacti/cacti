@@ -9,17 +9,17 @@
 package main
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 
 	"github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
+	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
-	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 )
 
 const (
-	callerCCIdPrefix  = "CallerCCId_" // prefix for the caller CC ID map, contractId --> caller-cc-id
+	callerCCIdPrefix = "CallerCCId_" // prefix for the caller CC ID map, contractId --> caller-cc-id
 )
 
 // helper functions to log and return errors
@@ -50,7 +50,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	}
 
 	// Start the locking process now
-    contractId, err := assetexchange.LockAsset(ctx, callerChaincodeID, assetAgreementBytesBase64, lockInfoBytesBase64)
+	contractId, err := assetexchange.LockAsset(ctx, callerChaincodeID, assetAgreementBytesBase64, lockInfoBytesBase64)
 	if err != nil {
 		return "", err
 	}
@@ -327,5 +327,3 @@ func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextIn
 func (s *SmartContract) GetHTLCHashPreImageByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
 	return assetexchange.GetHTLCHashPreImageByContractId(ctx, contractId)
 }
-
-

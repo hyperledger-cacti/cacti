@@ -14,11 +14,11 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/identity"
-	protoV2 "google.golang.org/protobuf/proto"
 	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	protoV2 "google.golang.org/protobuf/proto"
 )
 
 const membershipObjectType = "membership"
@@ -150,7 +150,7 @@ func validateCounterAttestedMembership(s *SmartContract, ctx contractapi.Transac
 	if err != nil {
 		return fmt.Errorf("Failed to unmarshal membership: %s", err.Error())
 	}
-	err = validateAttestationsList(localMembership, counterAttestedMembership.Attestations, counterAttestedMembership.GetAttestedMembershipSet() + matchedNonce)
+	err = validateAttestationsList(localMembership, counterAttestedMembership.Attestations, counterAttestedMembership.GetAttestedMembershipSet()+matchedNonce)
 	if err != nil {
 		return err
 	}
@@ -162,7 +162,7 @@ func validateCounterAttestedMembership(s *SmartContract, ctx contractapi.Transac
 	}
 
 	// Ensure authentic and valid attestations from all foreign IIN Agents
-	err = validateAttestationsList(foreignMembership, attestedMembershipSet.Attestations, attestedMembershipSet.Membership + matchedNonce)
+	err = validateAttestationsList(foreignMembership, attestedMembershipSet.Attestations, attestedMembershipSet.Membership+matchedNonce)
 	if err != nil {
 		return err
 	}
@@ -254,7 +254,7 @@ func (s *SmartContract) CreateMembership(ctx contractapi.TransactionContextInter
 		} else if !isAdmin {
 			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
 		}
-		return createMembership(ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
+		return createMembership(ctx, counterAttestedMembershipSerialized) // HACK to handle unattested memberships (for Corda) for backward compatibility
 	}
 
 	// Parse the counter attested membership structure and extract the relevant objects
@@ -329,7 +329,7 @@ func (s *SmartContract) UpdateMembership(ctx contractapi.TransactionContextInter
 		} else if !isAdmin {
 			return fmt.Errorf("Caller neither a network admin nor an IIN Agent; access denied")
 		}
-		return updateMembership(s, ctx, counterAttestedMembershipSerialized)		// HACK to handle unattested memberships (for Corda) for backward compatibility
+		return updateMembership(s, ctx, counterAttestedMembershipSerialized) // HACK to handle unattested memberships (for Corda) for backward compatibility
 	}
 
 	// Parse the counter attested membership structure and extract the relevant objects
@@ -502,7 +502,7 @@ func verifyMemberInSecurityDomain2(certPEM string, cert *x509.Certificate, membe
 		if member.Value == "" {
 			return fmt.Errorf("CA member certificate is blank")
 		}
-		if certPEM != member.Value {	// The CA is automatically a member of the security domain
+		if certPEM != member.Value { // The CA is automatically a member of the security domain
 			err := verifyCaCertificate(cert, member.Value)
 			if err != nil {
 				return err

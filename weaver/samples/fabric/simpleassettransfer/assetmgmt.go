@@ -11,9 +11,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
-	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
 )
 
 // asset specific checks (ideally an asset in a different application might implement checks specific to that asset)
@@ -315,7 +315,6 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 		return false, logThenErrorf("unlock on token asset using contractId %s failed", contractId)
 	}
 }
-
 
 func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	return s.amc.GetHTLCHash(ctx, assetAgreementBytesBase64)
