@@ -33,7 +33,7 @@
             }
         },
         {
-            "packageName": "@hyperledger/cactus-plugin-consortium-manual",
+            "packageName": "@hyperledger/cacti-plugin-consortium-static",
             "type": "org.hyperledger.cactus.plugin_import_type.LOCAL",
             "options": {
                 "instanceId": "0b8c0ade-03d1-4cb6-a9dd-440633c4ca2a",

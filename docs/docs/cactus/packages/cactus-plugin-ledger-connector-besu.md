@@ -309,6 +309,6 @@ This distribution is published under the Apache License Version 2.0 found in the
 Acknowledgments
 ----------------------------------------------------------------
 
-[Previous](cactus-plugin-keychain-vault.md "@hyperledger/cactus-plugin-keychain-vault") [Next](cactus-plugin-ledger-connector-corda.md "@hyperledger/cactus-plugin-ledger-connector-corda")
+[Previous](cactus-core.md "@hyperledger/cactus-core") [Next](cactus-plugin-ledger-connector-corda.md "@hyperledger/cactus-plugin-ledger-connector-corda")
 
 * * *

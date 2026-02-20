@@ -494,7 +494,7 @@ Once Prometheus is setup, the corresponding scrape_config needs to be added to t
     - targets: ['{host}:{port}']
 ```
 
-Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-consortium-manual/src/test/typescript/unit/consortium/get-node-jws-endpoint-v1.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
+Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases expose it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
 `Metrics URL: http://0.0.0.0:42379/api/v1/api-server/get-prometheus-exporter-metrics/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
