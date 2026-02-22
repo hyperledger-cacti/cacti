@@ -66,7 +66,7 @@
     "@types/lodash": "4.14.195",
     "@types/uuid": "10.0.0",
     "jest-extended": "7.0.0",
-    "lodash": "4.17.21",
+    "lodash": "4.17.23",
     "uuid": "10.0.0",
     "web3": "4.4.0"
   },
