@@ -37,7 +37,8 @@
 import { Knex } from "knex";
 import { Err, Ok, Result } from "ts-results";
 
-import * as create_logs_table from "./migrations/20220331132128_create_logs_table";
+import * as create_satp_logs_table from "./migrations/20220331132128_create_satp_logs_table";
+import * as create_oracle_logs_table from "./migrations/20220331132127_create_oracle_logs_table";
 import * as create_remote_logs_table from "./migrations/20240130234303_create_remote_logs_table";
 
 /**
@@ -136,7 +137,8 @@ function registerMigration(
 export function createMigrationSource(): IKnexMigrationSource<IKnexMigration> {
   const migrations: Map<string, IKnexMigration> = new Map();
 
-  registerMigration(migrations, create_logs_table);
+  registerMigration(migrations, create_satp_logs_table);
+  registerMigration(migrations, create_oracle_logs_table);
   registerMigration(migrations, create_remote_logs_table);
 
   const kms: IKnexMigrationSource<IKnexMigration> = {

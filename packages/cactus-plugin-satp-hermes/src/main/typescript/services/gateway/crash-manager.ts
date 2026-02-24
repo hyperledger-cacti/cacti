@@ -659,13 +659,11 @@ export class CrashManager {
 
           for (const logEntry of recoveredLogs) {
             await this.localRepository.create({
-              sessionId: logEntry.sessionId,
+              key: logEntry.key,
+              type: logEntry.type,
               operation: logEntry.operation,
               data: logEntry.data,
               timestamp: logEntry.timestamp,
-              type: logEntry.type,
-              key: logEntry.key,
-              sequenceNumber: logEntry.sequenceNumber,
             });
           }
 

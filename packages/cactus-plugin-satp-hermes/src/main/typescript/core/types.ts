@@ -211,16 +211,23 @@ export function isOfType<T>(
   return obj instanceof type;
 }
 
-export interface LocalLog {
-  sessionId: string;
-  type: string;
+export interface Log {
   key: string;
+  type: string;
   operation: string;
   timestamp?: string;
   data: string;
+}
+export interface SATPLocalLog extends Log {
+  sessionId: string;
   sequenceNumber: number;
 }
-export interface RemoteLog {
+export interface OracleLocalLog extends Log {
+  taskId: string;
+  oracleOperationId: string;
+}
+
+export interface SATPRemoteLog {
   key: string;
   hash: string;
   signature: string;
