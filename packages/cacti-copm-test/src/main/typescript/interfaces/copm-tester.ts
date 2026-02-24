@@ -1,6 +1,6 @@
-import { PromiseClient } from "@connectrpc/connect";
 import { DefaultService, DLAccount } from "@hyperledger-cacti/cacti-copm-core";
 import { TestAssets } from "./test-assets";
+import { Client } from "@connectrpc/connect";
 
 // Supplies the data needed to test COPM plugins on different networks
 export interface CopmTester {
@@ -13,7 +13,7 @@ export interface CopmTester {
   getPartyA(assetType: string): DLAccount;
   getPartyB(assetType: string): DLAccount;
 
-  clientFor(account: DLAccount): PromiseClient<typeof DefaultService>;
+  clientFor(account: DLAccount): Client<typeof DefaultService>;
   assetsFor(account: DLAccount): Promise<TestAssets>;
 
   getCertificateString(account: DLAccount): Promise<string>;

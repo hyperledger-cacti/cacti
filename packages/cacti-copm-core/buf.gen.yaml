@@ -1,14 +1,13 @@
-version: v1
+version: v2
+clean: true
 plugins:
-  # This will invoke protoc-gen-es and write output to src/gen
-  - plugin: es
-    out: src/main/typescript/generated
+  - local: protoc-gen-es
+    out: src/main/typescript/generated/protos/
+    opt: target=ts
+    strategy: directory
+  - local: protoc-gen-connect-es
+    out: src/main/typescript/generated/protos/
     opt:
-      # Add more plugin options here
       - target=ts
-  # This will invoke protoc-gen-connect-es
-  - plugin: connect-es
-    out: src/main/typescript/generated
-    opt:
-      # Add more plugin options here
-      - target=ts
+      - js_import_style=module
+    strategy: directory

@@ -2,7 +2,7 @@ import { TransferrableAsset } from "../lib/transferrable-asset";
 import { DLAccount } from "../lib/types";
 import { ConnectError, Code } from "@connectrpc/connect";
 import { validateTransferrableAsset, validateAssetAccount } from "./common";
-import { PledgeAssetV1Request } from "../generated/services/default_service_pb";
+import { PledgeAssetV1Request } from "../generated/protos/services/default_service_pb";
 
 export function validatePledgeAssetRequest(req: PledgeAssetV1Request): {
   asset: TransferrableAsset;

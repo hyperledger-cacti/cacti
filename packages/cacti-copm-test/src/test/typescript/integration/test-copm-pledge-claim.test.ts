@@ -4,14 +4,15 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import {
-  ClaimPledgedAssetV1Request,
-  PledgeAssetV1Request,
-} from "@hyperledger-cacti/cacti-copm-core";
 import { CopmNetworkMode } from "../../../main/typescript/lib/types";
 import { CopmTestertMultiNetwork } from "../../../main/typescript/lib/copm-tester-multi-network";
 import * as path from "path";
 import * as dotenv from "dotenv";
+import {
+  ClaimPledgedAssetV1RequestSchema,
+  PledgeAssetV1RequestSchema,
+} from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/generated/protos/services/default_service_pb";
+import { create } from "@bufbuild/protobuf";
 
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
@@ -81,7 +82,7 @@ describe("Copm Pledge and Claim", () => {
       await assetsPartyA.addNonFungibleAsset(assetType, pledgeAssetName);
 
       const pledgeNFTResult = await copmTester.clientFor(partyA).pledgeAssetV1(
-        new PledgeAssetV1Request({
+        create(PledgeAssetV1RequestSchema, {
           assetPledgeV1PB: {
             asset: {
               assetType: assetType,
@@ -101,7 +102,7 @@ describe("Copm Pledge and Claim", () => {
       const claimNFTResult = await copmTester
         .clientFor(partyB)
         .claimPledgedAssetV1(
-          new ClaimPledgedAssetV1Request({
+          create(ClaimPledgedAssetV1RequestSchema, {
             assetPledgeClaimV1PB: {
               pledgeId: pledgeNFTResult.pledgeId,
               asset: {
@@ -161,7 +162,7 @@ describe("Copm Pledge and Claim", () => {
       );
 
       const pledgeResult = await copmTester.clientFor(partyA).pledgeAssetV1(
-        new PledgeAssetV1Request({
+        create(PledgeAssetV1RequestSchema, {
           assetPledgeV1PB: {
             asset: {
               assetType: assetType,
@@ -181,7 +182,7 @@ describe("Copm Pledge and Claim", () => {
       const claimResult = await copmTester
         .clientFor(partyB)
         .claimPledgedAssetV1(
-          new ClaimPledgedAssetV1Request({
+          create(ClaimPledgedAssetV1RequestSchema, {
             assetPledgeClaimV1PB: {
               pledgeId: pledgeResult.pledgeId,
               asset: {

@@ -44,15 +44,13 @@
   ],
   "scripts": {
     "codegen": "yarn run --top-level run-s 'codegen:*'",
+    "clone-fabric-protos": "rm -rf src/main/proto/fabric-protos && git clone https://github.com/hyperledger/fabric-protos.git --branch release-2.1 src/main/proto/fabric-protos",
     "codegen:openapi": "npm run generate-sdk",
-    "codegen:proto": "run-s proto:protoc-gen-ts",
+    "codegen:proto": "yarn clone-fabric-protos; yarn buf generate --verbose",
     "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
-    "proto:protoc-gen-ts": "run-s proto:protoc-gen-ts:make-dir proto:protoc-gen-ts:grpc_tools_node_protoc",
-    "proto:protoc-gen-ts:make-dir": "make-dir ./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/",
-    "proto:protoc-gen-ts:grpc_tools_node_protoc": "yarn run grpc_tools_node_protoc --plugin=protoc-gen-ts=$(yarn bin protoc-gen-ts) --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/weaver/common/protos/ --proto_path ./src/main/proto/weaver/common/protos/ ./src/main/proto/weaver/common/protos/common/*.proto ./src/main/proto/weaver/common/protos/corda/*.proto ./src/main/proto/weaver/common/protos/driver/*.proto ./src/main/proto/weaver/common/protos/networks/*.proto ./src/main/proto/weaver/common/protos/relay/*.proto",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -60,6 +58,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "@bufbuild/protobuf": "2.10.1",
     "@grpc/grpc-js": "1.13.3",
     "@hyperledger/cactus-common": "2.1.0",
     "ajv": "8.17.1",
@@ -70,8 +69,11 @@
     "google-protobuf": "3.21.4"
   },
   "devDependencies": {
-    "@bufbuild/protobuf": "1.10.0",
-    "@connectrpc/connect": "1.4.0",
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protobuf": "2.10.1",
+    "@bufbuild/protoc-gen-es": "2.10.1",
+    "@connectrpc/connect": "2.1.1",
+    "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@grpc/proto-loader": "0.7.13",
     "@types/express": "5.0.1",
     "@types/google-protobuf": "3.15.5",

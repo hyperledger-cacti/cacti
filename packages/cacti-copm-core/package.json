@@ -41,22 +41,23 @@
   ],
   "scripts": {
     "bundleopenapi": "yarn run --top-level tools:bundle-open-api-tpl-files",
+    "clone-fabric-protos": "rm -rf src/main/protos/fabric-protos && git clone https://github.com/hyperledger/fabric-protos.git --branch release-2.1 src/main/protos/fabric-protos",
     "codegen": "yarn run --top-level run-s 'codegen:*'",
-    "codegen:proto": "yarn run proto:openapi; yarn run proto:connectrpc",
+    "codegen:proto": "yarn run proto:openapi; yarn clone-fabric-protos; buf generate --verbose",
     "dev:redo": "yarn run bundleopenapi; yarn run codegen:proto",
-    "proto:connectrpc": "yarn run buf generate --template=./buf.gen.yaml ./src/main/proto/generated/openapi",
-    "proto:openapi": "yarn run --top-level openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --language-specific-primitives=google.protobuf.Any --type-mappings=AnyType=google.protobuf.Any --type-mappings=object=google.protobuf.Any --additional-properties=packageName=org.hyperledger.cacti.plugin.copm.core -o ./src/main/proto/generated/openapi/ -t=./src/main/mustache/openapi-generator/templates/protobuf-schema/ --ignore-file-override ../../openapi-generator-ignore"
+    "proto:openapi": "yarn run --top-level openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --language-specific-primitives=google.protobuf.Any --type-mappings=AnyType=google.protobuf.Any --type-mappings=object=google.protobuf.Any --additional-properties=packageName=org.hyperledger.cacti.plugin.copm.core -o ./src/main/protos/generated/openapi/ -t=./src/main/mustache/openapi-generator/templates/protobuf-schema/ --ignore-file-override ../../openapi-generator-ignore"
   },
   "dependencies": {
-    "@bufbuild/buf": "1.30.0",
-    "@bufbuild/protobuf": "1.10.0",
-    "@connectrpc/connect": "1.4.0",
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protobuf": "2.10.1",
+    "@connectrpc/connect": "2.1.1",
     "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0"
   },
   "devDependencies": {
-    "@bufbuild/protoc-gen-es": "1.8.0",
-    "@connectrpc/connect-node": "1.4.0",
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protoc-gen-es": "2.10.1",
+    "@connectrpc/connect-node": "2.1.1",
     "@connectrpc/protoc-gen-connect-es": "1.4.0",
     "@openapitools/openapi-generator-cli": "2.7.0"
   },

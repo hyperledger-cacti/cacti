@@ -4,15 +4,16 @@ import {
   Logger,
   LoggerProvider,
 } from "@hyperledger/cactus-common";
-import {
-  PledgeAssetV1Request,
-  GetVerifiedViewV1Request,
-  DLAccount,
-} from "@hyperledger-cacti/cacti-copm-core";
+import { DLAccount } from "@hyperledger-cacti/cacti-copm-core";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { CopmTestertMultiNetwork } from "../../../main/typescript/lib/copm-tester-multi-network";
 import { CopmNetworkMode } from "../../../main/typescript/lib/types";
+import {
+  GetVerifiedViewV1RequestSchema,
+  PledgeAssetV1RequestSchema,
+} from "@hyperledger-cacti/cacti-copm-core/src/main/typescript/generated/protos/services/default_service_pb";
+import { create } from "@bufbuild/protobuf";
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -60,7 +61,7 @@ describe(`COPM get verified view ${net1Type}-${net2Type}`, () => {
     log.info(`party b ${partyB.organization} ${partyB.userId}`);
 
     const pledgeResult = await copmTester.clientFor(partyA).pledgeAssetV1(
-      new PledgeAssetV1Request({
+      create(PledgeAssetV1RequestSchema, {
         assetPledgeV1PB: {
           asset: {
             assetType: assetType,
@@ -89,7 +90,7 @@ describe(`COPM get verified view ${net1Type}-${net2Type}`, () => {
       partyB.organization,
     );
     const res = await copmTester.clientFor(partyB).getVerifiedViewV1(
-      new GetVerifiedViewV1Request({
+      create(GetVerifiedViewV1RequestSchema, {
         getVerifiedViewV1RequestPB: {
           account: {
             organization: partyB.organization,

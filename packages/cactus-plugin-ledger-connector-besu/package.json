@@ -51,7 +51,7 @@
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "proto:openapi": "yarn run --top-level openapi-generator-cli generate -i ./src/main/json/openapi.json -g protobuf-schema --model-name-suffix=PB --language-specific-primitives=google.protobuf.Any --type-mappings=AnyType=google.protobuf.Any --type-mappings=object=google.protobuf.Any --additional-properties=packageName=org.hyperledger.cacti.plugin.ledger.connector.besu -o ./src/main/proto/generated/openapi/ -t=./src/main/mustache/openapi-generator/templates/protobuf-schema/ --ignore-file-override ../../openapi-generator-ignore",
-    "proto:protoc-gen-ts": "yarn run --top-level grpc_tools_node_protoc --plugin=protoc-gen-ts=$(yarn bin protoc-gen-ts) --ts_out=grpc_js:./src/main/typescript/generated/proto/protoc-gen-ts/ --proto_path ./src/main/proto/generated/openapi/ --proto_path ./src/main/proto/generated/openapi/models/ --proto_path ./src/main/proto/ ./src/main/proto/generated/openapi/services/*.proto ./src/main/proto/services/*.proto",
+    "proto:protoc-gen-ts": "buf generate",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
     "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
@@ -84,6 +84,8 @@
     "websocket-event-codes": "1.1.0"
   },
   "devDependencies": {
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protobuf": "2.10.1",
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@openapitools/openapi-generator-cli": "2.7.0",

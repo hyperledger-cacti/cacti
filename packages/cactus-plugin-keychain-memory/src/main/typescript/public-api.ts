@@ -18,7 +18,7 @@ export async function createPluginFactory(
 export { IKeychainMemoryCrpcSvcOpenApiOptions } from "./crpc-services/keychain-memory-crpc-svc-openapi";
 export { KeychainMemoryCrpcSvcOpenApi } from "./crpc-services/keychain-memory-crpc-svc-openapi";
 
-export { DefaultService } from "./generated/crpc/services/default_service_connect";
+export { DefaultService } from "./generated/crpc/services/default_service_pb";
 
 export { DeleteKeychainEntryRequestV1PB } from "./generated/crpc/models/delete_keychain_entry_request_v1_pb_pb";
 export { DeleteKeychainEntryResponseV1PB } from "./generated/crpc/models/delete_keychain_entry_response_v1_pb_pb";

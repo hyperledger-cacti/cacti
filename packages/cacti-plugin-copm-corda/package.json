@@ -44,10 +44,10 @@
     "bundleopenapi": "yarn run --top-level tools:bundle-open-api-tpl-files"
   },
   "dependencies": {
-    "@bufbuild/buf": "1.30.0",
-    "@bufbuild/protobuf": "1.10.0",
-    "@connectrpc/connect": "1.4.0",
-    "@connectrpc/connect-node": "1.4.0",
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protobuf": "2.10.1",
+    "@connectrpc/connect": "2.1.1",
+    "@connectrpc/connect-node": "2.1.1",
     "@connectrpc/connect-web": "1.4.0",
     "@hyperledger-cacti/cacti-copm-core": "2.1.0",
     "@hyperledger/cacti-weaver-protos-js": "2.1.0",
@@ -57,7 +57,7 @@
     "@hyperledger/cactus-core-api": "2.1.0"
   },
   "devDependencies": {
-    "@connectrpc/connect-node": "1.4.0",
+    "@connectrpc/connect-node": "2.1.1",
     "@types/convict": "6.1.1",
     "convict": "6.2.4"
   },

@@ -42,8 +42,10 @@
     "test:view": "yarn run --top-level test:jest:all ./src/test/typescript/integration/test-copm-getverifiedview.test.ts"
   },
   "dependencies": {
-    "@connectrpc/connect": "1.4.0",
-    "@connectrpc/connect-node": "1.4.0",
+    "@bufbuild/buf": "1.47.2",
+    "@bufbuild/protobuf": "2.10.1",
+    "@connectrpc/connect": "2.1.1",
+    "@connectrpc/connect-node": "2.1.1",
     "@hyperledger-cacti/cacti-copm-core": "2.1.0",
     "@hyperledger-cacti/cacti-plugin-copm-corda": "2.1.0",
     "@hyperledger-cacti/cacti-plugin-copm-fabric": "2.1.0",
