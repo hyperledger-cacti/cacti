@@ -97,6 +97,7 @@ import { AddCounterpartyGatewayEndpointV1 } from "./admin/add-counterparty-gatew
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
+  IAuditEntryRepository,
 } from "../database/repository/interfaces/repository";
 import { GatewayShuttingDownError } from "./gateway-errors";
 import {
@@ -168,6 +169,8 @@ export interface BLODispatcherOptions {
   localRepository: ILocalLogRepository;
   /** Optional remote repository for distributed logging */
   remoteRepository?: IRemoteLogRepository;
+  /** Local repository for audit entries persistence */
+  auditRepository: IAuditEntryRepository;
   /** Optional claim format specification (defaults to JWT) */
   claimFormat?: ClaimFormat;
   /** Monitoring service for telemetry and metrics */
@@ -237,6 +240,7 @@ export class BLODispatcher {
   private localRepository: ILocalLogRepository;
   /** Remote log repository for distributed coordination */
   private remoteRepository: IRemoteLogRepository | undefined;
+  private auditRepository: IAuditEntryRepository;
   /** Shutdown flag to prevent new requests during shutdown */
   private isShuttingDown = false;
   /** Monitoring service for telemetry and metrics */
@@ -292,6 +296,7 @@ export class BLODispatcher {
     const ourGateway = this.orchestrator.ourGateway;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
+    this.auditRepository = options.auditRepository;
     this.ccManager = options.ccManager;
 
     context.with(ctx, () => {
@@ -305,6 +310,7 @@ export class BLODispatcher {
           pubKey: options.pubKey,
           localRepository: this.localRepository,
           remoteRepository: this.remoteRepository,
+          auditRepository: this.auditRepository,
           claimFormat: options.claimFormat,
           monitorService: this.monitorService,
         };
@@ -765,10 +771,7 @@ export class BLODispatcher {
     return context.with(ctx, () => {
       try {
         this.logger.info(`Perform Audit request: ${safeStableStringify(req)}`);
-        if (!this.manager) {
-          throw new Error("SATPManager is not defined");
-        }
-        return executeAudit(this.level, req, this.manager);
+        return executeAudit(this.level, this.auditRepository, req);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

@@ -215,20 +215,25 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      const parseTimestamp = (value: unknown): number | null => {
-        if (typeof value === "string" || typeof value === "number") {
-          const num = Number(value);
-          return isNaN(num) ? null : num;
+      const parseIso = (value: unknown, fallback: Date): string => {
+        if (typeof value === "string") {
+          const date = new Date(value);
+          if (!isNaN(date.getTime())) return date.toISOString();
         }
-        return null;
+        return fallback.toISOString();
       };
 
+      const startIso = parseIso(req.query["startTimestamp"], new Date(0));
+      const endIso = parseIso(req.query["endTimestamp"], new Date());
+
+      // Build API request (OpenAPI schema expects string)
       const auditRequest: AuditRequest = {
-        startTimestamp: parseTimestamp(req.query["startTimestamp"]) || 0,
-        endTimestamp: parseTimestamp(req.query["endTimestamp"]) || Date.now(),
+        startTimestamp: startIso,
+        endTimestamp: endIso,
       };
 
       const result = await this.options.dispatcher.PerformAudit(auditRequest);
+
       res.status(200).json(result);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);

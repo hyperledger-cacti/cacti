@@ -246,3 +246,20 @@ export enum CrashStatus {
   /** System encountered an error during recovery */
   ERROR = "ERROR",
 }
+
+export interface AuditEntry {
+  auditEntryId: string;
+  session: LocalLog;
+  timestamp: number;
+}
+
+export interface Audit {
+  auditEntries: AuditEntry[];
+}
+
+//TODO
+export type SessionData = {
+  sessionId: string;
+  localLog: LocalLog;
+  proof: string;
+};

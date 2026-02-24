@@ -1,5 +1,6 @@
-import { LocalLog, RemoteLog } from "../core/types";
+import { AuditEntry, LocalLog, RemoteLog } from "../core/types";
 import {
+  IAuditEntryRepository,
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
@@ -23,6 +24,7 @@ interface GatewayLogEntryPersistence {
 export interface IGatewayPersistenceConfig {
   localRepository: ILocalLogRepository;
   remoteRepository?: IRemoteLogRepository;
+  auditRepository: IAuditEntryRepository;
   signer: JsObjectSigner;
   pubKey: string;
   logLevel?: LogLevelDesc;
@@ -34,6 +36,7 @@ export class GatewayPersistence {
   private defaultRepository: boolean = true;
   public localRepository: ILocalLogRepository;
   public remoteRepository: IRemoteLogRepository | undefined;
+  public auditRepository: IAuditEntryRepository;
   private signer: JsObjectSigner;
   private pubKey: string;
   private readonly log: Logger;
@@ -42,6 +45,7 @@ export class GatewayPersistence {
   constructor(config: IGatewayPersistenceConfig) {
     this.localRepository = config.localRepository;
     this.remoteRepository = config.remoteRepository;
+    this.auditRepository = config.auditRepository;
     this.signer = config.signer;
     this.pubKey = config.pubKey;
     this.monitorService = config.monitorService;
@@ -63,6 +67,10 @@ export class GatewayPersistence {
 
   public getRemoteRepository(): IRemoteLogRepository | undefined {
     return this.remoteRepository;
+  }
+
+  public getAuditRepository(): IAuditEntryRepository {
+    return this.auditRepository;
   }
 
   public async storeProof(logEntry: GatewayLogEntryPersistence): Promise<void> {
@@ -94,7 +102,13 @@ export class GatewayPersistence {
           sequenceNumber: logEntry.sequenceNumber,
         };
 
-        await this.storeInDatabase(localLog);
+        const auditEntry: AuditEntry = {
+          auditEntryId: `audit-${Date.now()}-${logEntry.sessionId}`,
+          session: localLog,
+          timestamp: Date.now(),
+        };
+
+        await this.storeInDatabase(localLog, auditEntry);
 
         const hash = SHA256(localLog.data).toString();
 
@@ -136,7 +150,8 @@ export class GatewayPersistence {
           sequenceNumber: logEntry.sequenceNumber,
         };
 
-        await this.storeInDatabase(localLog);
+        //TODO: AuditEntry population
+        await this.storeInDatabase(localLog, {} as AuditEntry);
 
         const hash = this.getHash(localLog);
 
@@ -182,7 +197,10 @@ export class GatewayPersistence {
     });
   }
 
-  private async storeInDatabase(localLog: LocalLog): Promise<void> {
+  private async storeInDatabase(
+    localLog: LocalLog,
+    auditEntry: AuditEntry,
+  ): Promise<void> {
     const fnTag = `${GatewayPersistence.CLASS_NAME}#storeInDatabase()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     await context.with(ctx, async () => {
@@ -197,6 +215,7 @@ export class GatewayPersistence {
         }
 
         await this.localRepository.create(localLog);
+        await this.auditRepository.create(auditEntry);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

@@ -266,8 +266,10 @@ export {
  *
  * @see {@link ILocalLogRepository} for local database persistence interface
  * @see {@link IRemoteLogRepository} for distributed logging interface
+ * @see {@link IAuditEntryRepository} for audit entry logging interface
  * @see {@link KnexLocalLogRepository} for Knex.js-based local implementation
  * @see {@link KnexRemoteLogRepository} for Knex.js-based remote implementation
+ * @see {@link KnexAuditEntryRepository} for Knex.js-based audit entry implementation
  * @see {@link LocalLog} for local log data structure
  * @see {@link RemoteLog} for remote log data structure
  *
@@ -291,16 +293,22 @@ export {
  * Handles distributed logging for crash recovery with cryptographic hashes and
  * signatures for data integrity across gateway instances.
  *
+ * **Audit Entry Repository:**
+ * Stores sessions by timestamp for auditing purposes.
+ *
  * @see {@link KnexLocalLogRepository} for Knex.js-based local implementation
  * @see {@link KnexRemoteLogRepository} for Knex.js-based remote implementation
+ * @see {@link KnexAuditEntryRepository} for Knex.js-based audit entry implementation
  * @see {@link LocalLog} for local log data structure
  * @see {@link RemoteLog} for remote log data structure
+ * @see {@link AuditEntry} for audit entry data structure
  *
  * @since 0.0.3-beta
  */
 export {
   ILocalLogRepository,
   IRemoteLogRepository,
+  IAuditEntryRepository,
 } from "./database/repository/interfaces/repository";
 
 /**
@@ -313,6 +321,7 @@ export {
  *
  * @see {@link ILocalLogRepository} for local repository interface
  * @see {@link IRemoteLogRepository} for remote repository interface
+ * @see {@link IAuditEntryRepository} for audit entry repository interface
  */
 export {
   GatewayPersistence,
@@ -329,9 +338,11 @@ export {
  *
  * @see {@link ILocalLogRepository} for local repository interface
  * @see {@link IRemoteLogRepository} for remote repository interface
+ * @see {@link IAuditEntryRepository} for audit entry repository interface
  */
 export { KnexLocalLogRepository } from "./database/repository/knex-local-log-repository";
 export { KnexRemoteLogRepository } from "./database/repository/knex-remote-log-repository";
+export { KnexAuditEntryRepository } from "./database/repository/knex-audit-repository";
 
 /**
  * Monitoring Service - Gateway monitoring and telemetry service for SATP operations.
@@ -350,6 +361,7 @@ export { KnexRemoteLogRepository } from "./database/repository/knex-remote-log-r
  *
  * @see {@link ILocalLogRepository} for persistence layer integration
  * @see {@link IRemoteLogRepository} for distributed logging integration
+ * @see {@link IAuditEntryRepository} for audit logging integration
  * @see {@link SATPGateway} for gateway monitoring setup
  * @see {@link SATPLogger} for logging integration with monitoring
  *
@@ -404,5 +416,6 @@ export { OracleManager } from "./cross-chain-mechanisms/oracle/oracle-manager";
  * @see {@link SATPGateway} for gateway integration with dispatcher
  * @see {@link ILocalLogRepository} for persistence integration
  * @see {@link IRemoteLogRepository} for distributed logging
+ * @see {@link IAuditEntryRepository} for audit logging
  */
 export { BLODispatcher, BLODispatcherOptions } from "./api1/dispatcher";

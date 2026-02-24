@@ -33,14 +33,14 @@
  */
 
 import { GetStatusError } from "../../core/errors/satp-errors";
-import { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
 import {
   AuditRequest,
   AuditResponse,
 } from "../../generated/gateway-client/typescript-axios/api";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
-import { SATPManager } from "../../services/gateway/satp-manager";
-import { SATPSession } from "../../core/satp-session";
+import type { IAuditEntryRepository } from "../../database/repository/interfaces/repository";
+
+import type { Audit } from "../../core/types";
 
 /**
  * Execute audit operations for SATP sessions and transactions.
@@ -76,8 +76,8 @@ import { SATPSession } from "../../core/satp-session";
  */
 export async function executeAudit(
   logLevel: LogLevelDesc,
+  auditRepository: IAuditEntryRepository,
   req: AuditRequest,
-  manager: SATPManager,
 ): Promise<AuditResponse> {
   const fnTag = `executeAudit()`;
   const logger = LoggerProvider.getOrCreate({
@@ -89,7 +89,11 @@ export async function executeAudit(
 
   try {
     const processedRequest = req;
-    const result = await getAuditData(logLevel, processedRequest, manager);
+    const result = await getAuditData(
+      logLevel,
+      auditRepository,
+      processedRequest,
+    );
     return result;
   } catch (error) {
     if (error instanceof GetStatusError) {
@@ -118,64 +122,33 @@ export async function executeAudit(
  */
 export async function getAuditData(
   logLevel: LogLevelDesc,
+  auditRepository: IAuditEntryRepository,
   req: AuditRequest,
-  manager: SATPManager,
 ): Promise<AuditResponse> {
-  const fnTag = `getStatusService()`;
+  const fnTag = `getAuditData()`;
   const logger = LoggerProvider.getOrCreate({
     label: fnTag,
     level: logLevel,
   });
 
-  const sessions = manager.getSessions().values();
+  //const _repository: KnexAuditEntryRepository = new KnexAuditEntryRepository(
+  //  undefined,
+  //);
 
-  const sessionsData: SATPSession[] = [];
+  const audit: Audit = await auditRepository.readByTimeInterval(
+    Date.parse(new Date(req.startTimestamp).toISOString()),
+    Date.parse(new Date(req.endTimestamp).toISOString()),
+  );
 
-  let sessionData: SessionData | undefined;
-  for (const session of sessions) {
-    if (session.hasClientSessionData()) {
-      sessionData = session.getClientSessionData();
-    } else if (session.hasServerSessionData()) {
-      sessionData = session.getServerSessionData();
-    } else {
-      logger.warn(
-        `${fnTag}, Session ${session.getSessionId()} does not have session data.`,
-      );
-      continue;
-    }
-
-    if (Number(sessionData.lastMessageReceivedTimestamp) > req.endTimestamp) {
-      logger.info(
-        `${fnTag}, Session ${session.getSessionId()} is not within the requested time range.`,
-      );
-      logger.debug(
-        `${fnTag}, Session ${session.getSessionId()} last message received timestamp: ${sessionData.lastMessageReceivedTimestamp}, requested end timestamp: ${req.endTimestamp}`,
-      );
-      continue;
-    }
-
-    if (
-      !sessionData.receivedTimestamps?.stage0
-        ?.newSessionRequestMessageTimestamp ||
-      Number(
-        sessionData.receivedTimestamps?.stage0
-          ?.newSessionRequestMessageTimestamp,
-      ) < req.startTimestamp
-    ) {
-      logger.warn(
-        `${fnTag}, Session ${session.getSessionId()} does not have complete timestamps.`,
-      );
-      continue;
-    }
-
-    logger.info(
-      `${fnTag}, Adding session ${session.getSessionId()} to audit data.`,
-    );
-    sessionsData.push(session);
-  }
-
+  logger.info(`${fnTag}, Fetched audit entries: ${audit.auditEntries.length}`);
   return {
-    sessions: sessionsData.map((session) => session.toString()),
+    auditEntries: {
+      entries: audit.auditEntries.map((entry) => ({
+        auditEntryId: entry.auditEntryId,
+        session: entry.session,
+        timestamp: entry.timestamp,
+      })),
+    },
     startTimestamp: req.startTimestamp,
     endTimestamp: req.endTimestamp,
   };
