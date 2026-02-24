@@ -1,14 +1,14 @@
 module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils
 
-go 1.20
+go 1.23.0
 
 require (
 	github.com/golang/protobuf v1.5.3
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a
 	github.com/hyperledger/fabric-contract-api-go v1.2.1
 	github.com/hyperledger/fabric-protos-go v0.3.0
-	github.com/sirupsen/logrus v1.9.0
-	google.golang.org/protobuf v1.33.0
+	github.com/sirupsen/logrus v1.9.1
+	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -26,9 +26,9 @@ require (
 	github.com/xeipuuv/gojsonpointer v0.0.0-20190905194746-02993c407bfb // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
-	golang.org/x/net v0.36.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/net v0.38.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
+	golang.org/x/text v0.23.0 // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.3 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
