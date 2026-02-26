@@ -68,7 +68,7 @@
   "devDependencies": {
     "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "express": "5.1.0",
     "http-status-codes": "2.3.0",
     "jest-extended": "7.0.0",
