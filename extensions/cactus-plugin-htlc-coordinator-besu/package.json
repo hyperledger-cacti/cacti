@@ -65,7 +65,7 @@
     "@hyperledger/cactus-plugin-htlc-eth-besu-erc20": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-test-plugin-htlc-eth-besu-erc20": "2.1.0",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "body-parser": "1.20.3",
     "fast-safe-stringify": "2.1.1",
     "joi": "17.13.3",
