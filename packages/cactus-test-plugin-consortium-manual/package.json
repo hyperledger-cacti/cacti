@@ -56,7 +56,7 @@
     "@hyperledger/cactus-core-api": "2.1.0",
     "@hyperledger/cactus-plugin-consortium-manual": "2.1.0",
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "jose": "4.15.5"
   },
   "devDependencies": {
