@@ -86,7 +86,7 @@
     "jest-extended": "7.0.0",
     "jose": "4.15.5",
     "json-stable-stringify": "1.0.2",
-    "qs": "6.13.0",
+    "qs": "6.14.2",
     "tape-promise": "4.0.0"
   },
   "engines": {
