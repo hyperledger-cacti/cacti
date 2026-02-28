@@ -1964,14 +1964,14 @@ paths:
         - name: startTimestamp
           in: query
           description: The start timestamp for the audit period.
-          required: false
+          required: true
           schema:
             type: string
             format: date-time
         - name: endTimestamp
           in: query
           description: The end timestamp for the audit period.
-          required: false
+          required: true
           schema:
             type: string
             format: date-time

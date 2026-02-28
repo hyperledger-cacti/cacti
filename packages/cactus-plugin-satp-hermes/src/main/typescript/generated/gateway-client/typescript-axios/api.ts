@@ -4377,12 +4377,16 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
         /**
          * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
          * @summary Audit transactions
-         * @param {string} [startTimestamp] The start timestamp for the audit period.
-         * @param {string} [endTimestamp] The end timestamp for the audit period.
+         * @param {string} startTimestamp The start timestamp for the audit period.
+         * @param {string} endTimestamp The end timestamp for the audit period.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        performAudit: async (startTimestamp?: string, endTimestamp?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        performAudit: async (startTimestamp: string, endTimestamp: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'startTimestamp' is not null or undefined
+            assertParamExists('performAudit', 'startTimestamp', startTimestamp)
+            // verify required parameter 'endTimestamp' is not null or undefined
+            assertParamExists('performAudit', 'endTimestamp', endTimestamp)
             const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -4485,12 +4489,12 @@ export const AdminApiFp = function(configuration?: Configuration) {
         /**
          * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
          * @summary Audit transactions
-         * @param {string} [startTimestamp] The start timestamp for the audit period.
-         * @param {string} [endTimestamp] The end timestamp for the audit period.
+         * @param {string} startTimestamp The start timestamp for the audit period.
+         * @param {string} endTimestamp The end timestamp for the audit period.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async performAudit(startTimestamp?: string, endTimestamp?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PerformAudit200Response>> {
+        async performAudit(startTimestamp: string, endTimestamp: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PerformAudit200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.performAudit(startTimestamp, endTimestamp, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -4556,12 +4560,12 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
         /**
          * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
          * @summary Audit transactions
-         * @param {string} [startTimestamp] The start timestamp for the audit period.
-         * @param {string} [endTimestamp] The end timestamp for the audit period.
+         * @param {string} startTimestamp The start timestamp for the audit period.
+         * @param {string} endTimestamp The end timestamp for the audit period.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        performAudit(startTimestamp?: string, endTimestamp?: string, options?: any): AxiosPromise<PerformAudit200Response> {
+        performAudit(startTimestamp: string, endTimestamp: string, options?: any): AxiosPromise<PerformAudit200Response> {
             return localVarFp.performAudit(startTimestamp, endTimestamp, options).then((request) => request(axios, basePath));
         },
     };
@@ -4636,13 +4640,13 @@ export class AdminApi extends BaseAPI {
     /**
      * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
      * @summary Audit transactions
-     * @param {string} [startTimestamp] The start timestamp for the audit period.
-     * @param {string} [endTimestamp] The end timestamp for the audit period.
+     * @param {string} startTimestamp The start timestamp for the audit period.
+     * @param {string} endTimestamp The end timestamp for the audit period.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AdminApi
      */
-    public performAudit(startTimestamp?: string, endTimestamp?: string, options?: AxiosRequestConfig) {
+    public performAudit(startTimestamp: string, endTimestamp: string, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).performAudit(startTimestamp, endTimestamp, options).then((request) => request(this.axios, this.basePath));
     }
 }
