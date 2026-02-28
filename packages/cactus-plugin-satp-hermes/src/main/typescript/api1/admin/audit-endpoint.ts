@@ -199,6 +199,34 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
   }
 
   /**
+   * Helper method to parse and validate required ISO-8601 timestamp parameters.
+   *
+   * Validates that the input value is a string and can be parsed as a valid
+   * ISO-8601 date. Throws an error with appropriate status code if validation
+   * fails.
+   * @param value
+   * @param name
+   * @returns
+   */
+  private parseRequiredIso(value: unknown, name: string): Date {
+    if (typeof value !== "string") {
+      const err = new Error(`${name} must be an ISO-8601 string`);
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+      const err = new Error(`${name} must be a valid ISO-8601 timestamp`);
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    return date;
+  }
+
+  /**
    * Handle HTTP requests for audit operations.
    *
    * Processes audit requests by parsing query parameters for timestamp
@@ -214,32 +242,42 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
+
     try {
-      const parseIso = (value: unknown, fallback: Date): string => {
-        if (typeof value === "string") {
-          const date = new Date(value);
-          if (!isNaN(date.getTime())) return date.toISOString();
-        }
-        return fallback.toISOString();
-      };
+      const startDate = this.parseRequiredIso(
+        req.query["startTimestamp"],
+        "startTimestamp",
+      );
 
-      const startIso = parseIso(req.query["startTimestamp"], new Date(0));
-      const endIso = parseIso(req.query["endTimestamp"], new Date());
+      const endDate = this.parseRequiredIso(
+        req.query["endTimestamp"],
+        "endTimestamp",
+      );
 
-      // Build API request (OpenAPI schema expects string)
+      if (startDate.getTime() > endDate.getTime()) {
+        const err = new Error(
+          "startTimestamp must be less than or equal to endTimestamp",
+        );
+        (err as any).statusCode = 400;
+        throw err;
+      }
+
       const auditRequest: AuditRequest = {
-        startTimestamp: startIso,
-        endTimestamp: endIso,
+        startTimestamp: startDate.toISOString(),
+        endTimestamp: endDate.toISOString(),
       };
 
       const result = await this.options.dispatcher.PerformAudit(auditRequest);
 
       res.status(200).json(result);
-    } catch (ex) {
+    } catch (ex: any) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
+
+      const status = ex?.statusCode ?? 500;
+
+      res.status(status).json({
+        error: status === 400 ? "InvalidParameter" : "InternalError",
+        message: ex?.message ?? "Internal Server Error",
       });
     }
   }
