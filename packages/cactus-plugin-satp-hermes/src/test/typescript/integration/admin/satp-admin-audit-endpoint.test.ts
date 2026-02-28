@@ -96,12 +96,12 @@ describe("Audit Endpoint Integration Tests", () => {
 
   afterEach(async () => {
     await repository.getAuditEntriesTable().del();
-  });
-
-  afterAll(async () => {
     if (gateway) {
       await gateway.shutdown();
     }
+  });
+
+  afterAll(async () => {
     await repository.destroy();
     fs.unlinkSync(dbPath);
   });
@@ -137,21 +137,140 @@ describe("Audit Endpoint Integration Tests", () => {
     expect(auditResponse.data.startTimestamp).toEqual(startTimestamp);
     expect(auditResponse.data.endTimestamp).toEqual(endTimestamp);
     expect(auditResponse.data.auditEntries).toBeDefined();
+    expect(auditResponse.data.auditEntries.entries.length).toBe(1);
     expect(identity.gatewayServerPort).toBe(3010);
     expect(identity.gatewayClientPort).toBe(3011);
     expect(identity.gatewayOapiPort).toBe(4010);
     expect(identity.address).toBe("http://localhost");
   });
 
-  it("Given invalid StartTimestampAndEndTimestamp, When calling an available audit endpoint, Then return 400 Bad Request response", async () => {
+  it("Given startTimestamp equal to endTimestamp, When calling audit endpoint, Then return 200 and possibly matching entries", async () => {
     // Given
+    const timestamp = Date.now();
+
+    await repository.create({
+      auditEntryId: uuidv4(),
+      session: mockLocalLog,
+      timestamp,
+    });
+
+    const isoTimestamp = new Date(timestamp).toISOString();
+
+    const api = new AdminApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
     // When
-    // Then
+    const auditResponse = await api.performAudit(isoTimestamp, isoTimestamp);
+
+    //Then
+    expect(auditResponse.status).toBe(200);
+    expect(auditResponse.data.startTimestamp).toEqual(isoTimestamp);
+    expect(auditResponse.data.endTimestamp).toEqual(isoTimestamp);
+    expect(auditResponse.data.auditEntries).toBeDefined();
+    expect(auditResponse.data.auditEntries.entries.length).toBe(1);
   });
 
-  it("Given valid StartTimestampAndEndTimestamp, When calling an unavailable audit endpoint, Then return 503 Service Unavailable response", async () => {
+  it("Given valid range with no matching entries, Then return 200 and empty auditEntries", async () => {
     // Given
+    const now = Date.now();
+
+    const api = new AdminApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
     // When
+    const response = await api.performAudit(
+      new Date(now - 100000).toISOString(),
+      new Date(now - 50000).toISOString(),
+    );
+
     // Then
+    expect(response.status).toBe(200);
+    expect(response.data.auditEntries.entries.length).toBe(0);
+  });
+
+  it("Given multiple entries, Then only entries within range are returned", async () => {
+    // Given
+    const now = Date.now();
+
+    const insideTimestamp = now;
+    const outsideTimestamp = now - 100000;
+
+    await repository.create({
+      auditEntryId: uuidv4(),
+      session: mockLocalLog,
+      timestamp: insideTimestamp,
+    });
+
+    await repository.create({
+      auditEntryId: uuidv4(),
+      session: mockLocalLog,
+      timestamp: outsideTimestamp,
+    });
+
+    const api = new AdminApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
+    // When
+    const response = await api.performAudit(
+      new Date(now - 1000).toISOString(),
+      new Date(now + 1000).toISOString(),
+    );
+
+    // Then
+    expect(response.status).toBe(200);
+    expect(response.data.auditEntries.entries.length).toBe(1);
+  });
+
+  it("Given invalid timestamp format, When calling audit endpoint, Then return 400 Bad Request", async () => {
+    // Given
+    const SATPGatewayAdminApi: AdminApi = new AdminApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
+    const invalidStartTimestamp = "INVALID_TIMESTAMP";
+    const invalidEndTimestamp = "ANOTHER_INVALID_TIMESTAMP";
+
+    try {
+      // When
+      await SATPGatewayAdminApi.performAudit(
+        invalidStartTimestamp,
+        invalidEndTimestamp,
+      );
+
+      fail("Request should have thrown AxiosError");
+    } catch (error: any) {
+      // Then
+      expect(error.response).toBeDefined();
+      expect(error.response.status).toBe(400);
+      expect(error.response.data).toBeDefined();
+      expect(error.response.data.error).toBe("InvalidParameter");
+    }
+  });
+
+  it("Given startTimestamp greater than endTimestamp, When calling audit endpoint, Then return 400 Bad Request", async () => {
+    // Given
+    const SATPGatewayAdminApi: AdminApi = new AdminApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
+    const timestamp = Date.now();
+
+    const startTimestamp = new Date(timestamp + 10000).toISOString();
+    const endTimestamp = new Date(timestamp).toISOString();
+
+    try {
+      // When
+      await SATPGatewayAdminApi.performAudit(startTimestamp, endTimestamp);
+
+      // Then
+      fail("Request should have thrown an HTTP 400 Error");
+    } catch (error: any) {
+      expect(error.response.status).toBe(400);
+      expect(error.response.data).toBeDefined();
+      expect(error.response.data.error).toBe("InvalidParameter");
+    }
   });
 });
