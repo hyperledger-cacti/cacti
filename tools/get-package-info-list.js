@@ -39,7 +39,7 @@ import fs from "fs-extra";
  * @returns {PackageDependencyGraph}
  */
 const getDependencyGraph = () => {
-  const cliCommand = `./node_modules/.bin/lerna list --all --graph --toposort`;
+  const cliCommand = `yarn exec lerna  list --all --graph --toposort`;
   const processOutputBuffer = execSync(cliCommand);
   const processOutput = processOutputBuffer.toString("utf-8");
 
@@ -60,7 +60,7 @@ const getDependencyGraph = () => {
  * @returns {PackageInfo[]}
  */
 export function getPackageInfoList(ignorePatterns = []) {
-  const cliCommand = `./node_modules/.bin/lerna list --all --json --toposort`;
+  const cliCommand = `yarn exec lerna list --all --json --toposort`;
   const processOutputBuffer = execSync(cliCommand);
   const processOutput = processOutputBuffer.toString("utf-8");
 

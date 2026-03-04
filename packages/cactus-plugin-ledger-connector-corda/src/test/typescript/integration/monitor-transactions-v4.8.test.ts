@@ -30,7 +30,7 @@ import {
   CordaTestLedger,
   SampleCordappEnum,
   CordaConnectorContainer,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   Logger,
@@ -235,7 +235,7 @@ describe("Monitor Tests", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     ledger = new CordaTestLedger({
       imageName: ledgerImageName,

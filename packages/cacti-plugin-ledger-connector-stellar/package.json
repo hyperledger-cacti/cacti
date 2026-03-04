@@ -50,7 +50,7 @@
   "scripts": {
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
     "webpack": "npm-run-all webpack:dev",
@@ -82,6 +82,7 @@
     "@types/http-errors": "2.0.4",
     "@types/uuid": "10.0.0",
     "body-parser": "1.20.3",
+    "jest-extended": "7.0.0",
     "npm-run-all2": "6.1.2",
     "socket.io": "4.6.2",
     "uuid": "10.0.0"

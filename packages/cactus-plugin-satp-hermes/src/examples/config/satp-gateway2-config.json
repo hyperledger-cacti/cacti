@@ -11,7 +11,7 @@
     ],
     "connectedDLTs": [
       {
-        "id": "HardhatTestNetwork2",
+        "id": "EthereumLedgerTestNetwork2",
         "ledgerType": "ETHEREUM"
       }
     ],
@@ -20,7 +20,7 @@
     "gatewayClientPort": 3011,
     "gatewayServerPort": 3010,
     "gatewayOapiPort": 4010,
-    "identificationCredentials": {
+    "identificationCredential": {
       "signingAlgorithm": "SECP256K1",
       "pubKey": "024c0cf54f92d23dbb3d409a8047aa2a44abcb911767d3516b19fd94c2358dec65"
     }
@@ -40,7 +40,7 @@
       ],
       "connectedDLTs": [
         {
-          "id": "HardhatTestNetwork1",
+          "id": "EthereumLedgerTestNetwork1",
           "ledgerType": "ETHEREUM"
         }
       ],
@@ -49,7 +49,10 @@
       "gatewayClientPort": 3011,
       "gatewayServerPort": 3010,
       "gatewayOapiPort": 4010,
-      "pubKey": "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171c"
+      "identificationCredential": {
+        "signingAlgorithm": "SECP256K1",
+        "pubKey": "036256069f81bcaae52a64965b8add79521ee54cb2ad3d85de5250d78cf0fc171c"
+      }
     }
   ],
   "environment": "development",

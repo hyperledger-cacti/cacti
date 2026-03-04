@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import { ISupplyChainAppOptions, SupplyChainApp } from "./supply-chain-app";

@@ -50,7 +50,9 @@ router.post("/", (req: Request, res: Response, next: NextFunction) => {
 // Show Current Status of Trade
 router.get("/:id", (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = transactionManagement.getOperationStatus(req.params.id);
+    const result = transactionManagement.getOperationStatus(
+      req.params.id as string,
+    );
     if (result) {
       res.status(200).json(result);
     } else {

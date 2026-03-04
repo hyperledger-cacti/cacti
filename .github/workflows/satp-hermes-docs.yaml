@@ -150,7 +150,7 @@ jobs:
       - name: Create documentation metadata
         run: |
           VERSION=$(node -p "require('./packages/cactus-plugin-satp-hermes/package.json').version")
-          SATP_VERSION=$(node -p "require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version']")
+          SATP_VERSION=$(node -p "require('./packages/cactus-plugin-satp-hermes/package.json').version")
           
           cat > ./gh-pages/cacti/satp/metadata.json << EOF
           {

@@ -13,12 +13,13 @@
     "schemas": {
       "TokenTypeV1": {
         "type": "string",
-        "enum": ["erc20", "erc721"],
+        "enum": ["erc20", "erc721", "erc1155"],
         "x-enum-descriptions": [
           "EIP-20: Token Standard",
-          "EIP-721: Non-Fungible Token Standard"
+          "EIP-721: Non-Fungible Token Standard",
+          "EIP-1155: Multi Token Standard"
         ],
-        "x-enum-varnames": ["ERC20", "ERC721"]
+        "x-enum-varnames": ["ERC20", "ERC721","ERC1155"]
       },
       "MonitoredToken": {
         "description": "Ethereum tokens that are being monitored by the persistence plugin.",

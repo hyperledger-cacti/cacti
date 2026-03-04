@@ -1,7 +1,7 @@
 name: all-nodejs-packages-publish
 
 env:
-  NODEJS_VERSION: v18.18.2
+  NODEJS_VERSION: v20.20.0
 
 on:
   push:

@@ -1,0 +1,57 @@
+# =============================================================================
+# Adapter Configuration for satp-gateway1-simple-deployed-adapter
+# =============================================================================
+#
+# PURPOSE:
+# Adapter configuration for a Besu gateway with pre-deployed bridge contract.
+# Configures newSessionRequest step adapters for Stage 0.
+#
+# EXECUTION FLOW:
+# Stage 0, newSessionRequest:
+#   1. "before" point → Outbound webhook calls validation service
+#   2. SATP processes the new session request
+#   3. "after" point → Inbound webhook pauses for external approval
+#
+# ADAPTER DEFINITIONS:
+# - newSessionRequest-outbound-validator: Pre-validation before processing
+# - newSessionRequest-inbound-approval: Post-processing approval gate
+#
+# USAGE:
+# Place this file alongside the gateway config JSON, or mount to:
+# /opt/cacti/satp-hermes/config/adapter-config.yml
+# =============================================================================
+
+adapters:
+  - id: "newSessionRequest-outbound-validator"
+    name: "New Session Request Validator"
+    description: "Validates new session request before processing"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionRequest
+        point: "before"
+    outboundWebhook:
+      url: "http://localhost:9223/webhook/outbound/validate"
+      timeoutMs: 5000
+      retryAttempts: 3
+      retryDelayMs: 1000
+    active: true
+    priority: 1
+
+  - id: "newSessionRequest-inbound-approval"
+    name: "New Session Request Approval"
+    description: "Awaits external approval after session request processing"
+    executionPoints:
+      - stage: "stage0"
+        step: newSessionRequest
+        point: "after"
+    inboundWebhook:
+      timeoutMs: 3000
+    active: true
+    priority: 2
+
+# Global configuration
+global:
+  timeoutMs: 5000
+  retryAttempts: 3
+  retryDelayMs: 500
+  logLevel: "debug"

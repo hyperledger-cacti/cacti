@@ -15,6 +15,7 @@ import {
 import { ConfigService } from "../../../main/typescript/config/config-service";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { ApiServer } from "../../../main/typescript/api-server";
+import { createRequire } from "node:module";
 
 describe("ApiServer", () => {
   const logLevel: LogLevelDesc = "INFO";
@@ -146,13 +147,10 @@ describe("ApiServer", () => {
 
     await expect(apiServer.start()).toResolve();
 
-    const packageFilePath = path.join(
-      pluginsPath,
-      plugin.options.instanceId,
-      "node_modules",
-      `${plugin.packageName}`,
-      "package.json",
-    );
+    const instancePath = path.join(pluginsPath, plugin.options.instanceId);
+    const req = createRequire(path.join(instancePath, "package.json"));
+
+    const packageFilePath = req.resolve(`${plugin.packageName}/package.json`);
 
     const pkgJsonStr = await readFile(packageFilePath, "utf-8");
     const { version } = JSON.parse(pkgJsonStr);
@@ -212,12 +210,17 @@ describe("ApiServer", () => {
 
     await expect(apiServer.start()).toResolve();
 
-    const packageFilePath = path.join(
+    const instancePath = path.join(
       pluginsPath,
       apiSrvOpts.plugins[0].options.instanceId,
-      "node_modules",
-      `${apiSrvOpts.plugins[0].packageName}`,
-      "package.json",
+    );
+
+    // Create a resolver scoped to this plugin instance
+    const req = createRequire(path.join(instancePath, "package.json"));
+
+    // Resolve the plugin package.json safely
+    const packageFilePath = req.resolve(
+      `${apiSrvOpts.plugins[0].packageName}/package.json`,
     );
 
     const pkgJsonStr = await readFile(packageFilePath, "utf-8");

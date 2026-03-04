@@ -21,12 +21,60 @@
  * - Graceful startup and shutdown with proper error handling
  * - Production logging and monitoring integration
  * - OpenAPI server activation for gateway management
+ * - API3 adapter configuration for external webhook integrations
  *
- * **Configuration File Structure:**
- * Expects a JSON configuration file at `/opt/cacti/satp-hermes/config/config.json`
- * containing all SATPGatewayConfig properties with comprehensive validation
- * for each configuration section including gateway identity, cryptographic keys,
- * database repositories, and cross-chain bridge configurations.
+ * **Configuration Files:**
+ * The CLI expects configuration files at the following locations:
+ *
+ * 1. **Gateway Configuration** (required):
+ *    `/opt/cacti/satp-hermes/config/config.json`
+ *    Contains SATPGatewayConfig properties including gateway identity, cryptographic keys,
+ *    database repositories, and cross-chain bridge configurations.
+ *
+ * 2. **Adapter Configuration** (optional):
+ *    `/opt/cacti/satp-hermes/config/adapter-config.yml`
+ *    YAML file defining API3 adapter webhooks for external system integration.
+ *    When present, enables outbound notifications and inbound approval workflows
+ *    at specific SATP protocol execution points.
+ *
+ * **Adapter Configuration Structure:**
+ * ```yaml
+ * adapters:
+ *   - id: "compliance-check"
+ *     name: "AML/KYC Compliance"
+ *     active: true
+ *     priority: 100  # Global priority for ordering between adapters at same execution point
+ *     executionPoints:
+ *       - stage: 2
+ *         step: "checkLockAssertionRequest"
+ *         point: "before"
+ *     # Single outbound webhook (backward compatible)
+ *     outboundWebhook:
+ *       url: "https://compliance.example.com/check"
+ *       timeoutMs: 30000
+ *       priority: 1  # Hook priority for ordering multiple hooks within this adapter
+ *     # OR multiple outbound webhooks with individual priorities
+ *     outboundWebhooks:
+ *       - url: "https://audit.example.com/log"
+ *         timeoutMs: 5000
+ *         priority: 1  # Executes first
+ *       - url: "https://monitor.example.com/notify"
+ *         timeoutMs: 3000
+ *         priority: 2  # Executes second
+ *     # Inbound webhooks pause execution until external approval
+ *     inboundWebhook:
+ *       timeoutMs: 300000  # 5 minutes timeout
+ *       priority: 1
+ * global:
+ *   timeoutMs: 10000
+ *   retryAttempts: 3
+ * ```
+ *
+ * **Priority System:**
+ * - `adapter.priority`: Orders adapters at the same execution point (stage/step/point).
+ *   Lower numbers execute first. Default: 1000.
+ * - `webhook.priority`: Orders multiple webhooks within the same adapter.
+ *   Lower numbers execute first. Default: 1000.
  *
  * @module SatpGatewayCLI
  *
@@ -42,23 +90,46 @@
  * Direct Node.js execution:
  * ```bash
  * # Ensure config.json exists in expected location
+ * # Optionally provide adapter-config.yml for webhook integrations
  * node plugin-satp-hermes-gateway-cli.js
  * ```
  *
  * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
  * @see {@link SATPGateway} for gateway implementation
  * @see {@link SATPGatewayConfig} for configuration structure
+ * @see {@link AdapterLayerConfiguration} for adapter configuration schema
  * @see {@link launchGateway} for main launcher function
  *
  * @since 0.0.3-beta
  */
 
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
 import {
   SATPGateway,
   type SATPGatewayConfig,
 } from "./plugin-satp-hermes-gateway";
-import fs from "fs-extra";
+
+// Process-level error handlers for container/CLI deployment
+// These ensure that unhandled errors are properly logged before exit
+if (require.main === module) {
+  process.on("uncaughtException", (err: Error) => {
+    console.error("[SATP Gateway] Uncaught Exception:", err);
+    process.exit(255);
+  });
+
+  process.on(
+    "unhandledRejection",
+    (reason: unknown, promise: Promise<unknown>) => {
+      console.error(
+        "[SATP Gateway] Unhandled Rejection at:",
+        promise,
+        "reason:",
+        reason,
+      );
+      process.exit(255);
+    },
+  );
+}
 
 import { validateSatpGatewayIdentity } from "./services/validation/config-validating-functions/validate-satp-gateway-identity";
 import { validateSatpCounterPartyGateways } from "./services/validation/config-validating-functions/validate-satp-counter-party-gateways";
@@ -69,7 +140,6 @@ import { validateSatpPrivacyPolicies } from "./services/validation/config-valida
 import { validateSatpMergePolicies } from "./services/validation/config-validating-functions/validate-satp-merge-policies";
 import { validateSatpKeyPairJSON } from "./services/validation/config-validating-functions/validate-key-pair-json";
 import { validateCCConfig } from "./services/validation/config-validating-functions/validate-cc-config";
-import path from "node:path";
 import { validateSatpEnableCrashRecovery } from "./services/validation/config-validating-functions/validate-satp-enable-crash-recovery";
 import { validateKnexRepositoryConfig } from "./services/validation/config-validating-functions/validate-knex-repository-config";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -77,6 +147,15 @@ import { validateInstanceId } from "./services/validation/config-validating-func
 import { v4 as uuidv4 } from "uuid";
 import { validateOntologyPath } from "./services/validation/config-validating-functions/validate-ontology-path";
 import { validateExtensions } from "./services/validation/config-validating-functions/validate-extensions";
+import { validateAdapterConfig } from "./services/validation/config-validating-functions/validate-adapter-config";
+import { loadGatewayConfig } from "./services/validation/load-gateway-config";
+
+// Re-export config loading utilities for external consumers
+export type {
+  LoadConfigOptions,
+  LoadConfigResult,
+} from "./services/validation/load-gateway-config";
+export { loadGatewayConfig } from "./services/validation/load-gateway-config";
 
 /**
  * Launch SATP Gateway - Main CLI function for gateway deployment and startup.
@@ -86,6 +165,12 @@ import { validateExtensions } from "./services/validation/config-validating-func
  * comprehensive configuration validation, gateway initialization, and service startup
  * with proper error handling and logging. Designed for containerized deployment
  * with external configuration management and monitoring integration.
+ *
+ * **Launch Options:**
+ * The function accepts optional {@link LaunchGatewayOptions} to customize paths:
+ * - `workDir`: Base working directory (default: `/opt/cacti/satp-hermes`)
+ * - `configPath`: Path to gateway JSON config (default: `{workDir}/config/config.json`)
+ * - `adapterConfigPath`: Path to adapter YAML config (default: `{workDir}/config/adapter-config.yml`)
  *
  * **Configuration Validation Sequence:**
  * 1. **File System Validation**: Verify configuration file existence and accessibility
@@ -97,16 +182,30 @@ import { validateExtensions } from "./services/validation/config-validating-func
  * 7. **Cross-chain Configuration**: Verify bridge configurations and DLT connections
  * 8. **Policy Validation**: Validate privacy and merge policies for data handling
  * 9. **Recovery Configuration**: Verify crash recovery and persistence settings
+ * 10. **Adapter Configuration**: Validate API3 adapter webhooks (if YAML file present)
  *
  * **Gateway Startup Process:**
  * After successful validation, creates SATPGateway instance and initiates startup
  * sequence including database initialization, cross-chain mechanism deployment,
  * and protocol server activation. Optionally starts OpenAPI server for management.
  *
+ * **Logging YAML Configuration:**
+ * The adapter configuration loaded from YAML is converted to a JavaScript object
+ * by `js-yaml`. To log/print the parsed configuration, use `JSON.stringify()`:
+ * ```typescript
+ * const adapterConfig = loadAdapterConfigFromYaml(adapterConfigPath);
+ * logger.debug(`Adapter config: ${JSON.stringify(adapterConfig, null, 2)}`);
+ * ```
+ *
  * **Error Handling:**
  * Comprehensive error handling with detailed logging for configuration issues,
  * startup failures, and runtime errors. Ensures proper cleanup and shutdown
  * on failure conditions with appropriate exit codes.
+ *
+ * @param opts - Optional configuration for customizing file paths
+ * @param opts.workDir - Base working directory (default: `/opt/cacti/satp-hermes`)
+ * @param opts.configPath - Path to gateway configuration JSON file
+ * @param opts.adapterConfigPath - Path to adapter configuration YAML file
  *
  * @returns Promise resolving when gateway is fully operational
  *
@@ -116,21 +215,29 @@ import { validateExtensions } from "./services/validation/config-validating-func
  * @throws {Error} When database or cross-chain mechanism setup fails
  *
  * @example
- * CLI launcher with configuration validation:
+ * CLI launcher with default paths:
  * ```typescript
- * // Called automatically when script is executed directly
- * if (require.main === module) {
- *   launchGateway();
- * }
+ * // Uses default paths: /opt/cacti/satp-hermes/config/
+ * await launchGateway();
  * ```
  *
  * @example
- * Programmatic gateway launch:
+ * Custom configuration paths:
+ * ```typescript
+ * await launchGateway({
+ *   workDir: '/custom/path',
+ *   configPath: '/custom/path/gateway.json',
+ *   adapterConfigPath: '/custom/path/adapters.yml',
+ * });
+ * ```
+ *
+ * @example
+ * Programmatic gateway launch with error handling:
  * ```typescript
  * import { launchGateway } from './plugin-satp-hermes-gateway-cli';
  *
  * try {
- *   await launchGateway();
+ *   await launchGateway({ workDir: process.env.SATP_WORK_DIR });
  *   console.log('Gateway launched successfully');
  * } catch (error) {
  *   console.error('Gateway launch failed:', error);
@@ -140,143 +247,150 @@ import { validateExtensions } from "./services/validation/config-validating-func
  *
  * @see {@link SATPGateway} for gateway implementation
  * @see {@link SATPGatewayConfig} for configuration structure
+ * @see {@link LaunchGatewayOptions} for launch options
  * @see {@link validateSatpGatewayIdentity} for identity validation
  * @see {@link validateCCConfig} for cross-chain configuration validation
  * @see {@link validateSatpKeyPairJSON} for cryptographic key validation
  *
  * @since 0.0.3-beta
  */
-export async function launchGateway(): Promise<void> {
+
+/**
+ * Options for customizing the gateway launch configuration paths.
+ *
+ * @interface LaunchGatewayOptions
+ * @property {string} [workDir] - Base working directory for configuration files.
+ *   Defaults to `/opt/cacti/satp-hermes`. Used to derive default paths for
+ *   `configPath` and `adapterConfigPath` if not explicitly provided.
+ * @property {string} [configPath] - Absolute path to the gateway configuration JSON file.
+ *   Defaults to `{workDir}/config/config.json`. Must contain valid SATPGatewayConfig.
+ * @property {string} [adapterConfigPath] - Absolute path to the adapter configuration YAML file.
+ *   Defaults to `{workDir}/config/adapter-config.yml`. Optional - gateway will start
+ *   without adapter webhooks if file is not present.
+ */
+interface LaunchGatewayOptions {
+  workDir?: string;
+  configPath?: string;
+  adapterConfigPath?: string;
+}
+
+export async function launchGateway(
+  opts?: LaunchGatewayOptions,
+): Promise<void> {
   const logger = LoggerProvider.getOrCreate({
     level: "DEBUG",
     label: "SATP-Gateway",
   });
 
-  logger.debug("Checking for configuration file...");
-
-  const workDir = "/opt/cacti/satp-hermes";
-  if (!fs.existsSync(path.join(workDir, "/config/config.json"))) {
-    throw new Error(
-      "Could not find gateway-config.json in /config/config.json directory",
-    );
-  }
-
-  logger.debug("Reading configuration from: /config/config.json");
-  const config = await fs.readJson(path.join(workDir, "/config/config.json"));
-  logger.debug("Configuration read OK");
-
-  logger.debug(`Config: ${JSON.stringify(config, null, 2)}`);
-
-  // validating gateway-config.json
-
-  logger.debug("Validating SATP Gateway instanceId...");
-  const instanceId = validateInstanceId({
-    configValue: config.instanceId,
-  });
-  logger.debug("SATP Gateway instanceId is valid.");
-
-  logger.debug("Validating SATP Gateway Identity...");
-  const gid = validateSatpGatewayIdentity(
-    {
-      configValue: config.gid,
-    },
+  const { config, adapterConfig: adapterConfigRaw } = await loadGatewayConfig(
+    opts,
     logger,
   );
-  logger.debug("Valid SATP Gateway Identity");
 
-  logger.debug("Validating SATP Counter Party Gateways...");
-  const counterPartyGateways = validateSatpCounterPartyGateways(
-    {
-      configValue: config.counterPartyGateways,
-    },
+  const instanceId = await runValidation(
+    "SATP Gateway instanceId",
     logger,
+    () => validateInstanceId({ configValue: config.instanceId }),
   );
-  logger.debug("Valid SATP Counter Party Gateways");
 
-  logger.debug("Validating SATP Log Level...");
-  const logLevel = validateSatpLogLevel({
-    configValue: config.logLevel,
-  });
-  logger.debug("SATP Log Level is valid.");
+  const gid = await runValidation("SATP Gateway Identity", logger, () =>
+    validateSatpGatewayIdentity({ configValue: config.gid }, logger),
+  );
 
-  logger.debug("Validating SATP Environment...");
-  const environment = validateSatpEnvironment({
-    configValue: config.environment,
-  });
-  logger.debug("SATP Environment is valid.");
+  const counterPartyGateways = await runValidation(
+    "SATP Counter Party Gateways",
+    logger,
+    () =>
+      validateSatpCounterPartyGateways(
+        { configValue: config.counterPartyGateways },
+        logger,
+      ),
+  );
 
-  logger.debug("Validating SATP Validation Options...");
-  const validationOptions = validateSatpValidationOptions({
-    configValue: config.validationOptions,
-  });
-  logger.debug("SATP Validation Options is valid.");
+  const logLevel = await runValidation("SATP Log Level", logger, () =>
+    validateSatpLogLevel({ configValue: config.logLevel }),
+  );
 
-  logger.debug("Validating SATP Privacy Policies...");
-  const privacyPolicies = validateSatpPrivacyPolicies({
-    configValue: config.validationOptions,
-  });
-  logger.debug("SATP Privacy Policies is valid.");
+  const environment = await runValidation("SATP Environment", logger, () =>
+    validateSatpEnvironment({ configValue: config.environment }),
+  );
+
+  const validationOptions = await runValidation(
+    "SATP Validation Options",
+    logger,
+    () =>
+      validateSatpValidationOptions({ configValue: config.validationOptions }),
+  );
+
+  const privacyPolicies = await runValidation(
+    "SATP Privacy Policies",
+    logger,
+    () => validateSatpPrivacyPolicies({ configValue: config.privacyPolicies }),
+  );
   privacyPolicies.forEach((p: unknown, i: unknown) =>
     logger.debug("Privacy Policy #%d => %o", i, p),
   );
 
-  logger.debug("Validating SATP Merge Policies...");
-  const mergePolicies = validateSatpMergePolicies({
-    configValue: config.mergePolicies,
-  });
-  logger.debug("SATP Merge Policies is valid.");
+  const mergePolicies = await runValidation("SATP Merge Policies", logger, () =>
+    validateSatpMergePolicies({ configValue: config.mergePolicies }),
+  );
   mergePolicies.forEach((p: unknown, i: unknown) =>
     logger.debug("Merge Policy #%d => %o", i, p),
   );
 
-  logger.debug("Validating SATP KeyPair...");
-  const keyPair = validateSatpKeyPairJSON(
-    {
-      configValue: config.keyPair,
-    },
-    logger,
+  const keyPair = await runValidation("SATP KeyPair", logger, () =>
+    validateSatpKeyPairJSON({ configValue: config.keyPair }, logger),
   );
-  logger.debug("SATP KeyPair is valid.");
 
-  logger.debug("Validating Cross Chain Config...");
-  const ccConfig = await validateCCConfig(
-    {
-      configValue: config.ccConfig || null,
-    },
-    logger,
+  const ccConfig = await runValidation("Cross Chain Config", logger, () =>
+    validateCCConfig({ configValue: config.ccConfig || null }, logger),
   );
-  logger.debug("Cross Chain Config is valid.");
 
-  logger.debug("Validating Local Repository Config...");
-  const localRepository = validateKnexRepositoryConfig({
-    configValue: config.localRepository,
-  });
-  logger.debug("Local Repository Config is valid.");
+  const localRepository = await runValidation(
+    "Local Repository Config",
+    logger,
+    () => validateKnexRepositoryConfig({ configValue: config.localRepository }),
+  );
 
-  logger.debug("Validating Remote Repository Config...");
-  const remoteRepository = validateKnexRepositoryConfig({
-    configValue: config.remoteRepository,
-  });
-  logger.debug("Remote Repository Config is valid.");
+  const remoteRepository = await runValidation(
+    "Remote Repository Config",
+    logger,
+    () =>
+      validateKnexRepositoryConfig({ configValue: config.remoteRepository }),
+  );
 
-  logger.debug("Validating SATP Enable Crash Recovery...");
-  const enableCrashRecovery = validateSatpEnableCrashRecovery({
-    configValue: config.enableCrashRecovery,
-  });
-  logger.debug("SATP Enable Crash Recovery is valid.");
+  const enableCrashRecovery = await runValidation(
+    "SATP Enable Crash Recovery",
+    logger,
+    () =>
+      validateSatpEnableCrashRecovery({
+        configValue: config.enableCrashRecovery,
+      }),
+  );
 
-  logger.debug("SATP Bridges Config is valid.");
+  const ontologyPath = await runValidation("Ontologies Path", logger, () =>
+    validateOntologyPath({ configValue: config.ontologyPath }),
+  );
 
-  logger.debug("Validating Ontologies Path...");
-  const ontologyPath = validateOntologyPath({
-    configValue: config.ontologyPath,
-  });
-  logger.debug("SATP Gateway ontologyPath is valid.");
+  const extensions = await runValidation("Extensions", logger, () =>
+    validateExtensions({ configValue: config.extensions }),
+  );
 
-  logger.debug("Validating Extensions...");
-  const extensions = validateExtensions({
-    configValue: config.extensions,
-  });
+  const adapterConfig = await runValidation(
+    "Adapter Configuration",
+    logger,
+    () => validateAdapterConfig({ configValue: adapterConfigRaw }),
+  );
+
+  const toKeyPairBuffers = (
+    kp: { publicKey: string; privateKey: string } | undefined,
+  ) =>
+    kp
+      ? {
+          publicKey: Buffer.from(kp.publicKey, "hex"),
+          privateKey: Buffer.from(kp.privateKey, "hex"),
+        }
+      : undefined;
 
   logger.debug("Creating SATPGatewayConfig...");
   const gatewayConfig: SATPGatewayConfig = {
@@ -284,13 +398,7 @@ export async function launchGateway(): Promise<void> {
     gid,
     counterPartyGateways,
     logLevel,
-    keyPair:
-      keyPair === undefined
-        ? undefined
-        : {
-            publicKey: Buffer.from(keyPair.publicKey, "hex"),
-            privateKey: Buffer.from(keyPair.privateKey, "hex"),
-          },
+    keyPair: toKeyPairBuffers(keyPair),
     environment,
     validationOptions,
     privacyPolicies,
@@ -300,11 +408,13 @@ export async function launchGateway(): Promise<void> {
     localRepository,
     remoteRepository,
     extensions,
+    adapterConfig,
     pluginRegistry: new PluginRegistry({ plugins: [] }),
     ontologyPath,
   };
 
-  logger.debug("SATPGatewayConfig created successfully");
+  logger.info("SATPGatewayConfig created successfully");
+  logger.debug(`SATPGatewayConfig: ${JSON.stringify(gatewayConfig, null, 2)}`);
 
   const gateway = new SATPGateway(gatewayConfig);
   try {
@@ -316,10 +426,12 @@ export async function launchGateway(): Promise<void> {
     }
     logger.info("SATP Gateway started successfully");
   } catch (ex) {
-    // biome-ignore lint/style/noUnusedTemplateLiteral: <explanation>
     logger.error(`SATP Gateway crashed. Exiting...`, ex);
     await gateway.shutdown();
-    process.exit(-1);
+    if (require.main === module) {
+      process.exit(1);
+    }
+    throw ex;
   }
 }
 
@@ -364,5 +476,24 @@ export async function launchGateway(): Promise<void> {
  * @since 0.0.3-beta
  */
 if (require.main === module) {
-  launchGateway();
+  launchGateway()
+    .then(() => {
+      console.log("[SATP Gateway] Gateway launched successfully");
+    })
+    .catch((error: Error) => {
+      console.error("[SATP Gateway] Failed to launch gateway:", error.message);
+      console.error("[SATP Gateway] Stack trace:", error.stack);
+      process.exit(1);
+    });
 }
+
+const runValidation = <T>(
+  label: string,
+  logger: Logger,
+  validationFn: () => T | Promise<T>,
+): Promise<T> => {
+  logger.debug(`Validating ${label}...`);
+  const result = Promise.resolve(validationFn());
+  result.then(() => logger.debug(`${label} is valid.`));
+  return result;
+};

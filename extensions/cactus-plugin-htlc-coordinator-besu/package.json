@@ -45,7 +45,7 @@
   "scripts": {
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "run-p generate-sdk",
-    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z) --ignore-file-override=../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
@@ -79,9 +79,11 @@
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/body-parser": "1.19.6",
     "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",
     "express": "5.1.0",
+    "jest-extended": "7.0.0",
     "socket.io": "4.6.2",
     "web3-eth-abi": "4.2.1",
     "web3-utils": "4.2.1"

@@ -21,7 +21,7 @@ import { AddressInfo } from "net";
 import { v4 as uuidv4 } from "uuid";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
@@ -80,7 +80,7 @@ let keychainPlugin: PluginKeychainMemory;
 let networkDetailsList: BesuNetworkDetails[];
 
 beforeEach(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -449,7 +449,7 @@ afterEach(async () => {
   await besuLedger.stop();
   await besuLedger.destroy();
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

@@ -24,7 +24,7 @@ import {
 import {
   BesuTestLedger,
   buildImageBesuAllInOneLatest,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   BesuApiClientOptions,
@@ -66,7 +66,7 @@ describe("PluginLedgerConnectorBesu", () => {
   let node1Host: string;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
 
@@ -136,7 +136,7 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
 

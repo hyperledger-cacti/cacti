@@ -16,7 +16,7 @@ const testLogLevel: LogLevelDesc = "info";
 
 import {
   Iroha2TestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   IROHA2_TEST_LEDGER_DEFAULT_OPTIONS,
 } from "../../../../../main/typescript/index";
 
@@ -46,7 +46,7 @@ describe("Iroha V2 Test Ledger checks", () => {
 
   beforeAll(async () => {
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     log.info("Start Iroha2TestLedger...");
     ledger = new Iroha2TestLedger({
@@ -72,7 +72,7 @@ describe("Iroha V2 Test Ledger checks", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
   });
 
   //////////////////////////////////

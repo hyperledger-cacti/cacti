@@ -132,7 +132,11 @@ export const TokenTypeV1 = {
     /**
     * EIP-721: Non-Fungible Token Standard
     */
-    ERC721: 'erc721'
+    ERC721: 'erc721',
+    /**
+    * EIP-1155: Multi Token Standard
+    */
+    ERC1155: 'erc1155'
 } as const;
 
 export type TokenTypeV1 = typeof TokenTypeV1[keyof typeof TokenTypeV1];

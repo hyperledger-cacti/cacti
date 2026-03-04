@@ -5,7 +5,7 @@ import {
   Secp256k1Keys,
 } from "@hyperledger/cactus-common";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
@@ -21,6 +21,7 @@ import {
   EthereumTestEnvironment,
   createPGDatabase,
   setupDBTable,
+  createEnhancedTimeoutConfig,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -88,7 +89,7 @@ afterEach(async () => {
     await gatewayRunner2.stop();
     await gatewayRunner2.destroy();
   }
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -99,17 +100,29 @@ afterEach(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  await db_local1.stop();
-  await db_local1.remove();
-  await db_remote1.stop();
-  await db_remote1.remove();
-  await db_local2.stop();
-  await db_local2.remove();
-  await db_remote2.stop();
-  await db_remote2.remove();
+  if (db_local1) {
+    await db_local1.stop();
+    await db_local1.remove();
+  }
+  if (db_remote1) {
+    await db_remote1.stop();
+    await db_remote1.remove();
+  }
+  if (db_local2) {
+    await db_local2.stop();
+    await db_local2.remove();
+  }
+  if (db_remote2) {
+    await db_remote2.stop();
+    await db_remote2.remove();
+  }
 
-  await besuEnv.tearDown();
-  await ethereumEnv.tearDown();
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
 }, TIMEOUT);
 
 beforeAll(async () => {
@@ -118,6 +131,7 @@ beforeAll(async () => {
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_local_config1 = createEnhancedTimeoutConfig(db_local_config1);
 
   ({ config: db_remote_config1, container: db_remote1 } =
     await createPGDatabase({
@@ -125,12 +139,14 @@ beforeAll(async () => {
       postgresUser: "user123123",
       postgresPassword: "password",
     }));
+  db_remote_config1 = createEnhancedTimeoutConfig(db_remote_config1);
 
   ({ config: db_local_config2, container: db_local2 } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_local_config2 = createEnhancedTimeoutConfig(db_local_config2);
 
   ({ config: db_remote_config2, container: db_remote2 } =
     await createPGDatabase({
@@ -138,6 +154,7 @@ beforeAll(async () => {
       postgresUser: "user123123",
       postgresPassword: "password",
     }));
+  db_remote_config2 = createEnhancedTimeoutConfig(db_remote_config2);
   await setupDBTable(db_remote_config1);
   await setupDBTable(db_remote_config2);
 

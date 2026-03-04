@@ -51,6 +51,7 @@
   },
   "dependencies": {
     "@grpc/grpc-js": "1.13.3",
+    "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-cmd-api-server": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
@@ -70,6 +71,7 @@
     "axios": "1.8.4",
     "express": "5.1.0",
     "http-status-codes": "2.3.0",
+    "jest-extended": "7.0.0",
     "uuid": "10.0.0",
     "web3-core": "1.6.1"
   },

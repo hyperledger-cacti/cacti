@@ -74,6 +74,14 @@ export class PriceManager {
       FabricLedgerTestNetwork: 0.5, // 1 token = 0.5 USD
     };
 
+    if (networkId.includes("EthereumLedgerTestNetwork")) {
+      networkId = "EthereumLedgerTestNetwork";
+    } else if (networkId.includes("BesuLedgerTestNetwork")) {
+      networkId = "BesuLedgerTestNetwork";
+    } else if (networkId.includes("FabricLedgerTestNetwork")) {
+      networkId = "FabricLedgerTestNetwork";
+    }
+
     const rate = exchangeRates[networkId];
     if (rate === undefined) {
       this.logger.error(`Price not found for networkId: ${networkId}`);

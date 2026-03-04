@@ -8,7 +8,7 @@ import {
   SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -154,7 +154,7 @@ const createMockSession = (
 };
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -193,7 +193,7 @@ afterAll(async () => {
     log.error("Error shutting down monitor service:", err);
   });
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })

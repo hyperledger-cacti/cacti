@@ -15,14 +15,13 @@ import { DiscoveryOptions } from "fabric-network";
 import {
   Containers,
   FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   WsTestServer,
   WS_IDENTITY_HTTP_PORT,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
-import { v4 as internalIpV4 } from "internal-ip";
 import { WsWallet } from "ws-wallet";
 import { WsIdentityClient } from "ws-identity-client";
 
@@ -65,7 +64,7 @@ describe("PluginLedgerConnectorFabric", () => {
     await wsTestContainer.start();
 
     const ci = await Containers.getById(wsTestContainer.containerId);
-    const wsIpAddr = await internalIpV4();
+    const wsIpAddr = "127.0.0.1";
     const hostPort = await Containers.getPublicPort(WS_IDENTITY_HTTP_PORT, ci);
 
     await ledger.start({ omitPull: false });
@@ -141,7 +140,7 @@ describe("PluginLedgerConnectorFabric", () => {
   afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
     await wsTestContainer.stop();
     await wsTestContainer.destroy();
     await wsAdmin.close();

@@ -1,7 +1,7 @@
 name: ghpkg-all-kotlin-api-clients-publish
 
 env:
-  NODEJS_VERSION: v18.18.2
+  NODEJS_VERSION: v20.20.0
 
 on:
   # Publish `v1.2.3` tags as releases.

@@ -1,0 +1,113 @@
+name: Cacti Plugin COPM Workflow
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_code_coverage:
+        required: true
+        type: string
+
+concurrency:
+  group: copm-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+    matrix-pledge-and-getview:
+      name: pledge-getview-${{ matrix.net1 }}-${{ matrix.net2 }}
+      strategy:
+        fail-fast: false
+        matrix:
+            net1: ["fabric", "corda"]
+            net2: ["fabric", "corda"]
+      env:
+        JEST_TEST_PATTERN: packages/cacti-copm-test/src/test/typescript/integration/test-copm-getverifiedview.test.ts packages/cacti-copm-test/src/test/typescript/integration/test-copm-pledge-claim.test.ts
+        JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/copm-pledge-${{ matrix.net1 }}-${{ matrix.net2}}
+        COPM_NET_1: ${{ matrix.net1 }}
+        COPM_NET_2: ${{ matrix.net2 }}
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+        - uses: ./.github/actions/copm_test/
+          with:
+            github-actor: ${GITHUB_ACTOR}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+        - name: Make the ${{matrix.net1}} network
+          run: |
+            make -f Makefile_${{matrix.net1}} setup pledge-network
+          working-directory: packages/cacti-copm-test
+        - name: Make the ${{matrix.net2}} network
+          run: |
+            make -f Makefile_${{matrix.net2}} setup pledge-network
+          working-directory: packages/cacti-copm-test
+          if: ${{ matrix.net1 != matrix.net2 }}
+        - name: show the running network
+          run: docker container ls
+        
+        - name: build
+          with:
+            node_version: ${{ inputs.node_version }}
+            yarn_hardened_mode: '0'
+          uses: ./.github/actions/configure-repo/
+        
+        - name: Run Jest Tests
+          uses: ./.github/actions/jest-runner/
+          with:
+            run_code_coverage: ${{ inputs.run_code_coverage }}
+            jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+            jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+
+        - name: Upload coverage reports as artifacts
+          if: ${{ inputs.run_code_coverage == 'true' }}
+          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+          with:
+            name: copm-pledge-${{ matrix.net1 }}-${{ matrix.net2}}
+            path: ./code-coverage-ts/**/
+
+    matrix-lock:
+      name: lock-${{ matrix.net1 }}
+      strategy:
+        fail-fast: false
+        matrix:
+            net1: ["fabric", "corda"]
+      env:
+        JEST_TEST_PATTERN: packages/cacti-copm-test/src/test/typescript/integration/test-copm-lock-claim.test.ts
+        JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/copm-lock-${{ matrix.net1 }}
+        COPM_NET_1: ${{ matrix.net1 }}
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 #v4.1.1
+        - uses: ./.github/actions/copm_test/
+          with:
+            github-actor: ${GITHUB_ACTOR}
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+        - name: Make the ${{matrix.net1}} network
+          run: |
+            make -f Makefile_${{matrix.net1}} setup lock-network
+          working-directory: packages/cacti-copm-test
+        - name: show the running network
+          run: docker container ls
+        
+        - name: build
+          with:
+            node_version: ${{ inputs.node_version }}
+            yarn_hardened_mode: '0'
+          uses: ./.github/actions/configure-repo/
+        
+        - name: Run Jest Tests
+          uses: ./.github/actions/jest-runner/
+          with:
+            run_code_coverage: ${{ inputs.run_code_coverage }}
+            jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+            jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+
+        - name: Upload coverage reports as artifacts
+          if: ${{ inputs.run_code_coverage == 'true' }}
+          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+          with:
+            name: copm-lock-${{ matrix.net1 }}
+            path: ./code-coverage-ts/**/
+  

@@ -35,6 +35,11 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
 import { Knex } from "knex";
+import {
+  ACQUIRE_CONNECTION_TIMEOUT,
+  SQLITE_POOL_CONFIG,
+  createSqliteAfterCreate,
+} from "./db-config";
 
 const envPath = process.env.ENV_PATH;
 dotenv.config({ path: envPath });
@@ -56,7 +61,11 @@ export const knexRemoteInstance: { [key: string]: Knex.Config } = {
     client: "sqlite3",
     connection: {
       /** Unique remote SQLite file path for cross-gateway testing */
-      filename: path.resolve(__dirname, `.dev.remote-${uuidv4()}.sqlite3`),
+      filename: path.resolve(
+        __dirname,
+        "data",
+        `.dev.remote-${uuidv4()}.sqlite3`,
+      ),
     },
     migrations: {
       /** Directory containing database migration files */
@@ -64,6 +73,11 @@ export const knexRemoteInstance: { [key: string]: Knex.Config } = {
     },
     /** Allow NULL values as default for SQLite compatibility */
     useNullAsDefault: true,
+    acquireConnectionTimeout: ACQUIRE_CONNECTION_TIMEOUT,
+    pool: {
+      ...SQLITE_POOL_CONFIG,
+      afterCreate: createSqliteAfterCreate(),
+    },
   },
   /** Production PostgreSQL configuration for scalable remote persistence */
   production: {

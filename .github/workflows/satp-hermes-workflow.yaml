@@ -1,0 +1,429 @@
+name: SATP Hermes Package Workflow
+ # -----------------------------------------------------------------------------
+        # PROCESS OVERVIEW
+        #
+        # Purpose:
+        #   CI/CD pipeline for the SATP (Secure Asset Transfer Protocol) Hermes Gateway plugin.
+        #   It builds and tests the plugin, generates code artifacts (protobuf, OpenAPI, Solidity),
+        #   validates code quality, produces Docker images and (on push) publishes them to registries.
+        #
+        # Architecture:
+        #   This workflow has been modularized into separate stage-specific workflows:
+        #   - Unit and integration testing
+        #   - Docker image building and publishing
+        #   - .github/workflows/satp-hermes-release.yaml - GitHub release creation
+        #
+        # Triggers:
+        #   - workflow_call: invoked by packages-workflow.yaml when the SATP Hermes package is affected
+        #   - workflow_dispatch: manual triggers with release options
+        #
+        # High-level job flow and intent:
+        #   1) build-stage: Installs dependencies, runs minimal configure/build for the SATP plugin
+        #   2) lint-stage: Runs ESLint, OpenAPI linting and protobuf linting for the SATP plugin
+        #   3) codegen-stage: Generates protobuf artifacts, OpenAPI SDKs and Solidity ABIs
+        #   4) test-stage: Runs unit and integration tests across multiple scenarios
+        #   5) docker-stage: Builds and publishes Docker images with appropriate tagging
+        #   6) release-stage: Creates GitHub releases (release mode only)
+        #
+        # DEVELOPMENT MODE (Default):
+        # - Triggered by push/PR events on release branches
+        # - Creates date-based development tags (YYYY-MM-DD-dev-{hash})
+        # - Builds, tests, and publishes development images without affecting 'latest' tag
+        #
+        # RELEASE MODE:
+        # - Triggered manually via workflow_dispatch with is_release=true
+        # - Uses package.json version for release tags (e.g., 0.0.1-beta)
+        # - Updates 'latest' tag to point to new release
+        # - Additional options: custom version, branch selection, test skipping
+        # - Creates GitHub release with changelog and Docker image information
+        #
+        # Core Pipeline Features:
+        # - Builds all monorepo dependencies and generates protocol artifacts (protobuf, OpenAPI, Solidity)
+        # - Runs comprehensive test suites including unit tests and integration tests across multiple scenarios
+        # - Validates code quality through linting and static analysis
+        # - Creates deployable Docker images and publishes them to container registries
+        # - Supports multiple deployment environments (main, dev, staging) with appropriate tagging
+        #
+        # Artifacts published by jobs (names to reference):
+        #   - satp-hermes-build-output: build outputs (dist)
+        #   - satp-hermes-yarn-cache: cached .yarn directory (fallback to package-specific .yarn)
+        #   - satp-unit-junit-report, satp-integration-junit-report-*: JUnit test reports
+        #   - coverage-reports-satp-hermes: coverage artifacts (uploaded by tests when present)
+        # -----------------------------------------------------------------------------
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        required: true
+        type: string
+      run_code_coverage:
+        required: true
+        type: string
+    
+concurrency:
+  group: satp-hermes-package-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Test execution jobs: run unit and integration tests in parallel
+  run-satp-tests-unit:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/unit/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-unit-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-satp-hermes-unit
+          path: ./code-coverage-ts/**/
+
+      
+  run-satp-tests-integration-bridge:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/bridge/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-bridge-integration-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-satp-hermes-bridge
+          path: ./code-coverage-ts/**/
+
+  run-satp-tests-integration-oracle:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/oracle/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-oracle-integration-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-satp-hermes-oracle
+          path: ./code-coverage-ts/**/
+
+
+  run-satp-tests-integration-gateway:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/gateway/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-gateway-integration-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-satp-hermes-gateway
+          path: ./code-coverage-ts/**/
+
+
+  run-satp-tests-integration-docker:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/docker/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: postgres:17.2
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+      
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-gateway-docker-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-satp-hermes-gateway-docker
+          path: ./code-coverage-ts/**/
+
+  run-satp-tests-on-chain:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'         
+        uses: ./.github/actions/configure-repo/
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+
+      - name: Build Foundry contracts
+        run: |
+          set -euo pipefail
+          cd packages/cactus-plugin-satp-hermes
+          echo "Building Foundry contracts and tests"
+          yarn forge:build:all
+
+      - name: Run Foundry tests
+        run: |
+          set -euo pipefail
+          cd packages/cactus-plugin-satp-hermes
+          echo "Running Foundry on-chain tests"
+          yarn forge:test
+
+      - name: Upload SATP foundry test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: satp-foundry-report-${{ github.job }}
+          path: |
+            packages/cactus-plugin-satp-hermes/src/test/solidity/generated/**/*
+            packages/cactus-plugin-satp-hermes/src/main/solidity/generated/**/*
+
+  run-satp-tests-recovery:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/recovery/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-unit-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-satp-hermes-recovery
+          path: ./code-coverage-ts/**/
+
+  run-satp-tests-rollback:
+    runs-on: ubuntu-22.04
+    continue-on-error: true
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/rollback/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+      
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-unit-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{ inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        with:
+          name: coverage-reports-satp-hermes-rollback
+          path: ./code-coverage-ts/**/

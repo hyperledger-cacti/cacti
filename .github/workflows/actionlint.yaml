@@ -46,7 +46,7 @@ jobs:
     # npm ERR! this command with --force or --legacy-peer-deps
     # npm ERR! to accept an incorrect (and potentially broken) dependency resolution.
     - name: wipe_non_yaml_sources
-      run: rm -rf packages/ examples/ extensions/ package.json weaver/
+      run: rm -rf packages/ examples/ extensions/ package.json weaver/ node_modules/
 
     # Shellcheck comlains that inside single quotes
     # the environment variables are not expanded, but that's exactly what we want here because
@@ -75,9 +75,8 @@ jobs:
 
     - name: actionlint
       id: actionlint
-      uses: raven-actions/actionlint@01fce4f43a270a612932cb1c64d40505a029f821 #v2.0.0
+      uses: raven-actions/actionlint@e01d1ea33dd6a5ed517d95b4c0c357560ac6f518 #v2.1.1
       with:
-        version: 1.7.1
         cache: true
         files: ${{ env.CACTI_ACTIONLINT_FILES_TO_LINT }}
         flags: '--verbose'

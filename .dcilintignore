@@ -21,7 +21,7 @@ examples/cactus-example-carbon-accounting-backend/src/main/json/generated/build-
 **/generated/**/typescript-axios/git_push.sh
 examples/cactus-example-cbdc-bridging-backend/src/main/typescript/generated/openapi/typescript-axios/git_push.sh
 packages/cactus-plugin-satp-hermes/src/main/typescript/generated/gateway-client/typescript-axios/git_push.sh
-packages/cactus-plugin-satp-hermes/src/main/typescript/generated/openapi-blo/typescript-axios/git_push.sh
+packages/cactus-plugin-satp-hermes/src/main/typescript/generated/oapi-api1/typescript-axios/git_push.sh
 
 # Generated architecture diagrams
 packages/cactus-plugin-satp-hermes/docs/architecture/satp-hermes-arch-v2.1.0.vsdx

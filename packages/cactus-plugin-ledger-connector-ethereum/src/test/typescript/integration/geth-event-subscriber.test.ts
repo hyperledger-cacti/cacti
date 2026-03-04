@@ -22,7 +22,7 @@ import Web3, { DecodedParams, HexString } from "web3";
 import { LogLevelDesc } from "@hyperledger/cactus-common";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { Constants } from "@hyperledger/cactus-core-api";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import {
   GethTestLedger,
@@ -67,7 +67,9 @@ describe("Testing the ability for listening to events emitted by deployed contra
   //////////////////////////////////
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
 
     ledger = new GethTestLedger({
@@ -123,7 +125,9 @@ describe("Testing the ability for listening to events emitted by deployed contra
     await ledger.stop();
     await ledger.destroy();
 
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
   });
 

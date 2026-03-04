@@ -10,7 +10,7 @@ import {
   Servers,
 } from "@hyperledger/cactus-common";
 import { Configuration, PluginImportType } from "@hyperledger/cactus-core-api";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 
@@ -51,7 +51,7 @@ describe("PluginLedgerConnectorPolkadot", () => {
     apiConfig: Configuration;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).toResolve();
   });
 
@@ -61,7 +61,7 @@ describe("PluginLedgerConnectorPolkadot", () => {
   });
 
   afterAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
   });
 

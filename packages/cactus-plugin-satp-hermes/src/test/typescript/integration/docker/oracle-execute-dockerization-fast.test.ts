@@ -1,7 +1,7 @@
 import "jest-extended";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
@@ -17,6 +17,7 @@ import {
   setupDBTable,
   BesuTestEnvironment,
   CI_TEST_TIMEOUT,
+  createEnhancedTimeoutConfig,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -72,17 +73,38 @@ let ethereumContractAddress: string;
 let besuContractAddress: string;
 
 afterAll(async () => {
-  await gatewayRunner.stop();
-  await gatewayRunner.destroy();
-  await db_local.stop();
-  await db_local.remove();
-  await db_remote.stop();
-  await db_remote.remove();
+  if (gatewayRunner) {
+    await gatewayRunner.stop();
+    await gatewayRunner.destroy();
+  }
+  if (db_local) {
+    await db_local.stop();
+    await db_local.remove();
+  }
+  if (db_remote) {
+    await db_remote.stop();
+    await db_remote.remove();
+  }
 
-  await besuEnv.tearDown();
-  await ethereumEnv.tearDown();
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
+}, CI_TEST_TIMEOUT);
+
+beforeEach(() => {
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -93,7 +115,7 @@ afterAll(async () => {
 }, CI_TEST_TIMEOUT);
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -107,12 +129,14 @@ beforeAll(async () => {
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_local_config = createEnhancedTimeoutConfig(db_local_config);
 
   ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_remote_config = createEnhancedTimeoutConfig(db_remote_config);
 
   await setupDBTable(db_remote_config);
 

@@ -23,7 +23,7 @@ router.get("/:assetID", (req: Request, res: Response, next: NextFunction) => {
   try {
     logger.debug(`start queryAsset`);
 
-    queryAsset(req.params.assetID)
+    queryAsset(req.params.assetID as string)
       .then((result: unknown) => {
         logger.debug("result(queryAsset) = " + JSON.stringify(result));
         res.status(200).json(result);

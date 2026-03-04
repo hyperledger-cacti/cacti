@@ -2,7 +2,7 @@ import "jest-extended";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { v4 as uuidv4 } from "uuid";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -64,11 +64,17 @@ let gateway: SATPGateway;
 
 const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
-  await besuEnv.tearDown();
-  await ethereumEnv.tearDown();
-  await fabricEnv.tearDown();
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
+  if (fabricEnv) {
+    await fabricEnv.tearDown();
+  }
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -88,10 +94,7 @@ afterEach(async () => {
   if (knexSourceRemoteClient) {
     await knexSourceRemoteClient.destroy();
   }
-}, TIMEOUT);
-
-beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -99,7 +102,20 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
+}, TIMEOUT);
 
+beforeEach(() => {
+  pruneDockerContainersIfGithubAction({ logLevel })
+    .then(() => {
+      log.info("Pruning throw OK");
+    })
+    .catch(async () => {
+      await Containers.logDiagnostics({ logLevel });
+      fail("Pruning didn't throw OK");
+    });
+}, TIMEOUT);
+
+beforeAll(async () => {
   {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({

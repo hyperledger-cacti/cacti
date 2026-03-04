@@ -83,9 +83,11 @@
     "hardhat": "2.22.19",
     "http-cache-semantics": "4.1.1",
     "http-status-codes": "2.1.4",
+    "jest-extended": "7.0.0",
     "jose": "4.15.5",
     "json-stable-stringify": "1.0.2",
-    "qs": "6.13.0"
+    "qs": "6.13.0",
+    "tape-promise": "4.0.0"
   },
   "engines": {
     "node": ">=18",

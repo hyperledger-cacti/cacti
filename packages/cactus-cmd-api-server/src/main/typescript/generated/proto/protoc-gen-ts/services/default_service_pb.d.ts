@@ -6,6 +6,7 @@
 
 import * as jspb from "google-protobuf";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
+import * as models_cmd_api_server_endpoint_error_response_pb_pb from "../models/cmd_api_server_endpoint_error_response_pb_pb";
 import * as models_health_check_response_pb_pb from "../models/health_check_response_pb_pb";
 
 export class GetOpenApiSpecV1Response extends jspb.Message { 

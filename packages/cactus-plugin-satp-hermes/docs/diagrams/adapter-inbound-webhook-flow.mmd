@@ -1,0 +1,51 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#86efac','primaryTextColor':'#14532d','primaryBorderColor':'#166534','lineColor':'#22c55e','secondaryColor':'#dcfce7','tertiaryColor':'#f0fdf4', 'actorTextColor':'#14532d', 'actorBkg':'#bbf7d0', 'actorBorder':'#166534', 'signalColor':'#14532d', 'signalTextColor':'#14532d', 'noteBkgColor':'#fef9c3', 'noteTextColor':'#422006', 'noteBorderColor':'#ca8a04', 'labelBoxBkgColor':'#dcfce7', 'labelTextColor':'#14532d'}}}%%
+
+sequenceDiagram
+    autonumber
+    participant SH as Stage Handler
+    participant AM as AdapterManager
+    participant AH as AdapterHookService
+    participant GW as Gateway<br/>Inbound Endpoint
+    participant EC as External<br/>Controller
+
+    Note over SH,EC: Inbound Webhook Flow - Blocking Approval Gate
+
+    rect rgb(220, 252, 231)
+        Note over SH,AM: Step 1: Adapter Execution Triggers Inbound Wait
+        SH->>AM: executeAdapters(stage:0, step:newSessionRequest, point:after)
+        AM->>AM: getBindingsForExecutionPoint() returns inbound-approval adapter
+        AM->>AH: runInboundWebhook(context, webhookConfig)
+    end
+
+    rect rgb(254, 249, 195)
+        Note over SH,AH: Step 2: Gateway Pauses and Waits (BLOCKING)
+        AH->>AH: buildPendingKey(sessionId, adapterId)
+        AH->>AH: pendingInboundDecisions.set(key, Promise)
+        Note over AH: Transfer BLOCKED<br/>await Promise.race([decision, timeout])<br/>timeoutMs: 300000 (5 min)
+    end
+
+    rect rgb(187, 247, 208)
+        Note over GW,EC: Step 3: External Decision Arrives
+        EC->>GW: POST /api/v1/.../webhook/inbound/decide
+        Note over EC: Body: adapterId, sessionId, continue, reason
+        GW->>AM: decideInboundWebhook(input)
+        AM->>AH: processInboundDecision(input)
+    end
+
+    rect rgb(240, 253, 244)
+        Note over AH,SH: Step 4: Decision Applied
+        AH->>AH: pending.resolve(decisionResponse)
+        
+        alt continue: true
+            AH-->>AM: AdapterHookStepResult { disposition: CONTINUE }
+            AM-->>SH: Transfer resumes
+        else continue: false
+            AH--xSH: AdapterInboundWebhookRejectedError
+            SH->>SH: Abort transfer, log reason
+        else timeout (no decision)
+            AH--xSH: AdapterInboundWebhookTimeoutError
+            SH->>SH: Abort transfer
+        end
+    end
+
+    Note over SH,EC: Transfer continues or aborts based on decision

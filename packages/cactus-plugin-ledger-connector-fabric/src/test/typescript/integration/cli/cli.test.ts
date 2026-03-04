@@ -5,13 +5,23 @@ import { FileBase64 } from "../../../../main/typescript";
 import temp from "temp";
 import { LoggerProvider } from "@hyperledger/cactus-common";
 import tar from "tar-fs";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+
+const logLevel = "DEBUG";
 
 const log = LoggerProvider.getOrCreate({
-  level: "DEBUG",
+  level: logLevel,
   label: "satpTestWithLedgerConnectors",
 });
 
-afterAll(() => {
+beforeAll(async () => {
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
+  await expect(pruning).resolves.not.toThrow();
+});
+
+afterAll(async () => {
+  const pruning = pruneDockerContainersIfGithubAction({ logLevel });
+  await expect(pruning).resolves.not.toThrow();
   temp.cleanup();
 });
 

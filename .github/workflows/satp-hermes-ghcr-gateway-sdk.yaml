@@ -13,14 +13,13 @@ name: SATP Hermes Gateway SDK - GHCR Publish
 #   Registry: https://ghcr.io/
 #
 # VERSION STRATEGY:
-#   Version Source: package.json customMetadata.satp-package-version (0.0.3-beta)
-#   Note: package.json "version" field remains at 2.1.0 for monorepo compatibility.
-#         The workflow dynamically updates version from customMetadata before publishing.
+#   Version Source: package.json version (0.0.3-beta)
+#   Note: package.json "version" field is the single source of truth.
 #   
 #   Development Builds:
-#     Format: {base-version}-dev.{timestamp}
-#     Example: 0.0.3-beta-dev.20250106120000
-#     GHCR Tag: dev
+#     Format: {YYYY-MM-DD}-dev-{hash}
+#     Example: 2026-01-22-dev-abc1234
+#     GHCR Tag: dev-hash
 #     Trigger: Push to main, satp-dev, or satp-stg branches
 #   
 #   Release Builds:
@@ -110,7 +109,7 @@ jobs:
       - name: Set image tags
         id: set_tags
         run: |
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
           IS_RELEASE="${{ inputs.is_release }}"
           if [ "$IS_RELEASE" = "true" ]; then
             if [ -n "${{ inputs.custom_version }}" ]; then
@@ -136,7 +135,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Debug Build Info
         run: |
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
           {
             echo "Debug: Current ref = ${{ github.ref }}"
             echo "Debug: Event name = ${{ github.event_name }}"

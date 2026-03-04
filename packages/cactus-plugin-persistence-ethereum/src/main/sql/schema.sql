@@ -147,6 +147,87 @@ CREATE POLICY token_metadata_erc721_delete ON ethereum."token_metadata_erc721"
 FOR DELETE TO anon, authenticated, service_role
 USING (true);
 
+-- Table: ethereum.token_metadata_erc1155
+
+-- DROP TABLE IF EXISTS ethereum.token_metadata_erc1155;
+
+CREATE TABLE IF NOT EXISTS ethereum.token_metadata_erc1155
+(
+    address text COLLATE pg_catalog."default" NOT NULL,
+    name text COLLATE pg_catalog."default",
+    symbol text COLLATE pg_catalog."default",
+    created_at timestamp with time zone NOT NULL DEFAULT now(),
+    CONSTRAINT token_metadata_erc1155_pkey PRIMARY KEY (address),
+    CONSTRAINT token_metadata_erc1155_address_key UNIQUE (address)
+);
+
+ALTER TABLE IF EXISTS ethereum.token_metadata_erc1155
+    OWNER to postgres;
+
+ALTER TABLE ethereum.token_metadata_erc1155
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY token_metadata_erc1155_select ON ethereum.token_metadata_erc1155
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY token_metadata_erc1155_insert ON ethereum.token_metadata_erc1155
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY token_metadata_erc1155_update ON ethereum.token_metadata_erc1155
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY token_metadata_erc1155_delete ON ethereum.token_metadata_erc1155
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
+-- Table: ethereum.token_erc1155
+
+-- DROP TABLE IF EXISTS ethereum.token_erc1155;
+
+CREATE TABLE IF NOT EXISTS ethereum.token_erc1155
+(
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    account_address text COLLATE pg_catalog."default" NOT NULL,
+    token_address text COLLATE pg_catalog."default" NOT NULL,
+    token_id numeric NOT NULL,
+    balance numeric NOT NULL DEFAULT 0,
+    uri text COLLATE pg_catalog."default",
+    last_balance_change timestamp without time zone NOT NULL DEFAULT now(),
+    CONSTRAINT token_erc1155_pkey PRIMARY KEY (id),
+    CONSTRAINT token_erc1155_contract_token_account_unique UNIQUE (token_address, token_id, account_address),
+    CONSTRAINT token_erc1155_token_address_fkey FOREIGN KEY (token_address)
+        REFERENCES ethereum.token_metadata_erc1155 (address) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+);
+
+ALTER TABLE IF EXISTS ethereum.token_erc1155
+    OWNER to postgres;
+
+ALTER TABLE ethereum.token_erc1155
+ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY token_erc1155_select ON ethereum.token_erc1155
+FOR SELECT TO anon, authenticated, service_role
+USING (true);
+
+CREATE POLICY token_erc1155_insert ON ethereum.token_erc1155
+FOR INSERT TO anon, authenticated, service_role
+WITH CHECK (true);
+
+CREATE POLICY token_erc1155_update ON ethereum.token_erc1155
+FOR UPDATE TO anon, authenticated, service_role
+USING (true)
+WITH CHECK (true);
+
+CREATE POLICY token_erc1155_delete ON ethereum.token_erc1155
+FOR DELETE TO anon, authenticated, service_role
+USING (true);
+
 -- Table: ethereum.token_erc721
 
 -- DROP TABLE IF EXISTS ethereum.token_erc721;
@@ -280,8 +361,15 @@ CREATE POLICY token_transfer_delete ON ethereum.token_transfer
 FOR DELETE TO anon, authenticated, service_role
 USING (true);
 
+-- Adding token_id column to token_transfer for ERC-1155 support
+ALTER TABLE ethereum.token_transfer
+ADD COLUMN IF NOT EXISTS token_id numeric;
+
 COMMENT ON COLUMN ethereum.token_transfer.value
-    IS 'ERC20 - token quantity, ERC721 - token ID';
+    IS 'ERC20 - token quantity, ERC721 - not used (see token_id), ERC1155 - token quantity';
+
+COMMENT ON COLUMN ethereum.token_transfer.token_id
+    IS 'ERC721 - token ID, ERC1155 - token ID, ERC20 - not used';
 
 ----------------------------------------------------------------------------------------------------
 -- VIEWS
@@ -330,6 +418,31 @@ WITH (security_invoker = on)
   ORDER BY b.created_at, tt.recipient;
 
 ALTER TABLE ethereum.erc721_token_history_view
+    OWNER TO postgres;
+
+-- View: ethereum.erc1155_token_history_view
+
+-- DROP VIEW IF EXISTS ethereum.erc1155_token_history_view;
+
+CREATE OR REPLACE VIEW ethereum.erc1155_token_history_view
+WITH (security_invoker = on)
+AS
+SELECT 
+    tx.hash AS transaction_hash,
+    tx."to" AS token_address,
+    b.created_at,
+    tt.sender,
+    tt.recipient,
+    tt.token_id,
+    tt.value AS quantity
+FROM ethereum.transaction tx
+JOIN ethereum.block b ON tx.block_number = b.number
+JOIN ethereum.token_transfer tt ON tx.id = tt.transaction_id
+JOIN ethereum.token_metadata_erc1155 tkn ON tx."to" = tkn.address
+WHERE tt.token_id IS NOT NULL -- Ensure token_id is present (ERC-1155 or ERC-721)
+ORDER BY b.created_at, tt.recipient;
+
+ALTER TABLE ethereum.erc1155_token_history_view
     OWNER TO postgres;
 
 -- View: ethereum.token_erc20
@@ -465,6 +578,104 @@ ALTER PROCEDURE ethereum.update_issued_erc721_tokens(numeric)
     OWNER TO postgres;
 
 GRANT EXECUTE ON PROCEDURE ethereum.update_issued_erc721_tokens(numeric) TO public;
+
+-- PROCEDURE: ethereum.update_issued_erc1155_tokens(numeric)
+
+-- DROP PROCEDURE IF EXISTS ethereum.update_issued_erc1155_tokens(numeric);
+
+CREATE OR REPLACE PROCEDURE ethereum.update_issued_erc1155_tokens(IN from_block_number numeric)
+LANGUAGE 'plpgsql'
+SET search_path = ethereum, public
+AS $BODY$
+DECLARE
+  current_token_entry ethereum.token_erc1155%ROWTYPE;
+  token_transfer record;
+  block_created_at timestamp;
+BEGIN
+  -- Get the block's creation time
+  SELECT created_at
+  FROM ethereum.block
+  WHERE number = from_block_number
+  INTO block_created_at;
+
+  IF NOT found THEN
+    raise exception 'invalid block provided: %', from_block_number
+      USING hint = 'ensure that given block was synchronized correctly';
+  END IF;
+
+  -- Process each transfer (distinct by token_address, token_id, recipient to handle batch transfers)
+  FOR token_transfer IN SELECT
+    *
+    FROM ethereum.erc1155_token_history_view
+    WHERE created_at >= block_created_at
+    ORDER BY token_address, token_id, sender, recipient, created_at DESC
+  LOOP
+    -- Process sender (decrease balance)
+    IF token_transfer.sender != '0x0000000000000000000000000000000000000000' THEN -- Not a mint
+      SELECT * FROM ethereum.token_erc1155
+      WHERE token_id = token_transfer.token_id 
+        AND token_address = token_transfer.token_address 
+        AND account_address = token_transfer.sender
+      INTO current_token_entry;
+
+      IF found THEN
+        -- Decrease sender's balance
+        UPDATE ethereum.token_erc1155
+        SET balance = GREATEST(0, balance - token_transfer.quantity),
+            last_balance_change = token_transfer.created_at
+        WHERE id = current_token_entry.id;
+
+        -- Remove entry if balance reaches 0
+        DELETE FROM ethereum.token_erc1155
+        WHERE id = current_token_entry.id AND balance = 0;
+      END IF;
+    END IF;
+
+    -- Process recipient (increase balance)
+    IF token_transfer.recipient != '0x0000000000000000000000000000000000000000' THEN -- Not a burn
+      SELECT * FROM ethereum.token_erc1155
+      WHERE token_id = token_transfer.token_id 
+        AND token_address = token_transfer.token_address 
+        AND account_address = token_transfer.recipient
+      INTO current_token_entry;
+
+      IF NOT found THEN
+        -- Create new entry for recipient
+        raise notice 'create entry for token ID % on contract % for account %', 
+          token_transfer.token_id, token_transfer.token_address, token_transfer.recipient;
+        INSERT INTO ethereum.token_erc1155
+        VALUES (
+          uuid_generate_v4(),
+          token_transfer.recipient,
+          token_transfer.token_address,
+          token_transfer.token_id,
+          token_transfer.quantity,
+          NULL, -- uri (can be fetched later)
+          token_transfer.created_at
+        );
+      ELSE
+        -- Increase recipient's balance
+        IF current_token_entry.last_balance_change < token_transfer.created_at THEN
+          raise notice 'update balance for token ID % on contract % for account %', 
+            token_transfer.token_id, token_transfer.token_address, token_transfer.recipient;
+          UPDATE ethereum.token_erc1155
+          SET balance = balance + token_transfer.quantity,
+              last_balance_change = token_transfer.created_at
+          WHERE id = current_token_entry.id;
+        ELSE
+          raise notice 'current entry is more recent - ignore token ID % on contract % for account %', 
+            token_transfer.token_id, token_transfer.token_address, token_transfer.recipient;
+        END IF;
+      END IF;
+    END IF;
+  END LOOP;
+END
+$BODY$;
+
+ALTER PROCEDURE ethereum.update_issued_erc1155_tokens(numeric)
+    OWNER TO postgres;
+
+GRANT EXECUTE ON PROCEDURE ethereum.update_issued_erc1155_tokens(numeric) TO public;
 
 -- FUNCTION: ethereum.get_missing_blocks_in_range(integer, integer)
 

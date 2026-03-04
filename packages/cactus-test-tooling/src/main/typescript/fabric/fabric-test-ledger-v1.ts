@@ -96,12 +96,11 @@ export interface PeerCerts {
 }
 
 export const DEFAULT_FABRIC_2_AIO_IMAGE_NAME =
-  "ghcr.io/hyperledger/cactus-fabric2-all-in-one";
+  "ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one";
 export const DEFAULT_FABRIC_2_AIO_IMAGE_VERSION = "2023-08-17-issue2057-pr2135";
 export const DEFAULT_FABRIC_2_AIO_FABRIC_VERSION = "2.4.4";
 
-export const FABRIC_25_LTS_AIO_IMAGE_VERSION =
-  "2024-03-03--issue-2945-fabric-v2-5-6";
+export const FABRIC_25_LTS_AIO_IMAGE_VERSION = "v2.1.0";
 export const FABRIC_25_LTS_AIO_FABRIC_VERSION = "2.5.6";
 
 /*

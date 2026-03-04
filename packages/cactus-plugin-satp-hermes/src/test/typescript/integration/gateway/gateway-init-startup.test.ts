@@ -1,7 +1,7 @@
 import "jest-extended";
 import {
   Containers,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
@@ -44,7 +44,7 @@ const factoryOptions: IPluginFactoryOptions = {
 const factory = new PluginFactorySATPGateway(factoryOptions);
 
 beforeAll(async () => {
-  pruneDockerAllIfGithubAction({ logLevel })
+  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       logger.info("Pruning throw OK");
     })
@@ -398,7 +398,7 @@ describe("SATPGateway startup", () => {
 });
 
 afterAll(async () => {
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       logger.info("Pruning throw OK");
     })

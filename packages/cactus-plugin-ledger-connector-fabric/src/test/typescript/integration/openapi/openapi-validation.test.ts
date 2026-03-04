@@ -12,7 +12,7 @@ import {
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   IListenOptions,
@@ -62,7 +62,7 @@ describe("OpenApi Validation Test", () => {
   let peer0Org2Certs: PeerCerts;
   let coreFile: FileBase64;
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.not.toThrow();
     ledger = new FabricTestLedgerV1({
       emitContainerLogs: true,
@@ -111,6 +111,7 @@ describe("OpenApi Validation Test", () => {
         strategy: DefaultEventHandlerStrategy.NetworkScopeAllfortx,
         commitTimeout: 300,
       },
+      dockerNetworkName: ledger.getNetworkName(),
     };
     const plugin = new PluginLedgerConnectorFabric(pluginOptions);
 

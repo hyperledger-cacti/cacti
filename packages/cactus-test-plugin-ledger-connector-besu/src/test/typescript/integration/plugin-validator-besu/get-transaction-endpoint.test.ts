@@ -7,7 +7,6 @@ import KeyEncoder from "key-encoder";
 import { AddressInfo } from "net";
 
 import Web3 from "web3";
-import Web3JsQuorum, { IWeb3Quorum } from "web3js-quorum";
 
 import {
   ApiServer,
@@ -21,8 +20,7 @@ import {
 } from "@hyperledger/cactus-common";
 import {
   BesuTestLedger,
-  pruneDockerAllIfGithubAction,
-  IKeyPair,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import {
   BesuApiClientOptions,
@@ -43,7 +41,7 @@ describe(testCase, () => {
   let apiServer: ApiServer;
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel });
+    const pruning = pruneDockerContainersIfGithubAction({ logLevel });
     await expect(pruning).resolves.toBeTruthy();
     await besuTestLedger.start();
   });
@@ -124,29 +122,41 @@ describe(testCase, () => {
 
     const web3Provider = new Web3.providers.HttpProvider(rpcApiHttpHost);
     const web3 = new Web3(web3Provider);
-    const web3JsQuorum: IWeb3Quorum = Web3JsQuorum(web3);
 
-    const orionKeyPair: IKeyPair = await besuTestLedger.getOrionKeyPair();
     const besuKeyPair = await besuTestLedger.getBesuKeyPair();
 
     const besuPrivateKey = besuKeyPair.privateKey.toLowerCase().startsWith("0x")
       ? besuKeyPair.privateKey.substring(2)
       : besuKeyPair.privateKey; // besu node's private key
 
-    const contractOptions = {
-      data: `0x123`,
-      // privateFrom : Orion public key of the sender.
-      privateFrom: orionKeyPair.publicKey,
-      // privateFor : Orion public keys of recipients or privacyGroupId: Privacy group to receive the transaction
-      privateFor: [orionKeyPair.publicKey],
-      // privateKey: Ethereum private key with which to sign the transaction.
-      privateKey: besuPrivateKey,
-    };
+    const besuAccount = web3.eth.accounts.privateKeyToAccount(
+      "0x" + besuPrivateKey,
+    );
 
-    const transactionHash =
-      await web3JsQuorum.priv.generateAndSendRawTransaction(contractOptions);
-    await web3.eth.getTransaction(transactionHash);
+    web3.eth.accounts.wallet.add(besuAccount);
 
+    const nonce = await web3.eth.getTransactionCount(
+      besuAccount.address,
+      "latest",
+    );
+
+    const signedTx = await besuAccount.signTransaction({
+      from: besuAccount.address,
+      to: besuAccount.address,
+      data: "0x123",
+      gas: 1_000_000,
+      nonce,
+    });
+
+    if (!signedTx.rawTransaction) {
+      throw new Error("Failed to sign transaction");
+    }
+
+    const receipt = await web3.eth.sendSignedTransaction(
+      signedTx.rawTransaction,
+    );
+
+    const transactionHash = receipt.transactionHash;
     const request: GetTransactionV1Request = {
       transactionHash: transactionHash,
     };

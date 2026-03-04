@@ -46,6 +46,7 @@
     "stress-test-inspect": "node --expose-gc --inspect-brk --no-opt dist/lib/main/typescript/verifier-with-go-eth-stress-check.js"
   },
   "dependencies": {
+    "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",

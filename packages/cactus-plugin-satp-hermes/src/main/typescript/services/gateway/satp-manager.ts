@@ -110,6 +110,7 @@ import {
 } from "../../database/gateway-persistence";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import type { AdapterManager } from "../../adapters/adapter-manager";
 
 export interface ISATPManagerOptions {
   logLevel?: LogLevelDesc;
@@ -123,6 +124,7 @@ export interface ISATPManagerOptions {
   remoteRepository?: IRemoteLogRepository;
   claimFormat?: ClaimFormat;
   monitorService: MonitorService;
+  adapterManager?: AdapterManager;
 }
 export class SATPManager {
   public static readonly CLASS_NAME = "SATPManager";
@@ -143,6 +145,8 @@ export class SATPManager {
   private readonly ccManager: SATPCrossChainManager;
 
   private readonly orchestrator: GatewayOrchestrator;
+
+  private readonly adapterManager?: AdapterManager;
 
   private gatewaysPubKeys: Map<string, string> = new Map();
   private localRepository: ILocalLogRepository;
@@ -169,6 +173,7 @@ export class SATPManager {
     this.signer = options.signer;
     this.ccManager = options.ccManager;
     this.orchestrator = options.orchestrator;
+    this.adapterManager = options.adapterManager;
     this._pubKey = options.pubKey;
     this.loadPubKeys(this.orchestrator.getCounterPartyGateways());
     this.localRepository = options.localRepository;
@@ -512,6 +517,7 @@ export class SATPManager {
                 label: `SATPHandler-Stage${serviceIndex}`,
               },
               monitorService: this.monitorService,
+              adapterManager: this.adapterManager,
             };
             handlersOptions.push(handlerOptions);
           }

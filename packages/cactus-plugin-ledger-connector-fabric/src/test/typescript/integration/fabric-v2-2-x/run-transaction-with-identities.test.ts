@@ -24,12 +24,11 @@ import {
   VaultTestServer,
   K_DEFAULT_VAULT_HTTP_PORT,
   FabricTestLedgerV1,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
 } from "@hyperledger/cactus-test-tooling";
-import { v4 as internalIpV4 } from "internal-ip";
 import axios from "axios";
 
 // test scenario
@@ -75,7 +74,7 @@ describe("Run transaction with identities", () => {
     await vaultTestContainer.start();
 
     const ci = await Containers.getById(vaultTestContainer.containerId);
-    const vaultIpAddr = await internalIpV4();
+    const vaultIpAddr = "127.0.0.1";
     const hostPort = await Containers.getPublicPort(
       K_DEFAULT_VAULT_HTTP_PORT,
       ci,
@@ -147,7 +146,7 @@ describe("Run transaction with identities", () => {
   afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await pruneDockerAllIfGithubAction({ logLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel });
     await vaultTestContainer.stop();
     await vaultTestContainer.destroy();
   });

@@ -56,7 +56,7 @@
     "codegen": "yarn run --top-level run-s 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
     "compile-contracts": "forge build",
-    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:go": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g go -o ./src/main/go/generated/openapi/go-client/ --git-user-id hyperledger --git-repo-id $(echo $npm_package_name | replace @hyperledger/ \"\" -z)/src/main/go/generated/openapi/go-client --package-name $(echo $npm_package_name | replace @hyperledger/ \"\" -z)  --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "lint": "solhint --fix",
@@ -74,7 +74,7 @@
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "axios": "1.8.4",
-    "bn.js": "5.2.1",
+    "bn.js": "5.2.2",
     "dotenv": "16.3.1",
     "ethers": "6.12.1",
     "express": "5.1.0",
@@ -86,9 +86,11 @@
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
+    "@types/bn.js": "5.2.0",
     "@types/express": "5.0.1",
     "ds-test": "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0",
-    "forge-std": "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
+    "forge-std": "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb",
+    "jest-extended": "7.0.0"
   },
   "engines": {
     "node": ">=18",

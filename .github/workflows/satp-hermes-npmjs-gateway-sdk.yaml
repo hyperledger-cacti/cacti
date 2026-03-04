@@ -13,9 +13,8 @@ name: SATP Hermes Gateway SDK - NPM Publish
 #   Registry: https://registry.npmjs.org/
 #
 # VERSION STRATEGY:
-#   Version Source: package.json customMetadata.satp-package-version (0.0.3-beta)
-#   Note: package.json "version" field remains at 2.1.0 for monorepo compatibility.
-#         The workflow dynamically updates version from customMetadata before publishing.
+#   Version Source: package.json version (0.0.3-beta)
+#   Note: package.json "version" field is the single source of truth.
 #   
 #   Development Builds:
 #     Format: {base-version}-dev.{timestamp}
@@ -155,8 +154,8 @@ jobs:
       - name: Set package tags
         id: set_tags
         run: |
-          # Extract SATP package version from package.json customMetadata
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          # Extract SATP package version from package.json version field
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
           
           # Check if this is a release build (manual trigger with is_release=true)
           IS_RELEASE="${{ inputs.is_release }}"
@@ -190,7 +189,7 @@ jobs:
 
       - name: Debug Build Info
         run: |
-          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').customMetadata['satp-package-version'])")
+          PACKAGE_VERSION=$(node -e "console.log(require('./packages/cactus-plugin-satp-hermes/package.json').version)")
           {
             echo "Debug: Current ref = ${{ github.ref }}"
             echo "Debug: Event name = ${{ github.event_name }}"
@@ -305,8 +304,8 @@ jobs:
         if: needs.set-npm-tags.outputs.is_release != 'true'
         run: |
           cd packages/cactus-plugin-satp-hermes
-          # Get the base version from customMetadata
-          BASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+          # Get the base version from package.json
+          BASE_VERSION=$(node -e "console.log(require('./package.json').version)")
           # Create a development version with timestamp
           DEV_VERSION="${BASE_VERSION}-dev.$(date +%Y%m%d%H%M%S)"
           # Update package.json version field
@@ -318,11 +317,11 @@ jobs:
         if: needs.set-npm-tags.outputs.is_release == 'true'
         run: |
           cd packages/cactus-plugin-satp-hermes
-          # Use the version from customMetadata or custom version input
+          # Use the version from package.json or custom version input
           if [ -n "${{ inputs.custom_version }}" ]; then
             RELEASE_VERSION="${{ inputs.custom_version }}"
           else
-            RELEASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+            RELEASE_VERSION=$(node -e "console.log(require('./package.json').version)")
           fi
           # Update package.json version field
           npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version
@@ -391,8 +390,8 @@ jobs:
         if: needs.set-npm-tags.outputs.is_release != 'true'
         run: |
           cd packages/cactus-plugin-satp-hermes
-          # Get the base version from customMetadata
-          BASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+          # Get the base version from package.json
+          BASE_VERSION=$(node -e "console.log(require('./package.json').version)")
           # Create a development version with timestamp
           DEV_VERSION="${BASE_VERSION}-dev.$(date +%Y%m%d%H%M%S)"
           # Update package.json version field
@@ -403,11 +402,11 @@ jobs:
         if: needs.set-npm-tags.outputs.is_release == 'true'
         run: |
           cd packages/cactus-plugin-satp-hermes
-          # Use the version from customMetadata or custom version input
+          # Use the version from package.json or custom version input
           if [ -n "${{ inputs.custom_version }}" ]; then
             RELEASE_VERSION="${{ inputs.custom_version }}"
           else
-            RELEASE_VERSION=$(node -e "console.log(require('./package.json').customMetadata['satp-package-version'])")
+            RELEASE_VERSION=$(node -e "console.log(require('./package.json').version)")
           fi
           # Update package.json version field
           npm version "$RELEASE_VERSION" --no-git-tag-version --allow-same-version

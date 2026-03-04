@@ -493,6 +493,11 @@ export class Stage3ClientService extends SATPService {
     });
   }
 
+  /**
+   * Validates the LockAssertionResponse from Stage 2.
+   * Note: This method validates a Stage 2 message but is implemented in Stage 3
+   * because it's called at the start of the Stage 3 client workflow.
+   */
   async checkLockAssertionResponse(
     response: LockAssertionResponse,
     session: SATPSession,

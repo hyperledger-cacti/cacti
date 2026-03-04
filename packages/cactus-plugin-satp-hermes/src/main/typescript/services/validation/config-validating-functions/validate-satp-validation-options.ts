@@ -44,6 +44,8 @@ function isValidatorOptions(obj: unknown): obj is ValidatorOptions {
     (!("allowlist" in obj) || typeof objRecord.allowlist === "boolean") &&
     (!("forbidNonAllowListed" in obj) ||
       typeof objRecord.forbidNonAllowListed === "boolean") &&
+    (!("forbidNonWhitelisted" in obj) ||
+      typeof objRecord.forbidNonWhitelisted === "boolean") &&
     (!("groups" in obj) || isStringArray(objRecord.groups)) &&
     (!("always" in obj) || typeof objRecord.always === "boolean") &&
     (!("strictGroups" in obj) || typeof objRecord.strictGroups === "boolean") &&

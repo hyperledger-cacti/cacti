@@ -45,7 +45,7 @@
   "scripts": {
     "codegen": "run-p 'codegen:*'",
     "codegen:openapi": "npm run generate-sdk",
-    "generate-sdk": "run-p 'generate-sdk:*'",
+    "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:kotlin": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g kotlin -o ./src/main/kotlin/generated/openapi/kotlin-client/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
     "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --ignore-file-override ../../openapi-generator-ignore",
     "watch": "npm-watch",
@@ -67,6 +67,7 @@
     "async-exit-hook": "2.0.1",
     "axios": "1.8.4",
     "express": "5.1.0",
+    "jest-extended": "7.0.0",
     "openapi-types": "12.1.3",
     "run-time-error-cjs": "1.4.0",
     "typescript-optional": "2.0.1",

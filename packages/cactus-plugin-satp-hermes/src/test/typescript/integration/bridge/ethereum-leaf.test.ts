@@ -1,6 +1,6 @@
 import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
 import {
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger/cactus-test-tooling";
 import {
@@ -49,7 +49,7 @@ let ethereumEnv: EthereumTestEnvironment;
 const TIMEOUT = 60000;
 
 beforeAll(async () => {
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -104,7 +104,7 @@ afterAll(async () => {
 
   log.info("Ethereum Leaf connector shutdown successfully");
 
-  await pruneDockerAllIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -118,7 +118,7 @@ describe("Ethereum Leaf Test with Fungible Tokens", () => {
   jest.setTimeout(20000);
   it("Should Initialize the Leaf", async () => {
     ethereumLeaf = new EthereumLeaf(
-      ethereumEnv.createEthereumLeafConfig(ontologyManager, "DEBUG"),
+      ethereumEnv.createEthereumLeafConfig(ontologyManager, logLevel),
       ontologyManager,
       monitorService,
     );

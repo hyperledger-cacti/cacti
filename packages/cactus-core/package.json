@@ -66,6 +66,7 @@
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.1",
     "@types/http-errors": "2.0.2",
+    "jest-extended": "7.0.0",
     "node-mocks-http": "1.14.0",
     "uuid": "10.0.0"
   },

@@ -23,6 +23,15 @@ import { createMigrationSource } from "../../main/typescript/database/knex-migra
 import { ExtensionConfig } from "../../main/typescript/services/validation/config-validating-functions/validate-extensions";
 import { TokenType as TransactAssetType } from "../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
+// Re-export centralized database configuration for tests
+export {
+  createEnhancedKnexConfig,
+  createEnhancedPgConfig,
+  createEnhancedSqliteConfig,
+  COMMON_POOL_CONFIG,
+  SQLITE_POOL_CONFIG,
+} from "../../main/typescript/database/db-config";
+
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
@@ -195,6 +204,20 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
   fs.writeFileSync(configFilePath, JSON.stringify(jsonObject, null, 2));
   expect(fs.existsSync(configFilePath)).toBe(true);
 
+  // Log the absolute path for debugging Docker mount issues
+  const absoluteConfigDir = path.resolve(configDir);
+  console.log(
+    `[setupGatewayDockerFiles] Config directory (absolute): ${absoluteConfigDir}`,
+  );
+  console.log(`[setupGatewayDockerFiles] Config file path: ${configFilePath}`);
+  console.log(
+    `[setupGatewayDockerFiles] Config file exists: ${fs.existsSync(configFilePath)}`,
+  );
+  // List the contents to verify
+  console.log(
+    `[setupGatewayDockerFiles] Config dir contents: ${JSON.stringify(fs.readdirSync(absoluteConfigDir))}`,
+  );
+
   const logDir = path.join(
     directory,
     `gateway-info-${gatewayIdentity.id}/logs`,
@@ -221,9 +244,9 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
   }
 
   return {
-    configPath: configDir,
-    logsPath: logDir,
-    ontologiesPath: ontologiesDir,
+    configPath: path.resolve(configDir),
+    logsPath: path.resolve(logDir),
+    ontologiesPath: path.resolve(ontologiesDir),
   };
 }
 
@@ -407,8 +430,23 @@ export async function createPGDatabase(
 
 export async function setupDBTable(config: Knex.Config): Promise<void> {
   const knexInstanceClient = knex(config);
-  await knexInstanceClient.migrate.latest();
+  try {
+    await knexInstanceClient.migrate.latest();
+  } finally {
+    // Properly release connections to avoid pool exhaustion
+    await knexInstanceClient.destroy();
+  }
 }
+
+/**
+ * Creates an enhanced Knex configuration with optimized pool and timeout settings
+ * to prevent connection pool exhaustion and handle concurrent database operations.
+ *
+ * @deprecated Use createEnhancedKnexConfig or createEnhancedPgConfig from db-config instead
+ * @param config - Base Knex configuration
+ * @returns Enhanced Knex configuration with timeout settings
+ */
+export { createEnhancedKnexConfig as createEnhancedTimeoutConfig } from "../../main/typescript/database/db-config";
 
 export interface IContractJson {
   abi: any;

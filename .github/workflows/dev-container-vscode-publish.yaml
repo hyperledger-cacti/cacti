@@ -12,7 +12,7 @@ concurrency:
 
 env:
   IMAGE_NAME: cactus-dev-container-vscode
-  NODEJS_VERSION: v18.18.2
+  NODEJS_VERSION: v20.20.0
 
 jobs:
   # Push image to GitHub Packages.

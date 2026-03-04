@@ -22,6 +22,7 @@ export interface IBesuTestLedgerConstructorOptions {
   rpcApiHttpPort?: number;
   rpcApiWsPort?: number;
   envVars?: string[];
+  commands?: string[];
   logLevel?: LogLevelDesc;
   emitContainerLogs?: boolean;
   networkName?: string;
@@ -56,6 +57,7 @@ export class BesuTestLedger implements ITestLedger {
   public readonly rpcApiHttpPort: number;
   public readonly rpcApiWsPort: number;
   public readonly envVars: string[];
+  public readonly commands: string[];
   public readonly emitContainerLogs: boolean;
 
   private readonly log: Logger;
@@ -83,6 +85,8 @@ export class BesuTestLedger implements ITestLedger {
     this.envVars = options.envVars || BESU_TEST_LEDGER_DEFAULT_OPTIONS.envVars;
     this.networkName =
       options.networkName || BESU_TEST_LEDGER_DEFAULT_OPTIONS.networkName;
+
+    this.commands = options.commands || [];
 
     this.emitContainerLogs = Bools.isBooleanStrict(options.emitContainerLogs)
       ? (options.emitContainerLogs as boolean)
@@ -227,6 +231,13 @@ export class BesuTestLedger implements ITestLedger {
     return receipt;
   }
 
+  // Get Besu key pair for Besu v21, this besu version does not have the genesis.json file
+  public async getV21BesuKeyPair(): Promise<IKeyPair> {
+    const publicKey = await this.getFileContents("/opt/besu/keys/key.pub");
+    const privateKey = await this.getFileContents("/opt/besu/keys/key");
+    return { publicKey, privateKey };
+  }
+
   public async getBesuKeyPair(
     opts: { genesisAllocIdx: number } = { genesisAllocIdx: 1 },
   ): Promise<IKeyPair> {
@@ -253,6 +264,13 @@ export class BesuTestLedger implements ITestLedger {
     }
     const pKey0x = privateKey.startsWith("0x") ? privateKey : "0x" + privateKey;
     return { publicKey, privateKey: pKey0x };
+  }
+
+  // Get Orion key pair for Besu v21, this besu version does not have the genesis.json file
+  public async getV21OrionKeyPair(): Promise<IKeyPair> {
+    const publicKey = await this.getFileContents("/config/orion/nodeKey.pub");
+    const privateKey = await this.getFileContents("/config/orion/nodeKey.key");
+    return { publicKey, privateKey };
   }
 
   public async getOrionKeyPair(): Promise<IKeyPair> {
@@ -316,6 +334,7 @@ export class BesuTestLedger implements ITestLedger {
             NetworkMode: this.networkName,
           },
           Env: this.envVars,
+          Cmd: this.commands,
         },
         {},
         (err: unknown) => {

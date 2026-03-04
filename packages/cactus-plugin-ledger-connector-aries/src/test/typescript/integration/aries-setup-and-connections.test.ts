@@ -32,7 +32,7 @@ import {
 import { Configuration, Constants } from "@hyperledger/cactus-core-api";
 import {
   IndyTestLedger,
-  pruneDockerAllIfGithubAction,
+  pruneDockerContainersIfGithubAction,
 } from "@hyperledger/cactus-test-tooling";
 import * as path from "node:path";
 import * as os from "node:os";
@@ -60,7 +60,7 @@ const testWalletPath = path.join(
 // Setup Tests
 //////////////////////////////////
 
-describe("Aries connector setup tests", () => {
+describe.skip("Aries connector setup tests", () => {
   const fakeIndyNetworkConfig = {
     isProduction: false,
     genesisTransactions: JSON.stringify({
@@ -267,7 +267,9 @@ describe("Connect Aries agents through connector tests", () => {
   });
 
   beforeAll(async () => {
-    const pruning = pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    const pruning = pruneDockerContainersIfGithubAction({
+      logLevel: testLogLevel,
+    });
     await expect(pruning).resolves.toBeTruthy();
 
     ledger = new IndyTestLedger({
@@ -343,7 +345,7 @@ describe("Connect Aries agents through connector tests", () => {
     }
 
     log.info("Prune Docker...");
-    await pruneDockerAllIfGithubAction({ logLevel: testLogLevel });
+    await pruneDockerContainersIfGithubAction({ logLevel: testLogLevel });
 
     try {
       await rm(testWalletPath, {

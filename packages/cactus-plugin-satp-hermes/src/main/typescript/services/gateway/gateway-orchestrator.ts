@@ -39,6 +39,7 @@ import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/
 import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
 import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
 import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 
 export interface IGatewayOrchestratorOptions {
   logLevel?: LogLevelDesc;
@@ -56,7 +57,7 @@ import {
   getGatewaySeeds,
   resolveGatewayID,
 } from "../network-identification/resolve-gateway";
-import { SATPHandler, Stage } from "../../types/satp-protocol";
+import { SATPHandler } from "../../types/satp-protocol";
 import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { NetworkId } from "../../public-api";
 import { MonitorService } from "../monitoring/monitor";
@@ -413,7 +414,7 @@ export class GatewayOrchestrator {
             identity.address +
             ":" +
             identity.gatewayServerPort +
-            `/${Stage.STAGE0}`,
+            `/${SatpStageKey.Stage0}`,
           httpVersion: "1.1",
         });
 
@@ -422,7 +423,7 @@ export class GatewayOrchestrator {
             identity.address +
             ":" +
             identity.gatewayServerPort +
-            `/${Stage.STAGE0}`,
+            `/${SatpStageKey.Stage0}`,
         );
 
         const transport1 = createGrpcWebTransport({
@@ -430,7 +431,7 @@ export class GatewayOrchestrator {
             identity.address +
             ":" +
             identity.gatewayServerPort +
-            `/${Stage.STAGE1}`,
+            `/${SatpStageKey.Stage1}`,
           httpVersion: "1.1",
         });
 
@@ -439,7 +440,7 @@ export class GatewayOrchestrator {
             identity.address +
             ":" +
             identity.gatewayServerPort +
-            `/${Stage.STAGE2}`,
+            `/${SatpStageKey.Stage2}`,
           httpVersion: "1.1",
         });
 
@@ -448,7 +449,7 @@ export class GatewayOrchestrator {
             identity.address +
             ":" +
             identity.gatewayServerPort +
-            `/${Stage.STAGE3}`,
+            `/${SatpStageKey.Stage3}`,
           httpVersion: "1.1",
         });
 

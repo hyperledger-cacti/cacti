@@ -1,7 +1,6 @@
 import Docker, { Container, ContainerInfo } from "dockerode";
 import isPortReachable from "is-port-reachable";
 import Joi from "joi";
-import { EventEmitter } from "events";
 import { ITestLedger } from "../i-test-ledger";
 
 const OPTS_SCHEMA: Joi.Schema = Joi.object().keys({
@@ -65,55 +64,41 @@ export class HttpEchoContainer implements ITestLedger {
   }
 
   public async start(): Promise<Container> {
-    const containerNameAndTag = this.getImageName();
+    const image = this.getImageName();
 
     if (this.container) {
       await this.container.stop();
       await this.container.remove();
     }
+
     const docker = new Docker();
 
-    await this.pullContainerImage(containerNameAndTag);
+    await this.pullContainerImage(image);
 
-    return new Promise<Container>((resolve, reject) => {
-      const eventEmitter: EventEmitter = docker.run(
-        containerNameAndTag,
-        ["--port", this.httpPort.toString(10)],
-        [],
-        {
-          ExposedPorts: {
-            [`${this.httpPort}/tcp`]: {},
-          },
-          // This is a workaround needed for macOS which has issues with routing
-          // to docker container's IP addresses directly...
-          // https://stackoverflow.com/a/39217691
-          PublishAllPorts: true,
-        },
-        {},
-        (err: unknown) => {
-          if (err) {
-            reject(err);
-          }
-        },
-      );
-
-      eventEmitter.once("start", async (container: Container) => {
-        this.container = container;
-        this.containerId = container.id;
-        const host = "127.0.0.1";
-        const hostPort = await this.getPublicHttpPort();
-        try {
-          let reachable = false;
-          do {
-            reachable = await isPortReachable(hostPort, { host });
-            await new Promise((resolve2) => setTimeout(resolve2, 100));
-          } while (!reachable);
-          resolve(container);
-        } catch (ex) {
-          reject(ex);
-        }
-      });
+    const container = await docker.createContainer({
+      Image: image,
+      Cmd: ["--port", this.httpPort.toString(10)],
+      ExposedPorts: {
+        [`${this.httpPort}/tcp`]: {},
+      },
+      HostConfig: {
+        PublishAllPorts: true,
+      },
     });
+
+    await container.start();
+
+    this.container = container;
+    this.containerId = container.id;
+
+    const host = "127.0.0.1";
+    const hostPort = await this.getPublicHttpPort();
+
+    while (!(await isPortReachable(hostPort, { host }))) {
+      await new Promise((r) => setTimeout(r, 100));
+    }
+
+    return container;
   }
 
   public stop(): Promise<Container> {
