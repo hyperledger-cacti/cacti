@@ -118,7 +118,16 @@ Getting Started
         *   [Installing the SDK](https://github.com/hyperledger/indy-sdk#installing-the-sdk)
             
         *   [Build the SDK from source](https://github.com/hyperledger/indy-sdk#how-to-build-indy-sdk-from-source)
-            
+
+    *   Foundry (required for SATP Hermes smart contract compilation)
+
+        ```sh
+        curl -L https://foundry.paradigm.xyz | bash
+        foundryup
+        ```
+
+        Verify installation: `forge --version`
+
 *   Clone the repository
     
 

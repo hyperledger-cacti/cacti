@@ -105,9 +105,22 @@ _Unless explicitly stated otherwise, each bullet will apply to both Intel and AR
   * [Installing Go for Mac](https://go.dev/dl/)
     * _Under featured downloads on the page above choose between the ARM64 or x86-64 option based on your machine._
   * [Adding Environment Variable and Go extensions](https://code.visualstudio.com/docs/languages/go)
+* Foundry (required for SATP Hermes smart contract compilation)
+  * Install Foundry:
+    ```sh
+    curl -L https://foundry.paradigm.xyz | bash
+    ```
+  * Restart your terminal or run `source ~/.zshrc`, then:
+    ```sh
+    foundryup
+    ```
+  * Verify installation:
+    ```sh
+    forge --version
+    ```
 
-### Linux 
-* Insert Linux instructions here 
+### Linux
+* Insert Linux instructions here
 
 ### Windows 
 * Insert Linux instructions here 
