@@ -106,7 +106,7 @@ SUPABASE_CONNECTION_STRING=postgresql://postgres:your-super-secret-and-long-post
 Instantiate a new `PluginPersistenceFabric` instance:
 
 ```typescript
-import { PluginPersistenceFabric } from "@hyperledger/cactus-plugin-persistence-fabric";
+import { PluginPersistenceFabric } from "@hyperledger-cacti/cactus-plugin-persistence-fabric";
 import { v4 as uuidv4 } from "uuid";
 
 const persistencePlugin = new PluginPersistenceFabric({

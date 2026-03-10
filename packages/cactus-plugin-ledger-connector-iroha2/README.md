@@ -36,9 +36,9 @@ yarn run configure
 Import `PluginFactoryLedgerConnector` from the connector package and use it to create a connector.
 
 ```typescript
-import { PluginFactoryLedgerConnector } from "@hyperledger/cactus-plugin-ledger-connector-iroha2";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginFactoryLedgerConnector } from "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2";
+import { PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 
 const defaultConfig = {
@@ -66,8 +66,8 @@ const connector = await factory.create({
 Alternatively, you can instantiate a new `PluginLedgerConnectorIroha2` instance directly.
 
 ```typescript
-import { PluginLedgerConnectorIroha2 } from "@hyperledger/cactus-plugin-ledger-connector-iroha2";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginLedgerConnectorIroha2 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 
 const defaultConfig = {
@@ -101,7 +101,7 @@ You can use the connector plugin to send transactions to or query the Iroha V2 l
 Here, for instance, we create and query a new domain:
 
 ```typescript
-import { IrohaInstruction } from "@hyperledger/cactus-plugin-ledger-connector-iroha2";
+import { IrohaInstruction } from "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2";
 
 const transactionResponse = await connector.transact({
   // Note: `instruction` can be a list of instructions to be sent as single transaction.
