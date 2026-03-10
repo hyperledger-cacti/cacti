@@ -19,7 +19,7 @@
   },
   "servers": [
     {
-      "url": "http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes",
+      "url": "http://{host}:{port}/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes",
       "description": "Development server",
       "variables": {
         "host": {
@@ -58,7 +58,7 @@
     }
   ],
   "paths": {
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact": {
       "post": {
         "tags": [
           "transaction"
@@ -66,7 +66,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"
           }
         },
         "summary": "Submit a transaction intent",
@@ -471,7 +471,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/cancel": {
       "post": {
         "tags": [
           "transaction"
@@ -482,7 +482,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/cancel"
           }
         },
         "requestBody": {
@@ -710,7 +710,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/status": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status": {
       "get": {
         "summary": "Get SATP current session data",
         "description": "Retrieve the status of a SATP session",
@@ -721,7 +721,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/status"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status"
           }
         },
         "parameters": [
@@ -886,7 +886,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/get-sessions-ids": {
       "get": {
         "summary": "Get SATP session ids",
         "description": "Retrieve the all SATP session IDs",
@@ -897,7 +897,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/get-sessions-ids"
           }
         },
         "parameters": [
@@ -939,7 +939,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck": {
       "get": {
         "summary": "Health check endpoint",
         "description": "Responds if SATP Hermes is on",
@@ -950,7 +950,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"
           }
         },
         "responses": {
@@ -980,7 +980,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers": {
       "get": {
         "summary": "Get supported ledgers",
         "description": "Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.",
@@ -991,7 +991,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers"
           }
         },
         "responses": {
@@ -1024,7 +1024,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/continue": {
       "post": {
         "tags": [
           "admin"
@@ -1035,7 +1035,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/continue"
           }
         },
         "requestBody": {
@@ -1262,7 +1262,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/pause": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/pause": {
       "post": {
         "tags": [
           "admin"
@@ -1273,7 +1273,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/pause"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/pause"
           }
         },
         "requestBody": {
@@ -1496,7 +1496,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations": {
       "get": {
         "description": "Retrieves metadata about each supported blockchain networks, chains, and other systems.",
         "summary": "Get supported integrations",
@@ -1507,7 +1507,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
           }
         },
         "responses": {
@@ -1609,7 +1609,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/routes": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/routes": {
       "get": {
         "description": "Get a list of possible routes for swapping one asset for another across multiple exchanges",
         "summary": "Get a list of routes for a gateway-to-gateway asset transfer",
@@ -1620,7 +1620,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/routes"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/routes"
           }
         },
         "parameters": [
@@ -2605,7 +2605,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit": {
       "get": {
         "tags": [
           "admin"
@@ -2616,7 +2616,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit"
           }
         },
         "parameters": [
@@ -2675,7 +2675,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address": {
       "get": {
         "tags": [
           "get-approve-address"
@@ -2686,7 +2686,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address"
           }
         },
         "parameters": [
@@ -2771,7 +2771,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/add-counterparty-gateway": {
       "post": {
         "tags": [
           "add-counterparty"
@@ -2782,7 +2782,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/add-counterparty-gateway"
           }
         },
         "requestBody": {
@@ -2942,7 +2942,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute": {
       "post": {
         "summary": "Execute data transfer task",
         "description": "Execute a registered data transfer task from source to target blockchain",
@@ -2953,7 +2953,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute"
           }
         },
         "requestBody": {
@@ -3495,7 +3495,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/register": {
       "post": {
         "summary": "Register data transfer task",
         "description": "Register data transfer from source to target blockchain",
@@ -3506,7 +3506,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/register"
           }
         },
         "requestBody": {
@@ -3757,7 +3757,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister": {
       "post": {
         "summary": "Unregister data transfer task",
         "description": "Unregister data transfer task from source to target blockchain",
@@ -3768,7 +3768,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister"
           }
         },
         "parameters": [
@@ -3823,7 +3823,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status": {
       "get": {
         "summary": "Get oracle task status",
         "description": "Retrieve the status of an oracle task",
@@ -3834,7 +3834,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"
           }
         },
         "parameters": [
@@ -4219,7 +4219,7 @@
         }
       }
     },
-    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide": {
+    "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide": {
       "post": {
         "summary": "Submit inbound webhook decision",
         "description": "External approval controllers use this endpoint to submit decisions (approve/reject)\nfor paused SATP transfers. When an adapter with an inbound webhook executes, the \ngateway pauses and waits for an external decision via this endpoint.\n\n**Inbound Webhook Workflow:**\n1. SATP gateway reaches a stage/step with configured inbound adapter\n2. Gateway pauses execution and waits for external decision POST\n3. External controller evaluates business rules, compliance checks, or manual review\n4. Controller POSTs decision payload to this endpoint\n5. Gateway validates decision, logs justification, and resumes or aborts transfer\n\n**Decision Semantics:**\n- `continue: true` - Approve transfer continuation; gateway proceeds to next stage\n- `continue: false` - Reject transfer; gateway aborts and may trigger rollback\n- `reason` - Human-readable justification stored in audit logs\n\n**Timeout Handling:**\nEach inbound webhook declares a `timeoutMs` timeout. If no decision arrives\nwithin this window, the gateway treats it as a rejection and aborts the transfer.\n\n**Security Considerations:**\n- Inbound endpoints should use authentication (API keys, mTLS, JWT validation)\n- Decision payloads must include adapter ID to match the paused session state\n- All decisions are logged with timestamps for non-repudiation",
@@ -4230,7 +4230,7 @@
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide"
+            "path": "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide"
           }
         },
         "requestBody": {
