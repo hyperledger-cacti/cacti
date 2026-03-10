@@ -97,7 +97,7 @@ export class Stage2RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage2RollbackStrategy#handleClientSideRollback";
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    context.with(ctx, async () => {
+    return context.with(ctx, async () => {
       try {
         try {
           const networkId = {
@@ -166,7 +166,7 @@ export class Stage2RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage2RollbackStrategy#handleServerSideRollback";
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    context.with(ctx, () => {
+    return context.with(ctx, () => {
       try {
         try {
           const network = serverSessionData.recipientGatewayNetworkId;
