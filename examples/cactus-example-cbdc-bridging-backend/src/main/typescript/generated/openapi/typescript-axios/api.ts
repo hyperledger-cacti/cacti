@@ -309,7 +309,7 @@ export const ApproveApiAxiosParamCreator = function (configuration?: Configurati
         approve: async (approveRequest: ApproveRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'approveRequest' is not null or undefined
             assertParamExists('approve', 'approveRequest', approveRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-example-cbdc/approve-tokens`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -418,7 +418,7 @@ export const GetAmountApprovedApiAxiosParamCreator = function (configuration?: C
          * @throws {RequiredError}
          */
         getAmountApproved: async (user?: string, chain?: GetAmountApprovedChainEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-amount-approved`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -542,7 +542,7 @@ export const GetBalanceApiAxiosParamCreator = function (configuration?: Configur
          * @throws {RequiredError}
          */
         getBalance: async (user?: string, chain?: GetBalanceChainEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-example-cbdc/get-balance`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -663,7 +663,7 @@ export const GetSessionsReferencesApiAxiosParamCreator = function (configuration
          * @throws {RequiredError}
          */
         getSessionsReferences: async (ledger?: GetSessionsReferencesLedgerEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-sessions-references`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -782,7 +782,7 @@ export const MintApiAxiosParamCreator = function (configuration?: Configuration)
         mint: async (mintRequest: MintRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'mintRequest' is not null or undefined
             assertParamExists('mint', 'mintRequest', mintRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-example-cbdc/mint-tokens`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-example-cbdc/mint-tokens`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -892,7 +892,7 @@ export const TransactApiAxiosParamCreator = function (configuration?: Configurat
         transact: async (transactRequest: TransactRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'transactRequest' is not null or undefined
             assertParamExists('transact', 'transactRequest', transactRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-example-cbdc/transact`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-example-cbdc/transact`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1002,7 +1002,7 @@ export const TransferApiAxiosParamCreator = function (configuration?: Configurat
         transfer: async (transferRequest: TransferRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'transferRequest' is not null or undefined
             assertParamExists('transfer', 'transferRequest', transferRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-example-cbdc/transfer-tokens`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
