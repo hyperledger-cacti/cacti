@@ -31,7 +31,7 @@ npm run configure
 - See tests for more complete usage examples.
 
 ```typescript
-import { GethTestLedger } from "@hyperledger/cactus-test-geth-ledger";
+import { GethTestLedger } from "@hyperledger-cacti/cactus-test-geth-ledger";
 
 // You can supply empty object, suitable default values will be used.
 const options = {

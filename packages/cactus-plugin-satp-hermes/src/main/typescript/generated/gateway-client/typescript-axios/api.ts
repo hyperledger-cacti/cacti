@@ -4874,7 +4874,7 @@ export const AddCounterpartyApiAxiosParamCreator = function (configuration?: Con
         addCounterparty: async (addCounterpartyRequest: AddCounterpartyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'addCounterpartyRequest' is not null or undefined
             assertParamExists('addCounterparty', 'addCounterpartyRequest', addCounterpartyRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/add-counterparty-gateway`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -4981,7 +4981,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
         _continue: async (continueRequest: ContinueRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'continueRequest' is not null or undefined
             assertParamExists('_continue', 'continueRequest', continueRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/continue`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5014,7 +5014,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @throws {RequiredError}
          */
         getHealthCheck: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5045,7 +5045,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @throws {RequiredError}
          */
         getSessionIds: async (sessionsRequest?: object, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/get-sessions-ids`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5082,7 +5082,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
         getStatus: async (sessionID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sessionID' is not null or undefined
             assertParamExists('getStatus', 'sessionID', sessionID)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/status`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5119,7 +5119,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
         pause: async (pauseRequest: PauseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pauseRequest' is not null or undefined
             assertParamExists('pause', 'pauseRequest', pauseRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/pause`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/pause`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5154,7 +5154,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @throws {RequiredError}
          */
         performAudit: async (startTimestamp?: number, endTimestamp?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5434,7 +5434,7 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
             assertParamExists('getApproveAddress', 'networkId', networkId)
             // verify required parameter 'tokenType' is not null or undefined
             assertParamExists('getApproveAddress', 'tokenType', tokenType)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5549,7 +5549,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
         executeOracleTask: async (executeOracleTaskRequest: ExecuteOracleTaskRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'executeOracleTaskRequest' is not null or undefined
             assertParamExists('executeOracleTask', 'executeOracleTaskRequest', executeOracleTaskRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5585,7 +5585,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
         getOracleTaskStatus: async (taskID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskID' is not null or undefined
             assertParamExists('getOracleTaskStatus', 'taskID', taskID)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5622,7 +5622,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
         registerOracleTask: async (registerOracleTaskRequest: RegisterOracleTaskRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'registerOracleTaskRequest' is not null or undefined
             assertParamExists('registerOracleTask', 'registerOracleTaskRequest', registerOracleTaskRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/register`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5658,7 +5658,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
         unregisterOracleTask: async (taskID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskID' is not null or undefined
             assertParamExists('unregisterOracleTask', 'taskID', taskID)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5865,7 +5865,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
         cancel: async (cancelRequest: CancelRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'cancelRequest' is not null or undefined
             assertParamExists('cancel', 'cancelRequest', cancelRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/cancel`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5898,7 +5898,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
          * @throws {RequiredError}
          */
         getIntegrations: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -5949,7 +5949,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
             assertParamExists('getRoutes', 'fromAddress', fromAddress)
             // verify required parameter 'toAddress' is not null or undefined
             assertParamExists('getRoutes', 'toAddress', toAddress)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/routes`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/routes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6010,7 +6010,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
         transact: async (transactRequest: TransactRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'transactRequest' is not null or undefined
             assertParamExists('transact', 'transactRequest', transactRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6231,7 +6231,7 @@ export const WebhookApiAxiosParamCreator = function (configuration?: Configurati
         decideInboundWebhook: async (decideInboundWebhookRequest: DecideInboundWebhookRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'decideInboundWebhookRequest' is not null or undefined
             assertParamExists('decideInboundWebhook', 'decideInboundWebhookRequest', decideInboundWebhookRequest)
-            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide`;
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

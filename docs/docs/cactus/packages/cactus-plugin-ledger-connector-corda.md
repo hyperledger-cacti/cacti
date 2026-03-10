@@ -97,8 +97,8 @@ class SomeCoolFlow {
     
 3.  Invoke the flow via the API client with the `params` argument being specified as an empty array `[]`
     
-    import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
-    import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+    import { DefaultApi as CordaApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
+    import { FlowInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
     
     const apiUrl \= "your-cactus-host.example.com"; // don't forget to specify the port if applicable
     const apiClient \= new CordaApi({ basePath: apiUrl });
@@ -146,8 +146,8 @@ class SomeCoolFlow {
     
 4.  Invoke the flow via the API client with the `params` populated as explained above:
     
-    import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
-    import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+    import { DefaultApi as CordaApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
+    import { FlowInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
     
     // don't forget to specify the port if applicable
     const apiUrl \= "your-cactus-host.example.com";
@@ -210,8 +210,8 @@ cordaRpcClient.startFlowDynamic(
 
 **Cactus Invocation JSON DLS Equivalent to the Above Java Snippet**
 
-import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
-import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+import { DefaultApi as CordaApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
+import { FlowInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
 
 // don't forget to specify the port if applicable
 const apiUrl \= "your-cactus-host.example.com";
@@ -576,6 +576,6 @@ This file contains functions encasing the logic to process the data points
 
 This file lists all the prometheus metrics and what they are used for.
 
-[Previous](cactus-plugin-ledger-connector-besu.md "@hyperledger/cactus-plugin-ledger-connector-besu") [Next](cactus-plugin-ledger-connector-fabric.md "@hyperledger/cactus-plugin-ledger-connector-fabric")
+[Previous](cactus-plugin-ledger-connector-besu.md "@hyperledger-cacti/cactus-plugin-ledger-connector-besu") [Next](cactus-plugin-ledger-connector-fabric.md "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric")
 
 * * *

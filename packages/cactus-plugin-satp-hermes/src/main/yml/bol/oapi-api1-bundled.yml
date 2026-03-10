@@ -56,7 +56,7 @@ externalDocs:
   description: 'For more information about the SATP Gateway Client, refer to the official documentation.'
   url: 'https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-satp-hermes/README.md'
 servers:
-  - url: 'http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes'
+  - url: 'http://{host}:{port}/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes'
     description: Development server
     variables:
       host:
@@ -77,14 +77,14 @@ tags:
   - name: webhook
     description: API endpoints for inbound webhook decisions from external approval controllers
 paths:
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact:
     post:
       tags:
         - transaction
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/transact
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact
       summary: Submit a transaction intent
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transact
@@ -394,7 +394,7 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/cancel:
     post:
       tags:
         - transaction
@@ -404,7 +404,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/cancel
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/cancel
       requestBody:
         description: Cancel request object.
         content:
@@ -580,7 +580,7 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/status:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status:
     get:
       summary: Get SATP current session data
       description: Retrieve the status of a SATP session
@@ -590,7 +590,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/status
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status
       parameters:
         - name: SessionID
           in: query
@@ -718,7 +718,7 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/get-sessions-ids:
     get:
       summary: Get SATP session ids
       description: Retrieve the all SATP session IDs
@@ -728,7 +728,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/get-sessions-ids
       parameters:
         - name: SessionsRequest
           description: Request object for fetching session IDs.
@@ -753,7 +753,7 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck:
     get:
       summary: Health check endpoint
       description: Responds if SATP Hermes is on
@@ -763,7 +763,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck
       responses:
         '200':
           description: OK
@@ -780,7 +780,7 @@ paths:
                       - UNAVAILABLE
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/continue:
     post:
       tags:
         - admin
@@ -790,7 +790,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/continue
       requestBody:
         description: Continue request object.
         content:
@@ -965,7 +965,7 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/pause:
     post:
       tags:
         - admin
@@ -975,7 +975,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/pause
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/pause
       requestBody:
         description: Pause request object.
         content:
@@ -1147,7 +1147,7 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations:
     get:
       description: 'Retrieves metadata about each supported blockchain networks, chains, and other systems.'
       summary: Get supported integrations
@@ -1157,7 +1157,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations
       responses:
         '200':
           description: A list of supported systems.
@@ -1229,7 +1229,7 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/routes:
     get:
       description: Get a list of possible routes for swapping one asset for another across multiple exchanges
       summary: Get a list of routes for a gateway-to-gateway asset transfer
@@ -1239,7 +1239,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/routes
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/routes
       parameters:
         - name: fromNetworkID
           in: query
@@ -1982,7 +1982,7 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit:
     get:
       tags:
         - admin
@@ -1992,7 +1992,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/audit
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit
       parameters:
         - name: startTimestamp
           in: query
@@ -2030,7 +2030,7 @@ paths:
                     type: integer
                     format: int64
                     description: 'The end timestamp for the audit period, as a Unix timestamp (milliseconds since epoch).'
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address:
     get:
       tags:
         - get-approve-address
@@ -2040,7 +2040,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/approve-address
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address
       parameters:
         - name: networkId
           description: The network of the DLT being interacted with.
@@ -2097,7 +2097,7 @@ paths:
           description: Approve address not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/add-counterparty-gateway:
     post:
       tags:
         - add-counterparty
@@ -2107,7 +2107,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/add-counterparty-gateway
       requestBody:
         description: Add counterparty request object.
         required: true
@@ -2222,7 +2222,7 @@ paths:
           description: Counterparty not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute:
     post:
       summary: Execute data transfer task
       description: Execute a registered data transfer task from source to target blockchain
@@ -2232,7 +2232,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute
       requestBody:
         description: Execute request object.
         required: true
@@ -2623,7 +2623,7 @@ paths:
           description: Task not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/register:
     post:
       summary: Register data transfer task
       description: Register data transfer from source to target blockchain
@@ -2633,7 +2633,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/register
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/register
       requestBody:
         description: Register request object.
         required: true
@@ -2809,7 +2809,7 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister:
     post:
       summary: Unregister data transfer task
       description: Unregister data transfer task from source to target blockchain
@@ -2819,7 +2819,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister
       parameters:
         - name: taskID
           in: query
@@ -2854,7 +2854,7 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status:
     get:
       summary: Get oracle task status
       description: Retrieve the status of an oracle task
@@ -2864,7 +2864,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status
       parameters:
         - name: taskID
           in: query
@@ -3143,7 +3143,7 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide:
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide:
     post:
       summary: Submit inbound webhook decision
       description: |-
@@ -3177,7 +3177,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide
       requestBody:
         required: true
         content:

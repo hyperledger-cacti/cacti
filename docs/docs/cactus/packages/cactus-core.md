@@ -12,6 +12,6 @@ Usage
 
 // TODO: DEMONSTRATE API
 
-[Previous](cactus-common.md "@hyperledger/cactus-common") [Next](cactus-plugin-consortium-manual.md "@hyperledger/cactus-plugin-consortium-manual")
+[Previous](cactus-common.md "@hyperledger-cacti/cactus-common") [Next](cactus-plugin-consortium-manual.md "@hyperledger-cacti/cactus-plugin-consortium-manual")
 
 * * *
