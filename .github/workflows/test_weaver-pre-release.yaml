@@ -50,9 +50,9 @@ jobs:
           # Split PR title by space, and take 3rd word
           VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
-          VERSION=$(echo $VERSION | sed -e 's/^v//')
+          VERSION=$(echo "$VERSION" | sed -e 's/^v//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo $VERSION
+          echo "$VERSION"
 
       # Gradle
       - name: check weaver/common/protos-java-kt/gradle.properties
@@ -159,9 +159,9 @@ jobs:
           # Split PR title by space, and take 3rd word
           VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
-          VERSION=$(echo $VERSION | sed -e 's/^v//')
+          VERSION=$(echo "$VERSION" | sed -e 's/^v//')
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo $VERSION
+          echo "$VERSION"
       
       - name: Update GO Checksum
         run: ./go-gen-checksum.sh $VERSION
