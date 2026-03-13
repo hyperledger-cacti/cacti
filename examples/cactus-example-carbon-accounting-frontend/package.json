@@ -92,7 +92,7 @@
     "stream-browserify": "3.0.0",
     "stream-http": "3.2.0",
     "tls-browserify": "0.2.2",
-    "typescript": "5.9.3"
+    "typescript": "5.4.5"
   },
   "engines": {
     "node": ">=18",
