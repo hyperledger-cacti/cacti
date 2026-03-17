@@ -151,7 +151,12 @@ export class GatewayPersistence {
         };
 
         //TODO: AuditEntry population
-        await this.storeInDatabase(localLog, {} as AuditEntry);
+        const auditEntry: AuditEntry = {
+          auditEntryId: `audit-${Date.now()}-${logEntry.sessionId}`,
+          session: localLog,
+          timestamp: Date.now(),
+        };
+        await this.storeInDatabase(localLog, auditEntry);
 
         const hash = this.getHash(localLog);
 
