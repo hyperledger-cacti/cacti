@@ -1,5 +1,5 @@
 import type { Socket as SocketIoSocket } from "socket.io";
-import { ProofStateChangedEvent, ProofEventTypes } from "@aries-framework/core";
+import { DidCommProofStateChangedEvent, DidCommProofEventTypes } from "@credo-ts/didcomm";
 
 import {
   Logger,
@@ -49,33 +49,33 @@ export class WatchProofStateV1Endpoint {
     const { socket, log, agent } = this;
     log.info(`${WatchProofStateV1.Subscribe} => ${socket.id}`);
 
-    const eventListener = (e: ProofStateChangedEvent) => {
+    const eventListener = (e: DidCommProofStateChangedEvent) => {
       socket.emit(WatchProofStateV1.Next, e.payload);
     };
 
-    agent.events.on<ProofStateChangedEvent>(
-      ProofEventTypes.ProofStateChanged,
+    agent.events.on<DidCommProofStateChangedEvent>(
+      DidCommProofEventTypes.ProofStateChanged,
       eventListener,
     );
 
     socket.on("disconnect", async (reason: string) => {
       log.info("WebSocket:disconnect reason=%o", reason);
-      agent.events.off<ProofStateChangedEvent>(
-        ProofEventTypes.ProofStateChanged,
+      agent.events.off<DidCommProofStateChangedEvent>(
+        DidCommProofEventTypes.ProofStateChanged,
         eventListener,
       );
     });
 
     socket.on(WatchProofStateV1.Unsubscribe, async () => {
-      agent.events.off<ProofStateChangedEvent>(
-        ProofEventTypes.ProofStateChanged,
+      agent.events.off<DidCommProofStateChangedEvent>(
+        DidCommProofEventTypes.ProofStateChanged,
         eventListener,
       );
       log.debug("WatchProofStateV1 unsubscribe done.");
     });
 
     log.debug(
-      `Subscribing to proof state changes on aries agent ${agent.config.label}...`,
+      `Subscribing to proof state changes on aries agent ${agent.config.toJSON()}...`,
     );
   }
 }
