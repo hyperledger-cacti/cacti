@@ -5,38 +5,36 @@ import type {
 import type { Express } from "express";
 import * as path from "node:path";
 import * as os from "node:os";
-import { AskarModule } from "@aries-framework/askar";
+import { AskarModule, transformSeedToPrivateJwk } from "@credo-ts/askar";
 import {
   Agent,
   InitConfig,
-  HttpOutboundTransport,
-  ConnectionsModule,
   DidsModule,
   TypedArrayEncoder,
-  KeyType,
-  CredentialsModule,
-  V2CredentialProtocol,
-  ProofsModule,
-  AutoAcceptProof,
-  V2ProofProtocol,
-  AutoAcceptCredential,
-} from "@aries-framework/core";
-import { agentDependencies, HttpInboundTransport } from "@aries-framework/node";
-import { ariesAskar } from "@hyperledger/aries-askar-nodejs";
+} from "@credo-ts/core";
+import {
+  DidCommHttpOutboundTransport,
+  DidCommCredentialV2Protocol,
+  DidCommProofV2Protocol,
+  DidCommAutoAcceptCredential,
+  DidCommAutoAcceptProof,
+  DidCommModule,
+} from "@credo-ts/didcomm";
+import { agentDependencies, DidCommHttpInboundTransport } from "@credo-ts/node";
+import { askar } from "@openwallet-foundation/askar-nodejs";
 import {
   IndyVdrAnonCredsRegistry,
   IndyVdrIndyDidRegistrar,
   IndyVdrIndyDidResolver,
   IndyVdrModule,
   IndyVdrPoolConfig,
-} from "@aries-framework/indy-vdr";
+} from "@credo-ts/indy-vdr";
 import { indyVdr } from "@hyperledger/indy-vdr-nodejs";
 import {
-  AnonCredsCredentialFormatService,
+  AnonCredsDidCommCredentialFormatService,
   AnonCredsModule,
-  AnonCredsProofFormatService,
-} from "@aries-framework/anoncreds";
-import { AnonCredsRsModule } from "@aries-framework/anoncreds-rs";
+  AnonCredsDidCommProofFormatService,
+} from "@credo-ts/anoncreds";
 import { anoncreds } from "@hyperledger/anoncreds-nodejs";
 
 import {
@@ -292,23 +290,32 @@ export class PluginLedgerConnectorAries
   public async getAgents(): Promise<AriesAgentSummaryV1[]> {
     const allAgents = new Array(...this.ariesAgents.values());
     return allAgents.map((agent) => {
-      if (!agent.config.walletConfig) {
+      const config = agent.config.toJSON() as {
+        label?: string;
+        endpoints?: string[];
+        walletConfig?: {
+          id?: string;
+          storage?: { type?: string };
+        };
+      };
+
+      if (!config.walletConfig) {
         this.log.error(
-          `Agent ${agent.config.label} doesn't have a wallet configured!`,
+          `Agent ${config.label} doesn't have a wallet configured!`,
         );
       }
 
       return {
-        name: agent.config.label,
+        name: config.label,
         isAgentInitialized: agent.isInitialized,
-        isWalletInitialized: agent.wallet.isInitialized,
-        isWalletProvisioned: agent.wallet.isProvisioned,
+        isWalletInitialized: agent.isInitialized, // wallet is no longer exposed directly on agent in credo
+        isWalletProvisioned: agent.isInitialized, // wallet is no longer exposed directly on agent in credo
         walletConfig: {
-          id: agent.config?.walletConfig?.id ?? "unknown",
-          type: agent.config?.walletConfig?.storage?.type ?? "unknown",
+          id: config.walletConfig?.id ?? "unknown",
+          type: config.walletConfig?.storage?.type ?? "unknown",
         },
-        endpoints: agent.config.endpoints,
-      };
+        endpoints: config.endpoints,
+      } as AriesAgentSummaryV1;
     });
   }
 
@@ -333,7 +340,10 @@ export class PluginLedgerConnectorAries
    * @param agentConfig Agent configuration.
    * @returns Modules that can be used to create new Aries agent.
    */
-  private getAskarAnonCredsIndyModules(agentConfig: AriesAgentConfigV1) {
+  private getAskarAnonCredsIndyModules(
+    agentConfig: AriesAgentConfigV1,
+    walletPath: string,
+  ) {
     if (!agentConfig.indyNetworks || agentConfig.indyNetworks.length === 0) {
       throw new Error(
         `Agent ${agentConfig.name} must have at least one Indy network defined!`,
@@ -368,45 +378,46 @@ export class PluginLedgerConnectorAries
       `Agent ${agentConfig.name} autoAcceptConnections:`,
       autoAcceptConnections,
     );
-    const autoAcceptCredentials = AutoAcceptCredential.ContentApproved;
+    const autoAcceptCredentials = DidCommAutoAcceptCredential.ContentApproved;
     this.log.debug(
       `Agent ${agentConfig.name} autoAcceptCredentials:`,
       autoAcceptCredentials,
     );
-    const autoAcceptProofs = AutoAcceptProof.ContentApproved;
+    const autoAcceptProofs = DidCommAutoAcceptProof.ContentApproved;
     this.log.debug(
       `Agent ${agentConfig.name} autoAcceptProofs:`,
       autoAcceptProofs,
     );
 
     return {
-      connections: new ConnectionsModule({
-        autoAcceptConnections,
-      }),
+      didcomm: new DidCommModule({
+        connections: {
+          autoAcceptConnections,
+        },
 
-      credentials: new CredentialsModule({
-        autoAcceptCredentials,
-        credentialProtocols: [
-          new V2CredentialProtocol({
-            credentialFormats: [new AnonCredsCredentialFormatService()],
-          }),
-        ],
-      }),
+        credentials: {
+          autoAcceptCredentials,
+          credentialProtocols: [
+            new DidCommCredentialV2Protocol({
+              credentialFormats: [
+                new AnonCredsDidCommCredentialFormatService(),
+              ],
+            }),
+          ],
+        },
 
-      proofs: new ProofsModule({
-        autoAcceptProofs,
-        proofProtocols: [
-          new V2ProofProtocol({
-            proofFormats: [new AnonCredsProofFormatService()],
-          }),
-        ],
+        proofs: {
+          autoAcceptProofs,
+          proofProtocols: [
+            new DidCommProofV2Protocol({
+              proofFormats: [new AnonCredsDidCommProofFormatService()],
+            }),
+          ],
+        },
       }),
 
       anoncreds: new AnonCredsModule({
         registries: [new IndyVdrAnonCredsRegistry()],
-      }),
-
-      anoncredsRs: new AnonCredsRsModule({
         anoncreds,
       }),
 
@@ -423,7 +434,19 @@ export class PluginLedgerConnectorAries
         resolvers: [new IndyVdrIndyDidResolver()],
       }),
 
-      askar: new AskarModule({ ariesAskar }),
+      askar: new AskarModule({
+        askar,
+        store: {
+          id: agentConfig.name,
+          key: agentConfig.walletKey,
+          database: {
+            type: "sqlite",
+            config: {
+              path: walletPath,
+            },
+          },
+        },
+      }),
     } as const;
   }
 
@@ -457,22 +480,15 @@ export class PluginLedgerConnectorAries
     if (agentConfig.walletPath) {
       walletPath = agentConfig.walletPath;
     }
+
     const config: InitConfig = {
       label: agentConfig.name,
-      walletConfig: {
-        id: agentConfig.name,
-        key: agentConfig.walletKey,
-        storage: {
-          type: "sqlite",
-          path: walletPath,
-        },
-      },
       endpoints: agentConfig.inboundUrl ? [agentConfig.inboundUrl] : undefined,
-    };
+    } as InitConfig;
 
-    const agent = new Agent({
-      config,
-      modules: this.getAskarAnonCredsIndyModules(agentConfig),
+    const agent: AnoncredAgent = new Agent({
+      config: config,
+      modules: this.getAskarAnonCredsIndyModules(agentConfig, walletPath),
       dependencies: agentDependencies,
     });
 
@@ -483,9 +499,11 @@ export class PluginLedgerConnectorAries
           `inboundUrl (${agentConfig.inboundUrl}) for agent ${agentConfig.name} must contain port`,
         );
       }
-      agent.registerInboundTransport(new HttpInboundTransport({ port }));
+      agent.didcomm.registerInboundTransport(
+        new DidCommHttpInboundTransport({ port }),
+      );
     }
-    agent.registerOutboundTransport(new HttpOutboundTransport());
+    agent.didcomm.registerOutboundTransport(new DidCommHttpOutboundTransport());
 
     await agent.initialize();
     this.ariesAgents.set(agentConfig.name, agent);
@@ -540,14 +558,18 @@ export class PluginLedgerConnectorAries
     const agent = await this.getAriesAgentOrThrow(agentName);
 
     const seedBuffer = TypedArrayEncoder.fromString(seed);
-    const key = await agent.wallet.createKey({
-      keyType: KeyType.Ed25519,
-      privateKey: seedBuffer,
+    const { privateJwk } = transformSeedToPrivateJwk({
+      seed: seedBuffer,
+      type: { kty: "OKP", crv: "Ed25519" },
+    });
+
+    const key = await agent.kms.importKey({
+      privateJwk,
     });
 
     // did is first 16 bytes of public key encoded as base58
     const unqualifiedIndyDid = TypedArrayEncoder.toBase58(
-      key.publicKey.slice(0, 16),
+      TypedArrayEncoder.fromBase64(key.publicJwk.x).slice(0, 16),
     );
 
     const did = `did:indy:${indyNamespace}:${unqualifiedIndyDid}`;
@@ -573,7 +595,7 @@ export class PluginLedgerConnectorAries
   ): Promise<AgentConnectionRecordV1[]> {
     Checks.truthy(agentName, "getConnections agentName options");
     const agent = await this.getAriesAgentOrThrow(agentName);
-    const allRecords = await agent.connections.findAllByQuery(
+    const allRecords = await agent.didcomm.connections.findAllByQuery(
       cactiAgentConnectionsFilterToQuery(filter),
     );
     return allRecords.map((c) => {
@@ -597,7 +619,7 @@ export class PluginLedgerConnectorAries
   ): Promise<CreateNewConnectionInvitationV1Response> {
     Checks.truthy(agentName, `createNewConnectionInvitation arg agentName`);
     const agent = await this.getAriesAgentOrThrow(agentName);
-    const outOfBandRecord = await agent.oob.createInvitation();
+    const outOfBandRecord = await agent.didcomm.oob.createInvitation();
 
     return {
       invitationUrl: outOfBandRecord.outOfBandInvitation.toUrl({
@@ -623,7 +645,9 @@ export class PluginLedgerConnectorAries
     const agent = await this.getAriesAgentOrThrow(agentName);
 
     const { outOfBandRecord } =
-      await agent.oob.receiveInvitationFromUrl(invitationUrl);
+      await agent.didcomm.oob.receiveInvitationFromUrl(invitationUrl, {
+        label: agentName,
+      });
 
     return {
       outOfBandId: outOfBandRecord.id,
@@ -652,7 +676,7 @@ export class PluginLedgerConnectorAries
     );
     const agent = await this.getAriesAgentOrThrow(agentName);
 
-    const proof = await agent.proofs.requestProof({
+    const proof = await agent.didcomm.proofs.requestProof({
       protocolVersion: "v2",
       connectionId,
       proofFormats: {
