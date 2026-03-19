@@ -21,7 +21,10 @@ import {
 } from "@hyperledger-cacti/cactus-common";
 import HelloWorldContractJson from "../../solidity/hello-world-contract/HelloWorld.json";
 import Web3 from "web3";
-import { Configuration, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  Configuration,
+  PluginImportType,
+} from "@hyperledger-cacti/cactus-core-api";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";

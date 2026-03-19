@@ -5,7 +5,10 @@ import {
   Servers,
 } from "@hyperledger-cacti/cactus-common";
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
-import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  Constants,
+  PluginImportType,
+} from "@hyperledger-cacti/cactus-core-api";
 import bodyParser from "body-parser";
 import express from "express";
 import http from "http";

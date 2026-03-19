@@ -5,7 +5,10 @@ import {
   LoggerProvider,
 } from "@hyperledger-cacti/cactus-common";
 
-import { CactusNode, ConsortiumDatabase } from "@hyperledger-cacti/cactus-core-api";
+import {
+  CactusNode,
+  ConsortiumDatabase,
+} from "@hyperledger-cacti/cactus-core-api";
 
 export interface IConsortiumRepositoryOptions {
   logLevel?: LogLevelDesc;

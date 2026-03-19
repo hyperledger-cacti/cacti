@@ -4,7 +4,11 @@ import bodyParser from "body-parser";
 import http from "http";
 import { AddressInfo } from "net";
 
-import { Bools, IListenOptions, Servers } from "@hyperledger-cacti/cactus-common";
+import {
+  Bools,
+  IListenOptions,
+  Servers,
+} from "@hyperledger-cacti/cactus-common";
 
 import { v4 as uuidv4 } from "uuid";
 import { Configuration } from "@hyperledger-cacti/cactus-core-api";

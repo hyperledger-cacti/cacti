@@ -16,7 +16,10 @@ import {
   createIsJwsGeneralTypeGuard,
 } from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry, ConsortiumRepository } from "@hyperledger-cacti/cactus-core";
+import {
+  PluginRegistry,
+  ConsortiumRepository,
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Checks,

@@ -4,7 +4,10 @@ import type {
   IntegrationsResponse,
   NetworkId,
 } from "../../generated/gateway-client/typescript-axios/api";
-import { LoggerProvider, type LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import {
+  LoggerProvider,
+  type LogLevelDesc,
+} from "@hyperledger-cacti/cactus-common";
 import type { SATPManager } from "../../services/gateway/satp-manager";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 

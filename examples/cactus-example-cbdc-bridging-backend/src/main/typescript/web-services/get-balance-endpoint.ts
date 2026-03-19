@@ -38,7 +38,9 @@ export class GetBalanceEndpointV1 implements IWebServiceEndpoint {
   }
 
   public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance"] {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance"];
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance"
+    ];
   }
 
   public async registerExpress(
@@ -58,8 +60,9 @@ export class GetBalanceEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance"].get
-      .operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance"
+    ].get.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

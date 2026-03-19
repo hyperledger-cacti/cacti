@@ -3,7 +3,10 @@ import {
   Containers,
   pruneDockerContainersIfGithubAction,
 } from "@hyperledger-cacti/cactus-test-tooling";
-import { type LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
+import {
+  type LogLevelDesc,
+  LoggerProvider,
+} from "@hyperledger-cacti/cactus-common";
 import { PluginFactorySATPGateway } from "../../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   type IPluginFactoryOptions,

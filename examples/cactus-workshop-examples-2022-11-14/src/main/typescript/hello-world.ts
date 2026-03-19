@@ -1,5 +1,8 @@
 // WARNING: This code IS NOT production-ready nor secure! Namely, cross-site scripting is possible if user input is not sanitized.
-import { ApiServer, ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import {
+  ApiServer,
+  ConfigService,
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { GoIpfsTestContainer } from "@hyperledger-cacti/cactus-test-tooling";
 import { createServer } from "http";
