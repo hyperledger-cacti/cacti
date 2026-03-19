@@ -11,14 +11,13 @@ import (
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
-
 type BondAsset struct {
-	Type          string      `json:"type"`
-	ID            string      `json:"id"`
-	Owner         string      `json:"owner"`
-	Issuer        string      `json:"issuer"`
-	FaceValue     int         `json:"facevalue"`
-	MaturityDate  time.Time   `json:"maturitydate"`
+	Type         string    `json:"type"`
+	ID           string    `json:"id"`
+	Owner        string    `json:"owner"`
+	Issuer       string    `json:"issuer"`
+	FaceValue    int       `json:"facevalue"`
+	MaturityDate time.Time `json:"maturitydate"`
 }
 
 func getBondAssetKey(assetType string, assetId string) string {
@@ -45,10 +44,10 @@ func getBondAsset(ctx contractapi.TransactionContextInterface, assetType, id str
 // InitBondAssetLedger adds a base set of assets to the ledger
 func (s *SmartContract) InitBondAssetLedger(ctx contractapi.TransactionContextInterface) error {
 	assets := []BondAsset{
-		{Type: "t1", ID: "a01", Issuer: "Treasury" , Owner: "", FaceValue: 300,
-			 MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
-			 {Type: "t1", ID: "a02", Issuer: "Treasury" , Owner: "", FaceValue: 400,
-			 MaturityDate: time.Date(2022, time.July, 1, 12, 0, 0, 0, time.UTC)},
+		{Type: "t1", ID: "a01", Issuer: "Treasury", Owner: "", FaceValue: 300,
+			MaturityDate: time.Date(2022, time.April, 1, 12, 0, 0, 0, time.UTC)},
+		{Type: "t1", ID: "a02", Issuer: "Treasury", Owner: "", FaceValue: 400,
+			MaturityDate: time.Date(2022, time.July, 1, 12, 0, 0, 0, time.UTC)},
 	}
 
 	for _, asset := range assets {
@@ -95,11 +94,11 @@ func (s *SmartContract) CreateAsset(ctx contractapi.TransactionContextInterface,
 	}
 
 	asset := BondAsset{
-		Type: assetType,
-		ID: id,
-		Owner: owner,
-		Issuer: issuer,
-		FaceValue: faceValue,
+		Type:         assetType,
+		ID:           id,
+		Owner:        owner,
+		Issuer:       issuer,
+		FaceValue:    faceValue,
 		MaturityDate: md_time,
 	}
 	assetJSON, err := json.Marshal(asset)
@@ -134,7 +133,6 @@ func (s *SmartContract) DeleteAsset(ctx contractapi.TransactionContextInterface,
 	return ctx.GetStub().DelState(getBondAssetKey(asset.Type, asset.ID))
 }
 
-
 // isCallerAssetOwner returns true only if the invoker of the transaction is also the asset owner
 func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	caller, err := getECertOfTxCreatorBase64(ctx)
@@ -149,9 +147,9 @@ func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *Bond
 func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
 		AssetType: asset.Type,
-		Id: asset.ID,
+		Id:        asset.ID,
 		Recipient: "*",
-		Locker: asset.Owner,
+		Locker:    asset.Owner,
 	}
 	bondAssetAgreementProtoSerialized, err := proto.Marshal(bondAssetAgreement)
 	if err != nil {
@@ -171,9 +169,9 @@ func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInter
 func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
 		AssetType: asset.Type,
-		Id: asset.ID,
+		Id:        asset.ID,
 		Recipient: "",
-		Locker: asset.Owner,
+		Locker:    asset.Owner,
 	}
 	bondAssetAgreementProtoSerialized, err := proto.Marshal(bondAssetAgreement)
 	if err != nil {
@@ -223,7 +221,7 @@ func (s *SmartContract) IsAssetReleased(ctx contractapi.TransactionContextInterf
 		return false, err
 	}
 	currDate := time.Now()
-	if (currDate.After(asset.MaturityDate)) {
+	if currDate.After(asset.MaturityDate) {
 		return true, nil
 	}
 

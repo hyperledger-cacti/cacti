@@ -65,21 +65,21 @@ func prepMocks(orgMSP, clientID string) (*mocks.TransactionContext, *mocks.Chain
 
 func generateSignedProposal(ccName string) *peer.SignedProposal {
 	cis := &peer.ChaincodeInvocationSpec{
-		ChaincodeSpec: &peer.ChaincodeSpec {
-			ChaincodeId: &peer.ChaincodeID {
-				Name: ccName,
-				Version: "v0",	// Any random string will do here
+		ChaincodeSpec: &peer.ChaincodeSpec{
+			ChaincodeId: &peer.ChaincodeID{
+				Name:    ccName,
+				Version: "v0", // Any random string will do here
 			},
-			Input: &peer.ChaincodeInput {
+			Input: &peer.ChaincodeInput{
 				Args: [][]byte{},
 			},
 		},
 	}
 	cisb, _ := proto.Marshal(cis)
-	cp := &peer.ChaincodeProposalPayload{ Input: cisb }
+	cp := &peer.ChaincodeProposalPayload{Input: cisb}
 	cpb, _ := proto.Marshal(cp)
-	prop := &peer.Proposal{ Payload: cpb }
+	prop := &peer.Proposal{Payload: cpb}
 	propb, _ := proto.Marshal(prop)
-	sp := &peer.SignedProposal{ ProposalBytes: propb }
+	sp := &peer.SignedProposal{ProposalBytes: propb}
 	return sp
 }

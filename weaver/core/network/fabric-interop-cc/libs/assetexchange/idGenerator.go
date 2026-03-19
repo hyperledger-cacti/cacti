@@ -9,22 +9,23 @@
 package assetexchange
 
 import (
-    "strconv"
+	"strconv"
 
-    "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
-    "github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
 // function to return the key to fetch an element from the map using contractId
 func generateContractIdMapKey(contractId string) string {
-    return contractIdPrefix + contractId
+	return contractIdPrefix + contractId
 }
+
 // function to return the key to fetch an element from the map using contractId
 func generateClaimContractIdMapKey(contractId string) string {
-    return claimContractIdPrefix + contractId
+	return claimContractIdPrefix + contractId
 }
 func generateAssetLockMapKey(assetLockKey string) string {
-    return claimAssetKeyPrefix + assetLockKey
+	return claimAssetKeyPrefix + assetLockKey
 }
 
 /*
@@ -32,13 +33,13 @@ func generateAssetLockMapKey(assetLockKey string) string {
  * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
 func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.AssetExchangeAgreement) (string, string, error) {
-    assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.AssetType, assetAgreement.Id})
-    if err != nil {
-        return "", "", logThenErrorf("error while creating composite key: %+v", err)
-    }
+	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.AssetType, assetAgreement.Id})
+	if err != nil {
+		return "", "", logThenErrorf("error while creating composite key: %+v", err)
+	}
 
-    contractId := GenerateSHA256HashInBase64Form(assetLockKey + ctx.GetStub().GetTxID())
-    return assetLockKey, contractId, nil
+	contractId := GenerateSHA256HashInBase64Form(assetLockKey + ctx.GetStub().GetTxID())
+	return assetLockKey, contractId, nil
 }
 
 /*
@@ -46,11 +47,11 @@ func GenerateAssetLockKeyAndContractId(ctx contractapi.TransactionContextInterfa
  * and contract-id (which is a hash on asset-lock key) for the non-fungible asset locking on the ledger
  */
 func GenerateClaimAssetLockKey(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.AssetExchangeAgreement) (string, error) {
-    assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.AssetType, assetAgreement.Id})
-    if err != nil {
-        return "", logThenErrorf("error while creating composite key: %+v", err)
-    }
-    return claimAssetKeyPrefix + assetLockKey, nil
+	assetLockKey, err := ctx.GetStub().CreateCompositeKey("AssetExchangeContract", []string{chaincodeId, assetAgreement.AssetType, assetAgreement.Id})
+	if err != nil {
+		return "", logThenErrorf("error while creating composite key: %+v", err)
+	}
+	return claimAssetKeyPrefix + assetLockKey, nil
 }
 
 /*
@@ -58,7 +59,7 @@ func GenerateClaimAssetLockKey(ctx contractapi.TransactionContextInterface, chai
  * a hash on the attributes of the fungible asset exchange agreement)
  */
 func GenerateFungibleAssetLockContractId(ctx contractapi.TransactionContextInterface, chaincodeId string, assetAgreement *common.FungibleAssetExchangeAgreement) string {
-    preimage := "FungibleAssetExchangeContract" + chaincodeId + assetAgreement.AssetType + strconv.Itoa(int(assetAgreement.NumUnits)) + assetAgreement.Locker + assetAgreement.Recipient
-    contractId := GenerateSHA256HashInBase64Form(preimage + ctx.GetStub().GetTxID())
-    return contractId
+	preimage := "FungibleAssetExchangeContract" + chaincodeId + assetAgreement.AssetType + strconv.Itoa(int(assetAgreement.NumUnits)) + assetAgreement.Locker + assetAgreement.Recipient
+	contractId := GenerateSHA256HashInBase64Form(preimage + ctx.GetStub().GetTxID())
+	return contractId
 }

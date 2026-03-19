@@ -1,8 +1,8 @@
 /*
  Copyright 2020 IBM All Rights Reserved.
- 
+
  SPDX-License-Identifier: Apache-2.0
- */
+*/
 
 package membershipmanager_test
 
@@ -11,17 +11,16 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	mmsdk "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/membershipmanager"
- )
-
+	"github.com/stretchr/testify/require"
+)
 
 func TestMembershipManager(t *testing.T) {
 
 	cacti_root := os.Getenv("CACTI_ROOT")
-	walletPath := cacti_root + "/weaver/samples/fabric/fabric-cli/src/wallet-network1"    // e.g., <cacti-root>/weaver/samples/fabric/fabric-cli/src/wallet-network1/
-	userName := "networkadmin"          // e.g., networkadmin
-	connectionProfilePath := cacti_root + "/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json"    // e.g., <cacti-root>/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.docker.json"
+	walletPath := cacti_root + "/weaver/samples/fabric/fabric-cli/src/wallet-network1"                                                                   // e.g., <cacti-root>/weaver/samples/fabric/fabric-cli/src/wallet-network1/
+	userName := "networkadmin"                                                                                                                           // e.g., networkadmin
+	connectionProfilePath := cacti_root + "/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.json" // e.g., <cacti-root>/weaver/tests/network-setups/fabric/shared/network1/peerOrganizations/org1.network1.com/connection-org1.docker.json"
 
 	fmt.Printf("Wallet Path: %s\n", walletPath)
 	fmt.Printf("Connection Profile Path: %s\n", connectionProfilePath)

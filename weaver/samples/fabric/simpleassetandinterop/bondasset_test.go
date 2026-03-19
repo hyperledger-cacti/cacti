@@ -12,18 +12,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassetandinterop"
-	"github.com/stretchr/testify/require"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 	wtestmocks "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassetandinterop"
+	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
+	"github.com/stretchr/testify/require"
 )
 
 const (
-	defaultAssetType    = "BearerBonds"
-	defaultAssetId      = "asset1"
-	defaultAssetOwner   = "Alice"
-	defaultAssetIssuer  = "Treasury"
+	defaultAssetType   = "BearerBonds"
+	defaultAssetId     = "asset1"
+	defaultAssetOwner  = "Alice"
+	defaultAssetIssuer = "Treasury"
 )
 
 func TestInitBondAssetLedger(t *testing.T) {
@@ -152,7 +152,7 @@ func TestDeleteAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, nil)
 	err = simpleAsset.DeleteAsset(transactionContext, "", "asset1")
-	require.EqualError(t, err, "the bond asset of type " + "" + " and id " + "asset1" + " does not exist")
+	require.EqualError(t, err, "the bond asset of type "+""+" and id "+"asset1"+" does not exist")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.DeleteAsset(transactionContext, "", "")
