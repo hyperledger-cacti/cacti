@@ -46,13 +46,17 @@ export class GetOracleStatusEndpointV1 implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 

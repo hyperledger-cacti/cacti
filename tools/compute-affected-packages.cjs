@@ -181,11 +181,6 @@ function findAllAffected(changed, dependents) {
 // --- MAIN ---
 const packages = getAllPackages();
 
-if (process.argv[2] === "true") {
-  const affectedDirs = packages.map((pkgName) => packages[pkgName].dir);
-  process.stdout.write(JSON.stringify(affectedDirs));
-  process.exit(0);
-}
 
 console.warn("Detected packages:", Object.keys(packages));
 const dependents = buildDependentsGraph(packages);
@@ -194,6 +189,15 @@ console.warn(
   Object.keys(dependents).length,
   "packages.",
 );
+
+if (process.argv[3] === "true") {
+  const affected = findAllAffected(Object.keys(packages), dependents);
+  const affectedDirs = affected.map((pkgName) => packages[pkgName].dir);
+  console.warn("Affected package dirs:", JSON.stringify(affectedDirs));
+  process.stdout.write(JSON.stringify(affectedDirs));
+  process.exit(0);
+}
+
 const changed = detectChangedPackages(packages);
 console.warn("Changed packages:", changed);
 console.warn(Object.keys(dependents).length, "packages changed.");
