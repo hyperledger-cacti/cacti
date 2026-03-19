@@ -88,7 +88,7 @@ jobs:
       working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
     - name: Tests
-      run: npm run test
+      run: yarn test
       working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
   unit_test_iin_agent_local:
@@ -130,7 +130,7 @@ jobs:
       working-directory: weaver/core/identity-management/iin-agent
 
     - name: Tests
-      run: npm run test
+      run: yarn test
       working-directory: weaver/core/identity-management/iin-agent
 
   build-docs:
