@@ -58,7 +58,7 @@ Once the last command has finished executing, open link printed on the console w
 * [Contributing](./CONTRIBUTING.md): How to get from an idea to an approved pull request
 * [Build](./BUILD.md): Instructions on how to set up the project for development
 
-  ![Build Script Decision Tree](./docs/docs/cactus/_images/build-script-decision-tree-2021-03-06.png)
+  ![Build Script Decision Tree](./docs/cactus/_images/build-script-decision-tree-2021-03-06.png)
 * [FAQ](./FAQ.md): A collection of frequently asked questions
 
 ## Inclusive Language Statement

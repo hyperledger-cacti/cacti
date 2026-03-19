@@ -77,7 +77,7 @@ Prominent features in our future roadmap are:
 - Common data structures and features used by different platform components and applications are implemented in the [common folder](./common).
 - Testing, experimentation, and evaluation frameworks, are implemented in the [tests](./tests) folder.
   * An extensible _testnet_ is implemented in the [tests/network-setups folder](./tests/network-setups) to spin up basic Fabric, Corda, and Besu networks, and test various cross-network operations.
-- Older documentation inherited from the Weaver Lab project lies in the [docs folder](./docs), which is now deprecated. The source for the latest documentation lies in the [Cacti docs folder](../docs/docs/weaver).
+- Older documentation inherited from the Weaver Lab project lies in the [docs folder](./docs), which is now deprecated. The source for the latest documentation lies in the [Cacti docs folder](../docs/weaver).
 
 ## Active Maintainers
 - https://github.com/VRamakrishna

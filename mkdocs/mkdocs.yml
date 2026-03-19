@@ -2,6 +2,7 @@ site_name: Using and Developing with Hyperledger Cacti
 site_url: !ENV [SITE_URL, 'https://${{ github.repository_owner }}.github.io/cacti']
 repo_name: hyperledger-cacti/cacti
 repo_url: https://github.com/hyperledger-cacti/cacti
+docs_dir: ../docs
 theme:
   name: material
   custom_dir: overrides
@@ -193,6 +194,7 @@ nav:
   - SATP Hermes:
     - Architecture: satp-hermes/architecture/satp-hermes.md
   - Guides:
+    - Getting Started: guides/getting-started.md
     - Operations: guides/operations.md
     - Developers: guides/developers.md
     - Upgrading: guides/upgrading.md
