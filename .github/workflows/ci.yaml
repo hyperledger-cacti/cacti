@@ -18,21 +18,12 @@ env:
   NODE_OPTIONS: --max-old-space-size=8192
 
 jobs:
-  check-ci-skip:
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-      - name: Check CI Skip
-        run: node tools/ci-skip-for-maintainers.js ${{ github.event.pull_request.url }} ${{ github.event.pull_request.user.login }}
-
   env-setup:
     outputs:
       node_version: ${{ steps.set-node-version.outputs.node_version }}
       run_code_coverage: ${{ steps.set-run-code-coverage.outputs.run_code_coverage }}
       run_trivy_scan: ${{ steps.set-run-trivy-scan.outputs.run_trivy_scan }}
     runs-on: ubuntu-22.04
-    needs: [check-ci-skip]
     steps:
       - name: Set Node Version Output
         id: set-node-version

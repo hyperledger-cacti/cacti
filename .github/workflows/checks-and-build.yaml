@@ -89,7 +89,7 @@ jobs:
       - id: compute-affected-packages
         name: Compute Affected Packages
         run: |
-          node ./tools/compute-affected-packages.cjs origin/${{ github.base_ref }} > affected-packages.json
+          node ./tools/compute-affected-packages.cjs origin/${{ github.base_ref }} ${{ github.event_name != 'pull_request'}} > affected-packages.json
           AFFECTED_PACKAGES=$(jq -c '.' affected-packages.json)
           echo "affected_packages=$AFFECTED_PACKAGES" >> "$GITHUB_OUTPUT"
     

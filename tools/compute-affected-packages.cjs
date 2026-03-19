@@ -180,6 +180,13 @@ function findAllAffected(changed, dependents) {
 
 // --- MAIN ---
 const packages = getAllPackages();
+
+if (process.argv[2] === "true") {
+  const affectedDirs = packages.map((pkgName) => packages[pkgName].dir);
+  process.stdout.write(JSON.stringify(affectedDirs));
+  process.exit(0);
+}
+
 console.warn("Detected packages:", Object.keys(packages));
 const dependents = buildDependentsGraph(packages);
 console.warn(
@@ -200,3 +207,4 @@ const affectedDirs = affected.map((pkgName) => packages[pkgName].dir);
 // Output JSON for GitHub matrix
 console.warn("Affected package dirs:", JSON.stringify(affectedDirs));
 process.stdout.write(JSON.stringify(affectedDirs));
+process.exit(0);
