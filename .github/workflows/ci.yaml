@@ -4,10 +4,9 @@ on:
     branches:
       - main
       - dev
-  push:
-    branches:
-      - main
-      - dev
+
+  workflow_dispatch:
+    
   schedule:
     # Run at 8:00 AM UTC on weekends (Monday and Thursday)
     - cron: "0 8 * * 1,4" 
