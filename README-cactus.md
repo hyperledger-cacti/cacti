@@ -41,15 +41,6 @@ As blockchain technology proliferates, blockchain integration will become an inc
 
 Once the last command has finished executing, open link printed on the console with a web browser of your choice
 
-### Discounted Asset Trade Example
-
-- The guidance is [here](./examples/cactus-example-discounted-asset-trade/README.md).
-
-### Electricity Trade Example
-
-- The guidance is [here](./examples/cactus-example-electricity-trade/README.md).
-
-
 ## Documentation
 
 * [Project Wiki](https://wiki.hyperledger.org/display/cactus): Schedule and logs of the maintainer meetings

@@ -47,9 +47,6 @@ jobs:
           echo https://localhost:4000/ > urls.txt
           {
           echo https://localhost:4000/api/v1/api-server/healthcheck
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
           echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source
