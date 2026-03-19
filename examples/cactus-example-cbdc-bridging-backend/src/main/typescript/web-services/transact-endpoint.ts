@@ -58,8 +58,8 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/transact"].post
-      .operationId;
+    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/transact"]
+      .post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

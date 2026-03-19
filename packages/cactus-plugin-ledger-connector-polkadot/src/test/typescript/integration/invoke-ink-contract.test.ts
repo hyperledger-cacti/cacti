@@ -21,7 +21,10 @@ import {
 import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { AddressInfo } from "net";
-import { Configuration, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  Configuration,
+  PluginImportType,
+} from "@hyperledger-cacti/cactus-core-api";
 import "jest-extended";
 
 const testCase = "invoke contract with all invocation types";

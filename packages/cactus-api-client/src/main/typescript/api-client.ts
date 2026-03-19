@@ -1,4 +1,8 @@
-import { Checks, IAsyncProvider, Objects } from "@hyperledger-cacti/cactus-common";
+import {
+  Checks,
+  IAsyncProvider,
+  Objects,
+} from "@hyperledger-cacti/cactus-common";
 
 import { ConsortiumDatabase, Ledger } from "@hyperledger-cacti/cactus-core-api";
 

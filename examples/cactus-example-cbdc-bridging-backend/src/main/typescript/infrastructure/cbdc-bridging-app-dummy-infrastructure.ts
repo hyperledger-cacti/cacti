@@ -17,7 +17,10 @@ import {
   SATPGatewayConfig,
   TokenType,
 } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
-import { IWebServiceEndpoint, LedgerType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  IWebServiceEndpoint,
+  LedgerType,
+} from "@hyperledger-cacti/cactus-core-api";
 import { GatewayIdentity } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import { SessionReference } from "../types";
 

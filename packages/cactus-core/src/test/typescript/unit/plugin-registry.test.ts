@@ -3,7 +3,10 @@ import "jest-extended";
 
 import { PluginRegistry } from "../../../main/typescript/public-api";
 
-import { ICactusPlugin, IPluginKeychain } from "@hyperledger-cacti/cactus-core-api";
+import {
+  ICactusPlugin,
+  IPluginKeychain,
+} from "@hyperledger-cacti/cactus-core-api";
 
 describe("PluginRegistry", () => {
   const keychainId = uuidv4();

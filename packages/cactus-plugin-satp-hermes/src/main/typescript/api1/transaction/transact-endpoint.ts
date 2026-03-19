@@ -95,7 +95,9 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
   }
 
   public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"] {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"];
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"
+    ];
   }
 
   public async registerExpress(
@@ -115,8 +117,9 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"]
-      .post.operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"
+    ].post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

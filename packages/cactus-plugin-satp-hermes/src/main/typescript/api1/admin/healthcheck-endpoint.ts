@@ -115,13 +115,17 @@ export class HealthCheckEndpointV1 implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 

@@ -24,7 +24,10 @@ import {
   Web3SigningCredentialType,
   Web3SigningCredentialType as Web3SigningCredentialTypeBesu,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
-import { NetworkId, ClaimFormat } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
+import {
+  NetworkId,
+  ClaimFormat,
+} from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import CryptoMaterial from "../../../crypto-material/crypto-material.json";
 import { getUserFromPseudonim } from "./utils";

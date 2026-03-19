@@ -63,8 +63,9 @@ export class TransferEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/transfer-tokens"]
-      .post.operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-example-cbdc/transfer-tokens"
+    ].post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

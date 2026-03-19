@@ -32,7 +32,10 @@ import {
   LoggerProvider,
 } from "@hyperledger-cacti/cactus-common";
 import HelloWorldContractJson from "../../../../solidity/hello-world-contract/HelloWorld.json";
-import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  Constants,
+  PluginImportType,
+} from "@hyperledger-cacti/cactus-core-api";
 
 const logLevel: LogLevelDesc = "INFO";
 

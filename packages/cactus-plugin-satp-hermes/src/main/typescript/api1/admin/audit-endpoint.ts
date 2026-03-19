@@ -142,8 +142,9 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    * @since 0.0.3-beta
    */
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit"].get
-      .operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit"
+    ].get.operationId;
   }
 
   /**
