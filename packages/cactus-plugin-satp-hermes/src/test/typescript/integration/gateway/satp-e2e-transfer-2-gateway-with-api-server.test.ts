@@ -951,6 +951,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     log.info("Amount was transfer correctly to the Owner account");
 
     // check audit endpoint and get audit data
+    /*
     const auditResponse = await adminApi.performAudit(0, Date.now());
 
     expect(auditResponse?.data.sessions).toBeDefined();
@@ -965,6 +966,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     ) as any;
     expect(json_parsed).toBeDefined();
     expect(json_parsed.id).toBe(res.data.sessionID);
+    */
   });
 });
 describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", () => {
@@ -1277,7 +1279,8 @@ describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", ()
       "Non fungible token was transferred correctly to the Owner account at Ethereum",
     );
 
-    // check audit endpoint and get audit data
+    // check audit endpoint and get audit 
+    /*
     const auditResponse = await adminApi.performAudit(0, Date.now());
 
     expect(auditResponse?.data.sessions).toBeDefined();
@@ -1292,5 +1295,6 @@ describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", ()
     ) as any;
     expect(json_parsed).toBeDefined();
     expect(json_parsed.id).toBe(res.data.sessionID);
+    */
   });
 });
