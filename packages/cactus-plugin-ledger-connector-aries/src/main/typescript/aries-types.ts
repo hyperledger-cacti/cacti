@@ -4,53 +4,31 @@
 
 import {
   Agent,
-  ConnectionsModule,
-  DidsModule,
-  CredentialsModule,
-  V2CredentialProtocol,
-  ProofsModule,
-  AutoAcceptProof,
-  V2ProofProtocol,
-  AutoAcceptCredential,
   Query,
-  ConnectionRecord,
-  DidExchangeState,
-  DidExchangeRole,
-} from "@aries-framework/core";
-import type { AskarModule } from "@aries-framework/askar";
-import type { IndyVdrModule } from "@aries-framework/indy-vdr";
+} from "@credo-ts/core";
+import {
+  DidCommAutoAcceptCredential,
+  DidCommAutoAcceptProof,
+  DidCommConnectionRecord,
+  DidCommDidExchangeState,
+  DidCommDidExchangeRole,
+} from "@credo-ts/didcomm";
 import type {
-  AnonCredsCredentialFormatService,
-  AnonCredsModule,
-  AnonCredsProofFormatService,
   AnonCredsRequestedAttribute,
-} from "@aries-framework/anoncreds";
-import type { AnonCredsRsModule } from "@aries-framework/anoncreds-rs";
+} from "@credo-ts/anoncreds";
 
 import {
   AgentConnectionsFilterV1,
   CactiAcceptPolicyV1,
   CactiProofRequestAttributeV1,
+  PluginLedgerConnectorAries,
 } from "./public-api";
 
 /**
  * Aries JS Agent with Anoncreds/Indy/Askar modules configured.
  * This is exact Agent type returned by factories used by this connector for now.
  */
-export type AnoncredAgent = Agent<{
-  readonly connections: ConnectionsModule;
-  readonly credentials: CredentialsModule<
-    V2CredentialProtocol<AnonCredsCredentialFormatService[]>[]
-  >;
-  readonly proofs: ProofsModule<
-    V2ProofProtocol<AnonCredsProofFormatService[]>[]
-  >;
-  readonly anoncreds: AnonCredsModule;
-  readonly anoncredsRs: AnonCredsRsModule;
-  readonly indyVdr: IndyVdrModule;
-  readonly dids: DidsModule;
-  readonly askar: AskarModule;
-}>;
+export type AnoncredAgent = Agent<ReturnType<PluginLedgerConnectorAries["getAskarAnonCredsIndyModules"]>>;
 
 /**
  * Convert Cacti OpenAPI input to Aries compatible `AutoAcceptProof`
@@ -60,14 +38,14 @@ export type AnoncredAgent = Agent<{
  */
 export function cactiAcceptPolicyToAutoAcceptProof(
   policy: CactiAcceptPolicyV1,
-): AutoAcceptProof {
+): DidCommAutoAcceptProof {
   switch (policy) {
     case CactiAcceptPolicyV1.Always:
-      return AutoAcceptProof.Always;
+      return DidCommAutoAcceptProof.Always;
     case CactiAcceptPolicyV1.ContentApproved:
-      return AutoAcceptProof.ContentApproved;
+      return DidCommAutoAcceptProof.ContentApproved;
     case CactiAcceptPolicyV1.Never:
-      return AutoAcceptProof.Never;
+      return DidCommAutoAcceptProof.Never;
     default:
       const _unknownPolicy: never = policy;
       throw new Error(`Unknown CactiAcceptPolicyV1: ${_unknownPolicy}`);
@@ -82,14 +60,14 @@ export function cactiAcceptPolicyToAutoAcceptProof(
  */
 export function cactiAcceptPolicyToAutoAcceptCredential(
   policy: CactiAcceptPolicyV1,
-): AutoAcceptCredential {
+): DidCommAutoAcceptCredential {
   switch (policy) {
     case CactiAcceptPolicyV1.Always:
-      return AutoAcceptCredential.Always;
+      return DidCommAutoAcceptCredential.Always;
     case CactiAcceptPolicyV1.ContentApproved:
-      return AutoAcceptCredential.ContentApproved;
+      return DidCommAutoAcceptCredential.ContentApproved;
     case CactiAcceptPolicyV1.Never:
-      return AutoAcceptCredential.Never;
+      return DidCommAutoAcceptCredential.Never;
     default:
       const _unknownPolicy: never = policy;
       throw new Error(`Unknown CactiAcceptPolicyV1: ${_unknownPolicy}`);
@@ -127,11 +105,11 @@ export function validateEnumValue<T extends Record<string, string>>(
  */
 export function cactiAgentConnectionsFilterToQuery(
   filter: AgentConnectionsFilterV1,
-): Query<ConnectionRecord> {
+): Query<DidCommConnectionRecord> {
   return {
     ...filter,
-    state: validateEnumValue(DidExchangeState, filter.state),
-    role: validateEnumValue(DidExchangeRole, filter.role),
+    state: validateEnumValue(DidCommDidExchangeState, filter.state),
+    role: validateEnumValue(DidCommDidExchangeRole, filter.role),
   };
 }
 

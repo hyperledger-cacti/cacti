@@ -1,8 +1,8 @@
 import type { Socket as SocketIoSocket } from "socket.io";
 import {
-  ConnectionEventTypes,
-  ConnectionStateChangedEvent,
-} from "@aries-framework/core";
+  DidCommConnectionEventTypes,
+  DidCommConnectionStateChangedEvent,
+} from "@credo-ts/didcomm";
 
 import {
   Logger,
@@ -57,33 +57,33 @@ export class WatchConnectionStateV1Endpoint {
     const { socket, log, agent } = this;
     log.info(`${WatchConnectionStateV1.Subscribe} => ${socket.id}`);
 
-    const eventListener = (e: ConnectionStateChangedEvent) => {
+    const eventListener = (e: DidCommConnectionStateChangedEvent) => {
       socket.emit(WatchConnectionStateV1.Next, e.payload);
     };
 
-    agent.events.on<ConnectionStateChangedEvent>(
-      ConnectionEventTypes.ConnectionStateChanged,
+    agent.events.on<DidCommConnectionStateChangedEvent>(
+      DidCommConnectionEventTypes.DidCommConnectionStateChanged,
       eventListener,
     );
 
     socket.on("disconnect", async (reason: string) => {
       log.info("WebSocket:disconnect reason=%o", reason);
-      agent.events.off<ConnectionStateChangedEvent>(
-        ConnectionEventTypes.ConnectionStateChanged,
+      agent.events.off<DidCommConnectionStateChangedEvent>(
+        DidCommConnectionEventTypes.DidCommConnectionStateChanged,
         eventListener,
       );
     });
 
     socket.on(WatchConnectionStateV1.Unsubscribe, async () => {
-      agent.events.off<ConnectionStateChangedEvent>(
-        ConnectionEventTypes.ConnectionStateChanged,
+      agent.events.off<DidCommConnectionStateChangedEvent>(
+        DidCommConnectionEventTypes.DidCommConnectionStateChanged,
         eventListener,
       );
       log.debug("WatchConnectionStateV1 unsubscribe done.");
     });
 
     log.debug(
-      `Subscribing to connection state changes on aries agent ${agent.config.label}...`,
+      `Subscribing to connection state changes on aries agent ${agent.config.toJSON()}...`,
     );
   }
 }
