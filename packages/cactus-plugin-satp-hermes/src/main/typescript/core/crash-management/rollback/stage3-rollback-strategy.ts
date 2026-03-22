@@ -97,7 +97,7 @@ export class Stage3RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage3RollbackStrategy#handleClientSideRollback";
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    context.with(ctx, async () => {
+    return context.with(ctx, async () => {
       try {
         try {
           const networkId = {
@@ -172,7 +172,7 @@ export class Stage3RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage3RollbackStrategy#handleServerSideRollback";
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    context.with(ctx, async () => {
+    return context.with(ctx, async () => {
       try {
         try {
           const networkId = {
