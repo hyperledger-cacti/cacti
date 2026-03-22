@@ -58,7 +58,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "express": "5.1.0",
     "joi": "17.13.3",
     "openapi-types": "12.1.3",
