@@ -7364,7 +7364,7 @@ __metadata:
     "@types/react": "npm:18.2.39"
     "@types/react-dom": "npm:18.2.17"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     copy-webpack-plugin: "npm:12.0.2"
     css-loader: "npm:7.1.2"
     customize-cra: "npm:1.0.0"
@@ -7379,7 +7379,7 @@ __metadata:
     ts-node: "npm:10.9.2"
     typescript: "npm:5.6.2"
     uuid: "npm:10.0.0"
-    webpack: "npm:5.94.0"
+    webpack: "npm:5.104.1"
     webpack-cli: "npm:5.1.4"
     webpack-dev-server: "npm:5.1.0"
   languageName: unknown
@@ -7402,7 +7402,7 @@ __metadata:
     "@types/react-dom": "npm:18.2.17"
     "@vitejs/plugin-react": "npm:5.1.0"
     apexcharts: "npm:3.45.2"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     buffer: "npm:6.0.3"
     ethers: "npm:6.12.1"
     react: "npm:18.2.0"
@@ -7429,7 +7429,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/json-stable-stringify": "npm:1.2.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -7458,7 +7458,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -7755,7 +7755,7 @@ __metadata:
     "@types/xml2js": "npm:0.4.9"
     "@vercel/ncc": "npm:0.38.1"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     benchmark: "npm:2.1.4"
     bluebird: "npm:3.7.2"
     body-parser: "npm:1.20.3"
@@ -7889,10 +7889,10 @@ __metadata:
     "@hyperledger/cactus-common": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
     "@types/google-protobuf": "npm:3.15.5"
-    ajv: "npm:8.17.1"
+    ajv: "npm:8.18.0"
     ajv-draft-04: "npm:1.0.0"
     ajv-formats: "npm:3.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     express: "npm:5.1.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -7962,7 +7962,7 @@ __metadata:
     jose: "npm:4.15.5"
     json-stable-stringify: "npm:1.0.2"
     openapi-types: "npm:12.1.3"
-    qs: "npm:6.13.0"
+    qs: "npm:6.14.2"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
@@ -7987,7 +7987,7 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
@@ -8078,7 +8078,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     cors: "npm:2.8.5"
     crypto-js: "npm:4.2.0"
@@ -8125,7 +8125,7 @@ __metadata:
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
-    webpack: "npm:5.94.0"
+    webpack: "npm:5.104.1"
   languageName: unknown
   linkType: soft
 
@@ -8144,7 +8144,7 @@ __metadata:
     "@hyperledger/aries-askar-nodejs": "npm:0.2.3"
     "@hyperledger/indy-vdr-nodejs": "npm:0.2.3"
     "@types/inquirer": "npm:8.2.6"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     inquirer: "npm:8.2.6"
     loglevel: "npm:1.8.1"
   bin:
@@ -8173,7 +8173,7 @@ __metadata:
     "@types/jsrsasign": "npm:10.5.8"
     "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     cookie-parser: "npm:1.4.6"
     debug: "npm:3.1.0"
@@ -8259,7 +8259,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     dotenv: "npm:16.0.0"
     express: "npm:5.1.0"
     express-jwt: "npm:8.4.1"
@@ -8294,7 +8294,7 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
@@ -8376,7 +8376,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     dockerode: "npm:3.3.0"
     express: "npm:5.1.0"
@@ -8406,7 +8406,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/json-stable-stringify": "npm:1.0.33"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -8434,7 +8434,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
@@ -8461,7 +8461,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     express: "npm:5.1.0"
     joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
@@ -8481,8 +8481,8 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/bn.js": "npm:5.2.0"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.8.4"
-    bn.js: "npm:5.2.2"
+    axios: "npm:1.13.5"
+    bn.js: "npm:4.12.3"
     dotenv: "npm:16.3.1"
     ds-test: "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
     ethers: "npm:6.12.1"
@@ -8509,7 +8509,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
     aws-sdk: "npm:2.965.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8538,7 +8538,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8564,7 +8564,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     google-gax: "npm:4.0.5"
@@ -8586,7 +8586,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     cpy-cli: "npm:4.2.0"
     del-cli: "npm:5.1.0"
@@ -8611,7 +8611,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -8636,7 +8636,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/tape-promise": "npm:4.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8672,7 +8672,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest: "npm:29.6.2"
@@ -8702,7 +8702,7 @@ __metadata:
     "@types/google-protobuf": "npm:3.15.5"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     benchmark: "npm:2.1.4"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
@@ -8749,7 +8749,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:18.11.9"
     "@types/sanitize-html": "npm:2.6.2"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
@@ -8771,7 +8771,7 @@ __metadata:
     "@types/multer": "npm:1.4.7"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.2.0"
@@ -8810,7 +8810,7 @@ __metadata:
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     chalk: "npm:4.1.2"
     ethers: "npm:6.8.1"
@@ -8862,9 +8862,9 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     bl: "npm:6.1.0"
-    bn.js: "npm:4.12.0"
+    bn.js: "npm:4.12.3"
     body-parser: "npm:1.20.3"
     dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.1"
@@ -8925,7 +8925,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/sanitize-html": "npm:2.9.5"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
@@ -8962,7 +8962,7 @@ __metadata:
     "@types/supertest": "npm:2.0.11"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     bl: "npm:6.1.0"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.2.0"
@@ -8996,7 +8996,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     cbor: "npm:9.0.1"
     express: "npm:5.1.0"
@@ -9019,7 +9019,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -9050,7 +9050,7 @@ __metadata:
     "@multiformats/multiaddr": "npm:11.6.1"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     ipfs-core-types: "npm:0.14.1"
@@ -9084,7 +9084,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
@@ -9117,7 +9117,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fabric-network: "npm:2.5.0-snapshot.23"
@@ -9193,9 +9193,9 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
     "@vercel/ncc": "npm:0.38.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     bignumber.js: "npm:9.1.2"
-    bn.js: "npm:5.2.1"
+    bn.js: "npm:4.12.3"
     body-parser: "npm:1.20.3"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"
@@ -9324,7 +9324,7 @@ __metadata:
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.1.0"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
     tape: "npm:5.6.3"
@@ -9347,7 +9347,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -9372,7 +9372,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -9418,7 +9418,7 @@ __metadata:
     "@hyperledger/cactus-verifier-client": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
     jest-extended: "npm:7.0.0"
@@ -9478,7 +9478,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/tar-stream": "npm:2.2.1"
     "@types/temp": "npm:0.9.1"
-    axios: "npm:1.8.4"
+    axios: "npm:1.13.5"
     compare-versions: "npm:3.6.0"
     dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.1"
@@ -9714,7 +9714,7 @@ __metadata:
     web3-core: "npm:4.1.1"
     web3-eth: "npm:4.1.1"
     web3-utils: "npm:4.3.0"
-    webpack: "npm:5.99.3"
+    webpack: "npm:5.104.1"
     webpack-cli: "npm:4.10.0"
     wget-improved: "npm:3.4.0"
     yargs: "npm:17.7.2"
@@ -20276,15 +20276,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv@npm:8.17.1, ajv@npm:^8.0.0, ajv@npm:^8.0.1, ajv@npm:^8.10.0, ajv@npm:^8.11.0, ajv@npm:^8.12.0, ajv@npm:^8.14.0, ajv@npm:^8.17.1, ajv@npm:^8.6.0, ajv@npm:^8.6.3, ajv@npm:^8.9.0":
-  version: 8.17.1
-  resolution: "ajv@npm:8.17.1"
+"ajv@npm:8.18.0":
+  version: 8.18.0
+  resolution: "ajv@npm:8.18.0"
   dependencies:
     fast-deep-equal: "npm:^3.1.3"
     fast-uri: "npm:^3.0.1"
     json-schema-traverse: "npm:^1.0.0"
     require-from-string: "npm:^2.0.2"
-  checksum: 10/ee3c62162c953e91986c838f004132b6a253d700f1e51253b99791e2dbfdb39161bc950ebdc2f156f8568035bb5ed8be7bd78289cd9ecbf3381fe8f5b82e3f33
+  checksum: 10/bfed9de827a2b27c6d4084324eda76a4e32bdde27410b3e9b81d06e6f8f5c78370fc6b93fe1d869f1939ff1d7c4ae8896960995acb8425e3e9288c8884247c48
   languageName: node
   linkType: hard
 
@@ -20319,6 +20319,18 @@ __metadata:
     json-schema-traverse: "npm:^0.4.1"
     uri-js: "npm:^4.2.2"
   checksum: 10/48d6ad21138d12eb4d16d878d630079a2bda25a04e745c07846a4ad768319533031e28872a9b3c5790fa1ec41aabdf2abed30a56e5a03ebc2cf92184b8ee306c
+  languageName: node
+  linkType: hard
+
+"ajv@npm:^8.0.0, ajv@npm:^8.0.1, ajv@npm:^8.10.0, ajv@npm:^8.11.0, ajv@npm:^8.12.0, ajv@npm:^8.14.0, ajv@npm:^8.17.1, ajv@npm:^8.6.0, ajv@npm:^8.6.3, ajv@npm:^8.9.0":
+  version: 8.17.1
+  resolution: "ajv@npm:8.17.1"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10/ee3c62162c953e91986c838f004132b6a253d700f1e51253b99791e2dbfdb39161bc950ebdc2f156f8568035bb5ed8be7bd78289cd9ecbf3381fe8f5b82e3f33
   languageName: node
   linkType: hard
 
@@ -22010,9 +22022,9 @@ __metadata:
   linkType: hard
 
 "basic-ftp@npm:^5.0.2":
-  version: 5.1.0
-  resolution: "basic-ftp@npm:5.1.0"
-  checksum: 10/49cdc2e0282487131520bbcd9b72215d6f66064799cdbbd3aecc6c1df06635e603dd9a2b8e940a4f7e6045f94486dee51143adb82c13a9d5d866f2fd987438b9
+  version: 5.2.0
+  resolution: "basic-ftp@npm:5.2.0"
+  checksum: 10/f5a15d789aa98859af4da9e976154b2aeae19052e1762dc68d259d2bce631dafa40c667aa06d7346cd630aa6f9cc9a26f515b468e0bd24243fbae2149c7d01ad
   languageName: node
   linkType: hard
 
@@ -22246,24 +22258,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bn.js@npm:4.12.0":
-  version: 4.12.0
-  resolution: "bn.js@npm:4.12.0"
-  checksum: 10/10f8db196d3da5adfc3207d35d0a42aa29033eb33685f20ba2c36cadfe2de63dad05df0a20ab5aae01b418d1c4b3d4d205273085262fa020d17e93ff32b67527
-  languageName: node
-  linkType: hard
-
-"bn.js@npm:5.2.1":
-  version: 5.2.1
-  resolution: "bn.js@npm:5.2.1"
-  checksum: 10/7a7e8764d7a6e9708b8b9841b2b3d6019cc154d2fc23716d0efecfe1e16921b7533c6f7361fb05471eab47986c4aa310c270f88e3507172104632ac8df2cfd84
-  languageName: node
-  linkType: hard
-
-"bn.js@npm:5.2.2, bn.js@npm:^5.1.2, bn.js@npm:^5.1.3, bn.js@npm:^5.2.0, bn.js@npm:^5.2.1, bn.js@npm:^5.2.2":
-  version: 5.2.2
-  resolution: "bn.js@npm:5.2.2"
-  checksum: 10/51ebb2df83b33e5d8581165206e260d5e9c873752954616e5bf3758952b84d7399a9c6d00852815a0aeefb1150a7f34451b62d4287342d457fa432eee869e83e
+"bn.js@npm:4.12.3":
+  version: 4.12.3
+  resolution: "bn.js@npm:4.12.3"
+  checksum: 10/57ed5a055f946f3e009f1589c45a5242db07f3dddfc72e4506f0dd9d8b145f0dbee4edabc2499288f3fc338eb712fb96a1c623a2ed2bcd49781df1a64db64dd1
   languageName: node
   linkType: hard
 
@@ -22271,6 +22269,13 @@ __metadata:
   version: 4.12.2
   resolution: "bn.js@npm:4.12.2"
   checksum: 10/5803983405c087443e0e6c9bb5d0bc863d9f987d77e710f81b14c55616494f5a274e1650ee892531acb3529d52c0e0ea48aa12d2873dd80a75dde9d73a2ec518
+  languageName: node
+  linkType: hard
+
+"bn.js@npm:^5.1.2, bn.js@npm:^5.1.3, bn.js@npm:^5.2.0, bn.js@npm:^5.2.1, bn.js@npm:^5.2.2":
+  version: 5.2.2
+  resolution: "bn.js@npm:5.2.2"
+  checksum: 10/51ebb2df83b33e5d8581165206e260d5e9c873752954616e5bf3758952b84d7399a9c6d00852815a0aeefb1150a7f34451b62d4287342d457fa432eee869e83e
   languageName: node
   linkType: hard
 
@@ -28051,6 +28056,16 @@ __metadata:
     graceful-fs: "npm:^4.2.4"
     tapable: "npm:^2.3.0"
   checksum: 10/b537d52173bf1ba903c623f96a43ea3b51466ee2b606b2fcca30d73d453fd79c8683dccbb83523de27cd02763c906f11486e2591a4335e6afe49fa5ad6e67b83
+  languageName: node
+  linkType: hard
+
+"enhanced-resolve@npm:^5.17.4":
+  version: 5.20.0
+  resolution: "enhanced-resolve@npm:5.20.0"
+  dependencies:
+    graceful-fs: "npm:^4.2.4"
+    tapable: "npm:^2.3.0"
+  checksum: 10/ba22699e4b46dc1be6441c359636ebcdd5028229219a7d6ba10f39996401f950967f8297ddf3284d0ee8e33c8133a8742696154e383cc08d8bd2bf80ba87df97
   languageName: node
   linkType: hard
 
@@ -40128,8 +40143,8 @@ __metadata:
   linkType: hard
 
 "markdown-it@npm:^14.1.0":
-  version: 14.1.0
-  resolution: "markdown-it@npm:14.1.0"
+  version: 14.1.1
+  resolution: "markdown-it@npm:14.1.1"
   dependencies:
     argparse: "npm:^2.0.1"
     entities: "npm:^4.4.0"
@@ -40139,7 +40154,7 @@ __metadata:
     uc.micro: "npm:^2.1.0"
   bin:
     markdown-it: bin/markdown-it.mjs
-  checksum: 10/f34f921be178ed0607ba9e3e27c733642be445e9bb6b1dba88da7aafe8ba1bc5d2f1c3aa8f3fc33b49a902da4e4c08c2feadfafb290b8c7dda766208bb6483a9
+  checksum: 10/088822c8aa9346ba4af6a205f6ee0f4baae55e3314f040dc5c28c897d57d0f979840c71872b3582a6a6e572d8c851c54e323c82f4559011dfa2e96224fc20fc2
   languageName: node
   linkType: hard
 
@@ -46707,6 +46722,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"qs@npm:6.14.2":
+  version: 6.14.2
+  resolution: "qs@npm:6.14.2"
+  dependencies:
+    side-channel: "npm:^1.1.0"
+  checksum: 10/682933a85bb4b7bd0d66e13c0a40d9e612b5e4bcc2cb9238f711a9368cd22d91654097a74fff93551e58146db282c56ac094957dfdc60ce64ea72c3c9d7779ac
+  languageName: node
+  linkType: hard
+
 "qs@npm:^6.12.3, qs@npm:^6.14.0, qs@npm:^6.14.1, qs@npm:^6.9.4, qs@npm:~6.14.0":
   version: 6.14.1
   resolution: "qs@npm:6.14.1"
@@ -48627,8 +48651,8 @@ __metadata:
   linkType: hard
 
 "rollup@npm:^2.43.1":
-  version: 2.79.2
-  resolution: "rollup@npm:2.79.2"
+  version: 2.80.0
+  resolution: "rollup@npm:2.80.0"
   dependencies:
     fsevents: "npm:~2.3.2"
   dependenciesMeta:
@@ -48636,7 +48660,7 @@ __metadata:
       optional: true
   bin:
     rollup: dist/bin/rollup
-  checksum: 10/095ba0a82811b1866a76d826987743278db0a87c45092656986bfff490326b66187d5f9ff0c24cf8d5682bc470aa00c36654e0044d6b6335ac0c1201b8280880
+  checksum: 10/1150ab0f71d59e25a0fe6c0d07e49615ada1e9deba1754073be527c48c558a019fcd31d4d927a9c172593b7dc9c7c3c6871ef07fe1e575371ee24400a7c58213
   languageName: node
   linkType: hard
 
@@ -52363,7 +52387,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:5.3.16, terser-webpack-plugin@npm:^5.2.5, terser-webpack-plugin@npm:^5.3.10, terser-webpack-plugin@npm:^5.3.11, terser-webpack-plugin@npm:^5.3.16":
+"terser-webpack-plugin@npm:5.3.16, terser-webpack-plugin@npm:^5.2.5, terser-webpack-plugin@npm:^5.3.10, terser-webpack-plugin@npm:^5.3.16":
   version: 5.3.16
   resolution: "terser-webpack-plugin@npm:5.3.16"
   dependencies:
@@ -54946,7 +54970,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"watchpack@npm:^2.4.0, watchpack@npm:^2.4.1, watchpack@npm:^2.5.1":
+"watchpack@npm:^2.4.0, watchpack@npm:^2.4.1, watchpack@npm:^2.4.4, watchpack@npm:^2.5.1":
   version: 2.5.1
   resolution: "watchpack@npm:2.5.1"
   dependencies:
@@ -57203,6 +57227,44 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webpack@npm:5.104.1":
+  version: 5.104.1
+  resolution: "webpack@npm:5.104.1"
+  dependencies:
+    "@types/eslint-scope": "npm:^3.7.7"
+    "@types/estree": "npm:^1.0.8"
+    "@types/json-schema": "npm:^7.0.15"
+    "@webassemblyjs/ast": "npm:^1.14.1"
+    "@webassemblyjs/wasm-edit": "npm:^1.14.1"
+    "@webassemblyjs/wasm-parser": "npm:^1.14.1"
+    acorn: "npm:^8.15.0"
+    acorn-import-phases: "npm:^1.0.3"
+    browserslist: "npm:^4.28.1"
+    chrome-trace-event: "npm:^1.0.2"
+    enhanced-resolve: "npm:^5.17.4"
+    es-module-lexer: "npm:^2.0.0"
+    eslint-scope: "npm:5.1.1"
+    events: "npm:^3.2.0"
+    glob-to-regexp: "npm:^0.4.1"
+    graceful-fs: "npm:^4.2.11"
+    json-parse-even-better-errors: "npm:^2.3.1"
+    loader-runner: "npm:^4.3.1"
+    mime-types: "npm:^2.1.27"
+    neo-async: "npm:^2.6.2"
+    schema-utils: "npm:^4.3.3"
+    tapable: "npm:^2.3.0"
+    terser-webpack-plugin: "npm:^5.3.16"
+    watchpack: "npm:^2.4.4"
+    webpack-sources: "npm:^3.3.3"
+  peerDependenciesMeta:
+    webpack-cli:
+      optional: true
+  bin:
+    webpack: bin/webpack.js
+  checksum: 10/c22b58fdf41d993971516154cb621d13b7b61dd744b7e2c6be972e9afcc9942694a8aaa322c07fba46448c69d663023ff53d0aeeb00eb0b125d83ace5ca8fa3c
+  languageName: node
+  linkType: hard
+
 "webpack@npm:5.90.3":
   version: 5.90.3
   resolution: "webpack@npm:5.90.3"
@@ -57273,42 +57335,6 @@ __metadata:
   bin:
     webpack: bin/webpack.js
   checksum: 10/648449c5fbbb0839814116e3b2b044ac6c75a7ba272435155ddeb1e64dfaa2f8079be3adfbb691f648b69900756ce0f6fb73beab0ced3cf5e0fd46868b4593a6
-  languageName: node
-  linkType: hard
-
-"webpack@npm:5.99.3":
-  version: 5.99.3
-  resolution: "webpack@npm:5.99.3"
-  dependencies:
-    "@types/eslint-scope": "npm:^3.7.7"
-    "@types/estree": "npm:^1.0.6"
-    "@webassemblyjs/ast": "npm:^1.14.1"
-    "@webassemblyjs/wasm-edit": "npm:^1.14.1"
-    "@webassemblyjs/wasm-parser": "npm:^1.14.1"
-    acorn: "npm:^8.14.0"
-    browserslist: "npm:^4.24.0"
-    chrome-trace-event: "npm:^1.0.2"
-    enhanced-resolve: "npm:^5.17.1"
-    es-module-lexer: "npm:^1.2.1"
-    eslint-scope: "npm:5.1.1"
-    events: "npm:^3.2.0"
-    glob-to-regexp: "npm:^0.4.1"
-    graceful-fs: "npm:^4.2.11"
-    json-parse-even-better-errors: "npm:^2.3.1"
-    loader-runner: "npm:^4.2.0"
-    mime-types: "npm:^2.1.27"
-    neo-async: "npm:^2.6.2"
-    schema-utils: "npm:^4.3.0"
-    tapable: "npm:^2.1.1"
-    terser-webpack-plugin: "npm:^5.3.11"
-    watchpack: "npm:^2.4.1"
-    webpack-sources: "npm:^3.2.3"
-  peerDependenciesMeta:
-    webpack-cli:
-      optional: true
-  bin:
-    webpack: bin/webpack.js
-  checksum: 10/07fb3e9b0fe1b3858945b62eac7aac75013f8486709a71dd97cdd4d299f47a372365be6ccbaf8af632c4bf9d8b3cc1ad96e0c8866f7f1c38af590cdf1f5b67a1
   languageName: node
   linkType: hard
 
