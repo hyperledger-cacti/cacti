@@ -63,7 +63,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "express": "5.1.0",
     "google-protobuf": "3.21.4",
     "http-errors": "2.0.0",
