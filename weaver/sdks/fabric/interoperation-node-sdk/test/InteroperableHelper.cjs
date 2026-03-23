@@ -37,7 +37,7 @@ const {
   serializeRemoteProposalResponse,
 } = require("../src/decoders");
 import { Relay } from "../src/Relay";
-import statePb from "@hyperledger/cacti-weaver-protos-js/common/state_pb";
+import statePb from "@hyperledger-cacti/cacti-weaver-protos-js/common/state_pb";
 
 describe("InteroperableHelper", () => {
   const mspId = "mspId";

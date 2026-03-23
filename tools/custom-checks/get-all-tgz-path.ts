@@ -39,17 +39,17 @@ export async function getAllTgzPath(): Promise<IGetAllTgzPathResponse> {
     ignore: [
       "**/node_modules",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3623
-      "weaver/core/drivers/fabric-driver/hyperledger-cacti-weaver-driver-fabric-*.tgz",
+      "weaver/core/drivers/fabric-driver/hyperledger-cacti-cacti-weaver-driver-fabric-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3626
-      "weaver/core/identity-management/iin-agent/hyperledger-cacti-weaver-iin-agent-*.tgz",
+      "weaver/core/identity-management/iin-agent/hyperledger-cacti-cacti-weaver-iin-agent-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3627
-      "weaver/sdks/fabric/interoperation-node-sdk/hyperledger-cacti-weaver-sdk-fabric-*.tgz",
+      "weaver/sdks/fabric/interoperation-node-sdk/hyperledger-cacti-cacti-weaver-sdk-fabric-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3628
-      "packages/cacti-plugin-weaver-driver-fabric/src/main/typescript/hyperledger-cacti-weaver-driver-fabric-*.tgz",
+      "packages/cacti-plugin-weaver-driver-fabric/src/main/typescript/hyperledger-cacti-cacti-weaver-driver-fabric-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3632
-      "examples/cactus-common-example-server/hyperledger-cactus-common-example-server-*.tgz",
+      "examples/cactus-common-example-server/hyperledger-cacti-cactus-common-example-server-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3633
-      "packages/cactus-verifier-client/hyperledger-cactus-verifier-client-*.tgz",
+      "packages/cactus-verifier-client/hyperledger-cacti-cactus-verifier-client-*.tgz",
     ],
   };
 
