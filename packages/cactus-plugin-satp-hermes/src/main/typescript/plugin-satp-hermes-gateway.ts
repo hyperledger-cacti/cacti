@@ -77,6 +77,8 @@ import {
   CrashManager,
   type ICrashRecoveryManagerOptions,
 } from "./services/gateway/crash-manager";
+import { OraclePersistence } from "./database/oracle-persistence";
+import { KnexOracleLogRepository } from "./database/repository/knex-oracle-log-repository";
 
 import * as OAS from "../json/oapi-api1-bundled.json";
 import { knexLocalInstance } from "./database/knexfile";
@@ -670,6 +672,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           throw new Error("GatewayIdentity is not defined");
         }
 
+        const oracleLogRepository = new KnexOracleLogRepository(undefined);
+        const oracleDbLogger = new OraclePersistence({
+          oracleLogRepository,
+          logLevel: this.config.logLevel,
+          monitorService: this.monitorService,
+        });
+
         const SATPCCManagerOptions: ISATPCrossChainManagerOptions = {
           orquestrator: this.gatewayOrchestrator,
           ontologyOptions: {
@@ -677,6 +686,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           },
           logLevel: this.config.logLevel,
           monitorService: this.monitorService,
+          dbLogger: oracleDbLogger,
         };
 
         this.SATPCCManager = new SATPCrossChainManager(SATPCCManagerOptions);

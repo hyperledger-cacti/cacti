@@ -50,6 +50,7 @@ import { GatewayOrchestrator } from "../services/gateway/gateway-orchestrator";
 import { OracleManager } from "./oracle/oracle-manager";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { OraclePersistence } from "../database/oracle-persistence";
 
 /**
  * Configuration options for the SATP Cross-Chain Manager.
@@ -69,6 +70,8 @@ export interface ISATPCrossChainManagerOptions {
   ontologyOptions?: IOntologyManagerOptions;
   /** Monitoring service for telemetry and metrics */
   monitorService: MonitorService;
+  /** Database logger for persisting proof logs in Oracle operations */
+  dbLogger?: OraclePersistence;
 }
 
 /**
@@ -235,6 +238,7 @@ export class SATPCrossChainManager {
           bungee: undefined,
           initialTasks: [],
           monitorService: this.monitorService,
+          dbLogger: options.dbLogger,
         });
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
