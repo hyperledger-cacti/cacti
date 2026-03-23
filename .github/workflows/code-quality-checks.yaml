@@ -100,6 +100,18 @@ jobs:
           restore-keys: |
             openapi-generator-cli-${{ runner.os }}-
 
+      # grpc-tools@1.12.4 ships a node-pre-gyp-downloaded native binary
+      # (bin/protoc) that is absent or incompatible on Ubuntu 22.04 + Node 20,
+      # causing ENOENT when yarn codegen runs the proto generation step in
+      # @hyperledger/cactus-core-api. The package.json script calls system
+      # protoc directly (instead of grpc_tools_node_protoc) so we must ensure
+      # it is available on PATH before codegen runs.
+      - name: Install protoc
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y protobuf-compiler
+          protoc --version
+
       - name: Run codegen
         run: yarn codegen
       - run: git status --porcelain
