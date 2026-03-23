@@ -23,9 +23,9 @@
     "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
-  "main": "index.js",
+  "main": "out/server.js",
   "scripts": {
-    "build": "npm run tsc",
+    "build": "yarn run tsc",
     "dev": "nodemon out/server.js",
     "start": "node out/server.js",
     "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
