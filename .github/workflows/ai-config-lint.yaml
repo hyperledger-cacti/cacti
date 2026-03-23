@@ -1,0 +1,29 @@
+name: "AI Config Lint"
+
+on:
+  pull_request:
+    paths:
+      - ".github/agents/**"
+      - ".github/skills/**"
+      - ".github/instructions/**"
+      - "tools/ai-config-lint.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  lint-ai-config:
+    name: Lint AI configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run AI config linter
+        run: node tools/ai-config-lint.mjs
