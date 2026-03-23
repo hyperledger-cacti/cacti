@@ -113,7 +113,10 @@
       "path": "./weaver/common/protos-js/tsconfig.json"
     },
     {
-      "path" : "weaver/sdks/fabric/interoperation-node-sdk/tsconfig.cacti.json"
+      "path" : "weaver/sdks/fabric/interoperation-node-sdk/tsconfig.json"
+    },
+    {
+      "path" : "weaver/sdks/besu/node/tsconfig.json"
     },
     {
       "path": "./packages/cacti-plugin-copm-fabric/tsconfig.json"
