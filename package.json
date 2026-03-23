@@ -63,6 +63,7 @@
     "spellcheck": "cspell lint --no-progress \"*/*/src/**/*.{js,ts}\"",
     "tsc": "NODE_OPTIONS=\"--max_old_space_size=3072\" tsc --build --verbose",
     "codegen": "run-s 'codegen:warmup-*' codegen:verify codegen:lerna codegen:cleanup",
+    "codegen:warmup-grpc-tools": "test -x \"$(yarn bin grpc_tools_node_protoc | sed 's/protoc\\.js$/protoc/')\" || yarn rebuild grpc-tools",
     "codegen:cleanup": "rm -f -v ./openapitools.json",
     "codegen:verify": "yarn exec openapi-generator-cli version",
     "codegen:lerna": "openapi-generator-cli version-manager set 6.6.0 && yarn exec lerna run codegen",
