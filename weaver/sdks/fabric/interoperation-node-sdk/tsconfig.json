@@ -1,14 +1,18 @@
 {
-    "compilerOptions": {
-        "outDir": "./build",
-        "allowJs": true,
-        "target": "es5",
-        "esModuleInterop": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "skipLibCheck": true
-    },
-    "include": ["src/**/*", "index.js"],
-    "exclude": ["node_modules", "protos", "scripts", "test", "protos-js", "build"]
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "allowJs": true,
+    "outDir": "./dist/lib/",
+    "declarationDir": "dist/lib",
+    "resolveJsonModule": true,
+    "rootDir": "./src",
+    "strict": false /* Enable all strict type-checking options. */,
+    "noImplicitAny": false,                 /* Raise error on expressions and declarations with an implied 'any' type. */
+
+    "tsBuildInfoFile": "../../../../.build-cache/weaver-fabric-node-sdk.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "references": [
+  ]
 }
