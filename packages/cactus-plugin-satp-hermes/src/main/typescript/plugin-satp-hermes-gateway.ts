@@ -860,12 +860,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   public getOpenApiSpec(): unknown {
-    return undefined; //this.OAS;
-    /*
-    This needs to be fixed. api-server installs some validation middleware using this
-    and it was breaking the integration of the plugin with the api-server.
-      Error: 404 not found - on all api requests when the middleware is installed.
-    */
+    return this.OAS;
   }
 
   public get Identity(): GatewayIdentity {
