@@ -125,7 +125,7 @@ jobs:
         working-directory: weaver/core/drivers/fabric-driver
 
       - name: Start Fabric Driver for network1 and network2
-        run: npm run dev &> fdriver.out &
+        run: yarn run dev &> fdriver.out &
         working-directory: weaver/core/drivers/fabric-driver
 
       # FABRIC CLI

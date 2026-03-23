@@ -1,14 +1,16 @@
 ARG BUILD_TAG
 
 # Local Build
-FROM node:16 AS builder-local
+FROM node:18 AS builder-local
 
 WORKDIR /opt/iinagent
 
 ADD protos-js /opt/iinagent/protos-js
 ADD cacti-weaver-sdk-fabric /opt/iinagent/cacti-weaver-sdk-fabric
 ADD package.json .
-RUN npm install --unsafe-perm
+RUN npm pkg set "dependencies.@hyperledger-cacti/cacti-weaver-protos-js=file:./protos-js" \
+ && npm pkg set "dependencies.@hyperledger-cacti/cacti-weaver-sdk-fabric=file:./cacti-weaver-sdk-fabric" \
+ && npm install --unsafe-perm
 
 ADD src /opt/iinagent/src
 ADD tsconfig.json .
@@ -20,7 +22,7 @@ FROM builder-${BUILD_TAG} AS builder
 RUN rm -rf node_modules
 RUN npm ci --only=production
 
-FROM node:16-alpine AS prod
+FROM node:18-alpine AS prod
 
 RUN deluser --remove-home node
 RUN addgroup -g 1000 iinagent
