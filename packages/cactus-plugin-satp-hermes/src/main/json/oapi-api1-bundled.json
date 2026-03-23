@@ -980,6 +980,50 @@
         }
       }
     },
+    "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers": {
+      "get": {
+        "summary": "Get supported ledgers",
+        "description": "Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.",
+        "operationId": "GetSupportedLedgers",
+        "tags": [
+          "admin"
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers"
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A list of supported ledger types.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).",
+                  "type": "object",
+                  "properties": {
+                    "supportedLedgers": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "description": "A LedgerType enum value."
+                      }
+                    }
+                  },
+                  "required": [
+                    "supportedLedgers"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
     "/api/v1/@hyperledger/cactus-plugin-satp-hermes/continue": {
       "post": {
         "tags": [
@@ -7449,6 +7493,22 @@
         "example": [
           "satp",
           "hyperledger"
+        ]
+      },
+      "SupportedLedgersResponse": {
+        "description": "List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).",
+        "type": "object",
+        "properties": {
+          "supportedLedgers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "A LedgerType enum value."
+            }
+          }
+        },
+        "required": [
+          "supportedLedgers"
         ]
       },
       "HealthCheckResponse": {
