@@ -46,18 +46,18 @@ jobs:
           version: stable
 
       - name: Generate protobuf files
-        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes codegen:proto
+        run: yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes codegen:proto
 
       - name: Generate OpenAPI SDKs
         run: |
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-yaml
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes bundle-openapi-json 
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes generate-sdk:typescript-axios-bol
+          yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes bundle-openapi-yaml
+          yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes bundle-openapi-json 
+          yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes generate-sdk:typescript-axios-bol
 
       - name: Generate ABIs
         id: codegen
         run: |
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes forge:build:all
+          yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes forge:build:all
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       # Upload generated artifacts for reuse in other jobs
