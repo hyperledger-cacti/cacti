@@ -42,14 +42,14 @@ jobs:
       - run: git status --porcelain | wc -l
 
       - name: yarn lint (SATP-specific)
-        run: yarn workspace @hyperledger/cactus-plugin-satp-hermes lint
+        run: yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes lint
 
       - name: Run additional SATP linting
         id: lint
         run: |
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint-code || echo "Linting completed with warnings" 
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:oapi || echo "OpenAPI linting completed with warnings"
-          yarn workspace @hyperledger/cactus-plugin-satp-hermes lint:protobuf || echo "Protobuf linting completed with warnings"
+          yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes lint-code || echo "Linting completed with warnings" 
+          yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes lint:oapi || echo "OpenAPI linting completed with warnings"
+          yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes lint:protobuf || echo "Protobuf linting completed with warnings"
           echo "success=true" >> "$GITHUB_OUTPUT"
       
       - run: git status --porcelain

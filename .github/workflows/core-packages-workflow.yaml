@@ -98,7 +98,7 @@ jobs:
           path: ./code-coverage-ts/**/
       
       - name: build_ncc_bundle
-        run: yarn lerna run build:bundle --scope=@hyperledger/cactus-cmd-api-server
+        run: yarn lerna run build:bundle --scope=@hyperledger-cacti/cactus-cmd-api-server
 
       - name: ghcr.io/hyperledger/cactus-cmd-api-server
         run: |
@@ -150,7 +150,7 @@ jobs:
           alert-threshold: '200%'
           comment-on-alert: true
           fail-on-alert: true
-          alert-comment-cc-users: '@hyperledger/cacti-maintainers'
+          alert-comment-cc-users: '@hyperledger-cacti/cacti-maintainers'
 
   cactus-common:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-common')
