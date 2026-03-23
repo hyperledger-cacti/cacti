@@ -23,7 +23,8 @@
     "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
-  "main": "index.js",
+  "main": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
