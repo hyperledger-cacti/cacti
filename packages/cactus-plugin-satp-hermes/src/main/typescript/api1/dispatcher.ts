@@ -108,6 +108,7 @@ import {
 import { GetApproveAddressEndpointV1 } from "./transaction/get-approve-address-endpoint";
 import { getEnumValueByKey } from "../services/utils";
 import { GatewayIdentity } from "../core/types";
+import { LedgerType } from "@hyperledger/cactus-core-api";
 
 import { OracleExecuteTaskEndpointV1 } from "./oracle/oracle-execute-task-endpoint";
 import { registerTask } from "./oracle/oracle-register-task-handler-service";
@@ -122,6 +123,16 @@ import safeStableStringify from "safe-stable-stringify";
 import { executeAudit } from "./admin/get-audit-handler-service";
 import { AuditEndpointV1 } from "./admin/audit-endpoint";
 import { DecideInboundWebhookEndpointV1 } from "./webhook/decide-endpoint";
+import { SupportedLedgersEndpointV1 } from "./admin/supported-ledgers-endpoint";
+import {
+  executeGetSupportedLedgers,
+  type SupportedLedgersResponse,
+} from "./admin/get-supported-ledgers-handler-service";
+import { LoadedLedgersEndpointV1 } from "./admin/loaded-ledgers-endpoint";
+import {
+  executeGetLoadedLedgers,
+  type LoadedLedgersResponse,
+} from "./admin/get-loaded-ledgers-handler-service";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import type { AdapterManager } from "../adapters/adapter-manager";
@@ -178,6 +189,8 @@ export interface BLODispatcherOptions {
   monitorService: MonitorService;
   /** Optional adapter manager instance for SATP hooks */
   adapterManager?: AdapterManager;
+  /** Operator-defined list of supported ledger types (optional) */
+  supportedLedgers?: LedgerType[];
 }
 
 /**
@@ -317,6 +330,7 @@ export class BLODispatcher {
           claimFormat: options.claimFormat,
           monitorService: this.monitorService,
           adapterManager: this.adapterManager,
+          supportedLedgers: options.supportedLedgers,
         };
 
         this.manager = new SATPManager(SATPManagerOpts);
@@ -442,6 +456,16 @@ export class BLODispatcher {
             logLevel: this.options.logLevel,
           });
 
+        const supportedLedgersEndpointV1 = new SupportedLedgersEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
+        const loadedLedgersEndpointV1 = new LoadedLedgersEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
         // TODO: keep getter; add an admin endpoint to get identity of connected gateway to BLO
         const endpoints = [
           getStatusEndpointV1,
@@ -457,6 +481,8 @@ export class BLODispatcher {
           oracleUnregisterTaskEndpointV1,
           oracleGetStatusEndpointV1,
           decideInboundWebhookEndpointV1,
+          supportedLedgersEndpointV1,
+          loadedLedgersEndpointV1,
         ];
         this.endpoints = endpoints;
         this.logger.debug(`${fnTag} registered ${endpoints.length} endpoints`);
@@ -551,6 +577,46 @@ export class BLODispatcher {
           throw new Error("SATPManager is not defined");
         }
         return executeGetIntegrations(this.level, this.manager);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
+  }
+
+  public async getSupportedLedgers(): Promise<SupportedLedgersResponse> {
+    const { span, context: ctx } = this.monitorService.startSpan(
+      "API1#getSupportedLedgers()",
+    );
+    return context.with(ctx, () => {
+      try {
+        if (!this.manager) {
+          throw new Error("SATPManager is not defined");
+        }
+        return executeGetSupportedLedgers(this.level, this.manager);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
+  }
+
+  public async getLoadedLedgers(): Promise<LoadedLedgersResponse> {
+    const { span, context: ctx } = this.monitorService.startSpan(
+      "API1#getLoadedLedgers()",
+    );
+    return context.with(ctx, () => {
+      try {
+        if (!this.manager) {
+          throw new Error("SATPManager is not defined");
+        }
+        return executeGetLoadedLedgers(this.level, this.manager);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

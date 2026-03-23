@@ -555,6 +555,27 @@ Tags:
   example:
     - satp
     - hyperledger
+SupportedLedgersResponse:
+  description: "List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers)."
+  type: object
+  properties:
+    supportedLedgers:
+      type: array
+      items:
+        type: string
+        description: A LedgerType enum value.
+  required:
+    - supportedLedgers
+LoadedLedgersResponse:
+  description: "List of ledger networks that the SATP gateway has successfully initialized (deployed bridge leafs)."
+  type: object
+  properties:
+    loadedLedgers:
+      type: array
+      items:
+        $ref: ./schemas.yml#/NetworkId
+  required:
+    - loadedLedgers
 HealthCheckResponse:
   description: "Response schema for healthcheck endpoint indicating the availability status of the service."
   type: object
