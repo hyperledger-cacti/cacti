@@ -67,7 +67,7 @@
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@types/tar-fs": "2.0.4",
     "async-exit-hook": "2.0.1",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "dotenv": "16.0.0",
     "express": "5.1.0",
     "express-jwt": "8.4.1",
