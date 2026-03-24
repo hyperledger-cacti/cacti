@@ -31,7 +31,7 @@
  * @since 0.0.3-beta
  */
 
-import type { LocalLog, RemoteLog } from "../../../core/types";
+import type { LocalLog, OracleLog, RemoteLog } from "../../../core/types";
 
 /**
  * Base repository interface for generic data persistence operations.
@@ -164,4 +164,32 @@ export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
   destroy(): any;
   /** Reset repository to initial state */
   reset(): any;
+}
+
+/**
+ * Repository interface for Oracle operation log persistence.
+ *
+ * Provides specialized operations for storing and retrieving
+ * Oracle operation logs including task execution, relay operations,
+ * and deployment events.
+ *
+ * @interface IOracleLogRepository
+ * @extends IRepository<OracleLog, string>
+ * @since 0.0.3-beta
+ */
+export interface IOracleLogRepository extends IRepository<OracleLog, string> {
+  /** Underlying database connection instance */
+  database: any;
+  /** Retrieve oracle log by unique key */
+  readById(id: string): Promise<OracleLog>;
+  /** Read all oracle logs for a specific task */
+  readByTaskId(taskId: string): Promise<OracleLog[]>;
+  /** Create new oracle log entry */
+  create(log: OracleLog): Promise<OracleLog>;
+  /** Clean up repository resources and connections */
+  destroy(): any;
+  /** Reset repository to initial state */
+  reset(): any;
+  /** Check if repository has been properly initialized */
+  getCreated(): boolean;
 }

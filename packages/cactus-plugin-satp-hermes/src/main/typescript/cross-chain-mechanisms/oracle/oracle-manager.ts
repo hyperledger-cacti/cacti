@@ -83,12 +83,14 @@ import { IOracleBesuOptions, OracleBesu } from "./implementations/oracle-besu";
 import { OracleSchedulerManager } from "./oracle-scheduler-manager";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { OraclePersistence } from "../../database/oracle-persistence";
 
 export interface IOracleManagerOptions {
   logLevel?: LogLevelDesc;
   bungee: IPluginBungeeHermesOptions | undefined;
   initialTasks?: OracleTask[];
   monitorService: MonitorService;
+  dbLogger?: OraclePersistence;
 }
 
 export class OracleManager {
@@ -96,6 +98,7 @@ export class OracleManager {
   private readonly logger: Logger;
   private readonly logLevel: LogLevelDesc = "INFO";
   private readonly monitorService: MonitorService;
+  private readonly dbLogger?: OraclePersistence;
 
   // Group oracle by the network, a network can have various oracles (bridges)
   private readonly oracles: Map<string, Map<string, OracleAbstract>> =
@@ -124,6 +127,11 @@ export class OracleManager {
     );
     this.logger.info(`${fnTag}: Initializing OracleManager`);
 
+    if (options.dbLogger) {
+      this.dbLogger = options.dbLogger;
+      this.logger.info(`${fnTag}: dbLogger initialized for Oracle`);
+    }
+
     // this.notificationDispatcher = new OracleNotificationDispatcher({
     //   logger: this.logger,
     // });
@@ -143,6 +151,27 @@ export class OracleManager {
     return this.schedulerManager;
   }
 
+  private logAndPersist(
+    taskId: string,
+    type: string,
+    operation: string,
+    data: string,
+    sequenceNumber: number,
+    operationId?: string,
+  ): void {
+    this.logger.info(
+      `${operation}-${type} [taskId=${taskId}, seq=${sequenceNumber}]`,
+    );
+    this.dbLogger?.storeOracleLog({
+      taskId,
+      type,
+      operation,
+      data,
+      sequenceNumber,
+      operationId,
+    });
+  }
+
   /**
    * Deploys a new oracle based on the provided options.
    *
@@ -157,10 +186,21 @@ export class OracleManager {
     const fnTag = `${OracleManager.CLASS_NAME}#deployOracle()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     await context.with(ctx, async () => {
+      const networkId = safeStableStringify(
+        oracleNetworkOptions.networkIdentification,
+      );
       try {
         this.logger.debug(`${fnTag}, Deploying Oracle...`);
         this.logger.debug(
           `${fnTag}, Oracle Network Options: ${JSON.stringify(oracleNetworkOptions)}`,
+        );
+
+        this.logAndPersist(
+          networkId,
+          "deploy-oracle",
+          "init",
+          safeStableStringify(oracleNetworkOptions) ?? "",
+          0,
         );
 
         if (
@@ -174,6 +214,14 @@ export class OracleManager {
         }
 
         try {
+          this.logAndPersist(
+            networkId,
+            "deploy-oracle",
+            "exec",
+            safeStableStringify(oracleNetworkOptions) ?? "",
+            0,
+          );
+
           let oracle: OracleAbstract;
           switch (oracleNetworkOptions.networkIdentification.ledgerType) {
             case LedgerType.Besu1X:
@@ -289,8 +337,23 @@ export class OracleManager {
             this.oracles.set(networkKey, new Map());
           }
           this.oracles.get(networkKey)?.set(oracle.getId(), oracle);
+
+          this.logAndPersist(
+            networkId,
+            "deploy-oracle",
+            "done",
+            safeStableStringify(oracleNetworkOptions) ?? "",
+            0,
+          );
         } catch (error) {
           this.logger.debug(`${fnTag}, Error deploying oracle: ${error}`);
+          this.logAndPersist(
+            networkId,
+            "deploy-oracle",
+            "fail",
+            safeStableStringify(oracleNetworkOptions) ?? "",
+            0,
+          );
           throw new DeployOracleError(error);
         }
       } catch (err) {
@@ -396,7 +459,23 @@ export class OracleManager {
           `${fnTag}: Registering task. ${safeStableStringify(task)}`,
         );
 
+        this.logAndPersist(
+          task.taskID,
+          "register-task",
+          "init",
+          safeStableStringify(task) ?? "",
+          task.operations.length,
+        );
+
         try {
+          this.logAndPersist(
+            task.taskID,
+            "register-task",
+            "exec",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
+
           this.taskStatusMap.set(task.taskID, task);
           task.timestamp = Date.now();
           task.status = OracleTaskStatusEnum.Active;
@@ -455,9 +534,23 @@ export class OracleManager {
           }
 
           this.logger.info(`${fnTag}: Task registered successfully`);
+          this.logAndPersist(
+            task.taskID,
+            "register-task",
+            "done",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
           return task;
         } catch (error) {
           this.logger.debug(`${fnTag}: Error registering task: ${error}`);
+          this.logAndPersist(
+            task.taskID,
+            "register-task",
+            "fail",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
           throw new OracleError(error);
         }
       } catch (err) {
@@ -483,22 +576,56 @@ export class OracleManager {
           throw new Error(`${fnTag}: Task with id ${taskId} not found`);
         }
 
-        if (task.mode === OracleTaskModeEnum.Immediate) {
-          this.logger.info(
-            `${fnTag}: Cannot unregister task with mode Immediate`,
+        this.logAndPersist(
+          taskId,
+          "unregister-task",
+          "init",
+          safeStableStringify(task) ?? "",
+          task.operations.length,
+        );
+
+        try {
+          this.logAndPersist(
+            taskId,
+            "unregister-task",
+            "exec",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
           );
+
+          if (task.mode === OracleTaskModeEnum.Immediate) {
+            this.logger.info(
+              `${fnTag}: Cannot unregister task with mode Immediate`,
+            );
+            return task;
+          } else if (task.mode === OracleTaskModeEnum.Polling) {
+            this.schedulerManager.removePoller(taskId);
+          } else if (task.mode === OracleTaskModeEnum.EventListening) {
+            this.schedulerManager.removeEventListener(taskId);
+          }
+
+          task.status = OracleTaskStatusEnum.Inactive;
+
+          this.logger.info(`${fnTag}: Task with id ${taskId} unregistered`);
+          this.logAndPersist(
+            taskId,
+            "unregister-task",
+            "done",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
+
           return task;
-        } else if (task.mode === OracleTaskModeEnum.Polling) {
-          this.schedulerManager.removePoller(taskId);
-        } else if (task.mode === OracleTaskModeEnum.EventListening) {
-          this.schedulerManager.removeEventListener(taskId);
+        } catch (innerErr) {
+          this.logAndPersist(
+            taskId,
+            "unregister-task",
+            "fail",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
+          throw innerErr;
         }
-
-        task.status = OracleTaskStatusEnum.Inactive;
-
-        this.logger.info(`${fnTag}: Task with id ${taskId} unregistered`);
-
-        return task;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
@@ -516,15 +643,44 @@ export class OracleManager {
       try {
         this.logger.info(`${fnTag}: Executing task with id ${task.taskID}`);
 
+        this.logAndPersist(
+          task.taskID,
+          "execute-task",
+          "init",
+          safeStableStringify(task) ?? "",
+          task.operations.length,
+        );
+
         this.taskStatusMap.set(task.taskID, task);
         task.timestamp = Date.now();
 
         try {
+          this.logAndPersist(
+            task.taskID,
+            "execute-task",
+            "exec",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
+
           task = await this.processTask(task);
           this.logger.info(`${fnTag}: Task executed successfully`);
-          // TODO: Dispatch a success notification.
+
+          this.logAndPersist(
+            task.taskID,
+            "execute-task",
+            "done",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
         } catch (error) {
-          // TODO: Dispatch a failure notification.
+          this.logAndPersist(
+            task.taskID,
+            "execute-task",
+            "fail",
+            safeStableStringify(task) ?? "",
+            task.operations.length,
+          );
         } finally {
           task.status = OracleTaskStatusEnum.Inactive;
         }
@@ -566,10 +722,26 @@ export class OracleManager {
       try {
         this.logger.debug(`${fnTag}: Processing task ${task.taskID}`);
 
+        this.logAndPersist(
+          task.taskID,
+          "process-task",
+          "init",
+          safeStableStringify(task) ?? "",
+          task.operations.length,
+        );
+
         // here, we decompose a task into multiple operations as needed and then call
         // relayOperation for each operation. A READ or UPDATE task are decomposed into
         // only one operation, but a READ_AND_UPDATE task is decomposed into two operations,
         // one READ and one UPDATE with the data read from the first operation.
+
+        this.logAndPersist(
+          task.taskID,
+          "process-task",
+          "exec",
+          safeStableStringify(task) ?? "",
+          task.operations.length,
+        );
 
         if (task.type === OracleTaskTypeEnum.Read) {
           const operation = {
@@ -645,8 +817,22 @@ export class OracleManager {
         }
 
         this.logger.debug(`${fnTag}: Task ${task.taskID} processed.`);
+        this.logAndPersist(
+          task.taskID,
+          "process-task",
+          "done",
+          safeStableStringify(task) ?? "",
+          task.operations.length,
+        );
         return task;
       } catch (err) {
+        this.logAndPersist(
+          task.taskID,
+          "process-task",
+          "fail",
+          safeStableStringify(task) ?? "",
+          task.operations.length,
+        );
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
         throw err;
@@ -671,9 +857,25 @@ export class OracleManager {
           `${fnTag}: Relaying operation ${operation.id} to network ${safeStableStringify(operation.networkId)}`,
         );
 
+        this.logAndPersist(
+          task.taskID,
+          "relay-operation",
+          "init",
+          safeStableStringify(operation) ?? "",
+          task.operations.length,
+        );
+
         let response: OracleResponse;
 
         try {
+          this.logAndPersist(
+            task.taskID,
+            "relay-operation",
+            "exec",
+            safeStableStringify(operation) ?? "",
+            task.operations.length,
+          );
+
           const oracle = this.getOracleExecutionLayer(operation.networkId);
 
           const entry = oracle.convertOperationToEntry(operation);
@@ -690,6 +892,14 @@ export class OracleManager {
             response,
           );
           task.operations.push(operation);
+
+          this.logAndPersist(
+            task.taskID,
+            "relay-operation",
+            "done",
+            safeStableStringify(response) ?? "",
+            task.operations.length,
+          );
         } catch (error) {
           response = {
             output: error.message + ". " + error.cause.message,
@@ -697,6 +907,13 @@ export class OracleManager {
 
           this.logger.error(
             `${fnTag}: Error relaying operation ${operation.id}: ${error}`,
+          );
+          this.logAndPersist(
+            task.taskID,
+            "relay-operation",
+            "fail",
+            safeStableStringify(operation) ?? "",
+            task.operations.length,
           );
           updateOracleOperation(
             operation,
