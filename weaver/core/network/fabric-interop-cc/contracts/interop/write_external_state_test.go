@@ -10,24 +10,22 @@ package main
 
 import (
 	"encoding/json"
-	"testing"
 	"io/ioutil"
+	"testing"
 
-	"github.com/hyperledger/fabric-protos-go/peer"
-	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	"github.com/hyperledger/fabric-protos-go/peer"
+	"github.com/stretchr/testify/require"
 )
 
-
 type TestData struct {
-	B64View             string      `json:"view64"`
-	B64ViewConfidential string      `json:"confidential_view64"`
-	B64ViewContents     []string    `json:"confidential_view_content64"`
+	B64View             string   `json:"view64"`
+	B64ViewConfidential string   `json:"confidential_view64"`
+	B64ViewContents     []string `json:"confidential_view_content64"`
 }
 
 func TestWriteExternalState(t *testing.T) {
-
 
 	var cordaTestDataBytes, _ = ioutil.ReadFile("./test_data/corda_viewdata.json")
 	var cordaTestData TestData
@@ -247,5 +245,5 @@ func TestWriteExternalState(t *testing.T) {
 	require.NoError(t, err)
 	chaincodeStub.GetStateReturnsOnCall(0, invalidVerificationPolicyBytes, nil)
 	err = interopcc.WriteExternalState(ctx, fabricNetwork, "mychannel", "Write", []string{"test-key", ""}, []int{1}, []string{fabricViewAddress}, []string{fabricTestData_2_Orgs.B64View}, decContentsList)
-	require.EqualError(t, err, "VerifyView error: Unable to resolve verification policy: Verification Policy Error: Failed to find verification policy matching view address: " + fabricPattern)
+	require.EqualError(t, err, "VerifyView error: Unable to resolve verification policy: Verification Policy Error: Failed to find verification policy matching view address: "+fabricPattern)
 }

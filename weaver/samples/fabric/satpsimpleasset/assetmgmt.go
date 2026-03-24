@@ -11,8 +11,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -46,8 +46,9 @@ func (s *SmartContract) BondAssetSpecificChecks(ctx contractapi.TransactionConte
 
 // LockAssetForSATP transfers the ownership of an asset to a calling relay.
 // TODO: Currently, this is a hacky implementation.
-//       We will need to add some logic for owner's consent that can be verified here.
-//       Right now, we are treating the relay as a trusted party.
+//
+//	We will need to add some logic for owner's consent that can be verified here.
+//	Right now, we are treating the relay as a trusted party.
 func (s *SmartContract) LockAssetForSATP(ctx contractapi.TransactionContextInterface, assetType, id string) error {
 	// Read asset
 	asset, err := getBondAsset(ctx, assetType, id)

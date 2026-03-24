@@ -7,11 +7,11 @@
 package main
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 
-	"github.com/stretchr/testify/require"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreate(t *testing.T) {
@@ -41,7 +41,7 @@ func TestRead(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("failed reading from ledger"))
 	err := ss.Update(ctx, key, value)
 	require.Error(t, err)
-	require.EqualError(t, err, "Failed to read key '" + key + "' from world state. " + "failed reading from ledger")
+	require.EqualError(t, err, "Failed to read key '"+key+"' from world state. "+"failed reading from ledger")
 
 	valueBytes := []byte(value)
 	chaincodeStub.GetStateReturnsOnCall(1, valueBytes, nil)
@@ -60,7 +60,7 @@ func TestUpdate(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(0, nil, fmt.Errorf("failed reading from ledger"))
 	err := ss.Update(ctx, key, value)
 	require.Error(t, err)
-	require.EqualError(t, err, "Failed to read key '" + key + "' from world state. " + "failed reading from ledger")
+	require.EqualError(t, err, "Failed to read key '"+key+"' from world state. "+"failed reading from ledger")
 
 	valueBytes := []byte(value)
 	chaincodeStub.GetStateReturnsOnCall(1, valueBytes, nil)

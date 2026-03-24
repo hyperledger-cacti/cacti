@@ -89,12 +89,12 @@ func main() {
 	_, ok := os.LookupEnv("EXTERNAL_SERVICE")
 	if ok {
 		server := &shim.ChaincodeServer{
-				CCID:    os.Getenv("CHAINCODE_CCID"),
-				Address: os.Getenv("CHAINCODE_ADDRESS"),
-				CC:      chaincode,
-				TLSProps: shim.TLSProperties{
-										Disabled: true,
-									},
+			CCID:    os.Getenv("CHAINCODE_CCID"),
+			Address: os.Getenv("CHAINCODE_ADDRESS"),
+			CC:      chaincode,
+			TLSProps: shim.TLSProperties{
+				Disabled: true,
+			},
 		}
 		// Start the chaincode external server
 		err = server.Start()

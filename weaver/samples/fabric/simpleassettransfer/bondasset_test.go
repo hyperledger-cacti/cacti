@@ -7,34 +7,34 @@
 package main_test
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
-	"crypto/sha256"
-	"encoding/hex"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
-	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassettransfer"
-	"github.com/stretchr/testify/require"
-	"github.com/hyperledger/fabric-chaincode-go/shim"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 	wtestmocks "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassettransfer"
+	"github.com/hyperledger/fabric-chaincode-go/shim"
+	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
+	"github.com/stretchr/testify/require"
 )
 
 const (
-	defaultPledgeId		= "abc123"
-	defaultAssetType    = "BearerBonds"
-	defaultAssetId      = "asset1"
-	defaultAssetOwner   = "Alice"
-	defaultAssetIssuer  = "Treasury"
-	defaultFaceValue    = 10000
-	sourceNetworkID     = "sourcenetwork"
-	destNetworkID       = "destinationnetwork"
-	localNetworkIdKey   = "localNetworkID"
+	defaultPledgeId    = "abc123"
+	defaultAssetType   = "BearerBonds"
+	defaultAssetId     = "asset1"
+	defaultAssetOwner  = "Alice"
+	defaultAssetIssuer = "Treasury"
+	defaultFaceValue   = 10000
+	sourceNetworkID    = "sourcenetwork"
+	destNetworkID      = "destinationnetwork"
+	localNetworkIdKey  = "localNetworkID"
 )
 
 func generateSHA256HashInHexForm(preimage string) string {
@@ -64,9 +64,9 @@ func unmarshalAssetPledge(assetPledgeBase64 string) (*common.AssetPledge, error)
 		return pledge, fmt.Errorf("empty asset pledge")
 	}
 	err = proto.Unmarshal([]byte(assetPledgeSerialized), pledge)
-    if err != nil {
-        return pledge, err
-    }
+	if err != nil {
+		return pledge, err
+	}
 	return pledge, nil
 }
 
@@ -322,7 +322,7 @@ func TestPledgeAsset(t *testing.T) {
 	simpleAsset.ConfigureInterop("interopcc")
 
 	// Pledge non-existent asset
-	expiry := uint64(time.Now().Unix()) + (5 * 60)      // Expires 5 minutes from now
+	expiry := uint64(time.Now().Unix()) + (5 * 60) // Expires 5 minutes from now
 	pledgeId, err := simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
 	require.Error(t, err)
 	fmt.Printf("%s\n", pledgeId)
@@ -334,27 +334,27 @@ func TestPledgeAsset(t *testing.T) {
 	bondAssetKey := defaultAssetType + defaultAssetId
 	md_time, err := time.Parse(time.RFC822, maturityDate)
 	bondAsset := sa.BondAsset{
-		Type: defaultAssetType,
-		ID: defaultAssetId,
-		Owner: defaultAssetOwner,
-		Issuer: defaultAssetIssuer,
-		FaceValue: defaultFaceValue,
+		Type:         defaultAssetType,
+		ID:           defaultAssetId,
+		Owner:        defaultAssetOwner,
+		Issuer:       defaultAssetIssuer,
+		FaceValue:    defaultFaceValue,
 		MaturityDate: md_time,
 	}
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
-	bondAssetPledgeMapKey := "asset_pledge_map_" + generateSHA256HashInHexForm(defaultAssetType + defaultAssetId)
+	bondAssetPledgeMapKey := "asset_pledge_map_" + generateSHA256HashInHexForm(defaultAssetType+defaultAssetId)
 	bondAssetPledgeMap := sa.AssetPledgeMap{
-		PledgeID: defaultPledgeId,
+		PledgeID:        defaultPledgeId,
 		RemoteNetworkID: destNetworkID,
-		Recipient: getRecipientECertBase64(),
+		Recipient:       getRecipientECertBase64(),
 	}
 
 	chaincodeStub.GetStateReturnsForKey(bondAssetPledgeMapKey, nil, fmt.Errorf("error"))
 	chaincodeStub.GetStateReturnsForKey(bondAssetKey, bondAssetJSON, nil)
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("locker")), nil)
 	pledgeId, err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
-	require.Error(t, err)       // Asset owner is not the pledger
+	require.Error(t, err) // Asset owner is not the pledger
 
 	bondAsset.Owner = getLockerECertBase64()
 	bondAssetJSON, _ = json.Marshal(bondAsset)
@@ -362,26 +362,26 @@ func TestPledgeAsset(t *testing.T) {
 	chaincodeStub.GetStateReturnsForKey(bondAssetKey, bondAssetJSON, nil)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte("true")))
 	pledgeId, err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
-	require.Error(t, err)       // Already locked asset cannot be pledged
+	require.Error(t, err) // Already locked asset cannot be pledged
 
 	bondAssetPledgeMapBytes, _ := json.Marshal(bondAssetPledgeMap)
 	chaincodeStub.GetStateReturnsForKey(bondAssetPledgeMapKey, bondAssetPledgeMapBytes, nil)
 	chaincodeStub.InvokeChaincodeReturns(shim.Success([]byte("false")))
 	pledgeId, err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, "someremoteNetwork", getRecipientECertBase64(), expiry)
-	require.Error(t, err)       // Already pledged asset cannot be pledged if the pledge attributes don't match the recorded value
+	require.Error(t, err) // Already pledged asset cannot be pledged if the pledge attributes don't match the recorded value
 
 	pledgeId, err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
-	require.NoError(t, err)     // Asset is already pledged, so there is nothing more to be done
+	require.NoError(t, err) // Asset is already pledged, so there is nothing more to be done
 
 	chaincodeStub.GetStateClearForKey(bondAssetPledgeMapKey)
-	pledgeId, err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry - (10 * 60))
-	require.Error(t, err)       // Invalid pledge as its expiry time in the past
+	pledgeId, err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry-(10*60))
+	require.Error(t, err) // Invalid pledge as its expiry time in the past
 
 	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(sourceNetworkID), nil)
 	chaincodeStub.PutStateReturns(nil)
 	chaincodeStub.DelStateReturns(nil)
 	pledgeId, err = simpleAsset.PledgeAsset(transactionContext, defaultAssetType, defaultAssetId, destNetworkID, getRecipientECertBase64(), expiry)
-	require.NoError(t, err)     // Asset pledge is recorded
+	require.NoError(t, err) // Asset pledge is recorded
 }
 
 func TestClaimRemoteAsset(t *testing.T) {
@@ -392,54 +392,54 @@ func TestClaimRemoteAsset(t *testing.T) {
 	maturityDate := "02 Jan 26 15:04 MST"
 	md_time, err := time.Parse(time.RFC822, maturityDate)
 	bondAsset := sa.BondAsset{
-		Type: defaultAssetType,
-		ID: defaultAssetId,
-		Owner: getLockerECertBase64(),
-		Issuer: defaultAssetIssuer,
-		FaceValue: defaultFaceValue,
+		Type:         defaultAssetType,
+		ID:           defaultAssetId,
+		Owner:        getLockerECertBase64(),
+		Issuer:       defaultAssetIssuer,
+		FaceValue:    defaultFaceValue,
 		MaturityDate: md_time,
 	}
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
 	expiry := uint64(time.Now().Unix()) - (5 * 60)
 	bondAssetPledge := &common.AssetPledge{
-		AssetDetails: bondAssetJSON,
-		LocalNetworkID: sourceNetworkID,
+		AssetDetails:    bondAssetJSON,
+		LocalNetworkID:  sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
-		Recipient: getRecipientECertBase64(),
-		ExpiryTimeSecs: expiry,
+		Recipient:       getRecipientECertBase64(),
+		ExpiryTimeSecs:  expiry,
 	}
 	bondAssetPledgeBytes, _ := marshalAssetPledge(bondAssetPledge)
 
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("recipient")), nil)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, bondAssetPledgeBytes)
-	require.Error(t, err)       // Expired pledge
+	require.Error(t, err) // Expired pledge
 
 	bondAssetPledge.ExpiryTimeSecs = bondAssetPledge.ExpiryTimeSecs + (10 * 60)
 	bondAssetPledgeBytes, _ = marshalAssetPledge(bondAssetPledge)
 
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getRecipientECertBase64(), sourceNetworkID, bondAssetPledgeBytes)
-	require.Error(t, err)       // Unexpected pledged asset owner
+	require.Error(t, err) // Unexpected pledged asset owner
 
 	bondAssetPledge.Recipient = getLockerECertBase64()
 	bondAssetPledgeBytes, _ = marshalAssetPledge(bondAssetPledge)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, bondAssetPledgeBytes)
-	require.Error(t, err)       // Claimer doesn't match pledge recipient
+	require.Error(t, err) // Claimer doesn't match pledge recipient
 
 	bondAssetPledge.Recipient = getRecipientECertBase64()
 	bondAssetPledgeBytes, _ = marshalAssetPledge(bondAssetPledge)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getLockerECertBase64(), destNetworkID, bondAssetPledgeBytes)
-	require.Error(t, err)       // Pledge not made for the claiming network
+	require.Error(t, err) // Pledge not made for the claiming network
 
 	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(sourceNetworkID), nil)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, bondAssetPledgeBytes)
-	require.Error(t, err)       // Pledge claimed from the wrong network
+	require.Error(t, err) // Pledge claimed from the wrong network
 
 	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(destNetworkID), nil)
 	chaincodeStub.GetStateReturnsForKey(defaultPledgeId, nil, fmt.Errorf("No record found"))
 	chaincodeStub.PutStateReturns(nil)
 	err = simpleAsset.ClaimRemoteAsset(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getLockerECertBase64(), sourceNetworkID, bondAssetPledgeBytes)
-	require.NoError(t, err)     // Asset claim is recorded
+	require.NoError(t, err) // Asset claim is recorded
 }
 
 func TestReclaimAsset(t *testing.T) {
@@ -450,53 +450,53 @@ func TestReclaimAsset(t *testing.T) {
 	maturityDate := "02 Jan 26 15:04 MST"
 	md_time, err := time.Parse(time.RFC822, maturityDate)
 	bondAsset := sa.BondAsset{
-		Type: defaultAssetType,
-		ID: defaultAssetId,
-		Owner: getLockerECertBase64(),
-		Issuer: defaultAssetIssuer,
-		FaceValue: defaultFaceValue,
+		Type:         defaultAssetType,
+		ID:           defaultAssetId,
+		Owner:        getLockerECertBase64(),
+		Issuer:       defaultAssetIssuer,
+		FaceValue:    defaultFaceValue,
 		MaturityDate: md_time,
 	}
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
 	expiry := uint64(time.Now().Unix()) + (5 * 60)
 	bondAssetPledge := &common.AssetPledge{
-		AssetDetails: bondAssetJSON,
-		LocalNetworkID: sourceNetworkID,
+		AssetDetails:    bondAssetJSON,
+		LocalNetworkID:  sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
-		Recipient: getRecipientECertBase64(),
-		ExpiryTimeSecs: expiry,
+		Recipient:       getRecipientECertBase64(),
+		ExpiryTimeSecs:  expiry,
 	}
 	bondAssetPledgeBytes, _ := proto.Marshal(bondAssetPledge)
 
 	claimStatus := &common.AssetClaimStatus{
-		AssetDetails: bondAssetJSON,
-		LocalNetworkID: destNetworkID,
-		RemoteNetworkID: sourceNetworkID,
-		Recipient: getRecipientECertBase64(),
-		ClaimStatus: false,
-		ExpiryTimeSecs: expiry,
+		AssetDetails:     bondAssetJSON,
+		LocalNetworkID:   destNetworkID,
+		RemoteNetworkID:  sourceNetworkID,
+		Recipient:        getRecipientECertBase64(),
+		ClaimStatus:      false,
+		ExpiryTimeSecs:   expiry,
 		ExpirationStatus: false,
 	}
 	claimStatusBytes, _ := marshalAssetClaimStatus(claimStatus)
-	
+
 	assetPledgeMap := &sa.AssetPledgeMap{
-		PledgeID: defaultPledgeId,
+		PledgeID:        defaultPledgeId,
 		RemoteNetworkID: destNetworkID,
-		Recipient: getRecipientECertBase64(),
+		Recipient:       getRecipientECertBase64(),
 	}
 	assetPledgeMapJSON, _ := json.Marshal(assetPledgeMap)
-	bondAssetPledgeMapKey := "asset_pledge_map_" + generateSHA256HashInHexForm(defaultAssetType + defaultAssetId)
+	bondAssetPledgeMapKey := "asset_pledge_map_" + generateSHA256HashInHexForm(defaultAssetType+defaultAssetId)
 
 	chaincodeStub.GetCreatorReturns([]byte(getCreatorInContext("locker")), nil)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "asset BearerBonds:asset1 was not pledged with pledgeId abc123")       // no pledge recorded
+	require.EqualError(t, err, "asset BearerBonds:asset1 was not pledged with pledgeId abc123") // no pledge recorded
 
 	bondAssetPledgeKey := "Pledged_" + defaultPledgeId
 	chaincodeStub.GetStateReturnsForKey(bondAssetPledgeMapKey, assetPledgeMapJSON, nil)
 	chaincodeStub.GetStateReturnsForKey(bondAssetPledgeKey, bondAssetPledgeBytes, nil)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as the expiry time is not yet elapsed")       // pledge has not expired yet
+	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as the expiry time is not yet elapsed") // pledge has not expired yet
 
 	bondAssetPledge.ExpiryTimeSecs = expiry - (10 * 60)
 	bondAssetPledgeBytes, _ = proto.Marshal(bondAssetPledge)
@@ -505,13 +505,13 @@ func TestReclaimAsset(t *testing.T) {
 	claimStatus.ExpirationStatus = false
 	claimStatusBytes, _ = marshalAssetClaimStatus(claimStatus)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as the pledge has not yet expired")       // claim probe time was before expiration time
+	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as the pledge has not yet expired") // claim probe time was before expiration time
 
 	claimStatus.ExpirationStatus = true
 	claimStatus.ClaimStatus = true
 	claimStatusBytes, _ = marshalAssetClaimStatus(claimStatus)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has already been claimed")       // claim was successfully made
+	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has already been claimed") // claim was successfully made
 
 	bondAsset.ID = "someid"
 	bondAssetJSON, _ = json.Marshal(bondAsset)
@@ -519,27 +519,27 @@ func TestReclaimAsset(t *testing.T) {
 	claimStatus.ClaimStatus = false
 	claimStatusBytes, _ = marshalAssetClaimStatus(claimStatus)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "asset BearerBonds:someid was not pledged with pledgeId abc123")       // claim was for a different asset
+	require.EqualError(t, err, "asset BearerBonds:someid was not pledged with pledgeId abc123") // claim was for a different asset
 
 	bondAsset.ID = defaultAssetId
 	bondAssetJSON, _ = json.Marshal(bondAsset)
 	claimStatus.AssetDetails = bondAssetJSON
 	claimStatusBytes, _ = marshalAssetClaimStatus(claimStatus)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), "somenetworkid", claimStatusBytes)
-	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has not been pledged to the given network")       // claim was probed in a different network than expected
+	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has not been pledged to the given network") // claim was probed in a different network than expected
 
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getLockerECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has not been pledged to the given recipient")       // claim recipient was different than expected
+	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has not been pledged to the given recipient") // claim recipient was different than expected
 
 	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(destNetworkID), nil)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has not been pledged by a claimer in this network")       // claim was not made for an asset in my network
+	require.EqualError(t, err, "cannot reclaim asset with pledgeId abc123 as it has not been pledged by a claimer in this network") // claim was not made for an asset in my network
 
 	chaincodeStub.GetStateReturnsForKey(localNetworkIdKey, []byte(sourceNetworkID), nil)
 	chaincodeStub.PutStateReturns(nil)
 	chaincodeStub.DelStateReturns(nil)
 	err = simpleAsset.ReclaimAsset(transactionContext, defaultPledgeId, getRecipientECertBase64(), destNetworkID, claimStatusBytes)
-	require.NoError(t, err)     // Asset is reclaimed
+	require.NoError(t, err) // Asset is reclaimed
 }
 
 func TestAssetTransferQueries(t *testing.T) {
@@ -550,32 +550,32 @@ func TestAssetTransferQueries(t *testing.T) {
 	maturityDate := "02 Jan 26 15:04 MST"
 	md_time, err := time.Parse(time.RFC822, maturityDate)
 	bondAsset := sa.BondAsset{
-		Type: defaultAssetType,
-		ID: defaultAssetId,
-		Owner: getLockerECertBase64(),
-		Issuer: defaultAssetIssuer,
-		FaceValue: defaultFaceValue,
+		Type:         defaultAssetType,
+		ID:           defaultAssetId,
+		Owner:        getLockerECertBase64(),
+		Issuer:       defaultAssetIssuer,
+		FaceValue:    defaultFaceValue,
 		MaturityDate: md_time,
 	}
 	bondAssetJSON, _ := json.Marshal(bondAsset)
 
 	expiry := uint64(time.Now().Unix()) + (5 * 60)
 	bondAssetPledge := &common.AssetPledge{
-		AssetDetails: bondAssetJSON,
-		LocalNetworkID: sourceNetworkID,
+		AssetDetails:    bondAssetJSON,
+		LocalNetworkID:  sourceNetworkID,
 		RemoteNetworkID: destNetworkID,
-		Recipient: getRecipientECertBase64(),
-		ExpiryTimeSecs: expiry,
+		Recipient:       getRecipientECertBase64(),
+		ExpiryTimeSecs:  expiry,
 	}
 	bondAssetPledgeBytes, _ := proto.Marshal(bondAssetPledge)
 
 	claimStatus := &common.AssetClaimStatus{
-		AssetDetails: bondAssetJSON,
-		LocalNetworkID: destNetworkID,
-		RemoteNetworkID: sourceNetworkID,
-		Recipient: getRecipientECertBase64(),
-		ClaimStatus: true,
-		ExpiryTimeSecs: expiry,
+		AssetDetails:     bondAssetJSON,
+		LocalNetworkID:   destNetworkID,
+		RemoteNetworkID:  sourceNetworkID,
+		Recipient:        getRecipientECertBase64(),
+		ClaimStatus:      true,
+		ExpiryTimeSecs:   expiry,
 		ExpirationStatus: false,
 	}
 	claimStatusBytes, _ := proto.Marshal(claimStatus)
@@ -585,7 +585,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	pledgeStatus, err := simpleAsset.GetAssetPledgeStatus(transactionContext, defaultPledgeId, getLockerECertBase64(), destNetworkID,
 		getRecipientECertBase64())
 	require.NoError(t, err)
-	lookupPledge, _ :=unmarshalAssetPledge(pledgeStatus)
+	lookupPledge, _ := unmarshalAssetPledge(pledgeStatus)
 	var lookupPledgeAsset sa.BondAsset
 	json.Unmarshal([]byte(lookupPledge.AssetDetails), &lookupPledgeAsset)
 	require.Equal(t, "", lookupPledgeAsset.Type)
@@ -602,7 +602,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	pledgeStatus, err = simpleAsset.GetAssetPledgeStatus(transactionContext, defaultPledgeId, getLockerECertBase64(), destNetworkID,
 		getRecipientECertBase64())
 	require.NoError(t, err)
-	lookupPledge, _ =unmarshalAssetPledge(pledgeStatus)
+	lookupPledge, _ = unmarshalAssetPledge(pledgeStatus)
 	json.Unmarshal([]byte(lookupPledge.AssetDetails), &lookupPledgeAsset)
 	var originalPledgeAsset sa.BondAsset
 	json.Unmarshal([]byte(bondAssetPledge.AssetDetails), &originalPledgeAsset)
@@ -619,7 +619,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	claimStatusQueried, err := simpleAsset.GetAssetClaimStatus(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getRecipientECertBase64(),
 		getLockerECertBase64(), sourceNetworkID, expiry)
 	require.NoError(t, err)
-	lookupClaim, _ :=unmarshalAssetClaimStatus(claimStatusQueried)
+	lookupClaim, _ := unmarshalAssetClaimStatus(claimStatusQueried)
 	var lookupClaimAsset sa.BondAsset
 	json.Unmarshal([]byte(lookupClaim.AssetDetails), &lookupClaimAsset)
 	require.Equal(t, "", lookupClaimAsset.Type)
@@ -641,7 +641,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	claimStatusQueried, err = simpleAsset.GetAssetClaimStatus(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getRecipientECertBase64(),
 		getLockerECertBase64(), sourceNetworkID, expiry)
 	require.NoError(t, err)
-	lookupClaim, _ =unmarshalAssetClaimStatus(claimStatusQueried)
+	lookupClaim, _ = unmarshalAssetClaimStatus(claimStatusQueried)
 	json.Unmarshal([]byte(lookupClaim.AssetDetails), &lookupClaimAsset)
 	require.Equal(t, "", lookupClaimAsset.Type)
 	require.Equal(t, "", lookupClaimAsset.ID)
@@ -658,7 +658,7 @@ func TestAssetTransferQueries(t *testing.T) {
 	claimStatusQueried, err = simpleAsset.GetAssetClaimStatus(transactionContext, defaultPledgeId, defaultAssetType, defaultAssetId, getRecipientECertBase64(),
 		getLockerECertBase64(), sourceNetworkID, expiry)
 	require.NoError(t, err)
-	lookupClaim, _ =unmarshalAssetClaimStatus(claimStatusQueried)
+	lookupClaim, _ = unmarshalAssetClaimStatus(claimStatusQueried)
 	json.Unmarshal([]byte(lookupClaim.AssetDetails), &lookupClaimAsset)
 	var originalClaimAsset sa.BondAsset
 	json.Unmarshal([]byte(claimStatus.AssetDetails), &originalClaimAsset)

@@ -22,12 +22,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
-	"github.com/stretchr/testify/require"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/identity"
-	protoV2 "google.golang.org/protobuf/proto"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	"github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
+	"github.com/stretchr/testify/require"
+	protoV2 "google.golang.org/protobuf/proto"
 )
 
 var securityDomainId = "2345"
@@ -77,10 +77,10 @@ func createX509Certificate(caCert *x509.Certificate, caCertPrivKey *ecdsa.Privat
 		Subject: pkix.Name{
 			Organization: []string{"Hyperledger"},
 		},
-		NotBefore:			   time.Now(),
-		NotAfter:			   time.Now().AddDate(1, 0, 0),		// 1 year expiry duration
-		KeyUsage:			   x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
-		ExtKeyUsage:		   []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(1, 0, 0), // 1 year expiry duration
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 		SignatureAlgorithm:    x509.ECDSAWithSHA384,
 		//SignatureAlgorithm:	 x509.ECDSAWithSHA256,
@@ -107,7 +107,7 @@ func createX509Certificate(caCert *x509.Certificate, caCertPrivKey *ecdsa.Privat
 }
 
 func x509CertToPem(certBytes []byte) (string, error) {
-	certBlock := &pem.Block{ Type: "CERTIFICATE", Bytes: certBytes }
+	certBlock := &pem.Block{Type: "CERTIFICATE", Bytes: certBytes}
 	var certBuf bytes.Buffer
 	err := pem.Encode(&certBuf, certBlock)
 	if err != nil {
@@ -152,7 +152,7 @@ func TestGetMembershipBySecurityDomain(t *testing.T) {
 	member1, member2 := getMembership()
 	membershipAsset := common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
+		Members:        map[string]*common.Member{"member1": &member1, "member2": &member2},
 	}
 
 	// Case when no Membership is found
@@ -191,7 +191,7 @@ func TestCreateLocalMembership(t *testing.T) {
 	member1, member2 := getMembership()
 	membershipAsset := common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
+		Members:        map[string]*common.Member{"member1": &member1, "member2": &member2},
 	}
 
 	membershipBytes, err := protoV2.Marshal(&membershipAsset)
@@ -247,7 +247,7 @@ func TestUpdateLocalMembership(t *testing.T) {
 	member1, member2 := getMembership()
 	membershipAsset := common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
+		Members:        map[string]*common.Member{"member1": &member1, "member2": &member2},
 	}
 
 	membershipBytes, err := protoV2.Marshal(&membershipAsset)
@@ -311,7 +311,7 @@ func TestCreateMembershipUnattested(t *testing.T) {
 	member1, member2 := getMembership()
 	membershipAsset := common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
+		Members:        map[string]*common.Member{"member1": &member1, "member2": &member2},
 	}
 
 	membershipBytes, err := json.Marshal(&membershipAsset)
@@ -342,7 +342,7 @@ func TestCreateMembership(t *testing.T) {
 	member1, member2 := getMembership()
 	membershipAsset := common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{ foreignMemberId1: &member1, foreignMemberId2: &member2},
+		Members:        map[string]*common.Member{foreignMemberId1: &member1, foreignMemberId2: &member2},
 	}
 
 	// Generate foreign network member 1 CA structure and client credentials
@@ -352,14 +352,14 @@ func TestCreateMembership(t *testing.T) {
 	cert1, _ := x509.ParseCertificate(decodedCert1.Bytes)
 	certBytes1, key1, err := createX509Certificate(cert1, keys1[2])
 	certPem1, _ := x509CertToPem(certBytes1)
-	attestation1 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestation1 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: securityDomainId,
-			MemberId: foreignMemberId1,
+			MemberId:       foreignMemberId1,
 		},
 		Certificate: certPem1,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	// Generate foreign network member 2 CA structure and client credentials
 	certChain2, keys2, _ := generateCertChain(3)
@@ -368,14 +368,14 @@ func TestCreateMembership(t *testing.T) {
 	cert2, _ := x509.ParseCertificate(decodedCert2.Bytes)
 	certBytes2, key2, err := createX509Certificate(cert2, keys2[2])
 	certPem2, _ := x509CertToPem(certBytes2)
-	attestation2 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestation2 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: securityDomainId,
-			MemberId: foreignMemberId2,
+			MemberId:       foreignMemberId2,
 		},
 		Certificate: certPem2,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	// Marshal membership for signature
 	membershipBytesPlain, err := protoV2.Marshal(&membershipAsset)
@@ -397,9 +397,9 @@ func TestCreateMembership(t *testing.T) {
 	require.NoError(t, err)
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
 	// Generate attested foreign membership
-	attestedMembershipSet := identity.CounterAttestedMembership_AttestedMembershipSet {
-		Membership:    membershipBytesStr,
-		Attestations:  []*identity.Attestation{&attestation1, &attestation2},
+	attestedMembershipSet := identity.CounterAttestedMembership_AttestedMembershipSet{
+		Membership:   membershipBytesStr,
+		Attestations: []*identity.Attestation{&attestation1, &attestation2},
 	}
 
 	// Generate local members
@@ -417,7 +417,7 @@ func TestCreateMembership(t *testing.T) {
 	}
 	localMembershipAsset := common.Membership{
 		SecurityDomain: localSecurityDomainId,
-		Members:		map[string]*common.Member{ localMemberId1: &localMember1, localMemberId2: &localMember2},
+		Members:        map[string]*common.Member{localMemberId1: &localMember1, localMemberId2: &localMember2},
 	}
 
 	// Generate local attesters
@@ -425,27 +425,27 @@ func TestCreateMembership(t *testing.T) {
 	certLocal1, _ := x509.ParseCertificate(decodedLocalCert1.Bytes)
 	certLocalBytes1, keyLocal1, err := createX509Certificate(certLocal1, localKeyChain1[2])
 	certLocalPem1, _ := x509CertToPem(certLocalBytes1)
-	attestationLocal1 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestationLocal1 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: localSecurityDomainId,
-			MemberId: localMemberId1,
+			MemberId:       localMemberId1,
 		},
 		Certificate: certLocalPem1,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	decodedLocalCert2, _ := pem.Decode([]byte(localCertChain2[2]))
 	certLocal2, _ := x509.ParseCertificate(decodedLocalCert2.Bytes)
 	certLocalBytes2, keyLocal2, err := createX509Certificate(certLocal2, localKeyChain2[2])
 	certLocalPem2, _ := x509CertToPem(certLocalBytes2)
-	attestationLocal2 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestationLocal2 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: localSecurityDomainId,
-			MemberId: localMemberId2,
+			MemberId:       localMemberId2,
 		},
 		Certificate: certLocalPem2,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	// Marshal attested membership set for signature
 	attestedMembershipSetBytesPlain, err := protoV2.Marshal(&attestedMembershipSet)
@@ -468,7 +468,7 @@ func TestCreateMembership(t *testing.T) {
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	// Generate counter attested foreign membership
 	counterAttestedMembership := identity.CounterAttestedMembership{
-		Response: &identity.CounterAttestedMembership_AttestedMembershipSet_{attestedMembershipSetBytesStr},
+		Response:     &identity.CounterAttestedMembership_AttestedMembershipSet_{attestedMembershipSetBytesStr},
 		Attestations: []*identity.Attestation{&attestationLocal1, &attestationLocal2},
 	}
 
@@ -675,7 +675,7 @@ func TestUpdateMembershipUnattested(t *testing.T) {
 	member1, member2 := getMembership()
 	membershipAsset := common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{ "member1": &member1, "member2": &member2},
+		Members:        map[string]*common.Member{"member1": &member1, "member2": &member2},
 	}
 
 	membershipBytes, err := json.Marshal(&membershipAsset)
@@ -707,7 +707,7 @@ func TestUpdateMembership(t *testing.T) {
 	member1, member2 := getMembership()
 	membershipAsset := common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{ foreignMemberId1: &member1, foreignMemberId2: &member2},
+		Members:        map[string]*common.Member{foreignMemberId1: &member1, foreignMemberId2: &member2},
 	}
 
 	// Generate foreign network member 1 CA structure and client credentials
@@ -717,14 +717,14 @@ func TestUpdateMembership(t *testing.T) {
 	cert1, _ := x509.ParseCertificate(decodedCert1.Bytes)
 	certBytes1, key1, err := createX509Certificate(cert1, keys1[2])
 	certPem1, _ := x509CertToPem(certBytes1)
-	attestation1 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestation1 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: securityDomainId,
-			MemberId: foreignMemberId1,
+			MemberId:       foreignMemberId1,
 		},
 		Certificate: certPem1,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	// Generate foreign network member 2 CA structure and client credentials
 	certChain2, keys2, _ := generateCertChain(3)
@@ -733,14 +733,14 @@ func TestUpdateMembership(t *testing.T) {
 	cert2, _ := x509.ParseCertificate(decodedCert2.Bytes)
 	certBytes2, key2, err := createX509Certificate(cert2, keys2[2])
 	certPem2, _ := x509CertToPem(certBytes2)
-	attestation2 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestation2 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: securityDomainId,
-			MemberId: foreignMemberId2,
+			MemberId:       foreignMemberId2,
 		},
 		Certificate: certPem2,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	// Marshal membership for signature
 	membershipBytesPlain, err := protoV2.Marshal(&membershipAsset)
@@ -762,9 +762,9 @@ func TestUpdateMembership(t *testing.T) {
 	require.NoError(t, err)
 	attestation2.Signature = base64.StdEncoding.EncodeToString(signature2)
 	// Generate attested foreign membership
-	attestedMembershipSet := identity.CounterAttestedMembership_AttestedMembershipSet {
-		Membership:    membershipBytesStr,
-		Attestations:  []*identity.Attestation{&attestation1, &attestation2},
+	attestedMembershipSet := identity.CounterAttestedMembership_AttestedMembershipSet{
+		Membership:   membershipBytesStr,
+		Attestations: []*identity.Attestation{&attestation1, &attestation2},
 	}
 
 	// Generate local members
@@ -782,7 +782,7 @@ func TestUpdateMembership(t *testing.T) {
 	}
 	localMembershipAsset := common.Membership{
 		SecurityDomain: localSecurityDomainId,
-		Members:		map[string]*common.Member{ localMemberId1: &localMember1, localMemberId2: &localMember2},
+		Members:        map[string]*common.Member{localMemberId1: &localMember1, localMemberId2: &localMember2},
 	}
 
 	// Generate local attesters
@@ -790,27 +790,27 @@ func TestUpdateMembership(t *testing.T) {
 	certLocal1, _ := x509.ParseCertificate(decodedLocalCert1.Bytes)
 	certLocalBytes1, keyLocal1, err := createX509Certificate(certLocal1, localKeyChain1[2])
 	certLocalPem1, _ := x509CertToPem(certLocalBytes1)
-	attestationLocal1 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestationLocal1 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: localSecurityDomainId,
-			MemberId: localMemberId1,
+			MemberId:       localMemberId1,
 		},
 		Certificate: certLocalPem1,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	decodedLocalCert2, _ := pem.Decode([]byte(localCertChain2[2]))
 	certLocal2, _ := x509.ParseCertificate(decodedLocalCert2.Bytes)
 	certLocalBytes2, keyLocal2, err := createX509Certificate(certLocal2, localKeyChain2[2])
 	certLocalPem2, _ := x509CertToPem(certLocalBytes2)
-	attestationLocal2 := identity.Attestation {
-		UnitIdentity: &identity.SecurityDomainMemberIdentity {
+	attestationLocal2 := identity.Attestation{
+		UnitIdentity: &identity.SecurityDomainMemberIdentity{
 			SecurityDomain: localSecurityDomainId,
-			MemberId: localMemberId2,
+			MemberId:       localMemberId2,
 		},
 		Certificate: certLocalPem2,
-		Signature: "",
-		Nonce: nonce,
+		Signature:   "",
+		Nonce:       nonce,
 	}
 	// Marshal attested membership set for signature
 	attestedMembershipSetBytesPlain, err := protoV2.Marshal(&attestedMembershipSet)
@@ -833,7 +833,7 @@ func TestUpdateMembership(t *testing.T) {
 	attestationLocal2.Signature = base64.StdEncoding.EncodeToString(signatureLocal2)
 	// Generate counter attested foreign membership
 	counterAttestedMembership := identity.CounterAttestedMembership{
-		Response: &identity.CounterAttestedMembership_AttestedMembershipSet_{attestedMembershipSetBytesStr},
+		Response:     &identity.CounterAttestedMembership_AttestedMembershipSet_{attestedMembershipSetBytesStr},
 		Attestations: []*identity.Attestation{&attestationLocal1, &attestationLocal2},
 	}
 
@@ -1099,8 +1099,8 @@ func TestVerifyMembership(t *testing.T) {
 		Subject: pkix.Name{
 			CommonName: "example-a.com",
 		},
-		NotBefore:	  now.Add(-threeDays),
-		NotAfter:	  now.Add(threeDays),
+		NotBefore:    now.Add(-threeDays),
+		NotAfter:     now.Add(threeDays),
 		SerialNumber: big.NewInt(1337),
 	}
 
@@ -1126,7 +1126,7 @@ func TestVerifyMembership(t *testing.T) {
 
 	var membershipAsset = common.Membership{
 		SecurityDomain: securityDomainId,
-		Members:		map[string]*common.Member{"member1": &member},
+		Members:        map[string]*common.Member{"member1": &member},
 	}
 	membershipBytes, err := json.Marshal(&membershipAsset)
 	require.NoError(t, err)
