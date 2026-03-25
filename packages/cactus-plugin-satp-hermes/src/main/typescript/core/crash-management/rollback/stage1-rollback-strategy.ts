@@ -83,7 +83,7 @@ export class Stage1RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage1RollbackStrategy#handleClientSideRollback";
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    context.with(ctx, () => {
+    return context.with(ctx, () => {
       try {
         try {
           rollbackState.rollbackLogEntries.push(
@@ -125,7 +125,7 @@ export class Stage1RollbackStrategy implements RollbackStrategy {
   ): Promise<void> {
     const fnTag = "Stage1RollbackStrategy#handleServerSideRollback";
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    context.with(ctx, () => {
+    return context.with(ctx, () => {
       try {
         try {
           rollbackState.rollbackLogEntries.push(
