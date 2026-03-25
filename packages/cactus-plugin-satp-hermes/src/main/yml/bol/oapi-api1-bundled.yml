@@ -780,6 +780,82 @@ paths:
                       - UNAVAILABLE
         '500':
           description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers:
+    get:
+      summary: Get supported ledgers
+      description: 'Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.'
+      operationId: GetSupportedLedgers
+      tags:
+        - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers
+      responses:
+        '200':
+          description: A list of supported ledger types.
+          content:
+            application/json:
+              schema:
+                description: List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
+                type: object
+                properties:
+                  supportedLedgers:
+                    type: array
+                    items:
+                      type: string
+                      description: A LedgerType enum value.
+                required:
+                  - supportedLedgers
+        '500':
+          description: Internal server error
+  /api/v1/@hyperledger/cactus-plugin-satp-hermes/loaded-ledgers:
+    get:
+      summary: Get loaded ledgers
+      description: Returns the list of ledger networks for which this gateway has successfully initialized bridge leafs.
+      operationId: GetLoadedLedgers
+      tags:
+        - admin
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger/cactus-plugin-satp-hermes/loaded-ledgers
+      responses:
+        '200':
+          description: A list of loaded ledger networks.
+          content:
+            application/json:
+              schema:
+                description: List of ledger networks that the SATP gateway has successfully initialized (deployed bridge leafs).
+                type: object
+                properties:
+                  loadedLedgers:
+                    type: array
+                    items:
+                      type: object
+                      description: The network of the DLT being interacted with.
+                      properties:
+                        id:
+                          type: string
+                          description: The network of the DLT being interacted with.
+                        ledgerType:
+                          description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                          type: string
+                          enum:
+                            - BESU_1X
+                            - BESU_2X
+                            - BURROW_0X
+                            - CORDA_4X
+                            - ETHEREUM
+                            - FABRIC_2
+                            - SAWTOOTH_1X
+                      required:
+                        - id
+                        - ledgerType
+                required:
+                  - loadedLedgers
+        '500':
+          description: Internal server error
   /api/v1/@hyperledger/cactus-plugin-satp-hermes/continue:
     post:
       tags:
@@ -5721,6 +5797,46 @@ components:
       example:
         - satp
         - hyperledger
+    SupportedLedgersResponse:
+      description: List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
+      type: object
+      properties:
+        supportedLedgers:
+          type: array
+          items:
+            type: string
+            description: A LedgerType enum value.
+      required:
+        - supportedLedgers
+    LoadedLedgersResponse:
+      description: List of ledger networks that the SATP gateway has successfully initialized (deployed bridge leafs).
+      type: object
+      properties:
+        loadedLedgers:
+          type: array
+          items:
+            type: object
+            description: The network of the DLT being interacted with.
+            properties:
+              id:
+                type: string
+                description: The network of the DLT being interacted with.
+              ledgerType:
+                description: 'Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example "BESU_1X" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.'
+                type: string
+                enum:
+                  - BESU_1X
+                  - BESU_2X
+                  - BURROW_0X
+                  - CORDA_4X
+                  - ETHEREUM
+                  - FABRIC_2
+                  - SAWTOOTH_1X
+            required:
+              - id
+              - ledgerType
+      required:
+        - loadedLedgers
     HealthCheckResponse:
       description: Response schema for healthcheck endpoint indicating the availability status of the service.
       type: object

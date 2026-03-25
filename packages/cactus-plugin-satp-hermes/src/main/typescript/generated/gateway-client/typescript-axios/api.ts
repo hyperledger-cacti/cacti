@@ -2083,6 +2083,19 @@ export interface GetIntegrations200ResponseIntegrationsInner {
     'environment'?: string;
 }
 /**
+ * List of ledger networks that the SATP gateway has successfully initialized (deployed bridge leafs).
+ * @export
+ * @interface GetLoadedLedgers200Response
+ */
+export interface GetLoadedLedgers200Response {
+    /**
+     * 
+     * @type {Array<TransactRequestSourceAssetNetworkId>}
+     * @memberof GetLoadedLedgers200Response
+     */
+    'loadedLedgers': Array<TransactRequestSourceAssetNetworkId>;
+}
+/**
  * Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
  * @export
  * @interface GetOracleTaskStatus200Response
@@ -2719,6 +2732,19 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerToolDetails {
     'logoURI': string;
 }
 /**
+ * List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
+ * @export
+ * @interface GetSupportedLedgers200Response
+ */
+export interface GetSupportedLedgers200Response {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GetSupportedLedgers200Response
+     */
+    'supportedLedgers': Array<string>;
+}
+/**
  * Response schema for healthcheck endpoint indicating the availability status of the service.
  * @export
  * @interface HealthCheckResponse
@@ -2964,6 +2990,19 @@ export interface IntegrationsResponse {
      * @memberof IntegrationsResponse
      */
     'integrations': Array<GetIntegrations200ResponseIntegrationsInner>;
+}
+/**
+ * List of ledger networks that the SATP gateway has successfully initialized (deployed bridge leafs).
+ * @export
+ * @interface LoadedLedgersResponse
+ */
+export interface LoadedLedgersResponse {
+    /**
+     * 
+     * @type {Array<TransactRequestSourceAssetNetworkId>}
+     * @memberof LoadedLedgersResponse
+     */
+    'loadedLedgers': Array<TransactRequestSourceAssetNetworkId>;
 }
 /**
  * The network of the DLT being interacted with.
@@ -4347,6 +4386,19 @@ export const StatusResponseStepEnum = {
 export type StatusResponseStepEnum = typeof StatusResponseStepEnum[keyof typeof StatusResponseStepEnum];
 
 /**
+ * List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
+ * @export
+ * @interface SupportedLedgersResponse
+ */
+export interface SupportedLedgersResponse {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof SupportedLedgersResponse
+     */
+    'supportedLedgers': Array<string>;
+}
+/**
  * Metadata detailing a supported token
  * @export
  * @interface Token
@@ -5038,6 +5090,36 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Returns the list of ledger networks for which this gateway has successfully initialized bridge leafs.
+         * @summary Get loaded ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLoadedLedgers: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/loaded-ledgers`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieve the all SATP session IDs
          * @summary Get SATP session ids
          * @param {object} [sessionsRequest] Request object for fetching session IDs.
@@ -5097,6 +5179,36 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             if (sessionID !== undefined) {
                 localVarQueryParameter['SessionID'] = sessionID;
             }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+         * @summary Get supported ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSupportedLedgers: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
 
 
     
@@ -5217,6 +5329,16 @@ export const AdminApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Returns the list of ledger networks for which this gateway has successfully initialized bridge leafs.
+         * @summary Get loaded ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLoadedLedgers(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetLoadedLedgers200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLoadedLedgers(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Retrieve the all SATP session IDs
          * @summary Get SATP session ids
          * @param {object} [sessionsRequest] Request object for fetching session IDs.
@@ -5236,6 +5358,16 @@ export const AdminApiFp = function(configuration?: Configuration) {
          */
         async getStatus(sessionID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transact200ResponseStatusResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatus(sessionID, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+         * @summary Get supported ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSupportedLedgers(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetSupportedLedgers200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSupportedLedgers(options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5291,6 +5423,15 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
             return localVarFp.getHealthCheck(options).then((request) => request(axios, basePath));
         },
         /**
+         * Returns the list of ledger networks for which this gateway has successfully initialized bridge leafs.
+         * @summary Get loaded ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLoadedLedgers(options?: any): AxiosPromise<GetLoadedLedgers200Response> {
+            return localVarFp.getLoadedLedgers(options).then((request) => request(axios, basePath));
+        },
+        /**
          * Retrieve the all SATP session IDs
          * @summary Get SATP session ids
          * @param {object} [sessionsRequest] Request object for fetching session IDs.
@@ -5309,6 +5450,15 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          */
         getStatus(sessionID: string, options?: any): AxiosPromise<Transact200ResponseStatusResponse> {
             return localVarFp.getStatus(sessionID, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+         * @summary Get supported ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSupportedLedgers(options?: any): AxiosPromise<GetSupportedLedgers200Response> {
+            return localVarFp.getSupportedLedgers(options).then((request) => request(axios, basePath));
         },
         /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
@@ -5365,6 +5515,17 @@ export class AdminApi extends BaseAPI {
     }
 
     /**
+     * Returns the list of ledger networks for which this gateway has successfully initialized bridge leafs.
+     * @summary Get loaded ledgers
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public getLoadedLedgers(options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).getLoadedLedgers(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Retrieve the all SATP session IDs
      * @summary Get SATP session ids
      * @param {object} [sessionsRequest] Request object for fetching session IDs.
@@ -5386,6 +5547,17 @@ export class AdminApi extends BaseAPI {
      */
     public getStatus(sessionID: string, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).getStatus(sessionID, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+     * @summary Get supported ledgers
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public getSupportedLedgers(options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).getSupportedLedgers(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
