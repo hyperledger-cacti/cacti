@@ -320,15 +320,15 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     counterPartyGateways,
     localRepository: localRepository
       ? ({
-        client: localRepository.client,
-        connection: localRepository.connection,
-      } as Knex.Config)
+          client: localRepository.client,
+          connection: localRepository.connection,
+        } as Knex.Config)
       : undefined,
     remoteRepository: remoteRepository
       ? ({
-        client: remoteRepository.client,
-        connection: remoteRepository.connection,
-      } as Knex.Config)
+          client: remoteRepository.client,
+          connection: remoteRepository.connection,
+        } as Knex.Config)
       : undefined,
     environment: "development",
     ccConfig,

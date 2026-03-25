@@ -699,7 +699,7 @@ export class BesuTestEnvironment {
       id: BesuTestEnvironment.BESU_ASSET_ID2,
       referenceId:
         BesuTestEnvironment.BESU_REFERENCE_ID[
-        TokenType.NONSTANDARD_NONFUNGIBLE
+          TokenType.NONSTANDARD_NONFUNGIBLE
         ],
       owner: this.firstHighNetWorthAccount,
       contractName:
