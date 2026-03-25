@@ -65,8 +65,10 @@ const erc20TokenContract = "SATPContract";
 
 let db_local_config1: Knex.Config;
 let db_remote_config1: Knex.Config;
+let db_remote_host_config1: Knex.Config;
 let db_local_config2: Knex.Config;
 let db_remote_config2: Knex.Config;
+let db_remote_host_config2: Knex.Config;
 let db_local1: Container;
 let db_remote1: Container;
 let db_local2: Container;
@@ -110,37 +112,47 @@ afterAll(async () => {
 }, TIMEOUT);
 
 beforeAll(async () => {
-  ({ config: db_local_config1, container: db_local1 } = await createPGDatabase({
-    network: testNetwork,
-    postgresUser: "user123123",
-    postgresPassword: "password",
-  }));
+  ({ networkConfig: db_local_config1, container: db_local1 } =
+    await createPGDatabase({
+      network: testNetwork,
+      postgresUser: "user123123",
+      postgresPassword: "password",
+    }));
   db_local_config1 = createEnhancedTimeoutConfig(db_local_config1);
 
-  ({ config: db_remote_config1, container: db_remote1 } =
-    await createPGDatabase({
-      network: testNetwork,
-      postgresUser: "user123123",
-      postgresPassword: "password",
-    }));
-  db_remote_config1 = createEnhancedTimeoutConfig(db_remote_config1);
-
-  ({ config: db_local_config2, container: db_local2 } = await createPGDatabase({
+  ({
+    hostConfig: db_remote_host_config1,
+    networkConfig: db_remote_config1,
+    container: db_remote1,
+  } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
-  db_local_config2 = createEnhancedTimeoutConfig(db_local_config2);
+  db_remote_host_config1 = createEnhancedTimeoutConfig(db_remote_host_config1);
+  db_remote_config1 = createEnhancedTimeoutConfig(db_remote_config1);
 
-  ({ config: db_remote_config2, container: db_remote2 } =
+  ({ networkConfig: db_local_config2, container: db_local2 } =
     await createPGDatabase({
       network: testNetwork,
       postgresUser: "user123123",
       postgresPassword: "password",
     }));
+  db_local_config2 = createEnhancedTimeoutConfig(db_local_config2);
+
+  ({
+    hostConfig: db_remote_host_config2,
+    networkConfig: db_remote_config2,
+    container: db_remote2,
+  } = await createPGDatabase({
+    network: testNetwork,
+    postgresUser: "user123123",
+    postgresPassword: "password",
+  }));
+  db_remote_host_config2 = createEnhancedTimeoutConfig(db_remote_host_config2);
   db_remote_config2 = createEnhancedTimeoutConfig(db_remote_config2);
-  await setupDBTable(db_remote_config1);
-  await setupDBTable(db_remote_config2);
+  await setupDBTable(db_remote_host_config1);
+  await setupDBTable(db_remote_host_config2);
 
   {
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(

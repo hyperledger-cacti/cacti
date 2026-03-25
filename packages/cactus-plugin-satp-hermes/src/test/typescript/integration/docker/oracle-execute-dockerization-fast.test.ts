@@ -64,6 +64,7 @@ let ethereumEnv: EthereumTestEnvironment;
 
 let db_local_config: Knex.Config;
 let db_remote_config: Knex.Config;
+let db_remote_host_config: Knex.Config;
 let db_local: Container;
 let db_remote: Container;
 let gatewayRunner: SATPGatewayRunner;
@@ -114,21 +115,27 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
 
-  ({ config: db_local_config, container: db_local } = await createPGDatabase({
-    network: testNetwork,
-    postgresUser: "user123123",
-    postgresPassword: "password",
-  }));
+  ({ networkConfig: db_local_config, container: db_local } =
+    await createPGDatabase({
+      network: testNetwork,
+      postgresUser: "user123123",
+      postgresPassword: "password",
+    }));
   db_local_config = createEnhancedTimeoutConfig(db_local_config);
 
-  ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
+  ({
+    hostConfig: db_remote_host_config,
+    networkConfig: db_remote_config,
+    container: db_remote,
+  } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_remote_host_config = createEnhancedTimeoutConfig(db_remote_host_config);
   db_remote_config = createEnhancedTimeoutConfig(db_remote_config);
 
-  await setupDBTable(db_remote_config);
+  await setupDBTable(db_remote_host_config);
 
   const businessLogicContract = "OracleTestContract";
 

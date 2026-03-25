@@ -15,6 +15,7 @@ import { BesuTestEnvironment } from "./environments/besu-test-environment";
 import { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 import { FabricTestEnvironment } from "./environments/fabric-test-environment";
 import knex, { Knex } from "knex";
+import net from "net";
 import Docker, { Container, ContainerInfo } from "dockerode";
 import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript/common/containers";
 import { EventEmitter } from "events";
@@ -319,15 +320,15 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     counterPartyGateways,
     localRepository: localRepository
       ? ({
-          client: localRepository.client,
-          connection: localRepository.connection,
-        } as Knex.Config)
+        client: localRepository.client,
+        connection: localRepository.connection,
+      } as Knex.Config)
       : undefined,
     remoteRepository: remoteRepository
       ? ({
-          client: remoteRepository.client,
-          connection: remoteRepository.connection,
-        } as Knex.Config)
+        client: remoteRepository.client,
+        connection: remoteRepository.connection,
+      } as Knex.Config)
       : undefined,
     environment: "development",
     ccConfig,
@@ -439,9 +440,49 @@ export interface PGDatabaseConfig {
   postgresDB?: string;
 }
 
+export interface PGDatabaseResult {
+  /** Config using localhost:<mapped_host_port> — use from Jest process */
+  hostConfig: Knex.Config;
+  /** Config using <internal_ip>:5432 — use for inter-container comms */
+  networkConfig: Knex.Config;
+  container: Container;
+  /** @deprecated Use hostConfig for host-side or networkConfig for containers */
+  config: Knex.Config;
+}
+
+/**
+ * Polls a TCP socket until a connection to PostgreSQL succeeds from the host,
+ * confirming that Docker's port mapping is actually reachable — not just that
+ * pg_isready passed inside the container.
+ */
+async function waitForPgHostConnectivity(
+  host: string,
+  port: number,
+  timeoutMs: number,
+): Promise<void> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const ok = await new Promise<boolean>((resolve) => {
+      const sock = net.createConnection({ host, port });
+      sock.once("connect", () => {
+        sock.destroy();
+        resolve(true);
+      });
+      sock.once("error", () => resolve(false));
+      sock.setTimeout(2000, () => {
+        sock.destroy();
+        resolve(false);
+      });
+    });
+    if (ok) return;
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+  throw new Error(`PG not reachable at ${host}:${port} after ${timeoutMs}ms`);
+}
+
 export async function createPGDatabase(
   config: PGDatabaseConfig,
-): Promise<{ config: Knex.Config; container: Container }> {
+): Promise<PGDatabaseResult> {
   const {
     network,
     postgresUser = "postgres",
@@ -471,7 +512,7 @@ export async function createPGDatabase(
     }
   }
 
-  const hostConfig: Docker.HostConfig = {
+  const dockerHostConfig: Docker.HostConfig = {
     PublishAllPorts: true,
     Binds: [],
     NetworkMode: network,
@@ -497,7 +538,7 @@ export async function createPGDatabase(
         ExposedPorts: {
           ["5432/tcp"]: {},
         },
-        HostConfig: hostConfig,
+        HostConfig: dockerHostConfig,
         Healthcheck: healthCheck,
         Env: [
           `POSTGRES_USER=${postgresUser}`,
@@ -518,10 +559,11 @@ export async function createPGDatabase(
 
       try {
         const startedAt = Date.now();
+        const PG_READY_TIMEOUT_MS = 180_000;
         let isHealthy = false;
         do {
-          if (Date.now() >= startedAt + 60000) {
-            throw new Error(`${fnTag} timed out (${60000}ms)`);
+          if (Date.now() >= startedAt + PG_READY_TIMEOUT_MS) {
+            throw new Error(`${fnTag} timed out (${PG_READY_TIMEOUT_MS}ms)`);
           }
 
           const containerInfos = await docker.listContainers({});
@@ -548,39 +590,77 @@ export async function createPGDatabase(
     });
   });
 
+  const resolvedContainer = await container;
   const containerData = await docker
-    .getContainer((await container).id)
+    .getContainer(resolvedContainer.id)
     .inspect();
+
+  const internalIp =
+    containerData.NetworkSettings.Networks[network || "bridge"].IPAddress;
+  const pgPortBindings = containerData.NetworkSettings.Ports["5432/tcp"];
+  const mappedHostPort = parseInt(pgPortBindings[0].HostPort, 10);
+
+  // Verify actual host-to-PG TCP connectivity before returning
+  await waitForPgHostConnectivity("127.0.0.1", mappedHostPort, 30_000);
 
   const migrationSource = await createMigrationSource();
 
+  const hostConfig: Knex.Config = {
+    client: "pg",
+    connection: {
+      host: "127.0.0.1",
+      port: mappedHostPort,
+      user: postgresUser,
+      password: postgresPassword,
+      database: postgresDB,
+      ssl: false,
+    },
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  };
+
+  const networkConfig: Knex.Config = {
+    client: "pg",
+    connection: {
+      host: internalIp,
+      port: 5432,
+      user: postgresUser,
+      password: postgresPassword,
+      database: postgresDB,
+      ssl: false,
+    },
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  };
+
   return {
-    config: {
-      client: "pg",
-      connection: {
-        host: containerData.NetworkSettings.Networks[network || "bridge"]
-          .IPAddress,
-        user: postgresUser,
-        password: postgresPassword,
-        database: postgresDB,
-        port: 5432,
-        ssl: false,
-      },
-      migrations: {
-        migrationSource: migrationSource,
-      },
-    } as Knex.Config,
-    container: await container,
+    hostConfig,
+    networkConfig,
+    config: hostConfig,
+    container: resolvedContainer,
   };
 }
 
 export async function setupDBTable(config: Knex.Config): Promise<void> {
-  const knexInstanceClient = knex(config);
-  try {
-    await knexInstanceClient.migrate.latest();
-  } finally {
-    // Properly release connections to avoid pool exhaustion
-    await knexInstanceClient.destroy();
+  const maxRetries = 3;
+  const retryDelayMs = 3000;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const knexInstanceClient = knex(config);
+    try {
+      await knexInstanceClient.migrate.latest();
+      return;
+    } catch (err) {
+      if (attempt === maxRetries) throw err;
+      console.warn(
+        `setupDBTable attempt ${attempt}/${maxRetries} failed, retrying...`,
+        (err as Error).message,
+      );
+      await new Promise((r) => setTimeout(r, retryDelayMs));
+    } finally {
+      await knexInstanceClient.destroy();
+    }
   }
 }
 

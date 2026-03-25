@@ -123,7 +123,11 @@ export class BesuTestEnvironment {
   ): Promise<void> {
     this.ledger = new BesuTestLedger({
       emitContainerLogs: true,
-      envVars: ["BESU_NETWORK=dev"],
+      envVars: [
+        "BESU_NETWORK=dev",
+        "BESU_HOST_ALLOWLIST=*",
+        "BESU_RPC_WS_HOST_ALLOWLIST=*",
+      ],
       containerImageVersion: "v2.2.0-rc.2",
       containerImageName: "ghcr.io/hyperledger-cacti/besu-all-in-one",
       networkName: this.dockerNetwork,
@@ -293,8 +297,8 @@ export class BesuTestEnvironment {
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
       gasConfig: this.besuConfig.gasConfig,
       connectorOptions: {
-        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(),
-        rpcApiWsHost: await this.ledger.getRpcApiWsHost(),
+        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(false),
+        rpcApiWsHost: await this.ledger.getRpcApiWsHost(false),
       },
       claimFormats: this.besuConfig.claimFormats,
     } as INetworkOptions;
@@ -695,7 +699,7 @@ export class BesuTestEnvironment {
       id: BesuTestEnvironment.BESU_ASSET_ID2,
       referenceId:
         BesuTestEnvironment.BESU_REFERENCE_ID[
-          TokenType.NONSTANDARD_NONFUNGIBLE
+        TokenType.NONSTANDARD_NONFUNGIBLE
         ],
       owner: this.firstHighNetWorthAccount,
       contractName:
