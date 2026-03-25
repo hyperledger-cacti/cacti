@@ -22,6 +22,9 @@ import {
   createPGDatabase,
   setupDBTable,
   createEnhancedTimeoutConfig,
+  runCleanup,
+  cleanupContainers,
+  cleanupEnvs,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -100,29 +103,10 @@ afterEach(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  if (db_local1) {
-    await db_local1.stop();
-    await db_local1.remove();
-  }
-  if (db_remote1) {
-    await db_remote1.stop();
-    await db_remote1.remove();
-  }
-  if (db_local2) {
-    await db_local2.stop();
-    await db_local2.remove();
-  }
-  if (db_remote2) {
-    await db_remote2.stop();
-    await db_remote2.remove();
-  }
-
-  if (besuEnv) {
-    await besuEnv.tearDown();
-  }
-  if (ethereumEnv) {
-    await ethereumEnv.tearDown();
-  }
+  await runCleanup(log, [
+    ...cleanupContainers({ db_local1, db_remote1, db_local2, db_remote2 }),
+    ...cleanupEnvs({ besuEnv, ethereumEnv }),
+  ]);
 }, TIMEOUT);
 
 beforeAll(async () => {

@@ -1047,7 +1047,15 @@ export class FabricTestEnvironment {
 
   // Stops and destroys the test ledger
   public async tearDown(): Promise<void> {
-    await this.ledger.stop();
-    await this.ledger.destroy();
+    try {
+      await this.ledger.stop();
+    } catch (err) {
+      this.log.warn("FabricTestEnvironment#tearDown() stop failed:", err);
+    }
+    try {
+      await this.ledger.destroy();
+    } catch (err) {
+      this.log.warn("FabricTestEnvironment#tearDown() destroy failed:", err);
+    }
   }
 }

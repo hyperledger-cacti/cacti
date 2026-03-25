@@ -24,6 +24,8 @@ import {
   EthereumTestEnvironment,
   FabricTestEnvironment,
   getTransactRequest,
+  runCleanup,
+  cleanupEnvs,
 } from "../../test-utils";
 import {
   SATP_ARCHITECTURE_VERSION,
@@ -61,15 +63,7 @@ let gateway: SATPGateway;
 const TIMEOUT = 900000; // 15 minutes
 
 afterAll(async () => {
-  if (ethereumEnv) {
-    await ethereumEnv.tearDown();
-  }
-  if (besuEnv) {
-    await besuEnv.tearDown();
-  }
-  if (fabricEnv) {
-    await fabricEnv.tearDown();
-  }
+  await runCleanup(log, [...cleanupEnvs({ ethereumEnv, besuEnv, fabricEnv })]);
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {

@@ -677,8 +677,16 @@ export class EthereumTestEnvironment {
 
   // Stops and destroys the test ledger
   public async tearDown(): Promise<void> {
-    await this.ledger.stop();
-    await this.ledger.destroy();
+    try {
+      await this.ledger.stop();
+    } catch (err) {
+      this.log.warn("EthereumTestEnvironment#tearDown() stop failed:", err);
+    }
+    try {
+      await this.ledger.destroy();
+    } catch (err) {
+      this.log.warn("EthereumTestEnvironment#tearDown() destroy failed:", err);
+    }
   }
 
   public async writeData(

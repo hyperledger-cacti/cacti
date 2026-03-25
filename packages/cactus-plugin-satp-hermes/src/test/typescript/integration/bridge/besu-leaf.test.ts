@@ -92,7 +92,9 @@ beforeAll(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  await besuEnv.tearDown();
+  if (besuEnv) {
+    await besuEnv.tearDown();
+  }
 
   await monitorService.shutdown();
 

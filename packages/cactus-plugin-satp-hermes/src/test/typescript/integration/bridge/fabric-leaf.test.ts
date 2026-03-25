@@ -79,7 +79,6 @@ afterAll(async () => {
   if (fabricLeaf) {
     await fabricLeaf.shutdownConnection().catch((err) => {
       log.error("Error shutting down Fabric Leaf connector:", err);
-      fail("Error shutting down Fabric Leaf connector");
     });
 
     log.info("Fabric Leaf connector shutdown successfully");

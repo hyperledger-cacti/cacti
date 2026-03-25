@@ -36,6 +36,152 @@ export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
 
+/**
+ * Safely stops and removes a Docker container, logging but not throwing
+ * on errors. Use this in afterAll blocks so one container's failure
+ * doesn't prevent cleanup of the rest.
+ */
+export async function safeStopAndRemoveContainer(
+  container: Container | undefined,
+  label: string,
+  log?: { warn: (msg: string, ...args: unknown[]) => void },
+): Promise<void> {
+  if (!container) return;
+  try {
+    await container.stop();
+  } catch (err) {
+    const msg = `safeStopAndRemoveContainer(${label}): stop failed`;
+    if (log) log.warn(msg, err);
+    else console.warn(msg, err);
+  }
+  try {
+    await container.remove();
+  } catch (err) {
+    const msg = `safeStopAndRemoveContainer(${label}): remove failed`;
+    if (log) log.warn(msg, err);
+    else console.warn(msg, err);
+  }
+}
+
+/** A single cleanup action: a label for logging and an async function. */
+export interface CleanupTask {
+  label: string;
+  fn: () => Promise<unknown>;
+}
+
+/**
+ * Runs every cleanup task in order, catching and collecting errors so that
+ * one failure never prevents the remaining tasks from executing.
+ * Returns the list of errors (empty on full success).
+ *
+ * Usage in afterAll:
+ * ```ts
+ * const errors = await runCleanup(log, [
+ *   ...cleanupContainers({ db_local, db_remote }),
+ *   ...cleanupEnvs({ besuEnv, ethereumEnv, fabricEnv }),
+ * ]);
+ * ```
+ */
+export async function runCleanup(
+  log: { warn: (msg: string, ...args: unknown[]) => void },
+  tasks: CleanupTask[],
+): Promise<unknown[]> {
+  const errors: unknown[] = [];
+  for (const { label, fn } of tasks) {
+    try {
+      await fn();
+    } catch (err) {
+      errors.push(err);
+      log.warn(`cleanup(${label}) failed`, err);
+    }
+  }
+  if (errors.length > 0) {
+    log.warn(`afterAll encountered ${errors.length} cleanup error(s)`);
+  }
+  return errors;
+}
+
+/**
+ * Build cleanup tasks for Docker containers (stop + remove each).
+ * Pass a record of `{ label: container | undefined }`.
+ */
+export function cleanupContainers(
+  containers: Record<string, Container | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, c] of Object.entries(containers)) {
+    if (!c) continue;
+    tasks.push({ label: `${label}.stop`, fn: () => c.stop() });
+    tasks.push({ label: `${label}.remove`, fn: () => c.remove() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for test environments (tearDown each).
+ * Pass a record of `{ label: env | undefined }`.
+ */
+export function cleanupEnvs(
+  envs: Record<string, { tearDown: () => Promise<void> } | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, env] of Object.entries(envs)) {
+    if (!env) continue;
+    tasks.push({ label: `${label}.tearDown`, fn: () => env.tearDown() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for gateway runner instances (stop + destroy each).
+ * Pass a record of `{ label: runner | undefined }`.
+ */
+export function cleanupGatewayRunners(
+  runners: Record<
+    string,
+    | { stop: () => Promise<unknown>; destroy: () => Promise<unknown> }
+    | undefined
+  >,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, r] of Object.entries(runners)) {
+    if (!r) continue;
+    tasks.push({ label: `${label}.stop`, fn: () => r.stop() });
+    tasks.push({ label: `${label}.destroy`, fn: () => r.destroy() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for SATPGateway instances (shutdown each).
+ * Pass a record of `{ label: gateway | undefined }`.
+ */
+export function cleanupGateways(
+  gateways: Record<string, { shutdown: () => Promise<unknown> } | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, gw] of Object.entries(gateways)) {
+    if (!gw) continue;
+    tasks.push({ label: `${label}.shutdown`, fn: () => gw.shutdown() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for Knex client instances (destroy each).
+ * Pass a record of `{ label: client | undefined }`.
+ */
+export function cleanupKnexClients(
+  clients: Record<string, { destroy: () => Promise<unknown> } | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, c] of Object.entries(clients)) {
+    if (!c) continue;
+    tasks.push({ label: `${label}.destroy`, fn: () => c.destroy() });
+  }
+  return tasks;
+}
+
 export const CI_TEST_TIMEOUT = 900000;
 const testFilesDirectory = `${__dirname}/../../../cache/`;
 

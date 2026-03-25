@@ -25,6 +25,10 @@ import {
   EthereumTestEnvironment,
   FabricTestEnvironment,
   getTransactRequest,
+  runCleanup,
+  cleanupEnvs,
+  cleanupGateways,
+  cleanupKnexClients,
 } from "../../test-utils";
 import {
   SATP_ARCHITECTURE_VERSION,
@@ -72,43 +76,16 @@ async function shutdownGateways() {
 
 const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
-  if (gateway1) {
-    if (knexSourceRemoteClient) {
-      await knexSourceRemoteClient.destroy();
-    }
-  }
-
-  if (gateway2) {
-    if (knexTargetRemoteClient) {
-      await knexTargetRemoteClient.destroy();
-    }
-  }
-
-  if (gateway1) {
-    await gateway1.shutdown();
-  }
-  if (gateway2) {
-    await gateway2.shutdown();
-  }
-  if (besuEnv) {
-    await besuEnv.tearDown();
-  }
-  if (fabricEnv) {
-    await fabricEnv.tearDown();
-  }
-  if (ethereumEnv) {
-    await ethereumEnv.tearDown();
-  }
+  await runCleanup(log, [
+    ...cleanupKnexClients({
+      knexSourceRemoteClient,
+      knexTargetRemoteClient,
+    }),
+    ...cleanupGateways({ gateway1, gateway2 }),
+    ...cleanupEnvs({ besuEnv, fabricEnv, ethereumEnv }),
+  ]);
 
   await pruneDockerContainersIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
-  pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
