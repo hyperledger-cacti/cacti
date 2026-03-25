@@ -191,6 +191,8 @@ afterAll(async () => {
   monitorService.shutdown();
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("CrashManager Tests", () => {
   it("Default config test", async () => {
     const mock = jest

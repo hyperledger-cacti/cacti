@@ -114,12 +114,12 @@ const createMockSession = (
     }),
     stage1: isClient
       ? create(Stage1HashesSchema, {
-          transferProposalRequestMessageHash: "h1",
-        })
+        transferProposalRequestMessageHash: "h1",
+      })
       : create(Stage1HashesSchema, {
-          transferProposalRequestMessageHash: "h1",
-          transferProposalReceiptMessageHash: "h2",
-        }),
+        transferProposalRequestMessageHash: "h1",
+        transferProposalReceiptMessageHash: "h2",
+      }),
   });
 
   sessionData.processedTimestamps = create(MessageStagesTimestampsSchema, {
@@ -131,12 +131,12 @@ const createMockSession = (
     }),
     stage1: isClient
       ? create(Stage1TimestampsSchema, {
-          transferProposalRequestMessageTimestamp: incrementTime(5),
-        })
+        transferProposalRequestMessageTimestamp: incrementTime(5),
+      })
       : create(Stage1TimestampsSchema, {
-          transferProposalRequestMessageTimestamp: incrementTime(5),
-          transferProposalReceiptMessageTimestamp: incrementTime(6),
-        }),
+        transferProposalRequestMessageTimestamp: incrementTime(5),
+        transferProposalReceiptMessageTimestamp: incrementTime(6),
+      }),
   });
 
   sessionData.signatures = create(MessageStagesSignaturesSchema, {
@@ -148,12 +148,12 @@ const createMockSession = (
     }),
     stage1: isClient
       ? create(Stage1SignaturesSchema, {
-          transferProposalRequestMessageSignature: "sig_h1",
-        })
+        transferProposalRequestMessageSignature: "sig_h1",
+      })
       : create(Stage1SignaturesSchema, {
-          transferProposalRequestMessageSignature: "sig_h1",
-          transferProposalReceiptMessageSignature: "sig_h2",
-        }),
+        transferProposalRequestMessageSignature: "sig_h1",
+        transferProposalReceiptMessageSignature: "sig_h2",
+      }),
   });
 
   if (isClient) {
@@ -327,6 +327,8 @@ afterAll(async () => {
   }
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("Stage 1 Recovery Test", () => {
   it("should recover Stage 1 hashes, timestamps, signatures, and update session state to RECOVERED", async () => {
     crashManager1 = gateway1["crashManager"] as CrashManager;

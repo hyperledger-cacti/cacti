@@ -133,12 +133,12 @@ const createMockSession = (
     }),
     stage3: isClient
       ? create(Stage3HashesSchema, {
-          commitPreparationRequestMessageHash: "h12",
-        })
+        commitPreparationRequestMessageHash: "h12",
+      })
       : create(Stage3HashesSchema, {
-          commitPreparationRequestMessageHash: "h12",
-          commitReadyResponseMessageHash: "h13",
-        }),
+        commitPreparationRequestMessageHash: "h12",
+        commitReadyResponseMessageHash: "h13",
+      }),
   });
 
   sessionData.processedTimestamps = create(MessageStagesTimestampsSchema, {
@@ -161,12 +161,12 @@ const createMockSession = (
     }),
     stage3: isClient
       ? create(Stage3TimestampsSchema, {
-          commitPreparationRequestMessageTimestamp: incrementTime(11),
-        })
+        commitPreparationRequestMessageTimestamp: incrementTime(11),
+      })
       : create(Stage3TimestampsSchema, {
-          commitPreparationRequestMessageTimestamp: incrementTime(11),
-          commitReadyResponseMessageTimestamp: incrementTime(12),
-        }),
+        commitPreparationRequestMessageTimestamp: incrementTime(11),
+        commitReadyResponseMessageTimestamp: incrementTime(12),
+      }),
   });
 
   sessionData.signatures = create(MessageStagesSignaturesSchema, {
@@ -189,12 +189,12 @@ const createMockSession = (
     }),
     stage3: isClient
       ? create(Stage3SignaturesSchema, {
-          commitPreparationRequestMessageSignature: "sig_h12",
-        })
+        commitPreparationRequestMessageSignature: "sig_h12",
+      })
       : create(Stage3SignaturesSchema, {
-          commitPreparationRequestMessageSignature: "sig_h12",
-          commitReadyResponseMessageSignature: "sig_h13",
-        }),
+        commitPreparationRequestMessageSignature: "sig_h12",
+        commitReadyResponseMessageSignature: "sig_h13",
+      }),
   });
 
   if (isClient) {
@@ -372,6 +372,8 @@ afterAll(async () => {
   }
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("Stage 3 Recovery Test", () => {
   it("should recover Stage 3 hashes and timestamps and update session state to RECOVERED", async () => {
     crashManager1 = gateway1["crashManager"] as CrashManager;
