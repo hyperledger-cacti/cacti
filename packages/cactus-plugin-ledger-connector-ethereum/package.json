@@ -70,7 +70,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.8.4",
+    "axios": "1.13.5",
     "ethers": "6.8.1",
     "express": "5.1.0",
     "http-proxy-middleware": "3.0.5",
