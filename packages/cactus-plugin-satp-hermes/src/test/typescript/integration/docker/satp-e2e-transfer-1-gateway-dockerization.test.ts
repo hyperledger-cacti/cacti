@@ -177,7 +177,9 @@ beforeAll(async () => {
   }
 }, TIMEOUT);
 
-describe("SATPGateway sending a token from Besu to Fabric", () => {
+// TODO: Skipped — Fabric AIO container fails to start reliably.
+// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
+describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
   jest.setTimeout(TIMEOUT);
   it("should mint 100 tokens to the owner account", async () => {
     await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
@@ -349,7 +351,9 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
   });
 });
 
-describe("SATPGateway sending a token from Fabric to Besu", () => {
+// TODO: Skipped — Fabric AIO container fails to start reliably.
+// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
+describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     const address: Address = `http://${gatewayAddress}`;
@@ -506,7 +510,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
   });
 });
 
-describe("SATPGateway sending a token from Besu to Ethereum", () => {
+// TODO: Skipped — depends on beforeAll which requires Fabric AIO.
+// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
+describe.skip("SATPGateway sending a token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     const address: Address = `http://${gatewayAddress}`;

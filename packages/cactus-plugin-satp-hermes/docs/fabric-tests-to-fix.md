@@ -32,12 +32,22 @@ res=1
 
 This repeats indefinitely until Jest kills the test for exceeding the timeout.
 
-### Environment
+### Tested on:
 
-- **Docker image:** `ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0`
-- **Platform:** WSL2 with Docker Desktop (also observed on some CI runners)
-- **Class:** `FabricTestLedgerV1` from `@hyperledger/cactus-test-tooling`
-- **SATP wrapper:** `FabricTestEnvironment` from `test-utils.ts`
+| Component | Version / Detail |
+|-----------|-----------------|
+| **OS** | Ubuntu 22.04.5 LTS (Jammy Jellyfish) |
+| **Kernel** | 6.6.87.2-microsoft-standard-WSL2 |
+| **Platform** | WSL 2 on Windows (Docker Desktop integration) |
+| **Architecture** | x86_64 |
+| **Node.js** | v22.18.0 |
+| **npm** | 10.9.3 |
+| **Yarn** | 4.3.1 (Corepack 0.33.0) |
+| **nvm** | 0.40.3 |
+| **Java** | OpenJDK 17.0.18+8 (Ubuntu 22.04.1) |
+| **Docker** | 28.4.0 (Docker Desktop) |
+| **Docker Compose** | v2.39.4-desktop.1 |
+| **Docker image** | `ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0` |
 
 ### Root Cause (suspected)
 
@@ -77,6 +87,12 @@ tests don't depend on Fabric startup. This would recover ~9 test suites.
 |------|-----------|----------------|
 | `integration/docker/satp-e2e-transfer-1-gateway-dockerization.test.ts` | 3 | 2 of 3 |
 | `integration/docker/satp-e2e-transfer-2-gateways-dockerization.test.ts` | 3 | 2 of 3 |
+
+### Bridge Tests (1 file)
+
+| File | Describes | Fabric-specific |
+|------|-----------|-----------------|
+| `integration/bridge/fabric-leaf.test.ts` | 1 | 1 of 1 |
 
 ### Oracle API Server Tests (2 files)
 

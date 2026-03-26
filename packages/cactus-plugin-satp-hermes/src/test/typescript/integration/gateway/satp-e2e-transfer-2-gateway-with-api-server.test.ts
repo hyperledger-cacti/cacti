@@ -187,7 +187,9 @@ beforeAll(async () => {
   );
 }, TIMEOUT);
 
-describe("2 SATPGateways sending a token from Besu to Fabric", () => {
+// TODO: Skipped — Fabric AIO container fails to start reliably.
+// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
+describe.skip("2 SATPGateways sending a token from Besu to Fabric", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     // Setup SATP gateways
@@ -443,7 +445,9 @@ describe("2 SATPGateways sending a token from Besu to Fabric", () => {
   });
 });
 
-describe("2 SATPGateways sending a token from Fabric to Besu", () => {
+// TODO: Skipped — Fabric AIO container fails to start reliably.
+// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
+describe.skip("2 SATPGateways sending a token from Fabric to Besu", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     //setup satp gateway
@@ -696,7 +700,9 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
   });
 });
 
-describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
+// TODO: Skipped — depends on beforeAll which requires Fabric AIO.
+// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
+describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     //setup satp gateway
@@ -997,7 +1003,9 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     expect(json_parsed.id).toBe(res.data.sessionID);
   });
 });
-describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", () => {
+// TODO: Skipped — depends on beforeAll which requires Fabric AIO.
+// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
+describe.skip("2 SATPGateways sending a non fungible token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   const tokenUniqueDescriptor = "1001";
   it("should mint a non fungible token to the owner account", async () => {
