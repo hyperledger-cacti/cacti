@@ -125,12 +125,12 @@ const createMockSession = (
     }),
     stage2: isClient
       ? create(Stage2HashesSchema, {
-        lockAssertionRequestMessageHash: "h10",
-      })
+          lockAssertionRequestMessageHash: "h10",
+        })
       : create(Stage2HashesSchema, {
-        lockAssertionRequestMessageHash: "h10",
-        lockAssertionReceiptMessageHash: "h11",
-      }),
+          lockAssertionRequestMessageHash: "h10",
+          lockAssertionReceiptMessageHash: "h11",
+        }),
   });
 
   sessionData.processedTimestamps = create(MessageStagesTimestampsSchema, {
@@ -149,12 +149,12 @@ const createMockSession = (
     }),
     stage2: isClient
       ? create(Stage2TimestampsSchema, {
-        lockAssertionRequestMessageTimestamp: incrementTime(9),
-      })
+          lockAssertionRequestMessageTimestamp: incrementTime(9),
+        })
       : create(Stage2TimestampsSchema, {
-        lockAssertionRequestMessageTimestamp: incrementTime(9),
-        lockAssertionReceiptMessageTimestamp: incrementTime(10),
-      }),
+          lockAssertionRequestMessageTimestamp: incrementTime(9),
+          lockAssertionReceiptMessageTimestamp: incrementTime(10),
+        }),
   });
 
   sessionData.signatures = create(MessageStagesSignaturesSchema, {
@@ -173,12 +173,12 @@ const createMockSession = (
     }),
     stage2: isClient
       ? create(Stage2SignaturesSchema, {
-        lockAssertionRequestMessageSignature: "sig_h10",
-      })
+          lockAssertionRequestMessageSignature: "sig_h10",
+        })
       : create(Stage2SignaturesSchema, {
-        lockAssertionRequestMessageSignature: "sig_h10",
-        lockAssertionReceiptMessageSignature: "sig_h11",
-      }),
+          lockAssertionRequestMessageSignature: "sig_h10",
+          lockAssertionReceiptMessageSignature: "sig_h11",
+        }),
   });
 
   if (isClient) {
