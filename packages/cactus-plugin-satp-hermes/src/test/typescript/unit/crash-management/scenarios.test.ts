@@ -195,6 +195,8 @@ afterAll(async () => {
   monitorService.shutdown();
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("CrashManager Tests", () => {
   it("should reconstruct session by fetching logs", async () => {
     mockSession = createMockSession("1000", "3");
