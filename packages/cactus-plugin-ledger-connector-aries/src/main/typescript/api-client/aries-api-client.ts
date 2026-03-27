@@ -1,7 +1,7 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
 import { io } from "socket.io-client-fixed-types";
-import { ProofState } from "@aries-framework/core";
+import { DidCommProofState } from "@credo-ts/didcomm";
 
 import {
   Logger,
@@ -376,7 +376,10 @@ export class AriesApiClient extends DefaultApi {
             e.proofRecord.state,
           );
 
-          if (state === ProofState.Abandoned || state === ProofState.Declined) {
+          if (
+            state === DidCommProofState.Abandoned ||
+            state === DidCommProofState.Declined
+          ) {
             cleanup();
             reject(
               new Error(
@@ -385,7 +388,7 @@ export class AriesApiClient extends DefaultApi {
             );
           }
 
-          if (state === ProofState.Done) {
+          if (state === DidCommProofState.Done) {
             cleanup();
             this.log.info(`Proof ${id} was accepted by the peer`);
             resolve(e.proofRecord);
