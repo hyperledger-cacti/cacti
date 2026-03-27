@@ -15,7 +15,7 @@ import type { MonitorService } from "../../main/typescript/services/monitoring/m
 import { loadAdapterConfigFromYaml as loadYaml } from "../../main/typescript/services/validation/config-validating-functions/validate-adapter-config";
 import { readFileSync, existsSync } from "node:fs";
 import path from "node:path";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
+import type { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   startTestServer,
   stopTestServer,

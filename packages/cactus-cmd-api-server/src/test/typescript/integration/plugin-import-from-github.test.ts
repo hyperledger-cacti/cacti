@@ -3,11 +3,11 @@ import path from "node:path";
 import { readFile } from "node:fs/promises";
 
 import "jest-extended";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { ConfigService } from "../../../main/typescript/config/config-service";
 import { AuthorizationProtocol } from "../../../main/typescript/config/authorization-protocol";
 import { ApiServer } from "../../../main/typescript/api-server";
@@ -49,7 +49,7 @@ describe.skip("ApiServer", () => {
     apiSrvOpts.apiTlsEnabled = false;
     apiSrvOpts.plugins = [
       {
-        packageName: "@hyperledger/cactus-dummy-package",
+        packageName: "@hyperledger-cacti/cactus-dummy-package",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {

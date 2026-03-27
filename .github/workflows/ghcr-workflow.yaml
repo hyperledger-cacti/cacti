@@ -33,7 +33,7 @@ jobs:
 
             FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
             echo "files=$FILES" >> "$GITHUB_OUTPUT"
-        - name: ghcr.io/hyperledger/cactus-besu-all-in-one
+        - name: ghcr.io/hyperledger-cacti/cactus-besu-all-in-one
           if: contains(steps.changed.outputs.files, 'tools/docker/besu-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
     ghcr-connector-corda-server:
@@ -41,7 +41,7 @@ jobs:
       runs-on: ubuntu-22.04
       steps:
         - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-        - name: ghcr.io/hyperledger/cactus-connector-corda-server
+        - name: ghcr.io/hyperledger-cacti/cactus-connector-corda-server
           run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
           
     ghcr-corda-all-in-one-flowdb:
@@ -57,7 +57,7 @@ jobs:
 
             FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
             echo "files=$FILES" >> "$GITHUB_OUTPUT"
-        - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
+        - name: ghcr.io/hyperledger-cacti/cactus-corda-all-in-one-flowdb
           if: contains(steps.changed.outputs.files, 'tools/docker/corda-all-in-one/corda-v4_8-flowdb/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
 
@@ -93,7 +93,7 @@ jobs:
       runs-on: ubuntu-22.04
       steps:
         - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-        - name: ghcr.io/hyperledger/cactus-example-supply-chain-app
+        - name: ghcr.io/hyperledger-cacti/cactus-example-supply-chain-app
           run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
 
     ghcr-fabric2-all-in-one:
@@ -109,7 +109,7 @@ jobs:
 
             FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
             echo "files=$FILES" >> "$GITHUB_OUTPUT"
-        - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
+        - name: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one
           if: contains(steps.changed.outputs.files, 'tools/docker/fabric-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
 
@@ -126,7 +126,7 @@ jobs:
 
             FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
             echo "files=$FILES" >> "$GITHUB_OUTPUT"
-        - name: ghcr.io/hyperledger/daml-all-in-one
+        - name: ghcr.io/hyperledger-cacti/daml-all-in-one
           if: contains(steps.changed.outputs.files, 'tools/docker/daml-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/daml-all-in-one/ -f ./tools/docker/daml-all-in-one/Dockerfile
 
@@ -135,7 +135,7 @@ jobs:
       runs-on: ubuntu-22.04
       steps:
         - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-        - name: ghcr.io/hyperledger/cactus-keychain-vault-server
+        - name: ghcr.io/hyperledger-cacti/cactus-keychain-vault-server
           run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/ -f ./packages/cactus-plugin-keychain-vault/src/cactus-keychain-vault-server/Dockerfile -t cactus-keychain-vault-server
         - if: ${{ inputs.run_trivy_scan == 'true' && github.event.name == 'schedule' }}
           name: Run Trivy vulnerability scan for cactus-keychain-vault-server

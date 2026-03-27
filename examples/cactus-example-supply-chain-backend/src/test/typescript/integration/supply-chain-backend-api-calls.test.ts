@@ -1,15 +1,15 @@
 import { v4 as uuidV4 } from "uuid";
 import test, { Test } from "tape-promise/tape";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
-import { AuthorizationProtocol } from "@hyperledger/cactus-cmd-api-server";
-import { IAuthorizationConfig } from "@hyperledger/cactus-cmd-api-server";
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
+import { AuthorizationProtocol } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { IAuthorizationConfig } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
 
 import * as publicApi from "../../../main/typescript/public-api";
 import { ISupplyChainAppOptions } from "../../../main/typescript/public-api";
 import { SupplyChainApp } from "../../../main/typescript/public-api";
-import { Shipment } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
+import { Shipment } from "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin";
 
 const testCase =
   "can launch via CLI with generated API server .config.json file";

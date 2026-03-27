@@ -9,8 +9,8 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
-import { Containers } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-common";
+import { Containers } from "@hyperledger-cacti/cactus-test-tooling";
 
 export interface IGethTestLedgerOptions {
   readonly containerImageName?: string;

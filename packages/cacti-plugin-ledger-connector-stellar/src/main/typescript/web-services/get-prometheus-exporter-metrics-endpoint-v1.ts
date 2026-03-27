@@ -1,6 +1,6 @@
 import { Express, Request, Response } from "express";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 
@@ -8,7 +8,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   LogLevelDesc,
@@ -16,7 +16,7 @@ import {
   LoggerProvider,
   Checks,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { PluginLedgerConnectorStellar } from "../plugin-ledger-connector-stellar";
 
@@ -57,9 +57,9 @@ export class GetPrometheusExporterMetricsEndpointV1
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics"
+      "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics"
     ];
   }
 

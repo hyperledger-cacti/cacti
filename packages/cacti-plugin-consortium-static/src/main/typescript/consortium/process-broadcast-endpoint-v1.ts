@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { BroadcastResponseV1 } from "../generated/openapi/typescript-axios";
 
@@ -14,12 +14,12 @@ import {
   LoggerProvider,
   Checks,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginConsortiumStatic } from "../plugin-consortium-static";
@@ -78,9 +78,9 @@ export class ProcessBroadcastEndpoint implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/receive-broadcast"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/receive-broadcast"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/receive-broadcast"
+      "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/receive-broadcast"
     ];
   }
 

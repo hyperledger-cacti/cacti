@@ -4,7 +4,7 @@ import MerkleTree from "merkletreejs";
 import { Transaction } from "./transaction";
 import { IPrivacyPolicy, IPrivacyPolicyValue } from "./privacy-policies";
 import { PrivacyPolicyOpts } from "../generated/openapi/typescript-axios";
-import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 export interface IViewMetadata {

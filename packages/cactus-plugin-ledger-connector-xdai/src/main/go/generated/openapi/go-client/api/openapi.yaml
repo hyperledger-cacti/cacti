@@ -9,7 +9,7 @@ info:
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode:
     post:
       operationId: deployContractV1
       parameters: []
@@ -29,8 +29,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object:
     post:
       operationId: deployContractJsonObjectV1
       parameters: []
@@ -50,8 +50,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/run-transaction:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/deploy-contract-solidity-bytecode-json-object
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/run-transaction:
     post:
       operationId: runTransactionV1
       parameters: []
@@ -71,8 +71,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/run-transaction
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/run-transaction
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract:
     post:
       operationId: invokeContractV1
       parameters: []
@@ -92,8 +92,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object:
     post:
       operationId: invokeContractJsonObject
       parameters: []
@@ -113,8 +113,8 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics:
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/invoke-contract-json-object
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics:
     get:
       operationId: getPrometheusMetricsV1
       parameters: []
@@ -129,7 +129,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-xdai/get-prometheus-exporter-metrics
 components:
   schemas:
     ReceiptType:

@@ -11,19 +11,19 @@ import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import {
   Secp256k1Keys,
   KeyFormat,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   BesuTestLedger,
   IKeyPair,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   BesuApiClientOptions,
@@ -31,11 +31,11 @@ import {
   IPluginLedgerConnectorBesuOptions,
   PluginLedgerConnectorBesu,
   GetTransactionV1Request,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 const testCase = "API client can call get-transaction via network";
 const logLevel: LogLevelDesc = "INFO";

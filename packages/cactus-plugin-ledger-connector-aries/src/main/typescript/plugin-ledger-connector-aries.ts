@@ -44,14 +44,14 @@ import {
   IPluginWebService,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   Checks,
   Logger,
   LoggerProvider,
   LogLevelDesc,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import OAS from "../json/openapi.json";
 import {
@@ -281,7 +281,7 @@ export class PluginLedgerConnectorAries
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-aries`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-aries`;
   }
 
   /**

@@ -8,8 +8,8 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
-import { Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 
 import {
   AgentConnectionRecordV1,

@@ -3,7 +3,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Checks,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import {
@@ -14,9 +14,9 @@ import {
   InvokeRawWeb3EthMethodV1Request,
   PluginLedgerConnectorEthereum,
   InvokeRawWeb3EthMethodV1Response,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { NetworkDetails, ObtainLedgerStrategy } from "./obtain-ledger-strategy";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import { State } from "../view-creation/state";
 import { StateProof } from "../view-creation/state-proof";
 import Web3 from "web3";

@@ -1900,7 +1900,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         deployContractV1: async (deployContractV1Request?: DeployContractV1Request, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1934,7 +1934,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getBlockV1: async (getBlockRequestV1?: GetBlockRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-block`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -1968,7 +1968,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getChainInfoV1: async (getChainInfoRequestV1?: GetChainInfoRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-chain-info`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2002,7 +2002,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getDiscoveryResultsV1: async (getDiscoveryResultsRequestV1?: GetDiscoveryResultsRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-discovery-results`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2035,7 +2035,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getPrometheusMetricsV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2068,7 +2068,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         getTransactionReceiptByTxIDV1: async (runTransactionRequest: RunTransactionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'runTransactionRequest' is not null or undefined
             assertParamExists('getTransactionReceiptByTxIDV1', 'runTransactionRequest', runTransactionRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2104,7 +2104,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         runDelegatedSignTransactionV1: async (runDelegatedSignTransactionRequest: RunDelegatedSignTransactionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'runDelegatedSignTransactionRequest' is not null or undefined
             assertParamExists('runDelegatedSignTransactionV1', 'runDelegatedSignTransactionRequest', runDelegatedSignTransactionRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -2140,7 +2140,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
         runTransactionV1: async (runTransactionRequest: RunTransactionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'runTransactionRequest' is not null or undefined
             assertParamExists('runTransactionV1', 'runTransactionRequest', runTransactionRequest)
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

@@ -44,11 +44,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**deleteKeychainEntryV1**](docs/DefaultApi.md#deletekeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/delete-keychain-entry | Deletes an entry under a key on the keychain backend.
-*DefaultApi* | [**getKeychainEntryV1**](docs/DefaultApi.md#getkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
-*DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**hasKeychainEntryV1**](docs/DefaultApi.md#haskeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/has-keychain-entry | Checks that an entry exists under a key on the keychain backend
-*DefaultApi* | [**setKeychainEntryV1**](docs/DefaultApi.md#setkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/set-keychain-entry | Sets a value under a key on the keychain backend.
+*DefaultApi* | [**deleteKeychainEntryV1**](docs/DefaultApi.md#deletekeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/delete-keychain-entry | Deletes an entry under a key on the keychain backend.
+*DefaultApi* | [**getKeychainEntryV1**](docs/DefaultApi.md#getkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/get-keychain-entry | Retrieves the contents of a keychain entry from the backend.
+*DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**hasKeychainEntryV1**](docs/DefaultApi.md#haskeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/has-keychain-entry | Checks that an entry exists under a key on the keychain backend
+*DefaultApi* | [**setKeychainEntryV1**](docs/DefaultApi.md#setkeychainentryv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory/set-keychain-entry | Sets a value under a key on the keychain backend.
 
 
 <a id="documentation-for-models"></a>

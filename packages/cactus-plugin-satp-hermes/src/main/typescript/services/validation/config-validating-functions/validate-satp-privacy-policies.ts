@@ -1,7 +1,7 @@
 import {
   IPrivacyPolicyValue,
   isPrivacyPolicyValueArray,
-} from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
+} from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
 
 export function validateSatpPrivacyPolicies(opts: {
   readonly configValue: unknown;

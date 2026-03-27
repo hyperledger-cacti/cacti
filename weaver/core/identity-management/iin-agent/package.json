@@ -1,5 +1,5 @@
 {
-  "name": "@hyperledger/cacti-weaver-iin-agent",
+  "name": "@hyperledger-cacti/cacti-weaver-iin-agent",
   "version": "2.1.0",
   "description": "Implementation of Weaver IIN agent.",
   "keywords": [
@@ -23,9 +23,9 @@
     "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
-  "main": "index.js",
+  "main": "out/server.js",
   "scripts": {
-    "build": "npm run tsc",
+    "build": "yarn run tsc",
     "dev": "nodemon out/server.js",
     "start": "node out/server.js",
     "test": "nyc mocha -r ts-node/register --exclude 'test/data/**/*.js' --recursive  -t 10000",
@@ -35,8 +35,8 @@
   "dependencies": {
     "@fidm/x509": "1.2.1",
     "@grpc/grpc-js": "1.13.3",
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "2.1.0",
     "dotenv": "8.6.0",
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",

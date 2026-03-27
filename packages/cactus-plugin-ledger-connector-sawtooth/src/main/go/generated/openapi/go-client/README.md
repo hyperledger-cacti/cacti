@@ -77,7 +77,7 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status | Get the status of the connector and the sawtooth validator
+*DefaultApi* | [**GetStatusV1**](docs/DefaultApi.md#getstatusv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth/status | Get the status of the connector and the sawtooth validator
 
 
 ## Documentation For Models

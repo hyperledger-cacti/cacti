@@ -3,13 +3,13 @@ import { randomUUID } from "node:crypto";
 
 import test, { Test } from "tape-promise/tape";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import {
   Configuration,
   PluginImportAction,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { ConfigService } from "../../../../main/typescript/config/config-service";
 import { K_CACTUS_API_SERVER_TOTAL_PLUGIN_IMPORTS } from "../../../../main/typescript/prometheus-exporter/metrics";
@@ -42,7 +42,7 @@ test("can install plugin-ledger-connector-fabric", async (t: Test) => {
   apiServerOptions.apiTlsEnabled = false;
   apiServerOptions.plugins = [
     {
-      packageName: "@hyperledger/cactus-plugin-ledger-connector-fabric",
+      packageName: "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
       type: PluginImportType.Local,
       action: PluginImportAction.Install,
       options: {

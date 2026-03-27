@@ -44,7 +44,7 @@
  * @license Apache-2.0
  */
 
-import { asError } from "@hyperledger/cactus-common";
+import { asError } from "@hyperledger-cacti/cactus-common";
 import { RuntimeError } from "run-time-error-cjs";
 
 /**

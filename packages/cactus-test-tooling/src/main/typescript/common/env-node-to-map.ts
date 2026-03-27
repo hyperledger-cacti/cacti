@@ -1,4 +1,4 @@
-import { Checks } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
 
 /**
  * Converts the NodeJS formatted (POJO) environment variable object into an ES6

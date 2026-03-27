@@ -79,7 +79,7 @@ One of our design principles for the framework is **secure by default** which me
 
 import { ApiServer } from "../api-server";
 import { ConfigService } from "../config/config-service";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const log: Logger \= LoggerProvider.getOrCreate({
   label: "cactus-api",
@@ -122,10 +122,10 @@ if (require.main \=== module) {
 ### Remote Plugin Imports at Runtime Example
 
 ```js
-import { PluginImportType, PluginImportAction } from "@hyperledger/cactus-core-api";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { PluginImportType, PluginImportAction } from "@hyperledger-cacti/cactus-core-api";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const main \= async () \=> {
 
@@ -145,7 +145,7 @@ const main \= async () \=> {
       // npm package name of the plugin you are installing
       // Since this will be imported at runtime, you are responsible for
       // installing the package yourself prior to launching the API server.
-      packageName: "@hyperledger/cactus-plugin-keychain-vault",
+      packageName: "@hyperledger-cacti/cactus-plugin-keychain-vault",
       // The REMOTE value means that a different plugin factory will be imported and
       // called to obtain the plugin instance. This way plugins can support them
       // being imported by the API server regardless of the language the plugin
@@ -258,7 +258,7 @@ Once you’ve built the container, the following commands should work:
       \--env GRPC\_TLS\_ENABLED\=false \\
       cas \\
         ./node\_modules/.bin/cactusapi \\
-        \--plugins\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": { "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}\]'
+        \--plugins\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": { "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}\]'
     
 *   Launch container with plugin configuration as an **environment variable**:
     
@@ -269,7 +269,7 @@ Once you’ve built the container, the following commands should work:
       \--env AUTHORIZATION\_PROTOCOL\='NONE' \\
       \--env AUTHORIZATION\_CONFIG\_JSON\='{}' \\
       \--env GRPC\_TLS\_ENABLED\=false \\
-      \--env PLUGINS\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
+      \--env PLUGINS\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
       cas
     
 *   Launch container with plugin configuration as a **CLI argument**:
@@ -283,11 +283,11 @@ Once you’ve built the container, the following commands should work:
       \--env GRPC\_TLS\_ENABLED\=false \\
       cas \\
         ./node\_modules/.bin/cactusapi \\
-        \--plugins\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]'
+        \--plugins\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]'
     
 *   Launch container with **configuration file** mounted from host machine:
     
-    echo '\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \> cactus.json
+    echo '\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \> cactus.json
     
     docker run \\
       \--rm \\
@@ -320,7 +320,7 @@ Don’t have a Besu network on hand to test with? Test or develop against our Be
       \--env AUTHORIZATION\_PROTOCOL\='NONE' \\
       \--env AUTHORIZATION\_CONFIG\_JSON\='{}' \\
       \--env GRPC\_TLS\_ENABLED\=false \\
-      \--env PLUGINS\='\[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
+      \--env PLUGINS\='\[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin\_import\_type.LOCAL", "action": "org.hyperledger.cactus.plugin\_import\_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "instanceId": "some-unique-besu-connector-instance-id"}}\]' \\
       cas
     
 3.  Terminal Window 3 (curl - replace eth accounts as needed)
@@ -436,6 +436,6 @@ The node is what has an identity within your PKI and can be made up of 1-N API s
 
 **Yes.** You can deploy your plugin written in any language, anywhere as long as it is accessible over the network and does come with a Typescript API client that you can use to install into the API server as a proxy for an in-process plugin implementation.
 
-[Previous](cactus-api-client.md "@hyperledger/cactus-api-client") [Next](cactus-common.md "@hyperledger/cactus-common")
+[Previous](cactus-api-client.md "@hyperledger-cacti/cactus-api-client") [Next](cactus-common.md "@hyperledger-cacti/cactus-common")
 
 * * *

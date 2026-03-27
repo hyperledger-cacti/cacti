@@ -1,7 +1,7 @@
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   Web3SigningCredentialType,
   PluginLedgerConnectorBesu,
@@ -19,11 +19,11 @@ import {
   GetBesuRecordV1Request,
   RunTransactionResponse,
 } from "../../../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import KeyEncoder from "key-encoder";
 import {
   IListenOptions,
@@ -32,8 +32,8 @@ import {
   LoggerProvider,
   Secp256k1Keys,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
@@ -41,7 +41,7 @@ import HelloWorldContractJson from "../../../../solidity/hello-world-contract/He
 import { AddressInfo } from "net";
 import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client";
 
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../../../../main/json/openapi.json";
 import { Account } from "web3-core";
 

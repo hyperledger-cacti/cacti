@@ -1,7 +1,7 @@
 import "jest-extended";
 import { v4 as uuidV4 } from "uuid";
 
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 import { PluginKeychainMemory } from "../../../main/typescript/public-api";
 

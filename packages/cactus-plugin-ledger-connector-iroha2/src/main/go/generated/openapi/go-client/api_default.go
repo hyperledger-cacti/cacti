@@ -65,7 +65,7 @@ func (a *DefaultApiService) GenerateTransactionV1Execute(r ApiGenerateTransactio
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/generate-transaction"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -180,7 +180,7 @@ func (a *DefaultApiService) QueryV1Execute(r ApiQueryV1Request) (*QueryResponseV
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/query"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -295,7 +295,7 @@ func (a *DefaultApiService) TransactV1Execute(r ApiTransactV1Request) (*Transact
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
 
-	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact"
+	localVarPath := localBasePath + "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2/transact"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

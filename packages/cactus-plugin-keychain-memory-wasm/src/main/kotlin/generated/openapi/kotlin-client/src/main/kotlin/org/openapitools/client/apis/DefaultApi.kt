@@ -116,7 +116,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/delete-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/delete-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -188,7 +188,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/get-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/get-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -260,7 +260,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/has-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/has-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -332,7 +332,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory-wasm/set-keychain-entry",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-memory-wasm/set-keychain-entry",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

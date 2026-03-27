@@ -1,4 +1,4 @@
-import { Strings } from "@hyperledger/cactus-common";
+import { Strings } from "@hyperledger-cacti/cactus-common";
 import { Params } from "express-jwt";
 
 export function isExpressJwtOptions(x: unknown): x is Params {

@@ -254,7 +254,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         insertBambooHarvestV1: async (insertBambooHarvestRequest?: InsertBambooHarvestRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bamboo-harvest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -288,7 +288,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         insertBookshelfV1: async (insertBookshelfRequest?: InsertBookshelfRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bookshelf`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bookshelf`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -322,7 +322,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         insertShipmentV1: async (insertShipmentRequest?: InsertShipmentRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-shipment`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -355,7 +355,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listBambooHarvestV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bamboo-harvest`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bamboo-harvest`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -385,7 +385,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listBookshelfV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-bookshelf`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-bookshelf`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -415,7 +415,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         listShipmentV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment`;
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-shipment`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;

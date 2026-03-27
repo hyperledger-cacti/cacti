@@ -286,11 +286,11 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -319,11 +319,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/set-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/set-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/set-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/set-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -349,11 +349,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/delete-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/delete-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/delete-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/delete-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -379,11 +379,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/has-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/has-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/has-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/has-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -409,12 +409,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-aws-sm/get-prometheus-exporter-metrics"
           }
         },
         "operationId": "getPrometheusMetricsV1",

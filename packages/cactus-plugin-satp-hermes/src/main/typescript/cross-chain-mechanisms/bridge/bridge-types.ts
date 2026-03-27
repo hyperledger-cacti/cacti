@@ -19,14 +19,14 @@
 import {
   GasTransactionConfig,
   Web3SigningCredential as EthereumWeb3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum/";
-import { Web3SigningCredential as BesuWeb3SigningCredential } from "@hyperledger/cactus-plugin-ledger-connector-besu/";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/";
+import { Web3SigningCredential as BesuWeb3SigningCredential } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu/";
 import { ClaimFormat, NetworkId } from "../../public-api";
 import { IBridgeLeafOptions } from "./bridge-leaf";
-import { IPluginLedgerConnectorEthereumOptions } from "@hyperledger/cactus-plugin-ledger-connector-ethereum/";
-import { IPluginLedgerConnectorBesuOptions } from "@hyperledger/cactus-plugin-ledger-connector-besu/";
+import { IPluginLedgerConnectorEthereumOptions } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/";
+import { IPluginLedgerConnectorBesuOptions } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu/";
 import { BesuGasConfig } from "../../services/validation/config-validating-functions/bridges-config-validating-functions/validate-besu-config";
-import { ISignerKeyPair } from "@hyperledger/cactus-common/";
+import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common/";
 
 /**
  * Response structure for bridge transaction operations.

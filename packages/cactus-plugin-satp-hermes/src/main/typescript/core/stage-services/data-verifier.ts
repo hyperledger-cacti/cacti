@@ -73,7 +73,7 @@
  * @license Apache-2.0
  */
 
-import { JsObjectSigner } from "@hyperledger/cactus-common";
+import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import { verifySignature } from "../../utils/gateway-utils";
 import {
   CommonSatp,

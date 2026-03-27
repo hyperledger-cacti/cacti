@@ -307,12 +307,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/initialize"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize"
           }
         },
         "operationId": "initializeV1",
@@ -341,12 +341,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/withdraw"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw"
           }
         },
         "operationId": "withdrawV1",
@@ -375,12 +375,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-status"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status"
           }
         },
         "operationId": "getStatusV1",
@@ -401,12 +401,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/get-single-status"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status"
           }
         },
         "operationId": "getSingleStatusV1",
@@ -427,12 +427,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund"
           }
         },
         "operationId": "refundV1",
@@ -461,12 +461,12 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/new-contract"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract"
           }
         },
         "operationId": "newContractV1",

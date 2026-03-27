@@ -4,7 +4,7 @@ import {
   LoggerProvider,
   Checks,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import type {
   BlockType,

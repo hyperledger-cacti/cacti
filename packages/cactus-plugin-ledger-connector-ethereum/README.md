@@ -276,7 +276,7 @@ docker run \
   --env LOG_LEVEL=INFO \
   ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
   node index.js \
-  --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-ethereum-connector-instance-id"}}]'
+  --plugins='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-ethereum-connector-instance-id"}}]'
 ```
 
 Launch container with plugin configuration as a **CLI argument**:
@@ -297,12 +297,12 @@ docker run \
   --env LOG_LEVEL=INFO \
   ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
   node index.js \
-    --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-ethereum-connector-instance-id"}}]'
+    --plugins='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://localhost:8545", "rpcApiWsHost":"ws://localhost:8546", "instanceId": "some-unique-ethereum-connector-instance-id"}}]'
 ```
 
 Launch container with **configuration file** mounted from host machine:
 ```sh
-echo '{"plugins": [{"packageName": "@hyperledger/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://127.0.0.1:8545", "rpcApiWsHost":"ws://127.0.0.1:8546", "instanceId": "some-unique-ethereum-connector-instance-id"}}]}' > .cacti-config.json
+echo '{"plugins": [{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://127.0.0.1:8545", "rpcApiWsHost":"ws://127.0.0.1:8546", "instanceId": "some-unique-ethereum-connector-instance-id"}}]}' > .cacti-config.json
 ```
 
 ```sh
@@ -360,7 +360,7 @@ docker run \
   --env LOG_LEVEL=INFO \
   ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
   node index.js \
-  --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://127.0.0.1:8545", "rpcApiWsHost":"ws://127.0.0.1:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]'
+  --plugins='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": {"rpcApiHttpHost": "http://127.0.0.1:8545", "rpcApiWsHost":"ws://127.0.0.1:8546", "instanceId": "some-unique-besu-connector-instance-id"}}]'
 ```
 
 **Terminal Window 3 (curl - replace eth accounts as needed)**

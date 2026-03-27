@@ -1,4 +1,4 @@
-import { Checks } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
 
 /**
  * Converts an ES6 Map of environment variables into an

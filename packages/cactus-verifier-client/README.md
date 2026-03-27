@@ -28,7 +28,7 @@ This package provides `Verifier` and `VerifierFactory` components that can be us
 import {
   VerifierFactory,
   VerifierFactoryConfig,
-} from "@hyperledger/cactus-verifier-client";
+} from "@hyperledger-cacti/cactus-verifier-client";
 
 // Create VerifierFactory configuration that should describe all validators we want to connect to.
 // This can be read from a file or typed manually, the config is a superset of cactus-common-example-server ledger plugin config.

@@ -19,19 +19,19 @@ import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
 import { AddressInfo } from "net";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Constants } from "@hyperledger/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import {
   IListenOptions,
   Logger,
   LoggerProvider,
   Servers,
-} from "@hyperledger/cactus-common";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-common";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 
 import { PluginLedgerConnectorEthereum } from "../../../main/typescript/index";
 
@@ -120,7 +120,7 @@ describe("invokeRawWeb3EthMethod Tests", () => {
 
   test("invoke method using json-rpc proxy", async () => {
     const proxyUrl = new URL(
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc",
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/json-rpc",
       apiHost,
     );
     const web3ProxyClient = new Web3(proxyUrl.toString());

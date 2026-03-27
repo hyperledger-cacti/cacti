@@ -77,9 +77,9 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**GetConsortiumJwsV1**](docs/DefaultApi.md#getconsortiumjwsv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws | Retrieves a consortium JWS
-*DefaultApi* | [**GetNodeJwsV1**](docs/DefaultApi.md#getnodejwsv1) | **Post** /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws | Retrieves the JWT of a Cactus Node
-*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**GetConsortiumJwsV1**](docs/DefaultApi.md#getconsortiumjwsv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/consortium/jws | Retrieves a consortium JWS
+*DefaultApi* | [**GetNodeJwsV1**](docs/DefaultApi.md#getnodejwsv1) | **Post** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/node/jws | Retrieves the JWT of a Cactus Node
+*DefaultApi* | [**GetPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **Get** /api/v1/plugins/@hyperledger-cacti/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics | Get the Prometheus Metrics
 
 
 ## Documentation For Models

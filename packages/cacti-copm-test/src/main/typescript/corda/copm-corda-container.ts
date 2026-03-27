@@ -6,7 +6,7 @@ import {
   Logger,
   LoggerProvider,
   Checks,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 /*
  * Provides default options for Corda connector server

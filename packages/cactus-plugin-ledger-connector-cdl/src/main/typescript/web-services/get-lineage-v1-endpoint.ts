@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Logger,
@@ -13,9 +13,9 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import { PluginLedgerConnectorCDL } from "../plugin-ledger-connector-cdl";
 import OAS from "../../json/openapi.json";
 
@@ -43,9 +43,9 @@ export class GetLineageDataEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/get-lineage"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-cdl/get-lineage"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-cdl/get-lineage"
     ];
   }
 

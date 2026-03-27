@@ -1,9 +1,9 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   SATPGatewayConfig,
   SATPGateway,
@@ -25,7 +25,7 @@ import {
 import {
   IPluginFactoryOptions,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   BesuTestEnvironment,
@@ -37,12 +37,12 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import { keccak256 } from "web3-utils";
 import { BLODispatcher } from "../../../../main/typescript/api1/dispatcher";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";

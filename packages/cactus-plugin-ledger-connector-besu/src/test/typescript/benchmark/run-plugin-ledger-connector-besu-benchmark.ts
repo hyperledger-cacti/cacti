@@ -28,12 +28,12 @@ import {
   LoggerProvider,
   Secp256k1Keys,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Constants } from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-common";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { BesuTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
 
 const LOG_TAG =
   "[packages/cactus-plugin-ledger-connector-besu/src/test/typescript/benchmark/run-plugin-ledger-connector-besu-benchmark.ts]";

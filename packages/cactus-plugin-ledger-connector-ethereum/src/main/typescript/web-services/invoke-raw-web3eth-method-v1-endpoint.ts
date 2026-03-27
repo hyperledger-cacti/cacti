@@ -6,13 +6,13 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import { PluginLedgerConnectorEthereum } from "../plugin-ledger-connector-ethereum";
 import OAS from "../../json/openapi.json";
 import { InvokeRawWeb3EthMethodV1Response, isWeb3Error } from "../public-api";
@@ -42,9 +42,9 @@ export class InvokeRawWeb3EthMethodEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method"
     ];
   }
 

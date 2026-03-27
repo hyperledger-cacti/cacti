@@ -6,13 +6,13 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../json/openapi.json";
 import { PluginKeychainVault } from "../plugin-keychain-vault";
@@ -49,9 +49,9 @@ export class SetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/set-keychain-entry"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/set-keychain-entry"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/set-keychain-entry"
     ];
   }
 

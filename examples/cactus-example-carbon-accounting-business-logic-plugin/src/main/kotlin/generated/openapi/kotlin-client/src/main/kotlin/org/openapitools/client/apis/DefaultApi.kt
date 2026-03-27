@@ -113,7 +113,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance",
+            path = "/api/v1/plugins/@hyperledger-cacti/cactus-example-carbon-accounting-backend/dao-token/get-allowance",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

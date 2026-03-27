@@ -1,16 +1,16 @@
 import {
   GetOpenApiSpecV1EndpointBase,
   IGetOpenApiSpecV1EndpointBaseOptions,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
-import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
-import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
+import { Checks, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { IWebServiceEndpoint } from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../../json/openapi.json";
 
 export const OasPathGetOpenApiSpecV1 =
   OAS.paths[
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec"
   ];
 
 export type OasPathTypeGetOpenApiSpecV1 = typeof OasPathGetOpenApiSpecV1;

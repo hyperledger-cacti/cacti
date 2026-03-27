@@ -7,8 +7,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import { v4 as uuidv4 } from "uuid";
 
-import { IListenOptions } from "@hyperledger/cactus-common";
-import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
+import { IListenOptions } from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc, Servers } from "@hyperledger-cacti/cactus-common";
 
 import {
   Configuration,

@@ -9,7 +9,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 describe("validateSatpGatewayIdentity", () => {
   const logger = LoggerProvider.getOrCreate({

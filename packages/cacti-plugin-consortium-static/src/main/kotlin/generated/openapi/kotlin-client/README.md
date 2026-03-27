@@ -44,11 +44,11 @@ All URIs are relative to *http://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**addNodeToConsortiumV1**](docs/DefaultApi.md#addnodetoconsortiumv1) | **POST** /api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/add-node | Adds a node to consortium JWS
-*DefaultApi* | [**getConsortiumJwsV1**](docs/DefaultApi.md#getconsortiumjwsv1) | **POST** /api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/consortium/jws | Retrieves a consortium JWS
-*DefaultApi* | [**getNodeJwsV1**](docs/DefaultApi.md#getnodejwsv1) | **POST** /api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/node/jws | Retrieves the JWT of a Cactus Node
-*DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/get-prometheus-exporter-metrics | Get the Prometheus Metrics
-*DefaultApi* | [**receiveBroadcastV1**](docs/DefaultApi.md#receivebroadcastv1) | **POST** /api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/receive-broadcast | Adds a node to consortium JWS
+*DefaultApi* | [**addNodeToConsortiumV1**](docs/DefaultApi.md#addnodetoconsortiumv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/add-node | Adds a node to consortium JWS
+*DefaultApi* | [**getConsortiumJwsV1**](docs/DefaultApi.md#getconsortiumjwsv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/consortium/jws | Retrieves a consortium JWS
+*DefaultApi* | [**getNodeJwsV1**](docs/DefaultApi.md#getnodejwsv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/node/jws | Retrieves the JWT of a Cactus Node
+*DefaultApi* | [**getPrometheusMetricsV1**](docs/DefaultApi.md#getprometheusmetricsv1) | **GET** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/get-prometheus-exporter-metrics | Get the Prometheus Metrics
+*DefaultApi* | [**receiveBroadcastV1**](docs/DefaultApi.md#receivebroadcastv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/receive-broadcast | Adds a node to consortium JWS
 
 
 <a id="documentation-for-models"></a>

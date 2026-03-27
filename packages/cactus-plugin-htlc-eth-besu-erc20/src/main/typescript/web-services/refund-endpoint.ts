@@ -5,13 +5,13 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IExpressRequestHandler,
   IWebServiceEndpoint,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import { RefundRequest } from "../generated/openapi/typescript-axios";
 import OAS from "../../json/openapi.json";
 import { PluginHtlcEthBesuErc20 } from "../plugin-htlc-eth-besu-erc20";
@@ -37,9 +37,9 @@ export class RefundEndpoint implements IWebServiceEndpoint {
     return RefundEndpoint.CLASS_NAME;
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu-erc20/refund"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund"
     ];
   }
 
