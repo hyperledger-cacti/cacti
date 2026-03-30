@@ -222,7 +222,6 @@ export class ApiServer {
         this.shutdown()
           .catch((ex: unknown) => {
             this.log.warn("Failed async-exit-hook for cmd-api-server", ex);
-            throw ex;
           })
           .finally(() => {
             this.log.info("Concluded async-exit-hook for cmd-api-server ...");
@@ -521,7 +520,12 @@ export class ApiServer {
     }
 
     this.log.info(`Stopping ${webServicesShutdown.length} WS plugin(s)...`);
-    await Promise.all(webServicesShutdown);
+    const results = await Promise.allSettled(webServicesShutdown);
+    for (const result of results) {
+      if (result.status === "rejected") {
+        this.log.warn("Plugin shutdown failed:", result.reason);
+      }
+    }
     this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
 
     if (this.httpServerApi?.listening) {
