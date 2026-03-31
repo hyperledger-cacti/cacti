@@ -340,6 +340,11 @@ export class WatchBlocksV1Endpoint {
         code: 500,
         errorMessage,
       });
+      try {
+        gateway.disconnect();
+      } catch (disconnectError) {
+        log.warn("Failed to disconnect gateway after error:", disconnectError);
+      }
     }
   }
 
@@ -464,6 +469,12 @@ export class WatchBlocksV1Endpoint {
         code: 500,
         errorMessage,
       });
+      try {
+        channel.close();
+        channel.client.close();
+      } catch (cleanupError) {
+        log.warn("Failed to close channel after error:", cleanupError);
+      }
     }
   }
 
