@@ -312,6 +312,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           response = await (bridgeEndPoint as BridgeLeafFungible).lockAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafNonFungible).lockAsset(
@@ -327,6 +328,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           response = await (bridgeEndPoint as BridgeLeafFungible).unlockAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+             (asset as FungibleAsset).uniqueDescriptor
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (
@@ -344,6 +346,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           response = await (bridgeEndPoint as BridgeLeafFungible).mintAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafNonFungible).mintAsset(
@@ -357,6 +360,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
           response = await (bridgeEndPoint as BridgeLeafFungible).burnAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafNonFungible).burnAsset(
@@ -371,6 +375,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
             asset.id,
             asset.owner,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (
