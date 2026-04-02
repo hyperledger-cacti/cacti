@@ -131,7 +131,7 @@ Getting Started
 *   Clone the repository
     
 
-git clone https://github.com/hyperledger/cactus.git
+git clone https://github.com/hyperledger-cacti/cacti.git
 
 Windows specific gotcha: `File paths too long` error when cloning. To fix: Open PowerShell with administrative rights and then run the following:
 
@@ -140,7 +140,7 @@ git config \--system core.longpaths true
 *   Change directories to the project root
     
 
-cd cactus
+cd cacti
 
 *   Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
     

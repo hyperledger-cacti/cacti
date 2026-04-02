@@ -135,7 +135,7 @@ We test most frequently on Ubuntu 20.04 LTS
 * Clone the repository
 
 ```sh
-git clone https://github.com/hyperledger/cactus.git
+git clone https://github.com/hyperledger-cacti/cacti.git
 ```
 
 
@@ -149,7 +149,7 @@ git config --system core.longpaths true
 * Change directories to the project root
 
 ```sh
-cd cactus
+cd cacti
 ```
 
 * Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
