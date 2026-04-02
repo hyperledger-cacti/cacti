@@ -9,14 +9,14 @@ There are many ways to contribute to Hyperledger Cactus, both as a user and as a
 
 As a user, this can include:
 
-*   [Making Feature/Enhancement Proposals](https://github.com/hyperledger/cactus/issues/new?assignees=&amp;labels=enhancement&amp;template=feature_request.md&amp;title=)
+*   [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&amp;labels=enhancement&amp;template=feature_request.md&amp;title=)
     
-*   [Reporting bugs](https://github.com/hyperledger/cactus/issues/new?assignees=&amp;labels=bug&amp;template=bug_report.md&amp;title=)
+*   [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&amp;labels=bug&amp;template=bug_report.md&amp;title=)
     
 
 As a developer:
 
-*   if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger/cactus/labels/help%20wanted) or [“good-first-issue”](https://github.com/hyperledger/cactus/labels/good%20first%20issue) task
+*   if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger-cacti/cacti/labels/help%20wanted) or [“good-first-issue”](https://github.com/hyperledger-cacti/cacti/labels/good%20first%20issue) task
     
 *   If you can commit to full-time development, then please contact us on our [Rocketchat channel](https://chat.hyperledger.org/channel/cactus) to work through logistics!
     
@@ -61,7 +61,7 @@ PR Checklist - Contributor/Developer
 
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
-1.  Fork [hyperledger/cactus](https://github.com/hyperledger/cactus) via Github UI
+1.  Fork [hyperledger-cacti/cacti](https://github.com/hyperledger-cacti/cacti) via Github UI
     
     *   If you are using the Git client on the Windows operating system, you will need to enable long paths for git which you can do in PowerShell by executing the command below. To clarify, this may also apply if you are using any Git GUI application on Windows such as `Github Desktop` or others.
         
@@ -172,7 +172,7 @@ Create local branch
 2.  Setup your local fork to keep up-to-date (optional)
     
     \# Add 'upstream' repo to list of remotes
-    git remote add upstream https://github.com/hyperledger/cactus.git
+    git remote add upstream https://github.com/hyperledger-cacti/cacti.git
     
     \# Verify the new remote named 'upstream'
     git remote \-v
