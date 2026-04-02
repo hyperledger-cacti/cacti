@@ -120,8 +120,109 @@ _Unless explicitly stated otherwise, each bullet will apply to both Intel and AR
     ```
 
 ### Linux
-* Insert Linux instructions here
+# Getting Started: Ubuntu / Linux
 
+This guide provides a step-by-step walkthrough for setting up the Hyperledger Cacti development environment on Ubuntu (20.04+ recommended). These steps should also work for most Debian-based distributions.
+
+---
+
+## Prerequisites
+
+### 1. Git
+* Ensure your package index is updated and Git is installed for version control.
+```bash
+sudo apt update
+sudo apt install -y git
+```
+
+### 2. Node.js (v20.20.0) & npm
+
+* Cacti requires a specific Node version. We recommend using nvm (Node Version Manager) to avoid conflicts with system defaults.
+
+```
+curl -o- [https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh](https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh) | bash
+source ~/.bashrc
+
+nvm install 20.20.0
+nvm use 20.20.0
+```
+Verify:
+```
+node -v
+npm -v
+```
+### 3. Yarn (via Corepack)
+
+* Cacti uses Yarn for package management. Enable it using the built-in Corepack:
+
+```
+npm run enable-corepack
+```
+Verify:
+```
+yarn -v
+```
+### 4. Docker Engine
+
+* Docker is required to run the various blockchain ledgers supported by Cacti.
+```
+sudo apt install -y docker.io
+sudo systemctl start docker
+sudo systemctl enable docker
+```
+## Configure Permissions:
+* Add your user to the docker group so you can run commands without sudo:
+
+```
+sudo usermod -aG docker $USER
+newgrp docker
+```
+Verify:
+```
+docker --version
+```
+### 5. Docker Compose
+
+* Used for orchestrating multi-container ledger environments.
+```
+sudo apt install -y docker-compose
+```
+Verify:
+```
+docker-compose --version
+```
+### 6. OpenJDK (Java 8)
+
+* Required specifically for Corda ledger support.
+```
+sudo apt install -y openjdk-8-jdk
+```
+Verify:
+```
+java -version
+```
+### 7. Go
+
+* Required for Fabric and SATP components.
+```
+sudo apt install -y golang-go
+```
+Verify:
+```
+go version
+```
+### 8. Foundry
+
+* Required for SATP Hermes smart contract compilation.
+```
+curl -L [https://foundry.paradigm.xyz](https://foundry.paradigm.xyz) | bash
+source ~/.bashrc
+foundryup
+```
+Verify:
+```
+forge --version
+```
 ### Windows 
 * Insert Linux instructions here 
 
