@@ -8,6 +8,7 @@
   - [Random Windows specific issues not covered here](#random-windows-specific-issues-not-covered-here)
   - [Configure Cacti](#configure-cacti)
 - [Build Script Decision Tree](#build-script-decision-tree)
+- [Running CI Checks Locally Before Pushing](#running-ci-checks-locally-before-pushing)
 - [Configuring SSH to use upterm](#configuring-ssh-to-use-upterm)
 
 ## Hyperledger Cacti Build Instructions
@@ -120,10 +121,49 @@ _Unless explicitly stated otherwise, each bullet will apply to both Intel and AR
     ```
 
 ### Linux
-* Insert Linux instructions here
+* Git
+  * Install via your distribution's package manager (e.g., `sudo apt-get install git`)
+* NodeJS v20.20.0, npm v10.8.2 (we recommend using the Node Version Manager (nvm))
+  * [Install nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
+  * Using nvm:
+    ```sh
+    nvm install 20.20.0
+    nvm use 20.20.0
+    ```
+* Yarn
+  * `npm run enable-corepack` (from within the project directory)
+* Docker Engine
+  * [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
+  * [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/)
+* Docker Compose
+  * Included with Docker Engine on modern installations, or install separately:
+    [Install Docker Compose](https://docs.docker.com/compose/install/)
+* Go
+  * [Install Go on Linux](https://go.dev/doc/install)
+* Foundry (required for SATP Hermes smart contract compilation)
+  ```sh
+  curl -L https://foundry.paradigm.xyz | bash
+  source ~/.bashrc
+  foundryup
+  forge --version
+  ```
 
-### Windows 
-* Insert Linux instructions here 
+### Windows
+
+> **We strongly recommend using WSL2** (Windows Subsystem for Linux) for development.
+> Native Windows development is possible but may encounter path length and permission issues.
+
+* [Install WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) and then follow the Linux instructions above inside WSL2.
+* If using native Windows:
+  * Git: [Install Git for Windows](https://git-scm.com/download/win)
+    * Enable long paths:
+      ```powershell
+      git config --global core.longpaths true
+      ```
+  * NodeJS v20.20.0: [Download from nodejs.org](https://nodejs.org/) or use [nvm-windows](https://github.com/coreybutler/nvm-windows)
+  * Docker Desktop: [Install Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+  * Go: [Install Go for Windows](https://go.dev/dl/)
+
 
 ### Random Windows specific issues not covered here
 
@@ -135,7 +175,7 @@ We test most frequently on Ubuntu 20.04 LTS
 * Clone the repository
 
 ```sh
-git clone https://github.com/hyperledger/cactus.git
+git clone https://github.com/hyperledger-cacti/cacti.git
 ```
 
 
@@ -149,7 +189,7 @@ git config --system core.longpaths true
 * Change directories to the project root
 
 ```sh
-cd cactus
+cd cacti
 ```
 
 * Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
@@ -242,6 +282,54 @@ To figure out which script could work for rebuilding Cactus, please follow
 the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
+
+## Running CI Checks Locally Before Pushing
+
+Before opening a pull request, you should run the same checks that CI will run.
+This helps catch issues early and speeds up the review process.
+
+### Quick Checklist
+
+```sh
+# 1. Build the project
+yarn run configure
+
+# 2. Run linting
+yarn run lint
+
+# 3. Run all tests (unit + integration)
+yarn run test:jest:all
+
+# 4. Run the full CI script (Linux/macOS/WSL only)
+./tools/ci.sh
+```
+
+### Individual Steps
+
+| Check | Command | Notes |
+|-------|---------|-------|
+| TypeScript compilation | `yarn tsc` | Compiles all packages |
+| ESLint | `yarn run format:eslint` | Lints JS/TS files |
+| Prettier | `yarn run format:prettier` | Formats code |
+| Spell check | `yarn run spellcheck` | Checks spelling in source |
+| Jest tests | `yarn run test:jest:all` | Runs all Jest test suites |
+| Single test file | `yarn jest path/to/test.test.ts` | Run one specific test |
+
+### Docker Tests
+
+Some integration tests require Docker. Ensure Docker is running before executing:
+
+```sh
+# Build all-in-one ledger images (if needed)
+cd tools/docker/<ledger>-all-in-one
+docker build -t <image-name> .
+
+# Then run the integration tests that depend on Docker
+yarn jest --testPathPattern=integration
+```
+
+> **Tip:** If you are only modifying documentation or configuration files, you can
+> skip the Docker tests. CI will run them automatically on your PR.
 
 ## Configuring SSH to use upterm
 Upload your public key onto github if not done so already. A public key is necessary to join the ssh connection to use upterm. For a comprehensive guide, see the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
