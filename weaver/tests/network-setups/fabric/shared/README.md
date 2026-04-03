@@ -34,7 +34,7 @@ All paths in following steps are relative to this folder (`tests/network-setups/
     - Delete contents of `src/wallet-network1` and `src/wallet-network2`.
     - Delete contents of `src/data/credentials/network1` and `src/data/credentials/network2`.
     - Delete contents of `src/data/credentials_docker/network1` and `src/data/credentials_docker/network2`.
-3. Now follow the steps to run testnet demo provided [here](https://labs.hyperledger.org/weaver-dlt-interoperability/docs/external/getting-started/test-network/setup-local#fabric-driver), to build and run `fabric-driver` for both networks. This will re-generate wallets for fabric-driver.
+3. Now follow the steps to run testnet demo provided [here](https://hyperledger-cacti.github.io/cacti/weaver/getting-started/test-network/setup-local/#fabric-driver), to build and run `fabric-driver` for both networks. This will re-generate wallets for fabric-driver.
 4. Build `fabric-cli`. Set up `.env` and `config.json` as per the steps in docs. (Don't run anything else in fabric-cli from the steps there).
 4. Go to `samples/fabric/fabric-cli`, and run following commands to create credentials for fabric networks:
     ```
