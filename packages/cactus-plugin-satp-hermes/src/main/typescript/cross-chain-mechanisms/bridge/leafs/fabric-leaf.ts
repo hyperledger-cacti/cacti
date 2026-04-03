@@ -960,13 +960,14 @@ export class FabricLeaf
    */
   public async lockAsset(
     assetId: string,
-    amount: Amount,
+    assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#lockAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
       try {
-        this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${amount}`);
+        this.log.debug(`${fnTag}, Locking Asset: ${assetId} amount: ${assetAttribute}`);
 
         if (!this.contractChannel || !this.wrapperContractName) {
           throw new WrapperContractError(
@@ -978,7 +979,7 @@ export class FabricLeaf
           signingCredential: this.signingCredential,
           channelName: this.contractChannel,
           methodName: "lock",
-          params: [assetId, amount.toString()],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute.toString(), uniqueDescriptor.toString()] : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
         });
@@ -1012,14 +1013,15 @@ export class FabricLeaf
    */
   public async unlockAsset(
     assetId: string,
-    amount: Amount,
+    assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#unlockAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
       try {
         this.log.debug(
-          `${fnTag}, Unlocking Asset: ${assetId} amount: ${amount}`,
+          `${fnTag}, Unlocking Asset: ${assetId} amount: ${assetAttribute}`,
         );
 
         if (!this.contractChannel || !this.wrapperContractName) {
@@ -1032,7 +1034,7 @@ export class FabricLeaf
           signingCredential: this.signingCredential,
           channelName: this.contractChannel,
           methodName: "unlock",
-          params: [assetId, amount.toString()],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute.toString(), uniqueDescriptor.toString()] : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
         });
@@ -1066,13 +1068,14 @@ export class FabricLeaf
    */
   public async mintAsset(
     assetId: string,
-    amount: Amount,
+    assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#mintAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
       try {
-        this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${amount}`);
+        this.log.debug(`${fnTag}, Minting Asset: ${assetId} amount: ${assetAttribute}`);
 
         if (!this.contractChannel || !this.wrapperContractName) {
           throw new WrapperContractError(
@@ -1084,7 +1087,7 @@ export class FabricLeaf
           signingCredential: this.signingCredential,
           channelName: this.contractChannel,
           methodName: "mint",
-          params: [assetId, amount.toString()],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute.toString(), uniqueDescriptor.toString()] : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
         });
@@ -1118,13 +1121,14 @@ export class FabricLeaf
    */
   public async burnAsset(
     assetId: string,
-    amount: Amount,
+    assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#burnAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
       try {
-        this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${amount}`);
+        this.log.debug(`${fnTag}, Burning Asset: ${assetId} amount: ${assetAttribute}`);
 
         if (!this.contractChannel || !this.wrapperContractName) {
           throw new WrapperContractError(
@@ -1136,7 +1140,7 @@ export class FabricLeaf
           signingCredential: this.signingCredential,
           channelName: this.contractChannel,
           methodName: "burn",
-          params: [assetId, amount.toString()],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute.toString(), uniqueDescriptor.toString()] : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
         });
@@ -1172,14 +1176,15 @@ export class FabricLeaf
   public async assignAsset(
     assetId: string,
     to: string,
-    amount: Amount,
+    assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${FabricLeaf.CLASS_NAME}}#assignAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, async () => {
       try {
         this.log.debug(
-          `${fnTag}, Assigning Asset: ${assetId} amount: ${amount} to: ${to}`,
+          `${fnTag}, Assigning Asset: ${assetId} amount: ${assetAttribute} to: ${to}`,
         );
 
         if (!this.contractChannel || !this.wrapperContractName) {
@@ -1192,7 +1197,7 @@ export class FabricLeaf
           signingCredential: this.signingCredential,
           channelName: this.contractChannel,
           methodName: "assign",
-          params: [assetId, to, amount.toString()],
+          params: uniqueDescriptor !== undefined ? [assetId, to, assetAttribute.toString(), uniqueDescriptor.toString()] : [assetId, to, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
         });
