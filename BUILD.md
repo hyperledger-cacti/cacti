@@ -120,15 +120,22 @@ _Unless explicitly stated otherwise, each bullet will apply to both Intel and AR
     ```
 
 ### Linux
-* Insert Linux instructions here
+Linux setup is very similar to macOS. The prerequisites (Node.js, Yarn, Docker, OpenJDK, Go) are the same, and you can follow the same installation logic and version requirements.
 
-### Windows 
-* Insert Linux instructions here 
+### Windows
+
+For Windows users, we strongly recommend using **WSL2** (Windows Subsystem for Linux) for the best development experience and tool compatibility.
+
+* **WSL2 Installation**: Follow the [official WSL installation guide](https://learn.microsoft.com/en-us/windows/wsl/install) to set up a Linux distribution (e.g., Ubuntu).
+* **Native Support**: Native Windows setup is not fully supported and may lead to issues with Docker integration or file path limitations.
+* **Long Path Fix**: If you encounter "File paths too long" errors during cloning, run this in PowerShell with administrative rights:
+  ```powershell
+  git config --system core.longpaths true
+  ```
 
 ### Random Windows specific issues not covered here
 
-We recommend that you use WSL2 or any Linux VM (or bare metal).
-We test most frequently on Ubuntu 20.04 LTS
+We test most frequently on Ubuntu 20.04 LTS via WSL2.
 
 ### Configure Cacti 
 
@@ -138,13 +145,6 @@ We test most frequently on Ubuntu 20.04 LTS
 git clone https://github.com/hyperledger/cactus.git
 ```
 
-
-Windows specific gotcha: `File paths too long` error when cloning. To fix:
-Open PowerShell with administrative rights and then run the following:
-
-```sh
-git config --system core.longpaths true
-```
 
 * Change directories to the project root
 
@@ -243,6 +243,13 @@ the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
 
+If the diagram above is not visible, use the following guidance:
+
+- Use `npm run watch` for most development workflows (auto-rebuilds changed packages)
+- Use other build scripts only when:
+  - Adding new dependencies
+  - Modifying core modules
+
 ## Configuring SSH to use upterm
 Upload your public key onto github if not done so already. A public key is necessary to join the ssh connection to use upterm. For a comprehensive guide, see the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
 
@@ -252,9 +259,9 @@ Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code list
     with:
       repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v4.1.1) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details, see the [Debug your GitHub Actions by using ssh](https://github.com/marketplace/actions/debugging-with-ssh).
+Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v4.1.1) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details on debugging GitHub Actions workflows, see the [official GitHub documentation](https://docs.github.com/en/actions/monitoring-and-troubleshooting-workflows/enabling-debug-logging).
 
-By creating a PR for the edited `ci.yml` file, this will the CI to run their tests. There are two ways to navigate to CIs.
+By creating a PR for the edited `ci.yml` file, this will allow the CI to run their tests. There are two ways to navigate to CIs.
   1) Go to the PR and click the `checks` tab
   2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
 
