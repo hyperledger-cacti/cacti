@@ -741,8 +741,8 @@ For the complete schema, refer to [src/main/typescript/adapters/adapter-config.t
 
 ### Getting Started (Adapter Layer)
 
-- **Testing Guide**: [src/examples/docker-adapter-testing.md](src/examples/docker-adapter-testing.md)
-- **Test Runner (Makefile)**: [src/examples/docker-adapter-test.mk](src/examples/docker-adapter-test.mk)
+- **Testing Guide**: [https://github.com/hyperledger-cacti/cacti-demos/tree/main/gateway/satp/case_4/Readme.md](https://github.com/hyperledger-cacti/cacti-demos/tree/main/gateway/satp/case_4/Readme.md)
+- **Test Runner (Makefile)**: [https://github.com/hyperledger-cacti/cacti-demos/tree/main/gateway/satp/case_4/docker-adapter-test.mk](https://github.com/hyperledger-cacti/cacti-demos/tree/main/gateway/satp/case_4/docker-adapter-test.mk)
 - **Example Configuration**: [src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml](src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml)
 
 ### Adapter Layer Overview
@@ -992,6 +992,10 @@ Please review [CONTRIBUTING.md](https://github.com/hyperledger/cacti/blob/main/C
 
 ## Release process
 TBD. For each release, a commit in the form: "chore(satp-hermes): version X release" will be made.
+
+## Adapter Demo
+The Docker adapter layer demo has been moved to the cacti-demos repository.
+See [case_4 in cacti-demos](https://github.com/hyperledger-cacti/cacti-demos/tree/main/gateway/satp/case_4) for full instructions.
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.
