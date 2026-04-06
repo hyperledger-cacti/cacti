@@ -32,19 +32,11 @@ cacti-weaver-sdk-fabric:
 		(rm -rf cacti-weaver-sdk-fabric && echo "Error: Please build weaver/sdks/fabric/interoperation-node-sdk locally" && exit 1)
 
 build-local: protos-js cacti-weaver-sdk-fabric
-	(cp package.json package-remote.json && \
-		cp package-local.json package.json && \
-		yarn install) || \
-		(mv package-remote.json package.json && exit 1) # Only if fails	
-	mv package-remote.json package.json # Only if success
+	yarn install
 	yarn run build
 
 build-image-local: protos-js cacti-weaver-sdk-fabric
-	cp package.json package-remote.json
-	cp package-local.json package.json
-	(docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f iinagent.local.Dockerfile . ) || \
-		(mv package-remote.json package.json && exit 1) # Only if fails
-	mv package-remote.json package.json # Only if success
+	docker build --build-arg BUILD_TAG="local" --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) -f iinagent.local.Dockerfile .
 	rm -rf protos-js cacti-weaver-sdk-fabric
 	docker tag ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) $(DOCKER_IMAGE_NAME):latest
 
