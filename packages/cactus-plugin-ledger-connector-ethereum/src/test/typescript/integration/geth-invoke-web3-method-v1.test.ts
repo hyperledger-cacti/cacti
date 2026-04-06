@@ -167,16 +167,13 @@ describe("invokeRawWeb3EthMethod Tests", () => {
   });
 
   test("invokeRawWeb3EthMethod with missing arg throws error (getBlock)", async () => {
-    try {
-      const connectorResponse = connector.invokeRawWeb3EthMethod({
-        methodName: "getBlock",
-      });
+    const connectorResponse = connector.invokeRawWeb3EthMethod({
+      methodName: "getBlock",
+    });
 
-      await connectorResponse;
-      fail("Calling getBlock with missing argument should throw an error");
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
+    await expect(connectorResponse).rejects.toThrow(
+      "web3.eth.getBlock requires at least one argument",
+    );
   });
 
   test("invokeRawWeb3EthMethod with invalid arg throws error (getBlock)", async () => {
