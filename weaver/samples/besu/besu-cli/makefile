@@ -1,8 +1,8 @@
 build:
-	npm install --workspaces=false
+	yarn install
 
 build-local:
-	npm install --workspaces=false
+	yarn install
 
 clean:
 	rm -rf node_modules package-lock.json
