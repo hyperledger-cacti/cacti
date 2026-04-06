@@ -53,7 +53,8 @@ async function main(url: string, auth: AuthOptions = {}) {
       !connectorResponse.data.data ||
       connectorResponse.data.status !== 200
     ) {
-      console.log(connectorResponse.data);
+      const status = connectorResponse?.data?.status ?? "unknown";
+      console.log(`Unexpected connector response status: ${status}`);
       throw new Error("Invalid response from the connector");
     }
 

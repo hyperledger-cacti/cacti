@@ -15,6 +15,13 @@ import { MembershipManager } from "@hyperledger/cacti-weaver-sdk-fabric";
 import { getWallet } from "./walletUtils";
 import * as utils from "../common/utils";
 
+const getErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+};
+
 // Get a handle to a network gateway using existing wallet credentials
 const getNetworkGateway = async (
   walletPath: string,
@@ -62,7 +69,9 @@ const getNetworkGateway = async (
     });
     return gateway;
   } catch (error) {
-    console.error(`Failed to instantiate network (channel): ${error}`);
+    console.error(
+      `Failed to instantiate network (channel): ${getErrorMessage(error)}`,
+    );
     throw error;
   }
 };
@@ -88,7 +97,7 @@ const getNetworkContract = async (
     const contract = network.getContract(chaincodeId);
     return { gateway: gateway, contract: contract };
   } catch (error) {
-    console.error(`Failed to connect to contract: ${error}`);
+    console.error(`Failed to connect to contract: ${getErrorMessage(error)}`);
     throw error;
   }
 };
@@ -120,7 +129,7 @@ async function getMSPConfiguration(
     gateway.disconnect();
     return membership;
   } catch (error) {
-    console.error(`Failed to submit transaction: ${error}`);
+    console.error(`Failed to submit transaction: ${getErrorMessage(error)}`);
     throw error;
   }
 }
@@ -153,7 +162,7 @@ async function getAllMSPConfigurations(
     gateway.disconnect();
     return membership;
   } catch (error) {
-    console.error(`Failed to submit transaction: ${error}`);
+    console.error(`Failed to submit transaction: ${getErrorMessage(error)}`);
     throw error;
   }
 }
@@ -186,7 +195,7 @@ async function invokeFabricChaincode(
     gatewayAndContract.gateway.disconnect();
     return result;
   } catch (error) {
-    console.error(`Failed to submit transaction: ${error}`);
+    console.error(`Failed to submit transaction: ${getErrorMessage(error)}`);
     throw error;
   }
 }
@@ -219,7 +228,7 @@ async function queryFabricChaincode(
     gatewayAndContract.gateway.disconnect();
     return result;
   } catch (error) {
-    console.error(`Failed to submit query: ${error}`);
+    console.error(`Failed to submit query: ${getErrorMessage(error)}`);
     throw error;
   }
 }
