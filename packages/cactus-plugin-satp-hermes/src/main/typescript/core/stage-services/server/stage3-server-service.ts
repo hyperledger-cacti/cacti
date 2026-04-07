@@ -454,14 +454,12 @@ export class Stage3ServerService extends SATPService {
 
         const sessionData = session.getServerSessionData();
 
-        if (request.common == undefined) {
-          commonBodyVerifier(
-            fnTag,
-            request.common,
-            sessionData,
-            MessageType.COMMIT_PREPARE,
-          );
-        }
+        commonBodyVerifier(
+          fnTag,
+          request.common,
+          sessionData,
+          MessageType.COMMIT_PREPARE,
+        );
 
         signatureVerifier(fnTag, this.Signer, request, sessionData);
 
@@ -513,14 +511,12 @@ export class Stage3ServerService extends SATPService {
 
         const sessionData = session.getServerSessionData();
 
-        if (request.common == undefined) {
-          commonBodyVerifier(
-            fnTag,
-            request.common,
-            sessionData,
-            MessageType.COMMIT_FINAL,
-          );
-        }
+        commonBodyVerifier(
+          fnTag,
+          request.common,
+          sessionData,
+          MessageType.COMMIT_FINAL,
+        );
 
         signatureVerifier(fnTag, this.Signer, request, sessionData);
 
@@ -589,14 +585,12 @@ export class Stage3ServerService extends SATPService {
 
         const sessionData = session.getServerSessionData();
 
-        if (request.common == undefined) {
-          commonBodyVerifier(
-            fnTag,
-            request.common,
-            sessionData,
-            MessageType.COMMIT_TRANSFER_COMPLETE,
-          );
-        }
+        commonBodyVerifier(
+          fnTag,
+          request.common,
+          sessionData,
+          MessageType.COMMIT_TRANSFER_COMPLETE,
+        );
 
         signatureVerifier(fnTag, this.Signer, request, sessionData);
 
