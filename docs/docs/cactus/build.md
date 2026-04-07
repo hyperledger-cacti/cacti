@@ -1,16 +1,16 @@
-Hyperledger Cactus Build Instructions
+Hyperledger Cacti Build Instructions
 =====================================
 
-This is the place to start if you want to give Cactus a spin on your local machine or if you are planning on contributing.
+This is the place to start if you want to give Cacti a spin on your local machine or if you are planning on contributing.
 
-> This is not a guide for `using` Cactus for your projects that have business logic but rather a guide for people who want to make changes to the code of Cactus. If you are just planning on using Cactus as an npm dependency for your project, then you might not need this guide at all.
+> This is not a guide for `using` Cacti for your projects that have business logic but rather a guide for people who want to make changes to the code of Cacti. If you are just planning on using Cacti as an npm dependency for your project, then you might not need this guide at all.
 
 The project uses Typescript for both back-end and front-end components.
 
 Developers guide
 ----------------
 
-This is a video guide to setup Hyperledger Cactus on your local machine.
+This is a video guide to setup Hyperledger Cacti on your local machine.
 
 ### Installing git
 
@@ -131,7 +131,7 @@ Getting Started
 *   Clone the repository
     
 
-git clone https://github.com/hyperledger/cactus.git
+git clone https://github.com/hyperledger-cacti/cacti.git
 
 Windows specific gotcha: `File paths too long` error when cloning. To fix: Open PowerShell with administrative rights and then run the following:
 
@@ -140,7 +140,7 @@ git config \--system core.longpaths true
 *   Change directories to the project root
     
 
-cd cactus
+cd cacti
 
 *   Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
     
@@ -160,7 +160,7 @@ For example you can _run a ledger single status endpoint test_ via the REST API 
 
 npx tap \--ts \--timeout\=600 packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
 
-_You can also start the API server_ and verify more complex scenarios with an arbitrary list of plugins loaded into Cactus. This is useful for when you intend to develop your plugin either as a Cactus maintained plugin or one on your own.
+_You can also start the API server_ and verify more complex scenarios with an arbitrary list of plugins loaded into Cactus. This is useful for when you intend to develop your plugin either as a Cacti maintained plugin or one on your own.
 
 npm run generate-api-server-config
 
@@ -196,13 +196,13 @@ Build Script Decision Tree
 
 The `npm run watch` script should cover 99% of the cases when it comes to working on Cactus code and having it recompile, but for that last 1% you’ll need to get your hands dirty with the rest of the build scripts. Usually this is only needed when you are adding new dependencies (npm packages) as part of something that you are implementing.
 
-There are a lot of different build scripts in Cactus in order to provide contributors fine(r) grained control over what parts of the framework they wish build.
+There are a lot of different build scripts in Cacti in order to provide contributors fine(r) grained control over what parts of the framework they wish build.
 
 > Q: Why the complexity of so many build scripts?
 > 
 > A: We could just keep it simple with a single build script that builds everything always, but that would be a nightmare to wait for after having changed a single line of code for example.
 
-To figure out which script could work for rebuilding Cactus, please follow the following decision tree (and keep in mind that we have `npm run watch` too)
+To figure out which script could work for rebuilding Cacti, please follow the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](_images/build-script-decision-tree-2021-03-06.png)
 
@@ -222,11 +222,11 @@ By creating a PR for the edited `ci.yml` file, this will the CI to run their tes
 
 1.  Go to the PR and click the `checks` tab
     
-2.  Go to the `Actions` tab within the main Hyperledger Cactus Repository
+2.  Go to the `Actions` tab within the main Hyperledger Cacti Repository
     
 
 Click on the `CI Cactus workflow`. There should be a new job you’ve created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what’s you’ve named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh \*\*\*\*\*\*\*\*\*\*:\*\*\*\*\*\*\*\*\*\*\*@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
 
-[Previous](introduction.md "Welcome to Hyperledger Cactus documentation!") [Next](examples.md "Examples")
+[Previous](introduction.md "Welcome to Hyperledger Cacti documentation!") [Next](examples.md "Examples")
 
 * * *
