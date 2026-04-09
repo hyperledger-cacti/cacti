@@ -47,6 +47,7 @@ examples/simple-asset-transfer/fabric/**/hfc-key-store/
 
 bin/
 .tmp/
+.worktrees/
 lerna-debug.log
 cactus-openapi-spec.json
 cactus-openapi-spec-*.json
