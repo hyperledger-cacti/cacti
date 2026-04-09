@@ -37,7 +37,9 @@ As a fusion of two earlier systems (Cactus and Weaver) that have similar philoso
 
 The current Cacti code base contains the legacy Cactus and Weaver source code in aggregated form with their original folder structures intact. But the packages built from the two sections of code are unified and released under a common `cacti` namespace, and the CI/CD pipelines for testing and releases are also integrated under a common set of GitHub Actions. A _deeper_ merge and integration of source code is part of our roadmap, and will be carried out over a longer time period, but the current setup of code and release packages makes it easy for new users to navigate Cacti and for legacy users to carry out seamless upgrades.
 
-(Reference for legacy users: Cactus source code lies here (i.e., the root folder), excluding the `weaver` folder. Weaver source code lies within the [weaver](./weaver/) folder.
+Reference for legacy users: Cactus source code lives at the repository root,
+excluding the `weaver` folder. Weaver source code lives in
+[`./weaver/`](./weaver/).
 
 ## Documentation
 
@@ -72,7 +74,8 @@ as starting points.
 ## Contributing
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 
-Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
+Please review the [contributing guidelines](./CONTRIBUTING.md) to get started.
 
 ## License
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](/LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in
+the [LICENSE](./LICENSE) file.
