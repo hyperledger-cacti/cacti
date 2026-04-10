@@ -113,7 +113,7 @@ You also need to add the following to your application's `build.gradle` file:
 ```groovy
 repositories {
   maven {
-      url https://maven.pkg.github.com/hyperledger/cacti
+      url https://maven.pkg.github.com/hyperledger-cacti/cacti
       credentials {
           username <github-email>
           password <github-personal-access-token>
