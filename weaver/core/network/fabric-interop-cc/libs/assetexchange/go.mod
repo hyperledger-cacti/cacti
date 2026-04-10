@@ -1,10 +1,9 @@
-module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2
+module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3
 
 go 1.20
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.1.0
 	github.com/hyperledger/fabric-contract-api-go v1.1.1
 	github.com/hyperledger/fabric-protos-go v0.3.3
 	github.com/sirupsen/logrus v1.8.1
@@ -20,6 +19,7 @@ require (
 	github.com/gobuffalo/envy v1.7.0 // indirect
 	github.com/gobuffalo/packd v0.3.0 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-alpha
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20200424173110-d7076418f212 // indirect
 	github.com/joho/godotenv v1.3.0 // indirect
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
