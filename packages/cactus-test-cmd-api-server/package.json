@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cactus-test-cmd-api-server",
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "description": "Integration tests for the Cactus API Client package (formerly known as the Cactus SDK package that has been renamed for to purpose of being less ambiguous)",
   "keywords": [
     "Hyperledger",
@@ -50,17 +50,17 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger-cacti/cactus-cmd-api-server": "2.1.0",
-    "@hyperledger-cacti/cactus-common": "2.1.0",
-    "@hyperledger-cacti/cactus-core": "2.1.0",
-    "@hyperledger-cacti/cactus-core-api": "2.1.0",
-    "@hyperledger-cacti/cactus-plugin-keychain-vault": "2.1.0",
+    "@hyperledger-cacti/cactus-cmd-api-server": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-common": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-core": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-core-api": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-plugin-keychain-vault": "3.0.0-alpha",
     "express-jwt-authz": "2.4.1",
     "jose": "4.15.5",
     "uuid": "10.0.0"
   },
   "devDependencies": {
-    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-test-tooling": "3.0.0-alpha",
     "@types/uuid": "10.0.0",
     "jest-extended": "7.0.0"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cacti-plugin-copm-corda",
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "description": "Cacti Common Operators - Corda",
   "keywords": [
     "Hyperledger",
@@ -49,12 +49,12 @@
     "@connectrpc/connect": "1.4.0",
     "@connectrpc/connect-node": "1.4.0",
     "@connectrpc/connect-web": "1.4.0",
-    "@hyperledger-cacti/cacti-copm-core": "2.1.0",
-    "@hyperledger-cacti/cacti-weaver-protos-js": "2.1.0",
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "2.1.0",
-    "@hyperledger-cacti/cactus-common": "2.1.0",
-    "@hyperledger-cacti/cactus-core": "2.1.0",
-    "@hyperledger-cacti/cactus-core-api": "2.1.0"
+    "@hyperledger-cacti/cacti-copm-core": "3.0.0-alpha",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-alpha",
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-common": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-core": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-core-api": "3.0.0-alpha"
   },
   "devDependencies": {
     "@connectrpc/connect-node": "1.4.0",

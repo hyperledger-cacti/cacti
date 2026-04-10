@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/hyperledger-cacti/cacti/weaver/samples/fabric/go-cli/helpers"
-	am "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2/asset-manager"
+	am "github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v3/asset-manager"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 )
