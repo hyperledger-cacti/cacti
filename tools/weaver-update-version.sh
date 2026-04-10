@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Root of repo
-ROOT_DIR=${2:-'..'}
+ROOT_DIR=${2:-'.'}
 
 VERSION=${1:-"2.1.0"}
 
