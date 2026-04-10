@@ -90,6 +90,43 @@ update_gomod_module_name() {
   fi
 }
 
+# Function to update Makefile module path references for a single GOMODULE
+update_module_makefile() {
+  local module=$1
+
+  # Only update if major version changed
+  if [ "$OLD_MAJOR_VER" = "$NEW_MAJOR_VER" ]; then
+    return
+  fi
+
+  # Update Makefile/makefile if it exists (case insensitive)
+  local makefile_path=""
+  if [ -f "$ROOT_DIR/$module/Makefile" ]; then
+    makefile_path="$ROOT_DIR/$module/Makefile"
+  elif [ -f "$ROOT_DIR/$module/makefile" ]; then
+    makefile_path="$ROOT_DIR/$module/makefile"
+  elif [ -f "$ROOT_DIR/$module/MAKEFILE" ]; then
+    makefile_path="$ROOT_DIR/$module/MAKEFILE"
+  fi
+
+  if [ -z "$makefile_path" ]; then
+    return
+  fi
+
+  echo "Updating $module/$(basename $makefile_path)..."
+  # Update all module paths with old version suffix to new version suffix
+  for dep_module in ${GOMODULE_PATHS[@]}; do
+    local old_dep_path="$REPO/$dep_module$OLD_MAJOR_VER"
+    local new_dep_path="$REPO/$dep_module$NEW_MAJOR_VER"
+    # Only update if the old path exists in the Makefile
+    if grep -q "$old_dep_path" "$makefile_path" 2>/dev/null; then
+      sed -i.bak "s|$old_dep_path|$new_dep_path|g" "$makefile_path"
+    fi
+  done
+  rm -f "${makefile_path}.bak"
+  echo "  Updated Makefile module references"
+}
+
 # Function to update import paths in Go source files and markdown files
 update_import_paths() {
   echo "Collecting all files to update..."
@@ -266,6 +303,9 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
   GOMOD_DEPS=$((go mod graph | grep "$REPO/$GOMODULE_PATH $REPO" | cut -d ' ' -f 2) || (make undo-vendor && echo "ERROR: In generating dependency graph" && exit 1))
   make undo-vendor > /dev/null 2>&1
   popd > /dev/null
+  
+  # Update Makefile replace directives names after vendor tasks are done
+  update_module_makefile "$GOMODULE"
 
   for GOMOD_DEP in ${GOMOD_DEPS[@]}; do
     echo "--------- START DEP -----------"
@@ -345,39 +385,12 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
   echo "############# END $GOMODULE ################"
 done
 
-# Fifth pass: Update Makefiles
-echo ""
-echo "========== PHASE 5: Updating Makefiles =========="
-for GOMODULE in ${GOMODULE_PATHS[@]}; do
-  # Only update if major version changed
-  if [ "$OLD_MAJOR_VER" != "$NEW_MAJOR_VER" ]; then
-    # Update Makefile/makefile if it exists (case insensitive)
-    MAKEFILE_PATH=""
-    if [ -f "$ROOT_DIR/$GOMODULE/Makefile" ]; then
-      MAKEFILE_PATH="$ROOT_DIR/$GOMODULE/Makefile"
-    elif [ -f "$ROOT_DIR/$GOMODULE/makefile" ]; then
-      MAKEFILE_PATH="$ROOT_DIR/$GOMODULE/makefile"
-    elif [ -f "$ROOT_DIR/$GOMODULE/MAKEFILE" ]; then
-      MAKEFILE_PATH="$ROOT_DIR/$GOMODULE/MAKEFILE"
-    fi
-    
-    if [ -n "$MAKEFILE_PATH" ]; then
-      echo "Updating $GOMODULE/$(basename $MAKEFILE_PATH)..."
-      # Update all module paths with old version suffix to new version suffix
-      # Check each module path and update if present
-      for dep_module in ${GOMODULE_PATHS[@]}; do
-        OLD_DEP_PATH="$REPO/$dep_module$OLD_MAJOR_VER"
-        NEW_DEP_PATH="$REPO/$dep_module$NEW_MAJOR_VER"
-        # Only update if the old path exists in the Makefile
-        if grep -q "$OLD_DEP_PATH" "$MAKEFILE_PATH" 2>/dev/null; then
-          sed -i.bak "s|$OLD_DEP_PATH|$NEW_DEP_PATH|g" "$MAKEFILE_PATH"
-        fi
-      done
-      rm -f "${MAKEFILE_PATH}.bak"
-      echo "  Updated Makefile module references"
-    fi
-  fi
-done
+# # Fifth pass: Update Makefiles
+# echo ""
+# echo "========== PHASE 5: Updating Makefiles =========="
+# for GOMODULE in ${GOMODULE_PATHS[@]}; do
+#   update_module_makefile "$GOMODULE"
+# done
 
 echo ""
 echo "========== COMPLETE =========="
