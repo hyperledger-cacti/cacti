@@ -64,10 +64,10 @@ repositories {
     }
 }
 dependencies {
-    implementation(group: 'org.hyperledger.cacti.weaver.sdk.corda', name: 'weaver-sdk-corda', version: "2.1.0")
-    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "2.1.0")
-    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "2.1.0")
-    implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "2.1.0")
+    implementation(group: 'org.hyperledger.cacti.weaver.sdk.corda', name: 'weaver-sdk-corda', version: "3.0.0-alpha")
+    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "3.0.0-alpha")
+    implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "3.0.0-alpha")
+    implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "3.0.0-alpha")
 }
 ```
 

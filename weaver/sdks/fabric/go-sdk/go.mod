@@ -1,11 +1,10 @@
-module github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2
+module github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v3
 
 go 1.20
 
 require (
 	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.1.0
 	github.com/hyperledger/fabric-admin-sdk v0.0.0
 	github.com/hyperledger/fabric-gateway v1.2.1
 	github.com/hyperledger/fabric-protos-go v0.3.3
@@ -17,6 +16,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-alpha
 	github.com/hyperledger/fabric-protos-go-apiv2 v0.2.0 // indirect
 	github.com/miekg/pkcs11 v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

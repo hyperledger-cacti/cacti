@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-alpha) (2026-04-10)
+
+### Bug Fixes
+
+* **js:** renaming JS/TS package namespaces ([3dc744c](https://github.com/hyperledger-cacti/cacti/commit/3dc744cc52fbe22c9929badf2b8a6c15afd45454))
+* **satp-hermes:** fix inconsistencies for demo to work ([ae8219c](https://github.com/hyperledger-cacti/cacti/commit/ae8219c01d29a7baa0c1cd0cbf066693c82734ec))
+* **satp-hermes:** missing gateway persistence file ([#4082](https://github.com/hyperledger-cacti/cacti/issues/4082)) ([6b757ab](https://github.com/hyperledger-cacti/cacti/commit/6b757aba40ca0ece13f3b13007a3ac6609a39054))
+
+### Features
+
+* **satp-hermes:** add adapter layer ([8a940fd](https://github.com/hyperledger-cacti/cacti/commit/8a940fdc13ec1c74a64f71576fce971708db23c7))
+* **satp-hermes:** improve satp gateway configuration object ([4b614f1](https://github.com/hyperledger-cacti/cacti/commit/4b614f1992931ef1778d65e0efd5321abb41bd7c))
+* **satp-hermes:** persist oracle logs ([#4156](https://github.com/hyperledger-cacti/cacti/issues/4156)) ([f352040](https://github.com/hyperledger-cacti/cacti/commit/f35204030c052a71b3f6c53ba252a8d40b16fcd3)), closes [#3946](https://github.com/hyperledger-cacti/cacti/issues/3946)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-satp-hermes

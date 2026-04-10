@@ -31,7 +31,7 @@ Example `.vscode/tasks.json` file for building/running the image:
 
 ```json
 {
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "tasks": [
     {
       "label": "Docker - BUILD and TAG: 2.x",

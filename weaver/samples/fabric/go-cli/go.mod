@@ -4,8 +4,6 @@ go 1.20
 
 require (
 	github.com/cloudflare/cfssl v1.4.1
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.1.0
-	github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v2 v2.1.0
 	github.com/hyperledger/fabric-sdk-go v1.0.1-0.20221020141211-7af45cede6af
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
@@ -27,6 +25,8 @@ require (
 	github.com/google/certificate-transparency-go v1.0.21 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-alpha
+	github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v3 v3.0.0-alpha
 	github.com/hyperledger/fabric-config v0.0.5 // indirect
 	github.com/hyperledger/fabric-lib-go v1.0.0 // indirect
 	github.com/hyperledger/fabric-protos-go v0.3.3 // indirect
