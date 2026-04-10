@@ -28,9 +28,9 @@ function release() {
     if [ $? -ne 0 ]; then return 1; fi
     yarn build:dev
     if [ $? -ne 0 ]; then return 1; fi
-    ./tools/weaver-update-version.sh $VERSION .
-    if [ $? -ne 0 ]; then return 1; fi
     ./tools/go-gen-checksum.sh $VERSION .
+    if [ $? -ne 0 ]; then return 1; fi
+    ./tools/weaver-update-version.sh $VERSION .
     if [ $? -ne 0 ]; then return 1; fi
     git add . && git commit -s -m "chore(release): publish v$VERSION"
     return 0
