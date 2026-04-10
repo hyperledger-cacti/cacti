@@ -54,11 +54,11 @@ yarn lerna version 1.1.3 --ignore-scripts --conventional-commits --exact --git-r
 yarn tools:bump-openapi-spec-dep-versions --target-version=1.1.3
 yarn codegen
 yarn build:dev
-./tools/weaver-update-version.sh 1.1.3 .
 ./tools/go-gen-checksum.sh 1.1.3 .
+./tools/weaver-update-version.sh 1.1.3 .
 ```
 
-- Do note the `.` as the last parameter in last two commands.
+- Maintain the order of commands and do note the `.` as the last parameter in last two commands.
 
 - The `./tools/weaver-update-version.sh` automation script seems slightly buggy at the moment so you'll have to manually update `./weaver/core/relay/Cargo.toml` yourself. See this comment for an example: https://github.com/hyperledger-cacti/cacti/pull/3427#discussion_r1686850372
 
