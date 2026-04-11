@@ -26,7 +26,7 @@ Details:
 Details (only if yes):
 
 ## Pull Request Requirements
-- [ ] Rebase onto `upstream/main` and squash into a single commit before merging.
+- [ ] Rebased onto `upstream/main` and squashed into a single commit.
 - [ ] Sign off commits with `git commit -s`. Use the DCO reference: https://developercertificate.org/
 - [ ] Follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification).
 
