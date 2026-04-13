@@ -1,13 +1,17 @@
-# Welcome to the documentation template
+# Hyperledger Cacti Documentation
 
-This repository serves as a template for creating documentation for Hyperledger projects. The template utilizes MkDocs (documentation at [mkdocs.org](https://www.mkdocs.org)) and the theme Material for MkDocs (documentation at [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)). Material adds a number of extra features to MkDocs, and Hyperledger repositories can take advantage of the theme's [Insiders](https://squidfunk.github.io/mkdocs-material/insiders/) capabilities.
+This directory contains the source for the Hyperledger Cacti documentation
+site. It uses MkDocs (documentation at [mkdocs.org](https://www.mkdocs.org)),
+the Material for MkDocs theme, and the Mike plugin for versioned deployments to
+GitHub Pages.
 
 [Material for MkDocs]: https://squidfunk.github.io/mkdocs-material/
 [Mike]: https://github.com/jimporter/mike
 
 ## Prerequisites
 
-To test the documents and update the published site, the following tools are needed:
+To preview the docs locally and update the published site, the following tools
+are needed:
 
 - A Bash shell
 - git
@@ -23,11 +27,11 @@ To test the documents and update the published site, the following tools are nee
 ### Python 3
 `Python 3` can be installed locally, as described in the [Python Getting Started guide](https://www.python.org/about/gettingstarted/).
 
-### Mkdocs
+### MkDocs
 
-The Mkdocs-related items can be installed locally, as described in the [Material
-for Mkdocs] installation instructions. The short, case-specific version of those
-instructions follow:
+The MkDocs-related items can be installed locally, as described in the
+[Material for MkDocs] installation instructions. The short, case-specific
+version for this repository is:
 
 ```bash
 pip install -r requirements.txt
@@ -35,7 +39,7 @@ pip install -r requirements.txt
 
 ### Verify Setup
 
-To verify your setup, check that you can run `mkdocs` by running the command `mkdocs --help` to see the help text.
+To verify your setup, run `mkdocs --help` and confirm the help text is shown.
 
 ## Useful MkDocs Commands
 
