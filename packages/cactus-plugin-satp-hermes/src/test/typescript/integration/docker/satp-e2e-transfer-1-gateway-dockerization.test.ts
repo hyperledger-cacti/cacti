@@ -41,6 +41,7 @@ import {
 import {
   SATP_DOCKER_IMAGE_NAME,
   SATP_DOCKER_IMAGE_VERSION,
+  SATP_DOCKER_IMAGE_OMIT_PULL,
 } from "../../constants";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
@@ -249,7 +250,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
     log.debug("starting gatewayRunner...");
-    await gatewayRunner.start(false);
+    await gatewayRunner.start(SATP_DOCKER_IMAGE_OMIT_PULL);
     log.debug("gatewayRunner started successfully");
 
     const approveAddressApi = new GetApproveAddressApi(

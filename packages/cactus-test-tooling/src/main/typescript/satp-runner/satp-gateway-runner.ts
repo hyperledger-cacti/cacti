@@ -30,8 +30,8 @@ export interface ISATPGatewayRunnerConstructorOptions {
 }
 
 export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
-  containerImageVersion: "2024-10-30T19-54-20-dev-5e06263e0",
-  containerImageName: "ghcr.io/hyperledger/cacti-satp-hermes-gateway",
+  containerImageVersion: "2.1.0",
+  containerImageName: "hyperledger/cacti-satp-hermes-gateway",
   serverPort: 3010,
   clientPort: 3011,
   oapiPort: 4010,
@@ -324,6 +324,11 @@ export class SATPGatewayRunner implements ITestLedger {
         const uptimeMatch = Status.match(/Up (\d+) seconds?/);
         if (uptimeMatch && parseInt(uptimeMatch[1], 10) < 5) {
           unhealthyCount++;
+          if (unhealthyCount > 5) {
+            this.log.error(`Excessive restarts detected (${unhealthyCount}). Aborting.`);
+            await this.logContainerDiagnostics();
+            throw new Error(`Container in a crash loop (restart #${unhealthyCount}). Check logs.`);
+          }
           this.log.warn(
             `Container appears to have restarted (restart #${unhealthyCount}). ` +
               `Status: ${Status}. This may indicate the gateway process is crashing.`,
