@@ -71,7 +71,7 @@ export class KnexRemoteLogRepository implements IRemoteLogRepository {
    * @since 0.0.3-beta
    */
   public constructor(config: Knex.Config | undefined) {
-    const envName = process.env.ENVIRONMENT || "development";
+    const envName = process.env.ENVIRONMENT || "default";
     const configFile = knexRemoteInstance[envName];
 
     config = config || configFile;
