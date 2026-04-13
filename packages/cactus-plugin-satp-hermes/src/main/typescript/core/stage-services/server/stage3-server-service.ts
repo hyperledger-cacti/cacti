@@ -815,7 +815,7 @@ export class Stage3ServerService extends SATPService {
         session.verify(fnTag, SessionType.SERVER);
 
         const sessionData = session.getServerSessionData();
-        this.dbLogger.persistLogEntry({
+        await this.dbLogger.persistLogEntry({
           sessionId: sessionData.id,
           type: "mint-asset",
           operation: "init",
@@ -824,7 +824,7 @@ export class Stage3ServerService extends SATPService {
         });
         try {
           this.Log.info(`exec-${stepTag}`);
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "mint-asset",
             operation: "exec",
@@ -867,7 +867,7 @@ export class Stage3ServerService extends SATPService {
           sessionData.mintAssertionClaim.signature = bufArray2HexStr(
             sign(this.Signer, sessionData.mintAssertionClaim.receipt),
           );
-          this.dbLogger.storeProof({
+          await this.dbLogger.storeProof({
             sessionId: sessionData.id,
             type: "mint-asset",
             operation: "done",
@@ -877,7 +877,7 @@ export class Stage3ServerService extends SATPService {
           this.Log.info(`${fnTag}, done-${fnTag}`);
         } catch (error) {
           this.logger.debug(`Crash in ${fnTag}`, error);
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "mint-asset",
             operation: "fail",
@@ -908,7 +908,7 @@ export class Stage3ServerService extends SATPService {
 
         session.verify(fnTag, SessionType.SERVER);
         const sessionData = session.getServerSessionData();
-        this.dbLogger.persistLogEntry({
+        await this.dbLogger.persistLogEntry({
           sessionId: sessionData.id,
           type: "assign-asset",
           operation: "init",
@@ -918,7 +918,7 @@ export class Stage3ServerService extends SATPService {
         try {
           this.Log.info(`${fnTag}, Assigning Asset...`);
           this.Log.info(`exec-${stepTag}`);
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "assign-asset",
             operation: "exec",
@@ -962,7 +962,7 @@ export class Stage3ServerService extends SATPService {
           sessionData.assignmentAssertionClaim.signature = bufArray2HexStr(
             sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
           );
-          this.dbLogger.storeProof({
+          await this.dbLogger.storeProof({
             sessionId: sessionData.id,
             type: "assign-asset",
             operation: "done",
@@ -974,7 +974,7 @@ export class Stage3ServerService extends SATPService {
           this.Log.info(`${fnTag}, done-${fnTag}`);
         } catch (error) {
           this.logger.debug(`Crash in ${fnTag}`, error);
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "assign-asset",
             operation: "fail",
