@@ -194,7 +194,16 @@ export abstract class WatchBlocksV1Endpoint {
     }
 
     while (this.lastSeenBlock < latestBlockNumber) {
-      const blockNumber = this.lastSeenBlock + 1;
+      if (!this.isSubscribed) {
+        log.info(
+          "emitAllSinceLastSeenBlock() - not subscribed anymore, stopping...",
+        );
+        break;
+      }
+
+      // Claim the block number before awaiting the RPC so that a defensive
+      // overlapping invocation cannot re-fetch and re-emit the same block.
+      const blockNumber = ++this.lastSeenBlock;
       log.debug(
         `emitAllSinceLastSeenBlock() - pushing block ${blockNumber} (latest ${latestBlockNumber})`,
       );
@@ -225,8 +234,6 @@ export abstract class WatchBlocksV1Endpoint {
       }
 
       socket.emit(WatchBlocksV1.Next, next);
-
-      this.lastSeenBlock = blockNumber;
     }
 
     log.debug("emitAllSinceLastSeenBlock() - done");
@@ -254,7 +261,8 @@ export abstract class WatchBlocksV1Endpoint {
  * async subscriptions.
  */
 export class WatchBlocksV1HttpPollEndpoint extends WatchBlocksV1Endpoint {
-  private monitoringInterval: NodeJS.Timer | undefined;
+  private pollTimeout: NodeJS.Timeout | undefined;
+  private pollCancelled = false;
   private httpPollInterval: number;
 
   public get className(): string {
@@ -278,33 +286,45 @@ export class WatchBlocksV1HttpPollEndpoint extends WatchBlocksV1Endpoint {
       await this.unsubscribe();
     }
     this.isSubscribed = true;
+    this.pollCancelled = false;
 
-    socket.on("disconnect", async () => this.unsubscribe());
-    socket.on(WatchBlocksV1.Unsubscribe, async () => this.unsubscribe());
+    // NOTE: disconnect / unsubscribe socket listeners are already wired in the
+    // base-class constructor. Re-registering them here would leak listeners on
+    // every resubscribe.
 
-    log.debug("Starting new HTTP polling interval...");
-    this.monitoringInterval = setInterval(async () => {
+    log.debug("Starting new HTTP polling loop...");
+    const tick = async () => {
+      if (this.pollCancelled) {
+        return;
+      }
       try {
         await this.emitAllSinceLastSeenBlock();
       } catch (error) {
         log.warn(`${this.className} - polling thread exception:`, error);
       }
-    }, this.httpPollInterval);
+      if (!this.pollCancelled) {
+        this.pollTimeout = setTimeout(tick, this.httpPollInterval);
+      }
+    };
+    this.pollTimeout = setTimeout(tick, this.httpPollInterval);
 
     return this;
   }
 
   public async unsubscribe(): Promise<void> {
     this.log.debug("Unsubscribing HTTP polling monitor...");
-    try {
-      clearInterval(this.monitoringInterval);
-    } catch (error) {
-      this.log.info(
-        `Could not clear polling interval id ${this.monitoringInterval}, error:`,
-        error,
-      );
+    this.pollCancelled = true;
+    if (this.pollTimeout) {
+      try {
+        clearTimeout(this.pollTimeout);
+      } catch (error) {
+        this.log.info(
+          `Could not clear polling timeout id ${this.pollTimeout}, error:`,
+          error,
+        );
+      }
     }
-    this.monitoringInterval = undefined;
+    this.pollTimeout = undefined;
     this.isSubscribed = false;
   }
 }
