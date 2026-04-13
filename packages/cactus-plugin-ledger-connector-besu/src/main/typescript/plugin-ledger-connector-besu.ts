@@ -224,6 +224,16 @@ export class PluginLedgerConnectorBesu
 
   public async shutdown(): Promise<void> {
     this.log.info(`Shutting down ${this.className}...`);
+    
+    if (this.web3Provider && typeof this.web3Provider.disconnect === "function") {
+      this.web3Provider.disconnect();
+    }
+    
+    if (this.txSubject) {
+      this.txSubject.complete();
+    }
+    
+    this.contracts = {};
   }
 
   async registerWebServices(
