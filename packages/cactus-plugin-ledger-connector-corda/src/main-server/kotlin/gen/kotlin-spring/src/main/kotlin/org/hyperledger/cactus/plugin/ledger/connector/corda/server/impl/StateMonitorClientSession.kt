@@ -10,6 +10,7 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.GetMoni
 import rx.Subscription
 import java.math.BigInteger
 import java.time.LocalDateTime
+import java.util.Collections
 import jakarta.annotation.PreDestroy
 
 /**
@@ -32,6 +33,14 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
 
     private val monitors = mutableMapOf<String, StateMonitor>()
     private var sessionExpireTime = LocalDateTime.now().plusMinutes(sessionExpireMinutes)
+
+    /**
+     * Hard cap on how many unread state changes may be buffered per monitored state.
+     * Prevents unbounded heap growth when a client is slow, disconnected, or forgets
+     * to call clearTransactions. When the cap is reached, the oldest entry is dropped
+     * and a warning is logged.
+     */
+    private val maxBufferedChangesPerState: Int = 10_000
 
     companion object {
         val logger = loggerFor<StateMonitorClientSession>()
@@ -57,13 +66,39 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
         val stateUpdates = this.rpc.proxy.vaultTrackByWithPagingSpec(cordaState, criteria, pagingSpec).updates
 
         var indexCounter = BigInteger.valueOf(0)
-        val stateChanges = mutableSetOf<GetMonitorTransactionsV1ResponseTxInner>()
+        // stateChanges is written from the Corda RPC RX notification thread (inside the subscribe
+        // callback below) and read/mutated from Spring MVC HTTP worker threads (getTransactions /
+        // clearTransactions). A plain mutableSetOf() is a LinkedHashSet and is NOT thread-safe,
+        // which previously caused java.util.ConcurrentModificationException in clearTransactions
+        // and corrupted the set mid-iteration. Use a synchronized wrapper and guard every
+        // iteration / bulk operation with synchronized(stateChanges) { ... }.
+        val stateChanges: MutableSet<GetMonitorTransactionsV1ResponseTxInner> =
+            Collections.synchronizedSet(linkedSetOf())
+        var overflowWarned = false
         val monitorSub = stateUpdates.subscribe { update ->
             update.produced.forEach { change ->
-                val txResponse = GetMonitorTransactionsV1ResponseTxInner(indexCounter.toString(), change.toString())
-                indexCounter = indexCounter.add(BigInteger.valueOf(1))
-                logger.debug("Pushing new transaction for state '{}', index {}", stateName, indexCounter)
-                stateChanges.add(txResponse)
+                synchronized(stateChanges) {
+                    // Bound the buffer so a slow / disconnected / forgotten consumer cannot
+                    // drive the JVM to OutOfMemoryError. Drop the oldest entry on overflow.
+                    if (stateChanges.size >= maxBufferedChangesPerState) {
+                        val it = stateChanges.iterator()
+                        if (it.hasNext()) {
+                            it.next()
+                            it.remove()
+                        }
+                        if (!overflowWarned) {
+                            logger.warn(
+                                "State monitor buffer overflow for state '{}' (cap {}), dropping oldest entries",
+                                stateName, maxBufferedChangesPerState
+                            )
+                            overflowWarned = true
+                        }
+                    }
+                    val txResponse = GetMonitorTransactionsV1ResponseTxInner(indexCounter.toString(), change.toString())
+                    indexCounter = indexCounter.add(BigInteger.valueOf(1))
+                    logger.debug("Pushing new transaction for state '{}', index {}", stateName, indexCounter)
+                    stateChanges.add(txResponse)
+                }
             }
         }
         monitors[stateName] = StateMonitor(stateChanges, monitorSub)
@@ -79,11 +114,12 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
      * @return Set of corda state changes
      */
     fun getTransactions(stateName: String): MutableSet<GetMonitorTransactionsV1ResponseTxInner> {
-        if (!monitors.containsKey(stateName)) {
-            throw Exception("No monitor running for corda state $stateName on requested client")
-        }
+        val live = monitors[stateName]?.stateChanges
+            ?: throw Exception("No monitor running for corda state $stateName on requested client")
 
-        return monitors[stateName]?.stateChanges ?: mutableSetOf()
+        // Return an immutable snapshot so the Jackson serializer in the Spring response
+        // pipeline never walks the live set while the Corda RX thread is writing to it.
+        return synchronized(live) { LinkedHashSet(live) }
     }
 
     /**
@@ -95,10 +131,15 @@ class StateMonitorClientSession(private val rpc: NodeRPCConnection, private val 
      * @param indexesToRemove List of string indexes of transactions to remove.
      */
     fun clearTransactions(stateName: String, indexesToRemove: List<String>) {
-        val transactions = this.getTransactions(stateName)
-        logger.debug("Transactions before remove: {}", transactions.size)
-        transactions.removeAll { it.index in indexesToRemove }
-        logger.debug("Transactions after remove: {}", transactions.size)
+        // Mutate the live set directly (under its own monitor) instead of the snapshot
+        // returned by getTransactions(), otherwise the removal would be a no-op.
+        val transactions = monitors[stateName]?.stateChanges
+            ?: throw Exception("No monitor running for corda state $stateName on requested client")
+        synchronized(transactions) {
+            logger.debug("Transactions before remove: {}", transactions.size)
+            transactions.removeAll { it.index in indexesToRemove }
+            logger.debug("Transactions after remove: {}", transactions.size)
+        }
     }
 
     /**
