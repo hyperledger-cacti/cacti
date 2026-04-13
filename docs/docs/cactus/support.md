@@ -1,7 +1,7 @@
 Ledger Support for Connectors
 ============================================================================================
 
-This section contains the ledger supported versions for connectors in Hyperledger Cactus.
+This section contains the ledger supported versions for connectors in Hyperledger Cacti.
 
 *   [Besu](support/besu.md)
 *   [Corda](support/corda.md)
