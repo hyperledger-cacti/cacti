@@ -1,261 +1,265 @@
-- [Hyperledger Cacti Build Instructions](#hyperledger-cacti-build-instructions)
-- [Fast Developer Flow / Code Iterations](#fast-developer-flow--code-iterations)
-- [Getting Started](#getting-started)
-  - [VSCode Dev Container](#vscode-dev-container)
-  - [MacOS](#macos)
+# Hyperledger Cacti Build Guide
+
+This guide is for contributors who want to build and modify the Cacti codebase locally.
+If you only want to consume Cacti as an npm dependency, you likely do not need this document.
+
+---
+
+## Table of Contents
+
+- [Who This Guide Is For](#who-this-guide-is-for)
+- [Fast Developer Loop](#fast-developer-loop)
+- [Quick Start](#quick-start)
+- [Environment Setup](#environment-setup)
+  - [VS Code Dev Container](#vs-code-dev-container)
+  - [macOS](#macos)
   - [Linux](#linux)
   - [Windows](#windows)
-  - [Random Windows specific issues not covered here](#random-windows-specific-issues-not-covered-here)
-  - [Configure Cacti](#configure-cacti)
+  - [Windows Notes](#windows-notes)
+- [Configure Cacti](#configure-cacti)
+- [Common Development Commands](#common-development-commands)
 - [Build Script Decision Tree](#build-script-decision-tree)
-- [Configuring SSH to use upterm](#configuring-ssh-to-use-upterm)
+- [Enable Upterm in CI](#enable-upterm-in-ci)
 
-## Hyperledger Cacti Build Instructions
+---
 
-This is the place to start if you want to give Cactus a spin on your local
-machine or if you are planning on contributing.
+## Who This Guide Is For
 
-> This is not a guide for `using` Cactus for your projects that have business logic
-> but rather a guide for people who want to make changes to the code of Cactus.
-> If you are just planning on using Cactus as an npm dependency for your project,
-> then you might not need this guide at all.
+Use this guide if you want to:
 
-The project uses Typescript for both back-end and front-end components.
+- contribute code to Cacti
+- run and debug local packages
+- build plugins and test integrations
 
-## Fast Developer Flow / Code Iterations
+Cacti is primarily TypeScript across both backend and frontend components.
 
-We put a lot of thought and effort into making sure that fast developer iterations can be
-achieved (please file a bug if you feel otherwise) while working **on** the framework.
+## Fast Developer Loop
 
-If you find yourself waiting too much for builds to finish, most of the time
-that can be helped by using the `npm run watch` script which can automatically
-recompile packages as you modify them (and only the packages that you have
-modified, not everything).
+For most day-to-day development, use:
 
-It also supports re-running the OpenAPI generator when you update any
-`openapi.json` spec files that we use to describe our endpoints.
+```sh
+npm run watch
+```
 
-The `npm run watch` script in action:
+This command recompiles only what changed (instead of rebuilding everything), and it can also regenerate OpenAPI code when `openapi.json` files are updated.
 
 ![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
 
-## Getting Started
+## Quick Start
 
-### VSCode Dev Container
-* Install prerequisites
-  * [Git](https://github.com/git-guides/install-git#install-git-on-mac)
-  * [Visual Studio Code](https://code.visualstudio.com/)
-  * [Docker Desktop](https://www.docker.com/) (Please ensure Docker Desktop running when using VSCode Dev Container)
-  * [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) (Download this extension in VSCode)
+If you already have Docker, Node, and Git installed:
 
-* Direct Dev Container settings **(Suitable for Beginners)**
- 
-  * Clone the repository and open Cacti folder in VSCode
-  
-    ```
-    git clone https://github.com/hyperledger-cacti/cacti.git
-    ```
-  * Open the command palette (`F1` or `Ctrl+Shift+P`) and select **"Reopen in Container"**
-  * Wait for the container setup and start developing!
-    
-* Persistent Dev Environment settings with Docker Volume **(Suitable for Advanced Users)**
-  * Clone the repository and open Cacti folder in VSCode
-  
-    ```
-    git clone https://github.com/hyperledger-cacti/cacti.git
-    ```
-  * Create and run Docker Volume
+```sh
+git clone https://github.com/hyperledger-cacti/cacti.git
+cd cacti
+npm run enable-corepack
+yarn run configure
+```
 
-    ```
-    docker volume create cacti_volume
-    docker run -v cacti_volume:/workspace -w /workspace -it node:20.20.0 bash
-    ```
-  * Add Docker volume configuration to devcontainer.json
-    ```
-    "mounts": [
-      "source=cacti_volume,target=/workspace,type=volume"
-    ],
-    ```
-  * Open the command palette (`F1` or `Ctrl+Shift+P`) and select **"Reopen in Container"**
-  * Wait for the container setup and start developing!
-    
-### MacOS 
+Then start iterative development with:
 
-_Unless explicitly stated otherwise, each bullet will apply to both Intel and ARM Macs. In bullets where there is a difference in the installation process it will be noted._
-* Git
-  * https://github.com/git-guides/install-git#install-git-on-mac
-* NodeJS v20.20.0, npm v10.8.2 (we recommend using the Node Version Manager (nvm) if available for your OS)
-  * [Download nvm using script](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
-    * _See the Section "Macs with Apple Silicon Chips" under [macOS Troubleshooting](https://github.com/nvm-sh/nvm?tab=readme-ov-file#macos-troubleshooting) for ARM Mac specific instructions_
-  * [Download nvm using homebrew](https://sukiphan.medium.com/how-to-install-nvm-node-version-manager-on-macos-d9fe432cc7db)
-  * Using nvm install and use specific version of node: 
-    ```
-    nvm install 20.20.0
-    nvm use 20.20.0
-    ```
-* Yarn
-  * `npm run enable-corepack` (from within the project directory)
-* [Docker Engine is available on Mac OS through Docker Engine](https://docs.docker.com/desktop/install/mac-install/). 
-  * _See the difference in system requirements for Docker Desktop for Intel and ARM Macs under System Requirements on the page above._
-* Docker Compose
-  * Installing Docker Desktop on Mac will include Docker Compose 
-* OpenJDK (Corda support Java 8 JDK but do not currently support Java 9 or higher)
-  * [Follow instructions for Mac here](https://github.com/supertokens/supertokens-core/wiki/Installing-OpenJDK-for-Mac-and-Linux)
-* Go
-  * [Installing Go for Mac](https://go.dev/dl/)
-    * _Under featured downloads on the page above choose between the ARM64 or x86-64 option based on your machine._
-  * [Adding Environment Variable and Go extensions](https://code.visualstudio.com/docs/languages/go)
-* Foundry (required for SATP Hermes smart contract compilation)
-  * Install Foundry:
-    ```sh
-    curl -L https://foundry.paradigm.xyz | bash
-    ```
-  * Restart your terminal or run `source ~/.zshrc`, then:
-    ```sh
-    foundryup
-    ```
-  * Verify installation:
-    ```sh
-    forge --version
-    ```
+```sh
+npm run watch
+```
 
-### Linux
-* Insert Linux instructions here
+## Environment Setup
 
-### Windows 
-* Insert Linux instructions here 
+### VS Code Dev Container
 
-### Random Windows specific issues not covered here
+#### Prerequisites
 
-We recommend that you use WSL2 or any Linux VM (or bare metal).
-We test most frequently on Ubuntu 20.04 LTS
+- [Git](https://github.com/git-guides/install-git#install-git-on-mac)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Docker Desktop](https://www.docker.com/) (must be running)
+- [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
-### Configure Cacti 
-
-* Clone the repository
+#### Option A: Direct Dev Container (beginner friendly)
 
 ```sh
 git clone https://github.com/hyperledger-cacti/cacti.git
 ```
 
+1. Open the `cacti` folder in VS Code.
+2. Open command palette (`F1` or `Ctrl+Shift+P`).
+3. Select **Reopen in Container**.
+4. Wait for setup to finish.
 
-Windows specific gotcha: `File paths too long` error when cloning. To fix:
-Open PowerShell with administrative rights and then run the following:
+#### Option B: Persistent Volume Dev Container (advanced)
+
+```sh
+git clone https://github.com/hyperledger-cacti/cacti.git
+docker volume create cacti_volume
+docker run -v cacti_volume:/workspace -w /workspace -it node:20.20.0 bash
+```
+
+Add this mount to `devcontainer.json`:
+
+```json
+"mounts": [
+  "source=cacti_volume,target=/workspace,type=volume"
+]
+```
+
+Then reopen in container as in Option A.
+
+### macOS
+
+Unless noted, steps apply to both Intel and Apple Silicon.
+
+- **Git**
+  - [Install Git](https://github.com/git-guides/install-git#install-git-on-mac)
+- **Node.js and npm**
+  - Required: Node.js `20.20.0`, npm `10.8.2`
+  - Recommended: install with `nvm`
+    - [Install/update nvm via script](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
+    - [Apple Silicon troubleshooting](https://github.com/nvm-sh/nvm?tab=readme-ov-file#macos-troubleshooting)
+  - Install and select version:
+    ```sh
+    nvm install 20.20.0
+    nvm use 20.20.0
+    ```
+- **Yarn (via Corepack)**
+  - Run from project root: `npm run enable-corepack`
+- **Docker + Docker Compose**
+  - [Install Docker Desktop for Mac](https://docs.docker.com/desktop/install/mac-install/)
+  - Docker Compose is included with Docker Desktop
+- **OpenJDK**
+  - Corda supports Java 8 JDK (Java 9+ is not currently supported for this use case)
+  - [Install guide](https://github.com/supertokens/supertokens-core/wiki/Installing-OpenJDK-for-Mac-and-Linux)
+- **Go**
+  - [Install Go](https://go.dev/dl/)
+  - [VS Code Go tooling setup](https://code.visualstudio.com/docs/languages/go)
+- **Foundry** (required for SATP Hermes smart contract compilation)
+  - Install:
+    ```sh
+    curl -L https://foundry.paradigm.xyz | bash
+    ```
+  - Restart shell, then run:
+    ```sh
+    foundryup
+    forge --version
+    ```
+
+### Linux
+
+Recommended baseline:
+
+- Git
+- Node.js `20.20.0` and npm `10.8.2` (prefer `nvm`)
+- Docker Engine + Docker Compose
+- OpenJDK 8 (for Corda-related flows)
+- Go
+- Foundry (for SATP Hermes contract compilation)
+
+If you need a reference distro, Ubuntu LTS is the most frequently tested environment.
+
+### Windows
+
+Use **WSL2** if possible for the smoothest development experience.
+
+Recommended:
+
+- Windows 11/10 + WSL2
+- Ubuntu LTS inside WSL2
+- Docker Desktop with WSL integration enabled
+- Node.js via `nvm` inside WSL
+
+### Windows Notes
+
+If you see `File paths too long` when cloning, run PowerShell as Administrator:
 
 ```sh
 git config --system core.longpaths true
 ```
 
-* Change directories to the project root
+## Configure Cacti
+
+1. Clone and enter the repo:
 
 ```sh
+git clone https://github.com/hyperledger-cacti/cacti.git
 cd cacti
 ```
 
-* Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
+2. Enable Corepack:
 
 ```sh
 npm run enable-corepack
 ```
 
-* Run the initial configuration script (can take a long time, 10+ minutes on a low-spec laptop)
+3. Run initial configuration (can take 10+ minutes on low-spec machines):
 
 ```sh
 yarn run configure
 ```
 
-At this point you should have all packages built for development.
+After this, local packages should be ready for development.
 
-You can start making your changes (use your own fork and a feature branch)
-or just run existing tests and debug them to see how things fit together.
+## Common Development Commands
 
-For example you can *run a ledger single status endpoint test* via the
-REST API with this command:
+- Start incremental rebuild/watch mode:
 
-```sh
-npx tap --ts --timeout=600 packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
-```
+  ```sh
+  npm run watch
+  ```
 
-*You can also start the API server* and verify more complex scenarios with an
-arbitrary list of plugins loaded into Cactus. This is useful for when you intend
-to develop your plugin either as a Cactus maintained plugin or one on your own.
+- Run an example integration test:
 
-```sh
-npm run generate-api-server-config
-```
+  ```sh
+  npx tap --ts --timeout=600 packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
+  ```
 
-Notice how this task created a .config.json file in the project root with an
-example configuration that can be used a good starting point for you to make
-changes to it specific to your needs or wants.
+- Generate API server config:
 
-The most interesting part of the `.config.json` file is the plugins array which
-takes a list of plugin package names and their options (which can be anything
-that you can fit into a generic JSON object).
+  ```sh
+  npm run generate-api-server-config
+  ```
 
-Notice that to include a plugin, all you need is specify it's npm package name.
-This is important since it allows you to have your own plugins in their respective,
-independent Github repositories and npm packages where you do not have to seek
-explicit approval from the Cactus maintainers to create/maintain your plugin at all.
+  This creates `.config.json` in the project root. The `plugins` array is the most important section for loading plugin packages and options.
 
-Once you are satisfied with the `.config.json` file's contents you can just:
+- Start API server:
 
-```sh
-npm run start:api-server
-```
+  ```sh
+  npm run start:api-server
+  ```
 
-After starting the API server, you will see in the logs that plugins were loaded
-and that the API is reachable on the port you specified (4000 by default). The Web UI (Cockpit)
-is disabled by default but can be enabled by changing the property value 'cockpitEnabled'
-to true and it is reachable through port on the port your config
-specified (3000 by default).
+By default:
 
-> You may need to enable manually the CORS patterns in the configuration file.
-This may be slightly inconvenient, but something we are unable to compromise on
-despite valuing developer experience very much. We have decided that the
-software should be `secure by default` above all else and allow for
-customization/degradation of security as an opt-in feature rather than starting
-from that state.
+- API server listens on port `4000`
+- Cockpit UI is disabled unless `cockpitEnabled` is set to `true` in `.config.json` (default Cockpit port is typically `3000`)
 
-At this point, with the running API server, you can
-* Test the REST API directly with tools like cURL or Postman
-* Develop your own applications against it with the `Cactus API Client(s)`
-* Create and test your own plugins
+> You may need to manually set CORS patterns in your configuration. Cacti follows a secure-by-default approach.
+
+With the API server running, you can:
+
+- test endpoints via cURL/Postman
+- develop applications against Cacti API clients
+- build and test custom plugins
 
 ## Build Script Decision Tree
 
-The `npm run watch` script should cover 99% of the cases when it comes to working
-on Cactus code and having it recompile, but for that last 1% you'll need to
-get your hands dirty with the rest of the build scripts. Usually this is only
-needed when you are adding new dependencies (npm packages) as part of something
-that you are implementing.
-
-There are a lot of different build scripts in Cactus in order to provide contributors
-fine(r) grained control over what parts of the framework they wish build.
-
-> Q: Why the complexity of so many build scripts?
->
-> A: We could just keep it simple with a single build script that builds everything
-always, but that would be a nightmare to wait for after having changed a single
-line of code for example.
-
-To figure out which script could work for rebuilding Cactus, please follow
-the following decision tree (and keep in mind that we have `npm run watch` too)
+`npm run watch` should cover most development scenarios. For less common cases (for example, when adding new dependencies), use the build script decision tree:
 
 ![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
 
-## Configuring SSH to use upterm
-Upload your public key onto github if not done so already. A public key is necessary to join the ssh connection to use upterm. For a comprehensive guide, see the [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent).
+## Enable Upterm in CI
 
-Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code listed below:
-  - name: Setup upterm session
-    uses: lhotari/action-upterm@v1
-    with:
-      repo-token: ${{ secrets.GITHUB_TOKEN }}
+To debug GitHub Actions jobs interactively, you can add an Upterm step.
 
-Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v4.1.1) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details, see the [Debug your GitHub Actions by using ssh](https://github.com/marketplace/actions/debugging-with-ssh).
+1. Ensure your SSH public key is added to GitHub:
+   - [Generating a new SSH key and adding it to the ssh-agent](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+2. Edit `.github/workflows/ci.yml` and add this step **after checkout**:
 
-By creating a PR for the edited `ci.yml` file, this will the CI to run their tests. There are two ways to navigate to CIs.
-  1) Go to the PR and click the `checks` tab
-  2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
+```yaml
+- name: Setup upterm session
+  uses: lhotari/action-upterm@v1
+  with:
+    repo-token: ${{ secrets.GITHUB_TOKEN }}
+```
 
-Click on the `CI Cactus workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
+3. Open the workflow run (`PR checks` tab or `Actions` tab), then open the Upterm step output.
+4. Copy the provided `ssh ...@uptermd.upterm.dev` command and connect from your terminal.
+
+Reference:
+
+- [Debug your GitHub Actions by using SSH](https://github.com/marketplace/actions/debugging-with-ssh)
