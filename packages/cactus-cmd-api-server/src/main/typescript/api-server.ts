@@ -829,49 +829,67 @@ export class ApiServer {
       );
 
       log.debug("Installing gRPC services of IPluginGrpcService instances...");
-      pluginRegistry.getPlugins().forEach(async (x: ICactusPlugin) => {
-        if (!isIPluginGrpcService(x)) {
-          this.log.debug("%s skipping %s instance", fnTag, x.getPackageName());
-          return;
-        }
-        const opts = { logLevel };
-        log.info("%s Creating gRPC service of: %s", fnTag, x.getPackageName());
+      (async () => {
+        for (const x of pluginRegistry.getPlugins()) {
+          if (!isIPluginGrpcService(x)) {
+            this.log.debug(
+              "%s skipping %s instance",
+              fnTag,
+              x.getPackageName(),
+            );
+            continue;
+          }
+          const opts = { logLevel };
+          log.info(
+            "%s Creating gRPC service of: %s",
+            fnTag,
+            x.getPackageName(),
+          );
 
-        const svcPairs = await x.createGrpcSvcDefAndImplPairs(opts);
-        log.debug("%s Obtained %o gRPC svc pairs OK", fnTag, svcPairs.length);
+          const svcPairs = await x.createGrpcSvcDefAndImplPairs(opts);
+          log.debug("%s Obtained %o gRPC svc pairs OK", fnTag, svcPairs.length);
 
-        svcPairs.forEach(({ definition, implementation }) => {
-          const svcNames = Object.values(definition).map((x) => x.originalName);
-          const svcPaths = Object.values(definition).map((x) => x.path);
-          log.debug("%s Adding gRPC svc names %o ...", fnTag, svcNames);
-          log.debug("%s Adding gRPC svc paths %o ...", fnTag, svcPaths);
-          this.grpcServer.addService(definition, implementation);
-          log.debug("%s Added gRPC svc OK ...", fnTag);
-        });
-
-        log.info("%s Added gRPC service of: %s OK", fnTag, x.getPackageName());
-      });
-      log.debug("%s Installed all IPluginGrpcService instances OK", fnTag);
-
-      this.grpcServer.bindAsync(
-        grpcHostAndPort,
-        grpcTlsCredentials,
-        (error: Error | null, port: number) => {
-          if (error) {
-            this.log.error("%s Binding gRPC failed: ", fnTag, error);
-            return reject(new RuntimeError(fnTag + " gRPC bindAsync:", error));
-          } else {
-            this.log.info("%s gRPC server bound to port %o OK", fnTag, port);
+          for (const { definition, implementation } of svcPairs) {
+            const svcNames = Object.values(definition).map(
+              (x) => x.originalName,
+            );
+            const svcPaths = Object.values(definition).map((x) => x.path);
+            log.debug("%s Adding gRPC svc names %o ...", fnTag, svcNames);
+            log.debug("%s Adding gRPC svc paths %o ...", fnTag, svcPaths);
+            this.grpcServer.addService(definition, implementation);
+            log.debug("%s Added gRPC svc OK ...", fnTag);
           }
 
-          const portStr = port.toString(10);
-          this.boundGrpcHostPort = grpcHost.concat(":").concat(portStr);
-          log.info("%s boundGrpcHostPort=%s", fnTag, this.boundGrpcHostPort);
+          log.info(
+            "%s Added gRPC service of: %s OK",
+            fnTag,
+            x.getPackageName(),
+          );
+        }
+        log.debug("%s Installed all IPluginGrpcService instances OK", fnTag);
 
-          const family = determineAddressFamily(grpcHost);
-          resolve({ address: grpcHost, port, family });
-        },
-      );
+        this.grpcServer.bindAsync(
+          grpcHostAndPort,
+          grpcTlsCredentials,
+          (error: Error | null, port: number) => {
+            if (error) {
+              this.log.error("%s Binding gRPC failed: ", fnTag, error);
+              return reject(
+                new RuntimeError(fnTag + " gRPC bindAsync:", error),
+              );
+            } else {
+              this.log.info("%s gRPC server bound to port %o OK", fnTag, port);
+            }
+
+            const portStr = port.toString(10);
+            this.boundGrpcHostPort = grpcHost.concat(":").concat(portStr);
+            log.info("%s boundGrpcHostPort=%s", fnTag, this.boundGrpcHostPort);
+
+            const family = determineAddressFamily(grpcHost);
+            resolve({ address: grpcHost, port, family });
+          },
+        );
+      })().catch(reject);
     });
   }
 
