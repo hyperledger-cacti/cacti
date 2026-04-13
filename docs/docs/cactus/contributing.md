@@ -16,7 +16,7 @@ As a user, this can include:
 
 As a developer:
 
-*   if you only have a little time, consider picking up a ["help-wanted"](https://github.com/hyperledger-cacti/cacti/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger-cacti/cacti/labels/good%20first%20issue) task
+*   if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger-cacti/cacti/labels/help%20wanted) or [“good-first-issue”](https://github.com/hyperledger-cacti/cacti/labels/good%20first%20issue) task
     
 *   If you can commit to full-time development, then please contact us on our [Rocketchat channel](https://chat.hyperledger.org/channel/cactus) to work through logistics!
     
