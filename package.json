@@ -266,7 +266,7 @@
     "secp256k1": "5.0.1",
     "semver-parser": "4.1.4",
     "shebang-loader": "0.0.1",
-    "simple-git": "3.19.1",
+    "simple-git": "3.32.3",
     "sort-package-json": "1.57.0",
     "source-map-loader": "4.0.1",
     "stream-browserify": "3.0.0",
