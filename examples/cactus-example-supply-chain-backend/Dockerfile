@@ -58,7 +58,7 @@ RUN source ~/.bashrc && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-core-api": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-business-logic-plugin": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-example-supply-chain-frontend": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
-    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-consortium-manual": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
+    cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cacti-plugin-consortium-static": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-keychain-memory": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-besu": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \
     cat /usr/src/app/package.json | jq --arg NPM_PKG_VERSION ${NPM_PKG_VERSION} '.resolutions += { "@hyperledger/cactus-plugin-ledger-connector-fabric": "\($NPM_PKG_VERSION)" } ' | sponge /usr/src/app/package.json && \

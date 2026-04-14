@@ -41,9 +41,6 @@
       "path": "../cactus-example-supply-chain-business-logic-plugin/tsconfig.json"
     },
     {
-      "path": "../../packages/cactus-plugin-consortium-manual/tsconfig.json"
-    },
-    {
       "path": "../../packages/cactus-plugin-ledger-connector-besu/tsconfig.json"
     },
     {
