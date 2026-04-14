@@ -222,7 +222,6 @@ export class ApiServer {
         this.shutdown()
           .catch((ex: unknown) => {
             this.log.warn("Failed async-exit-hook for cmd-api-server", ex);
-            throw ex;
           })
           .finally(() => {
             this.log.info("Concluded async-exit-hook for cmd-api-server ...");
@@ -507,12 +506,13 @@ export class ApiServer {
 
     const registry = await this.getOrInitPluginRegistry();
 
-    const webServicesShutdown = registry
+    const plugins = registry
       .getPlugins()
-      .filter((pluginInstance) => isIPluginWebService(pluginInstance))
-      .map((pluginInstance: ICactusPlugin) => {
-        return (pluginInstance as IPluginWebService).shutdown();
-      });
+      .filter((pluginInstance) => isIPluginWebService(pluginInstance));
+
+    const webServicesShutdown = plugins.map((pluginInstance: ICactusPlugin) => {
+      return (pluginInstance as IPluginWebService).shutdown();
+    });
 
     if (this.wsApi) {
       this.log.info(`Disconnecting SocketIO connections...`);
@@ -521,7 +521,13 @@ export class ApiServer {
     }
 
     this.log.info(`Stopping ${webServicesShutdown.length} WS plugin(s)...`);
-    await Promise.all(webServicesShutdown);
+    const results = await Promise.allSettled(webServicesShutdown);
+    results.forEach((result, idx) => {
+      if (result.status === "rejected") {
+        const pluginId = plugins[idx].getInstanceId();
+        this.log.warn(`Plugin "${pluginId}" shutdown failed:`, result.reason);
+      }
+    });
     this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
 
     if (this.httpServerApi?.listening) {
@@ -804,32 +810,32 @@ export class ApiServer {
     const { logLevel } = this.options.config;
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
-    return new Promise((resolve, reject) => {
-      // const grpcHost = "0.0.0.0"; // FIXME - make this configurable (config-service.ts)
-      const grpcHost = "127.0.0.1"; // FIXME - make this configurable (config-service.ts)
-      const grpcHostAndPort = `${grpcHost}:${this.options.config.grpcPort}`;
+    // const grpcHost = "0.0.0.0"; // FIXME - make this configurable (config-service.ts)
+    const grpcHost = "127.0.0.1"; // FIXME - make this configurable (config-service.ts)
+    const grpcHostAndPort = `${grpcHost}:${this.options.config.grpcPort}`;
 
-      const grpcTlsCredentials = this.options.config.grpcMtlsEnabled
-        ? GrpcServerCredentials.createSsl(
-            Buffer.from(this.options.config.apiTlsCertPem),
-            [
-              {
-                cert_chain: Buffer.from(this.options.config.apiTlsCertPem),
-                private_key: Buffer.from(this.options.config.apiTlsKeyPem),
-              },
-            ],
-            true,
-          )
-        : GrpcServerCredentials.createInsecure();
+    const grpcTlsCredentials = this.options.config.grpcMtlsEnabled
+      ? GrpcServerCredentials.createSsl(
+          Buffer.from(this.options.config.apiTlsCertPem),
+          [
+            {
+              cert_chain: Buffer.from(this.options.config.apiTlsCertPem),
+              private_key: Buffer.from(this.options.config.apiTlsKeyPem),
+            },
+          ],
+          true,
+        )
+      : GrpcServerCredentials.createInsecure();
 
-      this.grpcServer.addService(
-        default_service.org.hyperledger.cactus.cmd_api_server
-          .DefaultServiceClient.service,
-        new GrpcServerApiServer(),
-      );
+    this.grpcServer.addService(
+      default_service.org.hyperledger.cactus.cmd_api_server
+        .DefaultServiceClient.service,
+      new GrpcServerApiServer(),
+    );
 
-      log.debug("Installing gRPC services of IPluginGrpcService instances...");
-      pluginRegistry.getPlugins().forEach(async (x: ICactusPlugin) => {
+    log.debug("Installing gRPC services of IPluginGrpcService instances...");
+    await Promise.all(
+      pluginRegistry.getPlugins().map(async (x: ICactusPlugin) => {
         if (!isIPluginGrpcService(x)) {
           this.log.debug("%s skipping %s instance", fnTag, x.getPackageName());
           return;
@@ -850,9 +856,11 @@ export class ApiServer {
         });
 
         log.info("%s Added gRPC service of: %s OK", fnTag, x.getPackageName());
-      });
-      log.debug("%s Installed all IPluginGrpcService instances OK", fnTag);
+      }),
+    );
+    log.debug("%s Installed all IPluginGrpcService instances OK", fnTag);
 
+    return new Promise((resolve, reject) => {
       this.grpcServer.bindAsync(
         grpcHostAndPort,
         grpcTlsCredentials,

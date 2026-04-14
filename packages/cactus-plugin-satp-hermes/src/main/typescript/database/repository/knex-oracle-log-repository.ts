@@ -13,8 +13,8 @@ export class KnexOracleLogRepository implements IOracleLogRepository {
   private created = false;
 
   public constructor(config: Knex.Config | undefined) {
-    const envName = process.env.ENVIRONMENT || "development";
-    const configFile = knexLocalInstance[envName];
+    const envName = process.env.ENVIRONMENT || "default";
+    const configFile = knexLocalInstance[envName] || knexLocalInstance.default;
     config = config || configFile;
 
     const migrationSource = createMigrationSource();
