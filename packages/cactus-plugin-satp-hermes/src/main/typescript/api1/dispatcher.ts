@@ -108,7 +108,7 @@ import {
 import { GetApproveAddressEndpointV1 } from "./transaction/get-approve-address-endpoint";
 import { getEnumValueByKey } from "../services/utils";
 import { GatewayIdentity } from "../core/types";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
 import { OracleExecuteTaskEndpointV1 } from "./oracle/oracle-execute-task-endpoint";
 import { registerTask } from "./oracle/oracle-register-task-handler-service";

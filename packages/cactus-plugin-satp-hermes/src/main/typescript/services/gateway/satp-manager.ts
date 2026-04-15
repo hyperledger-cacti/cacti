@@ -100,7 +100,7 @@ import {
   HealthCheckResponseStatusEnum,
   NetworkId,
 } from "../../generated/gateway-client/typescript-axios";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { SATP_IMPLEMENTED_LEDGERS } from "../../core/constants";
 import {
   ILocalLogRepository,

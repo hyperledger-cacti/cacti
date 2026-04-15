@@ -84,8 +84,8 @@
     "web3js-quorum": "22.4.0"
   },
   "devDependencies": {
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "2.1.0",
-    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-test-tooling": "3.0.0-alpha",
     "@types/bn.js": "5.2.0",
     "@types/express": "5.0.1",
     "ds-test": "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0",

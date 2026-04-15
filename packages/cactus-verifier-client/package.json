@@ -47,7 +47,7 @@
     "@hyperledger-cacti/cactus-core-api": "3.0.0-alpha"
   },
   "devDependencies": {
-    "@hyperledger-cacti/cactus-api-client": "2.1.0",
+    "@hyperledger-cacti/cactus-api-client": "3.0.0-alpha",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "3.0.0-alpha",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-corda": "3.0.0-alpha",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "3.0.0-alpha",

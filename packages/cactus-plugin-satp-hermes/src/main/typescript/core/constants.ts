@@ -31,7 +31,7 @@
  * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
  */
 
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
 /** Default port for SATP gateway server operations */
 export const DEFAULT_PORT_GATEWAY_SERVER = 3010;

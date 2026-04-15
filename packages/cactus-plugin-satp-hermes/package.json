@@ -250,7 +250,7 @@
     "@eslint/eslintrc": "3.3.1",
     "@eslint/js": "9.35.0",
     "@grpc/proto-loader": "0.7.13",
-    "@hyperledger-cacti/cactus-api-client": "2.1.0",
+    "@hyperledger-cacti/cactus-api-client": "3.0.0-alpha",
     "@hyperledger-cacti/cactus-test-geth-ledger": "3.0.0-alpha",
     "@jest/globals": "29.7.0",
     "@mermaid-js/mermaid-cli": "11.12.0",
