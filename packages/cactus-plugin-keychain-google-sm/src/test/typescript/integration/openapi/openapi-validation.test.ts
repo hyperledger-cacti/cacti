@@ -108,174 +108,134 @@ describe("PluginKeychainGoogleSm", () => {
   });
 
   it(` ${fSet} - ${cWithoutParams}`, async () => {
-    try {
-      await apiClient.setKeychainEntryV1({
-        value,
-      } as unknown as SetKeychainEntryRequestV1);
-    } catch (e) {
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("key")).toBeTrue();
-    }
+    const setKeychainEntryCall = apiClient.setKeychainEntryV1({
+      value,
+    } as unknown as SetKeychainEntryRequestV1);
+    await expect(setKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 
   it(` ${fGet} - ${cWithoutParams}`, async () => {
-    try {
-      await apiClient.getKeychainEntryV1(
-        {} as unknown as GetKeychainEntryRequestV1,
-      );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("key")).toBeTrue();
-    }
+    const getKeychainEntryCall = apiClient.getKeychainEntryV1(
+      {} as unknown as GetKeychainEntryRequestV1,
+    );
+    await expect(getKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 
   it(` ${fHas} - ${cWithoutParams}`, async () => {
-    try {
-      await apiClient.hasKeychainEntryV1(
-        {} as unknown as HasKeychainEntryRequestV1,
-      );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("key")).toBeTrue();
-    }
+    const hasKeychainEntryCall = apiClient.hasKeychainEntryV1(
+      {} as unknown as HasKeychainEntryRequestV1,
+    );
+    await expect(hasKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 
   it(` ${fDelete} - ${cWithoutParams}`, async () => {
-    try {
-      await apiClient.deleteKeychainEntryV1(
-        {} as unknown as DeleteKeychainEntryRequestV1,
-      );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("key")).toBeTrue();
-    }
+    const deleteKeychainEntryCall = apiClient.deleteKeychainEntryV1(
+      {} as unknown as DeleteKeychainEntryRequestV1,
+    );
+    await expect(deleteKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 
   it(` ${fSet} - ${cInvalidParams}`, async () => {
-    try {
-      await apiClient.setKeychainEntryV1({
-        key,
-        value,
-        fake: 4,
-      } as any as SetKeychainEntryRequestV1);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("fake")).toBeTrue();
-    }
+    const setKeychainEntryCall = apiClient.setKeychainEntryV1({
+      key,
+      value,
+      fake: 4,
+    } as any as SetKeychainEntryRequestV1);
+    await expect(setKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 
   it(` ${fGet} - ${cInvalidParams}`, async () => {
-    try {
-      await apiClient.getKeychainEntryV1({
-        key,
-        fake: 4,
-      } as unknown as GetKeychainEntryRequestV1);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("fake")).toBeTrue();
-    }
+    const getKeychainEntryCall = apiClient.getKeychainEntryV1({
+      key,
+      fake: 4,
+    } as unknown as GetKeychainEntryRequestV1);
+    await expect(getKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 
   it(` ${fHas} - ${cInvalidParams}`, async () => {
-    try {
-      await apiClient.hasKeychainEntryV1({
-        key,
-        fake: 4,
-      } as unknown as HasKeychainEntryRequestV1);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("fake")).toBeTrue();
-    }
+    const hasKeychainEntryCall = apiClient.hasKeychainEntryV1({
+      key,
+      fake: 4,
+    } as unknown as HasKeychainEntryRequestV1);
+    await expect(hasKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 
   it(` ${fDelete} - ${cInvalidParams}`, async () => {
-    try {
-      await apiClient.deleteKeychainEntryV1({
-        key,
-        fake: 4,
-      } as unknown as DeleteKeychainEntryRequestV1);
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: unknown) => {
-        if (!hasKey(param, "path")) {
-          throw new TypeError("Expected param.path to exist.");
-        }
-        if (typeof param.path !== "string") {
-          throw new TypeError("Expected param.path to be string");
-        }
-        return param.path.replace("/body/", "");
-      });
-
-      expect(fields.includes("fake")).toBeTrue();
-    }
+    const deleteKeychainEntryCall = apiClient.deleteKeychainEntryV1({
+      key,
+      fake: 4,
+    } as unknown as DeleteKeychainEntryRequestV1);
+    await expect(deleteKeychainEntryCall).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            path: expect.stringContaining("/body/"),
+          }),
+        ]),
+      },
+    });
   });
 });
