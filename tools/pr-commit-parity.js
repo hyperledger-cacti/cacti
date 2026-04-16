@@ -1,3 +1,5 @@
+const FETCH_TIMEOUT_MS = 10000; // 10 seconds
+
 // Levenshtein Distance string metric is used for calculating
 // string similarity which changes from 0 to 1,
 // for 1 being exactly the same
@@ -52,31 +54,46 @@ function stringSimilarity(str1, str2) {
   const distance = levenshteinDistance(str1, str2);
   const similarity = (maxLen - distance) / maxLen;
 
-  return Number(similarity.toFixed(2));
+  return similarity;
 }
 
 export async function fetchJsonFromUrl(url) {
-  const fetchResponse = await fetch(url, {
-    headers: {
-      Accept: "application/vnd.github+json",
-    },
-  });
-
-  if (!fetchResponse.ok) {
-    const errorText = await fetchResponse.text().catch(() => "");
-    throw new Error(
-      `Failed to fetch ${url}: ${fetchResponse.status} ${fetchResponse.statusText}${
-        errorText ? ` - ${errorText.slice(0, 200)}` : ""
-      }`,
-    );
-  }
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
   try {
-    return await fetchResponse.json();
+    const fetchResponse = await fetch(url, {
+      headers: {
+        Accept: "application/vnd.github+json",
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (!fetchResponse.ok) {
+      const errorText = await fetchResponse.text().catch(() => "");
+      throw new Error(
+        `Failed to fetch ${url}: ${fetchResponse.status} ${fetchResponse.statusText}${
+          errorText ? ` - ${errorText.slice(0, 200)}` : ""
+        }`,
+      );
+    }
+
+    try {
+      return await fetchResponse.json();
+    } catch (error) {
+      throw new Error(
+        `Failed to parse JSON from ${url}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
   } catch (error) {
-    throw new Error(
-      `Failed to parse JSON from ${url}: ${error instanceof Error ? error.message : String(error)}`,
-    );
+    clearTimeout(timeoutId);
+    if (error.name === "AbortError") {
+      throw new Error(`Fetch to ${url} timed out after ${FETCH_TIMEOUT_MS}ms`);
+    }
+    throw error;
   }
 }
 
@@ -100,9 +117,17 @@ const ACCEPTABLE_SIMILARITY_RATIO = parseFloat(args[1]);
 // const pullReqUrl = "https://api.github.com/repos/hyperledger/cactus/pulls/3338";
 // const ACCEPTABLE_SIMILARITY_RATIO = 0.9;
 
-if (!pullReqUrl || Number.isNaN(ACCEPTABLE_SIMILARITY_RATIO)) {
+if (
+  !pullReqUrl ||
+  typeof ACCEPTABLE_SIMILARITY_RATIO !== "number" ||
+  ACCEPTABLE_SIMILARITY_RATIO < 0 ||
+  ACCEPTABLE_SIMILARITY_RATIO > 1
+) {
   console.error(
     "Usage: node pr-commit-parity.js <pullReqUrl> <acceptableSimilarityRatio>",
+  );
+  console.error(
+    "Error: acceptableSimilarityRatio must be a number between 0 and 1 (inclusive).",
   );
   process.exit(1);
 }
