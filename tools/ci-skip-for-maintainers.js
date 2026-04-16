@@ -12,10 +12,70 @@ const MAINTAINERS_REGEX = new RegExp(
   "g",
 );
 
-const main = async () => {
-  const markdownContent = readFileSync(MaintainersFile, "utf-8");
+const fetchJsonFromUrl = async (url, fetchFn) => {
+  const fetchResponse = await fetchFn(url);
+  return fetchResponse.json();
+};
 
-  const args = process.argv.slice(2);
+export const extractMaintainers = (maintainerMetaData) => {
+  let match;
+  const maintainers = [];
+  while ((match = MAINTAINERS_REGEX.exec(maintainerMetaData)) !== null) {
+    const github = match[2];
+    maintainers.push(github);
+  }
+  return maintainers;
+};
+
+export const checkSkipCI = (commitMessageList, logger = console) => {
+  for (const commitMessage of commitMessageList) {
+    if (
+      typeof commitMessage === "string" &&
+      commitMessage.includes(SKIP_CACTI)
+    ) {
+      logger.log("Skip requested in commit message.");
+      return true;
+    }
+  }
+
+  logger.log("No skip request found.");
+  return false;
+};
+
+export const getCommitMessageList = async (
+  pullReqUrl,
+  { fetchFn = fetch, logger = console } = {},
+) => {
+  if (!pullReqUrl) {
+    logger.log("No pull request URL detected. Proceeding with CI.");
+    return [];
+  }
+
+  const commitMessagesMetadata = await fetchJsonFromUrl(
+    `${pullReqUrl}/commits`,
+    fetchFn,
+  );
+
+  if (!Array.isArray(commitMessagesMetadata)) {
+    logger.warn("Commit metadata payload is not a list. Proceeding with CI.");
+    return [];
+  }
+
+  return commitMessagesMetadata
+    .map((commitMessageMetadata) => commitMessageMetadata?.commit?.message)
+    .filter((commitMessage) => typeof commitMessage === "string");
+};
+
+export const run = async ({
+  args = process.argv.slice(2),
+  fetchFn = fetch,
+  readFile = readFileSync,
+  logger = console,
+  exit = process.exit,
+  maintainersFilePath = MaintainersFile,
+} = {}) => {
+  const markdownContent = readFile(maintainersFilePath, "utf-8");
+
   const pullReqUrl = args[0];
   const committerLogin = args[1];
 
@@ -23,81 +83,53 @@ const main = async () => {
   //const pullReqUrl = "https://api.github.com/repos/<username>/cactus/pulls/<number>";
   //const committerLogin = "<username>";
 
-  const fetchJsonFromUrl = async (url) => {
-    const fetchResponse = await fetch(url);
-    return fetchResponse.json();
-  };
-
-  let commitMessageList = [];
-  const commitMessagesMetadata = await fetchJsonFromUrl(
-    pullReqUrl + "/commits",
-  );
-
-  commitMessagesMetadata.forEach((commitMessageMetadata) => {
-    // get commit message body
-    commitMessageList.push(commitMessageMetadata["commit"]["message"]);
+  const commitMessageList = await getCommitMessageList(pullReqUrl, {
+    fetchFn,
+    logger,
   });
-
-  // Check if skip-ci is found in commit message
-  const checkSkipCI = () => {
-    for (let commitMessageListIndex in commitMessageList) {
-      let commitMessage = commitMessageList[commitMessageListIndex];
-      if (commitMessage.includes(SKIP_CACTI)) {
-        console.log("Skip requested in commit message.");
-        return true;
-      } else {
-        console.log("No skip request found.");
-      }
-      return false;
-    }
-  };
-
-  // Function to extract active maintainers
-  const extractMaintainers = (maintainerMetaData) => {
-    let match;
-    const maintainers = [];
-    while ((match = MAINTAINERS_REGEX.exec(maintainerMetaData)) !== null) {
-      const github = match[2];
-      maintainers.push(github);
-    }
-    return maintainers;
-  };
-  // Get the maintainers
-  const activeMaintainers = extractMaintainers(markdownContent);
-  activeMaintainers.forEach((maintainers) => {
-    maintainers;
-  });
-
-  // Check if committer is a trusted maintainer
-  const checkCommitterIsMaintainer = () => {
-    if (activeMaintainers.includes(committerLogin)) {
-      console.log("The author of this PR is an active maintainer.");
-      return true;
-    } else {
-      console.log(
-        "CI will not be skipped. \nThe author of this PR is not an active maintainer.\nPlease refer to https://github.com/hyperledger/cacti/blob/main/MAINTAINERS.md for the list of active maintainers.",
-      );
-      return false;
-    }
-  };
 
   // Main logic
+  const shouldSkipCI = checkSkipCI(commitMessageList, logger);
 
-  const shouldSkipCI = checkSkipCI();
-
-  if (shouldSkipCI) {
-    const isMaintainer = checkCommitterIsMaintainer();
-    if (isMaintainer) {
-      console.log(
-        "Exit with an error code so as to pause the dependent workflows. CI skipped as per request.",
-      );
-      process.exit(1); // Exit successfully to skip CI
-    }
-  } else {
-    console.log("No skip requested. Proceeding with CI.");
-    process.exit(0); // Exit successfully to run CI
+  if (!shouldSkipCI) {
+    logger.log("No skip requested. Proceeding with CI.");
+    exit(0); // Exit successfully to run CI
+    return 0;
   }
+
+  const activeMaintainers = extractMaintainers(markdownContent);
+
+  if (!committerLogin) {
+    logger.log(
+      "CI will not be skipped. Missing committer login in invocation context.",
+    );
+    exit(0);
+    return 0;
+  }
+
+  if (activeMaintainers.includes(committerLogin)) {
+    logger.log("The author of this PR is an active maintainer.");
+    logger.log(
+      "Exit with an error code so as to pause the dependent workflows. CI skipped as per request.",
+    );
+    exit(1); // Exit with an error code to skip CI
+    return 1;
+  }
+
+  logger.log(
+    "CI will not be skipped. \nThe author of this PR is not an active maintainer.\nPlease refer to https://github.com/hyperledger/cacti/blob/main/MAINTAINERS.md for the list of active maintainers.",
+  );
+  exit(0);
+  return 0;
 };
 
-// Run the main function
-main();
+const isDirectExecution =
+  typeof process.argv[1] === "string" &&
+  import.meta.url === new URL(`file://${process.argv[1]}`).href;
+
+if (isDirectExecution) {
+  run().catch((error) => {
+    console.error("check ci skip crashed:", error);
+    process.exit(1);
+  });
+}
