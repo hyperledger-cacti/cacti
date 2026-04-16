@@ -113,6 +113,7 @@ describe("PluginKeychainGoogleSm", () => {
     } as unknown as SetKeychainEntryRequestV1);
     await expect(setKeychainEntryCall).rejects.toMatchObject({
       response: {
+        status: 400,
         data: expect.arrayContaining([
           expect.objectContaining({
             path: expect.stringContaining("/body/"),

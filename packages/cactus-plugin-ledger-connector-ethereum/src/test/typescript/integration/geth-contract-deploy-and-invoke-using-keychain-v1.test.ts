@@ -246,7 +246,14 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       },
     });
     await expect(deployContractCall).rejects.toMatchObject({
-      message: expect.any(String),
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            message: expect.stringContaining("Expected type string but got type undefined"),
+          }),
+        ]),
+      },
     });
   });
 
@@ -265,7 +272,14 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       fake: 4,
     } as DeployContractV1Request);
     await expect(deployContractCall).rejects.toMatchObject({
-      message: expect.any(String),
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            message: expect.stringContaining('Unknown property "fake"'),
+          }),
+        ]),
+      },
     });
   });
 
@@ -307,7 +321,14 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       },
     });
     await expect(invokeContractCall).rejects.toMatchObject({
-      message: expect.any(String),
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            message: expect.stringContaining("Method 'foo' not found in contract"),
+          }),
+        ]),
+      },
     });
 
     const getNameOut = await apiClient.invokeContractV1({
@@ -537,7 +558,14 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
       },
     } as InvokeContractV1Request);
     await expect(invokeContractCall).rejects.toMatchObject({
-      message: expect.any(String),
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            message: expect.stringContaining("Expected type string but got type undefined"),
+          }),
+        ]),
+      },
     });
   });
 
