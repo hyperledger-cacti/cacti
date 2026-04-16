@@ -348,7 +348,7 @@ describe(testCase, () => {
       web3SigningCredential,
       nonce: 4,
     });
-    await expect(invokeContractCall).rejects.not.toThrow("Nonce too low");
+    await expect(invokeContractCall).rejects.toThrow("Nonce too low");
 
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
