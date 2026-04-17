@@ -45,7 +45,7 @@ jobs:
   # This job builds the TypeDoc documentation for the SATP Hermes Gateway
   
   build-docs:
-    runs-on: ubuntu-latest-16-cores
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.7
