@@ -19,7 +19,7 @@ import { ApiServer } from "../../../../main/typescript/api-server";
 
 const logLevel: LogLevelDesc = "INFO";
 
-test("can install plugin-ledger-connector-fabric", async (t: Test) => {
+test("can install plugin-ledger-connector-fabric without peerBinary", async (t: Test) => {
   const pluginsPath = path.join(
     __dirname, // start at the current file's path
     "../../../../../../../", // walk back up to the project root
@@ -49,7 +49,6 @@ test("can install plugin-ledger-connector-fabric", async (t: Test) => {
         instanceId: randomUUID(),
         logLevel,
         connectionProfile: {},
-        peerBinary: "peer",
       },
     },
   ];
