@@ -24,6 +24,7 @@
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
   "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
