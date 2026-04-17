@@ -7,3 +7,11 @@ If you think you have discovered a security issue in any of the Hyperledger proj
 In order to report a security bug please email a description of the flaw and any related information (e.g. reproduction steps, version) to [security at hyperledger dot org](mailto:security@hyperledger.org).
 
 The process by which the Hyperledger Security Team handles security bugs is documented further in our [Defect Response page](https://wiki.hyperledger.org/display/SEC/Defect+Response) on our [wiki](https://wiki.hyperledger.org).
+
+## Proactive Package Reviews
+
+Cacti also maintains a proactive security review program for high-impact
+packages such as connectors, keychains, persistence packages, and the API
+server. The review workflow and checklist live in the documentation site:
+
+- [Security Review Program](docs/docs/cactus/security-review-program.md)
