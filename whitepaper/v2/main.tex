@@ -1,0 +1,85 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{longtable}
+\usepackage{microtype}
+\usepackage{parskip}
+
+\geometry{margin=1in}
+
+\title{Hyperledger Cacti Whitepaper\\Version 2}
+\author{Hyperledger Cacti Contributors}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Hyperledger Cacti provides a framework for interoperability across distributed
+ledger technologies and related enterprise systems. This second whitepaper is a
+living source document for the architecture, trust assumptions, deployment
+models, and research foundations of the project.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+\section{Status}
+
+This document is the version 2 source scaffold. It intentionally starts as a
+concise outline so maintainers can evolve the whitepaper in reviewable changes.
+
+\section{Motivation}
+
+Enterprise interoperability requires systems that can coordinate actions,
+state, identities, and evidence across networks with different governance
+models. Cacti brings together connector, routing, validation, and application
+components so deployments can integrate ledgers without treating every
+interoperability problem as a one-off integration.
+
+\section{Scope}
+
+The whitepaper should describe:
+
+\begin{itemize}
+  \item Cacti's goals and non-goals.
+  \item Supported interoperability patterns.
+  \item Core architectural components and extension points.
+  \item Security and trust assumptions.
+  \item Operational and deployment models.
+  \item Related research, specifications, papers, and theses.
+\end{itemize}
+
+\section{Architecture Outline}
+
+\subsection{Connectors}
+
+Connectors expose ledger-specific capabilities through common APIs and plugin
+interfaces.
+
+\subsection{Validation and Verification}
+
+Validation components provide evidence handling, proof verification, and
+cross-network state checking where supported by the target networks.
+
+\subsection{Applications and Tooling}
+
+Cacti includes application-level packages, examples, and operational tooling
+that demonstrate how interoperability components are composed.
+
+\section{Research and Prior Art}
+
+The bibliography is intentionally kept in source form so papers, theses, and
+specifications can be reviewed alongside the text that cites them.
+
+\nocite{hyperledger-cacti-docs}
+\nocite{hyperledger-cacti-repo}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
