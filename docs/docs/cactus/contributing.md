@@ -1,11 +1,11 @@
 Contributing
 ==========================================================
 
-Thank you for your interest to contribute to Hyperledger Cactus! :tada:
+Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
 First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
 
-There are many ways to contribute to Hyperledger Cactus, both as a user and as a developer.
+There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
 
 As a user, this can include:
 
@@ -160,7 +160,7 @@ Ensure all the following conditions are met (on top of you agreeing with the cha
     3.  If you are adamant that you do not want to merge a PR with multiple commits, that is completely understandable and fair game. The recommended approach there is to ask the contributor to break the pull request up to multiple pull requests by doing an interactive rebase on their branch and cherry picking/re-ordering things accordingly. This is a fairly advanced git use case so you might want to help them out with it (or ask Peter who is the one constantly nagging everyone about these git rules…)
         
 
-To protect the Hyperledger Cactus source code, GitHub pull requests are accepted from forked repositories only. There are also quality standards identified and documented here that will be enhanced over time.
+To protect the Hyperledger Cacti source code, GitHub pull requests are accepted from forked repositories only. There are also quality standards identified and documented here that will be enhanced over time.
 
 Create local branch
 ------------------------------------------------------------------------
@@ -209,13 +209,13 @@ Create local branch
 7.  Repeat step 3 to 6 when you need to prepare posting new pull request.
     
 
-NOTE: Once you submitted pull request to Cactus repository, step 6 is not necessary when you made further changes with `git commit --amend` since your amends will be sent automatically.
+NOTE: Once you submitted pull request to Cacti repository, step 6 is not necessary when you made further changes with `git commit --amend` since your amends will be sent automatically.
 
 NOTE: You can refer original tutorial [‘GitHub Standard Fork & Pull Request Workflow’](https://gist.github.com/Chaser324/ce0505fbed06b947d962)
 
 ### Directory structure
 
-Whenever you begin to use your codes on Hyperledger Cactus, you should follow the directory strecture on Hyperledger Cactus. The current directory structure is described as the following:
+Whenever you begin to use your codes on Hyperledger Cacti, you should follow the directory structure on Hyperledger Cacti. The current directory structure is described as the following:
 
 > *   contrib/ : Contributions from each participants, which are not directly dependent on Cactus code.
 >     
@@ -353,7 +353,7 @@ Working with the Code
 
 There are additional details about this in the [BUILD.md](#./BUILD.md) file in the project root as well.
 
-We use Lerna for managing the [monorepo](https://blog.npmjs.org/post/186494959890/monorepos-and-npm) that is Cactus.
+We use Lerna for managing the [monorepo](https://blog.npmjs.org/post/186494959890/monorepos-and-npm) that is Cacti.
 
 > We heavily rely on Docker for testing the ledger plugins.
 
@@ -424,7 +424,7 @@ The specific classes that utilize the `all-in-one` images can be found in the `t
 
 Ledger plugin tests are written the same way as any other test (which is difficult to achieve, but we thrive to get it done).
 
-The only difference between a ledger connector plugin test case and any unit test is that the ledger connector plugin’s test case will pull up a docker container from one of the `all-in-one` images that we maintain as part of Cactus and then use that `all-in-one-*` container to verify things such as the ability of the ledger connector plugin to deploy a contract to said ledger.
+The only difference between a ledger connector plugin test case and any unit test is that the ledger connector plugin’s test case will pull up a docker container from one of the `all-in-one` images that we maintain as part of Cacti and then use that `all-in-one-*` container to verify things such as the ability of the ledger connector plugin to deploy a contract to said ledger.
 
 As a generic best practice, the test cases should never re-use any `all-in-one` ledger container for the execution of multiple test cases because that will almost surely lead to flaky/unstable test cases over the long run and needless complexity, ordering dependencies and so on. It is recommended that if you have two test cases for a ledger connector plugin, they both pull up a newly created container from scratch, execute the test scenario and then tear down and delete the container completely.
 
