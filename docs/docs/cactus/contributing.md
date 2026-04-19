@@ -99,7 +99,7 @@ PR Checklist - Contributor/Developer
         
     2.  Be aware that we are using git commit hooks for the automation of certain mundane tasks such as applying the required code style and formatting so your code will be wrapped at 80 characters each line automatically. If you wish to see how your changes will be altered by the formatter you can run the `npm run prettier` command from a terminal or install an IDE extension for the `Prettier` tool that can do the same (VSCode has one that is known to work).
         
-8.  Ensure your branch is rebased onto the `upstream` main branch where `upstream` is fancy git talk for the main Cactus repo on Github (the one you created your fork from).
+8.  Ensure your branch is rebased onto the `upstream` main branch where `upstream` is fancy git talk for the main Cacti repo on Github (the one you created your fork from).
     
     1.  **Do not** duplicate your pull request after it has been reviewed. Duplication here means closing the existing PR and then opening a brand new one which does not contain the review history anymore. If you encounter issues with version control that you do not know how to solve the maintainers will be happy to assist to ensure that you do not need to open a new pull request from scratch.
         
@@ -133,7 +133,7 @@ PR Checklist - Contributor/Developer
     
 16.  try to add the change in a way that does not produce additional commits on the PR but instead do an `git commit --amend --signoff` on your local branch and then a force push to the remote branch of yours (the PR essentially). Again, if the change you are doing does not fit within any one of the existing commits of your PR, then it is justified to add a new commit and this is up to your discretion (maintainers may respectfully ask you to squash if they see otherwise)
     
-17.  The rule of thumb for any and all things in git/Cactus is to maintain a clean, tidy commit log/history that enables everyone to easily look up changes and find accurate answers to the basic questions of `Who? / What? / When / Why?`. If you have ever been in a situation when you tried to figure out the original point a bug was introduced (and tried to figure out why the offending change was made in the first place) and the git blame just lead you to a 10 megabyte large patch with the message ‘merge xyz’, then you know exactly what it is we are trying to avoid here. :-)
+17.  The rule of thumb for any and all things in git/Cacti is to maintain a clean, tidy commit log/history that enables everyone to easily look up changes and find accurate answers to the basic questions of `Who? / What? / When / Why?`. If you have ever been in a situation when you tried to figure out the original point a bug was introduced (and tried to figure out why the offending change was made in the first place) and the git blame just lead you to a 10 megabyte large patch with the message ‘merge xyz’, then you know exactly what it is we are trying to avoid here. :-)
     
 
 PR Checklist - Maintainer/Reviewer
