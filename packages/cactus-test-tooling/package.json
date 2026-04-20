@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "@hyperledger/cactus-common": "2.1.0",
-    "axios": "1.15.0",
+    "axios": "1.15.1",
     "compare-versions": "3.6.0",
     "dockerode": "3.3.0",
     "elliptic": "6.6.1",
