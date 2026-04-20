@@ -18,8 +18,10 @@ build-local:
 		cp -r ../../../common/protos-js/package.json ./protos-js/) || \
 		(rm -rf protos-js && echo "Error: Please build weaver/common/protos-js locally" && exit 1)
 	yarn install
-	cp -r protos-js build/
+	rm -rf build
 	yarn run build
+	mkdir -p build
+	cp -r protos-js build/
 	
 
 .PHONE: publish

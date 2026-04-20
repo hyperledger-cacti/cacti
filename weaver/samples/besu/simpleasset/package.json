@@ -34,8 +34,8 @@
     "clean": "rm -rf node_modules package-lock.json build",
     "clean-run": "rm -rf package-lock.json build",
     "copy-interop-contracts": "cp ../../../core/network/besu/contracts/interop/manageAssetAny.sol contracts/ && cp ../../../core/network/besu/interface/asset-exchange/transferInterface.sol contracts/ && cp ../../../common/protos-sol/asset_locks.proto.sol contracts/",
-    "deploy-contract": "npm run copy-interop-contracts && npm install --workspaces=false && npm run update-truffle-config && truffle compile && truffle migrate",
-    "redeploy": "npm run copy-interop-contracts && truffle migrate --reset",
+    "deploy-contract": "yarn run copy-interop-contracts && yarn install && yarn run update-truffle-config && yarn run truffle compile && yarn run truffle migrate",
+    "redeploy": "yarn run copy-interop-contracts && yarn run truffle migrate --reset",
     "update-truffle-config": "node get-network-details.js"
   },
   "dependencies": {
