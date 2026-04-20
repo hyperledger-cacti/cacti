@@ -7388,7 +7388,7 @@ __metadata:
     "@types/react": "npm:18.2.39"
     "@types/react-dom": "npm:18.2.17"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     copy-webpack-plugin: "npm:12.0.2"
     css-loader: "npm:7.1.2"
     customize-cra: "npm:1.0.0"
@@ -7426,7 +7426,7 @@ __metadata:
     "@types/react-dom": "npm:18.2.17"
     "@vitejs/plugin-react": "npm:5.1.0"
     apexcharts: "npm:3.45.2"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     buffer: "npm:6.0.3"
     ethers: "npm:6.12.1"
     react: "npm:18.2.0"
@@ -7453,7 +7453,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/json-stable-stringify": "npm:1.2.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -7482,7 +7482,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -7603,7 +7603,7 @@ __metadata:
     google-protobuf: "npm:3.21.4"
     jest: "npm:29.6.2"
     pkg: "npm:5.8.1"
-    protobufjs: "npm:7.4.0"
+    protobufjs: "npm:8.0.1"
     ts-jest: "npm:29.1.1"
     ts-node: "npm:10.9.1"
     typescript: "npm:5.5.2"
@@ -7779,7 +7779,7 @@ __metadata:
     "@types/xml2js": "npm:0.4.9"
     "@vercel/ncc": "npm:0.38.1"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     benchmark: "npm:2.1.4"
     bluebird: "npm:3.7.2"
     body-parser: "npm:1.20.3"
@@ -7916,7 +7916,7 @@ __metadata:
     ajv: "npm:8.18.0"
     ajv-draft-04: "npm:1.0.0"
     ajv-formats: "npm:3.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     express: "npm:5.1.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -8011,7 +8011,7 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
@@ -8102,7 +8102,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     cors: "npm:2.8.5"
     crypto-js: "npm:4.2.0"
@@ -8168,7 +8168,7 @@ __metadata:
     "@hyperledger/aries-askar-nodejs": "npm:0.2.3"
     "@hyperledger/indy-vdr-nodejs": "npm:0.2.3"
     "@types/inquirer": "npm:8.2.6"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     inquirer: "npm:8.2.6"
     loglevel: "npm:1.8.1"
   bin:
@@ -8197,7 +8197,7 @@ __metadata:
     "@types/jsrsasign": "npm:10.5.8"
     "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     cookie-parser: "npm:1.4.6"
     debug: "npm:3.1.0"
@@ -8283,7 +8283,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     dotenv: "npm:16.0.0"
     express: "npm:5.1.0"
     express-jwt: "npm:8.4.1"
@@ -8318,7 +8318,7 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
@@ -8400,7 +8400,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     dockerode: "npm:3.3.0"
     express: "npm:5.1.0"
@@ -8430,7 +8430,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/json-stable-stringify": "npm:1.0.33"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -8458,7 +8458,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
@@ -8485,7 +8485,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     express: "npm:5.1.0"
     joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
@@ -8505,7 +8505,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/bn.js": "npm:5.2.0"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     bn.js: "npm:5.2.2"
     dotenv: "npm:16.3.1"
     ds-test: "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
@@ -8533,7 +8533,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
     aws-sdk: "npm:2.965.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8562,7 +8562,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8588,7 +8588,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     google-gax: "npm:4.0.5"
@@ -8610,7 +8610,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     cpy-cli: "npm:4.2.0"
     del-cli: "npm:5.1.0"
@@ -8635,7 +8635,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -8660,7 +8660,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/tape-promise": "npm:4.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8696,7 +8696,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest: "npm:29.6.2"
@@ -8726,7 +8726,7 @@ __metadata:
     "@types/google-protobuf": "npm:3.15.5"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     benchmark: "npm:2.1.4"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
@@ -8742,7 +8742,7 @@ __metadata:
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
-    protobufjs: "npm:7.4.0"
+    protobufjs: "npm:8.0.1"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
@@ -8773,7 +8773,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:18.11.9"
     "@types/sanitize-html": "npm:2.6.2"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
@@ -8795,7 +8795,7 @@ __metadata:
     "@types/multer": "npm:1.4.7"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.2.0"
@@ -8834,7 +8834,7 @@ __metadata:
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     chalk: "npm:4.1.2"
     ethers: "npm:6.8.1"
@@ -8886,7 +8886,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     bl: "npm:6.1.0"
     bn.js: "npm:4.12.0"
     body-parser: "npm:1.20.3"
@@ -8949,7 +8949,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/sanitize-html": "npm:2.9.5"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
@@ -8986,7 +8986,7 @@ __metadata:
     "@types/supertest": "npm:2.0.11"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     bl: "npm:6.1.0"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.2.0"
@@ -9020,7 +9020,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     cbor: "npm:9.0.1"
     express: "npm:5.1.0"
@@ -9043,7 +9043,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -9074,7 +9074,7 @@ __metadata:
     "@multiformats/multiaddr": "npm:11.6.1"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     ipfs-core-types: "npm:0.14.1"
@@ -9108,7 +9108,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
@@ -9141,7 +9141,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fabric-network: "npm:2.5.0-snapshot.23"
@@ -9217,7 +9217,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
     "@vercel/ncc": "npm:0.38.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     bignumber.js: "npm:9.1.2"
     bn.js: "npm:5.2.1"
     body-parser: "npm:1.20.3"
@@ -9260,7 +9260,7 @@ __metadata:
     npm-run-all: "npm:4.1.5"
     pg: "npm:8.13.1"
     prettier: "npm:3.2.5"
-    protobufjs: "npm:7.2.5"
+    protobufjs: "npm:8.0.1"
     puppeteer: "npm:24.23.0"
     reflect-metadata: "npm:0.2.2"
     run-time-error-cjs: "npm:1.4.0"
@@ -9348,7 +9348,7 @@ __metadata:
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.1.0"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
     tape: "npm:5.6.3"
@@ -9371,7 +9371,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -9396,7 +9396,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -9442,7 +9442,7 @@ __metadata:
     "@hyperledger/cactus-verifier-client": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
     jest-extended: "npm:7.0.0"
@@ -9502,7 +9502,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/tar-stream": "npm:2.2.1"
     "@types/temp": "npm:0.9.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.1"
     compare-versions: "npm:3.6.0"
     dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.1"
@@ -9721,7 +9721,7 @@ __metadata:
     secp256k1: "npm:5.0.1"
     semver-parser: "npm:4.1.4"
     shebang-loader: "npm:0.0.1"
-    simple-git: "npm:3.32.3"
+    simple-git: "npm:3.36.0"
     sort-package-json: "npm:1.57.0"
     source-map-loader: "npm:4.0.1"
     stream-browserify: "npm:3.0.0"
@@ -15488,6 +15488,22 @@ __metadata:
     "@sigstore/core": "npm:^1.1.0"
     "@sigstore/protobuf-specs": "npm:^0.3.2"
   checksum: 10/68a1bb341e93a86f738b4e55be8812034df398bdae1746b5f8c7e49d35c6a223ff634fa70b55152de5db992e8356cfaeae5779d6d805ecf4dd18caf167de8b95
+  languageName: node
+  linkType: hard
+
+"@simple-git/args-pathspec@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@simple-git/args-pathspec@npm:1.0.3"
+  checksum: 10/74bcc00123cd0da800fc5a6417f83f2f4fce66eb38749efc2ca3b6e4c431c6edaabe80c5834714c155f6ba07582069b182420eda27a601353fb5a3b48917d7e0
+  languageName: node
+  linkType: hard
+
+"@simple-git/argv-parser@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "@simple-git/argv-parser@npm:1.1.1"
+  dependencies:
+    "@simple-git/args-pathspec": "npm:^1.0.3"
+  checksum: 10/89f49ee1e9a936318d443a21b04fa8adcd7a3fa4d2d9ebc947d6d4f347d65db5fbcfec37f3d75711f2724d7886506f3003144735e244e1eea6badef58696d99f
   languageName: node
   linkType: hard
 
@@ -21390,13 +21406,13 @@ __metadata:
   linkType: hard
 
 "axios@npm:>=1.8.4":
-  version: 1.15.0
-  resolution: "axios@npm:1.15.0"
+  version: 1.15.1
+  resolution: "axios@npm:1.15.1"
   dependencies:
     follow-redirects: "npm:^1.15.11"
     form-data: "npm:^4.0.5"
     proxy-from-env: "npm:^2.1.0"
-  checksum: 10/d39a2c0ebc7ff4739401b282e726cc2673377949d6c46d60eb619458f8d7a2f7eadbcada7097f4dbc7d5c59abb4d3bf6fac33d474412bc3415d3f5aa7ed45530
+  checksum: 10/bfa286e29d1866695426b45c9a25ef21975669e500a8511a01e2fe5b9c4f734906701266d214b562dc525e463bae2bbba24c8e9e10c214f0d4f4c669e9372a7f
   languageName: node
   linkType: hard
 
@@ -21960,9 +21976,9 @@ __metadata:
   linkType: hard
 
 "basic-ftp@npm:^5.0.2":
-  version: 5.1.0
-  resolution: "basic-ftp@npm:5.1.0"
-  checksum: 10/49cdc2e0282487131520bbcd9b72215d6f66064799cdbbd3aecc6c1df06635e603dd9a2b8e940a4f7e6045f94486dee51143adb82c13a9d5d866f2fd987438b9
+  version: 5.3.0
+  resolution: "basic-ftp@npm:5.3.0"
+  checksum: 10/08eef717642f32d92936e02f516ab6426ecc61084e4a75b542cd202dd84dddff2520dda321db1be34b7e49860cf1b2aed67ab275dc3e53b185949df311241396
   languageName: node
   linkType: hard
 
@@ -22295,12 +22311,12 @@ __metadata:
   linkType: hard
 
 "brace-expansion@npm:^1.1.7":
-  version: 1.1.12
-  resolution: "brace-expansion@npm:1.1.12"
+  version: 1.1.14
+  resolution: "brace-expansion@npm:1.1.14"
   dependencies:
     balanced-match: "npm:^1.0.0"
     concat-map: "npm:0.0.1"
-  checksum: 10/12cb6d6310629e3048cadb003e1aca4d8c9bb5c67c3c321bafdd7e7a50155de081f78ea3e0ed92ecc75a9015e784f301efc8132383132f4f7904ad1ac529c562
+  checksum: 10/2de747a5891ea0d3a1946ea1ae26e056a47f7ea8d42a3009e1736ec3a31a5aa69a3c5da59d998426773553afe4c258e5b12d7953b534fa7f2cf12ce92eed4931
   languageName: node
   linkType: hard
 
@@ -27469,14 +27485,14 @@ __metadata:
   linkType: hard
 
 "dompurify@npm:^3.2.5, dompurify@npm:^3.3.1":
-  version: 3.3.1
-  resolution: "dompurify@npm:3.3.1"
+  version: 3.4.0
+  resolution: "dompurify@npm:3.4.0"
   dependencies:
     "@types/trusted-types": "npm:^2.0.7"
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 10/f71cca489e628591165d16e8cf4fa4f0d3e2ee48db4d73e9d2c5bedc6f915c92f9e9f101f8c4ba790bec0cdffe7f4e1747f5e31c69dc53ce7ae20a81ff6b0022
+  checksum: 10/ead40b78ec51cd451f2c74fada4233ee0afeafdbab54af2f4a4bd5d4d138ac04d0d85140e79f533803ecfd1c3758edc1176087039c1e7217824f9794a9d34d2c
   languageName: node
   linkType: hard
 
@@ -31490,12 +31506,12 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.12.1, follow-redirects@npm:^1.15.11":
-  version: 1.15.11
-  resolution: "follow-redirects@npm:1.15.11"
+  version: 1.16.0
+  resolution: "follow-redirects@npm:1.16.0"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: 10/07372fd74b98c78cf4d417d68d41fdaa0be4dcacafffb9e67b1e3cf090bc4771515e65020651528faab238f10f9b9c0d9707d6c1574a6c0387c5de1042cde9ba
+  checksum: 10/3fbe3d80b3b544c22705d837aa5d4a0d07a740d913534a2620b0a004c610af4148e3b58723536dd099aaa1c9d3a155964bde9665d6e5cb331460809a1fc572fd
   languageName: node
   linkType: hard
 
@@ -46431,8 +46447,8 @@ __metadata:
   linkType: hard
 
 "protobufjs@npm:>=7.2.5":
-  version: 8.0.0
-  resolution: "protobufjs@npm:8.0.0"
+  version: 8.0.1
+  resolution: "protobufjs@npm:8.0.1"
   dependencies:
     "@protobufjs/aspromise": "npm:^1.1.2"
     "@protobufjs/base64": "npm:^1.1.2"
@@ -46446,7 +46462,7 @@ __metadata:
     "@protobufjs/utf8": "npm:^1.1.0"
     "@types/node": "npm:>=13.7.0"
     long: "npm:^5.0.0"
-  checksum: 10/f9f2bc0acd37ca85ad4afb030fb3973cb93129e54623d7d36255a0406f852505afae4a94a88b305bca3a6384675bb34c7602dfa64cab6b67f95597234a94681d
+  checksum: 10/71431cbb8013206052f404a01b0e10b2f1a07595937eebaba7f30e168b50d26ad1a1d5d6f6d23fa3497c0ee4ad2983ad598aec7e68f0f3ee17ed49a4842a86da
   languageName: node
   linkType: hard
 
@@ -49866,14 +49882,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.32.3":
-  version: 3.32.3
-  resolution: "simple-git@npm:3.32.3"
+"simple-git@npm:3.36.0":
+  version: 3.36.0
+  resolution: "simple-git@npm:3.36.0"
   dependencies:
     "@kwsites/file-exists": "npm:^1.1.1"
     "@kwsites/promise-deferred": "npm:^1.1.1"
+    "@simple-git/args-pathspec": "npm:^1.0.3"
+    "@simple-git/argv-parser": "npm:^1.1.0"
     debug: "npm:^4.4.0"
-  checksum: 10/9ec8d0cb7a1f813fe56be71cfaf85f44960befa03528560b0d8234eab957cf2a11e62e7b90e0c88066b6db314c8559698f9c13c64602aec56e0834c7508e4c83
+  checksum: 10/79a745464798bce17fc5c286ff4a44ba07d368a745d03d31f3c3cef51bd63b98dc29e72f55dda087b64e5db90e5e9f91a7429543ddf08d105d9a069c525e6818
   languageName: node
   linkType: hard
 
