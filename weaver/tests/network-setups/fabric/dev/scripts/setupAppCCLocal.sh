@@ -40,6 +40,7 @@ cp -r ${APP_CC_PATH} ${CHAINCODE_PATH}/${CC_NAME}
     go mod edit -dropreplace github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3 || true)
 (cd ${CHAINCODE_PATH}/${CC_NAME} && \
     go mod edit -dropreplace github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils || true)
+(cd ${CHAINCODE_PATH}/${CC_NAME} && go mod vendor)
 
 (cd ${APP_CC_PATH} && make undo-vendor)
 
