@@ -222,7 +222,6 @@ export class ApiServer {
         this.shutdown()
           .catch((ex: unknown) => {
             this.log.warn("Failed async-exit-hook for cmd-api-server", ex);
-            throw ex;
           })
           .finally(() => {
             this.log.info("Concluded async-exit-hook for cmd-api-server ...");
@@ -507,12 +506,13 @@ export class ApiServer {
 
     const registry = await this.getOrInitPluginRegistry();
 
-    const webServicesShutdown = registry
+    const plugins = registry
       .getPlugins()
-      .filter((pluginInstance) => isIPluginWebService(pluginInstance))
-      .map((pluginInstance: ICactusPlugin) => {
-        return (pluginInstance as IPluginWebService).shutdown();
-      });
+      .filter((pluginInstance) => isIPluginWebService(pluginInstance));
+
+    const webServicesShutdown = plugins.map((pluginInstance: ICactusPlugin) => {
+      return (pluginInstance as IPluginWebService).shutdown();
+    });
 
     if (this.wsApi) {
       this.log.info(`Disconnecting SocketIO connections...`);
@@ -521,7 +521,13 @@ export class ApiServer {
     }
 
     this.log.info(`Stopping ${webServicesShutdown.length} WS plugin(s)...`);
-    await Promise.all(webServicesShutdown);
+    const results = await Promise.allSettled(webServicesShutdown);
+    results.forEach((result, idx) => {
+      if (result.status === "rejected") {
+        const pluginId = plugins[idx].getInstanceId();
+        this.log.warn(`Plugin "${pluginId}" shutdown failed:`, result.reason);
+      }
+    });
     this.log.info(`Stopped ${webServicesShutdown.length} WS plugin(s) OK`);
 
     if (this.httpServerApi?.listening) {

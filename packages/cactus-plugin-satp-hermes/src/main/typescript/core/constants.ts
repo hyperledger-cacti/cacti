@@ -31,6 +31,8 @@
  * @see {@link https://datatracker.ietf.org/doc/draft-ietf-satp-core/} IETF SATP Core Specification
  */
 
+import { LedgerType } from "@hyperledger/cactus-core-api";
+
 /** Default port for SATP gateway server operations */
 export const DEFAULT_PORT_GATEWAY_SERVER = 3010;
 /** Default port for SATP gateway client operations */
@@ -47,3 +49,14 @@ export const SATP_CORE_VERSION = "v02";
 export const SATP_ARCHITECTURE_VERSION = "v02";
 /** SATP Crash Recovery specification version */
 export const SATP_CRASH_VERSION = "v02";
+
+/**
+ * Hardcoded map of ledger types that SATP has implemented support for.
+ * This represents the gateway's actual bridge capabilities.
+ */
+export const SATP_IMPLEMENTED_LEDGERS: ReadonlySet<LedgerType> = new Set([
+  LedgerType.Fabric2,
+  LedgerType.Besu1X,
+  LedgerType.Besu2X,
+  LedgerType.Ethereum,
+]);
