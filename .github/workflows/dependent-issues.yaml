@@ -6,7 +6,9 @@ on:
       - opened
       - edited
       - reopened
-  pull_request:
+  # pull_request_target grants write scope on fork PRs. Safe here because
+  # this action only reads PR metadata and never checks out PR head code.
+  pull_request_target:
     types:
       - opened
       - edited
@@ -18,6 +20,12 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  statuses: write
 
 jobs:
   check:
