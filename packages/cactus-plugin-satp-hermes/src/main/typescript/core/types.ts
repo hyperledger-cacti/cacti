@@ -227,6 +227,17 @@ export interface RemoteLog {
   signerPubKey: string;
 }
 
+export interface OracleLog {
+  taskId: string;
+  type: string;
+  key: string;
+  operation: string;
+  timestamp?: string;
+  data: string;
+  operationId?: string;
+  sequenceNumber: number;
+}
+
 export { SATPServiceInstance };
 
 /**

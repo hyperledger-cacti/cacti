@@ -1,16 +1,16 @@
-Hyperledger Cactus Build Instructions
+Hyperledger Cacti Build Instructions
 =====================================
 
-This is the place to start if you want to give Cactus a spin on your local machine or if you are planning on contributing.
+This is the place to start if you want to give Cacti a spin on your local machine or if you are planning on contributing.
 
-> This is not a guide for `using` Cactus for your projects that have business logic but rather a guide for people who want to make changes to the code of Cactus. If you are just planning on using Cactus as an npm dependency for your project, then you might not need this guide at all.
+> This is not a guide for `using` Cacti for your projects that have business logic but rather a guide for people who want to make changes to the code of Cacti. If you are just planning on using Cacti as an npm dependency for your project, then you might not need this guide at all.
 
 The project uses Typescript for both back-end and front-end components.
 
 Developers guide
 ----------------
 
-This is a video guide to setup Hyperledger Cactus on your local machine.
+This is a video guide to setup Hyperledger Cacti on your local machine.
 
 ### Installing git
 
@@ -96,14 +96,14 @@ Getting Started
             
     *   Git
         
-    *   NodeJS v16.14.2, npm v8.5.0 (we recommend using the Node Version Manager (nvm) if available for your OS)
+    *   NodeJS v20.20.0, npm v10.8.2 (we recommend using the Node Version Manager (nvm) if available for your OS)
         
-        nvm install 16.14.2
-        nvm use 16.14.2
+        nvm install 20.20.0
+        nvm use 20.20.0
         
     *   Yarn
         
-        *   `npm run install-yarn` (from within the project directory)
+        *   `npm run enable-corepack` (from within the project directory)
             
     *   [Docker Engine](https://docs.docker.com/engine/install/ubuntu/). Make sure that Docker is working and running, for example, running `docker ps -aq`
         
@@ -118,11 +118,25 @@ Getting Started
         *   [Installing the SDK](https://github.com/hyperledger/indy-sdk#installing-the-sdk)
             
         *   [Build the SDK from source](https://github.com/hyperledger/indy-sdk#how-to-build-indy-sdk-from-source)
-            
+
+    *   Foundry (required for SATP Hermes smart contract compilation)
+
+        ```sh
+        curl -L https://foundry.paradigm.xyz | bash
+        ```
+
+        Restart your terminal or run `source ~/.zshrc`, then:
+
+        ```sh
+        foundryup
+        ```
+
+        Verify installation: `forge --version`
+
 *   Clone the repository
     
 
-git clone https://github.com/hyperledger/cactus.git
+git clone https://github.com/hyperledger-cacti/cacti.git
 
 Windows specific gotcha: `File paths too long` error when cloning. To fix: Open PowerShell with administrative rights and then run the following:
 
@@ -131,7 +145,7 @@ git config \--system core.longpaths true
 *   Change directories to the project root
     
 
-cd cactus
+cd cacti
 
 *   Run this command to enable corepack (Corepack is included by default with all Node.js installs, but is currently opt-in.)
     

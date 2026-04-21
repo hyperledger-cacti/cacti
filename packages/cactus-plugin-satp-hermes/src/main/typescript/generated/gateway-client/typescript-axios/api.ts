@@ -2719,6 +2719,19 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerToolDetails {
     'logoURI': string;
 }
 /**
+ * List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
+ * @export
+ * @interface GetSupportedLedgers200Response
+ */
+export interface GetSupportedLedgers200Response {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GetSupportedLedgers200Response
+     */
+    'supportedLedgers': Array<string>;
+}
+/**
  * Response schema for healthcheck endpoint indicating the availability status of the service.
  * @export
  * @interface HealthCheckResponse
@@ -4347,6 +4360,19 @@ export const StatusResponseStepEnum = {
 export type StatusResponseStepEnum = typeof StatusResponseStepEnum[keyof typeof StatusResponseStepEnum];
 
 /**
+ * List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
+ * @export
+ * @interface SupportedLedgersResponse
+ */
+export interface SupportedLedgersResponse {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof SupportedLedgersResponse
+     */
+    'supportedLedgers': Array<string>;
+}
+/**
  * Metadata detailing a supported token
  * @export
  * @interface Token
@@ -5110,6 +5136,36 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+         * @summary Get supported ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSupportedLedgers: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
          * @summary Pause a transaction session
          * @param {PauseRequest} pauseRequest Pause request object.
@@ -5239,6 +5295,16 @@ export const AdminApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+         * @summary Get supported ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSupportedLedgers(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetSupportedLedgers200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSupportedLedgers(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
          * @summary Pause a transaction session
          * @param {PauseRequest} pauseRequest Pause request object.
@@ -5309,6 +5375,15 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          */
         getStatus(sessionID: string, options?: any): AxiosPromise<Transact200ResponseStatusResponse> {
             return localVarFp.getStatus(sessionID, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+         * @summary Get supported ledgers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSupportedLedgers(options?: any): AxiosPromise<GetSupportedLedgers200Response> {
+            return localVarFp.getSupportedLedgers(options).then((request) => request(axios, basePath));
         },
         /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
@@ -5386,6 +5461,17 @@ export class AdminApi extends BaseAPI {
      */
     public getStatus(sessionID: string, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).getStatus(sessionID, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
+     * @summary Get supported ledgers
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public getSupportedLedgers(options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).getSupportedLedgers(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
