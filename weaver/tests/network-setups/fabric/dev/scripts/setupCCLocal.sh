@@ -36,6 +36,7 @@ cp -r $INTEROP_CC_PATH/contracts/interop $CHAINCODE_PATH/interop
     go mod edit -dropreplace github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3 || true)
 (cd $CHAINCODE_PATH/interop && \
     go mod edit -dropreplace github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils || true)
+(cd $CHAINCODE_PATH/interop && go mod vendor)
 
 (cd $INTEROP_CC_PATH/contracts/interop && make undo-vendor)
 echo "Done."
