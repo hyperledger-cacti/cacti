@@ -48,16 +48,14 @@ export async function getIntegrationsService(
 
   logger.info(`${fnTag}, getting integrations service...`);
 
-  const supportedSystems = manager.getConnectedDLTs();
+  const loadedLedgers = manager.getLoadedLedgers();
 
-  return supportedSystems.map((supportedSystem) =>
-    convertconnectedDLTsIntoIntegrations(supportedSystem),
+  return loadedLedgers.map((networkId) =>
+    convertNetworkIdToIntegration(networkId),
   );
 }
 
-function convertconnectedDLTsIntoIntegrations(
-  networkId: NetworkId,
-): Integration {
+function convertNetworkIdToIntegration(networkId: NetworkId): Integration {
   switch (networkId.ledgerType) {
     case LedgerType.Fabric2:
       return {

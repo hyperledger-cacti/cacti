@@ -779,7 +779,7 @@ export class Stage3ClientService extends SATPService {
 
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${stepTag}`);
-        this.dbLogger.persistLogEntry({
+        await this.dbLogger.persistLogEntry({
           sessionId: sessionData.id,
           type: "burn-asset",
           operation: "init",
@@ -789,7 +789,7 @@ export class Stage3ClientService extends SATPService {
         this.Log.debug(`${fnTag}, Burning Asset...`);
         try {
           this.Log.info(`exec-${stepTag}`);
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "burn-asset",
             operation: "exec",
@@ -832,7 +832,7 @@ export class Stage3ClientService extends SATPService {
           sessionData.burnAssertionClaim.signature = bufArray2HexStr(
             sign(this.Signer, sessionData.burnAssertionClaim.receipt),
           );
-          this.dbLogger.storeProof({
+          await this.dbLogger.storeProof({
             sessionId: sessionData.id,
             type: "burn-asset",
             operation: "done",
@@ -841,7 +841,7 @@ export class Stage3ClientService extends SATPService {
           });
           this.Log.info(`${fnTag}, done-${fnTag}`);
         } catch (error) {
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "burn-asset",
             operation: "fail",

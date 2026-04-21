@@ -100,6 +100,8 @@ import {
   HealthCheckResponseStatusEnum,
   NetworkId,
 } from "../../generated/gateway-client/typescript-axios";
+import { LedgerType } from "@hyperledger/cactus-core-api";
+import { SATP_IMPLEMENTED_LEDGERS } from "../../core/constants";
 import {
   ILocalLogRepository,
   IRemoteLogRepository,
@@ -127,6 +129,7 @@ export interface ISATPManagerOptions {
   claimFormat?: ClaimFormat;
   monitorService: MonitorService;
   adapterManager?: AdapterManager;
+  supportedLedgers?: LedgerType[];
 }
 export class SATPManager {
   public static readonly CLASS_NAME = "SATPManager";
@@ -159,6 +162,8 @@ export class SATPManager {
 
   private readonly claimFormat: ClaimFormat;
 
+  private readonly supportedLedgers?: LedgerType[];
+
   constructor(public readonly options: ISATPManagerOptions) {
     const fnTag = `${SATPManager.CLASS_NAME}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
@@ -183,6 +188,7 @@ export class SATPManager {
     this.remoteRepository = options.remoteRepository;
     this.auditRepository = options.auditRepository;
     this.claimFormat = options.claimFormat || ClaimFormat.DEFAULT;
+    this.supportedLedgers = options.supportedLedgers;
     const satpLoggerConfig: IGatewayPersistenceConfig = {
       localRepository: this.localRepository,
       remoteRepository: this.remoteRepository,
@@ -325,6 +331,35 @@ export class SATPManager {
 
   public getConnectedDLTs(): NetworkId[] {
     return this.ourGateway.connectedDLTs || [];
+  }
+
+  /**
+   * Returns the intersection of operator-configured supported ledgers and
+   * the hardcoded set of ledger types that SATP has implemented bridges for.
+   *
+   * If the operator did not restrict ledgers via config, returns all
+   * implemented ledger types.
+   */
+  public getSupportedLedgers(): LedgerType[] {
+    if (
+      this.supportedLedgers !== undefined &&
+      this.supportedLedgers.length > 0
+    ) {
+      return this.supportedLedgers.filter((l) =>
+        SATP_IMPLEMENTED_LEDGERS.has(l),
+      );
+    }
+    return Array.from(SATP_IMPLEMENTED_LEDGERS);
+  }
+
+  /**
+   * Returns the list of ledger networks for which the gateway has
+   * successfully initialized bridge leafs (via the BridgeManager).
+   */
+  public getLoadedLedgers(): NetworkId[] {
+    return this.ccManager
+      .getClientBridgeManagerInterface()
+      .getAvailableEndPoints();
   }
 
   public getSATPHandler(type: SATPHandlerType): SATPHandler | undefined {
