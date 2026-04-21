@@ -1,8 +1,0 @@
-fingerprint.json
-/target
-protos-rs
-/db
-.env
-*.db
-*.sql
-*.out

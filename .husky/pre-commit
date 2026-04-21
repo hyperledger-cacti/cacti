@@ -1,7 +1,0 @@
-#!/bin/sh
-echo  "pre-commit hook, running yarn run lint"
-yarn run lint
-if [ $? -ne 0 ]; then
-	echo "Lint failed. Please fix errors before committing."
-	exit 1
-fi

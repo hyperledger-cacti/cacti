@@ -1,6 +1,0 @@
-*.d.ts
-**/dist/
-**/bin/
-**/generated/
-**/src/main/typescript/generated/**
-**/public/**
