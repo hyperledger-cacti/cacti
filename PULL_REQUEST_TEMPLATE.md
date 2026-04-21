@@ -4,8 +4,8 @@
 - [ ] Follow the Commit Linting specification. You may refer to this [link](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification) for more information. 
 
 **Character Limit**
-- [ ] Pull Request Title and Commit Subject must not exceed 72 characters (including spaces and special characters).
-- [ ] Commit Message per line must not exceed 80 characters (including spaces and special characters).
+- [ ] Pull Request Title and Commit Subject must not exceed 80 characters (including spaces and special characters).
+- [ ] Commit Message per line must not exceed 102 characters (including spaces and special characters).
 
 **A Must Read for Beginners**
 For rebasing and squashing, here's a [must read guide](https://github.com/servo/servo/wiki/Beginner's-guide-to-rebasing-and-squashing) for beginners.
