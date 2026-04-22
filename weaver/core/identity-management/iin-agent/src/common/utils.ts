@@ -12,9 +12,9 @@ import crypto from "crypto";
 const { X509Certificate } = require("crypto");
 
 // Weaver Packages
-import agent_grpc_pb from "@hyperledger/cacti-weaver-protos-js/identity/agent_grpc_pb";
-import agent_pb from "@hyperledger/cacti-weaver-protos-js/identity/agent_pb";
-import membership_pb from "@hyperledger/cacti-weaver-protos-js/common/membership_pb";
+import agent_grpc_pb from "@hyperledger-cacti/cacti-weaver-protos-js/identity/agent_grpc_pb";
+import agent_pb from "@hyperledger-cacti/cacti-weaver-protos-js/identity/agent_pb";
+import membership_pb from "@hyperledger-cacti/cacti-weaver-protos-js/common/membership_pb";
 import { InteroperableHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
 
 // Local modules

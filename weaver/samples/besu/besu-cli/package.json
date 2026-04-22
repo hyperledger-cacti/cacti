@@ -53,7 +53,7 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "2.1.0",
     "@hyperledger/cacti-weaver-sdk-besu": "2.1.0",
     "@truffle/contract": "4.6.28",
     "gluegun": "5.1.6",

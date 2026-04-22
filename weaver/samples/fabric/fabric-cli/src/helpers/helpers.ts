@@ -14,7 +14,7 @@ import {
   query,
   InvocationSpec,
 } from "./fabric-functions";
-import { AssetPledge } from "@hyperledger/cacti-weaver-protos-js/common/asset_transfer_pb";
+import { AssetPledge } from "@hyperledger-cacti/cacti-weaver-protos-js/common/asset_transfer_pb";
 import { InteroperableHelper } from "@hyperledger/cacti-weaver-sdk-fabric";
 import * as crypto from "crypto";
 import { promisify } from "util";

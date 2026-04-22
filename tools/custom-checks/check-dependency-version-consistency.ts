@@ -52,7 +52,7 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger/cactus-example-electricity-trade",
   "@hyperledger/cactus-example-supply-chain-backend",
   "@hyperledger/cactus-example-supply-chain-business-logic-plugin",
-  "@hyperledger/cacti-weaver-protos-js",
+  "@hyperledger-cacti/cacti-weaver-protos-js",
   "@hyperledger/cacti-weaver-besu-cli",
   "@hyperledger/cacti-weaver-driver-fabric",
   "@hyperledger/cacti-weaver-fabric-cli",

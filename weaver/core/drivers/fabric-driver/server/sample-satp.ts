@@ -5,9 +5,9 @@
  */
 
 import * as path from "path";
-import satp_pb from "@hyperledger/cacti-weaver-protos-js/relay/satp_pb";
-import satp_grpc_pb from "@hyperledger/cacti-weaver-protos-js/relay/satp_grpc_pb";
-import driverPb from "@hyperledger/cacti-weaver-protos-js/driver/driver_pb";
+import satp_pb from "@hyperledger-cacti/cacti-weaver-protos-js/relay/satp_pb";
+import satp_grpc_pb from "@hyperledger-cacti/cacti-weaver-protos-js/relay/satp_grpc_pb";
+import driverPb from "@hyperledger-cacti/cacti-weaver-protos-js/driver/driver_pb";
 import logger from "./logger";
 import { credentials } from "@grpc/grpc-js";
 import { SatpAssetManager } from "@hyperledger/cacti-weaver-sdk-fabric";
