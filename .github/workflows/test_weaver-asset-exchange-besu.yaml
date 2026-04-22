@@ -142,7 +142,7 @@ jobs:
               besu-cli asset issue --network=network1 --account=1 --token_id=${tokenId} --asset_type=ERC721 1> tmp.out
               tokenId=$(cat tmp.out | grep "New ERC721 token minted with id " | sed -e 's/New ERC721 token minted with id //')
               cat tmp.out
-              echo $tokenId
+              echo "$tokenId"
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
 
@@ -186,7 +186,7 @@ jobs:
               besu-cli asset issue --network=network1 --account=1 --token_id=${tokenId} --asset_type=ERC721 1> tmp.out
               tokenId=$(cat tmp.out | grep "New ERC721 token minted with id " | sed -e 's/New ERC721 token minted with id //')
               cat tmp.out
-              echo $tokenId
+              echo "$tokenId"
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
 
@@ -335,7 +335,7 @@ jobs:
               besu-cli asset issue --network=network1 --account=1 --token_id=${tokenId} --asset_type=ERC721 1> tmp.out
               tokenId=$(cat tmp.out | grep "New ERC721 token minted with id " | sed -e 's/New ERC721 token minted with id //')
               cat tmp.out
-              echo $tokenId
+              echo "$tokenId"
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
 
@@ -379,7 +379,7 @@ jobs:
               besu-cli asset issue --network=network1 --account=1 --token_id=${tokenId} --asset_type=ERC721 1> tmp.out
               tokenId=$(cat tmp.out | grep "New ERC721 token minted with id " | sed -e 's/New ERC721 token minted with id //')
               cat tmp.out
-              echo $tokenId
+              echo "$tokenId"
               besu-cli asset lock --network=network1 --sender_account=1 --recipient_account=2 --token_id=${tokenId} --asset_type=ERC721 --timeout=${timeout} --hash_base64=${hashBase64} 1> tmp.out
           fi
 

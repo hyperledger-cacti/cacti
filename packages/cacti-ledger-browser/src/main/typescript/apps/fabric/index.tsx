@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Blocks from "./pages/Blocks/Blocks";
 import Transactions from "./pages/Transactions/Transactions";
 import TransactionDetails from "./pages/TransactionDetails/TransactionDetails";
+import Discovery from "./pages/Discovery/Discovery";
 import {
   AppInstancePersistencePluginOptions,
   AppDefinition,
@@ -58,10 +59,18 @@ const fabricBrowserAppDefinition: AppDefinition = {
           title: "Dashboard",
           url: "/",
         },
+        {
+          title: "Discovery",
+          url: "/discovery",
+        },
       ],
       routes: [
         {
           element: <Dashboard />,
+        },
+        {
+          path: "discovery",
+          element: <Discovery />,
         },
         {
           path: "blocks",
