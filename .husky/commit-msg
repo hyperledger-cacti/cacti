@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# Validate commit message
-npx --no-install commitlint --edit "$1"

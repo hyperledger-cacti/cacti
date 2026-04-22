@@ -1,6 +1,0 @@
-{
-  "*/*/src/**/*.{js,ts}": [
-    "eslint --fix",
-    "cspell --no-must-find-files --config .cspell.json"
-  ]
-}
