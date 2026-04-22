@@ -1,8 +1,6 @@
 import "jest-extended";
 import type { Request, Response } from "express";
 
-import { LoggerProvider } from "@hyperledger/cactus-common";
-
 import { PluginKeychainVault } from "../../../main/typescript/plugin-keychain-vault";
 import { SetKeychainEntryEndpointV1 } from "../../../main/typescript/web-services/set-keychain-entry-endpoint-v1";
 
@@ -31,15 +29,6 @@ describe("SetKeychainEntryEndpointV1 security regression", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest
-      .spyOn(LoggerProvider, "getOrCreate")
-      .mockReturnValue(
-        loggerMock as unknown as ReturnType<typeof LoggerProvider.getOrCreate>,
-      );
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   test("does not leak secret in logs and does not return stack trace on error", async () => {
@@ -56,6 +45,7 @@ describe("SetKeychainEntryEndpointV1 security regression", () => {
       plugin,
       logLevel: "DEBUG",
     });
+    (endpoint as unknown as { log: typeof loggerMock }).log = loggerMock;
 
     const req = {
       body: { key, value: secretValue },

@@ -1,8 +1,6 @@
 import "jest-extended";
 import type { Request, Response } from "express";
 
-import { LoggerProvider } from "@hyperledger/cactus-common";
-
 import { PluginKeychainVault } from "../../../main/typescript/plugin-keychain-vault";
 import { DeleteKeychainEntryEndpointV1 } from "../../../main/typescript/web-services/delete-keychain-entry-endpoint-v1";
 import { GetKeychainEntryEndpointV1 } from "../../../main/typescript/web-services/get-keychain-entry-endpoint-v1";
@@ -35,15 +33,6 @@ describe("Keychain vault endpoint security regression", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    jest
-      .spyOn(LoggerProvider, "getOrCreate")
-      .mockReturnValue(
-        loggerMock as unknown as ReturnType<typeof LoggerProvider.getOrCreate>,
-      );
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   test("GetKeychainEntryEndpointV1 does not return stack details", async () => {
@@ -56,6 +45,7 @@ describe("Keychain vault endpoint security regression", () => {
       plugin,
       logLevel: "DEBUG",
     });
+    (endpoint as unknown as { log: typeof loggerMock }).log = loggerMock;
     const req = { body: { key: "k1" } } as Request;
     const res = createMockResponse();
 
@@ -76,6 +66,7 @@ describe("Keychain vault endpoint security regression", () => {
       plugin,
       logLevel: "DEBUG",
     });
+    (endpoint as unknown as { log: typeof loggerMock }).log = loggerMock;
     const req = { body: { key: "k2" } } as Request;
     const res = createMockResponse();
 
@@ -98,6 +89,7 @@ describe("Keychain vault endpoint security regression", () => {
       plugin,
       logLevel: "DEBUG",
     });
+    (endpoint as unknown as { log: typeof loggerMock }).log = loggerMock;
     const req = { body: { key: "k3" } } as Request;
     const res = createMockResponse();
 
@@ -120,6 +112,7 @@ describe("Keychain vault endpoint security regression", () => {
       plugin,
       logLevel: "DEBUG",
     });
+    (endpoint as unknown as { log: typeof loggerMock }).log = loggerMock;
     const req = {} as Request;
     const res = createMockResponse();
 
