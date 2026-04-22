@@ -56,6 +56,7 @@
     "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-alpha",
     "@hyperledger-cacti/cacti-weaver-sdk-besu": "3.0.0-alpha",
     "@truffle/contract": "4.6.28",
+    "bs58": "6.0.0",
     "gluegun": "5.1.6",
     "web3": "1.10.0",
     "winston": "3.10.0"
