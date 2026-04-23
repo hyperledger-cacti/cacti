@@ -7,13 +7,13 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import { DaoTokenGetAllowanceRequest } from "../../../generated/openapi/typescript-axios";
 import { CarbonAccountingPlugin } from "../../carbon-accounting-plugin";
@@ -56,9 +56,9 @@ export class GetAllowanceEndpoint implements IWebServiceEndpoint {
     };
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-example-carbon-accounting-backend/dao-token/get-allowance"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-example-carbon-accounting-backend/dao-token/get-allowance"
     ];
   }
 

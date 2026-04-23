@@ -54,7 +54,7 @@ yarn add @hyperledger/cactus-plugin-ledger-connector-polkadot
 ```typescript
 import {
   PluginLedgerConnectorPolkadot,
-} from "@hyperledger/cactus-plugin-ledger-connector-polkadot";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot";
 
 const plugin = new PluginLedgerConnectorPolkadot({
   // See test cases for exact details on what parameters are needed
@@ -83,7 +83,7 @@ try {
 import {
   PluginLedgerConnectorPolkadot,
   DefaultApi as PolkadotApi,
-} from "@hyperledger/cactus-plugin-ledger-connector-polkadot";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot";
 
 // Step zero is to deploy your Substrate ledger and the Cactus API server
 

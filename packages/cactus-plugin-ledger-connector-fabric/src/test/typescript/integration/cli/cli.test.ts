@@ -3,9 +3,9 @@ import { CompilerTools } from "../../../../main/typescript/compiler-tools/compil
 import fs from "fs-extra";
 import { FileBase64 } from "../../../../main/typescript";
 import temp from "temp";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import tar from "tar-fs";
-import { pruneDockerContainersIfGithubAction } from "@hyperledger/cactus-test-tooling";
+import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 
 const logLevel = "DEBUG";
 

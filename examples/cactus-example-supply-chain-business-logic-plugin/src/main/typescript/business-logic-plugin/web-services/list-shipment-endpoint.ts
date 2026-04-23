@@ -8,19 +8,19 @@ import {
   IAsyncProvider,
   safeStringifyException,
   Strings,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import {
   DefaultApi as FabricApi,
   FabricContractInvocationType,
   RunTransactionRequest,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import OAS from "../../../json/openapi.json";
 
@@ -39,9 +39,9 @@ export class ListShipmentEndpoint implements IWebServiceEndpoint {
     return ListShipmentEndpoint.CLASS_NAME;
   }
 
-  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-shipment"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/list-shipment"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/list-shipment"
     ];
   }
 

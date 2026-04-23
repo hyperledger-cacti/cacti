@@ -7,13 +7,13 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   ICactusPluginOptions,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { DefaultApi } from "./generated/openapi/typescript-axios";
 
@@ -139,7 +139,7 @@ export class PluginKeychainVaultRemoteAdapter
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-vault`;
+    return `@hyperledger-cacti/cactus-plugin-keychain-vault`;
   }
 
   public async onPluginInit(): Promise<unknown> {

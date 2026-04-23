@@ -6,8 +6,9 @@ name: Deploy Docs (Github Pages)
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      # only tags with stable versions a.b.c i.e. without -alpha or -dev or -beta etc
+      - v[0-9]+.[0-9]+.[0-9]+
 
     paths:
       - 'docs/**'

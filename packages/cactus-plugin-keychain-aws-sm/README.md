@@ -55,7 +55,7 @@ yarn add @hyperledger/cactus-plugin-keychain-aws-sm
 import {
   PluginKeychainAwsSm,
   AwsCredentialType,
-} from "@hyperledger/cactus-plugin-keychain-aws-sm";
+} from "@hyperledger-cacti/cactus-plugin-keychain-aws-sm";
 
 const plugin = new PluginKeychainAwsSm({
     // See test cases for exact details on what parameters are needed
@@ -77,7 +77,7 @@ import {
   PluginKeychainAwsSm,
   AwsCredentialType,
   DefaultApi as KeychainAwsSmApi,
-} from "@hyperledger/cactus-plugin-keychain-aws-sm";
+} from "@hyperledger-cacti/cactus-plugin-keychain-aws-sm";
 
 // Step zero is to deploy the Cactus API server
 const apiUrl = `https://${HOST}:${PORT}`;

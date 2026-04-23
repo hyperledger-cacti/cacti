@@ -14,7 +14,7 @@ import {
   Checks,
   JsObjectSigner,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -100,7 +100,7 @@ import {
   HealthCheckResponseStatusEnum,
   NetworkId,
 } from "../../generated/gateway-client/typescript-axios";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { SATP_IMPLEMENTED_LEDGERS } from "../../core/constants";
 import {
   ILocalLogRepository,

@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus - Keychain API",
     "description": "Contains/describes the Keychain API types/paths for Hyperledger Cactus.",
-    "version": "2.1.0",
+    "version": "3.0.0-alpha",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -13,11 +13,11 @@
     "schemas": {}
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/get-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/get-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/get-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/get-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -46,11 +46,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/set-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/set-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/set-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/set-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -76,11 +76,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/delete-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/delete-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/delete-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/delete-keychain-entry",
             "verbLowerCase": "post"
           }
         },
@@ -97,11 +97,11 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/has-keychain-entry": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/has-keychain-entry": {
       "post": {
         "x-hyperledger-cacti": {
           "http": {
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/has-keychain-entry",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-google-sm/has-keychain-entry",
             "verbLowerCase": "post"
           }
         },

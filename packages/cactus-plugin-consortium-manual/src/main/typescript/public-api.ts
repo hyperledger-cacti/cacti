@@ -21,7 +21,7 @@ export * from "./generated/openapi/typescript-axios/index";
 
 export { PluginFactoryWebService } from "./plugin-factory-consortium-manual";
 
-import { IPluginFactoryOptions } from "@hyperledger/cactus-core-api";
+import { IPluginFactoryOptions } from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactoryWebService } from "./plugin-factory-consortium-manual";
 
 export async function createPluginFactory(

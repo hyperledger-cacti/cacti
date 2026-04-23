@@ -3,10 +3,10 @@ import {
   type Logger,
   LoggerProvider,
   type LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { ExtensionType } from "./extensions-utils";
-import { ICactusPlugin } from "@hyperledger/cactus-core-api";
+import { ICactusPlugin } from "@hyperledger-cacti/cactus-core-api";
 import { ExtensionConfig } from "../services/validation/config-validating-functions/validate-extensions";
 
 export interface IExtensionsManagerOptions {

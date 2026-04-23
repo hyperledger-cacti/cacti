@@ -37,7 +37,7 @@ import {
 } from "./errors/satp-service-errors";
 import { SATPLogger } from "./satp-logger";
 import { protoToAsset } from "./stage-services/service-utils";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { NetworkId } from "../public-api";
 import { TokenType } from "../generated/proto/cacti/satp/v02/common/message_pb";
 import { SessionData } from "../generated/proto/cacti/satp/v02/session/session_pb";

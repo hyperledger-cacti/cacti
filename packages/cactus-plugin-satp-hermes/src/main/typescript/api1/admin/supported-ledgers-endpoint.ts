@@ -3,19 +3,19 @@ import {
   type IAsyncProvider,
   type Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { Express, Request, Response } from "express";
 import type { IRequestOptions } from "../../core/types";
 import OAS from "../../../json/oapi-api1-bundled.json";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 export class SupportedLedgersEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "SupportedLedgersEndpointV1";
@@ -36,9 +36,9 @@ export class SupportedLedgersEndpointV1 implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers"
     ];
   }
 
@@ -52,7 +52,7 @@ export class SupportedLedgersEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
@@ -60,14 +60,14 @@ export class SupportedLedgersEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/supported-ledgers"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers"
     ].get.operationId;
   }
 

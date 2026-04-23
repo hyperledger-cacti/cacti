@@ -25,16 +25,16 @@ import {
   Logger,
   LoggerProvider,
   Servers,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Constants } from "@hyperledger/cactus-core-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { pruneDockerAllIfGithubAction } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { pruneDockerAllIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
   WHALE_ACCOUNT_PRIVATE_KEY,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 
 import {
   PluginLedgerConnectorEthereum,

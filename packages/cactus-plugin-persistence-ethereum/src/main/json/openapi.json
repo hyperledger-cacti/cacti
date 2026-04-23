@@ -3,7 +3,7 @@
   "info": {
     "title": "Hyperledger Cactus Plugin - Persistence Ethereum",
     "description": "Synchronizes state of an ethereum ledger into a DB that can later be viewed in GUI",
-    "version": "2.1.0",
+    "version": "3.0.0-alpha",
     "license": {
       "name": "Apache-2.0",
       "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -126,12 +126,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status"
           }
         },
         "operationId": "getStatusV1",

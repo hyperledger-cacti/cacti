@@ -4,7 +4,7 @@ import {
   Secp256k1Keys,
   JsObjectSigner,
   type IJsObjectSignerOptions,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import { CrashStatus } from "../../../../main/typescript/core/types";
 import type { ICrashRecoveryManagerOptions } from "../../../../main/typescript/services/gateway/crash-manager";

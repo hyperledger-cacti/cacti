@@ -35,7 +35,7 @@ const targetJsArray = [
   //    {uri: '/api/v1/login/', jsPath: './routes/login.js'},
   //    {uri: '/api/v1/cars/', jsPath: './routes/cars.js'},
   {
-    uri: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/test-run-transaction/",
+    uri: "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/test-run-transaction/",
     jsPath: "./routes/supply-chain-app.js",
   },
 ];

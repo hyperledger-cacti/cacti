@@ -3,7 +3,7 @@ import {
   FabricContractContext,
 } from "@hyperledger-cacti/cacti-plugin-copm-fabric";
 import { Wallet, DiscoveryOptions, Wallets } from "fabric-network";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import path from "path";
 import fs from "fs-extra";
 import { TransferrableAsset } from "@hyperledger-cacti/cacti-copm-core";

@@ -1,7 +1,7 @@
 import test, { Test } from "tape-promise/tape";
 import path from "path";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import {
   ApiServer,

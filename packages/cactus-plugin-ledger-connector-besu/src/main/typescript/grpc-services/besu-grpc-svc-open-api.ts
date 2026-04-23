@@ -19,7 +19,7 @@ import {
   LoggerProvider,
   createRuntimeErrorWithCause,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import Web3 from "web3";
 
 export interface IBesuGrpcSvcOpenApiOptions {

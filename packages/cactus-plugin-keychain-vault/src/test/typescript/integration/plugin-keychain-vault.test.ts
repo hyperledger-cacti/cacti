@@ -11,7 +11,7 @@ import {
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
   K_DEFAULT_VAULT_HTTP_PORT,
   VaultTestServer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -19,7 +19,7 @@ import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   Configuration,
@@ -74,7 +74,7 @@ test("get,set,has,delete alters state", async (t: Test) => {
   const { address, port } = addressInfo;
   const apiHost = `http://${address}:${port}`;
   t.comment(
-    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics`,
+    `Metrics URL: ${apiHost}/api/v1/plugins/@hyperledger-cacti/cactus-plugin-keychain-vault/get-prometheus-exporter-metrics`,
   );
 
   const apiConfig = new Configuration({ basePath: apiHost });

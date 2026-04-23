@@ -10,11 +10,11 @@ import { RuntimeError } from "run-time-error-cjs";
 import * as grpc from "@grpc/grpc-js";
 import fse from "fs-extra";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
-import { IJoseFittingJwtParams } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Constants } from "@hyperledger/cactus-core-api";
+import { IJoseFittingJwtParams } from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 
 import {
   ApiServer,

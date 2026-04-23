@@ -1,6 +1,6 @@
 import type { SATPManager } from "../../services/gateway/satp-manager";
-import type { LogLevelDesc } from "@hyperledger/cactus-common";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import type { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 export interface SupportedLedgersResponse {
   supportedLedgers: string[];

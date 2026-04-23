@@ -5,11 +5,11 @@ info:
     name: Apache-2.0
     url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: Hyperledger Cacti Plugin - Connector Sawtooth
-  version: 2.1.0
+  version: 3.0.0-alpha
 servers:
 - url: /
 paths:
-  /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status:
+  /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth/status:
     get:
       operationId: getStatusV1
       parameters: []
@@ -30,7 +30,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status
+          path: /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth/status
 components:
   schemas:
     SawtoothTransactionHeaderV1:

@@ -5,7 +5,7 @@
  */
 
 import * as crypto from "crypto";
-import { HashMechanism } from "@hyperledger/cacti-weaver-protos-js/common/asset_locks_pb";
+import { HashMechanism } from "@hyperledger-cacti/cacti-weaver-protos-js/common/asset_locks_pb";
 
 //TODO: move all common node SDK functions to one place, instead of replicating in each SDK
 

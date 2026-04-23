@@ -29,7 +29,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { Resource } from "@opentelemetry/resources";
 import { UninitializedMonitorServiceError } from "../../cross-chain-mechanisms/common/errors";
 

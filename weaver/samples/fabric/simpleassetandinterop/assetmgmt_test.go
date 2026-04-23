@@ -15,8 +15,8 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
-	"github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3/common"
+	"github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3"
 	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassetandinterop"
 	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/stretchr/testify/require"

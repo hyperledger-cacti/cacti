@@ -4,13 +4,13 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ICactusPlugin,
   IPluginKeychain,
   isICactusPlugin,
   isIPluginKeychain,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 /**
  * This interface describes the constructor options object that can be used to provide configuration parameters to

@@ -41,7 +41,7 @@ import "jest-extended";
 import express from "express";
 import bodyParser from "body-parser";
 import { v4 as uuidV4 } from "uuid";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 import {
   LogLevelDesc,
@@ -49,7 +49,7 @@ import {
   Logger,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   AuthInfoV1,

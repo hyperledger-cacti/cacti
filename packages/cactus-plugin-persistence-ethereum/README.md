@@ -89,7 +89,7 @@ SUPABASE_CONNECTION_STRING=postgresql://postgres:your-super-secret-and-long-post
 Instantiate a new `PluginPersistenceEthereum` instance:
 
 ```typescript
-import { PluginPersistenceEthereum } from "@hyperledger/cactus-plugin-persistence-ethereum";
+import { PluginPersistenceEthereum } from "@hyperledger-cacti/cactus-plugin-persistence-ethereum";
 import { v4 as uuidv4 } from "uuid";
 
 const persistencePlugin = new PluginPersistenceEthereum({

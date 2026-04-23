@@ -13,25 +13,25 @@ import {
   NewContractObj,
   InitializeRequest,
   HashTimeLockJson,
-} from "@hyperledger/cactus-plugin-htlc-eth-besu";
+} from "@hyperledger-cacti/cactus-plugin-htlc-eth-besu";
 import {
   PluginFactoryLedgerConnector,
   PluginLedgerConnectorBesu,
   Web3SigningCredential,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginImportType } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginImportType } from "@hyperledger-cacti/cactus-core-api";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { DataTest } from "../data-test";
 import DemoHelperJSON from "../../../solidity/contracts/DemoHelpers.json";
 

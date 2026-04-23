@@ -6,13 +6,13 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import { PluginLedgerConnectorStub } from "../plugin-ledger-connector-stub";
 
@@ -52,7 +52,7 @@ export class UnprotectedActionEndpoint implements IWebServiceEndpoint {
         operationId: "runTransactionV1",
         "x-hyperledger-cacti": {
           http: {
-            path: "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-stub/unprotected-action",
+            path: "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-stub/unprotected-action",
             verbLowerCase: "post",
           },
         },

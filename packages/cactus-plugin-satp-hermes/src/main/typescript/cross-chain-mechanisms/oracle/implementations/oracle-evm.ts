@@ -4,11 +4,11 @@ import {
   ISignerKeyPair,
   type LogLevelDesc,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../../core/satp-logger";
-import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
+import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
+import { StrategyEthereum } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
 import {
   ContractJSON,
   EthContractInvocationType,
@@ -19,10 +19,10 @@ import {
   Web3SigningCredentialCactiKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialPrivateKeyHex,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
 import { EthereumLeaf } from "../../bridge/leafs/ethereum-leaf";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   ClaimFormatError,
   NoSigningCredentialError,
@@ -38,7 +38,7 @@ import {
 
 import { getUint8Key } from "../../bridge/leafs/leafs-utils";
 import { v4 as uuidv4 } from "uuid";
-import { SolidityEventLog } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { SolidityEventLog } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { keccak256 } from "web3-utils";
 import { AbiEventFragment, DecodedParams } from "web3";
 import { MonitorService } from "../../../services/monitoring/monitor";

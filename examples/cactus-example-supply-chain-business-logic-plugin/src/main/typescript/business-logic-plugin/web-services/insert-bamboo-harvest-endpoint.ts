@@ -7,23 +7,23 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   AuthorizationOptionsProvider,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   DefaultApi as XdaiApi,
   EthContractInvocationType,
   Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai";
 
 import OAS from "../../../json/openapi.json";
 import { InsertBambooHarvestRequest } from "../../generated/openapi/typescript-axios";
@@ -75,9 +75,9 @@ export class InsertBambooHarvestEndpoint implements IWebServiceEndpoint {
     this.log.debug(`Instantiated ${this.className} OK`);
   }
 
-  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bamboo-harvest"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-bamboo-harvest"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-bamboo-harvest"
     ];
   }
 

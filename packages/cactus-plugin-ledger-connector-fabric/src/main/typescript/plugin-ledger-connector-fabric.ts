@@ -43,19 +43,19 @@ import {
   IWebServiceEndpoint,
   ICactusPlugin,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   consensusHasTransactionFinality,
   PluginRegistry,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import {
   Logger,
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import OAS from "../json/openapi.json";
 
@@ -304,7 +304,7 @@ export class PluginLedgerConnectorFabric
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-ledger-connector-fabric`;
+    return `@hyperledger-cacti/cactus-plugin-ledger-connector-fabric`;
   }
 
   public getTxSubjectObservable(): Observable<IRunTxReqWithTxId> {

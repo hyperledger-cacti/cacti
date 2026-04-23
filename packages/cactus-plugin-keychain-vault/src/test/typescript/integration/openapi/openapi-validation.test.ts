@@ -11,12 +11,12 @@ import {
   K_DEFAULT_VAULT_DEV_ROOT_TOKEN,
   K_DEFAULT_VAULT_HTTP_PORT,
   VaultTestServer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   LogLevelDesc,
   IListenOptions,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   Configuration,
@@ -30,7 +30,7 @@ import {
 
 import { DefaultApi as KeychainVaultApi } from "../../../../main/typescript/public-api";
 
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
 
 const logLevel: LogLevelDesc = "TRACE";

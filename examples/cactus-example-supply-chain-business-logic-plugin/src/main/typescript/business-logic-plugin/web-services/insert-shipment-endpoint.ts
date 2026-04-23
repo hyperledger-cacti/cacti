@@ -7,19 +7,19 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import { InsertShipmentRequest } from "../../generated/openapi/typescript-axios/index";
 import {
   DefaultApi as FabricApi,
   FabricContractInvocationType,
   RunTransactionRequest,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import OAS from "../../../json/openapi.json";
 
@@ -67,9 +67,9 @@ export class InsertShipmentEndpoint implements IWebServiceEndpoint {
     return this;
   }
 
-  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment"] {
+  public getOasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-shipment"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-example-supply-chain-backend/insert-shipment"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-example-supply-chain-backend/insert-shipment"
     ];
   }
 

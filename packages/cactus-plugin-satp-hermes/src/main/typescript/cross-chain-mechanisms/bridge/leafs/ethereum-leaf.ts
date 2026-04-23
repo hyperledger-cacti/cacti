@@ -101,17 +101,17 @@ import {
   Web3SigningCredentialCactiKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialPrivateKeyHex,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { StrategyEthereum } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
+import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
+import { StrategyEthereum } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-ethereum";
 import {
   EvmAsset,
   EvmFungibleAsset,
   EvmNonFungibleAsset,
 } from "../ontology/assets/evm-asset";
-import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { v4 as uuidv4 } from "uuid";
@@ -119,9 +119,9 @@ import {
   ClaimFormat,
   TokenType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { OntologyManager } from "../ontology/ontology-manager";
-import { Web3TransactionReceipt } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+import { Web3TransactionReceipt } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { BridgeLeafFungible } from "../bridge-leaf-fungible";
 import { BridgeLeafNonFungible } from "../bridge-leaf-non-fungible";
 import { BridgeLeaf } from "../bridge-leaf";
@@ -141,7 +141,7 @@ import {
   WrapperContractAlreadyCreatedError,
   WrapperContractError,
 } from "../../common/errors";
-import { ISignerKeyPair } from "@hyperledger/cactus-common";
+import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { Asset, UniqueTokenID, Amount } from "../ontology/assets/asset";
 import { TokenResponse } from "../../../generated/SATPWrapperContract";

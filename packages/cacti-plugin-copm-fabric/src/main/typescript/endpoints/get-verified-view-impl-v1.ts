@@ -3,7 +3,7 @@ import {
   Validators,
   Interfaces as CopmIF,
 } from "@hyperledger-cacti/cacti-copm-core";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 export async function getVerifiedViewV1Impl(
   req: GetVerifiedViewV1Request,

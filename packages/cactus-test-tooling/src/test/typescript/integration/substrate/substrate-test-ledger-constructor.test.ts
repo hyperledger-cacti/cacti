@@ -1,5 +1,5 @@
 import test, { Test } from "tape-promise/tape";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SubstrateTestLedger } from "../../../../main/typescript/substrate-test-ledger/substrate-test-ledger";
 import { pruneDockerContainersIfGithubAction } from "../../../../main/typescript/github-actions/prune-docker-all-if-github-action";
 

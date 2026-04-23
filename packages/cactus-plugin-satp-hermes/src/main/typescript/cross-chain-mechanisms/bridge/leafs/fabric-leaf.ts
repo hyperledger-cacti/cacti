@@ -7,13 +7,13 @@ import {
   FileBase64,
   IPluginLedgerConnectorFabricOptions,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import path from "path";
 import fs from "fs-extra";
-import { PluginBungeeHermes } from "@hyperledger/cactus-plugin-bungee-hermes";
-import { StrategyFabric } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
+import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
+import { StrategyFabric } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
-import { LogLevelDesc, Secp256k1Keys } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../../core/satp-logger";
 import { v4 as uuidv4 } from "uuid";
@@ -21,12 +21,12 @@ import {
   ClaimFormat,
   TokenType,
 } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { BridgeLeaf, IBridgeLeafOptions } from "../bridge-leaf";
 import { BridgeLeafFungible } from "../bridge-leaf-fungible";
 import { BridgeLeafNonFungible } from "../bridge-leaf-non-fungible";
 import { OntologyManager } from "../ontology/ontology-manager";
-import { ISignerKeyPair } from "@hyperledger/cactus-common/";
+import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common/";
 import {
   ApproveAddressError,
   BungeeError,

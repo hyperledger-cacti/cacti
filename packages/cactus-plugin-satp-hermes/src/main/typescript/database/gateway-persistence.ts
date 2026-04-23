@@ -3,7 +3,7 @@ import {
   ILocalLogRepository,
   IRemoteLogRepository,
 } from "./repository/interfaces/repository";
-import { JsObjectSigner, LogLevelDesc } from "@hyperledger/cactus-common";
+import { JsObjectSigner, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLogger as Logger } from "../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import { SHA256 } from "crypto-js";

@@ -7,21 +7,21 @@ import {
   ICactusPlugin,
   ICactusPluginOptions,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-core-api";
+import { Checks, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   EthContractInvocationType,
   InvokeContractV1Response,
   PluginLedgerConnectorBesu,
   RunTransactionResponse,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import { GetSingleStatusEndpoint } from "./web-services/get-single-status-endpoint";
 import { GetStatusEndpoint } from "./web-services/get-status-endpoint";
 import { NewContractEndpoint } from "./web-services/new-contract-endpoint";
 import { RefundEndpoint } from "./web-services/refund-endpoint";
 import { WithdrawEndpoint } from "./web-services/withdraw-endpoint";
 import { InitializeEndpoint } from "./web-services/initialize-endpoint";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { NewContractRequest } from ".";
 import HashTimeLockJSON from "../solidity/contracts/HashedTimeLockContract.json";
 import {
@@ -90,7 +90,7 @@ export class PluginHtlcEthBesuErc20
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-plugin-htlc-eth-besu-erc20";
+    return "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20";
   }
 
   async registerWebServices(app: Express): Promise<IWebServiceEndpoint[]> {

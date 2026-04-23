@@ -1,4 +1,4 @@
-import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
+import { BesuTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
 import "jest-extended";
 
 const testCase = "PluginLedgerConnectorBesu:deploy-contract";

@@ -3,7 +3,7 @@ import {
   GetBlockV1Request,
   GetBlockV1Response,
 } from "../../generated/openapi/typescript-axios/api";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { getBlockV1Impl } from "./get-block-v1-impl";
 
 export async function getBlockV1Http(

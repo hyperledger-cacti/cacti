@@ -39,7 +39,7 @@
  * @since 0.0.3-beta
  */
 
-import { ILoggerOptions } from "@hyperledger/cactus-common";
+import { ILoggerOptions } from "@hyperledger-cacti/cactus-common";
 import { ConnectRouter } from "@connectrpc/connect";
 import { SATPSession } from "../core/satp-session";
 import {
