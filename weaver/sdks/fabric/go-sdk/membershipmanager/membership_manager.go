@@ -8,33 +8,32 @@ package membershipmanager
 
 import (
 	"context"
-	"fmt"
 	"crypto"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
-	"github.com/golang/protobuf/proto"
 	protoV2 "google.golang.org/protobuf/proto"
 
-	"github.com/hyperledger/fabric-protos-go/common"
-	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/hyperledger/fabric-admin-sdk/pkg/channel"
 	"github.com/hyperledger/fabric-admin-sdk/pkg/identity"
 	"github.com/hyperledger/fabric-gateway/pkg/client"
 	cidentity "github.com/hyperledger/fabric-gateway/pkg/identity"
+	"github.com/hyperledger/fabric-protos-go/common"
+	mspprotos "github.com/hyperledger/fabric-protos-go/msp"
 
 	cactiprotos "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 )
-
 
 func CreateLocalMembership(walletPath, userName, connectionProfilePath, securityDomain, channelId, weaverCCId string, mspIds []string) error {
 	membership, err := GetMSPConfigurations(walletPath, userName, connectionProfilePath, channelId, mspIds)
@@ -154,7 +153,7 @@ func GetConfigBlockFromChannel(walletPath, userName, connectionProfilePath, chan
 	if err != nil {
 		return nil, err
 	}
-	
+
 	configBlockBytes, err := protoV2.Marshal(configBlockV2)
 	var configBlock common.Block
 	err = proto.Unmarshal(configBlockBytes, &configBlock)
@@ -506,7 +505,7 @@ func getInfoFromConnectionProfile(connectionProfilePath, mspId string) (string, 
 		return "", "", -1, err
 	}
 
-	timeoutVal := 300	// peer connection timeout in seconds
+	timeoutVal := 300 // peer connection timeout in seconds
 	// Get endorser timeout from the "client.connection.timeout.peer.endorser" attribute
 	clientIface, ok := connProfile["client"]
 	if !ok {
@@ -588,7 +587,7 @@ func getInfoFromConnectionProfile(connectionProfilePath, mspId string) (string, 
 				peerUrlParts := strings.Split(peerUrl, "://")
 				if len(peerUrlParts) == 1 {
 					return peerUrlParts[0], tlsCACertsPemIface.(string), timeoutVal, nil
-				} else {	// If not 1, the slice must have a length larger than 1
+				} else { // If not 1, the slice must have a length larger than 1
 					return peerUrlParts[1], tlsCACertsPemIface.(string), timeoutVal, nil
 				}
 			}
@@ -615,7 +614,7 @@ func newGrpcConnection(networkPeerEndpoint, tlsCACertPEM string) (*grpc.ClientCo
 	var connection *grpc.ClientConn
 	if err != nil || len(addresses) == 0 {
 		fmt.Printf("Warning: Cannot resolve supplied hostname '%s'. Using 'localhost' instead.\n", hostname)
-		connection, err = grpc.Dial("localhost:" + port, grpc.WithTransportCredentials(transportCredentials))
+		connection, err = grpc.Dial("localhost:"+port, grpc.WithTransportCredentials(transportCredentials))
 	} else {
 		connection, err = grpc.Dial(networkPeerEndpoint, grpc.WithTransportCredentials(transportCredentials))
 	}

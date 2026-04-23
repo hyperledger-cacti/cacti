@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"os"
 
+	am "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2"
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
-	am "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2"
 )
 
 // SmartContract provides functions for managing an BondAsset and TokenAsset
@@ -45,12 +45,12 @@ func main() {
 	_, ok := os.LookupEnv("EXTERNAL_SERVICE")
 	if ok {
 		server := &shim.ChaincodeServer{
-				CCID:    os.Getenv("CHAINCODE_CCID"),
-				Address: os.Getenv("CHAINCODE_ADDRESS"),
-				CC:      chaincode,
-				TLSProps: shim.TLSProperties{
-					Disabled: true,
-				},
+			CCID:    os.Getenv("CHAINCODE_CCID"),
+			Address: os.Getenv("CHAINCODE_ADDRESS"),
+			CC:      chaincode,
+			TLSProps: shim.TLSProperties{
+				Disabled: true,
+			},
 		}
 		// Start the chaincode external server
 		err = server.Start()

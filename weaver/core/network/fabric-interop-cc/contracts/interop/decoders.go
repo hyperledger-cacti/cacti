@@ -14,8 +14,8 @@ package main
 import (
 	"encoding/base64"
 	"encoding/json"
-	"strings"
 	"fmt"
+	"strings"
 
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/identity"

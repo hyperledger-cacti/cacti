@@ -8,17 +8,17 @@
 package main
 
 import (
-	"fmt"
-	"errors"
 	"bytes"
 	"crypto/sha256"
-	"encoding/hex"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
+	"fmt"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	log "github.com/sirupsen/logrus"
 )
 
 // functions to log and return errors

@@ -14,17 +14,17 @@ import (
 )
 
 type AssetPledgeMap struct {
-	PledgeID          string      `json:"pledgeid"`
-	RemoteNetworkID   string      `json:"remotenetworkid"`
-	Recipient         string      `json:"recipient"`
+	PledgeID        string `json:"pledgeid"`
+	RemoteNetworkID string `json:"remotenetworkid"`
+	Recipient       string `json:"recipient"`
 }
 
 func createAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, pledgeId, assetType, id, remoteNetworkId, recipientCert string) error {
-	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType + id)
+	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType+id)
 	assetPledgeMap := &AssetPledgeMap{
-		PledgeID: pledgeId,
+		PledgeID:        pledgeId,
 		RemoteNetworkID: remoteNetworkId,
-		Recipient: recipientCert,
+		Recipient:       recipientCert,
 	}
 	assetPledgeMapJSON, err := json.Marshal(assetPledgeMap)
 	if err != nil {
@@ -38,7 +38,7 @@ func createAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, pledgeI
 }
 
 func getAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType, id string) (*AssetPledgeMap, error) {
-	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType + id)
+	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType+id)
 	fmt.Printf("key: %s\n", key)
 	assetPledgeMap := &AssetPledgeMap{}
 	assetPledgeMapJSON, err := ctx.GetStub().GetState(key)
@@ -50,11 +50,10 @@ func getAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType,
 }
 
 func delAssetPledgeIdMap(ctx contractapi.TransactionContextInterface, assetType, id string) error {
-	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType + id)
+	key := "asset_pledge_map_" + generateSHA256HashInHexForm(assetType+id)
 	err := ctx.GetStub().DelState(key)
-	if err!=nil {
+	if err != nil {
 		return fmt.Errorf("error deleting asset pledge mapping")
 	}
 	return nil
 }
-

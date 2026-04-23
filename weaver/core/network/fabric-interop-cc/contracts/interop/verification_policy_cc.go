@@ -12,9 +12,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	wutils "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2"
+	"github.com/hyperledger/fabric-contract-api-go/contractapi"
 )
 
 const verificationPolicyObjectType = "verificationPolicy"

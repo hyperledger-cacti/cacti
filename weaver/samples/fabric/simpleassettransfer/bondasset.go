@@ -212,12 +212,12 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if err != nil {
 		return err
 	}
-	
+
 	asset, err := getBondAssetFromPledge(pledgeBytes64)
 	if err != nil {
 		return err
 	}
-	
+
 	// Validate pledged asset details using app-specific-logic
 	if asset.ID == "" {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged in %s", id, remoteNetworkId)
@@ -231,7 +231,7 @@ func (s *SmartContract) ClaimRemoteAsset(ctx contractapi.TransactionContextInter
 	if asset.Owner != owner {
 		return fmt.Errorf("cannot claim asset %s as it has not been pledged by the given owner", id)
 	}
-	
+
 	// Question in PR: Is following return `pledgeAssetDetails` required from utils?
 	_, err = wutils.ClaimRemoteAsset(ctx, pledgeId, remoteNetworkId, pledgeBytes64)
 	if err != nil {
@@ -250,7 +250,7 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if err != nil {
 		return err
 	}
-	
+
 	if claimAsset.Type != "" &&
 		claimAsset.ID != "" &&
 		claimAsset.Owner != "" {
@@ -267,7 +267,7 @@ func (s *SmartContract) ReclaimAsset(ctx contractapi.TransactionContextInterface
 	if err != nil {
 		return err
 	}
-	
+
 	// Recreate the asset in this network and chaincode using app-specific logic
 	var pledgeAsset BondAsset
 	err = json.Unmarshal(pledgeAssetDetails, &pledgeAsset)
@@ -411,7 +411,7 @@ func isCallerAssetOwner(ctx contractapi.TransactionContextInterface, asset *Bond
 // isBondAssetLocked returns true only if the asset is presently locked
 func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
-		AssetType:      asset.Type,
+		AssetType: asset.Type,
 		Id:        asset.ID,
 		Recipient: "*",
 		Locker:    asset.Owner,
@@ -433,7 +433,7 @@ func isBondAssetLocked(s *SmartContract, ctx contractapi.TransactionContextInter
 // isBondAssetLockedForMe returns true only if the asset is presently locked for me
 func isBondAssetLockedForMe(s *SmartContract, ctx contractapi.TransactionContextInterface, asset *BondAsset) bool {
 	bondAssetAgreement := &common.AssetExchangeAgreement{
-		AssetType:      asset.Type,
+		AssetType: asset.Type,
 		Id:        asset.ID,
 		Recipient: "",
 		Locker:    asset.Owner,
