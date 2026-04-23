@@ -26,7 +26,7 @@
 Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
 
-First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
+First things first, please review the [Hyperledger Code of Conduct](https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct) before participating.
 
 There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
 
@@ -79,7 +79,7 @@ Further reading:
 ## PR Checklist - Contributor/Developer
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
-1. Fork [hyperledger/cacti](https://github.com/hyperledger/cacti) via Github UI
+1. Fork [hyperledger-cacti/cacti](https://github.com/hyperledger-cacti/cacti) via Github UI
    - If you are using the Git client on the Windows operating system, you will need to enable long paths for git
      which you can do in PowerShell by executing the command below.
      To clarify, this may also apply if you are using any Git GUI application on Windows such as `Github Desktop` or others.
@@ -147,7 +147,7 @@ To protect the Hyperledger Cacti source code, GitHub pull requests are accepted 
 2. Setup your local fork to keep up-to-date (optional)
    ```
    # Add 'upstream' repo to list of remotes
-   git remote add upstream https://github.com/hyperledger/cacti.git
+   git remote add upstream https://github.com/hyperledger-cacti/cacti.git
 
    # Verify the new remote named 'upstream'
    git remote -v

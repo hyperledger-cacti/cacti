@@ -1,7 +1,7 @@
 Governance
 ======================================================
 
-Hyperledger Cactus is managed under an open governance model as described in the Hyperledger charter. Cactus is led by a set of maintainers, who can be found in the MAINTAINERS.md file.
+Hyperledger Cacti is managed under an open governance model as described in the Hyperledger charter. Cacti is led by a set of maintainers, who can be found in the MAINTAINERS.md file.
 
 **Maintainers**
 
@@ -15,7 +15,7 @@ Maintainers may be removed by explicit resignation, for prolonged inactivity (3 
 
 **Releases**
 
-A majority of the maintainers may decide to create a release of Cactus. Any broader rules of Hyperledger pertaining to releases must be followed. Once the project is mature, there will be a stable LTS (long term support) release branch, as well as the main branch for upcoming new features.
+A majority of the maintainers may decide to create a release of Cacti. Any broader rules of Hyperledger pertaining to releases must be followed. Once the project is mature, there will be a stable LTS (long term support) release branch, as well as the main branch for upcoming new features.
 
 **Making Feature/Enhancement Proposals**
 
@@ -25,9 +25,9 @@ In particular, all contributors to the project should have enough time to voice 
 
 Significant changes can be marked as such via the predefined label with the same name. This is a tool that helps maintainers identify the most important issues/discussions to be had at any given time through the GitHub web interface.
 
-To easily access the list of significant changes, navigate to the label: https://github.com/hyperledger/cactus/labels/Significant\_Change
+To easily access the list of significant changes, navigate to the label: https://github.com/hyperledger-cacti/cacti/labels/Significant\_Change
 
-We also recommend reading our CONTRIBUTING.md file (https://github.com/hyperledger/cactus/blob/main/CONTRIBUTING.md) for more information about contributing.
+We also recommend reading our CONTRIBUTING.md file (https://github.com/hyperledger-cacti/cacti/blob/main/CONTRIBUTING.md) for more information about contributing.
 
 **Approving Pull Requests**
 
@@ -55,7 +55,7 @@ The technical roadmap is implicitly derived from the Github “milestones” fea
 
 **Communications**
 
-We use the Cactus email list for long-form communications and RocketChat for short, informal announcements and other communications. We encourage all communication, whenever possible, to be public and in the clear (i.e. rather than sending an email directly to a person or two, send it out to the whole list if it pertains to the project).
+We use the Cacti email list for long-form communications and Discord for short, informal announcements and other communications. We encourage all communication, whenever possible, to be public and in the clear (i.e. rather than sending an email directly to a person or two, send it out to the whole list if it pertains to the project).
 
 **Future Changes**
 
@@ -67,6 +67,6 @@ We require that changes to this document require a three-quarters approval of th
 
 This document is based on the Hyperledger Fabric governance document, with some substantial changes.
 
-[Previous](examples/supply-chain-app.md "Hyperledger Cactus Example - Supply Chain App") [Next](code-of-conduct.md "Code of Conduct Guidelines")
+[Previous](examples/supply-chain-app.md "Hyperledger Cacti Example - Supply Chain App") [Next](code-of-conduct.md "Code of Conduct Guidelines")
 
 * * *
