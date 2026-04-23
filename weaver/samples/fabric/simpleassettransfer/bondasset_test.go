@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3/common"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 	wtestmocks "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
 	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassettransfer"
