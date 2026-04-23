@@ -1,7 +1,7 @@
 .PHONY: build
 build: .npmrc
-	npm install --workspaces=false
-	npm run build
+	yarn workspaces focus
+	yarn build
 	
 .PHONY: build-local
 build-local:
@@ -19,17 +19,16 @@ build-local:
 		(rm -rf protos-js && echo "Error: Please build weaver/common/protos-js locally" && exit 1)
 	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
-		npm install --workspaces=false && \
+		yarn workspaces focus && \
 		cp -r protos-js build/) || \
 		(mv package-remote.json package.json && exit 1)	# Runs if failure
 	mv package-remote.json package.json	                # Runs if success
-	npm run build
+	yarn build
 	
 
 .PHONE: publish
 publish: .npmrc
-	npm publish --no-workspaces
-	
+	yarn npm publish
 
 clean:
 	rm -rf build node_modules protos-js package-lock.json .nyc_output coverage
