@@ -37,6 +37,23 @@ const IVLength = 16; // bytes
 const CURVE_P_256_Size = 256;
 const CURVE_P_384_Size = 384;
 
+function deriveFixedLengthSecretBytes(sharedSecret, level) {
+  const secretLengthBytes = Math.ceil(level / 8);
+  const zBytes = sharedSecret.toArray();
+  if (zBytes.length > secretLengthBytes) {
+    throw new Error(
+      `Illegal shared secret length: ${zBytes.length} must be <= ${secretLengthBytes}`,
+    );
+  }
+  if (zBytes.length === secretLengthBytes) {
+    return zBytes;
+  }
+
+  const out = new Uint8Array(secretLengthBytes);
+  out.set(zBytes, secretLengthBytes - zBytes.length);
+  return out;
+}
+
 /** Decrypt a message.
  *
  * @param {object} recipientPrivateKey the private key object. Format
@@ -92,12 +109,7 @@ function eciesDecryptMessage(
   const privKey = ecdsa.keyFromPrivate(recipientPrivateKey.prvKeyHex, "hex");
 
   const Z = privKey.derive(ephPubKey.pub); // 'z'
-  // Append missing leading zeros to Z
-  let ZArray = Z.toArray();
-  const zerosToAdd = 32 - ZArray.length;
-  for (let ii = 0; ii < zerosToAdd; ii++) {
-    ZArray = new Uint8Array([0, ...ZArray]);
-  }
+  const ZArray = deriveFixedLengthSecretBytes(Z, level);
   // The 'null's below correspond to 's1' and 's2',
   // which are both set to nil in golang implementation of the encryption function
   const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
@@ -175,7 +187,8 @@ function eciesEncryptMessage(
   // Derive a shared secret field element z from the ephemeral secret key k
   // and convert z to an octet string Z
   const Z = ephPrivKey.derive(pubKey.pub);
-  const kdfOutput = hkdf(Z.toArray(), ECIESKDFOutput, null, null, options);
+  const ZArray = deriveFixedLengthSecretBytes(Z, level);
+  const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
 
   const aesKey = kdfOutput.slice(0, aesKeyLength);
   const hmacKey = kdfOutput.slice(aesKeyLength, aesKeyLength + HMACKeyLength);
