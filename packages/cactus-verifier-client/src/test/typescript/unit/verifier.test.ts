@@ -46,6 +46,15 @@ class MockApiClient<T> implements ISocketApiClient<T> {
   watchBlocksV1 = jest.fn().mockName("watchBlocksV1");
 }
 
+class AsyncOnlyMockApiClient<T> implements ISocketApiClient<T> {
+  watchBlocksAsyncV1 = jest
+    .fn()
+    .mockName("watchBlocksAsyncV1")
+    .mockResolvedValue(
+      new Observable<T>(() => log.debug("Async mock subscribe called")),
+    );
+}
+
 class MockEventListener<T> implements IVerifierEventListener<T> {
   onEvent = jest.fn().mockName("onEvent");
   onError = jest.fn().mockName("onError");
@@ -178,6 +187,30 @@ describe("Monitoring Tests", () => {
     // Assert monitor closed and removed from runningMonitors
     expect(sut.runningMonitors.size).toEqual(0);
     expect(mon?.closed).toBeTrue();
+  });
+});
+
+describe("Async-only connector monitoring tests", () => {
+  let apiClientMock: AsyncOnlyMockApiClient<string>;
+  let sut: Verifier<AsyncOnlyMockApiClient<string>>;
+  let eventListenerMock: MockEventListener<string>;
+
+  beforeEach(() => {
+    apiClientMock = new AsyncOnlyMockApiClient();
+    sut = new Verifier("test-id", apiClientMock, sutLogLevel);
+    eventListenerMock = new MockEventListener();
+  }, setupTimeout);
+
+  test("stopMonitor works for connectors that only implement watchBlocksAsyncV1", async () => {
+    const thisAppId = "asyncOnlyId";
+
+    expect(sut.runningMonitors.size).toEqual(0);
+    await sut.startMonitor(thisAppId, {}, eventListenerMock);
+    expect(sut.runningMonitors.size).toEqual(1);
+
+    // Before fix this threw: "stopMonitor not supported on this ledger"
+    expect(() => sut.stopMonitor(thisAppId)).not.toThrow();
+    expect(sut.runningMonitors.size).toEqual(0);
   });
 });
 
