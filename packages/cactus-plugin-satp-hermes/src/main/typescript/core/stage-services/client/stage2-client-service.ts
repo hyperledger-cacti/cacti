@@ -343,7 +343,8 @@ export class Stage2ClientService extends SATPService {
             },
           );
 
-          sessionData.lockAssertionExpiration = BigInt(99999999999); //todo implement
+          sessionData.lockAssertionExpiration =
+            BigInt(Date.now()) + sessionData.lockExpirationTime;
 
           sessionData.lockAssertionClaim.signature = bufArray2HexStr(
             sign(this.Signer, sessionData.lockAssertionClaim.receipt),
