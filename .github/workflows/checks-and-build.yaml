@@ -60,7 +60,7 @@ jobs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: Set output
         id: set-output
         run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
@@ -68,7 +68,7 @@ jobs:
   build-dev:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       - name: build
         uses:  ./.github/actions/configure-repo/
         with:
@@ -79,7 +79,7 @@ jobs:
     outputs:
       affected_packages: ${{ steps.compute-affected-packages.outputs.affected_packages }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
         with:
           fetch-depth: 0
       - name: Set up Node.js
