@@ -108,8 +108,83 @@ import { SATPInternalError } from "./errors/satp-errors";
 import { SATPSession } from "./satp-session";
 
 import { v4 as uuidv4 } from "uuid";
-import { TokenType } from "../public-api";
+import { TokenType, TransactRequest } from "../public-api";
 import { TokenType as ProtoTokenType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+
+/**
+ * Validates the required fields of a TransactRequest.
+ *
+ * @description
+ * Checks that the essential nested fields needed by
+ * {@link populateClientSessionData} are present on the request,
+ * throwing a 400 SATPInternalError for the first missing field.
+ *
+ * @public
+ * @param {TransactRequest} req - The incoming transact request.
+ * @param {string} fnTag - Caller function tag for error context.
+ * @throws {SATPInternalError} If a required field is missing.
+ */
+export function validateTransactRequest(
+  req: TransactRequest,
+  fnTag: string,
+): void {
+  if (!req.sourceAsset) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: sourceAsset`,
+      null,
+      400,
+    );
+  }
+  if (!req.receiverAsset) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: receiverAsset`,
+      null,
+      400,
+    );
+  }
+  if (!req.sourceAsset.networkId) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: sourceAsset.networkId`,
+      null,
+      400,
+    );
+  }
+  if (!req.receiverAsset.networkId) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: receiverAsset.networkId`,
+      null,
+      400,
+    );
+  }
+  if (!req.sourceAsset.owner) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: sourceAsset.owner`,
+      null,
+      400,
+    );
+  }
+  if (!req.receiverAsset.owner) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: receiverAsset.owner`,
+      null,
+      400,
+    );
+  }
+  if (!req.sourceAsset.contractName) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: sourceAsset.contractName`,
+      null,
+      400,
+    );
+  }
+  if (!req.receiverAsset.contractName) {
+    throw new SATPInternalError(
+      `${fnTag}, missing required field: receiverAsset.contractName`,
+      null,
+      400,
+    );
+  }
+}
 
 /**
  * Enumeration of timestamp types for SATP message processing.
