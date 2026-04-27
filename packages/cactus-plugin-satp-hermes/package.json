@@ -240,7 +240,7 @@
     "swagger-ui-express": "5.0.0",
     "ts-results": "3.3.0",
     "typescript-optional": "2.0.1",
-    "uuid": "10.0.0",
+    "uuid": "14.0.0",
     "web3": "4.4.0",
     "web3-utils": "1.6.1"
   },
@@ -296,7 +296,7 @@
     "kubo-rpc-client": "3.0.4",
     "make-dir-cli": "3.1.0",
     "prettier": "3.2.5",
-    "protobufjs": "7.2.5",
+    "protobufjs": "7.5.5",
     "puppeteer": "24.23.0",
     "swagger-cli": "4.0.4",
     "ts-jest": "29.3.3",

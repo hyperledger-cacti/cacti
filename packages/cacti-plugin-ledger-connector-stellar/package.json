@@ -85,7 +85,7 @@
     "jest-extended": "7.0.0",
     "npm-run-all2": "6.1.2",
     "socket.io": "4.6.2",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "engines": {
     "node": ">=18",

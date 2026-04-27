@@ -70,7 +70,7 @@
     "axios": "1.15.0",
     "pg": "8.8.0",
     "run-time-error-cjs": "1.4.0",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-cmd-api-server": "2.1.0",

@@ -78,7 +78,7 @@
     "solc": "0.8.6",
     "tar-fs": "3.0.10",
     "typescript-optional": "2.0.1",
-    "uuid": "10.0.0",
+    "uuid": "14.0.0",
     "web3-core": "1.6.1"
   },
   "devDependencies": {

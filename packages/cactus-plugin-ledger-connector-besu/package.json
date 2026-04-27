@@ -102,11 +102,11 @@
     "jest-extended": "7.0.0",
     "key-encoder": "2.0.3",
     "npm-run-all2": "6.1.2",
-    "protobufjs": "7.4.0",
+    "protobufjs": "7.5.5",
     "socket.io": "4.6.2",
     "tape-promise": "4.0.0",
     "tsx": "4.16.2",
-    "uuid": "10.0.0",
+    "uuid": "14.0.0",
     "web3-core": "1.6.1",
     "web3-eth": "1.6.1",
     "web3-eth-accounts": "patch:web3-eth-accounts@npm%3A1.6.1#~/.yarn/patches/web3-eth-accounts-npm-1.6.1-c95f31ca81.patch"
