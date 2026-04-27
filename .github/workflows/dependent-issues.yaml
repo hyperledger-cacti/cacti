@@ -6,7 +6,10 @@ on:
       - opened
       - edited
       - reopened
-  pull_request:
+  # Use pull_request_target so the GITHUB_TOKEN gets write scopes for PRs
+  # originating from forks. Safe here because the job does not check out
+  # untrusted PR code — it only calls the GitHub Issues/PR API.
+  pull_request_target:
     types:
       - opened
       - edited
@@ -23,6 +26,9 @@ jobs:
   check:
     runs-on: ubuntu-22.04
     name: Dependent Issues
+    permissions:
+      issues: write
+      pull-requests: write
     steps:
       - uses: z0al/dependent-issues@104e2eed9880cf70215b545f9e5674372d576a05 #v1
         env:
