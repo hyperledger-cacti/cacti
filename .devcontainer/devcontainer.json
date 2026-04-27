@@ -42,7 +42,7 @@
 			"version": "v3.20.3"
 		},
 		"ghcr.io/dhoeric/features/trivy:1.0.0": {
-			"version": "0.52.1"
+			"version": "0.61.0"
 		}
 	},
 	"customizations": {
