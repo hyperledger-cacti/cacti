@@ -223,16 +223,28 @@ export class PluginLedgerConnectorBesu
   }
 
   public async shutdown(): Promise<void> {
-    this.log.info(`Shutting down ${this.className}...`);
-    
-    if (this.web3Provider && typeof this.web3Provider.disconnect === "function") {
-      this.web3Provider.disconnect();
+    const fnTag = `${this.className}#shutdown()`;
+    this.log.info(`${fnTag} Shutting down...`);
+
+    if (
+      this.web3Provider &&
+      typeof this.web3Provider.disconnect === "function"
+    ) {
+      try {
+        this.web3Provider.disconnect();
+      } catch (ex) {
+        this.log.error(`${fnTag} Failed to disconnect web3Provider:`, ex);
+      }
     }
-    
+
     if (this.txSubject) {
-      this.txSubject.complete();
+      try {
+        this.txSubject.complete();
+      } catch (ex) {
+        this.log.error(`${fnTag} Failed to complete txSubject:`, ex);
+      }
     }
-    
+
     this.contracts = {};
   }
 
