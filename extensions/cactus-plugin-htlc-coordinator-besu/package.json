@@ -74,7 +74,7 @@
     "run-time-error-cjs": "1.4.0",
     "socket.io-client-fixed-types": "4.5.4",
     "typescript-optional": "2.0.1",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@hyperledger/cactus-plugin-keychain-memory": "2.1.0",

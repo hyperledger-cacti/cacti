@@ -41,7 +41,7 @@
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@types/jsrsasign": "10.5.11",
@@ -49,7 +49,7 @@
     "@types/uuid": "10.0.0",
     "chai": "4.3.7",
     "chai-as-promised": "7.1.1",
-    "jsrsasign": "11.0.0",
+    "jsrsasign": "11.1.1",
     "mocha": "10.7.3",
     "nodemon": "2.0.22",
     "nyc": "12.0.2",

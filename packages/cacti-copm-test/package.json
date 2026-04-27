@@ -63,7 +63,7 @@
     "fabric-network": "2.2.20",
     "fs-extra": "11.2.0",
     "jest-extended": "7.0.0",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "engines": {
     "node": ">=18",
