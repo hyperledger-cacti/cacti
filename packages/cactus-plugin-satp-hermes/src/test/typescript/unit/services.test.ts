@@ -706,6 +706,8 @@ describe("SATP Services Testing", () => {
     );
   });
   it("Service2Client lockAssertionRequest", async () => {
+    const nowSpy = jest.spyOn(Date, "now").mockReturnValue(1_700_000_000_000);
+
     //mock claims
 
     mockSession.getClientSessionData().lockAssertionClaim = create(
@@ -747,12 +749,16 @@ describe("SATP Services Testing", () => {
     expect(lockAssertionRequestMessage.common?.sequenceNumber).toBeDefined();
     expect(lockAssertionRequestMessage.lockAssertionClaim).toBeDefined();
     expect(lockAssertionRequestMessage.lockAssertionClaimFormat).toBeDefined();
-    expect(lockAssertionRequestMessage.lockAssertionExpiration).toBeDefined();
+    expect(lockAssertionRequestMessage.lockAssertionExpiration).toBe(
+      BigInt(1_700_000_001_000),
+    );
     expect(lockAssertionRequestMessage.clientTransferNumber).toBeDefined();
     expect(lockAssertionRequestMessage.clientSignature).toBeDefined();
     expect(
       lockAssertionRequestMessage.common?.hashPreviousMessage,
     ).toBeDefined();
+
+    nowSpy.mockRestore();
   });
   it("Service2Server checkLockAssertionRequest", async () => {
     expect(satpServerService2).toBeDefined();
@@ -764,6 +770,20 @@ describe("SATP Services Testing", () => {
       lockAssertionRequestMessage,
       mockSession,
     );
+  });
+  it("Service2Server checkLockAssertionRequest rejects expired locks", async () => {
+    const expiredRequest = {
+      ...lockAssertionRequestMessage,
+      lockAssertionExpiration: BigInt(1),
+    } as LockAssertionRequest;
+
+    const nowSpy = jest.spyOn(Date, "now").mockReturnValue(1_700_000_000_000);
+
+    await expect(
+      satpServerService2.checkLockAssertionRequest(expiredRequest, mockSession),
+    ).rejects.toThrow("lockAssertionExpiration missing or faulty");
+
+    nowSpy.mockRestore();
   });
   it("Service2Server lockAssertionResponse", async () => {
     lockAssertionReceiptMessage =
