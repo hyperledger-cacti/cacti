@@ -75,6 +75,7 @@
     "watch-tsc": "tsc --build --watch",
     "watch": "run-p -r watch-*",
     "docs:diagrams": "mkdir -p docs/assets && echo 'Generating Getting Started guide diagrams (PNG)...' && bash -c 'for f in docs/docs/guides/diagrams/*.mmd; do name=$(basename \"$f\" .mmd); echo \"  $name.png\"; mmdc -i \"$f\" -o \"docs/assets/$name.png\" -t default -b transparent -w 1920 -s 2; done' && echo 'All diagrams generated successfully'",
+    "docs:whitepaper:pdf": "./tools/build-whitepaper-v2-pdf.sh",
     "build": "npm-run-all build:dev build:prod",
     "build:prod": "npm-run-all build:prod:frontend",
     "build:prod:frontend": "lerna run build:prod:frontend",
