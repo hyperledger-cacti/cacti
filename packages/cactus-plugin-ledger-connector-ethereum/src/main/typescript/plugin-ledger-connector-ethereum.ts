@@ -1003,6 +1003,13 @@ export class PluginLedgerConnectorEthereum
     req: DeployContractV1Request,
   ): Promise<RunTransactionResponse> {
     Checks.truthy(req, "deployContract() request arg");
+    this.ensureAllowedObjectKeys(req, [
+      "web3SigningCredential",
+      "contract",
+      "constructorArgs",
+      "gasConfig",
+      "value",
+    ]);
 
     if (isWeb3SigningCredentialNone(req.web3SigningCredential)) {
       throw new Error(`Cannot deploy contract with pre-signed TX`);
@@ -1135,6 +1142,7 @@ export class PluginLedgerConnectorEthereum
       args.methodName,
       "web3.eth method string must not be empty",
     );
+    this.validateRawWeb3EthMethodArgs(args);
 
     const looseWeb3Eth = this.web3.eth as any;
     // web3.eth methods in 4.X are stored in parent class
@@ -1152,6 +1160,31 @@ export class PluginLedgerConnectorEthereum
 
     const web3MethodArgs = args.params || [];
     return looseWeb3Eth[args.methodName](...web3MethodArgs);
+  }
+
+  private ensureAllowedObjectKeys(
+    object: object,
+    allowedKeys: string[],
+  ): void {
+    const unexpectedKeys = Object.keys(object as Record<string, unknown>).filter(
+      (key) => !allowedKeys.includes(key),
+    );
+
+    if (unexpectedKeys.length > 0) {
+      throw new Error(
+        `Unexpected properties in request: ${unexpectedKeys.join(", ")}`,
+      );
+    }
+  }
+
+  private validateRawWeb3EthMethodArgs(
+    args: InvokeRawWeb3EthMethodV1Request,
+  ): void {
+    const methodArgs = args.params || [];
+
+    if (args.methodName === "getBlock" && methodArgs.length < 1) {
+      throw new Error("web3.eth.getBlock requires at least one argument");
+    }
   }
 
   /**
