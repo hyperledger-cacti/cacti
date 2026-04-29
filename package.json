@@ -68,6 +68,7 @@
     "codegen:lerna": "openapi-generator-cli version-manager set 6.6.0 && yarn exec lerna run codegen",
     "codegen:warmup-bundle": "yarn tools:bundle-open-api-tpl-files",
     "codegen:warmup-cleancodegendir": "yarn node tools/clear-openapi-codegen-folders.js",
+    "codegen:warmup-execbin": "chmod +x ./node_modules/@openapitools/openapi-generator-cli/main.js",
     "codegen:warmup-mkdir": "make-dir ./.cache/openapi-generator-cli/versions/",
     "codegen:warmup-v6.6.0": "yarn codegen:ensure-jar-exists || yarn tools:download-file-to-disk --url=https://repo1.maven.org/maven2/org/openapitools/openapi-generator-cli/6.6.0/openapi-generator-cli-6.6.0.jar --output-file-path=./.cache/openapi-generator-cli/versions/6.6.0.jar",
     "codegen:ensure-jar-exists": "test -f ./.cache/openapi-generator-cli/versions/6.6.0.jar",
@@ -334,6 +335,9 @@
     "esbuild": {
       "built": false
     },
+    "grpc-tools": {
+      "built": true
+    },
     "indy-sdk": {
       "built": false
     },
@@ -386,7 +390,7 @@
       "built": false
     }
   },
-  "packageManager": "yarn@4.3.1",
+  "packageManager": "yarn@4.13.0",
   "packageExtensions": {
     "form-data@2.5.4": {
       "dependencies": {
