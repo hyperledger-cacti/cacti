@@ -165,7 +165,7 @@ For example you can _run a ledger single status endpoint test_ via the REST API 
 
 npx tap \--ts \--timeout\=600 packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts
 
-_You can also start the API server_ and verify more complex scenarios with an arbitrary list of plugins loaded into Cactus. This is useful for when you intend to develop your plugin either as a Cactus maintained plugin or one on your own.
+_You can also start the API server_ and verify more complex scenarios with an arbitrary list of plugins loaded into Cacti. This is useful for when you intend to develop your plugin either as a Cacti maintained plugin or one on your own.
 
 npm run generate-api-server-config
 
@@ -173,7 +173,7 @@ Notice how this task created a .config.json file in the project root with an exa
 
 The most interesting part of the `.config.json` file is the plugins array which takes a list of plugin package names and their options (which can be anything that you can fit into a generic JSON object).
 
-Notice that to include a plugin, all you need is specify it’s npm package name. This is important since it allows you to have your own plugins in their respective, independent Github repositories and npm packages where you do not have to seek explicit approval from the Cactus maintainers to create/maintain your plugin at all.
+Notice that to include a plugin, all you need is specify it’s npm package name. This is important since it allows you to have your own plugins in their respective, independent Github repositories and npm packages where you do not have to seek explicit approval from the Cacti maintainers to create/maintain your plugin at all.
 
 Once you are satisfied with the `.config.json` file’s contents you can just:
 
@@ -199,15 +199,15 @@ We recommend that you use WSL2 or any Linux VM (or bare metal). We test most fre
 Build Script Decision Tree
 --------------------------------------------------------------------------------------
 
-The `npm run watch` script should cover 99% of the cases when it comes to working on Cactus code and having it recompile, but for that last 1% you’ll need to get your hands dirty with the rest of the build scripts. Usually this is only needed when you are adding new dependencies (npm packages) as part of something that you are implementing.
+The `npm run watch` script should cover 99% of the cases when it comes to working on Cacti code and having it recompile, but for that last 1% you’ll need to get your hands dirty with the rest of the build scripts. Usually this is only needed when you are adding new dependencies (npm packages) as part of something that you are implementing.
 
-There are a lot of different build scripts in Cactus in order to provide contributors fine(r) grained control over what parts of the framework they wish build.
+There are a lot of different build scripts in Cacti in order to provide contributors fine(r) grained control over what parts of the framework they wish build.
 
 > Q: Why the complexity of so many build scripts?
 > 
 > A: We could just keep it simple with a single build script that builds everything always, but that would be a nightmare to wait for after having changed a single line of code for example.
 
-To figure out which script could work for rebuilding Cactus, please follow the following decision tree (and keep in mind that we have `npm run watch` too)
+To figure out which script could work for rebuilding Cacti, please follow the following decision tree (and keep in mind that we have `npm run watch` too)
 
 ![Build Script Decision Tree](_images/build-script-decision-tree-2021-03-06.png)
 
@@ -227,7 +227,7 @@ By creating a PR for the edited `ci.yml` file, this will the CI to run their tes
 
 1.  Go to the PR and click the `checks` tab
     
-2.  Go to the `Actions` tab within the main Hyperledger Cactus Repository
+2.  Go to the `Actions` tab within the main Hyperledger Cacti Repository
     
 
 Click on the `CI Cactus workflow`. There should be a new job you’ve created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what’s you’ve named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh \*\*\*\*\*\*\*\*\*\*:\*\*\*\*\*\*\*\*\*\*\*@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
