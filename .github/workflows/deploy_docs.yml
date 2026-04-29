@@ -11,6 +11,8 @@ on:
 
     paths:
       - 'docs/**'
+      - 'whitepaper/**'
+      - 'tools/build-whitepaper-v2-pdf.sh'
       - 'packages/cactus-plugin-satp-hermes/docs/**'
 
   # Allows you to run this workflow manually from the Actions tab
@@ -77,6 +79,9 @@ jobs:
 
       - name: Build markdown for openapi specs
         run: 'python3 docs/scripts/publish_openapi.py'
+
+      - name: Build whitepaper PDF artifact for mkdocs
+        run: ./tools/build-whitepaper-v2-pdf.sh
         
       - name: Build and publish
         run: git pull && mkdocs gh-deploy

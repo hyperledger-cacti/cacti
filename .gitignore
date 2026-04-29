@@ -7,6 +7,7 @@ target/
 node_modules/
 docs/main
 docs/docs/references/openapi
+docs/docs/cactus/assets/whitepaper/*.pdf
 logs/
 jspm_packages/
 generated-sources/

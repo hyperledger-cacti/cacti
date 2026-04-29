@@ -50,6 +50,15 @@ The commands you will usually use with `mkdocs` are:
 * `mkdocs -h` - Print help message and exit.
 * `mkdocs gh-deploy` - Build and push documents to `gh-pages` branch, and publish to URL configured in `mkdocs.yml`.
 
+To build the whitepaper PDF artifact that is linked from the docs site, run:
+
+```bash
+yarn docs:whitepaper:pdf
+```
+
+This generates `whitepaper/v2/build/main.pdf` and copies it into the MkDocs
+source tree at `docs/docs/cactus/assets/whitepaper/hyperledger-cacti-whitepaper-v2.pdf`.
+
 ## Adding Content
 
 The basic process for adding content to the site is:
