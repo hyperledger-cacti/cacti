@@ -1,0 +1,42 @@
+name: SATP Hermes Scheduled Tests
+
+# ─── Purpose ────────────────────────────────────────────────────────────────
+# Runs the full SATP Hermes test suite every Sunday as a health check,
+# independent of PR activity or affected-package detection.
+#
+# This is a thin caller workflow.  All job definitions live in
+# satp-hermes-workflow.yaml; inputs with explicit defaults are passed here
+# so the reusable workflow never receives empty values.
+#
+# To view results:
+#   GitHub → Actions → "SATP Hermes Scheduled Tests" → pick the run.
+# ────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # Every Sunday at 08:00 UTC.
+    # cron syntax: minute hour day-of-month month day-of-week
+    - cron: "0 8 * * 0"
+
+  # Keep manual dispatch so you can trigger an ad-hoc run without waiting
+  # for Sunday (useful when debugging a flaky test outside normal PR flow).
+  workflow_dispatch:
+
+jobs:
+  satp-hermes:
+    permissions:
+      # actions: read  — needed to download artifacts (e.g. jest-junit XML)
+      #   via the GitHub Actions API inside composite actions.
+      actions: read
+      # checks: write  — required by dorny/test-reporter to post check run
+      #   results to the Checks tab of the triggering commit.
+      checks: write
+      # contents: read  — required by actions/checkout inside
+      #   configure-repo and other composite actions.
+      contents: read
+    uses: ./.github/workflows/satp-hermes-workflow.yaml
+    with:
+      node_version: "v20.20.0"
+      # Coverage is expensive; keep it off for the weekly health-check run.
+      # Set to "true" if you want a full coverage report on Sundays.
+      run_code_coverage: "false"

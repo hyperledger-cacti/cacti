@@ -49,6 +49,18 @@ jobs:
       
   packages-workflow:
     needs: [checks-and-build, code-quality-checks, env-setup]
+    permissions:
+      # actions: read  — allows the jest-runner composite action (and the
+      #   upcoming workflow_run reporter) to download artifacts produced by
+      #   this run via the GitHub Actions API.
+      actions: read
+      # checks: write  — allows dorny/test-reporter (called from the
+      #   jest-runner composite action) to create and update Check Runs on
+      #   the commit under test.
+      checks: write
+      # contents: read  — required by actions/checkout (used inside
+      #   configure-repo and other composite actions) to clone the repo.
+      contents: read
     uses: ./.github/workflows/packages-workflow.yaml
     with:
       affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}

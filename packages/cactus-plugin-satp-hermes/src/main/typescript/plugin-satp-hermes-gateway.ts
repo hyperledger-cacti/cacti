@@ -684,7 +684,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           throw new Error("GatewayIdentity is not defined");
         }
 
-        const oracleLogRepository = new KnexOracleLogRepository(undefined);
+        const oracleLogRepository = new KnexOracleLogRepository(
+          knexLocalInstance.default,
+        );
         const oracleDbLogger = new OraclePersistence({
           oracleLogRepository,
           logLevel: this.config.logLevel,

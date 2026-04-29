@@ -57,6 +57,10 @@ jobs:
       
   satp-hermes-workflow:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-satp-hermes')
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     uses: ./.github/workflows/satp-hermes-workflow.yaml
     with:
       node_version: ${{ inputs.node_version }}
