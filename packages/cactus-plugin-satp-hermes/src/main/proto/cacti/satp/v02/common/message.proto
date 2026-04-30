@@ -295,6 +295,7 @@ message Asset {
   string channel_name = 9;
   NetworkId network_id = 10;
   ERCTokenStandard erc_token_standard = 11;
+  string unique_descriptor = 12;
 }
 
 message NetworkId {
@@ -307,5 +308,6 @@ enum ERCTokenStandard {
     ERC_TOKEN_STANDARD_ERC20 = 1;
     ERC_TOKEN_STANDARD_ERC721 = 2;
     ERC_TOKEN_STANDARD_ERC1155 = 3;
+    ERC_TOKEN_STANDARD_ERC6909 = 4;
 }
 

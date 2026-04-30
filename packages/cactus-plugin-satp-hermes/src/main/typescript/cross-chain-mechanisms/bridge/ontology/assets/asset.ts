@@ -114,10 +114,11 @@ export interface Asset {
 
 export type Brand<K, T> = K & { __brand: T };
 export type Amount = Brand<number, "Amount">;
-export type UniqueTokenID = Brand<null, "UniqueTokenID">;
+export type UniqueTokenID = Brand<number, "UniqueTokenID">;
 
 export interface FungibleAsset extends Asset {
   amount: Amount;
+  uniqueDescriptor?: UniqueTokenID;
 }
 
 export interface NonFungibleAsset extends Asset {
