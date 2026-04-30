@@ -23,4 +23,4 @@ make test
 
 ## Deploy and Run in Weaver Integration Tests
 
-Follow the [Getting Started](https://labs.hyperledger.org/weaver-dlt-interoperability/docs/external/getting-started) instructions.
+Follow the [Getting Started](https://hyperledger-cacti.github.io/cacti/weaver/getting-started/guide/) instructions.
