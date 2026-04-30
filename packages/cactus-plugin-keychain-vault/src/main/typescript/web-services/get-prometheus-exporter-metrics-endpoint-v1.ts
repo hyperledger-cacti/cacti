@@ -95,8 +95,7 @@ export class GetPrometheusExporterMetricsEndpointV1
     } catch (ex) {
       this.log.error(`${fnTag} failed to serve request`, ex);
       res.status(500);
-      res.statusMessage = ex.message;
-      res.json({ error: ex.stack });
+      res.json({ error: "Internal Server Error" });
     }
   }
 }
