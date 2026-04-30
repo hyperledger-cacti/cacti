@@ -30,7 +30,7 @@
 		},
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,
-			"version": "18.19.0",
+			"version": "20.20.0",
 			"installYarnUsingApt": false
 		},
 		"ghcr.io/devcontainers/features/rust:1": {
@@ -42,7 +42,7 @@
 			"version": "v3.20.3"
 		},
 		"ghcr.io/dhoeric/features/trivy:1.0.0": {
-			"version": "0.52.1"
+			"version": "0.61.0"
 		}
 	},
 	"customizations": {
