@@ -1298,9 +1298,10 @@ export class PluginLedgerConnectorFabric
       responseType: responseType,
     } = req;
 
+    let gateway: Gateway | undefined;
     try {
       this.log.debug("%s Creating Fabric Gateway instance...", fnTag);
-      const gateway = await this.createGateway(req);
+      gateway = await this.createGateway(req);
       this.log.debug("%s Obtaining Fabric gateway network instance...", fnTag);
       const network = await gateway.getNetwork(channelName);
       this.log.debug("%s Obtaining Fabric contract instance...", fnTag);
@@ -1384,7 +1385,6 @@ export class PluginLedgerConnectorFabric
         ),
         transactionId: transactionId,
       };
-      gateway.disconnect();
       this.log.debug(`transact() response: %o`, res);
       this.prometheusExporter.addCurrentTransaction();
 
@@ -1392,6 +1392,8 @@ export class PluginLedgerConnectorFabric
     } catch (ex) {
       this.log.error(`transact() crashed: `, ex);
       throw new Error(`${fnTag} Unable to run transaction: ${ex.message}`);
+    } finally {
+      gateway?.disconnect();
     }
   }
 
@@ -1399,12 +1401,16 @@ export class PluginLedgerConnectorFabric
     req: RunTransactionRequest,
   ): Promise<GetTransactionReceiptResponse> {
     const gateway = await this.createGateway(req);
-    const options: IGetTransactionReceiptByTxIDOptions = {
-      channelName: req.channelName,
-      params: req.params,
-      gateway: gateway,
-    };
-    return await getTransactionReceiptByTxID(options);
+    try {
+      const options: IGetTransactionReceiptByTxIDOptions = {
+        channelName: req.channelName,
+        params: req.params,
+        gateway: gateway,
+      };
+      return await getTransactionReceiptByTxID(options);
+    } finally {
+      gateway.disconnect();
+    }
   }
 
   /**
@@ -1680,76 +1686,80 @@ export class PluginLedgerConnectorFabric
     );
 
     const gateway = await this.createGatewayWithOptions(req.gatewayOptions);
-    const { channelName, responseType } = req;
-    const connectionChannelName = req.connectionChannelName ?? channelName;
-    const queryConfig = {
-      gateway,
-      connectionChannelName,
-    };
+    try {
+      const { channelName, responseType } = req;
+      const connectionChannelName = req.connectionChannelName ?? channelName;
+      const queryConfig = {
+        gateway,
+        connectionChannelName,
+      };
 
-    let responseData: Buffer;
-    if (req.query.blockNumber) {
-      this.log.debug("getBlock by it's blockNumber:", req.query.blockNumber);
-      responseData = await querySystemChainCode(
-        queryConfig,
-        "GetBlockByNumber",
-        channelName,
-        req.query.blockNumber,
-      );
-    } else if (req.query.blockHash) {
-      const { buffer, encoding } = req.query.blockHash;
-      this.log.debug("getBlock by it's hash:", buffer);
+      let responseData: Buffer;
+      if (req.query.blockNumber) {
+        this.log.debug("getBlock by its blockNumber:", req.query.blockNumber);
+        responseData = await querySystemChainCode(
+          queryConfig,
+          "GetBlockByNumber",
+          channelName,
+          req.query.blockNumber,
+        );
+      } else if (req.query.blockHash) {
+        const { buffer, encoding } = req.query.blockHash;
+        this.log.debug("getBlock by its hash:", buffer);
 
-      if (encoding && !Buffer.isEncoding(encoding)) {
-        throw new Error(`Unknown buffer encoding provided: ${encoding}`);
+        if (encoding && !Buffer.isEncoding(encoding)) {
+          throw new Error(`Unknown buffer encoding provided: ${encoding}`);
+        }
+
+        responseData = await querySystemChainCode(
+          queryConfig,
+          "GetBlockByHash",
+          channelName,
+          Buffer.from(buffer, encoding as BufferEncoding),
+        );
+      } else if (req.query.transactionId) {
+        this.log.debug(
+          "getBlock by transactionId it contains:",
+          req.query.transactionId,
+        );
+        responseData = await querySystemChainCode(
+          queryConfig,
+          "GetBlockByTxID",
+          channelName,
+          req.query.transactionId,
+        );
+      } else {
+        throw new Error(
+          "Unsupported block query type - you must provide either number, hash or txId",
+        );
       }
 
-      responseData = await querySystemChainCode(
-        queryConfig,
-        "GetBlockByHash",
-        channelName,
-        Buffer.from(buffer, encoding as BufferEncoding),
-      );
-    } else if (req.query.transactionId) {
-      this.log.debug(
-        "getBlock by transactionId it contains:",
-        req.query.transactionId,
-      );
-      responseData = await querySystemChainCode(
-        queryConfig,
-        "GetBlockByTxID",
-        channelName,
-        req.query.transactionId,
-      );
-    } else {
-      throw new Error(
-        "Unsupported block query type - you must provide either number, hash or txId",
-      );
-    }
+      if (!responseData) {
+        const eMsg = `${fnTag} - expected string as GetBlockByTxID response from Fabric system chaincode but received a falsy value instead...`;
+        throw new RuntimeError(eMsg);
+      }
 
-    if (!responseData) {
-      const eMsg = `${fnTag} - expected string as GetBlockByTxID response from Fabric system chaincode but received a falsy value instead...`;
-      throw new RuntimeError(eMsg);
-    }
-
-    if (responseType === GetBlockResponseTypeV1.Encoded) {
-      const encodedBlockB64 = responseData.toString("base64");
-      return {
-        encodedBlock: encodedBlockB64,
-      };
-    }
-
-    const decodedBlock = BlockDecoder.decode(responseData);
-    switch (responseType) {
-      case GetBlockResponseTypeV1.CactiTransactions:
-        return formatCactiTransactionsBlockResponse(decodedBlock);
-      case GetBlockResponseTypeV1.CactiFullBlock:
-        return formatCactiFullBlockResponse(decodedBlock);
-      case GetBlockResponseTypeV1.Full:
-      default:
+      if (responseType === GetBlockResponseTypeV1.Encoded) {
+        const encodedBlockB64 = responseData.toString("base64");
         return {
-          decodedBlock,
+          encodedBlock: encodedBlockB64,
         };
+      }
+
+      const decodedBlock = BlockDecoder.decode(responseData);
+      switch (responseType) {
+        case GetBlockResponseTypeV1.CactiTransactions:
+          return formatCactiTransactionsBlockResponse(decodedBlock);
+        case GetBlockResponseTypeV1.CactiFullBlock:
+          return formatCactiFullBlockResponse(decodedBlock);
+        case GetBlockResponseTypeV1.Full:
+        default:
+          return {
+            decodedBlock,
+          };
+      }
+    } finally {
+      gateway.disconnect();
     }
   }
 
@@ -1766,33 +1776,37 @@ export class PluginLedgerConnectorFabric
     this.log.debug("getChainInfo() called, channelName:", channelName);
 
     const gateway = await this.createGatewayWithOptions(req.gatewayOptions);
-    const connectionChannelName = req.connectionChannelName ?? channelName;
-    const queryConfig = {
-      gateway,
-      connectionChannelName,
-    };
+    try {
+      const connectionChannelName = req.connectionChannelName ?? channelName;
+      const queryConfig = {
+        gateway,
+        connectionChannelName,
+      };
 
-    const responseData = await querySystemChainCode(
-      queryConfig,
-      "GetChainInfo",
-      channelName,
-    );
+      const responseData = await querySystemChainCode(
+        queryConfig,
+        "GetChainInfo",
+        channelName,
+      );
 
-    const decodedResponse =
-      fabricProtos.common.BlockchainInfo.decode(responseData);
-    if (!decodedResponse) {
-      throw new RuntimeError("Could not decode BlockchainInfo");
+      const decodedResponse =
+        fabricProtos.common.BlockchainInfo.decode(responseData);
+      if (!decodedResponse) {
+        throw new RuntimeError("Could not decode BlockchainInfo");
+      }
+
+      return {
+        height: fabricLongToNumber(
+          decodedResponse.height as unknown as FabricLong,
+        ),
+        currentBlockHash:
+          "0x" + Buffer.from(decodedResponse.currentBlockHash).toString("hex"),
+        previousBlockHash:
+          "0x" + Buffer.from(decodedResponse.previousBlockHash).toString("hex"),
+      };
+    } finally {
+      gateway.disconnect();
     }
-
-    return {
-      height: fabricLongToNumber(
-        decodedResponse.height as unknown as FabricLong,
-      ),
-      currentBlockHash:
-        "0x" + Buffer.from(decodedResponse.currentBlockHash).toString("hex"),
-      previousBlockHash:
-        "0x" + Buffer.from(decodedResponse.previousBlockHash).toString("hex"),
-    };
   }
 
   /**
@@ -2059,38 +2073,40 @@ export class PluginLedgerConnectorFabric
     }
 
     const gateway = await this.createGatewayWithOptions(req.gatewayOptions);
+    try {
+      // We use `discoveryService` member of `Network`, which isn't private according to the sources (as of 2025),
+      // but is not listed in exported TS types for some reason.
+      // Since it's public in the sources, and because this API is deprecated anyways,
+      // I don't think we're at risk of this being changed anyway, so I use it
+      // to prevent unnecessary code duplication (which would be more risky in the end).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const looseNetwork: any = await gateway.getNetwork(req.channelName);
+      const discoveryResultsResponse =
+        await looseNetwork.discoveryService.getDiscoveryResults(true);
 
-    // We use `discoveryService` member of `Network`, which isn't private according to the sources (as of 2025),
-    // but is not listed in exported TS types for some reason.
-    // Since it's public in the sources, and because this API is deprecated anyways,
-    // I don't think we're at risk of this being changed anyway, so I use it
-    // to prevent unnecessary code duplication (which would be more risky in the end).
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const looseNetwork: any = await gateway.getNetwork(req.channelName);
-    const discoveryResultsResponse =
-      await looseNetwork.discoveryService.getDiscoveryResults(true);
+      // Rename the response fields
+      const discoveryResults = {
+        msps: discoveryResultsResponse.msps,
+        orderers: discoveryResultsResponse.orderers,
+        peersByMSP: discoveryResultsResponse.peers_by_org,
+        timestamp: discoveryResultsResponse.timestamp,
+      };
 
-    // Rename the response fields
-    const discoveryResults = {
-      msps: discoveryResultsResponse.msps,
-      orderers: discoveryResultsResponse.orderers,
-      peersByMSP: discoveryResultsResponse.peers_by_org,
-      timestamp: discoveryResultsResponse.timestamp,
-    };
-
-    // Convert peer.ledgerHeight from Long to number
-    Object.keys(discoveryResults.peersByMSP).forEach((peerOrg) => {
-      discoveryResults.peersByMSP[peerOrg].peers = discoveryResults.peersByMSP[
-        peerOrg
-      ].peers.map((peer: any) => {
-        return {
-          ...peer,
-          ledgerHeight: fabricLongToNumber(peer.ledgerHeight),
-        };
+      // Convert peer.ledgerHeight from Long to number
+      Object.keys(discoveryResults.peersByMSP).forEach((peerOrg) => {
+        discoveryResults.peersByMSP[peerOrg].peers =
+          discoveryResults.peersByMSP[peerOrg].peers.map((peer: any) => {
+            return {
+              ...peer,
+              ledgerHeight: fabricLongToNumber(peer.ledgerHeight),
+            };
+          });
       });
-    });
 
-    return discoveryResults;
+      return discoveryResults;
+    } finally {
+      gateway.disconnect();
+    }
   }
 
   /**
