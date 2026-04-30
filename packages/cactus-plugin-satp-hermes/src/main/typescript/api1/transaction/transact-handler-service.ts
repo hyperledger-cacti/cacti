@@ -1,6 +1,9 @@
 import { TransactRequest, TransactResponse } from "../../public-api";
 import { SATPManager } from "../../services/gateway/satp-manager";
-import { populateClientSessionData } from "../../core/session-utils";
+import {
+  populateClientSessionData,
+  validateTransactRequest,
+} from "../../core/session-utils";
 import {
   CredentialProfile,
   LockType,
@@ -26,8 +29,10 @@ export async function executeTransact(
 
   logger.info(`${fnTag}, executing transaction endpoint`);
 
-  //TODO check input for valid strings...
+  validateTransactRequest(req, fnTag);
+
   const ourGateway: GatewayIdentity = orchestrator.ourGateway;
+
   const senderGatewayOwnerId: string = ourGateway.id;
 
   //This data is set in satpManager GOL
