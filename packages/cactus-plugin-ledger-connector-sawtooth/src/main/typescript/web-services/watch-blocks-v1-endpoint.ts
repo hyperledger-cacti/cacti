@@ -83,6 +83,7 @@ export class WatchBlocksV1Endpoint {
         if (txFilterBy && txFilterBy.family_name) {
           return tx.header.family_name === txFilterBy.family_name;
         }
+        return true;
       })
       .map((tx) => {
         return {
