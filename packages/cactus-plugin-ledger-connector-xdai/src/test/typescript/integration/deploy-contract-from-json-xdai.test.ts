@@ -238,8 +238,8 @@ describe(testCase, () => {
     });
     expect(setNameOut).toBeTruthy();
 
-    try {
-      await connector.invokeContract({
+    await expect(
+      connector.invokeContract({
         contractName,
         keychainId: keychainPlugin.getKeychainId(),
         invocationType: EthContractInvocationType.Send,
@@ -252,11 +252,8 @@ describe(testCase, () => {
           type: Web3SigningCredentialType.PrivateKeyHex,
         },
         nonce: 1,
-      });
-      fail("It should not reach here");
-    } catch (error) {
-      expect(error).not.toBe("Nonce too low");
-    }
+      }),
+    ).rejects.toThrow("Nonce too low");
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,
       keychainId: keychainPlugin.getKeychainId(),
@@ -341,21 +338,17 @@ describe(testCase, () => {
     });
     expect(setNameOut).toBeTruthy();
 
-    try {
-      await connector.invokeContract({
-        contractName,
-        keychainId: keychainPlugin.getKeychainId(),
-        invocationType: EthContractInvocationType.Send,
-        methodName: "setName",
-        params: [newName],
-        gas: 1000000,
-        web3SigningCredential,
-        nonce: 4,
-      });
-      fail("It should not reach here");
-    } catch (error) {
-      expect(error).not.toBe("Nonce too low");
-    }
+    const invokeContractCall = connector.invokeContract({
+      contractName,
+      keychainId: keychainPlugin.getKeychainId(),
+      invocationType: EthContractInvocationType.Send,
+      methodName: "setName",
+      params: [newName],
+      gas: 1000000,
+      web3SigningCredential,
+      nonce: 4,
+    });
+    await expect(invokeContractCall).rejects.toThrow("Nonce too low");
 
     const { callOutput: getNameOut } = await connector.invokeContract({
       contractName,

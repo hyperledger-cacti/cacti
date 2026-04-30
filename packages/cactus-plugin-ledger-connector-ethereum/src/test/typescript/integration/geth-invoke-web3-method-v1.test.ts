@@ -167,43 +167,25 @@ describe("invokeRawWeb3EthMethod Tests", () => {
   });
 
   test("invokeRawWeb3EthMethod with missing arg throws error (getBlock)", async () => {
-    try {
-      const connectorResponse = connector.invokeRawWeb3EthMethod({
-        methodName: "getBlock",
-      });
-
-      await connectorResponse;
-      fail("Calling getBlock with missing argument should throw an error");
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
+    const connectorResponse = connector.invokeRawWeb3EthMethod({
+      methodName: "getBlock",
+    });
+    await expect(connectorResponse).rejects.toThrow();
   });
 
   test("invokeRawWeb3EthMethod with invalid arg throws error (getBlock)", async () => {
-    try {
-      const connectorResponse = connector.invokeRawWeb3EthMethod({
-        methodName: "getBlock",
-        params: ["foo"],
-      });
-
-      await connectorResponse;
-      fail("Calling getBlock with argument should throw an error");
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
+    const connectorResponse = connector.invokeRawWeb3EthMethod({
+      methodName: "getBlock",
+      params: ["foo"],
+    });
+    await expect(connectorResponse).rejects.toThrow();
   });
 
   test("invokeRawWeb3EthMethod with non existing method throws error", async () => {
-    try {
-      const connectorResponse = connector.invokeRawWeb3EthMethod({
-        methodName: "foo",
-        params: ["foo"],
-      });
-
-      await connectorResponse;
-      fail("Calling non existing method should throw an error");
-    } catch (err) {
-      expect(err).toBeTruthy();
-    }
+    const connectorResponse = connector.invokeRawWeb3EthMethod({
+      methodName: "foo",
+      params: ["foo"],
+    });
+    await expect(connectorResponse).rejects.toThrow();
   });
 });
