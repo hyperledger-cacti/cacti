@@ -492,6 +492,30 @@ export class OracleManager {
                   );
                   // TODO: Dispatch a success notification.
                 } catch (error) {
+                  this.logger.error(
+                    `${fnTag}: Task ${task.taskID} failed`,
+                    error,
+                  );
+                  this.schedulerManager.removePoller(task.taskID);
+                  task.status = OracleTaskStatusEnum.Inactive;
+                  this.taskStatusMap.set(task.taskID, task);
+                  this.logAndPersist(
+                    task.taskID,
+                    "poll-task",
+                    "fail",
+                    safeStableStringify({
+                      task,
+                      error:
+                        error instanceof Error
+                          ? {
+                              name: error.name,
+                              message: error.message,
+                              stack: error.stack,
+                            }
+                          : { message: String(error) },
+                    }) ?? "",
+                    task.operations.length,
+                  );
                   // TODO: Dispatch a failure notification.
                 }
               },
