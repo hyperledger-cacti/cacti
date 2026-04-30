@@ -147,18 +147,18 @@ export class CordaApiClient
    * Should be called to stop monitoring on the connector.
    * Calling this will remove all pending transactions (that were not read yet)!
    *
-   * @param monitor Monitoring interval set with `setTimeout`.
+   * @param cancelPoll Function that stops the self-rescheduling poll loop.
    * @param clientAppId Client application ID to identify monitoring queue on the connector.
    * @param stateName Corda state to monitor.
    */
   private finalizeMonitoring(
-    monitor: ReturnType<typeof setTimeout>,
+    cancelPoll: () => void,
     clientAppId: string,
     stateName: string,
   ) {
     this.log.info("Unsubscribe from the monitoring...");
 
-    clearInterval(monitor);
+    cancelPoll();
 
     this.stopMonitorV1({
       clientAppId: clientAppId,
@@ -212,22 +212,36 @@ export class CordaApiClient
       options.stateFullClassName,
     );
 
-    // Periodically poll
-    const monitoringInterval = setInterval(
-      () =>
-        this.pollTransactionsLogin(
-          subject,
-          options.clientAppId,
-          options.stateFullClassName,
-        ),
-      pollRate,
-    );
+    // Self-rescheduling poll: each iteration awaits completion before scheduling
+    // the next one, preventing concurrent overlapping poll calls that would
+    // deliver duplicate transactions when the Corda REST API is slow.
+    let cancelled = false;
+
+    const schedulePoll = () => {
+      if (cancelled) return;
+      setTimeout(async () => {
+        try {
+          await this.pollTransactionsLogin(
+            subject,
+            options.clientAppId,
+            options.stateFullClassName,
+          );
+        } catch (err) {
+          this.log.warn("Unexpected error in poll scheduler:", err);
+        }
+        schedulePoll();
+      }, pollRate);
+    };
+
+    schedulePoll();
 
     // Share and finalize monitoring when not listened to anymore
     return subject.pipe(
       finalize(() =>
         this.finalizeMonitoring(
-          monitoringInterval,
+          () => {
+            cancelled = true;
+          },
           options.clientAppId,
           options.stateFullClassName,
         ),
