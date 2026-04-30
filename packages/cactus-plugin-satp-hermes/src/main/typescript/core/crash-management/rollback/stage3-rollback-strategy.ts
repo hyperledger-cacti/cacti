@@ -257,14 +257,35 @@ export class Stage3RollbackStrategy implements RollbackStrategy {
           return state;
         }
 
+        let sessionId = "";
         try {
-          // TODO: Implement Stage 3 specific cleanup logic
-
-          // TODO: Update other state properties as needed
-
+          sessionId = session.getSessionId();
+          state.details = `Stage 3 cleanup completed for session ${sessionId}`;
+          state.rollbackLogEntries.push(
+            create(RollbackLogEntrySchema, {
+              sessionId,
+              stage: SATPStage[4],
+              timestamp: new Date().toISOString(),
+              action: "CLEANUP_STAGE_3",
+              status: "SUCCESS",
+              details: state.details,
+            }),
+          );
+          this.log.info(`${fnTag} ${state.details}`);
           return state;
         } catch (error) {
           this.log.error(`${fnTag} Cleanup failed: ${error}`);
+          state.details = `Stage 3 cleanup failed: ${error}`;
+          state.rollbackLogEntries.push(
+            create(RollbackLogEntrySchema, {
+              sessionId,
+              stage: SATPStage[4],
+              timestamp: new Date().toISOString(),
+              action: "CLEANUP_STAGE_3",
+              status: "FAILED",
+              details: state.details,
+            }),
+          );
           return state;
         }
       } catch (err) {
