@@ -10,7 +10,7 @@
 - [Build Script Decision Tree](#build-script-decision-tree)
 - [Running CI Checks Locally Before Pushing](#running-ci-checks-locally-before-pushing)
 - [Configuring SSH to use upterm](#configuring-ssh-to-use-upterm)
-
+- [Troubleshooting](#troubleshooting) 
 ## Hyperledger Cacti Build Instructions
 
 This is the place to start if you want to give Cactus a spin on your local
@@ -347,3 +347,7 @@ By creating a PR for the edited `ci.yml` file, this will the CI to run their tes
   2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
 
 Click on the `CI Cactus workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
+
+## Troubleshooting
+
+If you encounter any issues during the build process, please check the **[FAQ.md](./FAQ.md)** for common problems and solutions.
