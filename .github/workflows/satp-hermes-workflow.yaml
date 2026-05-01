@@ -52,6 +52,7 @@ name: SATP Hermes Package Workflow
         # -----------------------------------------------------------------------------
 
 on:
+  # Invoked automatically by packages-workflow.yaml when SATP Hermes files are affected.
   workflow_call:
     inputs:
       node_version:
@@ -60,6 +61,29 @@ on:
       run_code_coverage:
         required: true
         type: string
+
+  # Manual trigger — go to Actions → "SATP Hermes Package Workflow" → Run workflow.
+  # Useful for re-running tests on a branch without pushing a new commit.
+  workflow_dispatch:
+    inputs:
+      node_version:
+        description: "Node.js version (e.g. v20.20.0)"
+        required: false
+        default: "v20.20.0"
+        type: string
+      run_code_coverage:
+        description: "Collect code coverage?"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+permissions:
+  actions: read
+  checks: write
+  contents: read
     
 concurrency:
   group: satp-hermes-package-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -96,7 +120,7 @@ jobs:
           report_name: "satp-unit-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
+        if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-satp-hermes-unit
@@ -143,7 +167,7 @@ jobs:
           report_name: "satp-bridge-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
+        if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-satp-hermes-bridge
@@ -188,7 +212,7 @@ jobs:
           report_name: "satp-oracle-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
+        if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-satp-hermes-oracle
@@ -235,7 +259,7 @@ jobs:
           report_name: "satp-gateway-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
+        if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-satp-hermes-gateway
@@ -290,7 +314,7 @@ jobs:
           report_name: "satp-gateway-docker-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
+        if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-satp-hermes-gateway-docker
@@ -376,7 +400,7 @@ jobs:
           report_name: "satp-unit-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
+        if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-satp-hermes-recovery
@@ -422,7 +446,7 @@ jobs:
           report_name: "satp-unit-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
+        if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: coverage-reports-satp-hermes-rollback

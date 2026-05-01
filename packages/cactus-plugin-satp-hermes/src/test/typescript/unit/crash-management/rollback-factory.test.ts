@@ -70,6 +70,8 @@ const log = LoggerProvider.getOrCreate(
   monitorService,
 );
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("RollbackStrategyFactory Tests", () => {
   let factory: RollbackStrategyFactory;
   let bridgesManager: SATPCrossChainManager;
