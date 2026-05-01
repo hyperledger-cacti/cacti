@@ -1,5 +1,9 @@
 # Frequently Asked Questions
 
+# Frequently Asked Questions
+
+> **Before reading the FAQ:** If you haven't built the project yet, start with the **[BUILD.md](../BUILD.md)** instructions first. This FAQ is for troubleshooting issues that may arise during or after the build process.
+
 ## History
 
 ### When and how was Cacti created?
