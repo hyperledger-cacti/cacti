@@ -55,6 +55,7 @@ export interface ICactusApiServerOptions {
   apiTlsCertPem: string;
   apiTlsKeyPem: string;
   apiTlsClientCaPem: string;
+  grpcHost: string;
   grpcPort: number;
   grpcMtlsEnabled: boolean;
   plugins: PluginImport[];
@@ -400,6 +401,13 @@ export class ConfigService {
         arg: "api-tls-key-pem",
         default: null as string | null,
       },
+      grpcHost: {
+        doc: "The host to bind the gRPC server to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
+        format: "ipaddress",
+        env: "GRPC_HOST",
+        arg: "grpc-host",
+        default: "127.0.0.1",
+      },
       grpcPort: {
         doc: "The gRPC port to serve web services on.",
         format: "port",
@@ -500,6 +508,7 @@ export class ConfigService {
     const apiPort = (schema.apiPort as SchemaObj).default;
     const apiProtocol = apiTlsEnabled ? "https:" : "http";
     const apiBaseUrl = `${apiProtocol}//${apiHost}:${apiPort}`;
+    const grpcHost = (schema.grpcHost as SchemaObj).default;
     const grpcPort = (schema.grpcPort as SchemaObj).default;
     const grpcMtlsEnabled = (schema.grpcMtlsEnabled as SchemaObj).default;
     const enableShutdownHook = (schema.enableShutdownHook as SchemaObj).default;
@@ -607,6 +616,7 @@ export class ConfigService {
       apiTlsCertPem: pkiServer.certificatePem,
       apiTlsKeyPem: pkiServer.privateKeyPem,
       apiTlsClientCaPem: "-", // API mTLS is off so this will not crash the server
+      grpcHost,
       grpcPort,
       grpcMtlsEnabled,
       cockpitEnabled: (schema.cockpitEnabled as SchemaObj).default,

@@ -811,8 +811,7 @@ export class ApiServer {
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
     return new Promise((resolve, reject) => {
-      // const grpcHost = "0.0.0.0"; // FIXME - make this configurable (config-service.ts)
-      const grpcHost = "127.0.0.1"; // FIXME - make this configurable (config-service.ts)
+      const grpcHost = this.options.config.grpcHost;
       const grpcHostAndPort = `${grpcHost}:${this.options.config.grpcPort}`;
 
       const grpcTlsCredentials = this.options.config.grpcMtlsEnabled
