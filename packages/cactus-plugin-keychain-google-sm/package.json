@@ -1,7 +1,7 @@
 {
   "name": "@hyperledger/cactus-plugin-keychain-google-sm",
   "version": "2.1.0",
-  "description": "A keychain implementation storing its entries in Azure key vault.",
+  "description": "A keychain implementation storing its entries in Google Cloud Secret Manager.",
   "keywords": [
     "Hyperledger",
     "Cacti",
