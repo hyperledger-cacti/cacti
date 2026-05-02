@@ -77,6 +77,8 @@ RUN npm install fabric-common bufferutil sqlite3 --build-from-source
 # Set environment
 ENV TZ=Etc/UTC
 ENV NODE_ENV=production
+ENV DATABASE_CLIENT=sqlite3
+ENV DATABASE_NAME=/opt/cacti/satp-hermes/database/satp.sqlite
 
 # Expose app ports
 EXPOSE 3010 3011 4010
