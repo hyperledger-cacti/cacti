@@ -834,6 +834,38 @@ export class BLODispatcherErraneousError extends SATPInternalError {
   }
 }
 
+export class AuditEntryNotFoundError extends SATPInternalError {
+  protected errorType = SATPErrorType.SESSION_ID_NOT_FOUND;
+
+  constructor(
+    public readonly auditEntryId: string,
+    cause: Error | string | null = null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(`Audit entry not found: ${auditEntryId}`, cause, 404, traceID, trace);
+    this.name = "AuditEntryNotFoundError";
+  }
+}
+export class AuditEntryInvalidTimestampError extends SATPInternalError {
+  protected errorType = SATPErrorType.INCORRECT_PARAMETER;
+
+  constructor(
+    public readonly parameterName: string,
+    cause: Error | string | null = null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Audit Entry Invalid timestamp: ${parameterName}`,
+      cause,
+      400,
+      traceID,
+      trace,
+    );
+    this.name = "AuditEntryInvalidTimestampError";
+  }
+}
 /**
  * Client-facing error class for user-friendly SATP error reporting.
  *

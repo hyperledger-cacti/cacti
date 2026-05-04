@@ -985,24 +985,6 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    // check audit endpoint and get audit data
-    /*
-    const auditResponse = await adminApi.performAudit(0, Date.now());
-
-    expect(auditResponse?.data.sessions).toBeDefined();
-    expect(auditResponse?.data.sessions?.length).toEqual(1);
-
-    log.info(
-      `Audit response: ${JSON.stringify(auditResponse?.data.sessions?.[0])}`,
-    );
-
-    const json_parsed = JSON.parse(
-      auditResponse?.data.sessions?.[0] || "{}",
-    ) as any;
-    expect(json_parsed).toBeDefined();
-    expect(json_parsed.id).toBe(res.data.sessionID);
-    */
   });
 });
 describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", () => {
@@ -1314,23 +1296,5 @@ describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", ()
     log.info(
       "Non fungible token was transferred correctly to the Owner account at Ethereum",
     );
-
-    // check audit endpoint and get audit
-    /*
-    const auditResponse = await adminApi.performAudit(0, Date.now());
-
-    expect(auditResponse?.data.sessions).toBeDefined();
-    expect(auditResponse?.data.sessions?.length).toEqual(1);
-
-    log.info(
-      `Audit response: ${JSON.stringify(auditResponse?.data.sessions?.[0])}`,
-    );
-
-    const json_parsed = JSON.parse(
-      auditResponse?.data.sessions?.[0] || "{}",
-    ) as any;
-    expect(json_parsed).toBeDefined();
-    expect(json_parsed.id).toBe(res.data.sessionID);
-    */
   });
 });

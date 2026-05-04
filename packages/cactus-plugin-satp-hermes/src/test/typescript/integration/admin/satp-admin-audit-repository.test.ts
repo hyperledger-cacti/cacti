@@ -6,6 +6,7 @@ import type {
   LocalLog,
 } from "../../../../main/typescript/core/types";
 import { v4 as uuidv4 } from "uuid";
+import { AuditEntryNotFoundError } from "../../../../main/typescript/core/errors/satp-errors";
 
 describe("AuditEntry Repository Integration Tests", () => {
   let repository: KnexAuditEntryRepository;
@@ -338,7 +339,7 @@ describe("AuditEntry Repository Integration Tests", () => {
   it("Given an empty database, When reading by non-existing ID, Then it should return undefined", async () => {
     // Given / When / Then
     await expect(repository.readById("non-existing-id")).rejects.toThrow(
-      TypeError,
+      AuditEntryNotFoundError,
     );
   });
 

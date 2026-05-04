@@ -2633,8 +2633,8 @@
           {
             "name": "endTimestamp",
             "in": "query",
-            "description": "The end timestamp for the audit period.",
-            "required": true,
+            "description": "The end timestamp for the audit period (defaults to now if omitted).",
+            "required": false,
             "schema": {
               "type": "string",
               "format": "date-time"

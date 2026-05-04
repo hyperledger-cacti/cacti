@@ -821,10 +821,17 @@ export class BLODispatcher {
     const { span, context: ctx } = this.monitorService.startSpan(
       "API1#performAudit()",
     );
-    return context.with(ctx, () => {
+    return context.with(ctx, async () => {
       try {
         this.logger.info(`Perform Audit request: ${safeStableStringify(req)}`);
-        return executeAudit(this.level, this.auditRepository, req);
+
+        const result = await executeAudit(
+          this.level,
+          this.auditRepository,
+          req,
+        );
+
+        return result;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

@@ -258,4 +258,31 @@ describe("Audit Endpoint Integration Tests", () => {
       },
     });
   });
+
+  it("Given missing endTimestamp, When calling audit endpoint, Then it should default to now and return matching entries", async () => {
+    // Given
+    const timestamp = Date.now();
+
+    await repository.create({
+      auditEntryId: uuidv4(),
+      session: mockLocalLog,
+      timestamp,
+    });
+
+    const startIso = new Date(timestamp - 1000).toISOString();
+
+    const api = new AdminApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
+    // When
+    const auditResponse = await api.performAudit(startIso);
+
+    // Then
+    expect(auditResponse.status).toBe(200);
+    expect(auditResponse.data.startTimestamp).toEqual(startIso);
+    expect(auditResponse.data.endTimestamp).toBeDefined();
+    expect(auditResponse.data.auditEntries).toBeDefined();
+    expect(auditResponse.data.auditEntries.entries.length).toBe(1);
+  });
 });

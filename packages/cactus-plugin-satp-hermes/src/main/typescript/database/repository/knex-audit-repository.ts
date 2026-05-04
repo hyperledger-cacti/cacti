@@ -13,6 +13,7 @@
 
 import type { AuditEntry, Audit } from "../../core/types";
 import type { IAuditEntryRepository } from "./interfaces/repository";
+import { AuditEntryNotFoundError } from "../../core/errors/satp-errors";
 import knex, { type Knex } from "knex";
 import { knexAuditInstance } from "../knexfile-audit";
 import { createMigrationSource } from "../knex-migration-source";
@@ -119,16 +120,22 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
    *
    * @param auditEntryId - Unique audit entry identifier
    * @returns Promise resolving to an audit entry or undefined
+   * @throws AuditEntryNotFoundError if no entry is found with the given ID
    */
-  readById(auditEntryId: string): Promise<AuditEntry> {
-    return this.getAuditEntriesTable()
+  async readById(auditEntryId: string): Promise<AuditEntry> {
+    const row = await this.getAuditEntriesTable()
       .where({ auditEntryId })
-      .first()
-      .then((row) => ({
-        auditEntryId: row.auditEntryId,
-        session: JSON.parse(row.session),
-        timestamp: row.timestamp,
-      }));
+      .first();
+
+    if (!row) {
+      throw new AuditEntryNotFoundError(auditEntryId);
+    }
+
+    return {
+      auditEntryId: row.auditEntryId,
+      session: JSON.parse(row.session),
+      timestamp: row.timestamp,
+    };
   }
 
   /**
@@ -138,7 +145,7 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
    * @param endTimestamp - epoch timestamp representing the end of the interval
    * @returns Promise resolving to an Audit object containing all matching audit entries
    */
-  readByTimeInterval(
+  async readByTimeInterval(
     startTimestamp: number,
     endTimestamp: number,
   ): Promise<Audit> {
@@ -165,17 +172,18 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
    * @param auditEntry - The transaction-level AuditEntry to persist, including transaction timestamp and sessions.
    * @returns A promise resolving when the database insertion completes.
    */
-  create(auditEntry: AuditEntry): Promise<AuditEntry> {
+  async create(auditEntry: AuditEntry): Promise<AuditEntry> {
     this.logger.debug(
       `Creating audit entry with ID: ${auditEntry.auditEntryId}`,
     );
 
-    //return this.getAuditEntriesTable().insert(auditEntry);
-    return this.getAuditEntriesTable().insert({
+    await this.getAuditEntriesTable().insert({
       auditEntryId: auditEntry.auditEntryId,
       session: JSON.stringify(auditEntry.session),
       timestamp: auditEntry.timestamp,
     });
+
+    return auditEntry;
   }
 
   /**

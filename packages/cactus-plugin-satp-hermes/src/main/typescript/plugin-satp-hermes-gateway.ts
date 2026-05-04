@@ -718,6 +718,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         const oracleLogRepository = new KnexOracleLogRepository(
           hardcodedKnexConfig,
         );
+        //const oracleLogRepository = new KnexOracleLogRepository(undefined);
         const oracleDbLogger = new OraclePersistence({
           oracleLogRepository,
           logLevel: this.config.logLevel,
@@ -1502,6 +1503,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           this.logger.debug("Shutting down monitor service");
           await this.monitorService.shutdown();
         }
+        this.logger.debug("Shutting down audit repository");
+        await this.auditRepository?.destroy();
+
         return;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });

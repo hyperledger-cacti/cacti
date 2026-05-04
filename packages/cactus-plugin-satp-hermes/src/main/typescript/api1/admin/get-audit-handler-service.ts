@@ -32,7 +32,10 @@
  * @since 0.0.3-beta
  */
 
-import { GetStatusError } from "../../core/errors/satp-errors";
+import {
+  AuditEntryInvalidTimestampError,
+  GetStatusError,
+} from "../../core/errors/satp-errors";
 import {
   AuditRequest,
   AuditResponse,
@@ -54,7 +57,7 @@ import type { Audit } from "../../core/types";
  * @param manager - SATP manager instance for session data access
  * @returns Promise resolving to formatted audit response
  * @throws GetStatusError for data access errors
- * @throws Error for unexpected service failures
+ * @throws AuditEntryInvalidTimestampError for invalid timestamp parameters
  * @since 0.0.3-beta
  * @example
  * ```typescript
@@ -101,7 +104,7 @@ export async function executeAudit(
       throw error;
     } else {
       logger.error(`${fnTag}, Unexpected error: ${error.message}`);
-      throw new Error("An unexpected error occurred while obtaining status.");
+      throw error;
     }
   }
 }
@@ -131,14 +134,20 @@ export async function getAuditData(
     level: logLevel,
   });
 
-  //const _repository: KnexAuditEntryRepository = new KnexAuditEntryRepository(
-  //  undefined,
-  //);
+  const start = Date.parse(req.startTimestamp);
+  const end = Date.parse(req.endTimestamp);
 
-  const audit: Audit = await auditRepository.readByTimeInterval(
-    Date.parse(new Date(req.startTimestamp).toISOString()),
-    Date.parse(new Date(req.endTimestamp).toISOString()),
-  );
+  if (isNaN(start) || isNaN(end)) {
+    throw new AuditEntryInvalidTimestampError("Invalid timestamp format");
+  }
+
+  if (start > end) {
+    throw new AuditEntryInvalidTimestampError(
+      "startTimestamp must be <= endTimestamp",
+    );
+  }
+
+  const audit: Audit = await auditRepository.readByTimeInterval(start, end);
 
   logger.info(`${fnTag}, Fetched audit entries: ${audit.auditEntries.length}`);
   return {

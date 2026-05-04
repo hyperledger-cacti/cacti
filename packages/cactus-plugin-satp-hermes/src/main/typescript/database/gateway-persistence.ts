@@ -12,6 +12,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { bufArray2HexStr, getSatpLogKey, sign } from "../utils/gateway-utils";
 import { MonitorService } from "../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { v4 as uuidv4 } from "uuid";
 
 interface GatewayLogEntryPersistence {
   sessionId: string;
@@ -103,7 +104,7 @@ export class GatewayPersistence {
         };
 
         const auditEntry: AuditEntry = {
-          auditEntryId: `audit-${Date.now()}-${logEntry.sessionId}`,
+          auditEntryId: uuidv4(),
           session: localLog,
           timestamp: Date.now(),
         };

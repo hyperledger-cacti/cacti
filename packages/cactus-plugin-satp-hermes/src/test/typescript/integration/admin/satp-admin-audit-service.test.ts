@@ -24,6 +24,7 @@ import {
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
 import { Knex } from "knex";
+import { AuditEntryInvalidTimestampError } from "../../../../main/typescript/core/errors/satp-errors";
 
 describe("Admin Audit Service Integration Tests", () => {
   let repository: KnexAuditEntryRepository;
@@ -97,7 +98,9 @@ describe("Admin Audit Service Integration Tests", () => {
       await gateway.shutdown();
     }
     await repository.destroy();
-    fs.unlinkSync(dbPath);
+    if (fs.existsSync(dbPath)) {
+      fs.unlinkSync(dbPath);
+    }
   });
 
   it("Given a valid AuditRequest, When calling performAudit, Then it should return a valid AuditResponse", async () => {
@@ -135,9 +138,59 @@ describe("Admin Audit Service Integration Tests", () => {
     expect(entry.session).toEqual(auditEntry.session);
   });
 
-  it("Given a invalid AuditRequest, When calling performAudit, Then it should return an empty AuditResponse", async () => {
+  it("Given valid timestamps with no matching entries, When calling performAudit, Then it should return an empty auditEntries array", async () => {
     // Given
-    // When
+    const request: AuditRequest = {
+      startTimestamp: new Date(Date.now() - 100000).toISOString(),
+      endTimestamp: new Date(Date.now() - 50000).toISOString(),
+    };
+
+    //When
+    const response = await gateway.BLODispatcherInstance?.PerformAudit(request);
+
+    //Then
+    expect(response).toBeDefined();
+    expect(response!.auditEntries?.entries).toBeDefined();
+    expect(response!.auditEntries?.entries).toHaveLength(0);
+  });
+
+  it("Given invalid timestamp format, When calling performAudit, Then it should throw InvalidParameterError", async () => {
+    // Given
+    const request: AuditRequest = {
+      startTimestamp: "invalid-date",
+      endTimestamp: "also-invalid",
+    };
+
+    // When/Then
+    await expect(
+      gateway.BLODispatcherInstance?.PerformAudit(request),
+    ).rejects.toThrow(AuditEntryInvalidTimestampError);
+  });
+
+  it("Given one invalid timestamp, When calling performAudit, Then it should throw InvalidParameterError", async () => {
+    // Given
+    const request: AuditRequest = {
+      startTimestamp: new Date().toISOString(),
+      endTimestamp: "invalid-date",
+    };
+
+    //When/Then
+    await expect(
+      gateway.BLODispatcherInstance?.PerformAudit(request),
+    ).rejects.toThrow(AuditEntryInvalidTimestampError);
+  });
+
+  it("Given startTimestamp greater than endTimestamp, When calling performAudit, Then it should throw InvalidParameterError", async () => {
+    // Given
+    const now = Date.now();
+    //When
+    const request: AuditRequest = {
+      startTimestamp: new Date(now + 1000).toISOString(),
+      endTimestamp: new Date(now).toISOString(),
+    };
     // Then
+    await expect(
+      gateway.BLODispatcherInstance?.PerformAudit(request),
+    ).rejects.toThrow(AuditEntryInvalidTimestampError);
   });
 });

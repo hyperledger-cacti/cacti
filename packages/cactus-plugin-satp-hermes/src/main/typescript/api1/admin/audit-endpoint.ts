@@ -249,10 +249,10 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
         "startTimestamp",
       );
 
-      const endDate = this.parseRequiredIso(
-        req.query["endTimestamp"],
-        "endTimestamp",
-      );
+      const endDate =
+        req.query["endTimestamp"] !== undefined
+          ? this.parseRequiredIso(req.query["endTimestamp"], "endTimestamp")
+          : new Date();
 
       if (startDate.getTime() > endDate.getTime()) {
         const err = new Error(

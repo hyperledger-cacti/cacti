@@ -73,9 +73,9 @@ const auditConfig: Knex.Config = {
 
 const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
-  await besuEnv.tearDown();
-  await ethereumEnv.tearDown();
-  await fabricEnv.tearDown();
+  await besuEnv?.tearDown();
+  await ethereumEnv?.tearDown();
+  await fabricEnv?.tearDown();
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
