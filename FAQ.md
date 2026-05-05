@@ -1,4 +1,6 @@
 # Frequently Asked Questions - Hyperledger Cacti <!-- omit in toc -->
+> **New to the project?** See the [Build Instructions](./BUILD.md) for
+> setup guides covering VSCode Dev Containers, macOS, Linux, and Windows.
 
 - [1. What are the minimum and recommended hardware specs? Do you have a cool story about this?](#1-what-are-the-minimum-and-recommended-hardware-specs-do-you-have-a-cool-story-about-this)
 - [2. Cacti API-Server returns `Unauthorized Error` using Postman on local machine](#2-cacti-api-server-returns-unauthorized-error-using-postman-on-local-machine)
