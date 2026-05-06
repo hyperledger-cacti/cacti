@@ -93,7 +93,7 @@
     "tar-stream": "2.2.0",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
-    "uuid": "10.0.0",
+    "uuid": "14.0.0",
     "web3": "1.6.1",
     "web3-core": "1.6.1",
     "web3-utils": "1.6.1"

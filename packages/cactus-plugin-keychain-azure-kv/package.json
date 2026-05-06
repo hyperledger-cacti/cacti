@@ -83,7 +83,7 @@
     "jest-extended": "7.0.0",
     "openapi-types": "12.1.3",
     "tape-promise": "4.0.0",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "engines": {
     "node": ">=18",
