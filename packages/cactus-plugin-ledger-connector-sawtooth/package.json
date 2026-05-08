@@ -58,7 +58,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.15.0",
+    "axios": "1.15.2",
     "cbor": "9.0.1",
     "rxjs": "7.8.1",
     "socket.io-client-fixed-types": "4.5.4"
@@ -72,7 +72,7 @@
     "express": "5.1.0",
     "jest-extended": "7.0.0",
     "socket.io": "4.6.2",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "engines": {
     "node": ">=18",
