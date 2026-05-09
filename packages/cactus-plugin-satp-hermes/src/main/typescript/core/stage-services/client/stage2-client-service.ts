@@ -293,7 +293,7 @@ export class Stage2ClientService extends SATPService {
 
         const sessionData = session.getClientSessionData();
         this.Log.info(`init-${stepTag}`);
-        this.dbLogger.storeProof({
+        await this.dbLogger.storeProof({
           sessionId: sessionData.id,
           type: "lock-asset",
           operation: "init",
@@ -302,7 +302,7 @@ export class Stage2ClientService extends SATPService {
         });
         try {
           this.Log.info(`exec-${stepTag}`);
-          this.dbLogger.storeProof({
+          await this.dbLogger.storeProof({
             sessionId: sessionData.id,
             type: "lock-asset",
             operation: "exec",
@@ -349,7 +349,7 @@ export class Stage2ClientService extends SATPService {
             sign(this.Signer, sessionData.lockAssertionClaim.receipt),
           );
 
-          this.dbLogger.storeProof({
+          await this.dbLogger.storeProof({
             sessionId: sessionData.id,
             type: "lock-asset",
             operation: "done",
@@ -358,7 +358,7 @@ export class Stage2ClientService extends SATPService {
           });
           this.Log.info(`${fnTag}, done-${fnTag}`);
         } catch (error) {
-          this.dbLogger.storeProof({
+          await this.dbLogger.storeProof({
             sessionId: sessionData.id,
             type: "lock-asset",
             operation: "fail",
