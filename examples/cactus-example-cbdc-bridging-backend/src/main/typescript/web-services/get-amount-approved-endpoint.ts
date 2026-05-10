@@ -17,6 +17,7 @@ import {
   registerWebServiceEndpoint,
 } from "@hyperledger-cacti/cactus-core";
 import { TransactRequestSourceChainAssetTypeEnum } from "../generated/openapi/typescript-axios/api";
+import createHttpError from "http-errors"; // Import createHttpError
 
 export class GetAmountApprovedEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetAmountApprovedEndpointV1";
@@ -78,16 +79,22 @@ export class GetAmountApprovedEndpointV1 implements IWebServiceEndpoint {
     const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
+
+    const user = req.query.user as string;
+    if (!user) {
+      throw createHttpError(400, "User parameter is required.");
+    }
+
     try {
       let result;
       if (req.query.chain === TransactRequestSourceChainAssetTypeEnum.Besu) {
         result = await this.options.infrastructure
           .getBesuEnvironment()
-          .getAmountApprovedBesu(req.query.user as string);
+          .getAmountApprovedBesu(user);
       } else {
         result = await this.options.infrastructure
           .getFabricEnvironment()
-          .getAmountApprovedFabric(req.query.user as string);
+          .getAmountApprovedFabric(user);
       }
       res.status(200).json(result);
     } catch (ex) {

@@ -54,9 +54,9 @@ export async function handleRestEndpointException(
     // For 5xx errors we treat it as a production bug that needs to be fixed on
     // our side and for everything else we treat it a user error and debug log it.
     if (ctx.error.statusCode >= INTERNAL_SERVER_ERROR) {
-      ctx.log.debug(ctx.errorMsg, errorAsSanitizedJson);
-    } else {
       ctx.log.error(ctx.errorMsg, errorAsSanitizedJson);
+    } else {
+      ctx.log.debug(ctx.errorMsg, errorAsSanitizedJson);
     }
 
     // If the `expose` property is set to true it implies that we can safely
