@@ -12,18 +12,18 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
-	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassetandinterop"
-	"github.com/stretchr/testify/require"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
 	wtestmocks "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils/mocks"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassetandinterop"
+	"github.com/hyperledger/fabric-protos-go/ledger/queryresult"
+	"github.com/stretchr/testify/require"
 )
 
 const (
-	defaultAssetType    = "BearerBonds"
-	defaultAssetId      = "asset1"
-	defaultAssetOwner   = "Alice"
-	defaultAssetIssuer  = "Treasury"
+	defaultAssetType   = "BearerBonds"
+	defaultAssetId     = "asset1"
+	defaultAssetOwner  = "Alice"
+	defaultAssetIssuer = "Treasury"
 )
 
 func TestInitBondAssetLedger(t *testing.T) {
@@ -41,20 +41,22 @@ func TestInitBondAssetLedger(t *testing.T) {
 func TestCreateAsset(t *testing.T) {
 	transactionContext, chaincodeStub := wtest.PrepMockStub()
 	simpleAsset := sa.SmartContract{}
+	currentTime := time.Now()
+	bondMaturityDate := currentTime.Add(time.Hour * 24).Format(time.RFC822) // maturity date is 1 day after current time
 
-	err := simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, "02 Jan 26 15:04 MST")
+	err := simpleAsset.CreateAsset(transactionContext, "", "", "", "", 0, bondMaturityDate)
 	require.Error(t, err)
 
-	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, "", "", "", 0, "02 Jan 26 15:04 MST")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, "", "", "", 0, bondMaturityDate)
 	require.Error(t, err)
 
-	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", "", 0, "02 Jan 26 15:04 MST")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", "", 0, bondMaturityDate)
 	require.Error(t, err)
 
-	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "02 Jan 26 15:04 MST")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, bondMaturityDate)
 	require.NoError(t, err)
 
-	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", defaultAssetIssuer, 0, "02 Jan 26 15:04 MST")
+	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, "", defaultAssetIssuer, 0, bondMaturityDate)
 	require.NoError(t, err)
 
 	err = simpleAsset.CreateAsset(transactionContext, defaultAssetType, defaultAssetId, defaultAssetOwner, "", 0, "02 Jan 06 15:04 MST")
@@ -152,7 +154,7 @@ func TestDeleteAsset(t *testing.T) {
 
 	chaincodeStub.GetStateReturns(nil, nil)
 	err = simpleAsset.DeleteAsset(transactionContext, "", "asset1")
-	require.EqualError(t, err, "the bond asset of type " + "" + " and id " + "asset1" + " does not exist")
+	require.EqualError(t, err, "the bond asset of type "+""+" and id "+"asset1"+" does not exist")
 
 	chaincodeStub.GetStateReturns(nil, fmt.Errorf("unable to retrieve asset"))
 	err = simpleAsset.DeleteAsset(transactionContext, "", "")
