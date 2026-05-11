@@ -84,6 +84,53 @@ export interface ISupplyChainAppOptions {
 }
 
 export type ShutdownHook = () => Promise<void>;
+// Small, local helper to run a shutdown hook with a timeout so a
+// single hung hook cannot block the entire application shutdown.
+const SHUTDOWN_HOOK_TIMEOUT_MS = Number(process.env.SHUTDOWN_HOOK_TIMEOUT_MS) || 5_000;
+
+async function runShutdownHookWithTimeout(
+  log: Logger,
+  hook: ShutdownHook,
+  hookIndex: number,
+  fnTag: string,
+): Promise<void> {
+  let timedOut = false;
+  const hookPromise = Promise.resolve().then(() => hook());
+
+  hookPromise.catch((err: unknown) => {
+    // If the hook rejects after timing out, make sure we log it but
+    // avoid an unhandled rejection.
+    if (timedOut) {
+      log.error(`${fnTag}: exit hook #%d rejected after timing out:`, hookIndex, err);
+    }
+  });
+
+  let timeoutId: NodeJS.Timeout | undefined;
+  const timeoutPromise = new Promise<string>((resolve) => {
+    timeoutId = setTimeout(() => {
+      timedOut = true;
+      resolve("timed-out");
+    }, SHUTDOWN_HOOK_TIMEOUT_MS);
+  });
+
+  try {
+    const result = await Promise.race([hookPromise.then(() => "completed"), timeoutPromise]);
+    if (result === "timed-out") {
+      log.warn(
+        `${fnTag}: exit hook #%d timed out after %d ms; continuing shutdown`,
+        hookIndex,
+        SHUTDOWN_HOOK_TIMEOUT_MS,
+      );
+      return;
+    }
+    // completed normally
+  } catch (err) {
+    log.error(`${fnTag}: exit hook #%d failed; continuing shutdown:`, hookIndex, err);
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+  }
+}
+
 //TODO: Generate fabric connector and set in the pluginRegistry
 export class SupplyChainApp {
   private readonly log: Logger;
@@ -459,11 +506,12 @@ export class SupplyChainApp {
   }
 
   public async stop(): Promise<void> {
+    const fnTag = "SupplyChainApp#stop()";
     let i = 0;
     for (const hook of this.shutdownHooks) {
       i++;
       this.log.info("Executing exit hook #%d...", i);
-      await hook(); // FIXME add timeout here so that shutdown does not hang
+      await runShutdownHookWithTimeout(this.log, hook, i, fnTag);
       this.log.info("Executed exit hook #%d OK", i);
     }
   }
