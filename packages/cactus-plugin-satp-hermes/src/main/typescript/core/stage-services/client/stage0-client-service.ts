@@ -623,7 +623,7 @@ export class Stage0ClientService extends SATPService {
         session.verify(fnTag, SessionType.CLIENT, false, false, true);
 
         const sessionData = session.getClientSessionData();
-        this.dbLogger.persistLogEntry({
+        await this.dbLogger.persistLogEntry({
           sessionId: sessionData.id,
           type: "wrap-token-client",
           operation: "init",
@@ -632,7 +632,7 @@ export class Stage0ClientService extends SATPService {
         });
         try {
           this.Log.info(`exec-${stepTag}`);
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "wrap-token-client",
             operation: "exec",
@@ -673,7 +673,7 @@ export class Stage0ClientService extends SATPService {
             sign(this.Signer, sessionData.senderWrapAssertionClaim.receipt),
           );
 
-          this.dbLogger.storeProof({
+          await this.dbLogger.storeProof({
             sessionId: sessionData.id,
             type: "wrap-token-client",
             operation: "done",
@@ -685,7 +685,7 @@ export class Stage0ClientService extends SATPService {
           this.Log.info(`${fnTag}, done-${fnTag}`);
         } catch (error) {
           this.logger.debug(`Crash in ${fnTag}`, error);
-          this.dbLogger.persistLogEntry({
+          await this.dbLogger.persistLogEntry({
             sessionId: sessionData.id,
             type: "wrap-token-client",
             operation: "fail",

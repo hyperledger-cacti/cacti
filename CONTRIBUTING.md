@@ -1,4 +1,5 @@
 - [Git Know How / Reading List](#git-know-how--reading-list)
+- [Small, Focused Pull Requests](#small-focused-pull-requests)
 - [PR Checklist - Contributor/Developer](#pr-checklist---contributordeveloper)
 - [PR Checklist - Maintainer/Reviewer](#pr-checklist---maintainerreviewer)
 - [Create local branch](#create-local-branch)
@@ -27,6 +28,7 @@ Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
 
 First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
+If you use AI or LLM tooling in your contributions, please also review our [AI Guidelines](./AI_GUIDELINES.md).
 
 There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
 
@@ -75,6 +77,30 @@ Further reading:
 - https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-collaborative-development-models
 - https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests
 
+
+## Small, Focused Pull Requests
+
+Pull requests **must** be small, self-contained chunks of work that
+address a single concern — one bug fix, one feature, or one
+refactoring. This is a core contribution principle, not a suggestion.
+
+- **One logical change per PR.** Do not bundle unrelated fixes,
+  features, or style changes in the same pull request.
+- **Prefer small diffs.** Smaller PRs are easier to review, less
+  likely to introduce regressions, and faster to merge. If a change
+  grows large, split it into a series of incremental PRs.
+- **Each commit should be self-contained.** Ideally a PR has a single
+  commit. When multiple commits are necessary (e.g., a feature commit
+  plus a test-tooling change), each commit must stand on its own and
+  be independently understandable.
+- **AI-generated PRs are not exempt.** AI tooling can easily produce
+  large, sprawling changes. Contributors using AI assistants must
+  still break work into focused, reviewable units — see
+  [AI Guidelines §2.4](./AI_GUIDELINES.md#24-compliance-with-project-standards).
+
+Small, focused PRs significantly reduce the cognitive load on
+reviewers, speed up the review cycle, and keep the git history clean
+and bisectable.
 
 ## PR Checklist - Contributor/Developer
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
