@@ -76,14 +76,13 @@ listed.
 **Examples:**
 
 ```
-Assisted-by: anthropic:claude-opus-4-6 eslint semgrep
-Assisted-by: anthropic:claude-sonnet-4-6
+Assisted-by: anthropic:claude-opus-4.7 
+Assisted-by: anthropic:claude-sonnet-4.6
 Assisted-by: openai:gpt-5.4
 Assisted-by: google:gemini-2.5-pro
 Assisted-by: deepseek:deepseek-r1
 Assisted-by: openai:o3
-Assisted-by: anthropic:claude-sonnet-4-5
-Assisted-by: anthropic:claude-opus-4-5
+Assisted-by: anthropic:claude-sonnet-4.5
 Assisted-by: openai:gpt-5.4-mini
 Assisted-by: openai:gpt-5.3-codex
 ```
