@@ -287,6 +287,9 @@ DCO (Developer Certificate of Origin) is enforced.
 - "Significant Change" label for large proposals
 - 2 maintainer approvals required for merge
 
+Full PR quality requirements (scope, size, testing, severity):
+[PULL.md](./PULL.md).
+
 ---
 
 ## 9. CI / Linting

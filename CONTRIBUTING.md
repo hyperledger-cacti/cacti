@@ -102,6 +102,9 @@ Small, focused PRs significantly reduce the cognitive load on
 reviewers, speed up the review cycle, and keep the git history clean
 and bisectable.
 
+See [PULL.md](./PULL.md) for the full Pull Request Guidelines,
+including concrete examples.
+
 ## PR Checklist - Contributor/Developer
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
