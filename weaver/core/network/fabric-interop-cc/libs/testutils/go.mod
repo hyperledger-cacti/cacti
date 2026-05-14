@@ -33,3 +33,5 @@ require (
 	google.golang.org/grpc v1.56.3 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
+
+replace golang.org/x/net => golang.org/x/net v0.33.0
