@@ -59,7 +59,7 @@
   "devDependencies": {
     "@connectrpc/connect-node": "1.4.0",
     "@types/convict": "6.1.1",
-    "convict": "6.2.4"
+    "convict": "6.2.5"
   },
   "engines": {
     "node": ">=18",
