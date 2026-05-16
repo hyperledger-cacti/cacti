@@ -93,7 +93,7 @@ export class HealthCheckEndpointV1 implements IWebServiceEndpoint {
   constructor(public readonly options: IRequestOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.dispatcher, `${fnTag} arg options.connector`);
+    Checks.truthy(options.dispatcher, `${fnTag} arg options.dispatcher`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
