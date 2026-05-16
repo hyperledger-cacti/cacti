@@ -49,6 +49,7 @@ import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
 import { AuditRequest } from "../../public-api";
+import { parseAuditTimestampRange } from "./audit-timestamp-query-params";
 
 /**
  * Web service endpoint for SATP audit operations.
@@ -199,35 +200,6 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  /**
-   * Helper method to parse and validate required ISO-8601 timestamp parameters.
-   *
-   * Validates that the input value is a string and can be parsed as a valid
-   * ISO-8601 date. Throws an error with appropriate status code if validation
-   * fails.
-   * @param value
-   * @param name
-   * @returns
-   */
-  private parseRequiredIso(value: unknown, name: string): Date {
-    if (typeof value !== "string") {
-      const err = new Error(`${name} must be an ISO-8601 string`);
-      (err as any).statusCode = 400;
-      throw err;
-    }
-
-    const date = new Date(value);
-
-    if (isNaN(date.getTime())) {
-      const err = new Error(`${name} must be a valid ISO-8601 timestamp`);
-      (err as any).statusCode = 400;
-      throw err;
-    }
-
-    return date;
-  }
-
-  /**
    * Handle HTTP requests for audit operations.
    *
    * Processes audit requests by parsing query parameters for timestamp
@@ -245,27 +217,15 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(reqTag);
 
     try {
-      const startDate = this.parseRequiredIso(
-        req.query["startTimestamp"],
-        "startTimestamp",
-      );
-
-      const endDate =
-        req.query["endTimestamp"] !== undefined
-          ? this.parseRequiredIso(req.query["endTimestamp"], "endTimestamp")
-          : new Date();
-
-      if (startDate.getTime() > endDate.getTime()) {
-        const err = new Error(
-          "startTimestamp must be less than or equal to endTimestamp",
-        );
-        (err as any).statusCode = 400;
-        throw err;
+      const parsed = parseAuditTimestampRange(req.query);
+      if (!parsed.ok) {
+        res.status(400).json({ message: parsed.message });
+        return;
       }
 
       const auditRequest: AuditRequest = {
-        startTimestamp: startDate.toISOString(),
-        endTimestamp: endDate.toISOString(),
+        startTimestamp: parsed.startTimestamp,
+        endTimestamp: parsed.endTimestamp,
       };
 
       const result = await this.options.dispatcher.PerformAudit(auditRequest);
