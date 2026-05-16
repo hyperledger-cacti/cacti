@@ -46,7 +46,10 @@ import {
   type IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
@@ -159,11 +162,8 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
       const result = await this.options.dispatcher.GetStatus(statusRequest);
       res.status(200).json(result);
     } catch (ex) {
-      this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `${reqTag} Failed to get status:`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }

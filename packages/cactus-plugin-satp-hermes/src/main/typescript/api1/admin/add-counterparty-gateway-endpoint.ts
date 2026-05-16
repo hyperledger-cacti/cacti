@@ -12,7 +12,10 @@ import {
   type IAsyncProvider,
 } from "@hyperledger/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
@@ -83,7 +86,6 @@ export class AddCounterpartyGatewayEndpointV1 implements IWebServiceEndpoint {
   // TODO discover way to inherit OAS schema and have request types here
   // parameter checks should be enforced by the type system
   public async handleRequest(req: Request, res: Response): Promise<void> {
-    const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     const reqBody: AddCounterpartyRequest = req.body;
     try {
@@ -91,11 +93,8 @@ export class AddCounterpartyGatewayEndpointV1 implements IWebServiceEndpoint {
         await this.options.dispatcher.AddCounterpartyGateway(reqBody);
       res.status(200).json(status);
     } catch (ex) {
-      this.log.error(`${fnTag}: Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
-      });
+      const errorMsg = `${reqTag} Failed to add counterparty gateway:`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }
