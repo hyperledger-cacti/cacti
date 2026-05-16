@@ -54,9 +54,11 @@ export class AddCounterpartyGatewayEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/get-sessions-ids"
-    ].get.operationId;
+    const apiPath =
+      OAS.paths[
+        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/add-counterparty-gateway"
+      ];
+    return apiPath.post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
