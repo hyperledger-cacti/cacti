@@ -44,7 +44,10 @@ import {
   type IAsyncProvider,
 } from "@hyperledger-cacti/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
+import {
+  handleRestEndpointException,
+  registerWebServiceEndpoint,
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
@@ -271,18 +274,9 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
       const result = await this.options.dispatcher.PerformAudit(auditRequest);
 
       res.status(200).json(result);
-    } catch (ex: any) {
-      this.log.error(`Crash while serving ${reqTag}`, ex);
-
-      const status = ex?.statusCode ?? 500;
-
-      res.status(status).json({
-        error: status === 400 ? "InvalidParameter" : "InternalError",
-        message:
-          status === 400
-            ? ex?.message ?? "Invalid parameter"
-            : "Internal Server Error",
-      });
+    } catch (ex) {
+      const errorMsg = `${reqTag} Failed to perform audit:`;
+      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }
   }
 }
