@@ -49,6 +49,7 @@ import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
 import { AuditRequest } from "../../public-api";
+import { parseAuditTimestampRange } from "./audit-timestamp-query-params";
 
 /**
  * Web service endpoint for SATP audit operations.
@@ -215,17 +216,15 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
     try {
-      const parseTimestamp = (value: unknown): number | null => {
-        if (typeof value === "string" || typeof value === "number") {
-          const num = Number(value);
-          return isNaN(num) ? null : num;
-        }
-        return null;
-      };
+      const parsed = parseAuditTimestampRange(req.query);
+      if (!parsed.ok) {
+        res.status(400).json({ message: parsed.message });
+        return;
+      }
 
       const auditRequest: AuditRequest = {
-        startTimestamp: parseTimestamp(req.query["startTimestamp"]) || 0,
-        endTimestamp: parseTimestamp(req.query["endTimestamp"]) || Date.now(),
+        startTimestamp: parsed.startTimestamp,
+        endTimestamp: parsed.endTimestamp,
       };
 
       const result = await this.options.dispatcher.PerformAudit(auditRequest);
