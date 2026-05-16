@@ -426,6 +426,7 @@ describe("SQLite oracle log database isolation", () => {
       createOracleLogKnexConfig(instanceId),
     );
     await repoA.database.migrate.latest();
+    await repoA.reset();
 
     // Open a second handle to the same file (simulates pool connection #2).
     const repoB = new KnexOracleLogRepository(
@@ -462,6 +463,8 @@ describe("SQLite oracle log database isolation", () => {
 
     await repoAlpha.database.migrate.latest();
     await repoBeta.database.migrate.latest();
+    await repoAlpha.reset();
+    await repoBeta.reset();
 
     const logAlpha: OracleLog = {
       key: "alpha-key-1",
@@ -488,6 +491,7 @@ describe("SQLite oracle log database isolation", () => {
       createOracleLogKnexConfig(instanceId),
     );
     await repo.database.migrate.latest();
+    await repo.reset();
 
     const log: OracleLog = {
       key: "mti-key-1",

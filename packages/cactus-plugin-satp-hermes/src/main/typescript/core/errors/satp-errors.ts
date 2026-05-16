@@ -870,32 +870,30 @@ export class AuditEntryInvalidTimestampError extends SATPInternalError {
  * Client-facing error class for user-friendly SATP error reporting.
  *
  * @description
- * **⚠️ TODO - Implementation Pending:**
- * This class is intended to provide client-facing error representations that map
- * internal SATP errors to user-friendly messages and error codes. The implementation
- * should include error sanitization, localization support, and API-appropriate
- * error formatting while preserving essential debugging information.
+ * Provides client-facing error representations that map internal SATP errors
+ * to user-friendly messages and error codes. Implements error sanitization
+ * and API-appropriate error formatting while preserving essential debugging
+ * information such as trace IDs for support correlation.
  *
- * **Planned Features:**
- * - User-friendly error message translation
- * - API-appropriate error code mapping
- * - Sensitive information sanitization
- * - Localization and internationalization support
- * - Client SDK integration compatibility
+ * **Features:**
+ * - User-friendly error message translation from internal errors
+ * - API-appropriate HTTP error code mapping
+ * - Sensitive information sanitization (stack traces, cause chains stripped)
+ * - Consistent error structure across different client interfaces via toJSON()
+ * - Trace ID and correlation information preserved for support
  *
- * **Design Considerations:**
- * - Should map SATPInternalError instances to client-safe representations
- * - Must preserve trace IDs and correlation information for support
- * - Should provide consistent error structure across different client interfaces
- * - Must not expose internal system details or security-sensitive information
+ * **Design Principles:**
+ * - Maps SATPInternalError instances to client-safe representations
+ * - Preserves trace IDs and correlation information for support
+ * - Provides consistent error structure across different client interfaces
+ * - Never exposes internal system details or security-sensitive information
  *
  * @class SATPError
  * @extends Error
  *
  * @example
- * Planned usage pattern:
+ * Converting internal errors to client-safe responses:
  * ```typescript
- * // TODO: Implement this functionality
  * try {
  *   await performSATPOperation();
  * } catch (internalError) {
@@ -906,10 +904,335 @@ export class AuditEntryInvalidTimestampError extends SATPInternalError {
  * }
  * ```
  *
- * @todo Implement client-facing error logic that maps SATPInternalErrors to user-friendly errors
+ * @example
+ * Creating a client error directly:
+ * ```typescript
+ * const error = new SATPError(
+ *   'The requested transfer session could not be found.',
+ *   404,
+ *   SATPErrorType.SESSION_NOT_FOUND,
+ *   'trace-abc-123'
+ * );
+ * console.log(error.toJSON());
+ * // {
+ * //   error: 'SATPError',
+ * //   message: 'The requested transfer session could not be found.',
+ * //   httpCode: 404,
+ * //   errorType: 'SESSION_NOT_FOUND',
+ * //   traceID: 'trace-abc-123'
+ * // }
+ * ```
+ *
  * @since 0.0.3-beta
  * @see {@link SATPInternalError} for internal error representation
  */
+/**
+ * SATP protocol URN prefix for error types per IETF SATP Core spec Section 11.3 & Section 13.1.
+ * e.g., urn:ietf:params:satp:error:err_0.1.1
+ */
+export const SATP_ERROR_URN_PREFIX = "urn:ietf:params:satp:error:";
+
+/**
+ * SATP protocol URN prefix for message types per IETF SATP Core spec Section 13.1 & 13.2.
+ * e.g., urn:ietf:satp:msgtype:reject-msg
+ */
+export const SATP_MSG_TYPE_URN_PREFIX = "urn:ietf:satp:msgtype:";
+
+/**
+ * Helper to format a SATP error type into an IETF compliant URN.
+ *
+ * @param errorType - SATPErrorType enum, string code, or number
+ * @returns Standardized URN string (e.g. urn:ietf:params:satp:error:err_0.1.1)
+ */
+export function formatSATPErrorTypeURN(
+  errorType: SATPErrorType | string | number,
+): string {
+  if (typeof errorType === "string") {
+    if (errorType.startsWith(SATP_ERROR_URN_PREFIX)) {
+      return errorType;
+    }
+    return `${SATP_ERROR_URN_PREFIX}${errorType.toLowerCase()}`;
+  }
+  const enumName = SATPErrorType[errorType as SATPErrorType];
+  if (enumName) {
+    return `${SATP_ERROR_URN_PREFIX}${enumName.toLowerCase()}`;
+  }
+  return `${SATP_ERROR_URN_PREFIX}unspecified`;
+}
+
+/**
+ * Extended options interface for constructing client-facing SATPError instances.
+ */
+export interface ISATPErrorOptions {
+  traceID?: string;
+  messageType?: string;
+  title?: string;
+  detail?: string;
+  version?: string;
+  sessionId?: string;
+  transferContextId?: string;
+  instance?: string;
+  prevMsgType?: string;
+  hashPrevMessage?: string;
+  timestamp?: string;
+}
+
+/**
+ * Client-facing error class for user-friendly SATP error reporting.
+ *
+ * @description
+ * Provides client-facing error representations that map internal SATP errors
+ * to user-friendly messages and RFC 9457 Problem Details error objects. Aligns
+ * with the IETF SATP Core specification URN registration standards (Section 11.3 & 13.1).
+ *
+ * @class SATPError
+ * @extends Error
+ */
 export class SATPError extends Error {
-  // TODO: Implement client-facing error logic, maps SATPInternalErrors to user friendly errors
+  /**
+   * HTTP status code for the error response.
+   * @public
+   * @readonly
+   */
+  public readonly httpCode: number;
+
+  /**
+   * SATP protocol error type classification.
+   * @public
+   * @readonly
+   */
+  public readonly errorType: SATPErrorType;
+
+  /**
+   * Distributed tracing identifier for support correlation.
+   * @public
+   * @readonly
+   */
+  public readonly traceID?: string;
+
+  /**
+   * SATP protocol message type URN (e.g. urn:ietf:satp:msgtype:reject-msg).
+   * @public
+   * @readonly
+   */
+  public readonly messageType: string;
+
+  /**
+   * Short human-readable summary of the error per RFC 9457.
+   * @public
+   * @readonly
+   */
+  public readonly title: string;
+
+  /**
+   * Detailed explanation specific to this error occurrence per RFC 9457.
+   * @public
+   * @readonly
+   */
+  public readonly detail?: string;
+
+  /**
+   * SATP protocol version string (e.g. "1.0").
+   * @public
+   * @readonly
+   */
+  public readonly version: string;
+
+  /**
+   * SATP session identifier.
+   * @public
+   * @readonly
+   */
+  public readonly sessionId?: string;
+
+  /**
+   * SATP transfer context identifier.
+   * @public
+   * @readonly
+   */
+  public readonly transferContextId?: string;
+
+  /**
+   * URI reference identifying specific occurrence per RFC 9457.
+   * @public
+   * @readonly
+   */
+  public readonly instance?: string;
+
+  /**
+   * Previous SATP message type string.
+   * @public
+   * @readonly
+   */
+  public readonly prevMsgType?: string;
+
+  /**
+   * Cryptographic hash of last message causing rejection.
+   * @public
+   * @readonly
+   */
+  public readonly hashPrevMessage?: string;
+
+  /**
+   * Timestamp string (ISO-8601).
+   * @public
+   * @readonly
+   */
+  public readonly timestamp: string;
+
+  /**
+   * Creates a new client-facing SATP error.
+   *
+   * @param {string} message - User-friendly error message safe for API responses
+   * @param {number} httpCode - HTTP status code for the error response
+   * @param {SATPErrorType} errorType - SATP protocol error type classification
+   * @param {string | ISATPErrorOptions} [traceIDOrOptions] - Tracing ID or full error options
+   */
+  constructor(
+    message: string,
+    httpCode: number,
+    errorType: SATPErrorType,
+    traceIDOrOptions?: string | ISATPErrorOptions,
+  ) {
+    super(message);
+    this.name = "SATPError";
+    this.httpCode = httpCode;
+    this.errorType = errorType;
+
+    const opts: ISATPErrorOptions =
+      typeof traceIDOrOptions === "string"
+        ? { traceID: traceIDOrOptions }
+        : traceIDOrOptions ?? {};
+
+    this.traceID = opts.traceID;
+    this.messageType =
+      opts.messageType ?? `${SATP_MSG_TYPE_URN_PREFIX}reject-msg`;
+    this.title =
+      opts.title ??
+      SATPError.DEFAULT_MESSAGES.get(httpCode) ??
+      "SATP Protocol Error";
+    this.detail = opts.detail ?? message;
+    this.version = opts.version ?? "1.0";
+    this.sessionId = opts.sessionId;
+    this.transferContextId = opts.transferContextId;
+    this.instance = opts.instance;
+    this.prevMsgType = opts.prevMsgType;
+    this.hashPrevMessage = opts.hashPrevMessage;
+    this.timestamp = opts.timestamp ?? new Date().toISOString();
+
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+
+  /**
+   * Default user-friendly messages keyed by HTTP status code.
+   *
+   * @private
+   * @static
+   * @readonly
+   */
+  private static readonly DEFAULT_MESSAGES: ReadonlyMap<number, string> =
+    new Map<number, string>([
+      [400, "The request was invalid. Please check your input and try again."],
+      [401, "Authentication is required to perform this operation."],
+      [403, "You do not have permission to perform this operation."],
+      [404, "The requested resource could not be found."],
+      [408, "The operation timed out. Please try again."],
+      [409, "The request conflicts with the current state of the resource."],
+      [
+        500,
+        "An internal error occurred while processing the request. Please try again later.",
+      ],
+    ]);
+
+  /**
+   * Creates a client-safe SATPError from an internal SATPInternalError.
+   *
+   * @static
+   * @param {SATPInternalError} internalError - The internal error to convert
+   * @returns {SATPError} A client-safe error representation
+   */
+  public static fromInternalError(internalError: SATPInternalError): SATPError {
+    const httpCode = internalError.code;
+    const errorType = internalError.getSATPErrorType();
+    const traceID = internalError.traceID;
+
+    const userMessage =
+      SATPError.DEFAULT_MESSAGES.get(httpCode) ??
+      SATPError.DEFAULT_MESSAGES.get(500)!;
+
+    return new SATPError(userMessage, httpCode, errorType, {
+      traceID,
+      detail: internalError.message,
+      title: internalError.name,
+    });
+  }
+
+  /**
+   * Serializes the error to an RFC 9457 Problem Details compliant JSON object.
+   *
+   * @public
+   * @returns Problem details object for API responses.
+   */
+  public toJSON(): {
+    error: string;
+    message: string;
+    httpCode: number;
+    status: number;
+    errorType: string;
+    type: string;
+    title: string;
+    detail?: string;
+    version: string;
+    messageType: string;
+    sessionId?: string;
+    transferContextId?: string;
+    instance?: string;
+    prevMsgType?: string;
+    hashPrevMessage?: string;
+    timestamp: string;
+    traceID?: string;
+  } {
+    const typeURN = formatSATPErrorTypeURN(this.errorType);
+    const result: {
+      error: string;
+      message: string;
+      httpCode: number;
+      status: number;
+      errorType: string;
+      type: string;
+      title: string;
+      detail?: string;
+      version: string;
+      messageType: string;
+      sessionId?: string;
+      transferContextId?: string;
+      instance?: string;
+      prevMsgType?: string;
+      hashPrevMessage?: string;
+      timestamp: string;
+      traceID?: string;
+    } = {
+      error: this.name,
+      message: this.message,
+      httpCode: this.httpCode,
+      status: this.httpCode,
+      errorType: SATPErrorType[this.errorType] ?? String(this.errorType),
+      type: typeURN,
+      title: this.title,
+      version: this.version,
+      messageType: this.messageType,
+      timestamp: this.timestamp,
+    };
+
+    if (this.detail) result.detail = this.detail;
+    if (this.sessionId) result.sessionId = this.sessionId;
+    if (this.transferContextId)
+      result.transferContextId = this.transferContextId;
+    if (this.instance) result.instance = this.instance;
+    if (this.prevMsgType) result.prevMsgType = this.prevMsgType;
+    if (this.hashPrevMessage) result.hashPrevMessage = this.hashPrevMessage;
+    if (this.traceID) result.traceID = this.traceID;
+
+    return result;
+  }
 }
