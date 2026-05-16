@@ -838,32 +838,30 @@ export class BLODispatcherErraneousError extends SATPInternalError {
  * Client-facing error class for user-friendly SATP error reporting.
  *
  * @description
- * **⚠️ TODO - Implementation Pending:**
- * This class is intended to provide client-facing error representations that map
- * internal SATP errors to user-friendly messages and error codes. The implementation
- * should include error sanitization, localization support, and API-appropriate
- * error formatting while preserving essential debugging information.
+ * Provides client-facing error representations that map internal SATP errors
+ * to user-friendly messages and error codes. Implements error sanitization
+ * and API-appropriate error formatting while preserving essential debugging
+ * information such as trace IDs for support correlation.
  *
- * **Planned Features:**
- * - User-friendly error message translation
- * - API-appropriate error code mapping
- * - Sensitive information sanitization
- * - Localization and internationalization support
- * - Client SDK integration compatibility
+ * **Features:**
+ * - User-friendly error message translation from internal errors
+ * - API-appropriate HTTP error code mapping
+ * - Sensitive information sanitization (stack traces, cause chains stripped)
+ * - Consistent error structure across different client interfaces via toJSON()
+ * - Trace ID and correlation information preserved for support
  *
- * **Design Considerations:**
- * - Should map SATPInternalError instances to client-safe representations
- * - Must preserve trace IDs and correlation information for support
- * - Should provide consistent error structure across different client interfaces
- * - Must not expose internal system details or security-sensitive information
+ * **Design Principles:**
+ * - Maps SATPInternalError instances to client-safe representations
+ * - Preserves trace IDs and correlation information for support
+ * - Provides consistent error structure across different client interfaces
+ * - Never exposes internal system details or security-sensitive information
  *
  * @class SATPError
  * @extends Error
  *
  * @example
- * Planned usage pattern:
+ * Converting internal errors to client-safe responses:
  * ```typescript
- * // TODO: Implement this functionality
  * try {
  *   await performSATPOperation();
  * } catch (internalError) {
@@ -874,10 +872,177 @@ export class BLODispatcherErraneousError extends SATPInternalError {
  * }
  * ```
  *
- * @todo Implement client-facing error logic that maps SATPInternalErrors to user-friendly errors
+ * @example
+ * Creating a client error directly:
+ * ```typescript
+ * const error = new SATPError(
+ *   'The requested transfer session could not be found.',
+ *   404,
+ *   SATPErrorType.SESSION_NOT_FOUND,
+ *   'trace-abc-123'
+ * );
+ * console.log(error.toJSON());
+ * // {
+ * //   error: 'SATPError',
+ * //   message: 'The requested transfer session could not be found.',
+ * //   httpCode: 404,
+ * //   errorType: 'SESSION_NOT_FOUND',
+ * //   traceID: 'trace-abc-123'
+ * // }
+ * ```
+ *
  * @since 0.0.3-beta
  * @see {@link SATPInternalError} for internal error representation
  */
 export class SATPError extends Error {
-  // TODO: Implement client-facing error logic, maps SATPInternalErrors to user friendly errors
+  /**
+   * HTTP status code for the error response.
+   * @public
+   * @readonly
+   */
+  public readonly httpCode: number;
+
+  /**
+   * SATP protocol error type classification.
+   * @public
+   * @readonly
+   */
+  public readonly errorType: SATPErrorType;
+
+  /**
+   * Distributed tracing identifier for support correlation.
+   * @public
+   * @readonly
+   */
+  public readonly traceID?: string;
+
+  /**
+   * Creates a new client-facing SATP error.
+   *
+   * @param {string} message - User-friendly error message safe for API responses
+   * @param {number} httpCode - HTTP status code for the error response
+   * @param {SATPErrorType} errorType - SATP protocol error type classification
+   * @param {string} [traceID] - Optional distributed tracing identifier
+   */
+  constructor(
+    message: string,
+    httpCode: number,
+    errorType: SATPErrorType,
+    traceID?: string,
+  ) {
+    super(message);
+    this.name = "SATPError";
+    this.httpCode = httpCode;
+    this.errorType = errorType;
+    this.traceID = traceID;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+
+  /**
+   * Default user-friendly messages keyed by HTTP status code.
+   *
+   * @description
+   * Provides generic, safe fallback messages when a more specific message
+   * is not available. These messages never expose internal details.
+   *
+   * @private
+   * @static
+   * @readonly
+   */
+  private static readonly DEFAULT_MESSAGES: ReadonlyMap<number, string> =
+    new Map<number, string>([
+      [400, "The request was invalid. Please check your input and try again."],
+      [401, "Authentication is required to perform this operation."],
+      [403, "You do not have permission to perform this operation."],
+      [404, "The requested resource could not be found."],
+      [408, "The operation timed out. Please try again."],
+      [409, "The request conflicts with the current state of the resource."],
+      [
+        500,
+        "An internal error occurred while processing the request. Please try again later.",
+      ],
+    ]);
+
+  /**
+   * Creates a client-safe SATPError from an internal SATPInternalError.
+   *
+   * @description
+   * Maps an internal error to a client-safe representation by:
+   * 1. Extracting the HTTP status code and error type from the internal error
+   * 2. Replacing the internal message with a sanitized, user-friendly message
+   * 3. Preserving the trace ID for support correlation
+   * 4. Stripping stack traces, cause chains, and internal state
+   *
+   * @static
+   * @param {SATPInternalError} internalError - The internal error to convert
+   * @returns {SATPError} A client-safe error representation
+   *
+   * @example
+   * ```typescript
+   * try {
+   *   await gatewayOperation();
+   * } catch (error) {
+   *   if (error instanceof SATPInternalError) {
+   *     const clientError = SATPError.fromInternalError(error);
+   *     res.status(clientError.httpCode).json(clientError.toJSON());
+   *   }
+   * }
+   * ```
+   */
+  public static fromInternalError(internalError: SATPInternalError): SATPError {
+    const httpCode = internalError.code;
+    const errorType = internalError.getSATPErrorType();
+    const traceID = internalError.traceID;
+
+    const userMessage =
+      SATPError.DEFAULT_MESSAGES.get(httpCode) ??
+      SATPError.DEFAULT_MESSAGES.get(500)!;
+
+    return new SATPError(userMessage, httpCode, errorType, traceID);
+  }
+
+  /**
+   * Serializes the error to a JSON-safe object for API responses.
+   *
+   * @description
+   * Produces a consistent, client-safe JSON structure that can be directly
+   * used in HTTP error responses. The output never includes stack traces,
+   * cause chains, or internal system details.
+   *
+   * @public
+   * @returns {{ error: string; message: string; httpCode: number; errorType: string; traceID?: string }}
+   *   A plain object suitable for JSON serialization in API responses.
+   *
+   * @example
+   * ```typescript
+   * const error = SATPError.fromInternalError(internalError);
+   * res.status(error.httpCode).json(error.toJSON());
+   * ```
+   */
+  public toJSON(): {
+    error: string;
+    message: string;
+    httpCode: number;
+    errorType: string;
+    traceID?: string;
+  } {
+    const result: {
+      error: string;
+      message: string;
+      httpCode: number;
+      errorType: string;
+      traceID?: string;
+    } = {
+      error: this.name,
+      message: this.message,
+      httpCode: this.httpCode,
+      errorType: SATPErrorType[this.errorType],
+    };
+
+    if (this.traceID) {
+      result.traceID = this.traceID;
+    }
+
+    return result;
+  }
 }
