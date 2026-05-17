@@ -44,6 +44,7 @@ import OracleTestContract from "../../../solidity/generated/OracleTestContract.s
 import {
   SATP_DOCKER_IMAGE_NAME,
   SATP_DOCKER_IMAGE_VERSION,
+  SATP_DOCKER_IMAGE_OMIT_PULL,
 } from "../../constants";
 import { keccak256 } from "web3-utils";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
@@ -253,7 +254,7 @@ beforeAll(async () => {
 
   gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
   log.debug("starting gatewayRunner...");
-  await gatewayRunner.start(false);
+  await gatewayRunner.start(SATP_DOCKER_IMAGE_OMIT_PULL);
   log.debug("gatewayRunner started successfully");
 
   oracleApi = new OracleApi(
