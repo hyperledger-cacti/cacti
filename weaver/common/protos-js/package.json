@@ -59,7 +59,9 @@
     "grpc-tools": "1.12.4"
   },
   "devDependencies": {
-    "grpc_tools_node_protoc_ts": "5.3.3"
+    "@grpc/proto-loader": "0.7.13",
+    "grpc_tools_node_protoc_ts": "5.3.3",
+    "typescript": "5.5.2"
   },
   "engines": {
     "node": ">=18",

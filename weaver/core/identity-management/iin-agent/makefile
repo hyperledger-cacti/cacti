@@ -6,9 +6,8 @@ DLT_SPECIFIC_DIR ?= .
 COMPOSE_ARG ?=
 
 build: .npmrc
-	npm install --workspaces=false
-	npm run build
-
+	yarn workspaces focus
+	yarn build
 	
 protos-js:
 	mkdir -p protos-js && \
@@ -34,10 +33,10 @@ cacti-weaver-sdk-fabric:
 build-local: protos-js cacti-weaver-sdk-fabric
 	(cp package.json package-remote.json && \
 		cp package-local.json package.json && \
-		npm install --workspaces=false) || \
+		yarn workspaces focus) || \
 		(mv package-remote.json package.json && exit 1) # Only if fails	
 	mv package-remote.json package.json # Only if success
-	npm run build
+	yarn build
 
 build-image-local: protos-js cacti-weaver-sdk-fabric
 	cp package.json package-remote.json
@@ -73,7 +72,7 @@ stop:
 re-deploy: stop deploy
 	
 test-local: build-local
-	npm run test
+	yarn test
 
 clean:
 	rm -rf node_modules package-lock.json out

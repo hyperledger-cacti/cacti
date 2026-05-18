@@ -1,12 +1,8 @@
 build:
-	npm install --workspaces=false
+	yarn workspaces focus
 
 build-local:
-	(cp package.json package-remote.json && \
-		cp package-local.json package.json && \
-		npm install --workspaces=false) || \
-		(mv package-remote.json package.json && exit 1)	# Runs if failure
-	mv package-remote.json package.json					# Runs if success
+	yarn workspaces focus
 
 build-image:
 	docker build -t fabric-cli:latest .

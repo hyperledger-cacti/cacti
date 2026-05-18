@@ -38,7 +38,7 @@ runs:
       working-directory: weaver/core/relay
     - uses: actions/setup-go@v4
       with:
-        go-version: '1.20.2'
+        go-version: '1.23.3'
     - name: Use Protoc 3.15
       shell: bash
       run: |

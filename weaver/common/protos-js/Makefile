@@ -1,12 +1,12 @@
 .PHONY: build
 build:
 	sh ../get-fabric-protos.sh ../..
-	npm install --workspaces=false
-	npm run build
+	yarn workspaces focus
+	yarn build
 
 .PHONY: publish
 publish: build
-	npm publish --no-workspaces
+	yarn npm publish
 
 .PHONY: clean-build
 clean-build:

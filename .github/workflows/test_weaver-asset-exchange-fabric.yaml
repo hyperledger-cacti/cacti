@@ -74,7 +74,7 @@ jobs:
         working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Build Fabric CLI
-        run: npm install
+        run: yarn workspaces focus
         working-directory: weaver/samples/fabric/fabric-cli
 
       - name: Setup Fabric CLI Config
