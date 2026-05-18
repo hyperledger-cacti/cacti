@@ -12,7 +12,7 @@ path = "pkg/src/lib.rs"
 [dependencies]
 tonic = {version="0.12.3",  features = ["tls"]}
 prost = "0.13.3"
-tokio = { version = "1.40.0", features = ["macros", "fs"] }
+tokio = { version = "1.43.1", features = ["macros", "fs"] }
 serde = {version="1.0.193", features = ["derive"]}
 
 [build-dependencies]
