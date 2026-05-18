@@ -15,6 +15,10 @@
 - [11. HTTP requests sent with Postman/curl/etc. hang if I'm debugging a test case with VSCode, why?](#11-http-requests-sent-with-postmancurletc-hang-if-im-debugging-a-test-case-with-vscode-why)
 - [12. How do I run test cases with my own ledger images?](#12-how-do-i-run-test-cases-with-my-own-ledger-images)
 - [13. How do I re-run a single job in the CI through the GitHub UI?](#13-how-do-i-re-run-a-single-job-in-the-ci-through-the-github-ui)
+- [15. How do I build the project from scratch?](#15-how-do-i-build-the-project-from-scratch)
+- [16. How do I contribute to Hyperledger Cacti?](#16-how-do-i-contribute-to-hyperledger-cacti)
+- [17. How do I submit a pull request?](#17-how-do-i-submit-a-pull-request)
+
 - [14. How to fix the script configure, stuck at `RequestError: connect ETIMEOUT 2606:4700:6810:223:443` (or similar ports)?](#14-how-to-fix-the-script-configure-stuck-at-requesterror-connect-etimeout-260647006810223443-or-similar-ports)
 
 ## 1. What are the minimum and recommended hardware specs? Do you have a cool story about this?
@@ -242,3 +246,19 @@ Sometimes the IPv6 defaults can lead to npm registry being undiscoverable. To fi
     net.ipv6.conf.lo.disable_ipv6 = 1
   ```
 1. Start the service: `service procps start`
+## 15. How do I build the project from scratch?
+
+For complete build instructions including prerequisites (Node.js, Yarn, Docker)
+and platform-specific setup for macOS, Linux, and Windows (WSL2), see
+[BUILD.md](./BUILD.md).
+
+## 16. How do I contribute to Hyperledger Cacti?
+
+For contribution guidelines, coding standards, branching strategy, and
+community expectations, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## 17. How do I submit a pull request?
+
+For pull request guidelines and the PR template, see
+[PULL_REQUEST_TEMPLATE.md](./PULL_REQUEST_TEMPLATE.md).
+
