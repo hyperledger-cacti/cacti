@@ -18,12 +18,12 @@ runs:
           sudo rm -rf "/usr/local/share/boost"
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
     - name: Use Node.js ${{ env.NODEJS_VERSION }}
-      uses: actions/setup-node@v4.0.2
+      uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
       with:
         node-version: ${{ env.NODEJS_VERSION }}
     - id: yarn-cache
       name: Restore Yarn Cache
-      uses: actions/cache@v4.2.2
+      uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
       with:
         key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
         path: ./.yarn/
@@ -36,7 +36,7 @@ runs:
         cargo update -p nom
         cargo update -p lexical-core
       working-directory: weaver/core/relay
-    - uses: actions/setup-go@v4
+    - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
       with:
         go-version: '1.20.2'
     - name: Use Protoc 3.15
@@ -47,7 +47,7 @@ runs:
         go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
         go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.4.0
     - name: Set up JDK 17
-      uses: actions/setup-java@v3.11.0
+      uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
       with:
           java-version: '17'
           distribution: 'adopt'

@@ -23,17 +23,17 @@ jobs:
     steps:
       # Install Cacti pre-requisites
       - name: Use Node.js
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: v22.18.0
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
         with:
           submodules: recursive
   
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -62,7 +62,7 @@ jobs:
 
       # Upload build artifacts for reuse in other jobs
       - name: Upload build output
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: satp-hermes-build-output
           path: packages/cactus-plugin-satp-hermes/dist/
@@ -83,7 +83,7 @@ jobs:
 
       - name: Upload .yarn cache artifact
         if: steps.upload_yarn_cache.outputs.found == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: satp-hermes-yarn-cache
           path: ./.yarn/
@@ -104,7 +104,7 @@ jobs:
 
       - name: Upload package .yarn cache artifact (fallback)
         if: steps.upload_yarn_cache_package.outputs.found == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: satp-hermes-yarn-cache
           path: packages/cactus-plugin-satp-hermes/.yarn/

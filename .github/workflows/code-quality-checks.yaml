@@ -16,7 +16,7 @@ jobs:
   yarn_lint:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
       
       - name: build
         with:
@@ -70,7 +70,7 @@ jobs:
     continue-on-error: false
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -92,7 +92,7 @@ jobs:
 
       - name: Cache OpenAPI Generator JAR
         id: cache-openapi-generator-jar
-        uses: actions/cache@v4
+        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
         with:
           path: |
             node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar
@@ -159,7 +159,7 @@ jobs:
       CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION: 3.0.3
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - name: build
         with:
@@ -174,7 +174,7 @@ jobs:
     continue-on-error: true
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
 
       - name: build
         with:

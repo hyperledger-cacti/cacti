@@ -20,13 +20,13 @@ jobs:
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
         with:
           submodules: recursive
 
       # Install Cacti pre-requisites
       - name: Use Node.js
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
         with:
           node-version: v22.18.0
 
@@ -62,13 +62,13 @@ jobs:
 
       # Upload generated artifacts for reuse in other jobs
       - name: Upload generated protobuf files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: satp-hermes-generated-protobuf
           path: packages/cactus-plugin-satp-hermes/src/main/typescript/generated/
 
       - name: Upload generated OpenAPI files
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: satp-hermes-generated-openapi
           path: |
@@ -77,7 +77,7 @@ jobs:
             packages/cactus-plugin-satp-hermes/src/main/typescript/generated/gateway-client/
 
       - name: Upload generated Solidity artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
         with:
           name: satp-hermes-generated-solidity
           path: packages/cactus-plugin-satp-hermes/src/main/solidity/generated/
