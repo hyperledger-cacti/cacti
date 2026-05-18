@@ -19,3 +19,177 @@ jobs:
       - uses: amannn/action-semantic-pull-request@01d5fd8a8ebb9aafe902c40c53f0f4744f7381eb #v5.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  validate-title-match:
+    name: Validate PR title match with latest commit message
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify PR Title Matches Latest Commit
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          LATEST_COMMIT_MSG=$(git log -1 --pretty=%s)
+          
+          echo "PR Title: '$PR_TITLE'"
+          echo "Latest Commit Message: '$LATEST_COMMIT_MSG'"
+          
+          if [ "$PR_TITLE" != "$LATEST_COMMIT_MSG" ]; then
+            echo "❌ ERROR: PR Title does not match your latest commit message!"
+            echo "Your PR Title must match your Git commit message exactly."
+            echo "To fix this, either rename your PR title on GitHub, or run:"
+            echo "  git commit --amend -m \"$PR_TITLE\" && git push --force"
+            exit 1
+          fi
+          echo "✅ PR Title matches the latest commit message."
+  
+  validate-type:
+    name: Validate PR Type
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Get Changed Files
+        id: file-list
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}...HEAD > changed_files.txt
+          echo "Files changed:"
+          cat changed_files.txt
+
+      - name: Validate PR Title Prefix
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          # Matches conventional headers like "feat: description" or "fix(scope): description"
+          PR_TYPE=$(echo "$PR_TITLE" | sed -E 's/^([a-z]+)(\(.*\))?:.*/\1/')
+          
+          HAS_DOCS=false
+          HAS_CI_WORKFLOW=false
+          HAS_CORE_CODE=false
+          HAS_TOOLS=false
+          HAS_WEAVER_SAMPLES=false
+          HAS_EXAMPLES=false
+          HAS_STANDARD_TESTS=false
+          HAS_ROOT_MD_CHORE=false
+          HAS_GITHUB_CHORE=false
+          HAS_GENERIC_OTHER=false
+
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            
+            if [[ "$file" == .github/workflows/* ]]; then
+              HAS_CI_WORKFLOW=true
+
+            # The exclusion of forward slashes defines files located exclusively in the repository root
+            elif [[ "$file" == *.md && "$file" != */* ]]; then
+              HAS_ROOT_MD_CHORE=true
+
+            elif [[ "$file" == .github/* ]]; then
+              HAS_GITHUB_CHORE=true
+
+            elif [[ "$file" == docs/* || "$file" == */docs/* || "$file" == *.md ]]; then
+              HAS_DOCS=true
+
+            elif [[ "$file" == tools/* ]]; then
+              HAS_TOOLS=true
+
+            elif [[ "$file" == weaver/samples/* ]]; then
+              HAS_WEAVER_SAMPLES=true
+
+            elif [[ "$file" == examples/* ]]; then
+              HAS_EXAMPLES=true
+
+            elif [[ "$file" == *test* || "$file" == *spec* ]]; then
+              HAS_STANDARD_TESTS=true
+
+            elif [[ "$file" == *.js || "$file" == *.ts || "$file" == *.py || "$file" == *.go || \
+                    "$file" == *.rs || "$file" == *.kt || "$file" == *.sol || "$file" == *.java || \
+                    "$file" == *.cpp || "$file" == *.c || "$file" == *.h || "$file" == *.cs ]]; then
+              HAS_CORE_CODE=true
+              
+            else
+              HAS_GENERIC_OTHER=true
+            fi
+          done < changed_files.txt
+
+          echo "Analysis Summary:"
+          echo " - Core Code: $HAS_CORE_CODE, Docs: $HAS_DOCS, Actions Workflows: $HAS_CI_WORKFLOW"
+          echo " - Tools: $HAS_TOOLS, Weaver Samples: $HAS_WEAVER_SAMPLES, Examples: $HAS_EXAMPLES"
+          echo " - Standard Tests: $HAS_STANDARD_TESTS"
+          echo " - Root MD Flags: $HAS_ROOT_MD_CHORE, GitHub Folder Flags: $HAS_GITHUB_CHORE"
+          echo "Detected PR Prefix Type: '$PR_TYPE'"
+
+          # --- PRIORITY RULES MATRIX ---
+
+          if [ "$HAS_CORE_CODE" = true ]; then
+            if [[ "$PR_TYPE" != "feat" && "$PR_TYPE" != "fix" && "$PR_TYPE" != "build" && "$PR_TYPE" != "refactor" ]]; then
+              echo "❌ ERROR: Source code modifications require 'feat:', 'fix:', 'build:', or 'refactor:'"
+              exit 1
+            fi
+            exit 0
+          fi
+
+          if [ "$HAS_ROOT_MD_CHORE" = true ] || [ "$HAS_GITHUB_CHORE" = true ]; then
+            if [[ "$PR_TYPE" != "chore" && "$PR_TYPE" != "docs" ]]; then
+              echo "❌ ERROR: Root markdown modifications or general '.github/' adjustments must use 'chore:' or 'docs:' prefixes."
+              exit 1
+            fi
+            exit 0
+          fi
+
+          if [ "$HAS_TOOLS" = true ]; then
+            if [[ "$PR_TYPE" != "ci" && "$PR_TYPE" != "test" ]]; then
+              echo "❌ ERROR: Modifications inside the 'tools/' directory must use 'ci:' or 'test:' prefixes."
+              exit 1
+            fi
+            exit 0
+          fi
+
+          if [ "$HAS_WEAVER_SAMPLES" = true ]; then
+            if [[ "$PR_TYPE" != "test" && "$PR_TYPE" != "chore" ]]; then
+              echo "❌ ERROR: Code changed inside 'weaver/samples/' must use 'test:' or 'chore:' prefixes."
+              exit 1
+            fi
+            exit 0
+          fi
+
+          if [ "$HAS_EXAMPLES" = true ]; then
+            if [[ "$PR_TYPE" != "test" && "$PR_TYPE" != "chore" ]]; then
+              echo "❌ ERROR: Modifications inside the 'examples/' directory must use 'test:' or 'chore:' prefixes."
+              exit 1
+            fi
+            exit 0
+          fi
+
+          # Restricted to prevent internal test corrections from generating false-positive entries in consumer-facing changelogs
+          if [ "$HAS_STANDARD_TESTS" = true ]; then
+             if [[ "$PR_TYPE" != "test" && "$PR_TYPE" != "chore" ]]; then
+               echo "❌ ERROR: Test suite adjustments do not affect users. Please use 'test:' or 'chore:' prefixes to prevent CHANGELOG pollution."
+               exit 1
+             fi
+             exit 0
+          fi
+
+          if [ "$HAS_CI_WORKFLOW" = true ]; then
+            if [ "$PR_TYPE" != "ci" ]; then
+              echo "❌ ERROR: Changes affecting GitHub Action YAML paths require the 'ci:' prefix."
+              exit 1
+            fi
+            exit 0
+          fi
+
+          if [ "$HAS_DOCS" = true ]; then
+            if [ "$PR_TYPE" != "docs" ]; then
+              echo "❌ ERROR: Isolated markdown or 'docs/' path updates require the 'docs:' prefix."
+              exit 1
+            fi
+            exit 0
+          fi
+
+          echo "✅ PR title and commit validation completely satisfies all formatting matrix rules!"
+
