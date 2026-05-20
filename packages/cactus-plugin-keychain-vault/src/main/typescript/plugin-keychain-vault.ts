@@ -247,8 +247,8 @@ export class PluginKeychainVault implements IPluginWebService, IPluginKeychain {
   async has(key: string): Promise<boolean> {
     const path = this.pathFor(key);
     try {
-      const res = await this.backend.read(path);
-      return res;
+      await this.backend.read(path);
+      return true;
     } catch (ex) {
       // We have to make sure that the exception is either an expected
       // or an unexpected one where the expected exception is what we
