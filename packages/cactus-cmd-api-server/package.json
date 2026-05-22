@@ -74,7 +74,7 @@
     "@hyperledger/cactus-core-api": "2.1.0",
     "@thream/socketio-jwt": "2.1.1",
     "async-exit-hook": "2.0.1",
-    "axios": "1.15.0",
+    "axios": "1.15.2",
     "bluebird": "3.7.2",
     "body-parser": "1.20.3",
     "compression": "1.7.4",
@@ -102,7 +102,7 @@
     "socket.io": "4.6.2",
     "socket.io-client-fixed-types": "4.5.4",
     "typescript-optional": "2.0.1",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@bufbuild/buf": "1.30.0",

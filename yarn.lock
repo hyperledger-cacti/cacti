@@ -7275,7 +7275,7 @@ __metadata:
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:11.2.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7388,7 +7388,7 @@ __metadata:
     "@types/react": "npm:18.2.39"
     "@types/react-dom": "npm:18.2.17"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     copy-webpack-plugin: "npm:12.0.2"
     css-loader: "npm:7.1.2"
     customize-cra: "npm:1.0.0"
@@ -7402,10 +7402,10 @@ __metadata:
     ts-loader: "npm:9.5.1"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     webpack: "npm:5.104.1"
     webpack-cli: "npm:5.1.4"
-    webpack-dev-server: "npm:5.1.0"
+    webpack-dev-server: "npm:5.2.4"
   languageName: unknown
   linkType: soft
 
@@ -7426,7 +7426,7 @@ __metadata:
     "@types/react-dom": "npm:18.2.17"
     "@vitejs/plugin-react": "npm:5.1.0"
     apexcharts: "npm:3.45.2"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     buffer: "npm:6.0.3"
     ethers: "npm:6.12.1"
     react: "npm:18.2.0"
@@ -7453,7 +7453,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/json-stable-stringify": "npm:1.2.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -7463,7 +7463,7 @@ __metadata:
     prom-client: "npm:15.1.3"
     safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -7482,7 +7482,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -7497,7 +7497,7 @@ __metadata:
     socket.io-client-fixed-types: "npm:4.5.4"
     stellar-plus: "npm:0.8.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7603,11 +7603,11 @@ __metadata:
     google-protobuf: "npm:3.21.4"
     jest: "npm:29.6.2"
     pkg: "npm:5.8.1"
-    protobufjs: "npm:7.4.0"
+    protobufjs: "npm:8.2.0"
     ts-jest: "npm:29.1.1"
     ts-node: "npm:10.9.1"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     winston: "npm:3.10.0"
   bin:
     fabric-cli: bin/fabric-cli
@@ -7642,7 +7642,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7710,7 +7710,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7779,7 +7779,7 @@ __metadata:
     "@types/xml2js": "npm:0.4.9"
     "@vercel/ncc": "npm:0.38.1"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     benchmark: "npm:2.1.4"
     bluebird: "npm:3.7.2"
     body-parser: "npm:1.20.3"
@@ -7815,7 +7815,7 @@ __metadata:
     tape-promise: "npm:4.0.0"
     ts-node: "npm:10.9.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7898,7 +7898,7 @@ __metadata:
     sanitize-html: "npm:2.12.1"
     secp256k1: "npm:5.0.1"
     sha3: "npm:2.1.4"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7916,7 +7916,7 @@ __metadata:
     ajv: "npm:8.18.0"
     ajv-draft-04: "npm:1.0.0"
     ajv-formats: "npm:3.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     express: "npm:5.1.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -7950,7 +7950,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7989,7 +7989,7 @@ __metadata:
     qs: "npm:6.14.2"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -8011,12 +8011,12 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8102,7 +8102,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     cors: "npm:2.8.5"
     crypto-js: "npm:4.2.0"
@@ -8145,7 +8145,7 @@ __metadata:
     ts-results: "npm:3.3.0"
     typescript: "npm:5.8.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -8168,7 +8168,7 @@ __metadata:
     "@hyperledger/aries-askar-nodejs": "npm:0.2.3"
     "@hyperledger/indy-vdr-nodejs": "npm:0.2.3"
     "@types/inquirer": "npm:8.2.6"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     inquirer: "npm:8.2.6"
     loglevel: "npm:1.8.1"
   bin:
@@ -8197,7 +8197,7 @@ __metadata:
     "@types/jsrsasign": "npm:10.5.8"
     "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     cookie-parser: "npm:1.4.6"
     debug: "npm:3.1.0"
@@ -8218,7 +8218,7 @@ __metadata:
     shelljs: "npm:0.9.2"
     socket.io: "npm:4.6.2"
     ts-node: "npm:8.9.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     xmlhttprequest: "npm:1.8.0"
   languageName: unknown
   linkType: soft
@@ -8256,7 +8256,7 @@ __metadata:
     shelljs: "npm:0.9.2"
     socket.io: "npm:4.6.2"
     ts-node: "npm:8.9.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.8.1"
     xmlhttprequest: "npm:1.8.0"
   languageName: unknown
@@ -8283,7 +8283,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     dotenv: "npm:16.0.0"
     express: "npm:5.1.0"
     express-jwt: "npm:8.4.1"
@@ -8296,7 +8296,7 @@ __metadata:
     tape-promise: "npm:4.0.0"
     tar-fs: "npm:3.0.10"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-core: "npm:1.6.1"
   languageName: unknown
   linkType: soft
@@ -8318,13 +8318,13 @@ __metadata:
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
     run-time-error-cjs: "npm:1.4.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8374,7 +8374,7 @@ __metadata:
     stream-http: "npm:3.2.0"
     tls-browserify: "npm:0.2.2"
     tslib: "npm:2.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     zone.js: "npm:0.14.7"
   languageName: unknown
   linkType: soft
@@ -8400,7 +8400,7 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     dockerode: "npm:3.3.0"
     express: "npm:5.1.0"
@@ -8413,7 +8413,7 @@ __metadata:
     safe-stable-stringify: "npm:2.5.0"
     socket.io: "npm:4.6.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -8430,7 +8430,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/json-stable-stringify": "npm:1.0.33"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -8438,7 +8438,7 @@ __metadata:
     json-stable-stringify: "npm:1.0.2"
     prom-client: "npm:15.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8458,7 +8458,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
@@ -8470,7 +8470,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-eth-abi: "npm:4.2.1"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -8485,7 +8485,7 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     express: "npm:5.1.0"
     joi: "npm:17.13.3"
     openapi-types: "npm:12.1.3"
@@ -8505,7 +8505,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/bn.js": "npm:5.2.0"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     bn.js: "npm:5.2.2"
     dotenv: "npm:16.3.1"
     ds-test: "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
@@ -8533,7 +8533,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
     aws-sdk: "npm:2.965.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8543,7 +8543,7 @@ __metadata:
     prom-client: "npm:15.1.3"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8562,7 +8562,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8571,7 +8571,7 @@ __metadata:
     openapi-types: "npm:12.1.3"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8588,7 +8588,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     google-gax: "npm:4.0.5"
@@ -8597,7 +8597,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8610,14 +8610,14 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     cpy-cli: "npm:4.2.0"
     del-cli: "npm:5.1.0"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     prom-client: "npm:15.1.3"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8635,14 +8635,14 @@ __metadata:
     "@hyperledger/cactus-core-api": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     npm-run-all2: "npm:6.1.2"
     prom-client: "npm:15.1.3"
     rxjs: "npm:7.8.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8660,7 +8660,7 @@ __metadata:
     "@types/request": "npm:2.48.7"
     "@types/tape-promise": "npm:4.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
@@ -8671,7 +8671,7 @@ __metadata:
     prom-client: "npm:15.1.3"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8696,7 +8696,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest: "npm:29.6.2"
@@ -8704,7 +8704,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8726,7 +8726,7 @@ __metadata:
     "@types/google-protobuf": "npm:3.15.5"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     benchmark: "npm:2.1.4"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
@@ -8742,7 +8742,7 @@ __metadata:
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
-    protobufjs: "npm:7.4.0"
+    protobufjs: "npm:8.2.0"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
@@ -8750,7 +8750,7 @@ __metadata:
     tape-promise: "npm:4.0.0"
     tsx: "npm:4.16.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -8773,12 +8773,12 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:18.11.9"
     "@types/sanitize-html": "npm:2.6.2"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
     sanitize-html: "npm:2.12.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8795,7 +8795,7 @@ __metadata:
     "@types/multer": "npm:1.4.7"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.2.0"
@@ -8811,7 +8811,7 @@ __metadata:
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
     urlcat: "npm:3.1.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8834,7 +8834,7 @@ __metadata:
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     chalk: "npm:4.1.2"
     ethers: "npm:6.8.1"
@@ -8850,7 +8850,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-eth: "npm:4.4.0"
     web3-eth-accounts: "npm:4.1.1"
@@ -8886,7 +8886,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     bl: "npm:6.1.0"
     bn.js: "npm:4.12.0"
     body-parser: "npm:1.20.3"
@@ -8927,7 +8927,7 @@ __metadata:
     tar-fs: "npm:3.0.10"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     ws-identity-client: "npm:1.0.2"
     ws-wallet: "npm:1.1.5"
   languageName: unknown
@@ -8949,7 +8949,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/sanitize-html": "npm:2.9.5"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
@@ -8961,7 +8961,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     undici: "npm:7.24.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8986,7 +8986,7 @@ __metadata:
     "@types/supertest": "npm:2.0.11"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     bl: "npm:6.1.0"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.2.0"
@@ -9005,7 +9005,7 @@ __metadata:
     temp: "npm:0.9.1"
     tslint: "npm:6.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9020,7 +9020,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     cbor: "npm:9.0.1"
     express: "npm:5.1.0"
@@ -9028,7 +9028,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9043,7 +9043,7 @@ __metadata:
     "@hyperledger/cactus-test-tooling": "npm:2.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
@@ -9054,7 +9054,7 @@ __metadata:
     tape: "npm:5.6.1"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -9074,7 +9074,7 @@ __metadata:
     "@multiformats/multiaddr": "npm:11.6.1"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     ipfs-core-types: "npm:0.14.1"
@@ -9086,7 +9086,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9108,7 +9108,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
@@ -9117,7 +9117,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.0.3"
     web3-eth-accounts: "npm:4.0.3"
     web3-utils: "npm:4.3.0"
@@ -9141,7 +9141,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     fabric-network: "npm:2.5.0-snapshot.23"
@@ -9150,7 +9150,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9217,7 +9217,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
     "@vercel/ncc": "npm:0.38.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     bignumber.js: "npm:9.1.2"
     bn.js: "npm:5.2.1"
     body-parser: "npm:1.20.3"
@@ -9260,7 +9260,7 @@ __metadata:
     npm-run-all: "npm:4.1.5"
     pg: "npm:8.13.1"
     prettier: "npm:3.2.5"
-    protobufjs: "npm:7.2.5"
+    protobufjs: "npm:8.2.0"
     puppeteer: "npm:24.23.0"
     reflect-metadata: "npm:0.2.2"
     run-time-error-cjs: "npm:1.4.0"
@@ -9276,7 +9276,7 @@ __metadata:
     typedoc: "npm:0.28.13"
     typescript: "npm:5.5.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -9297,7 +9297,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -9317,7 +9317,7 @@ __metadata:
     express-jwt-authz: "npm:2.4.1"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9348,11 +9348,11 @@ __metadata:
     "@hyperledger/cactus-plugin-consortium-manual": "npm:2.1.0"
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
     tape: "npm:5.6.3"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9371,11 +9371,11 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-eth-abi: "npm:4.0.3"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -9396,13 +9396,13 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     key-encoder: "npm:2.0.3"
     tape-promise: "npm:4.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
   languageName: unknown
@@ -9422,7 +9422,7 @@ __metadata:
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9442,13 +9442,13 @@ __metadata:
     "@hyperledger/cactus-verifier-client": "npm:2.1.0"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
     jest-extended: "npm:7.0.0"
     key-encoder: "npm:2.0.3"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
@@ -9473,7 +9473,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
     lodash: "npm:4.18.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-eth-contract: "npm:4.2.0"
   languageName: unknown
@@ -9502,7 +9502,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/tar-stream": "npm:2.2.1"
     "@types/temp": "npm:0.9.1"
-    axios: "npm:1.15.0"
+    axios: "npm:1.15.2"
     compare-versions: "npm:3.6.0"
     dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.1"
@@ -9530,7 +9530,7 @@ __metadata:
     tar-stream: "npm:2.2.0"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -9557,7 +9557,7 @@ __metadata:
     express: "npm:5.1.0"
     log4js: "npm:6.4.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.7.3"
     web3-core: "npm:1.7.3"
     web3-eth-accounts: "npm:4.0.3"
@@ -9615,7 +9615,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     kubo-rpc-client: "npm:3.0.1"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -13958,6 +13958,97 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@peculiar/asn1-cms@npm:^2.6.0, @peculiar/asn1-cms@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-cms@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    "@peculiar/asn1-x509-attr": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/01515f46db97b1d5f8b0d2c181f10571efb91e11e0c034b49121c8f50ff76d6538eba04311d04347f180639a72818f3ac1c96a089eea9a1689e5cc5ee31a4117
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-csr@npm:^2.6.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-csr@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/d966d58d0104a6833b442080ef2663172730fd95928b95c5a84f5b86963eeeaa13435ee8e8d97612a3a1fef532c714b868ceb082a6f253186606efecfaa88a0c
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-ecc@npm:^2.6.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-ecc@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/c30736a867dd6facf7cf5090c9eace582b927c92cbc0dfd8787b3485e3012dc846b608d5d0c3c38df9e621e0c7fbe0bb2b96e7fa34c03b67f4b59fd3d6d4e8f4
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pfx@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-pfx@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.7.0"
+    "@peculiar/asn1-pkcs8": "npm:^2.7.0"
+    "@peculiar/asn1-rsa": "npm:^2.7.0"
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/ced7e9c4308d427ae9107df654f28b6e28b1bc963b059e1430459c49cee8d8da74338d251ac98d1af5efc98a0ff49fbec9f71073cdbf5e0ee7f93a40ba043f7e
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs8@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-pkcs8@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/9e8049e5fd9e35676c313ff0b88decb767c4d7ff09a0ab098ea1affa4b5076573b4e10fcd7968b1931b921b3107ede521c1b1bf91a1040ce454e6b44f32f3aa8
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs9@npm:^2.6.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-pkcs9@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.7.0"
+    "@peculiar/asn1-pfx": "npm:^2.7.0"
+    "@peculiar/asn1-pkcs8": "npm:^2.7.0"
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    "@peculiar/asn1-x509-attr": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/61b55f4b98e98ca659bb6ad5f043ca2fc9aa1c333372d91419251180d4332746aaed0f15975b6d9a131af3b6b066b90705b54b508c6854b6f2117fd3ab66a7a8
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-rsa@npm:^2.6.0, @peculiar/asn1-rsa@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-rsa@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/b314b77246a7bee0a2a76978ca08983a016afad78c74dc02b5ae6296f8a71f0146c521d431a9d6e9ba7faec42b5a8bba046ee4c9010cbd1b37067398e05e05af
+  languageName: node
+  linkType: hard
+
 "@peculiar/asn1-schema@npm:^2.3.13, @peculiar/asn1-schema@npm:^2.3.8":
   version: 2.6.0
   resolution: "@peculiar/asn1-schema@npm:2.6.0"
@@ -13969,12 +14060,56 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@peculiar/asn1-schema@npm:^2.6.0, @peculiar/asn1-schema@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-schema@npm:2.7.0"
+  dependencies:
+    "@peculiar/utils": "npm:^2.0.2"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/2b18ee2f3de2b68a36b964721e5101f589d6a1db765c450ce5a929829bfc8c0819e0b128145f65639952b257b9bdaa6ce7d1a54cd93c7bf6e694fed4c36d6c98
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509-attr@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-x509-attr@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/7a1c4f707224cf8ebf33bb231049069cf6a64902d7b7b317b4a2f4f8a0fb606bb39f6af5944d408c4eb930e8ae1435c0049cc42490131cf991383714c179f1dd
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509@npm:^2.6.0, @peculiar/asn1-x509@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-x509@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/utils": "npm:^2.0.2"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/6e6b1124076487e46d1b9f7237f173bc7aab92230e3a7a8b3841fdc84009ece0221624bd88fe16a478aec5b4ba21a9393735038ca4e38245d7f0c1be91f00e8c
+  languageName: node
+  linkType: hard
+
 "@peculiar/json-schema@npm:^1.1.12":
   version: 1.1.12
   resolution: "@peculiar/json-schema@npm:1.1.12"
   dependencies:
     tslib: "npm:^2.0.0"
   checksum: 10/dfec178afe63a02b6d45da8a18e51ef417e9f5412a8c2809c9a07b29b9376fadee1b4f2ea2d92d4e5a7b8eba76d9e99afbef6d7e9a27bd85257f69c4da228cbc
+  languageName: node
+  linkType: hard
+
+"@peculiar/utils@npm:^2.0.2":
+  version: 2.0.3
+  resolution: "@peculiar/utils@npm:2.0.3"
+  dependencies:
+    tslib: "npm:^2.8.1"
+  checksum: 10/e6b212db06e15f0ffa33482336f0e41108ce2d95fa69fa2c6f001120df1056404dc007b62bc6c90cc58d743f0cf4b23bfff89cdb8c121415d36ff0f9d60aead2
   languageName: node
   linkType: hard
 
@@ -13988,6 +14123,25 @@ __metadata:
     tslib: "npm:^2.6.2"
     webcrypto-core: "npm:^1.8.0"
   checksum: 10/a6658390c37b1d386f46066e796985eb56f6f86a772e1373c364ec9a8257adf8623f156596613d2828b489e2b5f32f9d2b0820289b4981646001cba7d21ae2f6
+  languageName: node
+  linkType: hard
+
+"@peculiar/x509@npm:^1.14.2":
+  version: 1.14.3
+  resolution: "@peculiar/x509@npm:1.14.3"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.6.0"
+    "@peculiar/asn1-csr": "npm:^2.6.0"
+    "@peculiar/asn1-ecc": "npm:^2.6.0"
+    "@peculiar/asn1-pkcs9": "npm:^2.6.0"
+    "@peculiar/asn1-rsa": "npm:^2.6.0"
+    "@peculiar/asn1-schema": "npm:^2.6.0"
+    "@peculiar/asn1-x509": "npm:^2.6.0"
+    pvtsutils: "npm:^1.3.6"
+    reflect-metadata: "npm:^0.2.2"
+    tslib: "npm:^2.8.1"
+    tsyringe: "npm:^4.10.0"
+  checksum: 10/d37c56fa5f2c644141948d85010e14f0e4963089e3b0b81edd0bfe85bdfea0eb3f38ab6ff20d322db2bd6977117824cc498a77b2d35af111983b4d58b5e2ccd1
   languageName: node
   linkType: hard
 
@@ -16238,9 +16392,9 @@ __metadata:
   linkType: hard
 
 "@tootallnate/once@npm:2":
-  version: 2.0.0
-  resolution: "@tootallnate/once@npm:2.0.0"
-  checksum: 10/ad87447820dd3f24825d2d947ebc03072b20a42bfc96cbafec16bff8bbda6c1a81fcb0be56d5b21968560c5359a0af4038a68ba150c3e1694fe4c109a063bed8
+  version: 2.0.1
+  resolution: "@tootallnate/once@npm:2.0.1"
+  checksum: 10/487b59b5adb8458dc13394a5aae997bf9705c51fa1e2396c50cd967019d06b273faba3c4d9e7895a996b9e9b055f1c55e53d822e54b3e9c298bcb4f6967cd0d5
   languageName: node
   linkType: hard
 
@@ -17394,7 +17548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-serve-static-core@npm:^4.17.18, @types/express-serve-static-core@npm:^4.17.33":
+"@types/express-serve-static-core@npm:^4.17.18, @types/express-serve-static-core@npm:^4.17.21, @types/express-serve-static-core@npm:^4.17.33":
   version: 4.19.8
   resolution: "@types/express-serve-static-core@npm:4.19.8"
   dependencies:
@@ -17449,7 +17603,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^4.17.13, @types/express@npm:^4.17.15, @types/express@npm:^4.17.18, @types/express@npm:^4.17.21":
+"@types/express@npm:^4.17.13, @types/express@npm:^4.17.15, @types/express@npm:^4.17.18, @types/express@npm:^4.17.25":
   version: 4.17.25
   resolution: "@types/express@npm:4.17.25"
   dependencies:
@@ -22709,6 +22863,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bytestreamjs@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "bytestreamjs@npm:2.0.1"
+  checksum: 10/523b1024e3f887cdc0b3db7c4fc14b8563aaeb75e6642a41991b3208277fd0ae9cd66003c73473fe706c42797bf0c3f1f498fb9880b431d75b332e5709d56a0c
+  languageName: node
+  linkType: hard
+
 "cacache@npm:^15.2.0":
   version: 15.3.0
   resolution: "cacache@npm:15.3.0"
@@ -24295,7 +24456,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"compression@npm:^1.7.4":
+"compression@npm:^1.7.4, compression@npm:^1.8.1":
   version: 1.8.1
   resolution: "compression@npm:1.8.1"
   dependencies:
@@ -30490,7 +30651,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.10.6, express@npm:^4.14.0, express@npm:^4.16.3, express@npm:^4.17.1, express@npm:^4.17.3, express@npm:^4.19.2":
+"express@npm:^4.10.6, express@npm:^4.14.0, express@npm:^4.16.3, express@npm:^4.17.1, express@npm:^4.17.3":
   version: 4.22.1
   resolution: "express@npm:4.22.1"
   dependencies:
@@ -30526,6 +30687,45 @@ __metadata:
     utils-merge: "npm:1.0.1"
     vary: "npm:~1.1.2"
   checksum: 10/f33c1bd0c7d36e2a1f18de9cdc176469d32f68e20258d2941b8d296ab9a4fd9011872c246391bf87714f009fac5114c832ec5ac65cbee39421f1258801eb8470
+  languageName: node
+  linkType: hard
+
+"express@npm:^4.22.1":
+  version: 4.22.2
+  resolution: "express@npm:4.22.2"
+  dependencies:
+    accepts: "npm:~1.3.8"
+    array-flatten: "npm:1.1.1"
+    body-parser: "npm:~1.20.5"
+    content-disposition: "npm:~0.5.4"
+    content-type: "npm:~1.0.4"
+    cookie: "npm:~0.7.1"
+    cookie-signature: "npm:~1.0.6"
+    debug: "npm:2.6.9"
+    depd: "npm:2.0.0"
+    encodeurl: "npm:~2.0.0"
+    escape-html: "npm:~1.0.3"
+    etag: "npm:~1.8.1"
+    finalhandler: "npm:~1.3.1"
+    fresh: "npm:~0.5.2"
+    http-errors: "npm:~2.0.0"
+    merge-descriptors: "npm:1.0.3"
+    methods: "npm:~1.1.2"
+    on-finished: "npm:~2.4.1"
+    parseurl: "npm:~1.3.3"
+    path-to-regexp: "npm:~0.1.12"
+    proxy-addr: "npm:~2.0.7"
+    qs: "npm:~6.15.1"
+    range-parser: "npm:~1.2.1"
+    safe-buffer: "npm:5.2.1"
+    send: "npm:~0.19.0"
+    serve-static: "npm:~1.16.2"
+    setprototypeof: "npm:1.2.0"
+    statuses: "npm:~2.0.1"
+    type-is: "npm:~1.6.18"
+    utils-merge: "npm:1.0.1"
+    vary: "npm:~1.1.2"
+  checksum: 10/defeef5f1cda5bf5ee4a6b35252563552d8d97fab1d29f502e45ef64316f5d02f49739d7c8a79e425613af3a542d0e3cd8cf7e85671ce2ddd592197abcf5acc3
   languageName: node
   linkType: hard
 
@@ -33656,7 +33856,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:^2.1.0, html-entities@npm:^2.3.2, html-entities@npm:^2.4.0":
+"html-entities@npm:^2.1.0, html-entities@npm:^2.3.2":
   version: 2.6.0
   resolution: "html-entities@npm:2.6.0"
   checksum: 10/06d4e7a3ba6243bba558af176e56f85e09894b26d911bc1ef7b2b9b3f18b46604360805b32636f080e954778e9a34313d1982479a05a5aa49791afd6a4229346
@@ -33947,7 +34147,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-proxy-middleware@npm:^2.0.3":
+"http-proxy-middleware@npm:^2.0.3, http-proxy-middleware@npm:^2.0.9":
   version: 2.0.9
   resolution: "http-proxy-middleware@npm:2.0.9"
   dependencies:
@@ -44779,6 +44979,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pkijs@npm:^3.3.3":
+  version: 3.4.0
+  resolution: "pkijs@npm:3.4.0"
+  dependencies:
+    "@noble/hashes": "npm:1.4.0"
+    asn1js: "npm:^3.0.6"
+    bytestreamjs: "npm:^2.0.1"
+    pvtsutils: "npm:^1.3.6"
+    pvutils: "npm:^1.1.3"
+    tslib: "npm:^2.8.1"
+  checksum: 10/a937347584b27012919f69e4b3865b2fd09dced85a344f9a22bbf1376dd9e1534ccbe0bbdb997807b4990b07865c1ea028447d78b2c8a64436d4d393193a0777
+  languageName: node
+  linkType: hard
+
 "platform@npm:^1.3.3":
   version: 1.3.6
   resolution: "platform@npm:1.3.6"
@@ -46701,6 +46915,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"qs@npm:~6.15.1":
+  version: 6.15.2
+  resolution: "qs@npm:6.15.2"
+  dependencies:
+    side-channel: "npm:^1.1.0"
+  checksum: 10/7a934b2dba40654cf9878dab7c1e7ad56c6186265509727fbece67dadc38fd5d67715b61b6ef938e5a0475faeee701d18ec0a7ce420ad64367caad7f1bdb66e2
+  languageName: node
+  linkType: hard
+
 "qs@npm:~6.5.2":
   version: 6.5.3
   resolution: "qs@npm:6.5.3"
@@ -47637,7 +47860,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reflect-metadata@npm:0.2.2, reflect-metadata@npm:^0.2.0":
+"reflect-metadata@npm:0.2.2, reflect-metadata@npm:^0.2.0, reflect-metadata@npm:^0.2.2":
   version: 0.2.2
   resolution: "reflect-metadata@npm:0.2.2"
   checksum: 10/1c93f9ac790fea1c852fde80c91b2760420069f4862f28e6fae0c00c6937a56508716b0ed2419ab02869dd488d123c4ab92d062ae84e8739ea7417fae10c4745
@@ -49281,13 +49504,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selfsigned@npm:^2.1.1, selfsigned@npm:^2.4.1":
+"selfsigned@npm:^2.1.1":
   version: 2.4.1
   resolution: "selfsigned@npm:2.4.1"
   dependencies:
     "@types/node-forge": "npm:^1.3.0"
     node-forge: "npm:^1"
   checksum: 10/52536623f1cfdeb2f8b9198377f2ce7931c677ea69421238d1dc1ea2983bbe258e56c19e7d1af87035cad7270f19b7e996eaab1212e724d887722502f68e17f2
+  languageName: node
+  linkType: hard
+
+"selfsigned@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "selfsigned@npm:5.5.0"
+  dependencies:
+    "@peculiar/x509": "npm:^1.14.2"
+    pkijs: "npm:^3.3.3"
+  checksum: 10/fe9be2647507c3ee21dcaf5cab20e1ae4b8b84eac83d2fe4d82f9a3b6c70636f9aaeeba0089e3343dcb13fbb31ef70c2e72c41f2e2dcf38368040b49830c670e
   languageName: node
   linkType: hard
 
@@ -53366,7 +53599,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsyringe@npm:^4.8.0":
+"tsyringe@npm:^4.10.0, tsyringe@npm:^4.8.0":
   version: 4.10.0
   resolution: "tsyringe@npm:4.10.0"
   dependencies:
@@ -54543,12 +54776,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:10.0.0, uuid@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "uuid@npm:10.0.0"
+"uuid@npm:14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
-    uuid: dist/bin/uuid
-  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
+    uuid: dist-node/bin/uuid
+  checksum: 10/8ee9b98f9650e25555515f7a28d3c3ae9364e72f7bb19b9e08b681bc135338beba5509b2830f6ae1cfaba4d45401da0d16d4d109b977097bc3d6ba0c5583341b
   languageName: node
   linkType: hard
 
@@ -54574,6 +54807,15 @@ __metadata:
   bin:
     uuid: dist/bin/uuid
   checksum: 10/9a5f7aa1d6f56dd1e8d5f2478f855f25c645e64e26e347a98e98d95781d5ed20062d6cca2eecb58ba7c84bc3910be95c0451ef4161906abaab44f9cb68ffbdd1
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "uuid@npm:10.0.0"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
   languageName: node
   linkType: hard
 
@@ -57031,13 +57273,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:5.1.0":
-  version: 5.1.0
-  resolution: "webpack-dev-server@npm:5.1.0"
+"webpack-dev-server@npm:5.2.4":
+  version: 5.2.4
+  resolution: "webpack-dev-server@npm:5.2.4"
   dependencies:
     "@types/bonjour": "npm:^3.5.13"
     "@types/connect-history-api-fallback": "npm:^1.5.4"
-    "@types/express": "npm:^4.17.21"
+    "@types/express": "npm:^4.17.25"
+    "@types/express-serve-static-core": "npm:^4.17.21"
     "@types/serve-index": "npm:^1.9.4"
     "@types/serve-static": "npm:^1.15.5"
     "@types/sockjs": "npm:^0.3.36"
@@ -57046,18 +57289,17 @@ __metadata:
     bonjour-service: "npm:^1.2.1"
     chokidar: "npm:^3.6.0"
     colorette: "npm:^2.0.10"
-    compression: "npm:^1.7.4"
+    compression: "npm:^1.8.1"
     connect-history-api-fallback: "npm:^2.0.0"
-    express: "npm:^4.19.2"
+    express: "npm:^4.22.1"
     graceful-fs: "npm:^4.2.6"
-    html-entities: "npm:^2.4.0"
-    http-proxy-middleware: "npm:^2.0.3"
+    http-proxy-middleware: "npm:^2.0.9"
     ipaddr.js: "npm:^2.1.0"
     launch-editor: "npm:^2.6.1"
     open: "npm:^10.0.3"
     p-retry: "npm:^6.2.0"
     schema-utils: "npm:^4.2.0"
-    selfsigned: "npm:^2.4.1"
+    selfsigned: "npm:^5.5.0"
     serve-index: "npm:^1.9.1"
     sockjs: "npm:^0.3.24"
     spdy: "npm:^4.0.2"
@@ -57072,7 +57314,7 @@ __metadata:
       optional: true
   bin:
     webpack-dev-server: bin/webpack-dev-server.js
-  checksum: 10/f23255681cc5e2c2709b23ca7b2185aeed83b1c9912657d4512eda8685625a46d7a103a92446494a55fe2afdfab936f9bd4f037d20b52f7fdfff303e7e7199c7
+  checksum: 10/5e5382f8cc7a73e2957542de0c755769548cbca8e7c6d17ed6b526364f11af35025be74f03827afa6723ccbdcc93730b0a0a59882d332fb3c6694a6d290c41e7
   languageName: node
   linkType: hard
 
