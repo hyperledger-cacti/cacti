@@ -92,7 +92,7 @@ export class GetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const tag = `${this.getVerbLowerCase().toUpperCase()} ${this.getPath()}`;
     try {
-      this.log.debug(`${tag} %o`, req.body);
+      this.log.debug(tag);
       const value = await this.plugin.get(req.body.key);
       const resBody: GetKeychainEntryResponseV1 = {
         key: req.body.key,
@@ -101,9 +101,9 @@ export class GetKeychainEntryEndpointV1 implements IWebServiceEndpoint {
       res.status(200);
       res.json(resBody);
     } catch (ex) {
-      this.log.debug(`${tag} Failed to serve request:`, ex);
+      this.log.error(`${tag} Failed to serve request:`, ex);
       res.status(500);
-      res.json({ error: ex.stack });
+      res.json({ error: "Internal Server Error" });
     }
   }
 }
