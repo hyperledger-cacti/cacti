@@ -106,8 +106,6 @@ nav:
       - CMD Api Server: cactus/packages/cactus-cmd-api-server.md
       - Cactus Common: cactus/packages/cactus-common.md
       - Cactus Core: cactus/packages/cactus-core.md
-      - Consortium Manual: cactus/packages/cactus-plugin-consortium-manual.md
-      - Keychain Vault: cactus/packages/cactus-plugin-keychain-vault.md
       - Connector Besu: cactus/packages/cactus-plugin-ledger-connector-besu.md
       - Connector Corda: cactus/packages/cactus-plugin-ledger-connector-corda.md
       - Connector Fabric: cactus/packages/cactus-plugin-ledger-connector-fabric.md

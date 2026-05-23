@@ -145,12 +145,10 @@ const main \= async () \=> {
       // npm package name of the plugin you are installing
       // Since this will be imported at runtime, you are responsible for
       // installing the package yourself prior to launching the API server.
-      packageName: "@hyperledger/cactus-plugin-keychain-vault",
-      // The REMOTE value means that a different plugin factory will be imported and
-      // called to obtain the plugin instance. This way plugins can support them
-      // being imported by the API server regardless of the language the plugin
-      // was written in.
-      type: PluginImportType.REMOTE,
+      packageName: "@hyperledger/cactus-plugin-keychain-memory",
+      // The LOCAL value means that the plugin factory will be imported and
+      // called to obtain the plugin instance.
+      type: PluginImportType.LOCAL,
       // The INSTALL value means that the plugin will be installed instead of
       // only instantiate it
       action: PluginImportAction.INSTALL,
@@ -158,7 +156,6 @@ const main \= async () \=> {
       options: {
         keychainId: "\_keychainId\_",
         instanceId: "\_instanceId\_",
-        remoteConfig: configuration,
       },
     },
   \];
@@ -383,13 +380,13 @@ The prometheus exporter object is initialized in the `ApiServer` class construct
 
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/). Once Prometheus is setup, the corresponding scrape\_config needs to be added to the prometheus.yml
 
-\- job\_name: 'consortium\_manual\_exporter'
+\- job\_name: 'consortium\_static\_exporter'
   metrics\_path: /api/v1/api-server/get-prometheus-exporter-metrics
   scrape\_interval: 5s
   static\_configs:
     - targets: \['{host}:{port}'\]
 
-Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-consortium-manual/src/test/typescript/unit/consortium/get-node-jws-endpoint-v1.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL) `Metrics URL: http://0.0.0.0:42379/api/v1/api-server/get-prometheus-exporter-metrics/get-prometheus-exporter-metrics`
+Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cacti-plugin-consortium-static/src/test/typescript/integration) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL) `Metrics URL: http://0.0.0.0:42379/api/v1/api-server/get-prometheus-exporter-metrics/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file. On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus\_api\_server\_total\_plugin\_imports** and click **execute**
 

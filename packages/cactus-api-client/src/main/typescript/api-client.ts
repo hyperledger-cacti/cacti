@@ -3,7 +3,7 @@ import { Checks, IAsyncProvider, Objects } from "@hyperledger/cactus-common";
 import { ConsortiumDatabase, Ledger } from "@hyperledger/cactus-core-api";
 
 import { ConsortiumRepository } from "@hyperledger/cactus-core";
-import { DefaultApi as ApiConsortium } from "@hyperledger/cactus-plugin-consortium-manual";
+import { DefaultApi as ApiConsortium } from "@hyperledger/cacti-plugin-consortium-static";
 import { DefaultConsortiumProvider } from "./default-consortium-provider";
 
 import { Configuration, BaseAPI } from "@hyperledger/cactus-core-api";
@@ -57,7 +57,7 @@ export class ApiClient extends BaseAPI {
    *
    * The `DefaultConsortiumProvider` class leverages the simplest consortium
    * plugin that we have at the time of this writing:
-   * `@hyperledger/cactus-plugin-consortium-manual` which holds the consortium
+   * `@hyperledger/cacti-plugin-consortium-static` which holds the consortium
    * metadata as pre-configured by the consortium operators.
    *
    * The pattern we use in the `ApiClient` class is that you can inject your

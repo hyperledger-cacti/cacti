@@ -25,9 +25,6 @@
       "path": "../../packages/cactus-core-api/tsconfig.json"
     },
     {
-      "path": "../../packages/cactus-plugin-consortium-manual/tsconfig.json"
-    },
-    {
       "path": "../../packages/cactus-plugin-keychain-memory/tsconfig.json"
     },
     {

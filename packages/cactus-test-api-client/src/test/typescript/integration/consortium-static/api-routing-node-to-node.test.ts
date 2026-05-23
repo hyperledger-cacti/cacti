@@ -1,16 +1,8 @@
 import { AddressInfo } from "net";
-import { Server } from "http";
 
 import "jest-extended";
 import { v4 as uuidV4 } from "uuid";
-import {
-  generateKeyPair,
-  exportSPKI,
-  exportPKCS8,
-  GenerateKeyPairResult,
-  KeyLike,
-  JWK,
-} from "jose";
+import { generateKeyPair, exportSPKI, exportPKCS8 } from "jose";
 import Web3 from "web3";
 
 import { ApiClient } from "@hyperledger/cactus-api-client";
@@ -30,6 +22,14 @@ import {
 } from "@hyperledger/cactus-core-api";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import {
+  DefaultApi as ConsortiumStaticApi,
+  IPluginConsortiumStaticOptions,
+  PluginConsortiumStatic,
+  StaticConsortiumProvider,
+  generateES256JWK,
+  issueOrgToken,
+} from "@hyperledger/cacti-plugin-consortium-static";
+import {
   DefaultApi as BesuApi,
   PluginLedgerConnectorBesu,
   ReceiptType,
@@ -41,11 +41,6 @@ import {
 } from "@hyperledger/cactus-test-tooling";
 import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
 
-import {
-  IPluginConsortiumStaticOptions,
-  PluginConsortiumStatic,
-  generateES256JWK,
-} from "@hyperledger/cacti-plugin-consortium-static";
 import { Account } from "web3-core";
 
 const logLevel: LogLevelDesc = "TRACE";
@@ -62,24 +57,26 @@ describe(testCase, () => {
 
   let initialFundsAccount1: string;
   let initialFundsAccount2: string;
-  let keyPair1: GenerateKeyPairResult<KeyLike>;
-  let keyPair2: GenerateKeyPairResult<KeyLike>;
+  let keyPair1: any;
+  let keyPair2: any;
   let addressInfo1: AddressInfo;
   let addressInfo2: AddressInfo;
-  let httpServer1: Server;
-  let httpServer2: Server;
+  let httpServer1: any;
+  let httpServer2: any;
+
+  let node1: CactusNode;
+  let node2: CactusNode;
+  let consortium: Consortium;
+  let member1: ConsortiumMember;
+  let member2: ConsortiumMember;
 
   let apiServer1: ApiServer;
   let apiServer2: ApiServer;
   let testEthAccount1: Account;
 
-  let node1: CactusNode;
-  let node2: CactusNode;
-  let member1: ConsortiumMember;
-  let member2: ConsortiumMember;
-  let entitiesJWK: { [key: string]: JWK };
-  let entity1JWK: { pub: JWK; priv: JWK };
-  let entity2JWK: { pub: JWK; priv: JWK };
+  let entitiesJWK: any;
+  let entity1JWK: any;
+  let entity2JWK: any;
 
   const ledger1: Ledger = {
     id: "my_cool_ledger_that_i_want_to_transact_on",
@@ -135,7 +132,6 @@ describe(testCase, () => {
       name: "Example Corp 1",
       nodeIds: [node1.id],
     };
-
     entity1JWK = await generateES256JWK();
 
     node2 = {
@@ -151,13 +147,12 @@ describe(testCase, () => {
     member2 = {
       id: memberId2,
       name: "Example Corp 2",
-      nodeIds: [node2.id],
+      nodeIds: [],
     };
 
     entity2JWK = await generateES256JWK();
     entitiesJWK = { [memberId1]: entity1JWK.pub, [memberId2]: entity2JWK.pub };
-
-    const consortium: Consortium = {
+    consortium = {
       id: consortiumId,
       mainApiHost: node1Host,
       name: consortiumName,
@@ -165,10 +160,10 @@ describe(testCase, () => {
     };
 
     consortiumDatabase = {
-      cactusNode: [node1, node2],
+      cactusNode: [node1],
       consortium: [consortium],
       consortiumMember: [member1, member2],
-      ledger: [ledger1, ledger2],
+      ledger: [ledger1],
       pluginInstance: [],
     };
 
@@ -209,19 +204,21 @@ describe(testCase, () => {
       });
 
       const keyPairPem = await exportPKCS8(keyPair1.privateKey);
-      const keyPairPub = await exportSPKI(keyPair1.publicKey);
+      const pub = await exportSPKI(keyPair2.publicKey);
+      console.log(pub);
+
       const options: IPluginConsortiumStaticOptions = {
         instanceId: uuidV4(),
         pluginRegistry,
         keyPairPem: keyPairPem,
-        keyPairPub: keyPairPub,
-        consortiumDatabase,
+        keyPairPub: pub,
+        consortiumDatabase: consortiumDatabase,
         node: node1,
         ledgers: [ledger1],
         pluginInstances: [],
         memberId: member1.id,
-        entitiesJWK,
         logLevel,
+        entitiesJWK,
       };
       const pluginConsortiumStatic = new PluginConsortiumStatic(options);
 
@@ -262,20 +259,29 @@ describe(testCase, () => {
         pluginRegistry: new PluginRegistry(),
       });
 
+      const consortiumDatabase1 = {
+        cactusNode: [],
+        consortium: [],
+        consortiumMember: [],
+        ledger: [],
+        pluginInstance: [],
+      };
+
       const keyPairPem = await exportPKCS8(keyPair2.privateKey);
-      const keyPairPub = await exportSPKI(keyPair2.publicKey);
+      const pub = await exportSPKI(keyPair2.publicKey);
+      console.log(pub);
       const options: IPluginConsortiumStaticOptions = {
         instanceId: uuidV4(),
         pluginRegistry,
         keyPairPem: keyPairPem,
-        keyPairPub: keyPairPub,
-        consortiumDatabase,
+        keyPairPub: pub,
+        consortiumDatabase: consortiumDatabase1,
         node: node2,
         ledgers: [ledger2],
         pluginInstances: [],
         memberId: member2.id,
-        entitiesJWK,
         logLevel,
+        entitiesJWK,
       };
       const pluginConsortiumStatic = new PluginConsortiumStatic(options);
 
@@ -304,12 +310,32 @@ describe(testCase, () => {
       });
 
       await apiServer2.start();
+
+      const consortApi = mainApiClient.extendWith(ConsortiumStaticApi);
+      //node asks to join consortium, not manual anymore
+      const jwt = await issueOrgToken(
+        entity2JWK.priv,
+        {
+          iss: member2.name,
+          exp: Date.now() + 5 * 60 * 1000, //expires in 5min
+        },
+        member2.id,
+        pub,
+      );
+      await pluginConsortiumStatic.joinConsortium(consortApi, jwt);
       // test.onFinish(() => apiServer.shutdown());
       // afterAll(async () => await apiServer.shutdown());
     }
   });
   test(testCase2, async () => {
-    const apiClient1 = await mainApiClient.ofLedger(ledger1.id, BesuApi, {});
+    const apiClient1 = await mainApiClient.ofLedger(
+      ledger1.id,
+      BesuApi,
+      {},
+      new StaticConsortiumProvider({
+        apiClient: mainApiClient.extendWith(ConsortiumStaticApi),
+      }),
+    );
     const testAccount1 = new Web3().eth.accounts.create(uuidV4());
     const res = await apiClient1.runTransactionV1({
       transactionConfig: {
@@ -335,7 +361,14 @@ describe(testCase, () => {
   });
 
   test(testCase3, async () => {
-    const apiClient2 = await mainApiClient.ofLedger(ledger2.id, BesuApi, {});
+    const apiClient2 = await mainApiClient.ofLedger(
+      ledger2.id,
+      BesuApi,
+      {},
+      new StaticConsortiumProvider({
+        apiClient: mainApiClient.extendWith(ConsortiumStaticApi),
+      }),
+    );
     const testAccount2 = new Web3().eth.accounts.create(uuidV4());
     const res = await apiClient2.runTransactionV1({
       transactionConfig: {
