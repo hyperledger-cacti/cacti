@@ -19,6 +19,13 @@ concurrency:
   group: examples-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Read-only test workflow: checkout/build plus `checks: write` for
+# dorny/test-reporter inside the jest-runner action.
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   ce-carbon-accounting-backend:
     if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-carbon-accounting-backend')}}

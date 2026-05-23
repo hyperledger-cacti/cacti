@@ -52,6 +52,8 @@ name: SATP Hermes Package Workflow
         # -----------------------------------------------------------------------------
 
 on:
+  # Invoked automatically by packages-workflow.yaml when SATP Hermes files are affected.
+  # For manual runs, use satp-hermes-scheduled.yaml which has workflow_dispatch.
   workflow_call:
     inputs:
       node_version:
@@ -70,11 +72,15 @@ jobs:
   run-satp-tests-unit:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/unit/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
 
       - uses: ./.github/actions/docker-pull/
         with:
@@ -96,8 +102,8 @@ jobs:
           report_name: "satp-unit-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-satp-hermes-unit
           path: ./code-coverage-ts/**/
@@ -106,11 +112,15 @@ jobs:
   run-satp-tests-integration-bridge:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/bridge/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -143,8 +153,8 @@ jobs:
           report_name: "satp-bridge-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-satp-hermes-bridge
           path: ./code-coverage-ts/**/
@@ -152,11 +162,15 @@ jobs:
   run-satp-tests-integration-oracle:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/oracle/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -188,8 +202,8 @@ jobs:
           report_name: "satp-oracle-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-satp-hermes-oracle
           path: ./code-coverage-ts/**/
@@ -198,11 +212,15 @@ jobs:
   run-satp-tests-integration-gateway:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/gateway/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -235,8 +253,8 @@ jobs:
           report_name: "satp-gateway-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-satp-hermes-gateway
           path: ./code-coverage-ts/**/
@@ -245,11 +263,15 @@ jobs:
   run-satp-tests-integration-docker:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/docker/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -290,8 +312,8 @@ jobs:
           report_name: "satp-gateway-docker-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-satp-hermes-gateway-docker
           path: ./code-coverage-ts/**/
@@ -299,8 +321,12 @@ jobs:
   run-satp-tests-on-chain:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
       
       - name: build
         with:
@@ -329,7 +355,7 @@ jobs:
 
       - name: Upload SATP foundry test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: satp-foundry-report-${{ github.job }}
           path: |
@@ -339,11 +365,15 @@ jobs:
   run-satp-tests-recovery:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/recovery/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -373,11 +403,11 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-unit-tests-report"
+          report_name: "satp-recovery-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-satp-hermes-recovery
           path: ./code-coverage-ts/**/
@@ -385,11 +415,15 @@ jobs:
   run-satp-tests-rollback:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    permissions:
+      actions: read
+      checks: write
+      contents: read
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/rollback/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@v4.1.7
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -419,11 +453,11 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-unit-tests-report"
+          report_name: "satp-rollback-integration-tests-report"
 
       - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@v4.3.3
         with:
           name: coverage-reports-satp-hermes-rollback
           path: ./code-coverage-ts/**/

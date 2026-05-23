@@ -12,6 +12,11 @@ concurrency:
   group: code-quality-checks-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Lint / codegen-drift checks. github-script usages only call
+# core.setFailed() -- no GitHub API writes -- so checkout-only suffices.
+permissions:
+  contents: read
+
 jobs:
   yarn_lint:
     runs-on: ubuntu-22.04

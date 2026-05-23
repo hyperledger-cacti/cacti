@@ -22,10 +22,27 @@ concurrency:
   group: connector-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Default for every job in this workflow: read-only checkout/build plus
+# `checks: write` for dorny/test-reporter inside the jest-runner action.
+# `cpl-connector-besu` overrides this with `contents: write` because it
+# pushes benchmark results to gh-pages on main and writes commit-comment
+# regression alerts via benchmark-action/github-action-benchmark.
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   cpl-connector-besu:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-besu')
-    permissions: write-all
+    # Narrowed from `write-all`. Required scopes:
+    #   contents: write     -> auto-push to gh-pages on main + commit-comment alerts
+    #   actions: read       -> restore previous benchmark from actions/cache
+    #   checks: write       -> dorny/test-reporter in jest-runner action
+    permissions:
+      contents: write
+      actions: read
+      checks: write
     continue-on-error: false
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
