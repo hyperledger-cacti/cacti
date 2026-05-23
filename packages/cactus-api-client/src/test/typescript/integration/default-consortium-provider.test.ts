@@ -4,7 +4,7 @@ import { AddressInfo } from "node:net";
 import "jest-extended";
 import { StatusCodes } from "http-status-codes";
 
-import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cactus-plugin-consortium-manual";
+import { DefaultApi as ConsortiumManualApi } from "@hyperledger/cacti-plugin-consortium-static";
 import {
   LoggerProvider,
   LogLevelDesc,

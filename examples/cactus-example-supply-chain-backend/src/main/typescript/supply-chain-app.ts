@@ -7,6 +7,7 @@ import {
   KeyLike,
   exportSPKI,
   SignJWT,
+  JWK,
 } from "jose";
 import expressJwt from "express-jwt";
 
@@ -40,7 +41,10 @@ import {
   IAuthorizationConfig,
 } from "@hyperledger/cactus-cmd-api-server";
 
-import { PluginConsortiumManual } from "@hyperledger/cactus-plugin-consortium-manual";
+import {
+  PluginConsortiumStatic,
+  generateES256JWK,
+} from "@hyperledger/cacti-plugin-consortium-static";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 
 import {
@@ -69,6 +73,23 @@ import {
 } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { SupplyChainCactusPlugin } from "@hyperledger/cactus-example-supply-chain-business-logic-plugin";
 import { DiscoveryOptions } from "fabric-network";
+
+/**
+ * Extended consortium info containing all data needed for PluginConsortiumStatic
+ */
+export interface IConsortiumInfo {
+  consortiumDatabase: ConsortiumDatabase;
+  nodeA: CactusNode;
+  nodeB: CactusNode;
+  nodeC: CactusNode;
+  memberIdA: string;
+  memberIdB: string;
+  memberIdC: string;
+  ledgerA: Ledger;
+  ledgerB: Ledger;
+  ledgerC: Ledger;
+  entitiesJWK: { [key: string]: JWK };
+}
 
 /**
  * The log pattern message that will be printed on stdout when the
@@ -277,14 +298,17 @@ export class SupplyChainApp {
 
     const keyPairA = await generateKeyPair("ES256K");
     const keyPairPemA = await exportPKCS8(keyPairA.privateKey);
+    const keyPairPubA = await exportSPKI(keyPairA.publicKey);
 
     const keyPairB = await generateKeyPair("ES256K");
     const keyPairPemB = await exportPKCS8(keyPairB.privateKey);
+    const keyPairPubB = await exportSPKI(keyPairB.publicKey);
 
     const keyPairC = await generateKeyPair("ES256K");
     const keyPairPemC = await exportPKCS8(keyPairC.privateKey);
+    const keyPairPubC = await exportSPKI(keyPairC.publicKey);
 
-    const consortiumDatabase = await this.createConsortium(
+    const consortiumInfo = await this.createConsortium(
       httpApiA,
       httpApiB,
       httpApiC,
@@ -292,6 +316,19 @@ export class SupplyChainApp {
       keyPairB.publicKey,
       keyPairC.publicKey,
     );
+    const {
+      consortiumDatabase,
+      nodeA,
+      nodeB,
+      nodeC,
+      memberIdA,
+      memberIdB,
+      memberIdC,
+      ledgerA,
+      ledgerB,
+      ledgerC,
+      entitiesJWK,
+    } = consortiumInfo;
     const consortiumPrettyJson = JSON.stringify(consortiumDatabase, null, 4);
     this.log.info(`Created Consortium definition: %o`, consortiumPrettyJson);
 
@@ -305,10 +342,16 @@ export class SupplyChainApp {
 
     const registryA = new PluginRegistry({
       plugins: [
-        new PluginConsortiumManual({
-          instanceId: "PluginConsortiumManual_A",
+        new PluginConsortiumStatic({
+          instanceId: "PluginConsortiumStatic_A",
           consortiumDatabase,
           keyPairPem: keyPairPemA,
+          keyPairPub: keyPairPubA,
+          node: nodeA,
+          ledgers: [ledgerA],
+          pluginInstances: [],
+          memberId: memberIdA,
+          entitiesJWK,
           logLevel: this.options.logLevel,
           ctorArgs: {
             baseOptions: {
@@ -349,10 +392,16 @@ export class SupplyChainApp {
 
     const registryB = new PluginRegistry({
       plugins: [
-        new PluginConsortiumManual({
-          instanceId: "PluginConsortiumManual_B",
+        new PluginConsortiumStatic({
+          instanceId: "PluginConsortiumStatic_B",
           consortiumDatabase,
           keyPairPem: keyPairPemB,
+          keyPairPub: keyPairPubB,
+          node: nodeB,
+          ledgers: [ledgerB],
+          pluginInstances: [],
+          memberId: memberIdB,
+          entitiesJWK,
           logLevel: this.options.logLevel,
           ctorArgs: {
             baseOptions: {
@@ -392,10 +441,16 @@ export class SupplyChainApp {
 
     const registryC = new PluginRegistry({
       plugins: [
-        new PluginConsortiumManual({
-          instanceId: "PluginConsortiumManual_C",
+        new PluginConsortiumStatic({
+          instanceId: "PluginConsortiumStatic_C",
           consortiumDatabase,
           keyPairPem: keyPairPemC,
+          keyPairPub: keyPairPubC,
+          node: nodeC,
+          ledgers: [ledgerC],
+          pluginInstances: [],
+          memberId: memberIdC,
+          entitiesJWK,
           logLevel: "INFO",
           ctorArgs: {
             baseOptions: {
@@ -479,9 +534,13 @@ export class SupplyChainApp {
     keyPairA: KeyLike,
     keyPairB: KeyLike,
     keyPairC: KeyLike,
-  ): Promise<ConsortiumDatabase> {
+  ): Promise<IConsortiumInfo> {
     const consortiumName = "Example Supply Chain Consortium";
     const consortiumId = uuidv4();
+
+    const keysA = await generateES256JWK();
+    const keysB = await generateES256JWK();
+    const keysC = await generateES256JWK();
 
     const memberIdA = uuidv4();
     const nodeIdA = uuidv4();
@@ -505,7 +564,7 @@ export class SupplyChainApp {
       name: "Example Manufacturer Corp",
     };
 
-    const ledger1 = {
+    const ledger1: Ledger = {
       id: "BesuDemoLedger",
       ledgerType: LedgerType.Besu1X,
     };
@@ -584,7 +643,25 @@ export class SupplyChainApp {
       pluginInstance: [],
     };
 
-    return consortiumDatabase;
+    const entitiesJWK: { [key: string]: JWK } = {
+      [memberIdA]: keysA.pub,
+      [memberIdB]: keysB.pub,
+      [memberIdC]: keysC.pub,
+    };
+
+    return {
+      consortiumDatabase,
+      nodeA: cactusNodeA,
+      nodeB: cactusNodeB,
+      nodeC: cactusNodeC,
+      memberIdA,
+      memberIdB,
+      memberIdC,
+      ledgerA: ledger1,
+      ledgerB: ledger2,
+      ledgerC: ledger3,
+      entitiesJWK,
+    };
   }
 
   public async startNode(

@@ -41,7 +41,7 @@
       "path": "../cactus-example-carbon-accounting-business-logic-plugin/tsconfig.json"
     },
     {
-      "path": "../../packages/cactus-plugin-consortium-manual/tsconfig.json"
+      "path": "../../packages/cacti-plugin-consortium-static/tsconfig.json"
     },
     {
       "path": "../../packages/cactus-plugin-ledger-connector-besu/tsconfig.json"

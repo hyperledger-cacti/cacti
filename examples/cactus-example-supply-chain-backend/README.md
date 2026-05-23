@@ -1,5 +1,9 @@
 # Hyperledger Cactus Example - Supply Chain App
 
+> **Known issue:** The `@hyperledger/cacti-plugin-consortium-static` dependency
+> listed in `package.json` is not yet published to npm. Installing dependencies
+> will fail until the package is published. This will be fixed in an upcoming
+> release.
 
 ## Usage
 

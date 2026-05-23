@@ -224,7 +224,7 @@ export class PluginKeychainAzureKv
   }
 
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-keychain-vault`;
+    return `@hyperledger/cactus-plugin-keychain-azure-kv`;
   }
 
   public getEncryptionAlgorithm(): string {

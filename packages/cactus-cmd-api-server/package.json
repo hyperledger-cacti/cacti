@@ -108,7 +108,6 @@
     "@bufbuild/buf": "1.30.0",
     "@bufbuild/protoc-gen-es": "1.8.0",
     "@connectrpc/protoc-gen-connect-es": "1.4.0",
-    "@hyperledger/cactus-plugin-keychain-vault": "2.1.0",
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "@openapitools/openapi-generator-cli": "2.7.0",
     "@types/async-exit-hook": "2.0.2",
