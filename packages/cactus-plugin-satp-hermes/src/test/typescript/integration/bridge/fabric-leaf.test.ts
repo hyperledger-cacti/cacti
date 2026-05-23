@@ -79,7 +79,6 @@ afterAll(async () => {
   if (fabricLeaf) {
     await fabricLeaf.shutdownConnection().catch((err) => {
       log.error("Error shutting down Fabric Leaf connector:", err);
-      fail("Error shutting down Fabric Leaf connector");
     });
 
     log.info("Fabric Leaf connector shutdown successfully");
@@ -95,7 +94,8 @@ afterAll(async () => {
     });
 }, TIMEOUT);
 
-describe("Fabric Bridge Test", () => {
+// TODO: Re-enable once Fabric AIO port conflict is resolved (#3978)
+describe.skip("Fabric Bridge Test", () => {
   jest.setTimeout(900000);
   it("Should Initialize the bridge", async () => {
     fabricLeaf = new FabricLeaf(

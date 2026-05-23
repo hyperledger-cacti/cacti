@@ -59,6 +59,7 @@ const options: SATPGatewayConfig = {
     proofID: "mockProofID10",
     gatewayServerPort: 3010,
     gatewayClientPort: 3011,
+    gatewayOapiPort: 4000,
     address: "http://localhost",
   },
   pluginRegistry: new PluginRegistry({ plugins: [] }),
@@ -86,9 +87,10 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         adminApiClient.getStatus(statusRequest.sessionID),
       ).rejects.toMatchObject({
         response: {
-          data: {
+          data: expect.objectContaining({
+            message: expect.stringContaining("Internal Server Error"),
             error: expect.stringContaining("Session not found"),
-          },
+          }),
         },
       });
     } finally {
@@ -193,9 +195,10 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         oracleApiClient.getOracleTaskStatus("test-task-id"),
       ).rejects.toMatchObject({
         response: {
-          data: {
+          data: expect.objectContaining({
+            message: expect.stringContaining("InternalServerError"),
             error: expect.stringContaining("test-task-id not found"),
-          },
+          }),
         },
       });
     } finally {

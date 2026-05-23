@@ -18,6 +18,10 @@ import {
   BesuTestEnvironment,
   CI_TEST_TIMEOUT,
   createEnhancedTimeoutConfig,
+  runCleanup,
+  cleanupContainers,
+  cleanupEnvs,
+  cleanupGatewayRunners,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -60,6 +64,7 @@ let ethereumEnv: EthereumTestEnvironment;
 
 let db_local_config: Knex.Config;
 let db_remote_config: Knex.Config;
+let db_remote_host_config: Knex.Config;
 let db_local: Container;
 let db_remote: Container;
 let gatewayRunner: SATPGatewayRunner;
@@ -73,25 +78,11 @@ let ethereumContractAddress: string;
 let besuContractAddress: string;
 
 afterAll(async () => {
-  if (gatewayRunner) {
-    await gatewayRunner.stop();
-    await gatewayRunner.destroy();
-  }
-  if (db_local) {
-    await db_local.stop();
-    await db_local.remove();
-  }
-  if (db_remote) {
-    await db_remote.stop();
-    await db_remote.remove();
-  }
-
-  if (besuEnv) {
-    await besuEnv.tearDown();
-  }
-  if (ethereumEnv) {
-    await ethereumEnv.tearDown();
-  }
+  await runCleanup(log, [
+    ...cleanupGatewayRunners({ gatewayRunner }),
+    ...cleanupContainers({ db_local, db_remote }),
+    ...cleanupEnvs({ besuEnv, ethereumEnv }),
+  ]);
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
@@ -124,21 +115,27 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
 
-  ({ config: db_local_config, container: db_local } = await createPGDatabase({
-    network: testNetwork,
-    postgresUser: "user123123",
-    postgresPassword: "password",
-  }));
+  ({ networkConfig: db_local_config, container: db_local } =
+    await createPGDatabase({
+      network: testNetwork,
+      postgresUser: "user123123",
+      postgresPassword: "password",
+    }));
   db_local_config = createEnhancedTimeoutConfig(db_local_config);
 
-  ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
+  ({
+    hostConfig: db_remote_host_config,
+    networkConfig: db_remote_config,
+    container: db_remote,
+  } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_remote_host_config = createEnhancedTimeoutConfig(db_remote_host_config);
   db_remote_config = createEnhancedTimeoutConfig(db_remote_config);
 
-  await setupDBTable(db_remote_config);
+  await setupDBTable(db_remote_host_config);
 
   const businessLogicContract = "OracleTestContract";
 

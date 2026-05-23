@@ -19,7 +19,7 @@
   },
   "servers": [
     {
-      "url": "http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes",
+      "url": "http://{host}:{port}",
       "description": "Development server",
       "variables": {
         "host": {
