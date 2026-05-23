@@ -23,7 +23,31 @@ import {
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
-import { OracleRegisterRequest } from "../../public-api";
+import {
+  OracleRegisterRequest,
+  OracleRegisterRequestTaskModeEnum,
+} from "../../public-api";
+import { BridgeInternalError } from "../../cross-chain-mechanisms/common/errors";
+
+function validateRegisterTaskRequest(
+  reqBody: OracleRegisterRequest,
+): string | null {
+  if (reqBody.taskMode === OracleRegisterRequestTaskModeEnum.Polling) {
+    if (!reqBody.pollingInterval) {
+      return `Missing required parameter for ${reqBody.taskType} task and mode POLLING: pollingInterval`;
+    }
+  } else if (
+    reqBody.taskMode === OracleRegisterRequestTaskModeEnum.EventListening
+  ) {
+    if (!reqBody.listeningOptions?.eventSignature) {
+      return `Missing required parameter for ${reqBody.taskType} task and mode EVENT_LISTENING: listeningOptions.eventSignature`;
+    }
+    if (reqBody.pollingInterval !== undefined) {
+      return `Invalid parameter for ${reqBody.taskType} task and mode EVENT_LISTENING: pollingInterval`;
+    }
+  }
+  return null;
+}
 
 export class OracleRegisterTaskEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "OracleRegisterTaskEndpointV1";
@@ -95,11 +119,31 @@ export class OracleRegisterTaskEndpointV1 implements IWebServiceEndpoint {
     this.log.debug("reqBody: ", reqBody);
 
     try {
+      const validationError = validateRegisterTaskRequest(reqBody);
+      if (validationError !== null) {
+        res.status(400).json({ message: validationError });
+        return;
+      }
+
       const result = await this.options.dispatcher.OracleRegisterTask(reqBody);
       res.status(200).json(result);
     } catch (ex) {
       const errorMsg = `${reqTag} Failed to register task:`;
-      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
+      if (
+        ex instanceof BridgeInternalError &&
+        ex.code >= 400 &&
+        ex.code < 500
+      ) {
+        this.log.warn(`${errorMsg} ${ex.message}`);
+        res.status(ex.code).json({ message: ex.message });
+      } else {
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
+      }
     }
   }
 }

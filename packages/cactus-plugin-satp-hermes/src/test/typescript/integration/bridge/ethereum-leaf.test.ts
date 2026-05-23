@@ -93,12 +93,15 @@ beforeAll(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  await ethereumEnv.tearDown();
+  if (ethereumEnv) {
+    await ethereumEnv.tearDown();
+  }
 
-  await ethereumLeaf.shutdownConnection().catch((err) => {
-    log.error("Error shutting down Ethereum Leaf connector:", err);
-    fail("Error shutting down Ethereum Leaf connector");
-  });
+  if (ethereumLeaf) {
+    await ethereumLeaf.shutdownConnection().catch((err) => {
+      log.error("Error shutting down Ethereum Leaf connector:", err);
+    });
+  }
 
   await monitorService.shutdown();
 

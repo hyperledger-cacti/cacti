@@ -56,7 +56,7 @@ externalDocs:
   description: For more information about the SATP Gateway Client, refer to the official documentation.
   url: https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-satp-hermes/README.md
 servers:
-  - url: http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes
+  - url: http://{host}:{port}
     description: Development server
     variables:
       host:

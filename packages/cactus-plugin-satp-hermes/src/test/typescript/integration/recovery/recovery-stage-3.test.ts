@@ -372,6 +372,8 @@ afterAll(async () => {
   }
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("Stage 3 Recovery Test", () => {
   it("should recover Stage 3 hashes and timestamps and update session state to RECOVERED", async () => {
     crashManager1 = gateway1["crashManager"] as CrashManager;

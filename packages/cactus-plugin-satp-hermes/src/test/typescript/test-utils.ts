@@ -15,6 +15,7 @@ import { BesuTestEnvironment } from "./environments/besu-test-environment";
 import { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 import { FabricTestEnvironment } from "./environments/fabric-test-environment";
 import knex, { Knex } from "knex";
+import net from "net";
 import Docker, { Container, ContainerInfo } from "dockerode";
 import { Containers } from "@hyperledger/cactus-test-tooling/src/main/typescript/common/containers";
 import { EventEmitter } from "events";
@@ -35,6 +36,152 @@ export {
 export { BesuTestEnvironment } from "./environments/besu-test-environment";
 export { EthereumTestEnvironment } from "./environments/ethereum-test-environment";
 export { FabricTestEnvironment } from "./environments/fabric-test-environment";
+
+/**
+ * Safely stops and removes a Docker container, logging but not throwing
+ * on errors. Use this in afterAll blocks so one container's failure
+ * doesn't prevent cleanup of the rest.
+ */
+export async function safeStopAndRemoveContainer(
+  container: Container | undefined,
+  label: string,
+  log?: { warn: (msg: string, ...args: unknown[]) => void },
+): Promise<void> {
+  if (!container) return;
+  try {
+    await container.stop();
+  } catch (err) {
+    const msg = `safeStopAndRemoveContainer(${label}): stop failed`;
+    if (log) log.warn(msg, err);
+    else console.warn(msg, err);
+  }
+  try {
+    await container.remove();
+  } catch (err) {
+    const msg = `safeStopAndRemoveContainer(${label}): remove failed`;
+    if (log) log.warn(msg, err);
+    else console.warn(msg, err);
+  }
+}
+
+/** A single cleanup action: a label for logging and an async function. */
+export interface CleanupTask {
+  label: string;
+  fn: () => Promise<unknown>;
+}
+
+/**
+ * Runs every cleanup task in order, catching and collecting errors so that
+ * one failure never prevents the remaining tasks from executing.
+ * Returns the list of errors (empty on full success).
+ *
+ * Usage in afterAll:
+ * ```ts
+ * const errors = await runCleanup(log, [
+ *   ...cleanupContainers({ db_local, db_remote }),
+ *   ...cleanupEnvs({ besuEnv, ethereumEnv, fabricEnv }),
+ * ]);
+ * ```
+ */
+export async function runCleanup(
+  log: { warn: (msg: string, ...args: unknown[]) => void },
+  tasks: CleanupTask[],
+): Promise<unknown[]> {
+  const errors: unknown[] = [];
+  for (const { label, fn } of tasks) {
+    try {
+      await fn();
+    } catch (err) {
+      errors.push(err);
+      log.warn(`cleanup(${label}) failed`, err);
+    }
+  }
+  if (errors.length > 0) {
+    log.warn(`afterAll encountered ${errors.length} cleanup error(s)`);
+  }
+  return errors;
+}
+
+/**
+ * Build cleanup tasks for Docker containers (stop + remove each).
+ * Pass a record of `{ label: container | undefined }`.
+ */
+export function cleanupContainers(
+  containers: Record<string, Container | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, c] of Object.entries(containers)) {
+    if (!c) continue;
+    tasks.push({ label: `${label}.stop`, fn: () => c.stop() });
+    tasks.push({ label: `${label}.remove`, fn: () => c.remove() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for test environments (tearDown each).
+ * Pass a record of `{ label: env | undefined }`.
+ */
+export function cleanupEnvs(
+  envs: Record<string, { tearDown: () => Promise<void> } | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, env] of Object.entries(envs)) {
+    if (!env) continue;
+    tasks.push({ label: `${label}.tearDown`, fn: () => env.tearDown() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for gateway runner instances (stop + destroy each).
+ * Pass a record of `{ label: runner | undefined }`.
+ */
+export function cleanupGatewayRunners(
+  runners: Record<
+    string,
+    | { stop: () => Promise<unknown>; destroy: () => Promise<unknown> }
+    | undefined
+  >,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, r] of Object.entries(runners)) {
+    if (!r) continue;
+    tasks.push({ label: `${label}.stop`, fn: () => r.stop() });
+    tasks.push({ label: `${label}.destroy`, fn: () => r.destroy() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for SATPGateway instances (shutdown each).
+ * Pass a record of `{ label: gateway | undefined }`.
+ */
+export function cleanupGateways(
+  gateways: Record<string, { shutdown: () => Promise<unknown> } | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, gw] of Object.entries(gateways)) {
+    if (!gw) continue;
+    tasks.push({ label: `${label}.shutdown`, fn: () => gw.shutdown() });
+  }
+  return tasks;
+}
+
+/**
+ * Build cleanup tasks for Knex client instances (destroy each).
+ * Pass a record of `{ label: client | undefined }`.
+ */
+export function cleanupKnexClients(
+  clients: Record<string, { destroy: () => Promise<unknown> } | undefined>,
+): CleanupTask[] {
+  const tasks: CleanupTask[] = [];
+  for (const [label, c] of Object.entries(clients)) {
+    if (!c) continue;
+    tasks.push({ label: `${label}.destroy`, fn: () => c.destroy() });
+  }
+  return tasks;
+}
 
 export const CI_TEST_TIMEOUT = 900000;
 const testFilesDirectory = `${__dirname}/../../../cache/`;
@@ -293,9 +440,49 @@ export interface PGDatabaseConfig {
   postgresDB?: string;
 }
 
+export interface PGDatabaseResult {
+  /** Config using localhost:<mapped_host_port> — use from Jest process */
+  hostConfig: Knex.Config;
+  /** Config using <internal_ip>:5432 — use for inter-container comms */
+  networkConfig: Knex.Config;
+  container: Container;
+  /** @deprecated Use hostConfig for host-side or networkConfig for containers */
+  config: Knex.Config;
+}
+
+/**
+ * Polls a TCP socket until a connection to PostgreSQL succeeds from the host,
+ * confirming that Docker's port mapping is actually reachable — not just that
+ * pg_isready passed inside the container.
+ */
+async function waitForPgHostConnectivity(
+  host: string,
+  port: number,
+  timeoutMs: number,
+): Promise<void> {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    const ok = await new Promise<boolean>((resolve) => {
+      const sock = net.createConnection({ host, port });
+      sock.once("connect", () => {
+        sock.destroy();
+        resolve(true);
+      });
+      sock.once("error", () => resolve(false));
+      sock.setTimeout(2000, () => {
+        sock.destroy();
+        resolve(false);
+      });
+    });
+    if (ok) return;
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+  throw new Error(`PG not reachable at ${host}:${port} after ${timeoutMs}ms`);
+}
+
 export async function createPGDatabase(
   config: PGDatabaseConfig,
-): Promise<{ config: Knex.Config; container: Container }> {
+): Promise<PGDatabaseResult> {
   const {
     network,
     postgresUser = "postgres",
@@ -325,7 +512,7 @@ export async function createPGDatabase(
     }
   }
 
-  const hostConfig: Docker.HostConfig = {
+  const dockerHostConfig: Docker.HostConfig = {
     PublishAllPorts: true,
     Binds: [],
     NetworkMode: network,
@@ -351,7 +538,7 @@ export async function createPGDatabase(
         ExposedPorts: {
           ["5432/tcp"]: {},
         },
-        HostConfig: hostConfig,
+        HostConfig: dockerHostConfig,
         Healthcheck: healthCheck,
         Env: [
           `POSTGRES_USER=${postgresUser}`,
@@ -372,10 +559,11 @@ export async function createPGDatabase(
 
       try {
         const startedAt = Date.now();
+        const PG_READY_TIMEOUT_MS = 180_000;
         let isHealthy = false;
         do {
-          if (Date.now() >= startedAt + 60000) {
-            throw new Error(`${fnTag} timed out (${60000}ms)`);
+          if (Date.now() >= startedAt + PG_READY_TIMEOUT_MS) {
+            throw new Error(`${fnTag} timed out (${PG_READY_TIMEOUT_MS}ms)`);
           }
 
           const containerInfos = await docker.listContainers({});
@@ -402,39 +590,77 @@ export async function createPGDatabase(
     });
   });
 
+  const resolvedContainer = await container;
   const containerData = await docker
-    .getContainer((await container).id)
+    .getContainer(resolvedContainer.id)
     .inspect();
+
+  const internalIp =
+    containerData.NetworkSettings.Networks[network || "bridge"].IPAddress;
+  const pgPortBindings = containerData.NetworkSettings.Ports["5432/tcp"];
+  const mappedHostPort = parseInt(pgPortBindings[0].HostPort, 10);
+
+  // Verify actual host-to-PG TCP connectivity before returning
+  await waitForPgHostConnectivity("127.0.0.1", mappedHostPort, 30_000);
 
   const migrationSource = await createMigrationSource();
 
+  const hostConfig: Knex.Config = {
+    client: "pg",
+    connection: {
+      host: "127.0.0.1",
+      port: mappedHostPort,
+      user: postgresUser,
+      password: postgresPassword,
+      database: postgresDB,
+      ssl: false,
+    },
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  };
+
+  const networkConfig: Knex.Config = {
+    client: "pg",
+    connection: {
+      host: internalIp,
+      port: 5432,
+      user: postgresUser,
+      password: postgresPassword,
+      database: postgresDB,
+      ssl: false,
+    },
+    migrations: {
+      migrationSource: migrationSource,
+    },
+  };
+
   return {
-    config: {
-      client: "pg",
-      connection: {
-        host: containerData.NetworkSettings.Networks[network || "bridge"]
-          .IPAddress,
-        user: postgresUser,
-        password: postgresPassword,
-        database: postgresDB,
-        port: 5432,
-        ssl: false,
-      },
-      migrations: {
-        migrationSource: migrationSource,
-      },
-    } as Knex.Config,
-    container: await container,
+    hostConfig,
+    networkConfig,
+    config: hostConfig,
+    container: resolvedContainer,
   };
 }
 
 export async function setupDBTable(config: Knex.Config): Promise<void> {
-  const knexInstanceClient = knex(config);
-  try {
-    await knexInstanceClient.migrate.latest();
-  } finally {
-    // Properly release connections to avoid pool exhaustion
-    await knexInstanceClient.destroy();
+  const maxRetries = 3;
+  const retryDelayMs = 3000;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const knexInstanceClient = knex(config);
+    try {
+      await knexInstanceClient.migrate.latest();
+      return;
+    } catch (err) {
+      if (attempt === maxRetries) throw err;
+      console.warn(
+        `setupDBTable attempt ${attempt}/${maxRetries} failed, retrying...`,
+        (err as Error).message,
+      );
+      await new Promise((r) => setTimeout(r, retryDelayMs));
+    } finally {
+      await knexInstanceClient.destroy();
+    }
   }
 }
 
