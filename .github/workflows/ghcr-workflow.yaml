@@ -19,6 +19,11 @@ concurrency:
   group: ghcr-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Docker builds run locally (no registry push from CI) and trivy runs in
+# table mode (no SARIF upload), so checkout-only suffices.
+permissions:
+  contents: read
+
 jobs:
     ghcr-besu-all-in-one:
       runs-on: ubuntu-22.04

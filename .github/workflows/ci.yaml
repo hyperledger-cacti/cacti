@@ -17,6 +17,18 @@ env:
   RUN_CODE_COVERAGE: true
   NODE_OPTIONS: --max-old-space-size=8192
 
+# Top-level cap for every reusable workflow called from this file.
+# Must be >= the union of all transitively reachable job-level scopes.
+# `contents: write` is required by `cpl-connector-besu` (connector-packages)
+# and `cactus-cmd-api-server` (core-packages) because they push benchmark
+# results to the gh-pages branch on main and write commit-comment alerts.
+# `actions: read` is used by the benchmark cache restore.
+# `checks: write` is used by dorny/test-reporter inside jest-runner.
+permissions:
+  contents: write
+  actions: read
+  checks: write
+
 jobs:
   env-setup:
     outputs:

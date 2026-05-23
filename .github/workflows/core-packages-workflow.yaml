@@ -22,6 +22,15 @@ concurrency:
   group: core-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Default for every job in this workflow: read-only checkout/build plus
+# `checks: write` for dorny/test-reporter inside the jest-runner action.
+# Jobs that need more (e.g. `cactus-cmd-api-server` pushing benchmark data)
+# declare their own job-level `permissions:` block.
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   cactus-api-client:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-api-client')
@@ -57,6 +66,14 @@ jobs:
 
   cactus-cmd-api-server:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-cmd-api-server')
+    # Override of the workflow-level default. Required scopes:
+    #   contents: write     -> auto-push to gh-pages on main + commit-comment alerts
+    #   actions: read       -> restore previous benchmark from actions/cache
+    #   checks: write       -> dorny/test-reporter in jest-runner action
+    permissions:
+      contents: write
+      actions: read
+      checks: write
     continue-on-error: false
     env:
       JEST_TEST_PATTERN: packages/cactus-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts

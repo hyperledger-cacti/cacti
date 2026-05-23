@@ -18,6 +18,10 @@ concurrency:
   group: checks-and-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# actionlint, dco-lint, and codegen only need to read the checkout.
+permissions:
+  contents: read
+
 jobs: 
   ActionLint:
     uses: ./.github/workflows/actionlint.yaml
