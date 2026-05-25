@@ -282,7 +282,7 @@ Weaver provides an SDK to help you adapt your applications to exercise the vario
 
 To import and use the Weaver SDK, you need to add the following dependency to the `dependencies` section of your Node.js application's `package.json` file:
 ```json
-"@hyperledger/cacti-weaver-sdk-fabric": "latest",
+"@hyperledger-cacti/cacti-weaver-sdk-fabric": "latest",
 ```
 (Instead of `latest`, you can select a particular version from the [package website](https://github.com/hyperledger-cacti/cacti/pkgs/npm/cacti-weaver-sdk-fabric).)
 
@@ -300,7 +300,7 @@ First, you must incorporate some code for Weaver's network administration, speci
 
 A Fabric network channel must share its security domain (or membership) configuration, i.e., its organizations' CA certificate chains, with a foreign network with which it seeks to interoperate. Each organization must run an IIN Agent for this purpose. The set of IIN Agents, a.k.a. the _local membership_ must be recorded in the ledger before those agents can be operational. In your Fabric network application suite, one or more applications will exist for network administration; the following code snippet should be added in at least one of those applications to record local membership as a prerequisite for interoperability:
   ```typescript
-  import { MembershipManager } from '@hyperledger/cacti-weaver-sdk-fabric'
+  import { MembershipManager } from '@hyperledger-cacti/cacti-weaver-sdk-fabric'
 
   const gateway = <get-fabric-network-gateway-instance>
 
@@ -329,7 +329,7 @@ Consider a scenario inspired by the [global trade use case](../../user-stories/g
 
 You will need to insert some code in the Layer-2 application that accepts a B/L and submits a `RecordBillOfLading` transaction in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `interopFlow` function offered by the [cacti-weaver-sdk-fabric](https://github.com/hyperledger-cacti/cacti/pkgs/npm/cacti-weaver-sdk-fabric) library (there's an [equivalent library in Golang](https://github.com/hyperledger-cacti/cacti/releases/tag/weaver%2Fsdks%2Ffabric%2Fgo-sdk%2Fv2.0.0) too). The following code sample illustrates this (the Golang equivalent is left to the reader):
 ```js
-const ihelper = require('@hyperledger/cacti-weaver-sdk-fabric').InteroperableHelper;
+const ihelper = require('@hyperledger-cacti/cacti-weaver-sdk-fabric').InteroperableHelper;
 const interopcc = <handle-to-fabric-interop-chaincode>;   // Use Fabric SDK functions: (new Gateway()).getNetwork(...).getContract(<fabric-interop-chaincode-id>)
 const keyCert = await ihelper.getKeyAndCertForRemoteRequestbyUserName(<wallet>, <user-id>);      // Read key and certificate for <user-id> from wallet (get handle using Fabric SDK Wallets API)
 // Collect view addresses for relay requests in the context of an interop flow
@@ -408,7 +408,7 @@ Let's take an example of asset exchange between `Alice` and `Bob`, where Bob wan
       
 `Alice` needs to select a secret text (say `s`), and hash it (say `H`) using say `SHA512`, which will be used to lock her asset in `BondNetwork`. At the place in your application where an asset exchange is to be initiated, you need to add code to enable Alice to lock the non-fungible asset using hash `H` and timeout duration of 10 minutes:
 ```typescript
-import { AssetManager, HashFunctions } from '@hyperledger/cacti-weaver-sdk-fabric'
+import { AssetManager, HashFunctions } from '@hyperledger-cacti/cacti-weaver-sdk-fabric'
 
 const hash = HashFunctions.SHA512();    // Create Hash instance of one of the supported Hash Algorithm
 hash.setSerializedHashBase64(H);        // Set the Hash
@@ -535,8 +535,8 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   RELAY_NAME=<"name" in config.toml>
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-relay-server
-  DOCKER_TAG=2.1.0
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-relay-server
+  DOCKER_TAG=3.0.0-alpha
   ```
     - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
     - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
@@ -629,8 +629,8 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   INTEROP_CHAINCODE=<interop-chaincode-name>
   EXTERNAL_NETWORK=<docker-bridge-network>
   TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-driver-fabric
-  DOCKER_TAG=2.1.0
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-driver-fabric
+  DOCKER_TAG=3.0.0-alpha
   DRIVER_TLS=<true|false>
   DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
   DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver
@@ -769,7 +769,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   SYNC_PERIOD=<repeated_auto_sync_interval>
   AUTO_SYNC=<true/false>
   TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-iin-agent
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-iin-agent
   DOCKER_TAG=<iin-agent-docker-image-version>
   EXTERNAL_NETWORK=<docker-bridge-network>
   ```

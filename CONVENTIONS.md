@@ -372,7 +372,7 @@ support.
 The `weaver/` subtree is a separate interoperability framework with its own
 SDKs, drivers, and sample applications integrated into the monorepo workspace.
 Weaver packages are published under the `cacti-weaver-` prefix (e.g.,
-`@hyperledger/cacti-weaver-sdk-fabric`, `@hyperledger/cacti-weaver-iin-agent`).
+`@hyperledger-cacti/cacti-weaver-sdk-fabric`, `@hyperledger-cacti/cacti-weaver-iin-agent`).
 
 ### API Server
 

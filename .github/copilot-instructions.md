@@ -6,7 +6,7 @@ Blockchain interoperability monorepo. See [CONVENTIONS.md](../../CONVENTIONS.md)
 
 - **Monorepo**: Yarn 4 + Lerna; packages in `packages/`, `examples/`, `extensions/`, `weaver/`.
 - **Language**: TypeScript, ES2022, CommonJS, strict mode.
-- **Scope**: `@hyperledger/cacti-*` (new) or `@hyperledger/cactus-*` (legacy).
+- **Scope**: `@hyperledger-cacti/cacti-*` (new) or `@hyperledger/cactus-*` (legacy).
 - **Style**: Prettier — 2-space, double quotes, semicolons, 80 cols, trailing commas.
 - **Tests**: Jest, `src/test/typescript/{unit,integration}/`, `*.test.ts`.
 - **APIs**: OpenAPI 3.x at `src/main/json/openapi.json`, generated Axios clients.
