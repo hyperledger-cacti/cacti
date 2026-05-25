@@ -17,7 +17,10 @@ import { NetworkConfig } from "stellar-plus/lib/stellar-plus/network";
 import { PluginLedgerConnectorStellar } from "../../../../../main/typescript/plugin-ledger-connector-stellar";
 import http from "http";
 import { Network } from "stellar-plus/lib/stellar-plus";
-import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  Constants,
+  PluginImportType,
+} from "@hyperledger-cacti/cactus-core-api";
 import { v4 as uuidV4 } from "uuid";
 import express from "express";
 import { Server as SocketIoServer } from "socket.io";
