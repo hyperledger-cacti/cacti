@@ -101,7 +101,7 @@
     "jest-extended": "7.0.0",
     "js-yaml": "4.1.0",
     "socket.io": "4.6.2",
-    "uuid": "10.0.0",
+    "uuid": "14.0.0",
     "web3-eth-accounts": "4.1.1",
     "web3-utils": "4.3.3"
   },
