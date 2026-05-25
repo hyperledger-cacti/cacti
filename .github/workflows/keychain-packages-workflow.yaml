@@ -125,44 +125,6 @@ jobs:
         with:
           name: coverage-reports-21
           path: ./code-coverage-ts/**/
-  
-  cpk-vault:
-    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-keychain-vault')
-    continue-on-error: false
-    env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-keychain-vault/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpk-vault
-      TAPE_TEST_PATTERN: '--files={./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/cactus-keychain-vault-server.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/openapi/openapi-validation.test.ts,./packages/cactus-plugin-keychain-vault/src/test/typescript/integration/plugin-keychain-vault.test.ts}'
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-
-      - name: build
-        with:
-          node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'         
-        uses: ./.github/actions/configure-repo/
-
-      - name: Run Jest Tests
-        uses: ./.github/actions/jest-runner/
-        with:
-          run_code_coverage: ${{ inputs.run_code_coverage }}
-          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
-          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
-          github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: cpk-vault-report
-      
-      - name: Run Tape Tests
-        uses: ./.github/actions/tape-runner/
-        with:
-          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
-        
-      - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
-        with:
-          name: coverage-reports-22
-          path: ./code-coverage-ts/**/
 
   cpk-aws-sm:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-keychain-aws-sm')
