@@ -60,7 +60,7 @@
     "@hyperledger/cactus-test-tooling": "2.1.0",
     "kubo-rpc-client": "3.0.1",
     "typescript-optional": "2.0.1",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@types/uuid": "10.0.0"
