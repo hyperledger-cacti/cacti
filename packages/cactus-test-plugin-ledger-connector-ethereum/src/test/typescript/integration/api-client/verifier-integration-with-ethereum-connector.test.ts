@@ -38,7 +38,10 @@ import {
   AuthorizationProtocol,
   ConfigService,
 } from "@hyperledger-cacti/cactus-cmd-api-server";
-import { Verifier, VerifierFactory } from "@hyperledger-cacti/cactus-verifier-client";
+import {
+  Verifier,
+  VerifierFactory,
+} from "@hyperledger-cacti/cactus-verifier-client";
 import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   GethTestLedger,

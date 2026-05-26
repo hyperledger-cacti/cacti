@@ -1,7 +1,11 @@
 import { Observable, ReplaySubject } from "rxjs";
 import { finalize } from "rxjs/operators";
 const { Socket, io, SocketOptions } = require("socket.io-client-fixed-types");
-import { Logger, Checks, IAsyncProvider } from "@hyperledger-cacti/cactus-common";
+import {
+  Logger,
+  Checks,
+  IAsyncProvider,
+} from "@hyperledger-cacti/cactus-common";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import {

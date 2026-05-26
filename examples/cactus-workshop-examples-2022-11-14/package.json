@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cactus-workshop-examples-2022-11-14",
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "description": "Cacti Workshop 2022-11-14 Examples",
   "keywords": [
     "Hyperledger",
@@ -53,11 +53,11 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger-cacti/cactus-cmd-api-server": "2.1.0",
-    "@hyperledger-cacti/cactus-common": "2.1.0",
-    "@hyperledger-cacti/cactus-core": "2.1.0",
-    "@hyperledger-cacti/cactus-core-api": "2.1.0",
-    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-cmd-api-server": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-common": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-core": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-core-api": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-test-tooling": "3.0.0-alpha",
     "kubo-rpc-client": "3.0.1",
     "typescript-optional": "2.0.1",
     "uuid": "10.0.0"

@@ -16,7 +16,7 @@
     "weaver/samples/besu/simpleasset",
     "weaver/samples/besu/simplestate"
   ],
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "npmClient": "yarn",
   "useWorkspaces": "true",
   "command": {

@@ -10,12 +10,12 @@
     "x-logo": {
       "altText": "Cacti logo",
       "backgroundColor": "#fafafa",
-      "url": "https://github.com/hyperledger/cacti/blob/main/images/HL_Cacti_Logo_Color.png"
+      "url": "https://github.com/hyperledger-cacti/cacti/blob/main/images/HL_Cacti_Logo_Color.png"
     }
   },
   "externalDocs": {
     "description": "For more information about the SATP Gateway Client, refer to the official documentation.",
-    "url": "https://github.com/hyperledger/cacti/tree/main/packages/cactus-plugin-satp-hermes/README.md"
+    "url": "https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-satp-hermes/README.md"
   },
   "servers": [
     {

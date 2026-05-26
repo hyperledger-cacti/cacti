@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-alpha) (2026-05-26)
+
+### Bug Fixes
+
+* renaming JS/TS package namespaces ([94e52db](https://github.com/hyperledger-cacti/cacti/commit/94e52dba6456ccdbc5e6d201e4d67c13fd2d7cfc))
+
+### Features
+
+* **ledger-browser:** show fabric network structure ([ccf25d1](https://github.com/hyperledger-cacti/cacti/commit/ccf25d111a9d016e32ebd0daa8e0b59dc6b1b5ae)), closes [#3837](https://github.com/hyperledger-cacti/cacti/issues/3837) [#3554](https://github.com/hyperledger-cacti/cacti/issues/3554)
+
 # [2.0.0](https://github.com/hyperledger/cacti/compare/v2.0.0-rc.7...v2.0.0) (2024-10-15)
 
 **Note:** Version bump only for package @hyperledger/cacti-ledger-browser
