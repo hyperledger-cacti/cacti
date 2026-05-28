@@ -9,6 +9,100 @@ This document tracks SATP version updates.
 - 🐛 [Open issues](https://github.com/hyperledger-cacti/cacti/issues?q=is%3Aissue%20state%3Aopen%20label%3AIETF-SATP-Hermes)
 - 🏁 [Milestones](https://github.com/hyperledger-cacti/cacti/milestones)
 
+## SATP v0.1.0-alpha
+
+> Previous release: [satp/v0.0.4-beta](https://github.com/hyperledger-cacti/cacti/releases/tag/satp%2Fv0.0.4-beta) (commit [`0c120549`](https://github.com/hyperledger-cacti/cacti/commit/0c120549fd4dc0b8e47e044cdd855d920bdaf1f3))
+>
+> Full diff: [`satp/v0.0.4-beta...satp/v0.1.0-alpha`](https://github.com/hyperledger-cacti/cacti/compare/satp/v0.0.4-beta...satp/v0.1.0-alpha)
+
+
+### 🌟 Key highlights
+
+- **Critical DB write safety**: Fix missing `await` on `storeProof()` and `persistLogEntry()` calls across all stage services (Stage 0, 2, and 3), preventing silent proof loss and crash recovery inconsistencies ([`d82dfa520`](https://github.com/hyperledger-cacti/cacti/commit/d82dfa520), [`e6b005251`](https://github.com/hyperledger-cacti/cacti/commit/e6b005251), issues [#4177](https://github.com/hyperledger-cacti/cacti/issues/4177), [#4167](https://github.com/hyperledger-cacti/cacti/issues/4167))
+- **Stage 3 body verifier fix**: Restore `commonBodyVerifier` enforcement in Stage 3 server service — all SATP protocol checks (version, sequence number, session id, gateway pubkeys, hash chain integrity, message type) are now correctly applied before critical blockchain operations ([`e6b005251`](https://github.com/hyperledger-cacti/cacti/commit/e6b005251))
+- **Audit endpoint improvements**: Enhancements to the audit endpoint API ([`11a6ad1da`](https://github.com/hyperledger-cacti/cacti/commit/11a6ad1da))
+- **CI/CD hardening**: CI permissions fixes, test reporter integration, vulnerability fixes in GitHub Actions ([`a70b4ae84`](https://github.com/hyperledger-cacti/cacti/commit/a70b4ae84), [#4150](https://github.com/hyperledger-cacti/cacti/pull/4150))
+- **Security**: Remove stale Corda 4.6 test image default ([`d6e85365f`](https://github.com/hyperledger-cacti/cacti/commit/d6e85365f))
+
+
+## What's Changed
+
+### ✨ Features
+
+- feat(satp-hermes): add audit endpoint improvements by Rodolfo Carapau ([`11a6ad1da`](https://github.com/hyperledger-cacti/cacti/commit/11a6ad1da))
+
+### 🐛 Bug Fixes
+
+- fix(satp-hermes): await async DB writes in Stage 0 and Stage 2 by [@mn-ram](https://github.com/mn-ram) ([`d82dfa520`](https://github.com/hyperledger-cacti/cacti/commit/d82dfa520)) (issue [#4177](https://github.com/hyperledger-cacti/cacti/issues/4177))
+- fix(satp-hermes): await Stage 3 DB writes and restore body verifier by [@mn-ram](https://github.com/mn-ram) ([`e6b005251`](https://github.com/hyperledger-cacti/cacti/commit/e6b005251)) (issue [#4167](https://github.com/hyperledger-cacti/cacti/issues/4167))
+- fix(api-server): use Promise.allSettled in shutdown by [@mn-ram](https://github.com/mn-ram) ([`3505e735c`](https://github.com/hyperledger-cacti/cacti/commit/3505e735c))
+- fix(security): remove stale corda 4.6 test image default by [@malsomesh9](https://github.com/malsomesh9) ([`d6e85365f`](https://github.com/hyperledger-cacti/cacti/commit/d6e85365f))
+
+### 📝 Documentation
+
+- docs: add PULL.md by [@RafaelAPB](https://github.com/RafaelAPB) ([`ceade1864`](https://github.com/hyperledger-cacti/cacti/commit/ceade1864))
+- docs: add AI agents and guidelines by [@RafaelAPB](https://github.com/RafaelAPB) ([`ecd393865`](https://github.com/hyperledger-cacti/cacti/commit/ecd393865))
+- docs(build): sync published build guide with repo instructions by Rahul Tripathi ([`b530f1943`](https://github.com/hyperledger-cacti/cacti/commit/b530f1943))
+- docs(setup): fix developer setup, docker instructions, and local CI steps by Dev10-sys ([`d4832928e`](https://github.com/hyperledger-cacti/cacti/commit/d4832928e))
+
+### 🧪 Tests
+
+- test(satp-hermes): fix tests by [@RafaelAPB](https://github.com/RafaelAPB) ([`eea3bb9f4`](https://github.com/hyperledger-cacti/cacti/commit/eea3bb9f4))
+
+### ⚙️ CI / CD
+
+- ci: fix ci permissions and add test reporter by [@RafaelAPB](https://github.com/RafaelAPB) ([`a70b4ae84`](https://github.com/hyperledger-cacti/cacti/commit/a70b4ae84))
+- ci(gh-actions): vulnerability fixes in several actions by [@VRamakrishna](https://github.com/VRamakrishna) in [#4150](https://github.com/hyperledger-cacti/cacti/pull/4150)
+- ci: enhance commitlint workflow and increase line length limits by [@sandeepnRES](https://github.com/sandeepnRES) ([`49476abdd`](https://github.com/hyperledger-cacti/cacti/commit/49476abdd))
+- fix(ci): update compute-affected-packages.cjs by [@RafaelAPB](https://github.com/RafaelAPB) ([`15ac724d0`](https://github.com/hyperledger-cacti/cacti/commit/15ac724d0))
+- ci: fix dependent issues and dev container jobs by [@RafaelAPB](https://github.com/RafaelAPB) ([`ce90509e6`](https://github.com/hyperledger-cacti/cacti/commit/ce90509e6))- ci: fix ci by [@RafaelAPB](https://github.com/RafaelAPB) ([`482e0a33d`](https://github.com/hyperledger-cacti/cacti/commit/482e0a33d))
+- ci: delete dependent issues job by [@RafaelAPB](https://github.com/RafaelAPB) ([`5028c87cf`](https://github.com/hyperledger-cacti/cacti/commit/5028c87cf))
+### 🧹 Chores / Maintenance
+
+- chore: archive packages by [@RafaelAPB](https://github.com/RafaelAPB) ([`13148f610`](https://github.com/hyperledger-cacti/cacti/commit/13148f610))
+- chore: update yarn by [@RafaelAPB](https://github.com/RafaelAPB) ([`1837c1d26`](https://github.com/hyperledger-cacti/cacti/commit/1837c1d26))
+- chore(root): fix broken scripts and update documentation year by Dev10-sys ([`090ffef36`](https://github.com/hyperledger-cacti/cacti/commit/090ffef36))
+- build(deps): consolidate npm_and_yarn group updates across all dirs by [@sandeepnRES](https://github.com/sandeepnRES) ([`9fd9b6e1a`](https://github.com/hyperledger-cacti/cacti/commit/9fd9b6e1a))
+
+## 📊 Release Summary
+
+| Metric | Value |
+|--------|-------|
+| 🏷️ **Tag** | `satp/v0.1.0-alpha` |
+| ⏮️ **Previous tag** | [`satp/v0.0.4-beta`](https://github.com/hyperledger-cacti/cacti/releases/tag/satp%2Fv0.0.4-beta) |
+| 📅 **Date range** | 2026-04-13 (v0.0.4-beta) — 2026-05-28 |
+| 🔢 **SATP commits** | 4 |
+| 🔢 **Total commits** | 26 |
+| 📁 **SATP files changed** | 63 |
+| ➕ **SATP lines added** | +4,236 |
+| ➖ **SATP lines removed** | −795 |
+| 👥 **Contributors** | 9 |
+
+### 📈 Contributions by type
+
+| Category | Count |
+|----------|------:|
+| ✨ Features | 1 |
+| 🐛 Bug Fixes | 4 |
+| 📝 Documentation | 4 |
+| 🧪 Tests | 1 |
+| ⚙️ CI / CD | 7 |
+| 🧹 Chores / Maintenance | 4 |
+
+## 👥 Contributors
+
+- [@RafaelAPB](https://github.com/RafaelAPB)
+- [@mn-ram](https://github.com/mn-ram)
+- Rodolfo Carapau
+- [@sandeepnRES](https://github.com/sandeepnRES)
+- [@VRamakrishna](https://github.com/VRamakrishna)
+- [@malsomesh9](https://github.com/malsomesh9)
+- Dev10-sys
+- Rahul Tripathi
+- Michal Bajer
+
+---
+
 ## SATP v0.0.4-beta
 
 > Release tracking issue: [chore(satp-hermes): release 0.0.4-beta #4021](https://github.com/hyperledger-cacti/cacti/issues/4021)
