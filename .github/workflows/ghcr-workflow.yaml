@@ -33,11 +33,16 @@ jobs:
             fetch-depth: 0
         - id: changed
           run: |
-            git fetch origin ${{ github.base_ref }}
-            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
-
-            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
-            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            BASE_REF="${{ github.base_ref }}"
+            if [[ -z "$BASE_REF" ]]; then
+              # workflow_dispatch / schedule: build everything
+              echo "files=tools/docker/ .github/workflows/" >> "$GITHUB_OUTPUT"
+            else
+              git fetch origin "$BASE_REF"
+              BASE=$(git merge-base HEAD "origin/$BASE_REF")
+              FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+              echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            fi
         - name: ghcr.io/hyperledger/cactus-besu-all-in-one
           if: contains(steps.changed.outputs.files, 'tools/docker/besu-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
@@ -57,11 +62,15 @@ jobs:
             fetch-depth: 0
         - id: changed
           run: |
-            git fetch origin ${{ github.base_ref }}
-            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
-
-            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
-            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            BASE_REF="${{ github.base_ref }}"
+            if [[ -z "$BASE_REF" ]]; then
+              echo "files=tools/docker/ .github/workflows/" >> "$GITHUB_OUTPUT"
+            else
+              git fetch origin "$BASE_REF"
+              BASE=$(git merge-base HEAD "origin/$BASE_REF")
+              FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+              echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            fi
         - name: ghcr.io/hyperledger/cactus-corda-all-in-one-flowdb
           if: contains(steps.changed.outputs.files, 'tools/docker/corda-all-in-one/corda-v4_8-flowdb/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
@@ -76,11 +85,15 @@ jobs:
             fetch-depth: 0
         - id: changed
           run: |
-            git fetch origin ${{ github.base_ref }}
-            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
-
-            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
-            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            BASE_REF="${{ github.base_ref }}"
+            if [[ -z "$BASE_REF" ]]; then
+              echo "files=.devcontainer/ .github/workflows/" >> "$GITHUB_OUTPUT"
+            else
+              git fetch origin "$BASE_REF"
+              BASE=$(git merge-base HEAD "origin/$BASE_REF")
+              FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+              echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            fi
         - name: Use Node.js ${{ inputs.node_version }}
           if: contains(steps.changed.outputs.files, '.devcontainer/') || contains(steps.changed.outputs.files, '.github/workflows/')
           uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
@@ -109,11 +122,15 @@ jobs:
             fetch-depth: 0
         - id: changed
           run: |
-            git fetch origin ${{ github.base_ref }}
-            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
-
-            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
-            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            BASE_REF="${{ github.base_ref }}"
+            if [[ -z "$BASE_REF" ]]; then
+              echo "files=tools/docker/ .github/workflows/" >> "$GITHUB_OUTPUT"
+            else
+              git fetch origin "$BASE_REF"
+              BASE=$(git merge-base HEAD "origin/$BASE_REF")
+              FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+              echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            fi
         - name: ghcr.io/hyperledger/cactus-fabric2-all-in-one
           if: contains(steps.changed.outputs.files, 'tools/docker/fabric-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
@@ -126,11 +143,15 @@ jobs:
             fetch-depth: 0
         - id: changed
           run: |
-            git fetch origin ${{ github.base_ref }}
-            BASE=$(git merge-base HEAD origin/${{ github.base_ref }})
-
-            FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
-            echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            BASE_REF="${{ github.base_ref }}"
+            if [[ -z "$BASE_REF" ]]; then
+              echo "files=tools/docker/ .github/workflows/" >> "$GITHUB_OUTPUT"
+            else
+              git fetch origin "$BASE_REF"
+              BASE=$(git merge-base HEAD "origin/$BASE_REF")
+              FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
+              echo "files=$FILES" >> "$GITHUB_OUTPUT"
+            fi
         - name: ghcr.io/hyperledger/daml-all-in-one
           if: contains(steps.changed.outputs.files, 'tools/docker/daml-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/daml-all-in-one/ -f ./tools/docker/daml-all-in-one/Dockerfile
