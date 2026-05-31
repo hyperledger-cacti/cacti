@@ -195,8 +195,9 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         oracleApiClient.getOracleTaskStatus("test-task-id"),
       ).rejects.toMatchObject({
         response: {
+          status: 404,
           data: expect.objectContaining({
-            message: expect.stringContaining("InternalServerError"),
+            message: expect.stringContaining("NotFound"),
             error: expect.stringContaining("test-task-id not found"),
           }),
         },
