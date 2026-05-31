@@ -149,51 +149,11 @@ jobs:
           name: coverage-reports-9
           path: ./code-coverage-ts/**/
 
-  ce-supply-chain-backend:
-    if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-supply-chain-backend')}}
-    continue-on-error: false
-    env:
-      JEST_TEST_PATTERN: examples/cactus-example-supply-chain-backend/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ce-supply-chain-backend
-      TAPE_TEST_PATTERN: '--files={./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-backend-api-calls.test.ts,./examples/cactus-example-supply-chain-backend/src/test/typescript/integration/supply-chain-cli-via-npm-script.test.ts}'
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+  # ce-supply-chain-backend job removed: package depends on
+  # @hyperledger/cacti-plugin-consortium-static@2.1.0 which is not published
+  # to npm. Tests are skipped via testPathIgnorePatterns in jest.config.js
+  # as part of the package archival cleanup (PR #4152).
 
-      - name: CI environment clean-up
-        run: ./tools/ci-env-clean-up.sh
-
-      - uses: ./.github/actions/docker-pull/
-        with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
-
-      - name: build
-        with:
-          node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'         
-        uses: ./.github/actions/configure-repo/
-
-      - name: Run Jest Tests
-        uses: ./.github/actions/jest-runner/
-        with:
-          run_code_coverage: ${{ inputs.run_code_coverage }}
-          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
-          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
-          github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: ce-supply-chain-backend-report
-      
-      - name: Run Tape Tests
-        uses: ./.github/actions/tape-runner/
-        with:
-          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
-        
-      - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
-        with:
-          name: coverage-reports-10
-          path: ./code-coverage-ts/**/
-  
   ce-supply-chain-business-logic-plugin:
     if: ${{ contains(fromJson(inputs.affected-packages), 'examples/cactus-example-supply-chain-business-logic-plugin')}}
     continue-on-error: false
