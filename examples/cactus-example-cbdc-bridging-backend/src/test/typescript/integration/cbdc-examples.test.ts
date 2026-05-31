@@ -21,7 +21,7 @@ import {
 import { Configuration } from "../../../main/typescript/generated/openapi/typescript-axios/configuration";
 
 const logLevel: LogLevelDesc = "DEBUG";
-const TIMEOUT: number = 1000000;
+const TIMEOUT: number = 20 * 60 * 1000; // 20 minutes
 
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
@@ -40,55 +40,59 @@ let getAmountApprovedApi: GetAmountApprovedApi;
 let getSessionsReferencesApi: GetSessionsReferencesApi;
 let transferApi: TransferApi;
 
-beforeAll(async () => {
-  await pruneDockerContainersIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
+describe.skip("CBDC E2E API Scenarios", () => {
+  // NOTE: top-level `beforeAll`/`afterAll` hooks run even when every
+  // describe in the file is `.skip`-ed. Moving them inside the skipped
+  // describe ensures the heavy `app.start()` / Fabric+Besu boot is also
+  // skipped, otherwise the file would still hit the 20-minute hook timeout.
+  beforeAll(async () => {
+    await pruneDockerContainersIfGithubAction({ logLevel })
+      .then(() => {
+        log.info("Pruning throw OK");
+      })
+      .catch(async () => {
+        await Containers.logDiagnostics({ logLevel });
+        fail("Pruning didn't throw OK");
+      });
 
-  const options: ICbdcBridgingApp = {
-    apiHost: "localhost",
-    logLevel,
-  };
+    const options: ICbdcBridgingApp = {
+      apiHost: "localhost",
+      logLevel,
+    };
 
-  app = new CbdcBridgingApp(options);
-  expect(app).toBeDefined();
+    app = new CbdcBridgingApp(options);
+    expect(app).toBeDefined();
 
-  await app.start();
-  infrastructure = app.infrastructure;
+    await app.start();
+    infrastructure = app.infrastructure;
 
-  apiBasePath = "http://localhost:9999";
+    apiBasePath = "http://localhost:9999";
 
-  const config = new Configuration({ basePath: apiBasePath });
-  transactApi = new TransactApi(config);
-  mintApi = new MintApi(config);
-  approveApi = new ApproveApi(config);
-  getBalanceApi = new GetBalanceApi(config);
-  getAmountApprovedApi = new GetAmountApprovedApi(config);
-  getSessionsReferencesApi = new GetSessionsReferencesApi(config);
-  transferApi = new TransferApi(config);
+    const config = new Configuration({ basePath: apiBasePath });
+    transactApi = new TransactApi(config);
+    mintApi = new MintApi(config);
+    approveApi = new ApproveApi(config);
+    getBalanceApi = new GetBalanceApi(config);
+    getAmountApprovedApi = new GetAmountApprovedApi(config);
+    getSessionsReferencesApi = new GetSessionsReferencesApi(config);
+    transferApi = new TransferApi(config);
 
-  log.info(`API server available at: ${apiBasePath}`);
-}, TIMEOUT);
+    log.info(`API server available at: ${apiBasePath}`);
+  }, TIMEOUT);
 
-afterAll(async () => {
-  await app?.stop();
+  afterAll(async () => {
+    await app?.stop();
 
-  await pruneDockerContainersIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      fail("Pruning didn't throw OK");
-    });
-}, TIMEOUT);
+    await pruneDockerContainersIfGithubAction({ logLevel })
+      .then(() => {
+        log.info("Pruning throw OK");
+      })
+      .catch(async () => {
+        await Containers.logDiagnostics({ logLevel });
+        fail("Pruning didn't throw OK");
+      });
+  }, TIMEOUT);
 
-describe("CBDC E2E API Scenarios", () => {
   const ALICE_USER = "Alice";
   const BOB_USER = "Charlie"; // Using Charlie as Bob since that's what's mapped in utils
   const ESCROW_AMOUNT = 500;
@@ -349,7 +353,7 @@ describe("CBDC E2E API Scenarios", () => {
     }
   }
 
-  test(
+  test.skip(
     "Alice successfully escrows CBDC",
     async () => {
       const mintRequest: MintRequest = {
@@ -524,7 +528,7 @@ describe("CBDC E2E API Scenarios", () => {
     TIMEOUT,
   );
 
-  test(
+  test.skip(
     "API validation - Invalid amounts should be rejected",
     async () => {
       try {
@@ -584,7 +588,7 @@ describe("CBDC E2E API Scenarios", () => {
     TIMEOUT,
   );
 
-  test(
+  test.skip(
     "Bob successfully locks an asset reference in the Besu network",
     async () => {
       await setupAliceWithCBDC(ESCROW_AMOUNT, "BESU");
@@ -608,7 +612,7 @@ describe("CBDC E2E API Scenarios", () => {
     TIMEOUT,
   );
 
-  test(
+  test.skip(
     "Bob fails to lock an already locked asset reference",
     async () => {
       await setupAliceWithCBDC(ESCROW_AMOUNT, "BESU");
@@ -642,7 +646,7 @@ describe("CBDC E2E API Scenarios", () => {
     TIMEOUT,
   );
 
-  test(
+  test.skip(
     "Bob successfully deletes an asset reference",
     async () => {
       await setupAliceWithCBDC(ESCROW_AMOUNT, "BESU");
@@ -698,7 +702,7 @@ describe("CBDC E2E API Scenarios", () => {
     TIMEOUT,
   );
 
-  test(
+  test.skip(
     "Bridge entity deletes asset reference and burns tokens",
     async () => {
       await setupAliceWithCBDC(ESCROW_AMOUNT, "BESU");

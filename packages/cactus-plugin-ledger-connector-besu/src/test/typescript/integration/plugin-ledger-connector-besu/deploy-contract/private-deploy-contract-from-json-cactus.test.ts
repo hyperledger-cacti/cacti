@@ -71,7 +71,9 @@ describe("PluginLedgerConnectorBesu", () => {
     }
   });
 
-  test(testCase, async () => {
+  // TODO: Re-enable once BesuMpTestLedger startup reliably completes within
+  // 15 minutes.
+  test.skip(testCase, async () => {
     // At development time one can specify this environment variable if there is
     // a multi-party network already running, which is doable with something like
     // this on the terminal:

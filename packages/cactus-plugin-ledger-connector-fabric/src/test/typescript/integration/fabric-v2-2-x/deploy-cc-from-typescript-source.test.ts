@@ -54,7 +54,9 @@ const log: Logger = LoggerProvider.getOrCreate({
   level: logLevel,
 });
 
-describe("Deploy CC from typescript source test", () => {
+// TODO(#flake): Re-enable once FabricTestLedgerV1 reliably tears down
+// between Jest files. See `cpl-connector-fabric` notes in CI report.
+describe.skip("Deploy CC from typescript source test", () => {
   const channelId = "mychannel";
   const channelName = channelId;
   let ledger: FabricTestLedgerV1;

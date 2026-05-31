@@ -99,6 +99,7 @@ export class FabricTestEnvironment {
   private coreFile: FileBase64 | undefined;
 
   private level: LogLevelDesc;
+  private removeSignalHandlers: (() => void) | null = null;
 
   private constructor(
     satpContractName: string,
@@ -130,10 +131,28 @@ export class FabricTestEnvironment {
       logLevel: this.level,
     });
 
-    const docker = new Docker();
-
     const container = await this.ledger.start();
 
+    // Register signal handlers so the Fabric container is always torn down,
+    // even when Jest kills the worker process on a test timeout (SIGTERM) or
+    // the user interrupts the run (SIGINT).  The handlers are removed in
+    // tearDown() to prevent double-cleanup on a normal afterAll path.
+    // Note: FabricTestLedgerV1 binds fixed host ports (7050, 7051, …) so only
+    // one container can run at a time; any orphaned container blocks new runs.
+    // See: https://github.com/hyperledger-cacti/cacti/issues/3978
+    const onSignal = () => {
+      void this.tearDown().catch((err) => {
+        this.log.warn("FabricTestEnvironment: signal tearDown failed:", err);
+      });
+    };
+    process.once("SIGTERM", onSignal);
+    process.once("SIGINT", onSignal);
+    this.removeSignalHandlers = () => {
+      process.removeListener("SIGTERM", onSignal);
+      process.removeListener("SIGINT", onSignal);
+    };
+
+    const docker = new Docker();
     const containerData = await docker
       .getContainer((await container).id)
       .inspect();
@@ -1047,6 +1066,12 @@ export class FabricTestEnvironment {
 
   // Stops and destroys the test ledger
   public async tearDown(): Promise<void> {
+    // Deregister signal handlers first so a concurrent signal doesn't trigger
+    // a second tearDown while this one is already running.
+    if (this.removeSignalHandlers) {
+      this.removeSignalHandlers();
+      this.removeSignalHandlers = null;
+    }
     try {
       await this.ledger.stop();
     } catch (err) {

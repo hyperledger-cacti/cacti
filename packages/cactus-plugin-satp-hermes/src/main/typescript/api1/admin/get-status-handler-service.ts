@@ -106,8 +106,8 @@ export async function executeGetStatus(
       logger.error(`${fnTag}, Error getting status: ${error.message}`);
       throw error;
     } else {
-      logger.error(`${fnTag}, Unexpected error: ${error.message}`);
-      throw new Error("An unexpected error occurred while obtaining status.");
+      logger.error(`${fnTag}, Unexpected error: ${String(error)}`);
+      throw error;
     }
   }
 }
