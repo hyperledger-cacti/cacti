@@ -29,7 +29,10 @@ import {
   PluginLedgerConnectorEthereum,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { pruneDockerAllIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
-import { Verifier, VerifierFactory } from "@hyperledger-cacti/cactus-verifier-client";
+import {
+  Verifier,
+  VerifierFactory,
+} from "@hyperledger-cacti/cactus-verifier-client";
 
 import http from "http";
 import express from "express";
