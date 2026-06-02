@@ -8,7 +8,10 @@ import { Network } from "stellar-plus/lib/stellar-plus";
 import { NetworkConfig } from "stellar-plus/lib/stellar-plus/network";
 import { pluginName } from "..";
 import { PluginFactoryLedgerConnector } from "../../../../../main/typescript/plugin-factory-ledger-connector";
-import { Constants, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  Constants,
+  PluginImportType,
+} from "@hyperledger-cacti/cactus-core-api";
 import { PluginLedgerConnectorStellar } from "../../../../../main/typescript/plugin-ledger-connector-stellar";
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { v4 as uuidV4 } from "uuid";
