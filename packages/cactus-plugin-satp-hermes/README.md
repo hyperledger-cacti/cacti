@@ -62,6 +62,46 @@ curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
+### Alternative: Use Nix
+
+If you prefer a reproducible development environment, use Nix instead of installing toolchains globally.
+
+1. Install [nix](https://nixos.org/download/).
+2. Enable flakes (one-time setup):
+  ```sh
+  mkdir -p ~/.config/nix
+  echo "experimental-features = nix-command flakes" >> ~/.config/nix/nix.conf
+  ```
+3. Enter the SATP Hermes Nix shell from this package directory:
+  ```sh
+  nix develop
+  ```
+  This opens a subshell with Node, Yarn, Go, Rust, Foundry, and other required tools pinned by the flake.
+
+4. Verify you are inside the Nix environment:
+  ```sh
+  echo "$IN_NIX_SHELL"
+  which node yarn go forge
+  ```
+  The binaries should resolve to paths under `/nix/store/...`.
+
+5. Install workspace dependencies from the monorepo root:
+  ```sh
+  cd ../..
+  yarn run configure
+  ```
+
+Common commands:
+```sh
+yarn run test
+yarn run build
+yarn run lint
+```
+
+To leave the Nix shell:
+```sh
+exit
+```
 
 Know how to use the following plugins of the project:
 

@@ -82,6 +82,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.7
 
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+
       - uses: ./.github/actions/docker-pull/
         with:
           image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
