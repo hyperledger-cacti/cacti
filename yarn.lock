@@ -7159,7 +7159,7 @@ __metadata:
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:11.2.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7286,10 +7286,10 @@ __metadata:
     ts-loader: "npm:9.5.1"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     webpack: "npm:5.104.1"
     webpack-cli: "npm:5.1.4"
-    webpack-dev-server: "npm:5.1.0"
+    webpack-dev-server: "npm:5.2.4"
   languageName: unknown
   linkType: soft
 
@@ -7347,7 +7347,7 @@ __metadata:
     prom-client: "npm:15.1.3"
     safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -7381,7 +7381,7 @@ __metadata:
     socket.io-client-fixed-types: "npm:4.5.4"
     stellar-plus: "npm:0.8.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7487,11 +7487,11 @@ __metadata:
     google-protobuf: "npm:3.21.4"
     jest: "npm:29.6.2"
     pkg: "npm:5.8.1"
-    protobufjs: "npm:7.4.0"
+    protobufjs: "npm:8.4.2"
     ts-jest: "npm:29.1.1"
     ts-node: "npm:10.9.1"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     winston: "npm:3.10.0"
   bin:
     fabric-cli: bin/fabric-cli
@@ -7526,7 +7526,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7594,7 +7594,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7698,7 +7698,7 @@ __metadata:
     tape-promise: "npm:4.0.0"
     ts-node: "npm:10.9.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7781,7 +7781,7 @@ __metadata:
     sanitize-html: "npm:2.12.1"
     secp256k1: "npm:5.0.1"
     sha3: "npm:2.1.4"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7833,7 +7833,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7869,10 +7869,10 @@ __metadata:
     jose: "npm:4.15.5"
     json-stable-stringify: "npm:1.0.2"
     openapi-types: "npm:12.1.3"
-    qs: "npm:6.14.2"
+    qs: "npm:6.15.2"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -7898,7 +7898,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8027,7 +8027,7 @@ __metadata:
     ts-results: "npm:3.3.0"
     typescript: "npm:5.8.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -8069,7 +8069,7 @@ __metadata:
     tape-promise: "npm:4.0.0"
     tar-fs: "npm:3.0.10"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-core: "npm:1.6.1"
   languageName: unknown
   linkType: soft
@@ -8096,7 +8096,7 @@ __metadata:
     openapi-types: "npm:12.1.3"
     run-time-error-cjs: "npm:1.4.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8145,7 +8145,7 @@ __metadata:
     stream-http: "npm:3.2.0"
     tls-browserify: "npm:0.2.2"
     tslib: "npm:2.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     zone.js: "npm:0.14.7"
   languageName: unknown
   linkType: soft
@@ -8184,7 +8184,7 @@ __metadata:
     safe-stable-stringify: "npm:2.5.0"
     socket.io: "npm:4.6.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -8218,7 +8218,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-eth-abi: "npm:4.2.1"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -8291,7 +8291,7 @@ __metadata:
     prom-client: "npm:15.1.3"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8319,7 +8319,7 @@ __metadata:
     openapi-types: "npm:12.1.3"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8345,7 +8345,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8365,7 +8365,7 @@ __metadata:
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     prom-client: "npm:15.1.3"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8390,7 +8390,7 @@ __metadata:
     npm-run-all2: "npm:6.1.2"
     prom-client: "npm:15.1.3"
     rxjs: "npm:7.8.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8423,7 +8423,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8461,7 +8461,7 @@ __metadata:
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
-    protobufjs: "npm:7.4.0"
+    protobufjs: "npm:8.4.2"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
@@ -8469,7 +8469,7 @@ __metadata:
     tape-promise: "npm:4.0.0"
     tsx: "npm:4.16.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -8497,7 +8497,7 @@ __metadata:
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
     sanitize-html: "npm:2.12.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8530,7 +8530,7 @@ __metadata:
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
     urlcat: "npm:3.1.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8569,7 +8569,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-eth: "npm:4.4.0"
     web3-eth-accounts: "npm:4.1.1"
@@ -8646,7 +8646,7 @@ __metadata:
     tar-fs: "npm:3.0.10"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     ws-identity-client: "npm:1.0.2"
     ws-wallet: "npm:1.1.5"
   languageName: unknown
@@ -8680,7 +8680,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     undici: "npm:7.24.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8724,7 +8724,7 @@ __metadata:
     temp: "npm:0.9.1"
     tslint: "npm:6.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8747,7 +8747,7 @@ __metadata:
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8773,7 +8773,7 @@ __metadata:
     tape: "npm:5.6.1"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -8805,7 +8805,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8836,7 +8836,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.0.3"
     web3-eth-accounts: "npm:4.0.3"
     web3-utils: "npm:4.3.0"
@@ -8869,7 +8869,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8979,7 +8979,7 @@ __metadata:
     npm-run-all: "npm:4.1.5"
     pg: "npm:8.13.1"
     prettier: "npm:3.2.5"
-    protobufjs: "npm:7.2.5"
+    protobufjs: "npm:8.4.2"
     puppeteer: "npm:24.23.0"
     reflect-metadata: "npm:0.2.2"
     run-time-error-cjs: "npm:1.4.0"
@@ -8995,7 +8995,7 @@ __metadata:
     typedoc: "npm:0.28.13"
     typescript: "npm:5.5.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -9016,7 +9016,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -9035,7 +9035,7 @@ __metadata:
     express-jwt-authz: "npm:2.4.1"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9074,7 +9074,7 @@ __metadata:
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-eth-abi: "npm:4.0.3"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -9101,7 +9101,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     key-encoder: "npm:2.0.3"
     tape-promise: "npm:4.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
   languageName: unknown
@@ -9121,7 +9121,7 @@ __metadata:
     "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -9147,7 +9147,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     key-encoder: "npm:2.0.3"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
@@ -9172,7 +9172,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
     lodash: "npm:4.18.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-eth-contract: "npm:4.2.0"
   languageName: unknown
@@ -9229,7 +9229,7 @@ __metadata:
     tar-stream: "npm:2.2.0"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -9256,7 +9256,7 @@ __metadata:
     express: "npm:5.1.0"
     log4js: "npm:6.4.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.7.3"
     web3-core: "npm:1.7.3"
     web3-eth-accounts: "npm:4.0.3"
@@ -9314,7 +9314,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     kubo-rpc-client: "npm:3.0.1"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -13804,7 +13804,98 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-schema@npm:^2.7.0":
+"@peculiar/asn1-cms@npm:^2.6.0, @peculiar/asn1-cms@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-cms@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    "@peculiar/asn1-x509-attr": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/01515f46db97b1d5f8b0d2c181f10571efb91e11e0c034b49121c8f50ff76d6538eba04311d04347f180639a72818f3ac1c96a089eea9a1689e5cc5ee31a4117
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-csr@npm:^2.6.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-csr@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/d966d58d0104a6833b442080ef2663172730fd95928b95c5a84f5b86963eeeaa13435ee8e8d97612a3a1fef532c714b868ceb082a6f253186606efecfaa88a0c
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-ecc@npm:^2.6.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-ecc@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/c30736a867dd6facf7cf5090c9eace582b927c92cbc0dfd8787b3485e3012dc846b608d5d0c3c38df9e621e0c7fbe0bb2b96e7fa34c03b67f4b59fd3d6d4e8f4
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pfx@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-pfx@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.7.0"
+    "@peculiar/asn1-pkcs8": "npm:^2.7.0"
+    "@peculiar/asn1-rsa": "npm:^2.7.0"
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/ced7e9c4308d427ae9107df654f28b6e28b1bc963b059e1430459c49cee8d8da74338d251ac98d1af5efc98a0ff49fbec9f71073cdbf5e0ee7f93a40ba043f7e
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs8@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-pkcs8@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/9e8049e5fd9e35676c313ff0b88decb767c4d7ff09a0ab098ea1affa4b5076573b4e10fcd7968b1931b921b3107ede521c1b1bf91a1040ce454e6b44f32f3aa8
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-pkcs9@npm:^2.6.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-pkcs9@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.7.0"
+    "@peculiar/asn1-pfx": "npm:^2.7.0"
+    "@peculiar/asn1-pkcs8": "npm:^2.7.0"
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    "@peculiar/asn1-x509-attr": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/61b55f4b98e98ca659bb6ad5f043ca2fc9aa1c333372d91419251180d4332746aaed0f15975b6d9a131af3b6b066b90705b54b508c6854b6f2117fd3ab66a7a8
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-rsa@npm:^2.6.0, @peculiar/asn1-rsa@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-rsa@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/b314b77246a7bee0a2a76978ca08983a016afad78c74dc02b5ae6296f8a71f0146c521d431a9d6e9ba7faec42b5a8bba046ee4c9010cbd1b37067398e05e05af
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-schema@npm:^2.6.0, @peculiar/asn1-schema@npm:^2.7.0":
   version: 2.7.0
   resolution: "@peculiar/asn1-schema@npm:2.7.0"
   dependencies:
@@ -13812,6 +13903,30 @@ __metadata:
     asn1js: "npm:^3.0.6"
     tslib: "npm:^2.8.1"
   checksum: 10/2b18ee2f3de2b68a36b964721e5101f589d6a1db765c450ce5a929829bfc8c0819e0b128145f65639952b257b9bdaa6ce7d1a54cd93c7bf6e694fed4c36d6c98
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509-attr@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-x509-attr@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/asn1-x509": "npm:^2.7.0"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/7a1c4f707224cf8ebf33bb231049069cf6a64902d7b7b317b4a2f4f8a0fb606bb39f6af5944d408c4eb930e8ae1435c0049cc42490131cf991383714c179f1dd
+  languageName: node
+  linkType: hard
+
+"@peculiar/asn1-x509@npm:^2.6.0, @peculiar/asn1-x509@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "@peculiar/asn1-x509@npm:2.7.0"
+  dependencies:
+    "@peculiar/asn1-schema": "npm:^2.7.0"
+    "@peculiar/utils": "npm:^2.0.2"
+    asn1js: "npm:^3.0.6"
+    tslib: "npm:^2.8.1"
+  checksum: 10/6e6b1124076487e46d1b9f7237f173bc7aab92230e3a7a8b3841fdc84009ece0221624bd88fe16a478aec5b4ba21a9393735038ca4e38245d7f0c1be91f00e8c
   languageName: node
   linkType: hard
 
@@ -13843,6 +13958,25 @@ __metadata:
     tslib: "npm:^2.8.1"
     webcrypto-core: "npm:^1.9.2"
   checksum: 10/192ff15fb00b0c27bcce3842549224078db047276bffa4a3f2d7f1db441e4d0bd206fa14241804d5026fdc7d506f384a523d5b22de3881d7bc9afa61a26bea7d
+  languageName: node
+  linkType: hard
+
+"@peculiar/x509@npm:^1.14.2":
+  version: 1.14.3
+  resolution: "@peculiar/x509@npm:1.14.3"
+  dependencies:
+    "@peculiar/asn1-cms": "npm:^2.6.0"
+    "@peculiar/asn1-csr": "npm:^2.6.0"
+    "@peculiar/asn1-ecc": "npm:^2.6.0"
+    "@peculiar/asn1-pkcs9": "npm:^2.6.0"
+    "@peculiar/asn1-rsa": "npm:^2.6.0"
+    "@peculiar/asn1-schema": "npm:^2.6.0"
+    "@peculiar/asn1-x509": "npm:^2.6.0"
+    pvtsutils: "npm:^1.3.6"
+    reflect-metadata: "npm:^0.2.2"
+    tslib: "npm:^2.8.1"
+    tsyringe: "npm:^4.10.0"
+  checksum: 10/d37c56fa5f2c644141948d85010e14f0e4963089e3b0b81edd0bfe85bdfea0eb3f38ab6ff20d322db2bd6977117824cc498a77b2d35af111983b4d58b5e2ccd1
   languageName: node
   linkType: hard
 
@@ -17139,7 +17273,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express-serve-static-core@npm:^4.17.18, @types/express-serve-static-core@npm:^4.17.33":
+"@types/express-serve-static-core@npm:^4.17.18, @types/express-serve-static-core@npm:^4.17.21, @types/express-serve-static-core@npm:^4.17.33":
   version: 4.19.8
   resolution: "@types/express-serve-static-core@npm:4.19.8"
   dependencies:
@@ -17194,7 +17328,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:^4.17.13, @types/express@npm:^4.17.15, @types/express@npm:^4.17.18, @types/express@npm:^4.17.21":
+"@types/express@npm:^4.17.13, @types/express@npm:^4.17.15, @types/express@npm:^4.17.18, @types/express@npm:^4.17.25":
   version: 4.17.25
   resolution: "@types/express@npm:4.17.25"
   dependencies:
@@ -22455,6 +22589,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bytestreamjs@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "bytestreamjs@npm:2.0.1"
+  checksum: 10/523b1024e3f887cdc0b3db7c4fc14b8563aaeb75e6642a41991b3208277fd0ae9cd66003c73473fe706c42797bf0c3f1f498fb9880b431d75b332e5709d56a0c
+  languageName: node
+  linkType: hard
+
 "cacache@npm:^15.2.0":
   version: 15.3.0
   resolution: "cacache@npm:15.3.0"
@@ -24021,7 +24162,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"compression@npm:^1.7.4":
+"compression@npm:^1.7.4, compression@npm:^1.8.1":
   version: 1.8.1
   resolution: "compression@npm:1.8.1"
   dependencies:
@@ -30106,7 +30247,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express@npm:^4.10.6, express@npm:^4.14.0, express@npm:^4.16.3, express@npm:^4.17.1, express@npm:^4.17.3, express@npm:^4.19.2":
+"express@npm:^4.10.6, express@npm:^4.14.0, express@npm:^4.16.3, express@npm:^4.17.1, express@npm:^4.17.3, express@npm:^4.22.1":
   version: 4.22.2
   resolution: "express@npm:4.22.2"
   dependencies:
@@ -33263,7 +33404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:^2.1.0, html-entities@npm:^2.3.2, html-entities@npm:^2.4.0":
+"html-entities@npm:^2.1.0, html-entities@npm:^2.3.2":
   version: 2.6.0
   resolution: "html-entities@npm:2.6.0"
   checksum: 10/06d4e7a3ba6243bba558af176e56f85e09894b26d911bc1ef7b2b9b3f18b46604360805b32636f080e954778e9a34313d1982479a05a5aa49791afd6a4229346
@@ -33554,7 +33695,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"http-proxy-middleware@npm:^2.0.3":
+"http-proxy-middleware@npm:^2.0.3, http-proxy-middleware@npm:^2.0.9":
   version: 2.0.9
   resolution: "http-proxy-middleware@npm:2.0.9"
   dependencies:
@@ -44381,6 +44522,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pkijs@npm:^3.3.3":
+  version: 3.4.0
+  resolution: "pkijs@npm:3.4.0"
+  dependencies:
+    "@noble/hashes": "npm:1.4.0"
+    asn1js: "npm:^3.0.6"
+    bytestreamjs: "npm:^2.0.1"
+    pvtsutils: "npm:^1.3.6"
+    pvutils: "npm:^1.1.3"
+    tslib: "npm:^2.8.1"
+  checksum: 10/a937347584b27012919f69e4b3865b2fd09dced85a344f9a22bbf1376dd9e1534ccbe0bbdb997807b4990b07865c1ea028447d78b2c8a64436d4d393193a0777
+  languageName: node
+  linkType: hard
+
 "platform@npm:^1.3.3":
   version: 1.3.6
   resolution: "platform@npm:1.3.6"
@@ -46215,7 +46370,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pvutils@npm:^1.1.5":
+"pvutils@npm:^1.1.3, pvutils@npm:^1.1.5":
   version: 1.1.5
   resolution: "pvutils@npm:1.1.5"
   checksum: 10/9a5a71603c72bf9ea3a4501e8251e3f7a56026ed059bf63a18bd9a30cac6c35cc8250b39eb6291c1cb204cdeb6660663ab9bb2c74e85a512919bb2d614e340ea
@@ -46238,12 +46393,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:6.14.2":
-  version: 6.14.2
-  resolution: "qs@npm:6.14.2"
+"qs@npm:6.15.2":
+  version: 6.15.2
+  resolution: "qs@npm:6.15.2"
   dependencies:
     side-channel: "npm:^1.1.0"
-  checksum: 10/682933a85bb4b7bd0d66e13c0a40d9e612b5e4bcc2cb9238f711a9368cd22d91654097a74fff93551e58146db282c56ac094957dfdc60ce64ea72c3c9d7779ac
+  checksum: 10/7a934b2dba40654cf9878dab7c1e7ad56c6186265509727fbece67dadc38fd5d67715b61b6ef938e5a0475faeee701d18ec0a7ce420ad64367caad7f1bdb66e2
   languageName: node
   linkType: hard
 
@@ -47221,7 +47376,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"reflect-metadata@npm:0.2.2, reflect-metadata@npm:^0.2.0":
+"reflect-metadata@npm:0.2.2, reflect-metadata@npm:^0.2.0, reflect-metadata@npm:^0.2.2":
   version: 0.2.2
   resolution: "reflect-metadata@npm:0.2.2"
   checksum: 10/1c93f9ac790fea1c852fde80c91b2760420069f4862f28e6fae0c00c6937a56508716b0ed2419ab02869dd488d123c4ab92d062ae84e8739ea7417fae10c4745
@@ -48840,13 +48995,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selfsigned@npm:^2.1.1, selfsigned@npm:^2.4.1":
+"selfsigned@npm:^2.1.1":
   version: 2.4.1
   resolution: "selfsigned@npm:2.4.1"
   dependencies:
     "@types/node-forge": "npm:^1.3.0"
     node-forge: "npm:^1"
   checksum: 10/52536623f1cfdeb2f8b9198377f2ce7931c677ea69421238d1dc1ea2983bbe258e56c19e7d1af87035cad7270f19b7e996eaab1212e724d887722502f68e17f2
+  languageName: node
+  linkType: hard
+
+"selfsigned@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "selfsigned@npm:5.5.0"
+  dependencies:
+    "@peculiar/x509": "npm:^1.14.2"
+    pkijs: "npm:^3.3.3"
+  checksum: 10/fe9be2647507c3ee21dcaf5cab20e1ae4b8b84eac83d2fe4d82f9a3b6c70636f9aaeeba0089e3343dcb13fbb31ef70c2e72c41f2e2dcf38368040b49830c670e
   languageName: node
   linkType: hard
 
@@ -52914,7 +53079,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsyringe@npm:^4.8.0":
+"tsyringe@npm:^4.10.0, tsyringe@npm:^4.8.0":
   version: 4.10.0
   resolution: "tsyringe@npm:4.10.0"
   dependencies:
@@ -54108,12 +54273,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:10.0.0, uuid@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "uuid@npm:10.0.0"
+"uuid@npm:14.0.0, uuid@npm:^11.1.0 || ^12 || ^13 || ^14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
-    uuid: dist/bin/uuid
-  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
+    uuid: dist-node/bin/uuid
+  checksum: 10/8ee9b98f9650e25555515f7a28d3c3ae9364e72f7bb19b9e08b681bc135338beba5509b2830f6ae1cfaba4d45401da0d16d4d109b977097bc3d6ba0c5583341b
   languageName: node
   linkType: hard
 
@@ -54142,21 +54307,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "uuid@npm:10.0.0"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
+  languageName: node
+  linkType: hard
+
 "uuid@npm:^11.1.0":
   version: 11.1.1
   resolution: "uuid@npm:11.1.1"
   bin:
     uuid: dist/esm/bin/uuid
   checksum: 10/16411d3dc12a08d6691616c09a75e66a7f900ba1beef6628a76fe0602f82fae2ee537b564d0b7bc95c24f58d059ca9b58c75a1e806118efb50e17822ff00ddd2
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^11.1.0 || ^12 || ^13 || ^14.0.0":
-  version: 14.0.0
-  resolution: "uuid@npm:14.0.0"
-  bin:
-    uuid: dist-node/bin/uuid
-  checksum: 10/8ee9b98f9650e25555515f7a28d3c3ae9364e72f7bb19b9e08b681bc135338beba5509b2830f6ae1cfaba4d45401da0d16d4d109b977097bc3d6ba0c5583341b
   languageName: node
   linkType: hard
 
@@ -56334,13 +56499,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-dev-server@npm:5.1.0":
-  version: 5.1.0
-  resolution: "webpack-dev-server@npm:5.1.0"
+"webpack-dev-server@npm:5.2.4":
+  version: 5.2.4
+  resolution: "webpack-dev-server@npm:5.2.4"
   dependencies:
     "@types/bonjour": "npm:^3.5.13"
     "@types/connect-history-api-fallback": "npm:^1.5.4"
-    "@types/express": "npm:^4.17.21"
+    "@types/express": "npm:^4.17.25"
+    "@types/express-serve-static-core": "npm:^4.17.21"
     "@types/serve-index": "npm:^1.9.4"
     "@types/serve-static": "npm:^1.15.5"
     "@types/sockjs": "npm:^0.3.36"
@@ -56349,18 +56515,17 @@ __metadata:
     bonjour-service: "npm:^1.2.1"
     chokidar: "npm:^3.6.0"
     colorette: "npm:^2.0.10"
-    compression: "npm:^1.7.4"
+    compression: "npm:^1.8.1"
     connect-history-api-fallback: "npm:^2.0.0"
-    express: "npm:^4.19.2"
+    express: "npm:^4.22.1"
     graceful-fs: "npm:^4.2.6"
-    html-entities: "npm:^2.4.0"
-    http-proxy-middleware: "npm:^2.0.3"
+    http-proxy-middleware: "npm:^2.0.9"
     ipaddr.js: "npm:^2.1.0"
     launch-editor: "npm:^2.6.1"
     open: "npm:^10.0.3"
     p-retry: "npm:^6.2.0"
     schema-utils: "npm:^4.2.0"
-    selfsigned: "npm:^2.4.1"
+    selfsigned: "npm:^5.5.0"
     serve-index: "npm:^1.9.1"
     sockjs: "npm:^0.3.24"
     spdy: "npm:^4.0.2"
@@ -56375,7 +56540,7 @@ __metadata:
       optional: true
   bin:
     webpack-dev-server: bin/webpack-dev-server.js
-  checksum: 10/f23255681cc5e2c2709b23ca7b2185aeed83b1c9912657d4512eda8685625a46d7a103a92446494a55fe2afdfab936f9bd4f037d20b52f7fdfff303e7e7199c7
+  checksum: 10/5e5382f8cc7a73e2957542de0c755769548cbca8e7c6d17ed6b526364f11af35025be74f03827afa6723ccbdcc93730b0a0a59882d332fb3c6694a6d290c41e7
   languageName: node
   linkType: hard
 

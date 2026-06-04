@@ -60,7 +60,7 @@
     "@hyperledger/cactus-common": "2.1.0",
     "@hyperledger/cactus-core": "2.1.0",
     "@hyperledger/cactus-core-api": "2.1.0",
-    "axios": "1.15.0",
+    "axios": "1.15.2",
     "bl": "6.1.0",
     "bn.js": "4.12.0",
     "dockerode": "3.3.0",
@@ -95,7 +95,7 @@
     "tar-fs": "3.0.10",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
-    "uuid": "10.0.0",
+    "uuid": "14.0.0",
     "ws-identity-client": "1.0.2"
   },
   "devDependencies": {
