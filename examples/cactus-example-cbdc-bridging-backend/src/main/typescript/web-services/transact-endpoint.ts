@@ -17,6 +17,7 @@ import {
   registerWebServiceEndpoint,
 } from "@hyperledger/cactus-core";
 import { TransactRequest } from "../generated/openapi/typescript-axios/api";
+import createHttpError from "http-errors"; // Import createHttpError
 
 export class TransactEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "TransactEndpointV1";
@@ -77,13 +78,30 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: TransactRequest = req.body;
     this.log.debug("reqBody: ", reqBody);
+
+    // Validate reqBody.sender
+    if (!reqBody.sender) {
+      throw createHttpError(400, "Sender parameter is required.");
+    }
+
+    // Validate reqBody.receiver
+    if (!reqBody.receiver) {
+      throw createHttpError(400, "Receiver parameter is required.");
+    }
+
+    // Validate reqBody.amount
+    const amountNum = parseInt(reqBody.amount);
+    if (isNaN(amountNum)) {
+      throw createHttpError(400, "Invalid amount provided for transaction. Must be a number.");
+    }
+
     try {
       const result = await this.options.infrastructure.bridgeTokens(
         reqBody.sender,
         reqBody.receiver,
         reqBody.sourceChain.assetType!,
         reqBody.receiverChain.assetType!,
-        parseInt(reqBody.amount),
+        amountNum, // Use validated amountNum
       );
       res.status(200).json(result);
     } catch (ex) {

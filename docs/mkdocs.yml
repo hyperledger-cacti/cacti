@@ -194,6 +194,7 @@ nav:
     - Getting Started: guides/getting-started.md
     - Operations: guides/operations.md
     - Developers: guides/developers.md
+    - Error Handling: guides/error-handling.md
     - Upgrading: guides/upgrading.md
   - References:
     - Technical Specifications: references/specs.md

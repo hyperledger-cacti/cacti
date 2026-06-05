@@ -20,6 +20,7 @@ import {
   ApproveRequest,
   TransactRequestSourceChainAssetTypeEnum,
 } from "../generated/openapi/typescript-axios/api";
+import createHttpError from "http-errors"; // Import createHttpError
 
 export class ApproveEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "ApproveEndpointV1";
@@ -80,6 +81,13 @@ export class ApproveEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: ApproveRequest = req.body;
     this.log.debug("reqBody: ", reqBody);
+
+    // Validate reqBody.amount
+    const amountNum = parseInt(reqBody.amount);
+    if (isNaN(amountNum)) {
+      throw createHttpError(400, "Invalid amount provided for approval. Must be a number.");
+    }
+
     try {
       let result;
       if (
@@ -88,7 +96,7 @@ export class ApproveEndpointV1 implements IWebServiceEndpoint {
       ) {
         result = await this.options.infrastructure
           .getBesuEnvironment()
-          .approveNTokensBesu(reqBody.user, parseInt(reqBody.amount));
+          .approveNTokensBesu(reqBody.user, amountNum); // Use validated amountNum
       } else {
         result = await this.options.infrastructure
           .getFabricEnvironment()
