@@ -262,6 +262,8 @@
   ,"adress"
   ,"NFToken"
   ,"NFT"
+  ,"Jtis"
+  ,"jtis"
   ],
   "dictionaries": [
     "typescript,node,npm,go,rust"
