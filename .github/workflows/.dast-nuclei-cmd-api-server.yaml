@@ -80,7 +80,7 @@ jobs:
 
       - name: Run Besu all-in-one image
         run: |
-          docker run -d -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger-cacti/cactus-besu-all-in-one:v2.0.0-rc.7
+          docker run -d -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
           until curl --fail -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545; do sleep 5;  done
 
       - name: Print API Server Config File - ./.config.json
