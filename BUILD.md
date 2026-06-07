@@ -9,6 +9,9 @@
   - [Configure Cacti](#configure-cacti)
 - [Build Script Decision Tree](#build-script-decision-tree)
 - [Running CI Checks Locally Before Pushing](#running-ci-checks-locally-before-pushing)
+  - [Quick Checklist](#quick-checklist)
+  - [Individual Steps](#individual-steps)
+  - [Docker Tests](#docker-tests)
 - [Configuring SSH to use upterm](#configuring-ssh-to-use-upterm)
 
 ## Hyperledger Cacti Build Instructions
