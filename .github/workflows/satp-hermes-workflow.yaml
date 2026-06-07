@@ -82,10 +82,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.7
 
-      - uses: ./.github/actions/docker-pull/
-        with:
-          image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
-
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
@@ -244,13 +240,13 @@ jobs:
             jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
             jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
             github_secret: ${{ secrets.GITHUB_TOKEN }}
-            report_name: "satp-oracle-integration-tests-report"
+            report_name: "satp-admin-integration-tests-report"
 
         - name: Upload coverage reports as artifacts
           if: ${{ inputs.run_code_coverage == 'true' }}
           uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
           with:
-            name: coverage-reports-satp-hermes-oracle
+            name: coverage-reports-satp-hermes-admin
             path: ./code-coverage-ts/**/
 
   run-satp-tests-integration-gateway:
@@ -280,6 +276,10 @@ jobs:
       - uses: ./.github/actions/docker-pull/
         with:
           image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: rafaelapb/cacti-satp-hermes-gateway:612643f9f-2026-06-07
 
       - name: build
         with:
@@ -334,7 +334,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
+          image: rafaelapb/cacti-satp-hermes-gateway:612643f9f-2026-06-07
 
       - uses: ./.github/actions/docker-pull/
         with:
