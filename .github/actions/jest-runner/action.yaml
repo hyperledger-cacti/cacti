@@ -27,7 +27,7 @@ runs:
       shell: bash
       run: |
         mkdir -p reports
-        export JEST_JUNIT_OUTPUT="reports/${{ inputs.report_name }}.xml"
+        export JEST_JUNIT_OUTPUT_FILE="reports/${{ inputs.report_name }}.xml"
         yarn jest "${{ inputs.jest_test_pattern }}" \
           --coverage \
           --coverageDirectory="${{ inputs.jest_test_coverage_path }}" \
@@ -40,7 +40,7 @@ runs:
       shell: bash
       run: |
         mkdir -p reports
-        export JEST_JUNIT_OUTPUT="reports/${{ inputs.report_name }}.xml"
+        export JEST_JUNIT_OUTPUT_FILE="reports/${{ inputs.report_name }}.xml"
         yarn jest "${{ inputs.jest_test_pattern }}" \
           --reporters=default \
           --reporters=jest-junit \

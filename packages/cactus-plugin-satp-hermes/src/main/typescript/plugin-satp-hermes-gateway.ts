@@ -1126,10 +1126,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     await context.with(this.initialSpanContext.context, async () => {
       try {
-        await Promise.all([
-          this.createDBRepository(),
-          this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!),
-        ]);
+        await this.createDBRepository();
+        await this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!);
 
         // start everything before starting the GOL server
         await this.startupGOLServer();
@@ -1266,6 +1264,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         });
 
         await database.migrate.latest();
+        await this.oracleLogRepository.database.migrate.latest();
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

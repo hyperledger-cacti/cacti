@@ -32,7 +32,7 @@ import { exec } from "child_process";
 const [, , protocol, host, port, path] = process.argv;
 
 const thePath =
-  path ?? "/api/v1/@hyperledger/cactus-plugin-satp-hermes/healthcheck";
+  path ?? "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck";
 
 const url = `${protocol}://${host}:${port}${thePath}`;
 

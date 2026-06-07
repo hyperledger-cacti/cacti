@@ -296,7 +296,7 @@ export class SATPGatewayRunner implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 300000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 60000): Promise<void> {
     const fnTag = "SATPGatewayRunner#waitForHealthCheck()";
     const startedAt = Date.now();
     let isHealthy = false;
