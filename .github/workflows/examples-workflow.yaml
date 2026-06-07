@@ -229,8 +229,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          # TODO Replace with official image when available
-          image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
+          image: rafaelapb/cacti-satp-hermes-gateway:612643f9f-2026-06-07
 
       - name: build
         with:
