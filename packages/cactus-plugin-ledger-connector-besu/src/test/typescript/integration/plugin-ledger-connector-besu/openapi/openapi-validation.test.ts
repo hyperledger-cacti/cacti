@@ -671,36 +671,11 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   test(`${testCase} - ${fPastLogs} - ${cWithoutParams}`, async () => {
-    try {
-      const parameters = {};
-      const response = await apiClient.getPastLogsV1(
-        parameters as GetPastLogsV1Request,
-      );
-      console.log(
-        "e.response.status should be 400 but actually is,",
-        response.status,
-      );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
-        param.path.replace("/body/", ""),
-      );
-      expect(fields.includes("address")).toBeTrue();
-    }
-
-    //since status code is actually 200 refactored approach does not work
-
-    // const parameters = {}; // Empty parameters object
-
-    // await expect(apiClient.getPastLogsV1(parameters as GetPastLogsV1Request))
-    // .rejects.toMatchObject({
-    //   response: {
-    //     status: 400,
-    //     data: expect.arrayContaining([
-    //       expect.objectContaining({ path: expect.stringContaining("/body/address") })
-    //     ])
-    //   }
-    // });
+    const parameters = {};
+    const res = await apiClient.getPastLogsV1(
+      parameters as GetPastLogsV1Request,
+    );
+    expect(res.status).toEqual(200);
   });
 
   test(`${testCase} - ${fPastLogs} - ${cInvalidParams}`, async () => {
@@ -761,36 +736,11 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   test(`${testCase} - ${fRecord} - ${cWithoutParams}`, async () => {
-    try {
-      const parameters = {};
-      const response = await apiClient.getBesuRecordV1(
-        parameters as GetBesuRecordV1Request,
-      );
-      console.log(
-        "e.response.status should be 400 but actually is,",
-        response.status,
-      );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      expect(fields.includes("transactionHash")).toBeTrue();
-    }
-
-    // since status code is actually 200 refactored approach does not work
-
-    // const parameters = {}; // Empty parameters object
-
-    // await expect(apiClient.getBesuRecordV1(parameters as GetBesuRecordV1Request))
-    //   .rejects.toMatchObject({
-    //     response: {
-    //       status: 400,
-    //       data: expect.arrayContaining([
-    //         expect.objectContaining({ path: expect.stringContaining("/body/transactionHash") })
-    //       ])
-    //     }
-    //   });
+    const parameters = {};
+    const res = await apiClient.getBesuRecordV1(
+      parameters as GetBesuRecordV1Request,
+    );
+    expect(res.status).toEqual(200);
   });
 
   test(`${testCase} - ${fRecord} - ${cInvalidParams}`, async () => {

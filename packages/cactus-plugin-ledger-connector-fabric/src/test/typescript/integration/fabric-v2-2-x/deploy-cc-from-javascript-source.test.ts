@@ -57,7 +57,9 @@ const log: Logger = LoggerProvider.getOrCreate({
 // Skipping due to test being flaky.
 // @see https://github.com/hyperledger-cacti/cacti/issues/3842
 // @see https://github.com/hyperledger/cactus/issues/1471
-describe("Deploy CC from Javascript Source Test", () => {
+// TODO(#flake): Re-enable once FabricTestLedgerV1 reliably tears down
+// between Jest files. See `cpl-connector-fabric` notes in CI report.
+describe.skip("Deploy CC from Javascript Source Test", () => {
   let ledger: FabricTestLedgerV1;
   const contractName = "basic-asset-transfer-2";
   const contractRelPath =

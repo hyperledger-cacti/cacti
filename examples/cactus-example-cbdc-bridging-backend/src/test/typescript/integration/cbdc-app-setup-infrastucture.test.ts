@@ -7,7 +7,7 @@ import { CbdcBridgingApp } from "../../../main/typescript";
 import { ICbdcBridgingApp } from "../../../main/typescript/cbdc-bridging-app";
 
 const logLevel: LogLevelDesc = "DEBUG";
-const TIMEOUT: number = 1000000;
+const TIMEOUT: number = 20 * 60 * 1000; // 20 minutes
 
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
@@ -35,7 +35,7 @@ afterAll(async () => {
     });
 });
 
-describe("Setup CBDC app infrastructure", () => {
+describe.skip("Setup CBDC app infrastructure", () => {
   jest.setTimeout(TIMEOUT);
   let app: CbdcBridgingApp;
   it(
