@@ -106,14 +106,6 @@ jobs:
           if: contains(steps.changed.outputs.files, '.devcontainer/') || contains(steps.changed.outputs.files, '.github/workflows/')
           run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"
 
-    ghcr-example-supply-chain-app:
-      if: contains(fromJson(inputs.affected-packages), 'examples/cactus-example-supply-chain-backend')
-      runs-on: ubuntu-22.04
-      steps:
-        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-        - name: ghcr.io/hyperledger-cacti/cactus-example-supply-chain-app
-          run: DOCKER_BUILDKIT=1 docker build . -f ./examples/cactus-example-supply-chain-backend/Dockerfile -t cactus-example-supply-chain-app
-
     ghcr-fabric2-all-in-one:
       runs-on: ubuntu-22.04
       steps:

@@ -192,20 +192,6 @@ jobs:
         name: cactus-plugin-satp-hermes-kotlin-client-${{ env.GITVERSION }}.jar
         path: packages/cactus-plugin-satp-hermes/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
 
-    - name: build-cactus-example-supply-chain-business-logic-plugin-kotlin-client
-      run: |
-        WDIR=$(pwd)
-        cd "${WDIR}/examples/cactus-example-supply-chain-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client"
-        chmod +x gradlew
-        ./gradlew clean
-        ./gradlew build
-
-    - name: publish-cactus-example-supply-chain-business-logic-plugin-kotlin-client
-      uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
-      with:
-        name: cactus-example-supply-chain-business-logic-plugin-kotlin-client-${{ env.GITVERSION }}.jar
-        path: examples/cactus-example-supply-chain-business-logic-plugin/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
-
     - name: build-cactus-example-carbon-accounting-business-logic-plugin-kotlin-client
       run: |
         WDIR=$(pwd)
