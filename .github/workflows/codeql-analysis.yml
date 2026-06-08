@@ -17,6 +17,10 @@ jobs:
   analyze:
     name: Analyze
     runs-on: ubuntu-22.04
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
 
     strategy:
       fail-fast: false
@@ -67,4 +71,17 @@ jobs:
     #   make release
 
     - name: Perform CodeQL Analysis
+      id: analyze
       uses: github/codeql-action/analyze@b8d3b6e8af63cde30bdc382c0bc28114f4346c88 #v2
+      with:
+        output: sarif-results
+        category: "/language:${{ matrix.language }}"
+
+    - name: Dismiss alerts (inline suppressions)
+      if: github.ref == 'refs/heads/main'
+      uses: advanced-security/dismiss-alerts@046d6b48d2e43cf563f96f67332c47c432eff83e #v2.0.2
+      with:
+        sarif-id: ${{ steps.analyze.outputs.sarif-id }}
+        sarif-file: sarif-results/${{ matrix.language }}.sarif
+      env:
+        GITHUB_TOKEN: ${{ github.token }}

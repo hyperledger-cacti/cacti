@@ -54,6 +54,7 @@ export class CDLGateway {
       this.log.info(
         `Allowing self signed CDL API GW certificates (skipCertCheck=${skipCertCheck})`,
       );
+      // codeql[js/disabling-certificate-validation] - intentional: user explicitly opted in via skipCertCheck
       agentOptions.rejectUnauthorized = false;
     }
 
