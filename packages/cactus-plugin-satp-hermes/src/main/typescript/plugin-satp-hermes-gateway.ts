@@ -1266,6 +1266,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         });
 
         await database.migrate.latest();
+        await this.oracleLogRepository.database.migrate.latest();
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
