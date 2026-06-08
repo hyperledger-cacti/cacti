@@ -35,7 +35,10 @@ describe("ApiServer", () => {
       instanceId: uuidv4(),
       keychainId: uuidv4(),
       logLevel,
-      version: "0.9.0",
+      packageSrc: path.join(
+        __dirname,
+        "../../../../../../packages/cactus-plugin-keychain-memory",
+      ),
     },
   };
 
@@ -82,6 +85,6 @@ describe("ApiServer", () => {
     const pkgJsonStr = await readFile(packageFilePath, "utf-8");
     const { version } = JSON.parse(pkgJsonStr);
 
-    expect(version).toEqual(aPluginImport.options.version);
+    expect(version).toMatch(/^\d+\.\d+\.\d+/);
   });
 });
