@@ -279,7 +279,7 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: rafaelapb/cacti-satp-hermes-gateway:612643f9f-2026-06-07
+          image: rafaelapb/cacti-satp-hermes-gateway:2026-06-08-dev-529a736ea
 
       - name: build
         with:
@@ -334,7 +334,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: rafaelapb/cacti-satp-hermes-gateway:612643f9f-2026-06-07
+          image: rafaelapb/cacti-satp-hermes-gateway:2026-06-08-dev-529a736ea
 
       - uses: ./.github/actions/docker-pull/
         with:
