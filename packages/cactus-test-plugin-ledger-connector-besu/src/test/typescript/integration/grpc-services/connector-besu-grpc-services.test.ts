@@ -214,7 +214,8 @@ describe("BesuGrpcSvcOpenApi", () => {
     expect(block).toBeTruthy();
     expect(block).toBeObject();
     expect(block).not.toBeEmptyObject();
-    expect(block.number).toBeTruthy();
+    expect(typeof block.number).toBe("number");
+    expect(block.number).toBeGreaterThanOrEqual(0);
     expect(block.hash).toBeTruthy();
     expect(block.transactions).toBeArray();
   });

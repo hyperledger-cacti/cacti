@@ -44,8 +44,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-example-carbon-accounting-frontend",
   "@hyperledger-cacti/cactus-example-cbdc-bridging-backend",
   "@hyperledger-cacti/cacti-example-cbdc-bridging-frontend",
-  "@hyperledger-cacti/cactus-example-supply-chain-backend",
-  "@hyperledger-cacti/cactus-example-supply-chain-business-logic-plugin",
   "@hyperledger-cacti/cacti-weaver-protos-js",
   "@hyperledger-cacti/cacti-weaver-besu-cli",
   "@hyperledger-cacti/cacti-weaver-driver-fabric",
