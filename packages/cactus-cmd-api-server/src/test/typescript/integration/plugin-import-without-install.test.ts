@@ -119,7 +119,11 @@ describe("ApiServer", () => {
     apiSrvOpts.plugins = [plugin];
 
     const pluginPackageDir = path.join(pluginsPath, instanceId);
-    const versionToInstall = "0.10.0";
+    const localPkgSrc = path.join(
+      __dirname,
+      "../../../../../../packages/cactus-plugin-keychain-memory",
+    );
+    const versionToInstall = "2.1.0"; // local monorepo version
 
     await fs.mkdirp(pluginPackageDir);
     lmify.setPackageManager("npm");
@@ -127,7 +131,7 @@ describe("ApiServer", () => {
     // @ts-expect-error
     lmify.setRootDir(pluginPackageDir);
     const out = await lmify.install([
-      `${plugin.packageName}@${versionToInstall}`,
+      localPkgSrc,
       "--production",
       "--audit=false",
       "--progress=false",
@@ -184,7 +188,11 @@ describe("ApiServer", () => {
     apiSrvOpts.grpcPort = 0;
     apiSrvOpts.crpcPort = 0;
     apiSrvOpts.apiTlsEnabled = false;
-    const versionToInstall = "0.8.0";
+    const versionToInstall = "2.1.0"; // local monorepo version
+    const localPkgSrc = path.join(
+      __dirname,
+      "../../../../../../packages/cactus-plugin-keychain-memory",
+    );
     apiSrvOpts.plugins = [
       {
         packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
@@ -194,7 +202,7 @@ describe("ApiServer", () => {
           instanceId: randomUUID(),
           keychainId: randomUUID(),
           logLevel,
-          version: versionToInstall,
+          packageSrc: localPkgSrc,
         },
       },
     ];
