@@ -21,7 +21,6 @@ import {
   Web3SigningCredentialPrivateKeyHex,
 } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
-import { EthereumLeaf } from "../../bridge/leafs/ethereum-leaf";
 import { LedgerType } from "@hyperledger/cactus-core-api";
 import {
   ClaimFormatError,
@@ -102,7 +101,7 @@ export class OracleEVM extends OracleAbstract {
       ledgerType: options.networkIdentification.ledgerType,
     };
 
-    this.id = this.options.leafId || this.createId(EthereumLeaf.CLASS_NAME);
+    this.id = this.options.leafId || this.createId(OracleEVM.CLASS_NAME);
     this.keyPair = options.keyPair || Secp256k1Keys.generateKeyPairsBuffer();
 
     this.claimFormats = options.claimFormats
@@ -115,7 +114,7 @@ export class OracleEVM extends OracleAbstract {
 
     if (isWeb3SigningCredentialNone(options.signingCredential)) {
       throw new NoSigningCredentialError(
-        `${EthereumLeaf.CLASS_NAME}#constructor, options.signingCredential`,
+        `${OracleEVM.CLASS_NAME}#constructor, options.signingCredential`,
       );
     }
     this.signingCredential = options.signingCredential;
