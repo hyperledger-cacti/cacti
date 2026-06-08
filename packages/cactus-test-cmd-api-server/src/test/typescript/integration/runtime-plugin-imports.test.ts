@@ -49,6 +49,10 @@ describe(testCase, () => {
           instanceId: uuidv4(),
           keychainId: uuidv4(),
           logLevel,
+          packageSrc: path.join(
+            __dirname,
+            "../../../../../../packages/cactus-plugin-keychain-memory",
+          ),
         },
       },
     ];
@@ -67,6 +71,10 @@ describe(testCase, () => {
           instanceId: uuidv4(),
           keychainId: uuidv4(),
           logLevel,
+          packageSrc: path.join(
+            __dirname,
+            "../../../../../../packages/cactus-plugin-keychain-memory",
+          ),
         },
       },
     ];
