@@ -184,47 +184,12 @@ export { IBesuNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-types
  * Ethereum Network Configuration - Ethereum mainnet and compatible network integration options.
  *
  * @description
- * Configuration interfaces for connecting SATP gateways to Ethereum networks,
+ * Configuration interface for connecting SATP gateways to Ethereum networks,
  * enabling cross-chain asset transfers between Ethereum and other supported networks.
  *
  * @see {@link INetworkOptions} for general network configuration interface
- * @see {@link EthereumLeaf} for the Ethereum bridge leaf implementation
- * @see {@link OracleEVM} for Ethereum oracle implementation
  */
-export {
-  IEthereumNetworkConfig,
-  IEthereumLeafOptions,
-} from "./cross-chain-mechanisms/bridge/bridge-types";
-
-/**
- * Ethereum Bridge Leaf - Ethereum-specific bridge leaf for SATP cross-chain operations.
- *
- * @description
- * Concrete implementation of the bridge leaf interface for Ethereum networks,
- * providing asset wrapping, locking, minting, burning, and cross-chain proof generation.
- * Supports ERC-20 and ERC-721 assets via the SATPWrapperContract.
- *
- * @see {@link IEthereumLeafOptions} for configuration options
- * @see {@link OracleEVM} for Ethereum oracle implementation
- */
-export { EthereumLeaf } from "./cross-chain-mechanisms/bridge/leafs/ethereum-leaf";
-
-/**
- * EVM Oracle - Ethereum-compatible oracle for SATP cross-chain event monitoring.
- *
- * @description
- * Oracle implementation for Ethereum and EVM-compatible networks, supporting
- * contract event subscriptions, on-chain reads, and transaction submission.
- * Used by the SATP gateway to monitor and react to cross-chain events.
- *
- * @see {@link OracleBesu} for Hyperledger Besu oracle implementation
- * @see {@link EthereumLeaf} for the Ethereum bridge leaf implementation
- */
-export {
-  OracleEVM,
-  IEVMOracleEntry,
-  IOracleEVMOptions,
-} from "./cross-chain-mechanisms/oracle/implementations/oracle-evm";
+export { IEthereumNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-types";
 
 /**
  * Gateway Identity Management - Gateway identification and network discovery.
@@ -272,7 +237,6 @@ export {
   type StepTagValidationResult,
 } from "./core/satp-protocol-map";
 
-/**
 /**
  * Fabric Network Validation - Hyperledger Fabric configuration validation utilities.
  *
