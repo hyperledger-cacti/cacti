@@ -265,7 +265,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
     this.claimType = options.claimType || ClaimFormat.DEFAULT;
 
-    if (!(this.claimType in options.leafBridge.getSupportedClaimFormats())) {
+    if (!options.leafBridge.getSupportedClaimFormats().includes(this.claimType)) {
       throw new ClaimFormatError("Claim not supported by the bridge");
     }
     this.bridgeEndPoint = options.leafBridge;
