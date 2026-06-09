@@ -227,7 +227,13 @@ async function invokeContract(apiClient: CordaApiClient, publicKey: PublicKey) {
 // Monitor Tests
 //////////////////////////////////
 
-describe("Monitor Tests", () => {
+// TODO(cleanup): assess if connector is to be supported long term
+// The Kotlin connector server image pinned here
+// (cactus-connector-corda-server:2022-05-26-0ff7407--pr-2021) predates the
+// @hyperledger → @hyperledger-cacti namespace rename, so all API routes return
+// 404. A new image must be built from the current Kotlin source and re-pinned
+// before these tests can
+describe.skip("Monitor Tests", () => {
   let ledger: CordaTestLedger;
   let connector: CordaConnectorContainer;
   let apiClient: CordaApiClient;
