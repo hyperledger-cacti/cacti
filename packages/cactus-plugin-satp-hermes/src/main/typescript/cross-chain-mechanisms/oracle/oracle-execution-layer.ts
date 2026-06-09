@@ -55,7 +55,9 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
 
     this.claimType = options.claimType || ClaimFormat.DEFAULT;
 
-    if (!options.oracleImpl.getSupportedClaimFormats().includes(this.claimType)) {
+    if (
+      !options.oracleImpl.getSupportedClaimFormats().includes(this.claimType)
+    ) {
       throw new ClaimFormatError("Claim not supported by the bridge");
     }
     this.oracleImpl = options.oracleImpl;
