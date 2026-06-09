@@ -26,6 +26,7 @@
  * @since 0.0.3-beta
  */
 
+import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
@@ -57,11 +58,11 @@ export const knexLocalInstance: { [key: string]: Knex.Config } = {
     client: "sqlite3",
     connection: {
       /** Unique SQLite file path to prevent instance conflicts */
-      filename: path.resolve(
-        __dirname,
-        "data",
-        `.dev.local-${uuidv4()}.sqlite3`,
-      ),
+      filename: (() => {
+        const dataDir = path.resolve(__dirname, "data");
+        fs.mkdirSync(dataDir, { recursive: true });
+        return path.join(dataDir, `.dev.local-${uuidv4()}.sqlite3`);
+      })(),
     },
     migrations: {
       /** Directory containing database migration files */
