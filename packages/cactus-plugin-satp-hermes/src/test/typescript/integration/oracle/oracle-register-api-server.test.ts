@@ -45,7 +45,7 @@ import { BLODispatcher } from "../../../../main/typescript/api1/dispatcher";
 import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
-import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 import { createServer } from "node:http";
 import { AddressInfo } from "node:net";
 

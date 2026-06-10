@@ -27,7 +27,10 @@ import { Asset } from "../cross-chain-mechanisms/bridge/ontology/assets/asset";
  * @see {@link getEnumKeyByValue} for enum utility functions
  */
 
-import { MessageType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+import {
+  ERCTokenStandard,
+  MessageType,
+} from "../generated/proto/cacti/satp/v02/common/message_pb";
 import { getEnumKeyByValue } from "../services/utils";
 import {
   TokenIdMissingError,
@@ -89,6 +92,56 @@ export function getMessageTypeName(
       : getEnumKeyByValue(MessageType, MessageType.UNSPECIFIED)) ||
     "UNSPECIFIED"
   );
+}
+
+/**
+ * Converts a camelCase string to SCREAMING_SNAKE_CASE.
+ *
+ * @description
+ * Inserts an underscore between every lowercase–uppercase boundary and
+ * uppercases the result (e.g. "contractName" → "CONTRACT_NAME").
+ * Used to map camelCase variable identifiers from ontology JSON to their
+ * corresponding enum keys.
+ *
+ * @public
+ * @function toScreamingSnakeCase
+ * @param {string} value - camelCase input string
+ * @returns {string} SCREAMING_SNAKE_CASE output string
+ * @since 0.1.0-alpha
+ */
+export function toScreamingSnakeCase(value: string): string {
+  return value.replace(/([a-z])([A-Z])/g, "$1_$2").toUpperCase();
+}
+
+/**
+ * Converts a string ERC token standard identifier to its corresponding enum value.
+ *
+ * @description
+ * Performs a case-insensitive mapping from a string representation (e.g. "ERC20",
+ * "erc721") to the protobuf {@link ERCTokenStandard} enum. Returns
+ * {@link ERCTokenStandard.ERC_TOKEN_STANDARD_UNSPECIFIED} for unknown or absent values.
+ *
+ * @public
+ * @function ercStandardToEnum
+ * @param {string | undefined} standard - String representation of the ERC standard
+ * @returns {ERCTokenStandard} Corresponding enum value
+ * @since 0.1.0-alpha
+ */
+export function ercStandardToEnum(
+  standard: string | undefined,
+): ERCTokenStandard {
+  switch (standard?.toUpperCase()) {
+    case "ERC20":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC20;
+    case "ERC721":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC721;
+    case "ERC1155":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC1155;
+    case "ERC6909":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC6909;
+    default:
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_UNSPECIFIED;
+  }
 }
 
 /**

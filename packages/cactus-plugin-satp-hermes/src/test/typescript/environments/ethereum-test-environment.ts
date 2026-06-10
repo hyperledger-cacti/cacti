@@ -5,6 +5,7 @@ import {
 } from "@hyperledger/cactus-common";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
 import SATPNFTokenContract from "../../solidity/generated/SATPNFTokenContract.sol/SATPNFTokenContract.json";
+import SATMultiTokenContract from "../../solidity/generated/SATMultiTokenContract.sol/SATMultiTokenContract.json";
 import SATPWrapperContract from "../../../main/solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger/cactus-core";
@@ -35,6 +36,7 @@ import { LedgerType } from "@hyperledger/cactus-core-api";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntologyERC20 from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
 import ExampleOntologyERC721 from "../../ontologies/ontology-satp-erc721-interact-ethereum.json";
+import ExampleOntologyERC6909 from "../../ontologies/ontology-satp-erc6909-interact-ethereum.json";
 import {
   IEthereumLeafOptions,
   IEthereumNetworkConfig,
@@ -48,6 +50,7 @@ export interface IEthereumTestEnvironment {
 export enum SupportedContractTypes {
   FUNGIBLE = "FUNGIBLE",
   NONFUNGIBLE = "NONFUNGIBLE",
+  MULTITOKEN = "MULTITOKEN",
   WRAPPER = "WRAPPER",
   ORACLE = "ORACLE",
 }
@@ -59,11 +62,15 @@ export interface tokenContractName {
 export class EthereumTestEnvironment {
   public static readonly ETH_ASSET_ID: string = "EthereumExampleAsset";
   public static readonly ETH_NFT_ASSET_ID: string = "EthereumExampleNFT";
+  public static readonly ETH_MULTI_TOKEN_ASSET_ID: string =
+    "EthereumExampleMultiToken";
   public static readonly ETHREFERENCE_ID: Record<TokenType, string> = {
     [TokenType.NONSTANDARD_FUNGIBLE]: ExampleOntologyERC20.id,
     [TokenType.NONSTANDARD_NONFUNGIBLE]: ExampleOntologyERC721.id,
     [TokenType.UNSPECIFIED]: "",
   };
+  public static readonly ERC6909_REFERENCE_ID: string =
+    ExampleOntologyERC6909.id;
   public static readonly ETH_NETWORK_ID: string = "EthereumLedgerTestNetwork";
   public readonly network: NetworkId = {
     id: EthereumTestEnvironment.ETH_NETWORK_ID,
@@ -75,6 +82,7 @@ export class EthereumTestEnvironment {
   public bungeeOptions!: IPluginBungeeHermesOptions;
   public keychainPluginFungible!: PluginKeychainMemory;
   public keychainPluginNonFungible!: PluginKeychainMemory;
+  public keychainPluginMultiToken!: PluginKeychainMemory;
   public keychainPluginWrapper!: PluginKeychainMemory;
 
   public keychainEntryKey!: string;
@@ -147,6 +155,13 @@ export class EthereumTestEnvironment {
       logLevel,
     });
 
+    this.keychainPluginMultiToken = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+      backend: new Map([[this.keychainEntryKey, this.keychainEntryValue]]),
+      logLevel,
+    });
+
     this.keychainPluginWrapper = new PluginKeychainMemory({
       instanceId: uuidv4(),
       keychainId: uuidv4(),
@@ -180,6 +195,18 @@ export class EthereumTestEnvironment {
       );
     }
 
+    if (this.tokenContracts.has(SupportedContractTypes.MULTITOKEN)) {
+      const SATPMultiTokenContractEntry = {
+        contractName: this.tokenContracts.get(SupportedContractTypes.MULTITOKEN),
+        abi: SATMultiTokenContract.abi,
+        bytecode: SATMultiTokenContract.bytecode.object,
+      };
+      this.keychainPluginMultiToken.set(
+        this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+        JSON.stringify(SATPMultiTokenContractEntry),
+      );
+    }
+
     const SATPWrapperContract1 = {
       contractName: "SATPWrapperContract",
       abi: SATPWrapperContract.abi,
@@ -200,6 +227,7 @@ export class EthereumTestEnvironment {
       plugins: [
         this.keychainPluginFungible,
         this.keychainPluginNonFungible,
+        this.keychainPluginMultiToken,
         this.keychainPluginWrapper,
       ],
     });
@@ -224,6 +252,11 @@ export class EthereumTestEnvironment {
       this.assetContractAddresses.get(SupportedContractTypes.NONFUNGIBLE) ?? ""
     );
   }
+  public getTestMultiTokenContractAddress(): string {
+    return (
+      this.assetContractAddresses.get(SupportedContractTypes.MULTITOKEN) ?? ""
+    );
+  }
 
   public getTestFungibleContractAbi(): any {
     return SATPTokenContract.abi;
@@ -231,12 +264,18 @@ export class EthereumTestEnvironment {
   public getTestNonFungibleContractAbi(): any {
     return SATPNFTokenContract.abi;
   }
+  public getTestMultiTokenContractAbi(): any {
+    return SATMultiTokenContract.abi;
+  }
 
   public getTestFungibleContractName(): string {
     return this.tokenContracts.get(SupportedContractTypes.FUNGIBLE) ?? "";
   }
   public getTestNonFungibleContractName(): string {
     return this.tokenContracts.get(SupportedContractTypes.NONFUNGIBLE) ?? "";
+  }
+  public getTestMultiTokenContractName(): string {
+    return this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "";
   }
   public getTestOracleContractName(): string {
     return this.tokenContracts.get(SupportedContractTypes.ORACLE) ?? "";
@@ -351,6 +390,9 @@ export class EthereumTestEnvironment {
       case SupportedContractTypes.NONFUNGIBLE:
         contractKeyChain = this.keychainPluginNonFungible.getKeychainId();
         break;
+      case SupportedContractTypes.MULTITOKEN:
+        contractKeyChain = this.keychainPluginMultiToken.getKeychainId();
+        break;
       default:
         throw new Error();
     }
@@ -389,6 +431,9 @@ export class EthereumTestEnvironment {
     }
     if (this.tokenContracts.has(SupportedContractTypes.NONFUNGIBLE)) {
       await this.deployAndSetupContract(SupportedContractTypes.NONFUNGIBLE);
+    }
+    if (this.tokenContracts.has(SupportedContractTypes.MULTITOKEN)) {
+      await this.deployAndSetupContract(SupportedContractTypes.MULTITOKEN);
     }
 
     this.ethereumConfig = {
@@ -504,6 +549,66 @@ export class EthereumTestEnvironment {
     );
   }
 
+  /**
+   * Mint ERC-6909 multi-tokens of a given type to WHALE_ACCOUNT_ADDRESS.
+   * The deployer owns BRIDGE_ROLE on SATMultiTokenContract so can mint directly.
+   */
+  public async mintMultiTokens(
+    amount: string,
+    tokenTypeId: number,
+  ): Promise<void> {
+    const responseMint = await this.connector.invokeContract({
+      contract: {
+        contractName:
+          this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+        keychainId: this.keychainPluginMultiToken.getKeychainId(),
+      },
+      invocationType: EthContractInvocationType.Send,
+      methodName: "mint",
+      params: [WHALE_ACCOUNT_ADDRESS, amount, tokenTypeId],
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+    });
+    expect(responseMint).toBeTruthy();
+    expect(responseMint.success).toBeTruthy();
+    this.log.info(
+      `Minted ${amount} of tokenTypeId ${tokenTypeId} to WHALE_ACCOUNT_ADDRESS`,
+    );
+  }
+
+  /**
+   * Check the ERC-6909 balance of `account` for a specific `tokenTypeId`.
+   * Uses the auto-generated `balances(uint256,address)` getter.
+   */
+  public async checkMultiTokenBalance(
+    contractAddress: string,
+    account: string,
+    tokenTypeId: number,
+    expectedAmount: string,
+    signingCredential: Web3SigningCredential,
+  ): Promise<void> {
+    const response = await this.connector.invokeContract({
+      contract: {
+        contractJSON: {
+          contractName: this.getTestMultiTokenContractName(),
+          abi: SATMultiTokenContract.abi,
+          bytecode: SATMultiTokenContract.bytecode.object,
+        },
+        contractAddress,
+      },
+      invocationType: EthContractInvocationType.Call,
+      methodName: "balances",
+      params: [tokenTypeId, account],
+      web3SigningCredential: signingCredential,
+    });
+    expect(response).toBeTruthy();
+    expect(response.success).toBeTruthy();
+    expect(response.callOutput.toString()).toBe(expectedAmount);
+  }
+
   public async giveRoleToBridge(wrapperAddress: string): Promise<void> {
     if (this.tokenContracts.has(SupportedContractTypes.FUNGIBLE)) {
       const giveRoleRes = await this.connector.invokeContract({
@@ -547,6 +652,28 @@ export class EthereumTestEnvironment {
       expect(giveRoleRes2.success).toBeTruthy();
       this.log.info(
         "BRIDGE_ROLE given over Non Fungible Token to SATPWrapperContract successfully",
+      );
+    }
+    if (this.tokenContracts.has(SupportedContractTypes.MULTITOKEN)) {
+      const giveRoleRes3 = await this.connector.invokeContract({
+        contract: {
+          contractName:
+            this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+          keychainId: this.keychainPluginMultiToken.getKeychainId(),
+        },
+        invocationType: EthContractInvocationType.Send,
+        methodName: "grantBridgeRole",
+        params: [wrapperAddress],
+        web3SigningCredential: {
+          ethAccount: WHALE_ACCOUNT_ADDRESS,
+          secret: "",
+          type: Web3SigningCredentialType.GethKeychainPassword,
+        },
+      });
+      expect(giveRoleRes3).toBeTruthy();
+      expect(giveRoleRes3.success).toBeTruthy();
+      this.log.info(
+        "BRIDGE_ROLE given over Multi-Token contract to SATPWrapperContract successfully",
       );
     }
   }
@@ -659,6 +786,22 @@ export class EthereumTestEnvironment {
       networkId: this.network,
       tokenType: AssetTokenTypeEnum.Nonfungible,
       ercTokenStandard: AssetErcTokenStandardEnum.Erc721,
+    };
+  }
+
+  public get multiTokenDefaultAsset(): Asset {
+    return {
+      id: EthereumTestEnvironment.ETH_MULTI_TOKEN_ASSET_ID,
+      referenceId: EthereumTestEnvironment.ERC6909_REFERENCE_ID,
+      owner: WHALE_ACCOUNT_ADDRESS,
+      contractName:
+        this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+      contractAddress:
+        this.assetContractAddresses.get(SupportedContractTypes.MULTITOKEN) ??
+        "",
+      networkId: this.network,
+      tokenType: AssetTokenTypeEnum.Fungible,
+      ercTokenStandard: AssetErcTokenStandardEnum.Erc6909,
     };
   }
 

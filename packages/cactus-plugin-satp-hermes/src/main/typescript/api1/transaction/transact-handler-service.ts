@@ -11,6 +11,7 @@ import { GatewayOrchestrator } from "../../services/gateway/gateway-orchestrator
 import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";
+import { ercStandardToEnum } from "../../core/satp-utils";
 
 export async function executeTransact(
   logLevel: LogLevelDesc,
@@ -82,6 +83,10 @@ export async function executeTransact(
     req.receiverAsset.referenceId,
     req.receiverAsset.networkId.ledgerType,
     req.receiverAsset.tokenType,
+    req.sourceAsset.uniqueDescriptor,
+    req.receiverAsset.uniqueDescriptor,
+    ercStandardToEnum(req.sourceAsset.ercTokenStandard),
+    ercStandardToEnum(req.receiverAsset.ercTokenStandard),
   );
   await manager.transfer(session);
 

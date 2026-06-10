@@ -170,7 +170,11 @@ paths:
                         - ERC20
                         - ERC721
                         - ERC1155
+                        - ERC6909
                       description: The ERC token standard.
+                    uniqueDescriptor:
+                      type: string
+                      description: Token ID or unique descriptor for ERC6909/ERC1155 tokens.
                 receiverAsset:
                   description: An asset
                   type: object
@@ -233,7 +237,11 @@ paths:
                         - ERC20
                         - ERC721
                         - ERC1155
+                        - ERC6909
                       description: The ERC token standard.
+                    uniqueDescriptor:
+                      type: string
+                      description: Token ID or unique descriptor for ERC6909/ERC1155 tokens.
       responses:
         '200':
           description: Transaction successfully queued
@@ -4154,7 +4162,11 @@ components:
             - ERC20
             - ERC721
             - ERC1155
+            - ERC6909
           description: The ERC token standard.
+        uniqueDescriptor:
+          type: string
+          description: Token ID or unique descriptor for ERC6909/ERC1155 tokens.
     TransactRequest:
       description: 'Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks.'
       type: object
@@ -4232,7 +4244,11 @@ components:
                 - ERC20
                 - ERC721
                 - ERC1155
+                - ERC6909
               description: The ERC token standard.
+            uniqueDescriptor:
+              type: string
+              description: Token ID or unique descriptor for ERC6909/ERC1155 tokens.
         receiverAsset:
           description: An asset
           type: object
@@ -4295,7 +4311,11 @@ components:
                 - ERC20
                 - ERC721
                 - ERC1155
+                - ERC6909
               description: The ERC token standard.
+            uniqueDescriptor:
+              type: string
+              description: Token ID or unique descriptor for ERC6909/ERC1155 tokens.
     TransactResponse:
       description: Response schema for a transaction request. Includes the session ID and the current status of the transaction.
       type: object
@@ -8308,6 +8328,7 @@ components:
         - ERC20
         - ERC721
         - ERC1155
+        - ERC6909
       description: The ERC token standard.
     DraftVersions:
       type: object

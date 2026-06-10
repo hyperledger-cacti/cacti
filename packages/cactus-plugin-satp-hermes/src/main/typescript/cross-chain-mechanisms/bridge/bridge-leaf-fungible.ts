@@ -1,4 +1,4 @@
-import { Amount, Asset } from "./ontology/assets/asset";
+import { Amount, Asset, UniqueTokenID } from "./ontology/assets/asset";
 /**
  * @fileoverview
  * SATP Bridge Leaf Fungible Asset Interface for cross-chain fungible token operations.
@@ -312,6 +312,7 @@ export abstract class BridgeLeafFungible {
   public abstract lockAsset(
     assetId: string,
     amount: Amount,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   /**
@@ -361,6 +362,7 @@ export abstract class BridgeLeafFungible {
   public abstract unlockAsset(
     assetId: string,
     amount: Amount,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   /**
@@ -405,6 +407,7 @@ export abstract class BridgeLeafFungible {
   public abstract mintAsset(
     assetId: string,
     amount: Amount,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   /**
@@ -451,6 +454,7 @@ export abstract class BridgeLeafFungible {
   public abstract burnAsset(
     assetId: string,
     amount: Amount,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   /**
@@ -502,6 +506,7 @@ export abstract class BridgeLeafFungible {
     assetId: string,
     to: string,
     amount: Amount,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse>;
 
   /**

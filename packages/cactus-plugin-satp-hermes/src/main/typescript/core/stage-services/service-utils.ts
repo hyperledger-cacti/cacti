@@ -166,6 +166,11 @@ export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
       switch (asset.type) {
         case TokenType.NONSTANDARD_FUNGIBLE:
           protoAsset.amount = BigInt((asset as EvmFungibleAsset).amount);
+          if ((asset as FungibleAsset).uniqueDescriptor !== undefined) {
+            protoAsset.uniqueDescriptor = String(
+              (asset as FungibleAsset).uniqueDescriptor,
+            );
+          }
           protoAsset.contractAddress = (
             asset as EvmFungibleAsset
           ).contractAddress;
@@ -279,6 +284,9 @@ export function protoToAsset(asset: ProtoAsset, networkId: NetworkId): Asset {
   };
   if (asset.tokenType == TokenType.NONSTANDARD_FUNGIBLE) {
     (assetObj as FungibleAsset).amount = Number(asset.amount) as Amount;
+    if (asset.uniqueDescriptor) {
+      (assetObj as FungibleAsset).uniqueDescriptor = Number(asset.uniqueDescriptor) as UniqueTokenID;
+    }
   } else if (asset.tokenType == TokenType.NONSTANDARD_NONFUNGIBLE) {
     (assetObj as NonFungibleAsset).uniqueDescriptor = Number(
       asset.amount,
@@ -398,6 +406,7 @@ export function compareProtoAsset(
     asset1.mspId === asset2.mspId &&
     asset1.channelName === asset2.channelName &&
     asset1.contractAddress === asset2.contractAddress &&
-    asset1.ercTokenStandard === asset2.ercTokenStandard
+    asset1.ercTokenStandard === asset2.ercTokenStandard &&
+    asset1.uniqueDescriptor === asset2.uniqueDescriptor
   );
 }
