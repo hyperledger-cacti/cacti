@@ -146,7 +146,7 @@ beforeEach(async () => {
     besuServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "127.0.0.1",
-      port: 4000,
+      port: 0,
       server: besuServer,
     };
     const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
@@ -340,7 +340,7 @@ test.each([{ apiPath: true }, { apiPath: false }])(
     bungeeServer = http.createServer(expressApp);
     const listenOptions: IListenOptions = {
       hostname: "127.0.0.1",
-      port: 3000,
+      port: 0,
       server: bungeeServer,
     };
     const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
