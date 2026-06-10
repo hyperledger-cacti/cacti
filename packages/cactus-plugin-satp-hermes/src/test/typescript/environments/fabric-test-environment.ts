@@ -119,6 +119,82 @@ export class FabricTestEnvironment {
     this.log = LoggerProvider.getOrCreate({ level: this.level, label });
   }
 
+  /**
+   * Remove stale containers left over from a previous Fabric AIO run.
+   *
+   * The Fabric AIO container spawns child containers on the host Docker socket
+   * (e.g. `ca_org1`, `ca_org2`, `ca_orderer`, the peers, orderer, couchdb …).
+   * When the AIO container is killed mid-test (timeout / SIGKILL) those child
+   * containers remain and the next `docker compose up` inside the AIO image
+   * prints "Found orphan containers …" then fails to join `mychannel` because
+   * the ledger state already exists.
+   */
+  private async pruneStaleContainers(): Promise<void> {
+    const FABRIC_CONTAINER_NAMES = new Set([
+      "ca_org1",
+      "ca_org2",
+      "ca_orderer",
+      "peer0.org1.example.com",
+      "peer0.org2.example.com",
+      "orderer.example.com",
+      "couchdb0",
+      "couchdb1",
+      "cli",
+    ]);
+
+    const FABRIC_COMPOSE_NETWORK = "cactusfabrictestnetwork";
+
+    const docker = new Docker();
+    let containers: Docker.ContainerInfo[];
+    try {
+      containers = await docker.listContainers({
+        all: true,
+        filters: JSON.stringify({ network: [FABRIC_COMPOSE_NETWORK] }),
+      });
+    } catch (err) {
+      this.log.warn(
+        "FabricTestEnvironment#pruneStaleContainers(): listContainers failed — skipping clean",
+        err,
+      );
+      return;
+    }
+
+    for (const info of containers) {
+      const containerNames = (info.Names ?? []).map((n) =>
+        n.replace(/^\//, ""),
+      );
+      const isKnownFabricService = containerNames.some((n) =>
+        FABRIC_CONTAINER_NAMES.has(n),
+      );
+      if (!isKnownFabricService) {
+        continue;
+      }
+
+      const container = docker.getContainer(info.Id);
+      if (info.State === "running") {
+        try {
+          await container.stop({ t: 5 });
+        } catch (err) {
+          this.log.warn(
+            `FabricTestEnvironment#pruneStaleContainers(): stop failed for ${info.Id}`,
+            err,
+          );
+        }
+      }
+      try {
+        await container.remove({ v: true, force: true });
+        this.log.info(
+          `FabricTestEnvironment#pruneStaleContainers(): removed stale container ${containerNames.join(",")}`,
+        );
+      } catch (err) {
+        this.log.warn(
+          `FabricTestEnvironment#pruneStaleContainers(): remove failed for ${info.Id}`,
+          err,
+        );
+      }
+    }
+  }
+
   // Initializes the Fabric ledger, accounts, and connector for testing
   public async init(): Promise<void> {
     this.ledger = new FabricTestLedgerV1({
@@ -1072,6 +1148,14 @@ export class FabricTestEnvironment {
       this.removeSignalHandlers();
       this.removeSignalHandlers = null;
     }
+    // Guard: if init() never completed (e.g. setup threw before ledger.start())
+    // the `ledger` field may be unset.
+    if (!this.ledger) {
+      this.log.warn(
+        "FabricTestEnvironment#tearDown(): ledger was never initialised — skipping stop/destroy",
+      );
+      return;
+    }
     try {
       await this.ledger.stop();
     } catch (err) {
@@ -1082,5 +1166,6 @@ export class FabricTestEnvironment {
     } catch (err) {
       this.log.warn("FabricTestEnvironment#tearDown() destroy failed:", err);
     }
+    await this.pruneStaleContainers();
   }
 }

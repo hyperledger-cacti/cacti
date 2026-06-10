@@ -1176,7 +1176,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         const address =
           this.options.gid?.address?.includes("localhost") ||
-            this.options.gid?.address?.includes("127.0.0.1")
+          this.options.gid?.address?.includes("127.0.0.1")
             ? "localhost"
             : "0.0.0.0";
 
@@ -1297,7 +1297,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             this.GOLServer = http.createServer(this.GOLApplication);
             const address =
               this.options.gid?.address?.includes("localhost") || // When running a gateway in localhost we don't want to bind it to 0.0.0.0 because if we do it will be accessible from the outside network
-                this.options.gid?.address?.includes("127.0.0.1")
+              this.options.gid?.address?.includes("127.0.0.1")
                 ? "localhost"
                 : "0.0.0.0";
 
