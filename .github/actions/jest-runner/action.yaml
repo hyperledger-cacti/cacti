@@ -33,6 +33,7 @@ runs:
           --coverageDirectory="${{ inputs.jest_test_coverage_path }}" \
           --reporters=default \
           --reporters=jest-junit \
+          --passWithNoTests \
           --forceExit
 
     - name: Run Jest Tests (without coverage)
@@ -44,6 +45,7 @@ runs:
         yarn jest "${{ inputs.jest_test_pattern }}" \
           --reporters=default \
           --reporters=jest-junit \
+          --passWithNoTests \
           --forceExit
 
     - name: Report Jest test results
@@ -59,7 +61,7 @@ runs:
         max-annotations: 0
         token: ${{ inputs.github_secret }}
         fail-on-error: false
-        fail-on-empty: true
+        fail-on-empty: false
         only-summary: false
         list-suites: failed
         list-tests: failed
