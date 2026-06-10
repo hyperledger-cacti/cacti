@@ -31,7 +31,7 @@ jobs:
             net1: ["fabric", "corda"]
             net2: ["fabric", "corda"]
       env:
-        JEST_TEST_PATTERN: packages/cacti-copm-test/src/test/typescript/integration/test-copm-getverifiedview.test.ts packages/cacti-copm-test/src/test/typescript/integration/test-copm-pledge-claim.test.ts
+        JEST_TEST_PATTERN: packages/cacti-copm-test/src/test/typescript/integration/test-copm-(getverifiedview|pledge-claim)\.test\.ts
         JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/copm-pledge-${{ matrix.net1 }}-${{ matrix.net2}}
         COPM_NET_1: ${{ matrix.net1 }}
         COPM_NET_2: ${{ matrix.net2 }}

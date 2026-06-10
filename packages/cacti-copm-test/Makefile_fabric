@@ -15,11 +15,13 @@ fabric-dl:
 
 fabric1-driver:
 	cd $(WORKSPACE)/weaver/core/drivers/fabric-driver && \
+	sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-driver-fabric#g" docker-testnet-envs/.env.n1 && \
 	sed -i "s#<PATH-TO-WEAVER>#$(WORKSPACE)/weaver#g" docker-testnet-envs/.env.n1 &&\
 	make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n1' NETWORK_NAME=network1 
 
 fabric2-driver:
 	cd $(WORKSPACE)/weaver/core/drivers/fabric-driver && \
+	sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-driver-fabric#g" docker-testnet-envs/.env.n2 && \
 	sed -i "s#<PATH-TO-WEAVER>#$(WORKSPACE)/weaver#g" docker-testnet-envs/.env.n2 && \
 	make deploy COMPOSE_ARG='--env-file docker-testnet-envs/.env.n2' NETWORK_NAME=network2
 
@@ -34,22 +36,25 @@ fabric1-relay:
 
 fabric2-relay:
 	cd $(WORKSPACE)/weaver/core/relay && \
-	make convert-compose-method2 && \
 	make start-server COMPOSE_ARG='--env-file docker/testnet-envs/.env.n2' 
 
 # IIN --------------------------------------------------------------------------------------
 
 iin:
 	cd $(WORKSPACE)/weaver/core/identity-management/iin-agent && \
+	sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n1.org1 && \
 	sed -i "s#<PATH-TO-WEAVER>#$(WORKSPACE)/weaver#g" docker-testnet/envs/.env.n1.org1 && \
 	sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1.org1 && \
 	sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n1.org1 && \
+	sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n1.org2 && \
 	sed -i "s#<PATH-TO-WEAVER>#$(WORKSPACE)/weaver#g" docker-testnet/envs/.env.n1.org2 && \
 	sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n1.org2 && \
 	sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n1.org2 && \
+	sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n2.org1 && \
 	sed -i "s#<PATH-TO-WEAVER>#$(WORKSPACE)/weaver#g" docker-testnet/envs/.env.n2.org1 && \
 	sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org1 && \
 	sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n2.org1 && \
+	sed -i "s#^DOCKER_IMAGE_NAME=.*#DOCKER_IMAGE_NAME=cacti-weaver-iin-agent#g" docker-testnet/envs/.env.n2.org2 && \
 	sed -i "s#<PATH-TO-WEAVER>#$(WORKSPACE)/weaver#g" docker-testnet/envs/.env.n2.org2 && \
 	sed -i "s#^AUTO_SYNC=true#AUTO_SYNC=false#g" docker-testnet/envs/.env.n2.org2 && \
 	sed -i "s#^DNS_CONFIG_PATH=.*#DNS_CONFIG_PATH=./docker-testnet/configs/dnsconfig-2-nodes.json#g" docker-testnet/envs/.env.n2.org2 && \
@@ -105,8 +110,9 @@ setup:
 	cd $(WORKSPACE)/weaver/common/protos-js && make build
 	rm -Rf $(WORKSPACE)/weaver/sdks/fabric/interoperation-node-sdk/build
 	cd $(WORKSPACE)/weaver/sdks/fabric/interoperation-node-sdk && make build-local
-	cd $(WORKSPACE)/weaver/core/identity-management/iin-agent && make build-local build-image-local
-	cd $(WORKSPACE)/weaver/samples/fabric/fabric-cli && make build-local 
+	cd $(WORKSPACE)/weaver/core/identity-management/iin-agent && make build-image-local
+	cd $(WORKSPACE)/weaver/core/drivers/fabric-driver && make build-image-local
+	cd $(WORKSPACE)/weaver/samples/fabric/fabric-cli && make build-local
 
 
 pledge-network: fabric-dl fabric1-driver fabric2-driver common-relay-config fabric1-relay fabric2-relay iin fabric-cli
