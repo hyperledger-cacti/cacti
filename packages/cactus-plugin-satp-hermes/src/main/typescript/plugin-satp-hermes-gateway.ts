@@ -1257,15 +1257,25 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.info(
           `${fnTag}: Created migration source: ${JSON.stringify(migrationSource)}`,
         );
-        const database = knex({
-          ...this.config.localRepository,
-          migrations: {
-            // This removes the problem with the migration source being in the file system
-            migrationSource: migrationSource,
-          },
-        });
 
-        await database.migrate.latest();
+        const dbConfigs = [
+          this.config.localRepository,
+          this.config.remoteRepository,
+          this.config.auditRepository,
+          this.config.oracleLogRepository,
+        ].filter(Boolean) as Knex.Config[];
+
+        for (const dbCfg of dbConfigs) {
+          const database = knex({
+            ...dbCfg,
+            migrations: {
+              // This removes the problem with the migration source being in the file system
+              migrationSource: migrationSource,
+            },
+          });
+          await database.migrate.latest();
+          await database.destroy();
+        }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
