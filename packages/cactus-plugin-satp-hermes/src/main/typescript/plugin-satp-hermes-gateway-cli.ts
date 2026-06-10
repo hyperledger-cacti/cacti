@@ -387,9 +387,9 @@ export async function launchGateway(
   ) =>
     kp
       ? {
-          publicKey: Buffer.from(kp.publicKey, "hex"),
-          privateKey: Buffer.from(kp.privateKey, "hex"),
-        }
+        publicKey: Buffer.from(kp.publicKey, "hex"),
+        privateKey: Buffer.from(kp.privateKey, "hex"),
+      }
       : undefined;
 
   logger.debug("Creating SATPGatewayConfig...");
