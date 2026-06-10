@@ -210,7 +210,7 @@ test("tests bungee api using different strategies", async () => {
   bungeeServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
     hostname: "127.0.0.1",
-    port: 3000,
+    port: 0,
     server: bungeeServer,
   };
   const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
@@ -408,7 +408,7 @@ async function setupFabricTestLedger(): Promise<string> {
   fabricServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
     hostname: "127.0.0.1",
-    port: 4100,
+    port: 0,
     server: fabricServer,
   };
   const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
@@ -667,7 +667,7 @@ async function setupBesuTestLedger(): Promise<string> {
   besuServer = http.createServer(expressApp);
   const listenOptions: IListenOptions = {
     hostname: "127.0.0.1",
-    port: 4000,
+    port: 0,
     server: besuServer,
   };
 
@@ -807,7 +807,7 @@ async function setupEthereumTestLedger(): Promise<string> {
 
   const listenOptions: IListenOptions = {
     hostname: "127.0.0.1",
-    port: 5000,
+    port: 0,
     server,
   };
   const addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;
