@@ -888,6 +888,12 @@ export interface Asset {
      * @memberof Asset
      */
     'ercTokenStandard': AssetErcTokenStandardEnum;
+    /**
+     * Token ID or unique descriptor for ERC6909/ERC1155 tokens.
+     * @type {string}
+     * @memberof Asset
+     */
+    'uniqueDescriptor'?: string;
 }
 
 export const AssetTokenTypeEnum = {
@@ -900,7 +906,8 @@ export const AssetErcTokenStandardEnum = {
     Unspecified: 'UNSPECIFIED',
     Erc20: 'ERC20',
     Erc721: 'ERC721',
-    Erc1155: 'ERC1155'
+    Erc1155: 'ERC1155',
+    Erc6909: 'ERC6909'
 } as const;
 
 export type AssetErcTokenStandardEnum = typeof AssetErcTokenStandardEnum[keyof typeof AssetErcTokenStandardEnum];
@@ -1313,7 +1320,8 @@ export const ERCTokenStandard = {
     Unspecified: 'UNSPECIFIED',
     Erc20: 'ERC20',
     Erc721: 'ERC721',
-    Erc1155: 'ERC1155'
+    Erc1155: 'ERC1155',
+    Erc6909: 'ERC6909'
 } as const;
 
 export type ERCTokenStandard = typeof ERCTokenStandard[keyof typeof ERCTokenStandard];
@@ -4962,6 +4970,12 @@ export interface TransactRequestSourceAsset {
      * @memberof TransactRequestSourceAsset
      */
     'ercTokenStandard': TransactRequestSourceAssetErcTokenStandardEnum;
+    /**
+     * Token ID or unique descriptor for ERC6909/ERC1155 tokens.
+     * @type {string}
+     * @memberof TransactRequestSourceAsset
+     */
+    'uniqueDescriptor'?: string;
 }
 
 export const TransactRequestSourceAssetTokenTypeEnum = {
@@ -4974,7 +4988,8 @@ export const TransactRequestSourceAssetErcTokenStandardEnum = {
     Unspecified: 'UNSPECIFIED',
     Erc20: 'ERC20',
     Erc721: 'ERC721',
-    Erc1155: 'ERC1155'
+    Erc1155: 'ERC1155',
+    Erc6909: 'ERC6909'
 } as const;
 
 export type TransactRequestSourceAssetErcTokenStandardEnum = typeof TransactRequestSourceAssetErcTokenStandardEnum[keyof typeof TransactRequestSourceAssetErcTokenStandardEnum];

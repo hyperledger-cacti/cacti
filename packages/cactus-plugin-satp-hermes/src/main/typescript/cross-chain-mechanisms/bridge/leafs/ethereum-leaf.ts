@@ -978,6 +978,7 @@ export class EthereumLeaf
   public async lockAsset(
     assetId: string,
     assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#lockAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1004,7 +1005,7 @@ export class EthereumLeaf
           },
           invocationType: EthContractInvocationType.Send,
           methodName: "lock",
-          params: [assetId, assetAttribute],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute, uniqueDescriptor] : [assetId, assetAttribute],
           web3SigningCredential: this.signingCredential,
           gasConfig: this.gasConfig,
         })) as EthereumResponse;
@@ -1039,6 +1040,7 @@ export class EthereumLeaf
   public async unlockAsset(
     assetId: string,
     assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#unlockAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1065,7 +1067,7 @@ export class EthereumLeaf
           },
           invocationType: EthContractInvocationType.Send,
           methodName: "unlock",
-          params: [assetId, assetAttribute],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute, uniqueDescriptor] : [assetId, assetAttribute],
           web3SigningCredential: this.signingCredential,
           gasConfig: this.gasConfig,
         })) as EthereumResponse;
@@ -1100,6 +1102,7 @@ export class EthereumLeaf
   public async mintAsset(
     assetId: string,
     assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#mintAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1126,7 +1129,7 @@ export class EthereumLeaf
           },
           invocationType: EthContractInvocationType.Send,
           methodName: "mint",
-          params: [assetId, assetAttribute],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute, uniqueDescriptor] : [assetId, assetAttribute],
           web3SigningCredential: this.signingCredential,
           gasConfig: this.gasConfig,
         })) as EthereumResponse;
@@ -1161,6 +1164,7 @@ export class EthereumLeaf
   public async burnAsset(
     assetId: string,
     assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#burnAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1187,7 +1191,7 @@ export class EthereumLeaf
           },
           invocationType: EthContractInvocationType.Send,
           methodName: "burn",
-          params: [assetId, assetAttribute],
+          params: uniqueDescriptor !== undefined ? [assetId, assetAttribute, uniqueDescriptor] : [assetId, assetAttribute],
           web3SigningCredential: this.signingCredential,
           gasConfig: this.gasConfig,
         })) as EthereumResponse;
@@ -1224,6 +1228,7 @@ export class EthereumLeaf
     assetId: string,
     to: string,
     assetAttribute: Amount | UniqueTokenID,
+    uniqueDescriptor?: UniqueTokenID,
   ): Promise<TransactionResponse> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#assignAsset`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -1250,7 +1255,7 @@ export class EthereumLeaf
           },
           invocationType: EthContractInvocationType.Send,
           methodName: "assign",
-          params: [assetId, to, assetAttribute],
+          params: uniqueDescriptor !== undefined ? [assetId, to, assetAttribute, uniqueDescriptor] : [assetId, to, assetAttribute],
           web3SigningCredential: this.signingCredential,
           gasConfig: this.gasConfig,
         })) as EthereumResponse;

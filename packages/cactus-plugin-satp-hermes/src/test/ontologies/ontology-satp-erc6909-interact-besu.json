@@ -1,0 +1,41 @@
+{
+    "name": "SATP-ERC6909",
+    "id": "SATP-ERC6909-BESU",
+    "type": "BESU_2X",
+    "contract": "solidity",
+    "ontology": {
+        "lock": [{
+                "functionSignature": "assign(address,address,uint256,uint256)",
+                "variables": ["owner", "bridge", "unique_descriptor", "amount"],
+                "available": true
+            }],
+        "unlock": [{
+                "functionSignature": "assign(address,address,uint256,uint256)",
+                "variables": ["bridge", "owner", "unique_descriptor", "amount"],
+                "available": true
+            }],
+        "mint": [{
+                "functionSignature": "mint(address,uint256,uint256)",
+                "variables": ["bridge", "unique_descriptor", "amount"],
+                "available": true
+            }],
+        "burn": [{
+                "functionSignature": "burn(address,uint256,uint256)",
+                "variables": ["bridge", "unique_descriptor", "amount"],
+                "available": true
+            }],
+        "assign": [{
+                "functionSignature": "assign(address,address,uint256,uint256)",
+                "variables": ["bridge", "receiver", "unique_descriptor", "amount"],
+                "available": true
+            }],
+        "checkPermission": [{
+                "functionSignature": "hasBridgeRole(address)",
+                "variables": ["bridge"],
+                "available": true
+            }]
+    },
+    "bytecode": "",
+    "signature": "",
+    "hash": ""
+}

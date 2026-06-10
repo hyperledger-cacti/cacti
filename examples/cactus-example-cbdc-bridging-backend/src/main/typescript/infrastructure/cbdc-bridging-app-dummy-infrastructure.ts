@@ -430,7 +430,7 @@ export class CbdcBridgingAppDummyInfrastructure {
 
     this.besuGatewayApproveAddress = reqApproveBesuAddress.data.approveAddress;
 
-    this.besuEnvironment.setApproveAddress(this.besuGatewayApproveAddress);
+    this.besuEnvironment.setApproveAddress(reqApproveBesuAddress.data.approveAddress);
 
     const fabricGatewayApproveAddressApi = new GetApproveAddressApi(
       new Configuration({

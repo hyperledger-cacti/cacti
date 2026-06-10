@@ -51,6 +51,7 @@ import { create, isMessage } from "@bufbuild/protobuf";
 import {
   AssetSchema,
   CredentialProfile,
+  ERCTokenStandard,
   Error as SATPError,
   LockType,
   MessageType,
@@ -206,6 +207,10 @@ export function populateClientSessionData(
   receiverAssetReferenceId: string,
   receiverAssetNetworkType: string,
   receiverAssetTokenType: TokenType,
+  sourceUniqueDescriptor?: string,
+  receiverUniqueDescriptor?: string,
+  sourceErcTokenStandard?: ERCTokenStandard,
+  receiverErcTokenStandard?: ERCTokenStandard,
 ): SATPSession {
   const fn = "session_utils#populateClientSessionData";
   const sessionData = session.getClientSessionData();
@@ -238,6 +243,9 @@ export function populateClientSessionData(
       type: sourceAssetNetworkType,
     }),
     tokenType: getEnumValueByKey(ProtoTokenType, sourceAssetTokenType),
+    uniqueDescriptor: sourceUniqueDescriptor || "",
+    ercTokenStandard:
+      sourceErcTokenStandard ?? ERCTokenStandard.ERC_TOKEN_STANDARD_UNSPECIFIED,
   });
 
   sessionData.receiverAsset = create(AssetSchema, {
@@ -254,6 +262,10 @@ export function populateClientSessionData(
       type: receiverAssetNetworkType,
     }),
     tokenType: getEnumValueByKey(ProtoTokenType, receiverAssetTokenType),
+    uniqueDescriptor: receiverUniqueDescriptor || "",
+    ercTokenStandard:
+      receiverErcTokenStandard ??
+      ERCTokenStandard.ERC_TOKEN_STANDARD_UNSPECIFIED,
   });
 
   sessionData.resourceUrl = "MOCK_RESOURCE_URL";
