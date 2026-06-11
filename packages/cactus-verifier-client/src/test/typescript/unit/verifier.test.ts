@@ -99,7 +99,7 @@ describe("Monitoring Tests", () => {
     expect(sut.startMonitor("someId", {}, eventListenerMock)).toReject();
   });
 
-  test("In case of ApiClient exception runningMonitors is not updated", () => {
+  test("In case of ApiClient exception startMonitor rejects and runningMonitors is not updated", async () => {
     apiClientMock = new MockApiClient();
     apiClientMock.watchBlocksV1.mockImplementation(() => {
       throw Error("Some mock error in watchBlocks");
@@ -107,7 +107,7 @@ describe("Monitoring Tests", () => {
     sut = new Verifier("test-id", apiClientMock, sutLogLevel);
 
     expect(sut.runningMonitors.size).toEqual(0);
-    expect(sut.startMonitor("someId", {}, eventListenerMock)).toResolve();
+    await expect(sut.startMonitor("someId", {}, eventListenerMock)).toReject();
     expect(sut.runningMonitors.size).toEqual(0);
   });
 

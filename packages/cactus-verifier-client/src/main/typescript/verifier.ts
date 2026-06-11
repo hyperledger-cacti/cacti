@@ -124,6 +124,7 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
     } catch (err) {
       this.log.error(`##Error: startMonitor, ${err}`);
       this.runningMonitors.delete(appId);
+      throw err;
     }
   }
 
