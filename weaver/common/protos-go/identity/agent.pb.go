@@ -11,7 +11,7 @@
 package identity
 
 import (
-	common "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	common "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3/common"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

@@ -123,7 +123,7 @@ describe("ApiServer", () => {
       __dirname,
       "../../../../../../packages/cactus-plugin-keychain-memory",
     );
-    const versionToInstall = "2.1.0"; // local monorepo version
+    const versionToInstall = "3.0.0-alpha.5"; // local monorepo version
 
     await fs.mkdirp(pluginPackageDir);
     lmify.setPackageManager("npm");
@@ -188,7 +188,7 @@ describe("ApiServer", () => {
     apiSrvOpts.grpcPort = 0;
     apiSrvOpts.crpcPort = 0;
     apiSrvOpts.apiTlsEnabled = false;
-    const versionToInstall = "2.1.0"; // local monorepo version
+    const versionToInstall = "3.0.0-alpha.5"; // local monorepo version
     const localPkgSrc = path.join(
       __dirname,
       "../../../../../../packages/cactus-plugin-keychain-memory",
