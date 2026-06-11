@@ -55,12 +55,14 @@ export default [
       "semi": ["error", "always"],
       "new-cap": ["off"],
       "comma-dangle": ["warn", "always-multiline"],
-      // Turn off some rules that are causing issues in the codebase
       "no-constant-condition": "warn",
       "no-fallthrough": "warn",
       "no-empty": "warn",
       "no-case-declarations": "warn",
       "no-duplicate-case": "warn",
+      "no-unreachable": "error",
+      "no-unused-private-class-members": "warn",
+      "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
     },
   }),
   
