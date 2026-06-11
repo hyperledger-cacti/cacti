@@ -13,6 +13,43 @@ Hyperledger Cacti is a multi-faceted pluggable interoperability framework to lin
 [Cacti is a _Graduated_ Hyperledger project](https://www.hyperledger.org/blog/hyperledger-cacti-a-general-purpose-modular-interoperability-framework-moves-to-graduated-status). Information on the different stages of a Hyperledger project and graduation criteria can be found in
 the [Hyperledger Project Incubation Exit Criteria document](https://wiki.hyperledger.org/display/TSC/Project+Incubation+Exit+Criteria).
 
+## Getting Started for Contributors
+
+If you're new to the project, here's a quick way to get started.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/hyperledger-cacti/cacti.git
+cd cacti
+```
+
+### 2. Install dependencies and set up
+
+Follow the OS-specific prerequisites in [BUILD.md](./BUILD.md), then run:
+
+```bash
+npm run enable-corepack
+yarn run configure
+```
+
+### 3. Run the project
+
+```bash
+npm run watch
+```
+
+This will rebuild packages as you make changes.
+
+### 4. Pick your first issue
+
+Look for issues labeled `good first issue` or `help wanted`.
+Starting with documentation or small fixes is a good way to begin.
+
+### 5. Open a pull request
+
+Before submitting, check the guidelines in [CONTRIBUTING.md](./CONTRIBUTING.md).
+
 # 📍 Important announcement
 
 We are conducting an initiative called "Cacti cleanup". The initiative focuses on several key goals:​
@@ -23,7 +60,7 @@ We are conducting an initiative called "Cacti cleanup". The initiative focuses o
 5. Enhance onboarding: Making it easier for new contributors to get started
 6. Optimize the CI/CD pipelines by reducing runtime and costs
 
-Please refer to [the overview of this initiative (+ the SATP-Hermes initiative)](https://www.youtube.com/watch?v=pN1m0vgV7bY), and the [public Github project board](https://github.com/orgs/hyperledger-cacti/projects/2). Please contribute and vote on the different aspects of the initiative [on the Discord threads](https://discord.com/channels/905194001349627914/908379338716631050/1428405972992266343).
+Please refer to [the overview of this initiative (+ the SATP-Hermes initiative)](https://www.youtube.com/watch?v=pN1m0vgV7bY), and the [public GitHub project board](https://github.com/orgs/hyperledger-cacti/projects/2). Please contribute and vote on the different aspects of the initiative [on the Discord threads](https://discord.com/channels/905194001349627914/908379338716631050/1428405972992266343).
 
 ## Scope of Project
 
@@ -37,7 +74,7 @@ As a fusion of two earlier systems (Cactus and Weaver) that have similar philoso
 
 The current Cacti code base contains the legacy Cactus and Weaver source code in aggregated form with their original folder structures intact. But the packages built from the two sections of code are unified and released under a common `cacti` namespace, and the CI/CD pipelines for testing and releases are also integrated under a common set of GitHub Actions. A _deeper_ merge and integration of source code is part of our roadmap, and will be carried out over a longer time period, but the current setup of code and release packages makes it easy for new users to navigate Cacti and for legacy users to carry out seamless upgrades.
 
-(Reference for legacy users: Cactus source code lies here (i.e., the root folder), excluding the `weaver` folder. Weaver source code lies within the [weaver](./weaver/) folder.
+For legacy users: Cactus source code is in the repository root (excluding the `weaver` folder), and Weaver source code is in the `weaver` directory.
 
 ## Documentation
 
@@ -60,7 +97,7 @@ deny list" to "white list and black list".
 writing inclusive documentation might not look like a huge improvement, it's a
 first step in the right direction.
 - We suggest to refer to
-[Microsoft bias free writing guidelines](https://docs.microsoft.com/en-us/style-guide/bias-free-communication)
+[Microsoft bias free writing guidelines](https://learn.microsoft.com/en-us/style-guide/bias-free-communication)
 and
 [Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation)
 as starting points.
