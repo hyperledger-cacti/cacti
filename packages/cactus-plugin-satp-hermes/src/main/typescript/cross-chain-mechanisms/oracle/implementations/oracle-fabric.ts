@@ -91,8 +91,12 @@ export class OracleFabric extends OracleAbstract {
       this.monitorService,
     );
 
+    const { connectorOptions, ...optionsWithoutConnector } = options;
     this.log.debug(
-      `${OracleFabric.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
+      `${OracleFabric.CLASS_NAME}#constructor options: ${safeStableStringify(optionsWithoutConnector)}`,
+    );
+    this.log.debug(
+      `${OracleFabric.CLASS_NAME}#constructor connectorOptions: ${safeStableStringify(connectorOptions)}`,
     );
 
     if (options.networkIdentification.ledgerType !== LedgerType.Fabric2) {
