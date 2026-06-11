@@ -6935,7 +6935,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hyperledger-cacti/cacti-copm-core@npm:2.1.0, @hyperledger-cacti/cacti-copm-core@workspace:packages/cacti-copm-core":
+"@hyperledger-cacti/cacti-copm-core@npm:3.0.0-alpha.3, @hyperledger-cacti/cacti-copm-core@workspace:packages/cacti-copm-core":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-copm-core@workspace:packages/cacti-copm-core"
   dependencies:
@@ -6945,8 +6945,8 @@ __metadata:
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
   languageName: unknown
   linkType: soft
@@ -6957,17 +6957,17 @@ __metadata:
   dependencies:
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
-    "@hyperledger-cacti/cacti-copm-core": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-plugin-copm-corda": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-plugin-copm-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-corda": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-copm-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-plugin-copm-corda": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-plugin-copm-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-corda": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/dockerode": "npm:3.2.7"
     dockerode: "npm:3.3.0"
     dotenv: "npm:17.2.3"
@@ -6986,7 +6986,7 @@ __metadata:
   dependencies:
     "@emotion/react": "npm:11.11.1"
     "@emotion/styled": "npm:11.11.0"
-    "@hyperledger-cacti/cactus-example-cbdc-bridging-backend": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-example-cbdc-bridging-backend": "npm:3.0.0-alpha.3"
     "@mui/icons-material": "npm:6.1.1"
     "@mui/material": "npm:6.1.1"
     "@testing-library/jest-dom": "npm:5.17.0"
@@ -7050,17 +7050,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cacti-plugin-consortium-static@npm:2.1.0, @hyperledger-cacti/cacti-plugin-consortium-static@workspace:packages/cacti-plugin-consortium-static":
+"@hyperledger-cacti/cacti-plugin-consortium-static@npm:3.0.0-alpha.3, @hyperledger-cacti/cacti-plugin-consortium-static@workspace:packages/cacti-plugin-consortium-static":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-plugin-consortium-static@workspace:packages/cacti-plugin-consortium-static"
   dependencies:
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/express": "npm:5.0.1"
     "@types/json-stable-stringify": "npm:1.2.0"
     "@types/uuid": "npm:10.0.0"
@@ -7080,7 +7080,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cacti-plugin-copm-corda@npm:2.1.0, @hyperledger-cacti/cacti-plugin-copm-corda@workspace:packages/cacti-plugin-copm-corda":
+"@hyperledger-cacti/cacti-plugin-copm-corda@npm:3.0.0-alpha.3, @hyperledger-cacti/cacti-plugin-copm-corda@workspace:packages/cacti-plugin-copm-corda":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-plugin-copm-corda@workspace:packages/cacti-plugin-copm-corda"
   dependencies:
@@ -7089,18 +7089,18 @@ __metadata:
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
     "@connectrpc/connect-web": "npm:1.4.0"
-    "@hyperledger-cacti/cacti-copm-core": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-copm-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
     "@types/convict": "npm:6.1.1"
     convict: "npm:6.2.4"
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cacti-plugin-copm-fabric@npm:2.1.0, @hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric":
+"@hyperledger-cacti/cacti-plugin-copm-fabric@npm:3.0.0-alpha.3, @hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-plugin-copm-fabric@workspace:packages/cacti-plugin-copm-fabric"
   dependencies:
@@ -7109,16 +7109,16 @@ __metadata:
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
-    "@hyperledger-cacti/cacti-copm-core": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-copm-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     fabric-ca-client: "npm:2.2.20"
     fabric-common: "npm:2.2.20"
     fabric-network: "npm:2.2.20"
@@ -7129,11 +7129,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-plugin-ledger-connector-stellar@workspace:packages/cacti-plugin-ledger-connector-stellar"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/http-errors": "npm:2.0.4"
@@ -7167,8 +7167,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-weaver-besu-cli@workspace:weaver/samples/besu/besu-cli"
   dependencies:
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-besu": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-sdk-besu": "npm:3.0.0-alpha.3"
     "@truffle/contract": "npm:4.6.28"
     "@types/jest": "npm:29.5.3"
     "@types/node": "npm:18.11.9"
@@ -7223,8 +7223,8 @@ __metadata:
   dependencies:
     "@fidm/x509": "npm:1.2.1"
     "@grpc/grpc-js": "npm:1.13.3"
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-alpha.3"
     "@types/node": "npm:18.11.9"
     dotenv: "npm:8.6.0"
     fabric-ca-client: "npm:2.2.20"
@@ -7246,8 +7246,8 @@ __metadata:
     "@fidm/x509": "npm:1.2.1"
     "@grpc/grpc-js": "npm:1.13.3"
     "@grpc/proto-loader": "npm:0.7.13"
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-alpha.3"
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:18.11.9"
     body-parser: "npm:1.20.3"
@@ -7277,8 +7277,8 @@ __metadata:
   dependencies:
     "@fidm/x509": "npm:1.2.1"
     "@grpc/grpc-js": "npm:1.13.3"
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-alpha.3"
     "@types/jsrsasign": "npm:10.5.11"
     "@types/node": "npm:18.11.9"
     "@types/uuid": "npm:10.0.0"
@@ -7303,7 +7303,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cacti-weaver-protos-js@npm:2.1.0, @hyperledger-cacti/cacti-weaver-protos-js@workspace:weaver/common/protos-js":
+"@hyperledger-cacti/cacti-weaver-protos-js@npm:3.0.0-alpha.3, @hyperledger-cacti/cacti-weaver-protos-js@workspace:weaver/common/protos-js":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-weaver-protos-js@workspace:weaver/common/protos-js"
   dependencies:
@@ -7316,11 +7316,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cacti-weaver-sdk-besu@npm:2.1.0, @hyperledger-cacti/cacti-weaver-sdk-besu@workspace:weaver/sdks/besu/node":
+"@hyperledger-cacti/cacti-weaver-sdk-besu@npm:3.0.0-alpha.3, @hyperledger-cacti/cacti-weaver-sdk-besu@workspace:weaver/sdks/besu/node":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-weaver-sdk-besu@workspace:weaver/sdks/besu/node"
   dependencies:
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
     "@types/node": "npm:18.11.9"
     chai: "npm:4.3.7"
     chai-as-promised: "npm:7.1.1"
@@ -7338,13 +7338,13 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cacti-weaver-sdk-fabric@npm:2.1.0, @hyperledger-cacti/cacti-weaver-sdk-fabric@workspace:weaver/sdks/fabric/interoperation-node-sdk":
+"@hyperledger-cacti/cacti-weaver-sdk-fabric@npm:3.0.0-alpha.3, @hyperledger-cacti/cacti-weaver-sdk-fabric@workspace:weaver/sdks/fabric/interoperation-node-sdk":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-weaver-sdk-fabric@workspace:weaver/sdks/fabric/interoperation-node-sdk"
   dependencies:
     "@grpc/grpc-js": "npm:1.13.3"
     "@grpc/proto-loader": "npm:0.7.13"
-    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-weaver-protos-js": "npm:3.0.0-alpha.3"
     "@types/node": "npm:18.11.9"
     chai: "npm:4.3.7"
     chai-as-promised: "npm:7.1.1"
@@ -7371,15 +7371,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-api-client@npm:2.1.0, @hyperledger-cacti/cactus-api-client@workspace:packages/cactus-api-client":
+"@hyperledger-cacti/cactus-api-client@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-api-client@workspace:packages/cactus-api-client":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-api-client@workspace:packages/cactus-api-client"
   dependencies:
-    "@hyperledger-cacti/cacti-plugin-consortium-static": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-plugin-consortium-static": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/jsonwebtoken": "npm:9.0.6"
     "@types/lodash": "npm:4.14.195"
     "@types/node": "npm:18.19.0"
@@ -7392,7 +7392,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-cmd-api-server@npm:2.1.0, @hyperledger-cacti/cactus-cmd-api-server@workspace:packages/cactus-cmd-api-server":
+"@hyperledger-cacti/cactus-cmd-api-server@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-cmd-api-server@workspace:packages/cactus-cmd-api-server":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-cmd-api-server@workspace:packages/cactus-cmd-api-server"
   dependencies:
@@ -7406,10 +7406,10 @@ __metadata:
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
     "@grpc/grpc-js": "npm:1.13.3"
     "@grpc/proto-loader": "npm:0.7.13"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@thream/socketio-jwt": "npm:2.1.1"
     "@types/async-exit-hook": "npm:2.0.2"
@@ -7479,9 +7479,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-common-example-server@workspace:examples/cactus-common-example-server"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.6"
     "@types/config": "npm:3.3.0"
     "@types/cookie-parser": "npm:1.4.5"
@@ -7521,7 +7521,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-common@npm:2.1.0, @hyperledger-cacti/cactus-common@workspace:packages/cactus-common":
+"@hyperledger-cacti/cactus-common@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-common@workspace:packages/cactus-common":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-common@workspace:packages/cactus-common"
   dependencies:
@@ -7544,7 +7544,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-core-api@npm:2.1.0, @hyperledger-cacti/cactus-core-api@workspace:packages/cactus-core-api":
+"@hyperledger-cacti/cactus-core-api@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-core-api@workspace:packages/cactus-core-api":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-core-api@workspace:packages/cactus-core-api"
   dependencies:
@@ -7552,7 +7552,7 @@ __metadata:
     "@connectrpc/connect": "npm:1.4.0"
     "@grpc/grpc-js": "npm:1.13.3"
     "@grpc/proto-loader": "npm:0.7.13"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@types/express": "npm:5.0.1"
     "@types/google-protobuf": "npm:3.15.5"
@@ -7573,12 +7573,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-core@npm:2.1.0, @hyperledger-cacti/cactus-core@workspace:packages/cactus-core":
+"@hyperledger-cacti/cactus-core@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-core@workspace:packages/cactus-core":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-core@workspace:packages/cactus-core"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/http-errors": "npm:2.0.2"
@@ -7601,16 +7601,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-example-carbon-accounting-backend@workspace:examples/cactus-example-carbon-accounting-backend"
   dependencies:
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@openzeppelin/contracts": "npm:4.9.6"
     "@openzeppelin/contracts-upgradeable": "npm:4.9.6"
     "@types/express": "npm:5.0.1"
@@ -7638,17 +7638,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin@npm:2.1.0, @hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin@workspace:examples/cactus-example-carbon-accounting-business-logic-plugin":
+"@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin@workspace:examples/cactus-example-carbon-accounting-business-logic-plugin":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin@workspace:examples/cactus-example-carbon-accounting-business-logic-plugin"
   dependencies:
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai": "npm:3.0.0-alpha.3"
     "@types/express": "npm:5.0.1"
     "@types/ssh2": "npm:0.5.47"
     "@types/uuid": "npm:10.0.0"
@@ -7678,13 +7678,13 @@ __metadata:
     "@angular/platform-browser": "npm:17.3.11"
     "@angular/platform-browser-dynamic": "npm:17.3.11"
     "@angular/router": "npm:17.3.11"
-    "@hyperledger-cacti/cacti-plugin-consortium-static": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-plugin-consortium-static": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
     "@ionic-native/core": "npm:5.36.0"
     "@ionic-native/splash-screen": "patch:@ionic-native/splash-screen@npm%3A5.36.0#~/.yarn/patches/@ionic-native-splash-screen-npm-5.36.0-531cbbe0f8.patch"
     "@ionic-native/status-bar": "patch:@ionic-native/status-bar@npm%3A5.36.0#~/.yarn/patches/@ionic-native-status-bar-npm-5.36.0-1ca86cbaad.patch"
@@ -7709,23 +7709,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-example-cbdc-bridging-backend@npm:2.1.0, @hyperledger-cacti/cactus-example-cbdc-bridging-backend@workspace:examples/cactus-example-cbdc-bridging-backend":
+"@hyperledger-cacti/cactus-example-cbdc-bridging-backend@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-example-cbdc-bridging-backend@workspace:examples/cactus-example-cbdc-bridging-backend":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-example-cbdc-bridging-backend@workspace:examples/cactus-example-cbdc-bridging-backend"
   dependencies:
     "@apidevtools/swagger-cli": "npm:4.0.4"
     "@foundry-rs/hardhat-forge": "npm:0.1.17"
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-object-store-ipfs": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-satp-hermes": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-object-store-ipfs": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-satp-hermes": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@openzeppelin/contracts": "npm:4.9.6"
     "@openzeppelin/contracts-upgradeable": "npm:4.9.6"
     "@types/body-parser": "npm:1.19.6"
@@ -7795,20 +7795,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-bungee-hermes@npm:2.1.0, @hyperledger-cacti/cactus-plugin-bungee-hermes@workspace:packages/cactus-plugin-bungee-hermes":
+"@hyperledger-cacti/cactus-plugin-bungee-hermes@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-bungee-hermes@workspace:packages/cactus-plugin-bungee-hermes":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-bungee-hermes@workspace:packages/cactus-plugin-bungee-hermes"
   dependencies:
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/crypto-js": "npm:4.0.1"
     "@types/dockerode": "npm:3.2.7"
@@ -7839,15 +7839,15 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu@workspace:extensions/cactus-plugin-htlc-coordinator-besu"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
@@ -7869,14 +7869,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20@npm:2.1.0, @hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20@workspace:packages/cactus-plugin-htlc-eth-besu-erc20":
+"@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20@workspace:packages/cactus-plugin-htlc-eth-besu-erc20":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20@workspace:packages/cactus-plugin-htlc-eth-besu-erc20"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
     "@types/express": "npm:5.0.1"
     axios: "npm:1.15.0"
     express: "npm:5.1.0"
@@ -7886,16 +7886,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-htlc-eth-besu@npm:2.1.0, @hyperledger-cacti/cactus-plugin-htlc-eth-besu@workspace:packages/cactus-plugin-htlc-eth-besu":
+"@hyperledger-cacti/cactus-plugin-htlc-eth-besu@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-htlc-eth-besu@workspace:packages/cactus-plugin-htlc-eth-besu":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-htlc-eth-besu@workspace:packages/cactus-plugin-htlc-eth-besu"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/bn.js": "npm:5.2.0"
     "@types/express": "npm:5.0.1"
     axios: "npm:1.15.0"
@@ -7917,10 +7917,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-keychain-aws-sm@workspace:packages/cactus-plugin-keychain-aws-sm"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
@@ -7948,10 +7948,10 @@ __metadata:
     "@azure/identity": "npm:4.8.0"
     "@azure/keyvault-secrets": "npm:4.9.0"
     "@azure/msal-node": "npm:3.4.1"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
@@ -7973,10 +7973,10 @@ __metadata:
   resolution: "@hyperledger-cacti/cactus-plugin-keychain-google-sm@workspace:packages/cactus-plugin-keychain-google-sm"
   dependencies:
     "@google-cloud/secret-manager": "npm:5.0.1"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/request": "npm:2.48.7"
@@ -7998,9 +7998,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-keychain-memory-wasm@workspace:packages/cactus-plugin-keychain-memory-wasm"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     axios: "npm:1.15.0"
@@ -8014,7 +8014,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-keychain-memory@npm:2.1.0, @hyperledger-cacti/cactus-plugin-keychain-memory@workspace:packages/cactus-plugin-keychain-memory":
+"@hyperledger-cacti/cactus-plugin-keychain-memory@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-keychain-memory@workspace:packages/cactus-plugin-keychain-memory":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-keychain-memory@workspace:packages/cactus-plugin-keychain-memory"
   dependencies:
@@ -8023,9 +8023,9 @@ __metadata:
     "@bufbuild/protoc-gen-es": "npm:1.8.0"
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/protoc-gen-connect-es": "npm:1.4.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     axios: "npm:1.15.0"
@@ -8049,10 +8049,10 @@ __metadata:
     "@aries-framework/core": "npm:0.5.0-alpha.97"
     "@aries-framework/indy-vdr": "npm:0.5.0-alpha.97"
     "@aries-framework/node": "npm:0.5.0-alpha.97"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@hyperledger/anoncreds-nodejs": "npm:0.3.4"
     "@hyperledger/aries-askar-nodejs": "npm:0.2.3"
     "@hyperledger/aries-askar-shared": "npm:0.2.3"
@@ -8072,16 +8072,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-besu@npm:2.1.0, @hyperledger-cacti/cactus-plugin-ledger-connector-besu@workspace:packages/cactus-plugin-ledger-connector-besu":
+"@hyperledger-cacti/cactus-plugin-ledger-connector-besu@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-ledger-connector-besu@workspace:packages/cactus-plugin-ledger-connector-besu":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-besu@workspace:packages/cactus-plugin-ledger-connector-besu"
   dependencies:
     "@grpc/grpc-js": "npm:1.13.3"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@types/benchmark": "npm:2.1.5"
     "@types/body-parser": "npm:1.19.4"
@@ -8130,9 +8130,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-cdl@workspace:packages/cactus-plugin-ledger-connector-cdl"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:18.11.9"
@@ -8146,14 +8146,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-corda@npm:2.1.0, @hyperledger-cacti/cactus-plugin-ledger-connector-corda@workspace:packages/cactus-plugin-ledger-connector-corda":
+"@hyperledger-cacti/cactus-plugin-ledger-connector-corda@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-ledger-connector-corda@workspace:packages/cactus-plugin-ledger-connector-corda":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-corda@workspace:packages/cactus-plugin-ledger-connector-corda"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/multer": "npm:1.4.7"
@@ -8179,19 +8179,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum@npm:2.1.0, @hyperledger-cacti/cactus-plugin-ledger-connector-ethereum@workspace:packages/cactus-plugin-ledger-connector-ethereum":
+"@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-ledger-connector-ethereum@workspace:packages/cactus-plugin-ledger-connector-ethereum":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum@workspace:packages/cactus-plugin-ledger-connector-ethereum"
   dependencies:
     "@ethereumjs/common": "npm:4.0.0"
     "@ethereumjs/tx": "npm:5.0.0"
     "@ethereumjs/util": "npm:9.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/js-yaml": "npm:4.0.5"
@@ -8225,16 +8225,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-fabric@npm:2.1.0, @hyperledger-cacti/cactus-plugin-ledger-connector-fabric@workspace:packages/cactus-plugin-ledger-connector-fabric":
+"@hyperledger-cacti/cactus-plugin-ledger-connector-fabric@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-ledger-connector-fabric@workspace:packages/cactus-plugin-ledger-connector-fabric":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric@workspace:packages/cactus-plugin-ledger-connector-fabric"
   dependencies:
     "@fidm/x509": "npm:1.2.1"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/bn.js": "npm:5.1.0"
     "@types/body-parser": "npm:1.19.4"
     "@types/dockerode": "npm:3.2.7"
@@ -8297,15 +8297,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2@npm:2.1.0, @hyperledger-cacti/cactus-plugin-ledger-connector-iroha2@workspace:packages/cactus-plugin-ledger-connector-iroha2":
+"@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-ledger-connector-iroha2@workspace:packages/cactus-plugin-ledger-connector-iroha2":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2@workspace:packages/cactus-plugin-ledger-connector-iroha2"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@iroha2/client": "npm:4.0.0"
     "@iroha2/crypto-core": "npm:0.1.1"
     "@iroha2/crypto-target-node": "npm:0.4.0"
@@ -8333,11 +8333,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot@workspace:packages/cactus-plugin-ledger-connector-polkadot"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@polkadot/api": "npm:10.9.1"
     "@polkadot/api-contract": "npm:10.9.1"
     "@polkadot/rpc-provider": "npm:10.9.1"
@@ -8373,14 +8373,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth@npm:2.1.0, @hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth@workspace:packages/cactus-plugin-ledger-connector-sawtooth":
+"@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth@workspace:packages/cactus-plugin-ledger-connector-sawtooth":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth@workspace:packages/cactus-plugin-ledger-connector-sawtooth"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
@@ -8396,15 +8396,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-xdai@npm:2.1.0, @hyperledger-cacti/cactus-plugin-ledger-connector-xdai@workspace:packages/cactus-plugin-ledger-connector-xdai":
+"@hyperledger-cacti/cactus-plugin-ledger-connector-xdai@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-ledger-connector-xdai@workspace:packages/cactus-plugin-ledger-connector-xdai":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai@workspace:packages/cactus-plugin-ledger-connector-xdai"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     axios: "npm:1.15.0"
@@ -8427,14 +8427,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-object-store-ipfs@npm:2.1.0, @hyperledger-cacti/cactus-plugin-object-store-ipfs@workspace:extensions/cactus-plugin-object-store-ipfs":
+"@hyperledger-cacti/cactus-plugin-object-store-ipfs@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-object-store-ipfs@workspace:extensions/cactus-plugin-object-store-ipfs":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-object-store-ipfs@workspace:extensions/cactus-plugin-object-store-ipfs"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@multiformats/multiaddr": "npm:11.6.1"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
@@ -8459,14 +8459,14 @@ __metadata:
   resolution: "@hyperledger-cacti/cactus-plugin-persistence-ethereum@workspace:packages/cactus-plugin-persistence-ethereum"
   dependencies:
     "@ethersproject/abi": "npm:5.7.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
@@ -8493,13 +8493,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-persistence-fabric@workspace:packages/cactus-plugin-persistence-fabric"
   dependencies:
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@types/body-parser": "npm:1.19.6"
     "@types/express": "npm:5.0.1"
@@ -8518,7 +8518,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-satp-hermes@npm:2.1.0, @hyperledger-cacti/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes":
+"@hyperledger-cacti/cactus-plugin-satp-hermes@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-satp-hermes@workspace:packages/cactus-plugin-satp-hermes"
   dependencies:
@@ -8534,19 +8534,19 @@ __metadata:
     "@foundry-rs/hardhat-forge": "npm:0.1.17"
     "@grpc/grpc-js": "npm:1.12.4"
     "@grpc/proto-loader": "npm:0.7.13"
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-bungee-hermes": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-object-store-ipfs": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-bungee-hermes": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-object-store-ipfs": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@jest/globals": "npm:29.7.0"
     "@mermaid-js/mermaid-cli": "npm:11.12.0"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
@@ -8650,14 +8650,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-api-client@workspace:packages/cactus-test-api-client"
   dependencies:
-    "@hyperledger-cacti/cacti-plugin-consortium-static": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cacti-plugin-consortium-static": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
@@ -8671,11 +8671,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-cmd-api-server@workspace:packages/cactus-test-cmd-api-server"
   dependencies:
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/uuid": "npm:10.0.0"
     express-jwt-authz: "npm:2.4.1"
     jest-extended: "npm:7.0.0"
@@ -8684,12 +8684,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-test-geth-ledger@npm:2.1.0, @hyperledger-cacti/cactus-test-geth-ledger@workspace:packages/cactus-test-geth-ledger":
+"@hyperledger-cacti/cactus-test-geth-ledger@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-test-geth-ledger@workspace:packages/cactus-test-geth-ledger":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-geth-ledger@workspace:packages/cactus-test-geth-ledger"
   dependencies:
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/dockerode": "npm:3.2.7"
     dockerode: "npm:3.3.0"
     internal-ip: "npm:6.2.0"
@@ -8700,18 +8700,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20@npm:2.1.0, @hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20@workspace:packages/cactus-test-plugin-htlc-eth-besu-erc20":
+"@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20@workspace:packages/cactus-test-plugin-htlc-eth-besu-erc20":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20@workspace:packages/cactus-test-plugin-htlc-eth-besu-erc20"
   dependencies:
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
@@ -8729,14 +8729,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu@workspace:packages/cactus-test-plugin-htlc-eth-besu"
   dependencies:
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-htlc-eth-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
@@ -8759,11 +8759,11 @@ __metadata:
     "@connectrpc/connect": "npm:1.4.0"
     "@connectrpc/connect-node": "npm:1.4.0"
     "@connectrpc/connect-web": "npm:1.4.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     uuid: "npm:10.0.0"
@@ -8775,15 +8775,15 @@ __metadata:
   resolution: "@hyperledger-cacti/cactus-test-plugin-ledger-connector-besu@workspace:packages/cactus-test-plugin-ledger-connector-besu"
   dependencies:
     "@grpc/grpc-js": "npm:1.13.3"
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-verifier-client": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-verifier-client": "npm:3.0.0-alpha.3"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
     axios: "npm:1.15.0"
@@ -8803,16 +8803,16 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-plugin-ledger-connector-ethereum@workspace:packages/cactus-test-plugin-ledger-connector-ethereum"
   dependencies:
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-verifier-client": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-keychain-memory": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-verifier-client": "npm:3.0.0-alpha.3"
     "@types/lodash": "npm:4.14.195"
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
@@ -8823,7 +8823,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-test-tooling@npm:2.1.0, @hyperledger-cacti/cactus-test-tooling@workspace:packages/cactus-test-tooling":
+"@hyperledger-cacti/cactus-test-tooling@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-test-tooling@workspace:packages/cactus-test-tooling":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-tooling@workspace:packages/cactus-test-tooling"
   dependencies:
@@ -8831,7 +8831,7 @@ __metadata:
     "@aries-framework/core": "npm:0.5.0-alpha.97"
     "@aries-framework/indy-vdr": "npm:0.5.0-alpha.97"
     "@aries-framework/node": "npm:0.5.0-alpha.97"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
     "@hyperledger/aries-askar-nodejs": "npm:0.2.3"
     "@hyperledger/indy-vdr-nodejs": "npm:0.2.3"
     "@types/dockerode": "npm:3.2.7"
@@ -8885,14 +8885,14 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-test-verifier-client@workspace:packages/cactus-test-verifier-client"
   dependencies:
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-verifier-client": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-geth-ledger": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-verifier-client": "npm:3.0.0-alpha.3"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:18.11.9"
@@ -8908,19 +8908,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-verifier-client@npm:2.1.0, @hyperledger-cacti/cactus-verifier-client@workspace:packages/cactus-verifier-client":
+"@hyperledger-cacti/cactus-verifier-client@npm:3.0.0-alpha.3, @hyperledger-cacti/cactus-verifier-client@workspace:packages/cactus-verifier-client":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-verifier-client@workspace:packages/cactus-verifier-client"
   dependencies:
-    "@hyperledger-cacti/cactus-api-client": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-corda": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-api-client": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-corda": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-iroha2": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth": "npm:3.0.0-alpha.3"
     jest-extended: "npm:7.0.0"
     rxjs: "npm:7.8.1"
   peerDependencies:
@@ -8951,11 +8951,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-workshop-examples-2022-11-14@workspace:examples/cactus-workshop-examples-2022-11-14"
   dependencies:
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-common": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-core-api": "npm:2.1.0"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:2.1.0"
+    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-common": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-alpha.3"
+    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-alpha.3"
     "@types/uuid": "npm:10.0.0"
     kubo-rpc-client: "npm:3.0.1"
     typescript-optional: "npm:2.0.1"
