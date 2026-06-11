@@ -454,6 +454,10 @@ export class Stage3ServerService extends SATPService {
 
         const sessionData = session.getServerSessionData();
 
+        if (request.common == undefined) {
+          throw new Error(`${fnTag} request.common is undefined`);
+        }
+
         commonBodyVerifier(
           fnTag,
           request.common,
@@ -510,6 +514,10 @@ export class Stage3ServerService extends SATPService {
         session.verify(fnTag, SessionType.SERVER);
 
         const sessionData = session.getServerSessionData();
+
+        if (request.common == undefined) {
+          throw new Error(`${fnTag} request.common is undefined`);
+        }
 
         commonBodyVerifier(
           fnTag,
@@ -584,6 +592,10 @@ export class Stage3ServerService extends SATPService {
         session.verify(fnTag, SessionType.SERVER);
 
         const sessionData = session.getServerSessionData();
+
+        if (request.common == undefined) {
+          throw new Error(`${fnTag} request.common is undefined`);
+        }
 
         commonBodyVerifier(
           fnTag,
