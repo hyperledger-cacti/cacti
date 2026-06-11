@@ -309,23 +309,24 @@ describe("Generate and send signed transaction tests", () => {
     const domainName = addRandomSuffix("errorCheckDomain");
     expect(domainName).toBeTruthy();
 
-    // Generate transaction with wrong instruction
-    try {
-      await env.apiClient.generateTransactionV1({
-        request: {
-          instruction: {
-            name: "foo" as IrohaInstruction,
-            params: [domainName],
-          },
+    const generateTransactionCall = env.apiClient.generateTransactionV1({
+      request: {
+        instruction: {
+          name: "foo" as IrohaInstruction,
+          params: [domainName],
         },
-        baseConfig: env.defaultBaseConfig,
-      });
-      expect(false).toBe(true); // should always throw by now
-    } catch (err: any) {
-      expect(err.response.status).toBe(500);
-      expect(err.response.data.message).toEqual("Internal Server Error");
-      expect(err.response.data.error).toBeTruthy();
-    }
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    await expect(generateTransactionCall).rejects.toMatchObject({
+      response: {
+        status: 500,
+        data: {
+          message: "Internal Server Error",
+          error: expect.any(String),
+        },
+      },
+    });
   });
 
   /**
@@ -333,20 +334,22 @@ describe("Generate and send signed transaction tests", () => {
    */
   test("generateTransactionV1 returns error for invalid query parameter number", async () => {
     // Query domain without it's ID
-    try {
-      await env.apiClient.generateTransactionV1({
-        request: {
-          query: IrohaQuery.FindDomainById,
-          params: [],
+    const generateTransactionCall = env.apiClient.generateTransactionV1({
+      request: {
+        query: IrohaQuery.FindDomainById,
+        params: [],
+      },
+      baseConfig: env.defaultBaseConfig,
+    });
+    await expect(generateTransactionCall).rejects.toMatchObject({
+      response: {
+        status: 500,
+        data: {
+          message: "Internal Server Error",
+          error: expect.any(String),
         },
-        baseConfig: env.defaultBaseConfig,
-      });
-      expect(false).toBe(true); // should always throw by now
-    } catch (err: any) {
-      expect(err.response.status).toBe(500);
-      expect(err.response.data.message).toEqual("Internal Server Error");
-      expect(err.response.data.error).toBeTruthy();
-    }
+      },
+    });
   });
 
   /**
