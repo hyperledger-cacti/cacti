@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cacti-weaver-besu-cli",
-  "version": "2.1.0",
+  "version": "3.0.0-alpha.2",
   "description": "besu-cli CLI",
   "keywords": [
     "Hyperledger",
@@ -53,8 +53,8 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@hyperledger-cacti/cacti-weaver-protos-js": "2.1.0",
-    "@hyperledger-cacti/cacti-weaver-sdk-besu": "2.1.0",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-alpha.2",
+    "@hyperledger-cacti/cacti-weaver-sdk-besu": "3.0.0-alpha.2",
     "@truffle/contract": "4.6.28",
     "bs58": "6.0.0",
     "gluegun": "5.1.6",
