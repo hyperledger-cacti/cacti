@@ -192,7 +192,7 @@ export class OracleManager {
       try {
         this.logger.debug(`${fnTag}, Deploying Oracle...`);
         this.logger.debug(
-          `${fnTag}, Oracle Network Options: ${JSON.stringify(oracleNetworkOptions)}`,
+          `${fnTag}, Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
         );
 
         this.logAndPersist(
@@ -228,9 +228,7 @@ export class OracleManager {
             case LedgerType.Besu2X:
               this.logger.debug(`${fnTag}, Deploying Besu Oracle...`);
               this.logger.debug(
-                `${fnTag}, Besu Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Besu Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               const besuNetworkOptions =
                 oracleNetworkOptions as unknown as IOracleBesuOptions;
@@ -251,9 +249,7 @@ export class OracleManager {
             case LedgerType.Ethereum:
               this.logger.debug(`${fnTag}, Deploying Ethereum Oracle...`);
               this.logger.debug(
-                `${fnTag}, Ethereum Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Ethereum Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               const ethereumNetworkOptions =
                 oracleNetworkOptions as unknown as IOracleEVMOptions;
@@ -274,9 +270,7 @@ export class OracleManager {
             case LedgerType.Fabric2:
               this.logger.debug(`${fnTag}, Deploying Fabric Oracle...`);
               this.logger.debug(
-                `${fnTag}, Fabric Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Fabric Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               if (
                 !(oracleNetworkOptions as Partial<IOracleFabricOptions>)
@@ -804,7 +798,7 @@ export class OracleManager {
               ...task.dstContract,
               params:
                 task.dstContract.params !== undefined &&
-                task.dstContract.params?.length !== 0 // if params are empty, use the read response
+                  task.dstContract.params?.length !== 0 // if params are empty, use the read response
                   ? task.dstContract.params
                   : writeContent,
             },

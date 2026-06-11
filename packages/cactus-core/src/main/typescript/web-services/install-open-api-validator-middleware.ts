@@ -78,8 +78,7 @@ export async function installOpenapiValidationMiddleware(
         }
       } else if (err) {
         log.debug("%s Got invalid error - validator crash(?) - %o", tag, err);
-        res.status(500);
-        res.send(err);
+        next();
       } else {
         log.debug("%s Validation Passed OK - %s", tag, req.url);
         next();
