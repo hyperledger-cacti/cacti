@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: git_clone
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
     # We need to wipe the root package.json file because the installation of actionlint fails otherwise like this:
     #
@@ -75,7 +75,7 @@ jobs:
 
     - name: actionlint
       id: actionlint
-      uses: raven-actions/actionlint@e01d1ea33dd6a5ed517d95b4c0c357560ac6f518 #v2.1.1
+      uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 #v2.1.2
       with:
         cache: true
         files: ${{ env.CACTI_ACTIONLINT_FILES_TO_LINT }}
