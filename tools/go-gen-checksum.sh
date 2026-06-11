@@ -225,33 +225,33 @@ update_import_paths() {
   done
 }
 
-# First pass: Update testutils dependency if present
-echo "========== PHASE 1: Updating testutils dependency =========="
-TESTUTILS_MODULE="github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
-for GOMODULE in ${GOMODULE_PATHS[@]}; do
-  if [ -f "$ROOT_DIR/$GOMODULE/go.mod" ]; then
-    pushd "$ROOT_DIR/$GOMODULE" > /dev/null
+# # First pass: Update testutils dependency if present
+# echo "========== PHASE 1: Updating testutils dependency =========="
+# TESTUTILS_MODULE="github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+# for GOMODULE in ${GOMODULE_PATHS[@]}; do
+#   if [ -f "$ROOT_DIR/$GOMODULE/go.mod" ]; then
+#     pushd "$ROOT_DIR/$GOMODULE" > /dev/null
     
-    # Check if testutils is a dependency
-    if grep -q $TESTUTILS_MODULE go.mod; then
-      echo "Updating testutils in $GOMODULE..."
+#     # Check if testutils is a dependency
+#     if grep -q $TESTUTILS_MODULE go.mod; then
+#       echo "Updating testutils in $GOMODULE..."
 
-      CURRENT_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE)
-      COMMIT_HASH=$(git rev-parse main)
-      LATEST_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE@$COMMIT_HASH)
+#       CURRENT_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE)
+#       COMMIT_HASH=$(git rev-parse main)
+#       LATEST_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE@$COMMIT_HASH)
       
-      if [ "$CURRENT_TESTUTILS_VERSION" != "$LATEST_TESTUTILS_VERSION" ]; then
-        # Get latest testutils
-        go mod edit -require=$TESTUTILS_MODULE@$LATEST_TESTUTILS_VERSION
-        go mod tidy
-      else
-        echo "Skipping: testutils is already up to date in $GOMODULE"
-      fi
-    fi
+#       if [ "$CURRENT_TESTUTILS_VERSION" != "$LATEST_TESTUTILS_VERSION" ]; then
+#         # Get latest testutils
+#         go mod edit -require=$TESTUTILS_MODULE@$LATEST_TESTUTILS_VERSION
+#         go mod tidy
+#       else
+#         echo "Skipping: testutils is already up to date in $GOMODULE"
+#       fi
+#     fi
     
-    popd > /dev/null
-  fi
-done
+#     popd > /dev/null
+#   fi
+# done
 
 # Second pass: Update import paths in source files
 echo "========== PHASE 2: Updating import paths in source files =========="
