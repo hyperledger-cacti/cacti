@@ -37,9 +37,7 @@
   ],
   "main": "dist/lib/main/typescript/index.js",
   "module": "dist/lib/main/typescript/index.js",
-  "browser": {
-    "./dist/lib/main/typescript/index.js": "./dist/lib/main/typescript/index.web.js"
-  },
+  "browser": "dist/cacti-plugin-consortium-static.web.umd.js",
   "types": "dist/lib/main/typescript/index.d.ts",
   "files": [
     "dist/*"
