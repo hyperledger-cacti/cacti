@@ -33,15 +33,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
-      with:
-        # We must fetch at least the immediate parents so that if this is
-        # a pull request then we can checkout the head.
-        fetch-depth: 2
-
-    # If this run was triggered by a pull request event, then checkout
-    # the head of the pull request instead of the merge commit.
-    - run: git checkout HEAD^2
-      if: ${{ github.event_name == 'pull_request' }}
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -77,6 +68,7 @@ jobs:
         category: "/language:${{ matrix.language }}"
 
     - name: Dismiss alerts (inline suppressions)
+      continue-on-error: true
       uses: advanced-security/dismiss-alerts@046d6b48d2e43cf563f96f67332c47c432eff83e #v2.0.2
       with:
         sarif-id: ${{ steps.analyze.outputs.sarif-id }}
