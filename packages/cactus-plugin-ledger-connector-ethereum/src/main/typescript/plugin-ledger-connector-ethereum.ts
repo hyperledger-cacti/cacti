@@ -108,9 +108,9 @@ const waitForWsProviderRequestsTimeout = 5 * 1000; // 5s
 const waitForWsProviderRequestsStep = 500; // 500ms
 type RunContractDeploymentInput = {
   web3SigningCredential:
-    | Web3SigningCredentialCactiKeychainRef
-    | Web3SigningCredentialGethKeychainPassword
-    | Web3SigningCredentialPrivateKeyHex;
+  | Web3SigningCredentialCactiKeychainRef
+  | Web3SigningCredentialGethKeychainPassword
+  | Web3SigningCredentialPrivateKeyHex;
   contractJSON: ContractJSON;
   gasConfig?: GasTransactionConfig;
   constructorArgs?: unknown[];
@@ -145,15 +145,14 @@ export interface IPluginLedgerConnectorEthereumOptions
 
 export class PluginLedgerConnectorEthereum
   implements
-    IPluginLedgerConnector<
-      DeployContractV1Request,
-      RunTransactionResponse,
-      RunTransactionRequest,
-      RunTransactionResponse
-    >,
-    ICactusPlugin,
-    IPluginWebService
-{
+  IPluginLedgerConnector<
+    DeployContractV1Request,
+    RunTransactionResponse,
+    RunTransactionRequest,
+    RunTransactionResponse
+  >,
+  ICactusPlugin,
+  IPluginWebService {
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
@@ -643,6 +642,7 @@ export class PluginLedgerConnectorEthereum
       );
     }
 
+    // codeql[js/unvalidated-dynamic-method-call] - req.methodName is validated by isSafeToCallContractMethod above
     const methodRef = contractInstance.methods[req.methodName] as (
       ...args: unknown[]
     ) => PayableMethodObject;
@@ -727,16 +727,16 @@ export class PluginLedgerConnectorEthereum
         } else {
           throw new Error(
             `${fnTag} Expected pre-signed raw transaction ` +
-              ` since signing credential is specified as` +
-              `Web3SigningCredentialType.NONE`,
+            ` since signing credential is specified as` +
+            `Web3SigningCredentialType.NONE`,
           );
         }
       }
       default: {
         throw new Error(
           `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-            `${req.web3SigningCredential.type} Supported ones are: ` +
-            `${Object.values(Web3SigningCredentialType).join(";")}`,
+          `${req.web3SigningCredential.type} Supported ones are: ` +
+          `${Object.values(Web3SigningCredentialType).join(";")}`,
         );
       }
     }
@@ -789,7 +789,7 @@ export class PluginLedgerConnectorEthereum
     } catch (error) {
       throw new Error(
         `${fnTag} Failed to create subscription for ${name}. ` +
-          `Error: ${error.message}`,
+        `Error: ${error.message}`,
       );
     }
   }
@@ -862,7 +862,7 @@ export class PluginLedgerConnectorEthereum
     } catch (ex) {
       throw new Error(
         `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-          `InnerException: ${ex.stack}`,
+        `InnerException: ${ex.stack}`,
       );
     }
   }
@@ -891,7 +891,7 @@ export class PluginLedgerConnectorEthereum
     } else {
       throw new Error(
         `${fnTag} Failed to sign eth transaction. ` +
-          `signedTransaction.rawTransaction is blank after .signTransaction().`,
+        `signedTransaction.rawTransaction is blank after .signTransaction().`,
       );
     }
   }
@@ -1237,12 +1237,25 @@ export class PluginLedgerConnectorEthereum
       });
     }
 
+    // codeql[js/unvalidated-dynamic-method-call] - contractMethod validated by isSafeToCallContractMethod above
     const methodRef = contract.methods[args.contractMethod] as (
       ...args: unknown[]
     ) => any;
-    return methodRef(...contractMethodArgs)[args.invocationType](
-      args.invocationParams,
-    );
+    const invocationResult = methodRef(...contractMethodArgs);
+    switch (args.invocationType) {
+      case EthContractInvocationWeb3Method.Send:
+        return invocationResult.send(args.invocationParams);
+      case EthContractInvocationWeb3Method.Call:
+        return invocationResult.call(args.invocationParams);
+      case EthContractInvocationWeb3Method.EncodeAbi:
+        return invocationResult.encodeABI(args.invocationParams);
+      case EthContractInvocationWeb3Method.EstimateGas:
+        return invocationResult.estimateGas(args.invocationParams);
+      default:
+        throw new Error(
+          `Unsupported invocationType: ${args.invocationType}`,
+        );
+    }
   }
 
   public decodeEvent(

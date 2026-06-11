@@ -92,6 +92,14 @@ export class CDLGateway {
   ): Promise<CDLCommonResponseV1> {
     const { httpsAgent, baseURL, userAgent } = this;
 
+    // Prevent SSRF: reject absolute URLs or protocol-relative URLs that would
+    // override baseURL in Axios.
+    if (/^(?:[a-zA-Z][a-zA-Z\d+\-.]*:)?\/\//i.test(url)) {
+      throw new Error(
+        `CDLGateway#request: url must be a relative path, got: ${url}`,
+      );
+    }
+
     let httpMethod = "get";
     if (dataPayload) {
       httpMethod = "post";
