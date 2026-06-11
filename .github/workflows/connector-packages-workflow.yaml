@@ -52,7 +52,7 @@ jobs:
       # (cactus-besu-all-in-one-multi-party) which does not start up reliably .
       # Re-enable once the multi-party image starts reliably within ~15 minutes.
       TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts}
+        --files=./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
