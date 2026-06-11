@@ -358,6 +358,23 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
   });
 
   it("should read data and write it to another blockchain (EVM to Besu)", async () => {
+    data_hash = keccak256("Hello World!");
+    const seedResponse = await oracleApi.executeOracleTask({
+      destinationNetworkId: ethereumEnv.network,
+      destinationContract: {
+        contractName: ethereumEnv.getTestOracleContractName(),
+        contractAddress: ethereumContractAddress,
+        contractAbi: OracleTestContract.abi,
+        contractBytecode: OracleTestContract.bytecode.object,
+        methodName: "setData",
+        params: ["Hello World!"],
+      },
+      taskType: OracleExecuteRequestTaskTypeEnum.Update,
+    });
+    expect(seedResponse.data.operations?.[0]?.status).toBe(
+      OracleOperationStatusEnum.Success,
+    );
+
     const response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {

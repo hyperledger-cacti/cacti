@@ -155,10 +155,20 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
 
-  {
+  try {
     log.info(await setupFabricTestLedger());
     log.info(await setupBesuTestLedger());
     log.info(await setupEthereumTestLedger());
+  } catch (ex) {
+    log.error("bungee-api-test beforeAll setup failed:", ex);
+    besuServer = undefined as unknown as Server;
+    fabricServer = undefined as unknown as Server;
+    ethereumServer = undefined as unknown as Server;
+    bungeeServer = undefined as unknown as Server;
+    besuLedger = undefined as unknown as BesuTestLedger;
+    fabricLedger = undefined as unknown as FabricTestLedgerV1;
+    ethereumLedger = undefined as unknown as GethTestLedger;
+    throw ex;
   }
 });
 
@@ -319,16 +329,28 @@ test("tests bungee api using different strategies", async () => {
 });
 
 afterAll(async () => {
-  await Servers.shutdown(besuServer);
-  await Servers.shutdown(fabricServer);
-  await Servers.shutdown(bungeeServer);
-  await Servers.shutdown(ethereumServer);
-  await ethereumLedger.stop();
-  await ethereumLedger.destroy();
-  await besuLedger.stop();
-  await besuLedger.destroy();
-  await fabricLedger.stop();
-  await fabricLedger.destroy();
+  // Guard every shutdown call: if setup threw before a server/ledger was
+  // initialised the variable is `undefined` and Servers.shutdown() would throw
+  // "server was falsy", masking the real test failure with a second error.
+  await Promise.allSettled([
+    besuServer ? Servers.shutdown(besuServer) : Promise.resolve(),
+    fabricServer ? Servers.shutdown(fabricServer) : Promise.resolve(),
+    bungeeServer ? Servers.shutdown(bungeeServer) : Promise.resolve(),
+    ethereumServer ? Servers.shutdown(ethereumServer) : Promise.resolve(),
+  ]);
+
+  if (ethereumLedger) {
+    await ethereumLedger.stop();
+    await ethereumLedger.destroy();
+  }
+  if (besuLedger) {
+    await besuLedger.stop();
+    await besuLedger.destroy();
+  }
+  if (fabricLedger) {
+    await fabricLedger.stop();
+    await fabricLedger.destroy();
+  }
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
