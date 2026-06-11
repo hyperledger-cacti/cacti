@@ -121,54 +121,85 @@ _Unless explicitly stated otherwise, each bullet will apply to both Intel and AR
     ```
 
 ### Linux
-* Git
-  * Install via your distribution's package manager (e.g., `sudo apt-get install git`)
+
+**Tested on Ubuntu 22.04 LTS**
+
+* Base prerequisites (install these first, they're used by later `curl`-based installers)
+  * `sudo apt-get update && sudo apt-get install -y git curl ca-certificates build-essential python3`
 * NodeJS v20.20.0, npm v10.8.2 (we recommend using the Node Version Manager (nvm))
-  * [Install nvm](https://github.com/nvm-sh/nvm?tab=readme-ov-file#install--update-script)
-  * Using nvm:
-    ```sh
+  * Install nvm:
+    ```bash
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    source ~/.bashrc
+    ```
+  * Install and use the required Node version:
+    ```bash
     nvm install 20.20.0
     nvm use 20.20.0
     ```
 * Yarn
   * `npm run enable-corepack` (from within the project directory)
-* Docker Engine
-  * [Install Docker Engine on Ubuntu](https://docs.docker.com/engine/install/ubuntu/)
-  * [Post-installation steps for Linux](https://docs.docker.com/engine/install/linux-postinstall/)
+* [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+  * Post-install — allow running without sudo:
+    ```bash
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
 * Docker Compose
-  * Included with Docker Engine on modern installations, or install separately:
-    [Install Docker Compose](https://docs.docker.com/compose/install/)
-* Go
-  * [Install Go on Linux](https://go.dev/doc/install)
+  * Included with Docker Engine on modern installations. Verify with:
+    ```bash
+    docker compose version
+    ```
+* OpenJDK (Corda support requires Java 8 JDK)
+  * `sudo apt-get install -y openjdk-8-jdk`
+  * Note: `openjdk-8-jdk` is not available from the default Ubuntu 24.04
+    repositories. On 24.04 you'll need a supported external distribution
+    (e.g. Temurin 8 from Adoptium) — see
+    [Adoptium install guide](https://adoptium.net/installation/linux/).
+* Go (**requires Go >= 1.20**; parts of this repo such as `weaver/common/protos-go` will fail to build with older toolchains)
+  * We recommend installing from the official Go downloads page:
+    [go.dev/dl](https://go.dev/dl/). The `golang-go` package on Ubuntu 22.04
+    ships an older toolchain (1.18) and is not sufficient on its own.
 * Foundry (required for SATP Hermes smart contract compilation)
-  ```sh
-  curl -L https://foundry.paradigm.xyz | bash
-  source ~/.bashrc
-  foundryup
-  forge --version
-  ```
+  * Install Foundry:
+    ```bash
+    curl -L https://foundry.paradigm.xyz | bash
+    source ~/.bashrc
+    foundryup
+    ```
+  * Verify installation:
+    ```bash
+    forge --version
+    ```
 
 ### Windows
 
-> **We strongly recommend using WSL2** (Windows Subsystem for Linux) for development.
-> Native Windows development is possible but may encounter path length and permission issues.
+We recommend using WSL2 (Windows Subsystem for Linux) with Ubuntu 22.04.
 
-* [Install WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) and then follow the Linux instructions above inside WSL2.
-* If using native Windows:
-  * Git: [Install Git for Windows](https://git-scm.com/download/win)
-    * Enable long paths:
-      ```powershell
-      git config --global core.longpaths true
-      ```
-  * NodeJS v20.20.0: [Download from nodejs.org](https://nodejs.org/) or use [nvm-windows](https://github.com/coreybutler/nvm-windows)
-  * Docker Desktop: [Install Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
-  * Go: [Install Go for Windows](https://go.dev/dl/)
+* Install WSL2
+  * Open PowerShell as Administrator:
+    ```powershell
+    wsl --install -d Ubuntu-22.04
+    ```
+  * Restart your machine, then open Ubuntu from the Start menu
 
+* [Docker Desktop for Windows](https://docs.docker.com/desktop/install/windows-install/)
+  * Enable WSL2 integration: Docker Desktop → Settings → Resources → WSL Integration
+  * If you encounter socket permission errors inside WSL2, add your user to
+    the `docker` group instead of loosening the socket permissions (do
+    **not** `chmod 666 /var/run/docker.sock` — that grants root-equivalent
+    access to any local process):
+    ```bash
+    sudo usermod -aG docker $USER
+    newgrp docker
+    ```
+
+* Then follow the [Linux](#linux) instructions above inside your WSL2 terminal
 
 ### Random Windows specific issues not covered here
 
 We recommend that you use WSL2 or any Linux VM (or bare metal).
-We test most frequently on Ubuntu 20.04 LTS
+We test most frequently on Ubuntu 22.04 LTS
 
 ### Configure Cacti 
 
