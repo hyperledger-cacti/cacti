@@ -259,12 +259,11 @@ export class ConfigService {
         default: 3000,
       },
       cockpitWwwRoot: {
-        doc: "The file-system path pointing to the static files of web application served as the cockpit by the API server.",
+        doc: "The file-system path pointing to the static files of web application served as the cockpit by the API server. NOTE: The @hyperledger/cactus-cockpit package has been removed from this repository. This configuration option is deprecated and its default value is now an empty string. If you still use a custom cockpit UI, provide a valid path via this setting or the COCKPIT_WWW_ROOT environment variable.",
         format: "*",
         env: "COCKPIT_WWW_ROOT",
         arg: "cockpit-www-root",
-        default:
-          "packages/cactus-cmd-api-server/node_modules/@hyperledger/cactus-cockpit/www/",
+        default: "",
       },
       cockpitCorsDomainCsv: {
         doc:

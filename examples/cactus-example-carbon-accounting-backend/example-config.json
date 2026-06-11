@@ -16,7 +16,7 @@
     "apiTlsClientCaPem": "-",
     "cockpitHost": "127.0.0.1",
     "cockpitPort": 3000,
-    "cockpitWwwRoot": "packages/cactus-cmd-api-server/node_modules/@hyperledger/cactus-cockpit/www/",
+    "cockpitWwwRoot": "",
     "cockpitCorsDomainCsv": "",
     "cockpitMtlsEnabled": false,
     "cockpitTlsEnabled": true,
