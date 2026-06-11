@@ -23,10 +23,10 @@ import (
 	"math/big"
 	"time"
 
-	"golang.org/x/crypto/ed25519"
 	"github.com/ethereum/go-ethereum/crypto/ecies"
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	"golang.org/x/crypto/ed25519"
 )
 
 const (
@@ -89,9 +89,11 @@ func verifyCaCertificate(cert *x509.Certificate, memberCertificate string) error
 	return nil
 }
 
-/* This function will receive arguments for exactly one node with the following cert chain assumed: <root cert> -> <int cert 0> -> <int cert 1> -> ......
-   In a Fabric network, we assume that there are multiple MSPs, each having one or more Root CAs and zero or more Intermediate CAs.
-   In a Corda network, we assume that there is a single Root CA and Doorman CA, and one or more Node CAs corresponding to nodes.
+/*
+This function will receive arguments for exactly one node with the following cert chain assumed: <root cert> -> <int cert 0> -> <int cert 1> -> ......
+
+	In a Fabric network, we assume that there are multiple MSPs, each having one or more Root CAs and zero or more Intermediate CAs.
+	In a Corda network, we assume that there is a single Root CA and Doorman CA, and one or more Node CAs corresponding to nodes.
 */
 func verifyCertificateChain(cert *x509.Certificate, certPEMs []string) error {
 	var parentCert *x509.Certificate
@@ -272,7 +274,7 @@ func encryptWithCert(message []byte, cert *x509.Certificate) ([]byte, error) {
 	pubKey := getECDSAPublicKeyFromCertificate(cert)
 	if pubKey != nil {
 		return encryptWithECDSAPublicKey(message, pubKey)
-	} else if (cert.RawSubjectPublicKeyInfo != nil && len(cert.RawSubjectPublicKeyInfo) == 44) {	// ed25519 public key
+	} else if cert.RawSubjectPublicKeyInfo != nil && len(cert.RawSubjectPublicKeyInfo) == 44 { // ed25519 public key
 		// We expect the key to be 44 bytes, but only the last 32 bytes (multiple of 8) comprise the public key
 		return encryptWithEd25519PublicKey(message, cert.RawSubjectPublicKeyInfo[12:])
 	} else {
@@ -323,7 +325,7 @@ func generateConfidentialInteropPayloadAndHash(message []byte, cert string) ([]b
 
 	confidentialPayloadContents := common.ConfidentialPayloadContents{
 		Payload: message,
-		Random: hashKey,
+		Random:  hashKey,
 	}
 	confidentialPayloadContentsBytes, err := proto.Marshal(&confidentialPayloadContents)
 	if err != nil {
@@ -347,8 +349,8 @@ func generateConfidentialInteropPayloadAndHash(message []byte, cert string) ([]b
 
 	confidentialPayload := common.ConfidentialPayload{
 		EncryptedPayload: encryptedPayload,
-		HashType: common.ConfidentialPayload_HMAC,
-		Hash: payloadHMAC,
+		HashType:         common.ConfidentialPayload_HMAC,
+		Hash:             payloadHMAC,
 	}
 	confidentialPayloadBytes, err := proto.Marshal(&confidentialPayload)
 	if err != nil {

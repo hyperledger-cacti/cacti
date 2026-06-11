@@ -25,10 +25,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/require"
 	"github.com/ethereum/go-ethereum/crypto/ecies"
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	"github.com/stretchr/testify/require"
 )
 
 func TestVerifyCertificateChain(t *testing.T) {

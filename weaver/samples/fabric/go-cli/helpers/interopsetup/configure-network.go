@@ -12,8 +12,8 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/hyperledger-cacti/cacti/weaver/samples/fabric/go-cli/helpers"
+	log "github.com/sirupsen/logrus"
 )
 
 // helper functions to log and return errors

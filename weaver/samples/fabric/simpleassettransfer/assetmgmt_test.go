@@ -7,20 +7,20 @@
 package main_test
 
 import (
-	"encoding/json"
-	"encoding/base64"
 	"crypto/sha256"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"testing"
 	"time"
 
-	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
 	"github.com/golang/protobuf/proto"
-	"github.com/hyperledger/fabric-chaincode-go/shim"
-	"github.com/stretchr/testify/require"
-	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassettransfer"
 	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleassettransfer"
+	"github.com/hyperledger/fabric-chaincode-go/shim"
+	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
+	"github.com/stretchr/testify/require"
 )
 
 // function that supplies value that is to be returned by ctx.GetStub().GetCreator() in locker/recipient context
@@ -62,8 +62,8 @@ func generateSHA256HashInBase64Form(preimage string) string {
 }
 
 type ContractedFungibleAsset struct {
-	Type		string	`json:"type"`
-	NumUnits	uint64	`json:"id"`
+	Type     string `json:"type"`
+	NumUnits uint64 `json:"id"`
 }
 
 // test case for "asset exchange" happy path
@@ -79,7 +79,7 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	bondIssuer := "network1"
 	bondFaceValue := 1
 	currentTime := time.Now()
-	bondMaturityDate := currentTime.Add(time.Hour * 24)  // maturity date is 1 day after current time
+	bondMaturityDate := currentTime.Add(time.Hour * 24) // maturity date is 1 day after current time
 
 	tokenType := "cbdc"
 	tokenIssuer := "network2"
@@ -88,13 +88,11 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	tokensLocker := getRecipientECertBase64()
 	tokensRecipient := getLockerECertBase64()
 
-
 	// Create bond asset
 	// let ctx.GetStub().GetState() return that the bond asset didn't exist before
 	chaincodeStub.GetStateReturnsOnCall(0, nil, nil)
 	err := sc.CreateAsset(ctx, bondType, bondId, bondLocker, bondIssuer, bondFaceValue, bondMaturityDate.Format(time.RFC822))
 	require.NoError(t, err)
-
 
 	// Create token asset type
 	chaincodeStub.GetStateReturnsOnCall(1, nil, nil)
@@ -102,13 +100,12 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, res, true)
 
-
 	// Issue token assets for Bob
-	tokenAssetType := sa.TokenAssetType {
+	tokenAssetType := sa.TokenAssetType{
 		Issuer: tokenIssuer,
-		Value: tokenValue,
+		Value:  tokenValue,
 	}
-    tokenAssetTypeBytes, _ := json.Marshal(tokenAssetType)
+	tokenAssetTypeBytes, _ := json.Marshal(tokenAssetType)
 	chaincodeStub.GetStateReturnsOnCall(2, tokenAssetTypeBytes, nil)
 	walletMap := make(map[string]uint64)
 	tokensWallet := &sa.TokenWallet{WalletMap: walletMap}
@@ -117,37 +114,36 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	err = sc.IssueTokenAssets(ctx, tokenType, numTokens, getRecipientECertBase64())
 	require.NoError(t, err)
 
-
 	// Lock bond asset in network1 by Alice for Bob
 	fmt.Println("*** Lock bond asset in network1 by Alice ***")
 	preimage := "abcd"
 	hashBase64 := generateSHA256HashInBase64Form(preimage)
-	defaultTimeLockSecs := uint64(300)   // set default locking period as 5 minutes
+	defaultTimeLockSecs := uint64(300) // set default locking period as 5 minutes
 	currentTimeSecs := uint64(time.Now().Unix())
 	bondContractId := "bond-contract"
-	lockInfoHTLC := &common.AssetLockHTLC {
-		HashBase64: []byte(hashBase64),
+	lockInfoHTLC := &common.AssetLockHTLC{
+		HashBase64:     []byte(hashBase64),
 		ExpiryTimeSecs: currentTimeSecs + defaultTimeLockSecs,
-		TimeSpec: common.TimeSpec_EPOCH,
+		TimeSpec:       common.TimeSpec_EPOCH,
 	}
 	lockInfoHTLCBytes, _ := proto.Marshal(lockInfoHTLC)
 	lockInfo := &common.AssetLock{
 		LockInfo: lockInfoHTLCBytes,
 	}
 	lockInfoBytes, _ := proto.Marshal(lockInfo)
-	bondAgreement := &common.AssetExchangeAgreement {
+	bondAgreement := &common.AssetExchangeAgreement{
 		AssetType: bondType,
-		Id: bondId,
-		Locker: bondLocker,
+		Id:        bondId,
+		Locker:    bondLocker,
 		Recipient: bondRecipient,
 	}
 	bondAgreementBytes, _ := proto.Marshal(bondAgreement)
-	bondAsset := sa.BondAsset {
-		Type: bondType,
-		ID: bondId,
-		Owner: bondLocker,
-		Issuer: bondIssuer,
-		FaceValue: bondFaceValue,
+	bondAsset := sa.BondAsset{
+		Type:         bondType,
+		ID:           bondId,
+		Owner:        bondLocker,
+		Issuer:       bondIssuer,
+		FaceValue:    bondFaceValue,
 		MaturityDate: bondMaturityDate,
 	}
 	bondAssetBytes, err := json.Marshal(bondAsset)
@@ -159,21 +155,20 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, bondContractId)
 
-
 	// Lock token asset in network2 by Bob for Alice
 	fmt.Println("*** Lock token asset in network2 by Bob ***")
 	tokensContractId := "tokens-contract"
-	tokensAgreement := &common.FungibleAssetExchangeAgreement {
+	tokensAgreement := &common.FungibleAssetExchangeAgreement{
 		AssetType: tokenType,
-		NumUnits: numTokens,
-		Locker: tokensLocker,
+		NumUnits:  numTokens,
+		Locker:    tokensLocker,
 		Recipient: tokensRecipient,
 	}
 	tokensAgreementBytes, _ := proto.Marshal(tokensAgreement)
 	chaincodeStub.GetCreatorReturnsOnCall(1, []byte(getCreatorInContext("recipient")), nil)
-	tokenAssetType = sa.TokenAssetType {
+	tokenAssetType = sa.TokenAssetType{
 		Issuer: tokenIssuer,
-		Value: tokenValue,
+		Value:  tokenValue,
 	}
 	tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
 	chaincodeStub.GetStateReturnsOnCall(5, tokenAssetTypeBytes, nil)
@@ -190,29 +185,28 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, tokensContractId)
 
-
 	// Claim token asset in network2 by Alice
 	fmt.Println("*** Claim token asset in network2 by Alice ***")
 	preimageBase64 := base64.StdEncoding.EncodeToString([]byte(preimage))
-	claimInfoHTLC := &common.AssetClaimHTLC {
+	claimInfoHTLC := &common.AssetClaimHTLC{
 		HashPreimageBase64: []byte(preimageBase64),
 	}
 	claimInfoHTLCBytes, _ := proto.Marshal(claimInfoHTLC)
 	claimInfo := &common.AssetClaim{
-		ClaimInfo: claimInfoHTLCBytes,
+		ClaimInfo:     claimInfoHTLCBytes,
 		LockMechanism: common.LockMechanism_HTLC,
 	}
 	claimInfoBytes, _ := proto.Marshal(claimInfo)
 	chaincodeStub.InvokeChaincodeReturnsOnCall(3, shim.Success(nil))
 	chaincodeStub.GetCreatorReturnsOnCall(3, []byte(getCreatorInContext("locker")), nil)
 	chaincodeStub.GetCreatorReturnsOnCall(4, []byte(getCreatorInContext("locker")), nil)
-	tokenAssetType = sa.TokenAssetType {
+	tokenAssetType = sa.TokenAssetType{
 		Issuer: tokenIssuer,
-		Value: tokenValue,
+		Value:  tokenValue,
 	}
 	tokenAssetTypeBytes, _ = json.Marshal(tokenAssetType)
 	contractedTokenAsset := ContractedFungibleAsset{
-		Type: tokenType,
+		Type:     tokenType,
 		NumUnits: numTokens,
 	}
 
@@ -222,7 +216,6 @@ func TestExchangeBondAssetWithTokenAsset(t *testing.T) {
 	chaincodeStub.GetStateReturnsOnCall(11, nil, nil)
 	_, err = sc.ClaimFungibleAsset(ctx, base64.StdEncoding.EncodeToString(tokensAgreementBytes), base64.StdEncoding.EncodeToString(claimInfoBytes))
 	require.NoError(t, err)
-
 
 	// Claim bond asset in network1 by Bob
 	fmt.Println("*** Claim bond asset in network1 by Bob ***")

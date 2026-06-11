@@ -8,10 +8,10 @@
 package main
 
 import (
-	"fmt"
-	"errors"
-	"encoding/base64"
 	"bytes"
+	"encoding/base64"
+	"errors"
+	"fmt"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/hyperledger/fabric-contract-api-go/contractapi"
@@ -30,7 +30,7 @@ func getECertOfTxCreatorBase64(ctx contractapi.TransactionContextInterface) (str
 
 	txCreatorBytes, err := ctx.GetStub().GetCreator()
 	if err != nil {
-	return "", fmt.Errorf("unable to get the transaction creator information: %+v", err)
+		return "", fmt.Errorf("unable to get the transaction creator information: %+v", err)
 	}
 
 	serializedIdentity := &mspProtobuf.SerializedIdentity{}

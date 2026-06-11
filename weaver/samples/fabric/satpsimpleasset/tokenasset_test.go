@@ -1,17 +1,17 @@
 package main_test
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"testing"
-	"encoding/base64"
-	"bytes"
 
 	"github.com/golang/protobuf/proto"
-	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
-	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/satpsimpleasset"
-	"github.com/stretchr/testify/require"
 	wtest "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+	sa "github.com/hyperledger-cacti/cacti/weaver/samples/fabric/satpsimpleasset"
+	mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInitTokenAssetLedger(t *testing.T) {
