@@ -1,5 +1,4 @@
 import type { Express, Request, Response } from "express";
-import fastSafeStringify from "fast-safe-stringify";
 
 import {
   IWebServiceEndpoint,
@@ -107,12 +106,13 @@ export class WithdrawCounterpartyEndpoint implements IWebServiceEndpoint {
     } catch (ex: unknown) {
       if (ex instanceof WithdrawCounterpartyTxReverted) {
         this.log.debug("%o %o", reqTag, ex);
-        res.status(400).json(ex);
+        res.status(400).json({
+          message: "Counterparty withdrawal transaction reverted",
+        });
       } else {
-        const error = ex instanceof Error ? ex.message : fastSafeStringify(ex);
+        this.log.error("%o %o", reqTag, ex);
         res.status(500).json({
           message: "Internal Server Error",
-          error,
         });
       }
     }
