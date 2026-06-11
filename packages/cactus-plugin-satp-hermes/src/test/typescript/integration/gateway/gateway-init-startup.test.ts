@@ -407,11 +407,8 @@ describe("SATPGateway startup", () => {
         useNullAsDefault: true,
       });
       try {
-        const tables = await db.raw(
-          "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'knex%'",
-        );
-        const names = tables.map((r: { name: string }) => r.name);
-        expect(names).toContain(expectedTable);
+        const hasTable = await db.schema.hasTable(expectedTable);
+        expect(hasTable).toBeTrue();
       } finally {
         await db.destroy();
       }
