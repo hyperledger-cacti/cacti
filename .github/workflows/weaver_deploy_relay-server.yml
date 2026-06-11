@@ -35,9 +35,9 @@ jobs:
             components: rustfmt, clippy
             
         - name: Publish
-          run: cargo publish --token ${CRATES_TOKEN}
+          run: cargo publish
           env:
-            CRATES_TOKEN: ${{ secrets.CARGO_CRATES_IO_TOKEN }}
+            CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
           working-directory: weaver/common/protos-rs/pkg
     
   publish-relay-image:
