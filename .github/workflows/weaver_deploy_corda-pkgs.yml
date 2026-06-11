@@ -40,14 +40,30 @@ jobs:
           echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
           cat github.properties
         working-directory: weaver/common/protos-java-kt
-        
-      - name: Publish
+
+      - name: Check if already published on GitHub Packages
+        id: check
+        working-directory: weaver/common/protos-java-kt
         run: |
-          make publish > out 2> error
-          exitStatus=$?
-          cat out
-          cat error
-          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
+          ART=protos-java-kt
+          GROUP=$(grep -oE '^group=.*' gradle.properties | cut -d= -f2-)
+          VER=$(grep -oE '^version=.*' gradle.properties | cut -d= -f2-)
+          GROUP_PATH=$(echo "$GROUP" | tr . /)
+          URL="https://maven.pkg.github.com/${{ github.repository_owner }}/cacti/$GROUP_PATH/$ART/$VER/$ART-$VER.pom"
+          HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+            -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$URL")
+          echo "GET $URL -> $HTTP"
+          if [ "$HTTP" = "200" ]; then
+            echo "$ART:$VER already on GitHub Packages — skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "$ART:$VER not yet published — will publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish
+        if: steps.check.outputs.skip != 'true'
+        run: make publish
         working-directory: weaver/common/protos-java-kt
         
 
@@ -78,17 +94,39 @@ jobs:
           cat github.properties
         working-directory: weaver/core/network/corda-interop-app
         
+      - name: Check if already published on GitHub Packages
+        id: check
+        working-directory: weaver/core/network/corda-interop-app
+        run: |
+          GROUP=org.hyperledger.cacti.weaver.imodule.corda
+          VER=$(grep -oE '^version=.*' gradle.properties | cut -d= -f2-)
+          GROUP_PATH=$(echo "$GROUP" | tr . /)
+          ALL_PUBLISHED=true
+          for ART in interop-contracts interop-workflows; do
+            URL="https://maven.pkg.github.com/${{ github.repository_owner }}/cacti/$GROUP_PATH/$ART/$VER/$ART-$VER.pom"
+            HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+              -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$URL")
+            echo "GET $URL -> $HTTP"
+            if [ "$HTTP" != "200" ]; then
+              ALL_PUBLISHED=false
+            fi
+          done
+          if [ "$ALL_PUBLISHED" = "true" ]; then
+            echo "interop-contracts & interop-workflows @ $VER already on GitHub Packages — skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "At least one artifact not yet published — will publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build
+        if: steps.check.outputs.skip != 'true'
         run: make build
         working-directory: weaver/core/network/corda-interop-app
-        
+
       - name: Publish
-        run: |
-          make publish > out 2> error
-          exitStatus=$?
-          cat out
-          cat error
-          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
+        if: steps.check.outputs.skip != 'true'
+        run: make publish
         working-directory: weaver/core/network/corda-interop-app
         
   publish-sdk:
@@ -118,17 +156,34 @@ jobs:
           cat github.properties
         working-directory: weaver/sdks/corda
         
+      - name: Check if already published on GitHub Packages
+        id: check
+        working-directory: weaver/sdks/corda
+        run: |
+          ART=weaver-sdk-corda
+          GROUP=$(grep -oE '^group=.*' gradle.properties | cut -d= -f2-)
+          VER=$(grep -oE '^version=.*' gradle.properties | cut -d= -f2-)
+          GROUP_PATH=$(echo "$GROUP" | tr . /)
+          URL="https://maven.pkg.github.com/${{ github.repository_owner }}/cacti/$GROUP_PATH/$ART/$VER/$ART-$VER.pom"
+          HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+            -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$URL")
+          echo "GET $URL -> $HTTP"
+          if [ "$HTTP" = "200" ]; then
+            echo "$ART:$VER already on GitHub Packages — skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "$ART:$VER not yet published — will publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build
+        if: steps.check.outputs.skip != 'true'
         run: make build
         working-directory: weaver/sdks/corda
-        
+
       - name: Publish
-        run: |
-          make publish > out 2> error
-          exitStatus=$?
-          cat out
-          cat error
-          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
+        if: steps.check.outputs.skip != 'true'
+        run: make publish
         working-directory: weaver/sdks/corda
     
   publish-driver-image:
