@@ -10,7 +10,7 @@
 ## Problem
 
 All integration tests that depend on the **Fabric All-in-One (AIO)** Docker
-image (`ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0`) suffer
+image (`ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.5`) suffer
 from two related issues:
 
 1. **Channel-join timeout:** The `peer channel join` command enters an infinite
@@ -47,7 +47,7 @@ This repeats indefinitely until Jest kills the test for exceeding the timeout.
 | **Java** | OpenJDK 17.0.18+8 (Ubuntu 22.04.1) |
 | **Docker** | 28.4.0 (Docker Desktop) |
 | **Docker Compose** | v2.39.4-desktop.1 |
-| **Docker image** | `ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0` |
+| **Docker image** | `ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.5` |
 
 ### Root Cause (suspected)
 

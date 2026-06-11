@@ -34,8 +34,6 @@ github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek
 github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.1.0 h1:lpzgs7zrwKrYLLoLTvZWZyh0GZNuRjQ9HEiqFlrDcSQ=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.1.0/go.mod h1:Z4LusyczoMuzq33wQk1Zdbyy53ONbuRVV/5xuRHV+hA=
 github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9 h1:XM/5fXIiBBQonxiJ375XpSgbxvOIB5onvVFi8ue2css=
 github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9/go.mod h1:0BojxsIV9fM9jFMQvzg3iYIyXCG5op/hvZaATGXSAoI=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a h1:HwSCxEeiBthwcazcAykGATQ36oG9M+HEQvGLvB7aLvA=
@@ -146,3 +144,5 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-alpha.5 h1:juC7G0xKE7zEQHCL2c489C1N0/+UXvjs2cJAzaGUjw8=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-alpha.5/go.mod h1:/lseTq2zQDQEi6RyVWQCGSsmkiaL3F5bLz5ke/2BoG4=
