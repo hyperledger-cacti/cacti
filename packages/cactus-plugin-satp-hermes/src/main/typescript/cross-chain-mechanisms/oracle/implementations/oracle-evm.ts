@@ -85,8 +85,12 @@ export class OracleEVM extends OracleAbstract {
       options.monitorService,
     );
 
+    const { connectorOptions, ...optionsWithoutConnector } = options;
     this.logger.debug(
-      `${OracleEVM.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
+      `${OracleEVM.CLASS_NAME}#constructor options: ${safeStableStringify(optionsWithoutConnector)}`,
+    );
+    this.logger.debug(
+      `${OracleEVM.CLASS_NAME}#constructor connectorOptions: ${safeStableStringify(connectorOptions)}`,
     );
 
     if (options.networkIdentification.ledgerType !== LedgerType.Ethereum) {
