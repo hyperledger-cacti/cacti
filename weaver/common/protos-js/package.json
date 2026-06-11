@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cacti-weaver-protos-js",
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "description": "Interop protos for Node JS (Weaver)",
   "keywords": [
     "Hyperledger",

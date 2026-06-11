@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cactus-test-geth-ledger",
-  "version": "2.1.0",
+  "version": "3.0.0-alpha",
   "description": "Helpers for running test go-ethereum ledger in test scripts.",
   "keywords": [
     "Hyperledger",
@@ -50,8 +50,8 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@hyperledger-cacti/cactus-common": "2.1.0",
-    "@hyperledger-cacti/cactus-test-tooling": "2.1.0",
+    "@hyperledger-cacti/cactus-common": "3.0.0-alpha",
+    "@hyperledger-cacti/cactus-test-tooling": "3.0.0-alpha",
     "dockerode": "3.3.0",
     "internal-ip": "6.2.0",
     "run-time-error-cjs": "1.4.0",
