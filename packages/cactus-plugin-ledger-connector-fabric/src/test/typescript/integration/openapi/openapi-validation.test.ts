@@ -231,7 +231,9 @@ describe("OpenApi Validation Test", () => {
   afterAll(async () => {
     await ledger.stop();
     await ledger.destroy();
-    await Servers.shutdown(server);
+    if (server) {
+      await Servers.shutdown(server);
+    }
   });
   test(`${testCase} - ${fDeploy} - ${cOk}`, async () => {
     const parameters = {
