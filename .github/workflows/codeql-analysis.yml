@@ -4,8 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [main]
+    branches: [main, 'release/**']
   schedule:
     - cron: '0 11 * * 1'
 
@@ -26,8 +25,8 @@ jobs:
       fail-fast: false
       matrix:
         # Override automatic language detection by changing the below list
-        # Supported options are ['csharp', 'cpp', 'go', 'java', 'javascript', 'python']
-        language: ['typescript']
+        # Supported options are ['csharp', 'cpp', 'go', 'java', 'javascript-typescript', 'python']
+        language: ['javascript-typescript']
         # Learn more...
         # https://docs.github.com/en/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#overriding-automatic-language-detection
 
@@ -78,7 +77,6 @@ jobs:
         category: "/language:${{ matrix.language }}"
 
     - name: Dismiss alerts (inline suppressions)
-      if: github.ref == 'refs/heads/main'
       uses: advanced-security/dismiss-alerts@046d6b48d2e43cf563f96f67332c47c432eff83e #v2.0.2
       with:
         sarif-id: ${{ steps.analyze.outputs.sarif-id }}
