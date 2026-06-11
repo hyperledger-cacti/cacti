@@ -267,7 +267,7 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
     OLD_MODULE_MAJOR_VER=$(get_old_module_major_ver "$GOMODULE")
     
     # Update VERSION file
-    echo "$NORMALIZED_VERSION" > "$ROOT_DIR/$GOMODULE/VERSION"
+    echo -n "$NORMALIZED_VERSION" > "$ROOT_DIR/$GOMODULE/VERSION"
     echo "  Updated VERSION file to $NORMALIZED_VERSION"
     
     # Update go.mod module name if major version changed
