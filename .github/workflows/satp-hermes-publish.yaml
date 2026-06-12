@@ -61,7 +61,7 @@ jobs:
       ghcr_image: ${{ steps.set_tags.outputs.ghcr_image }}
       is_release: ${{ steps.set_tags.outputs.is_release }}
     steps:
-      - uses: actions/checkout@v4.1.7  
+      - uses: actions/checkout@v6  
       - name: Set image tags
         id: set_tags
         run: |
@@ -124,10 +124,10 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'yarn'
@@ -135,7 +135,7 @@ jobs:
       
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -163,10 +163,10 @@ jobs:
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build Docker image (no push)
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -191,10 +191,10 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'yarn'
@@ -213,10 +213,10 @@ jobs:
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4.2.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -224,7 +224,7 @@ jobs:
 
       - name: Build and push to GHCR (Release)
         if: needs.set-docker-tags.outputs.is_release == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -237,7 +237,7 @@ jobs:
 
       - name: Build and push to GHCR (Development)
         if: needs.set-docker-tags.outputs.is_release != 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -254,10 +254,10 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: true  # Don't fail the workflow if Docker Hub push fails
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'yarn'
@@ -276,17 +276,17 @@ jobs:
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4.2.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
 
       - name: Build and push to Docker Hub (Release)
         if: needs.set-docker-tags.outputs.is_release == 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -299,7 +299,7 @@ jobs:
 
       - name: Build and push to Docker Hub (Development)
         if: needs.set-docker-tags.outputs.is_release != 'true'
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v7
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile

@@ -20,12 +20,12 @@ jobs:
       CONFIGURE_DISABLED: false
       CHECK_WORK_TREE_STATUS_DISABLED: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - name: Use Node.js
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v6
         with:
           node-version: v22.18.0
 
@@ -64,7 +64,7 @@ jobs:
         id: print_env_git_index_file_count
         run: |
             echo "${{ env.GIT_INDEX_FILE_COUNT }}"
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         id: set-result-git_index_file_count
         with:
           script: |
@@ -79,7 +79,7 @@ jobs:
 
       - name: Check Lint Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
         with:
           script: |
             const failMsg = "yarn lint script produced version control " +

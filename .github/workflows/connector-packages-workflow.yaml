@@ -34,7 +34,7 @@ jobs:
         --files={./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/private-deploy-contract-from-json-web3-eea.test.ts,./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -69,7 +69,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-24
           path: ./code-coverage-ts/**/
@@ -79,7 +79,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
         with:
           path: .tmp/benchmark-results/plugin-ledger-connector-besu/
           key: ${{ runner.os }}-benchmark
@@ -89,7 +89,7 @@ jobs:
         run: yarn run benchmark
 
       - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@4de1bed97a47495fc4c5404952da0499e31f5c29 #v1.20.3
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba #v1.22.1
         with:
           tool: 'benchmarkjs'
           output-file-path: .tmp/benchmark-results/plugin-ledger-connector-besu/run-plugin-ledger-connector-besu-benchmark.ts.log
@@ -113,7 +113,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-polkadot
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -132,7 +132,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-25
           path: ./code-coverage-ts/**/
@@ -147,7 +147,7 @@ jobs:
         --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -171,7 +171,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-26
           path: ./code-coverage-ts/**/
@@ -182,7 +182,7 @@ jobs:
   
       - if: ${{ inputs.run_trivy_scan == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cactus-connector-corda-server
-        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 #0.19.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #0.36.0
         with:
           scan-type: 'rootfs'
           scan-ref: 'packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/build/libs/cacti-connector-corda-server-dev.jar'
@@ -200,7 +200,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-fabric
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -226,7 +226,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-28
           path: ./code-coverage-ts/**/
@@ -239,7 +239,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-iroha2
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -258,7 +258,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-30
           path: ./code-coverage-ts/**/
@@ -271,7 +271,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-ethereum
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -290,7 +290,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-31
           path: ./code-coverage-ts/**/
@@ -303,7 +303,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-sawtooth
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -322,7 +322,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-32
           path: ./code-coverage-ts/**/
@@ -337,7 +337,7 @@ jobs:
         --files={./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/deploy-contract-from-json-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/invoke-contract-xdai-json-object.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation-no-keychain.test.ts,./packages/cactus-plugin-ledger-connector-xdai/src/test/typescript/integration/openapi/openapi-validation.test.ts}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -361,7 +361,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-33
           path: ./code-coverage-ts/**/
@@ -374,7 +374,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-besu
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -404,7 +404,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-43
           path: ./code-coverage-ts/**/
@@ -417,7 +417,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-ethereum
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -436,7 +436,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-44
           path: ./code-coverage-ts/**/
@@ -449,7 +449,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-verifier-client
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -468,7 +468,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-46
           path: ./code-coverage-ts/**/
@@ -481,7 +481,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-aries
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -500,7 +500,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-23
           path: ./code-coverage-ts/**/
@@ -513,7 +513,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-stellar
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -532,7 +532,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-27
           path: ./code-coverage-ts/**/

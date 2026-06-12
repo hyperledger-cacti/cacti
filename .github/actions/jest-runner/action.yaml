@@ -53,7 +53,7 @@ runs:
         inputs.run_code_coverage == 'true' &&
         inputs.github_token != '' &&
         github.event.pull_request.head.repo.fork != true
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v3
       with:
         name: "${{ inputs.report-name }}"
         path: "reports/${{ inputs.report-name }}.xml"  # matches JEST_JUNIT_OUTPUT
