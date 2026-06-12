@@ -516,17 +516,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const connectionProfilePath =
       orgName === "org1" || orgName === "org2"
         ? path.join(
-            "fabric-samples/test-network",
-            "organizations/peerOrganizations",
-            orgName + ".example.com",
-            "connection-" + orgName + ".json",
-          )
+          "fabric-samples/test-network",
+          "organizations/peerOrganizations",
+          orgName + ".example.com",
+          "connection-" + orgName + ".json",
+        )
         : path.join(
-            "add-org-" + orgName,
-            "organizations/peerOrganizations",
-            orgName + ".example.com",
-            "connection-" + orgName + ".json",
-          );
+          "add-org-" + orgName,
+          "organizations/peerOrganizations",
+          orgName + ".example.com",
+          "connection-" + orgName + ".json",
+        );
     const peer0Name = `peer0.${orgName}.example.com`;
     const peer1Name = `peer1.${orgName}.example.com`;
     const cInfo = await this.getContainerInfo();
@@ -1667,6 +1667,11 @@ export class FabricTestLedgerV1 implements ITestLedger {
       try {
         const { Status } = await this.getContainerInfo();
         reachable = Status.endsWith(" (healthy)");
+        if (!reachable && Date.now() >= startedAt + timeoutMs) {
+          throw new Error(
+            `${fnTag} timed out (${timeoutMs}ms) - container status: ${Status}`,
+          );
+        }
       } catch (ex) {
         reachable = false;
         if (Date.now() >= startedAt + timeoutMs) {

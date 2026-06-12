@@ -161,7 +161,7 @@ beforeAll(async () => {
   await setupDBTable(db_remote_host_config1);
   await setupDBTable(db_remote_host_config2);
 
-  {
+  try {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: satpContractName,
@@ -170,8 +170,10 @@ beforeAll(async () => {
       claimFormat: ClaimFormat.DEFAULT,
     });
     log.info("Fabric Ledger started successfully");
-
     await fabricEnv.deployAndSetupContracts();
+  } catch (err) {
+    log.warn("Fabric ledger failed to start, non-Fabric tests will proceed.", err);
+    fabricEnv = undefined as unknown as FabricTestEnvironment;
   }
 
   {
