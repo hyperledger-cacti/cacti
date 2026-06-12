@@ -51,7 +51,7 @@ runs:
         always() &&
         inputs.github_secret != '' &&
         github.event.pull_request.head.repo.fork != true
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v3
       with:
         name: "${{ inputs.report_name }}"
         path: "reports/${{ inputs.report_name }}.xml"

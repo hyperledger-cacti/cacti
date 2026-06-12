@@ -58,7 +58,7 @@ jobs:
     if: inputs.is_release == 'true'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
         with:
           ref: ${{ inputs.release_branch || github.ref }}
 
