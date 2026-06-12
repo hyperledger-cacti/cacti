@@ -417,6 +417,48 @@ describe("SATPGateway startup", () => {
     fs.rmSync(tmpDir, { recursive: true });
   });
 
+  test("shutdown destroys all repositories even without startup", async () => {
+    const sqliteConfig = (filename: string) => ({
+      client: "sqlite3",
+      connection: { filename },
+      useNullAsDefault: true,
+    });
+
+    const options: SATPGatewayConfig = {
+      instanceId: "gateway-db-shutdown-test",
+      pluginRegistry: new PluginRegistry(),
+      logLevel: logLevel,
+      gid: {
+        id: "mockID",
+        name: "DBShutdownGateway",
+        version: [
+          {
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
+          },
+        ],
+        gatewayServerPort: 13030,
+        gatewayClientPort: 13031,
+        address: "http://localhost",
+      },
+      localRepository: sqliteConfig(":memory:"),
+      remoteRepository: sqliteConfig(":memory:"),
+      auditRepository: sqliteConfig(":memory:"),
+      oracleLogRepository: sqliteConfig(":memory:"),
+      monitorService: monitorService,
+    };
+
+    const gateway = await factory.create(options);
+
+    await gateway.shutdown();
+
+    await expect(gateway.localRepository!.migrate()).rejects.toThrow();
+    await expect(gateway.remoteRepository!.migrate()).rejects.toThrow();
+    await expect(gateway.auditRepository.migrate()).rejects.toThrow();
+    await expect(gateway.oracleLogRepository.migrate()).rejects.toThrow();
+  });
+
   test("Gateway launches without database config", async () => {
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",

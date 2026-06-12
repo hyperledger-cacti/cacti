@@ -670,6 +670,21 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       });
     }
 
+    this.onShutdown({
+      name: "destroy-db-repositories",
+      hook: async () => {
+        const repositories = [
+          this.localRepository,
+          this.remoteRepository,
+          this.auditRepository,
+          this.oracleLogRepository,
+        ].filter((r): r is NonNullable<typeof r> => r != null);
+        for (const repo of repositories) {
+          await repo.destroy();
+        }
+      },
+    });
+
     if (this.config.keyPair === undefined) {
       throw new Error("Key pair is undefined");
     }
@@ -1511,9 +1526,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           this.logger.debug("Shutting down monitor service");
           await this.monitorService.shutdown();
         }
-        this.logger.debug("Shutting down audit repository");
-        await this.auditRepository?.destroy();
-
         return;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
