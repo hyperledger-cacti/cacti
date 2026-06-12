@@ -150,7 +150,7 @@ jobs:
       npm_package_name: ${{ steps.set_tags.outputs.npm_package_name }}
       is_release: ${{ steps.set_tags.outputs.is_release }}
     steps:
-      - uses: actions/checkout@v4.1.7  
+      - uses: actions/checkout@v6  
       - name: Set package tags
         id: set_tags
         run: |
@@ -210,10 +210,10 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: 'yarn'
@@ -221,7 +221,7 @@ jobs:
       
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -254,7 +254,7 @@ jobs:
           ls -la packages/cactus-plugin-satp-hermes/dist/
           
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: satp-hermes-build-artifacts
           path: |
@@ -279,10 +279,10 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           always-auth: true
@@ -290,7 +290,7 @@ jobs:
           scope: '@hyperledger-cacti'
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: satp-hermes-build-artifacts
           path: packages/cactus-plugin-satp-hermes/
@@ -365,10 +365,10 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true  # Don't fail the workflow if GitHub Package Registry push fails
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
           always-auth: true
@@ -376,7 +376,7 @@ jobs:
           scope: '@hyperledger-cacti'
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: satp-hermes-build-artifacts
           path: packages/cactus-plugin-satp-hermes/
