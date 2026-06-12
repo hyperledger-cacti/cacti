@@ -40,7 +40,7 @@
     "build": "yarn clean-build && yarn compile && yarn copy-templates",
     "clean-build": "rm -rf ./build",
     "compile": "tsc -p .",
-    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "copy-templates": "[ -d ./src/templates ] && cp -a ./src/templates ./build/ || true",
     "coverage": "jest --coverage",
     "lint": "tslint -p .",
     "prepublishOnly": "yarn build",
