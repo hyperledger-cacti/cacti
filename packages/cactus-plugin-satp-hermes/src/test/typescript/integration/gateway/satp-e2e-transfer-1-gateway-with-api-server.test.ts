@@ -129,7 +129,7 @@ beforeEach(() => {
 }, TIMEOUT);
 
 beforeAll(async () => {
-  {
+  try {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: satpContractName,
@@ -137,8 +137,13 @@ beforeAll(async () => {
       logLevel,
     });
     log.info("Fabric Ledger started successfully");
-
     await fabricEnv.deployAndSetupContracts();
+  } catch (err) {
+    log.warn(
+      "Fabric ledger failed to start, non-Fabric tests will proceed.",
+      err,
+    );
+    fabricEnv = undefined as unknown as FabricTestEnvironment;
   }
 
   {

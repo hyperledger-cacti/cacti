@@ -73,14 +73,15 @@ export interface IPluginLedgerConnectorXdaiOptions
 
 export class PluginLedgerConnectorXdai
   implements
-  IPluginLedgerConnector<
-    DeployContractV1Request,
-    DeployContractV1Response,
-    RunTransactionV1Request,
-    RunTransactionV1Response
-  >,
-  ICactusPlugin,
-  IPluginWebService {
+    IPluginLedgerConnector<
+      DeployContractV1Request,
+      DeployContractV1Response,
+      RunTransactionV1Request,
+      RunTransactionV1Response
+    >,
+    ICactusPlugin,
+    IPluginWebService
+{
   private readonly instanceId: string;
   public prometheusExporter: PrometheusExporter;
   private readonly log: Logger;
@@ -450,16 +451,16 @@ export class PluginLedgerConnectorXdai
         } else {
           throw new Error(
             `${fnTag} Expected pre-signed raw transaction ` +
-            ` since signing credential is specified as` +
-            `Web3SigningCredentialType.NONE`,
+              ` since signing credential is specified as` +
+              `Web3SigningCredentialType.NONE`,
           );
         }
       }
       default: {
         throw new Error(
           `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-          `${req.web3SigningCredential.type} Supported ones are: ` +
-          `${Object.values(Web3SigningCredentialType).join(";")}`,
+            `${req.web3SigningCredential.type} Supported ones are: ` +
+            `${Object.values(Web3SigningCredentialType).join(";")}`,
         );
       }
     }
@@ -492,8 +493,8 @@ export class PluginLedgerConnectorXdai
     ) {
       throw new Error(
         `${fnTag} Conflicting parameters for consistency` +
-        ` strategy: Cannot wait for >0 block confirmations AND only wait ` +
-        ` for the tx pool ACK at the same time.`,
+          ` strategy: Cannot wait for >0 block confirmations AND only wait ` +
+          ` for the tx pool ACK at the same time.`,
       );
     }
 
@@ -539,7 +540,7 @@ export class PluginLedgerConnectorXdai
     } else {
       throw new Error(
         `${fnTag} Failed to sign eth transaction. ` +
-        `signedTransaction.rawTransaction is blank after .signTransaction().`,
+          `signedTransaction.rawTransaction is blank after .signTransaction().`,
       );
     }
   }
@@ -602,7 +603,10 @@ export class PluginLedgerConnectorXdai
       await new Promise((resolve) =>
         setTimeout(
           resolve,
-          Math.min(Math.max(consistencyStrategy.pollIntervalMs ?? 100, 100), 60000),
+          Math.min(
+            Math.max(consistencyStrategy.pollIntervalMs ?? 100, 100),
+            60000,
+          ),
         ),
       );
 

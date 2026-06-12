@@ -108,9 +108,9 @@ const waitForWsProviderRequestsTimeout = 5 * 1000; // 5s
 const waitForWsProviderRequestsStep = 500; // 500ms
 type RunContractDeploymentInput = {
   web3SigningCredential:
-  | Web3SigningCredentialCactiKeychainRef
-  | Web3SigningCredentialGethKeychainPassword
-  | Web3SigningCredentialPrivateKeyHex;
+    | Web3SigningCredentialCactiKeychainRef
+    | Web3SigningCredentialGethKeychainPassword
+    | Web3SigningCredentialPrivateKeyHex;
   contractJSON: ContractJSON;
   gasConfig?: GasTransactionConfig;
   constructorArgs?: unknown[];
@@ -145,14 +145,15 @@ export interface IPluginLedgerConnectorEthereumOptions
 
 export class PluginLedgerConnectorEthereum
   implements
-  IPluginLedgerConnector<
-    DeployContractV1Request,
-    RunTransactionResponse,
-    RunTransactionRequest,
-    RunTransactionResponse
-  >,
-  ICactusPlugin,
-  IPluginWebService {
+    IPluginLedgerConnector<
+      DeployContractV1Request,
+      RunTransactionResponse,
+      RunTransactionRequest,
+      RunTransactionResponse
+    >,
+    ICactusPlugin,
+    IPluginWebService
+{
   private readonly pluginRegistry: PluginRegistry;
   public prometheusExporter: PrometheusExporter;
   private readonly instanceId: string;
@@ -648,6 +649,7 @@ export class PluginLedgerConnectorEthereum
     ) => PayableMethodObject;
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
 
+    // codeql[js/unvalidated-dynamic-method-call] - req.methodName is validated by isSafeToCallContractMethod above
     const method = methodRef(...req.params);
     if (req.invocationType === EthContractInvocationType.Call) {
       const callOutput = await method.call();
@@ -727,16 +729,16 @@ export class PluginLedgerConnectorEthereum
         } else {
           throw new Error(
             `${fnTag} Expected pre-signed raw transaction ` +
-            ` since signing credential is specified as` +
-            `Web3SigningCredentialType.NONE`,
+              ` since signing credential is specified as` +
+              `Web3SigningCredentialType.NONE`,
           );
         }
       }
       default: {
         throw new Error(
           `${fnTag} Unrecognized Web3SigningCredentialType: ` +
-          `${req.web3SigningCredential.type} Supported ones are: ` +
-          `${Object.values(Web3SigningCredentialType).join(";")}`,
+            `${req.web3SigningCredential.type} Supported ones are: ` +
+            `${Object.values(Web3SigningCredentialType).join(";")}`,
         );
       }
     }
@@ -789,7 +791,7 @@ export class PluginLedgerConnectorEthereum
     } catch (error) {
       throw new Error(
         `${fnTag} Failed to create subscription for ${name}. ` +
-        `Error: ${error.message}`,
+          `Error: ${error.message}`,
       );
     }
   }
@@ -862,7 +864,7 @@ export class PluginLedgerConnectorEthereum
     } catch (ex) {
       throw new Error(
         `${fnTag} Failed to invoke web3.eth.personal.sendTransaction(). ` +
-        `InnerException: ${ex.stack}`,
+          `InnerException: ${ex.stack}`,
       );
     }
   }
@@ -891,7 +893,7 @@ export class PluginLedgerConnectorEthereum
     } else {
       throw new Error(
         `${fnTag} Failed to sign eth transaction. ` +
-        `signedTransaction.rawTransaction is blank after .signTransaction().`,
+          `signedTransaction.rawTransaction is blank after .signTransaction().`,
       );
     }
   }
@@ -1252,9 +1254,7 @@ export class PluginLedgerConnectorEthereum
       case EthContractInvocationWeb3Method.EstimateGas:
         return invocationResult.estimateGas(args.invocationParams);
       default:
-        throw new Error(
-          `Unsupported invocationType: ${args.invocationType}`,
-        );
+        throw new Error(`Unsupported invocationType: ${args.invocationType}`);
     }
   }
 

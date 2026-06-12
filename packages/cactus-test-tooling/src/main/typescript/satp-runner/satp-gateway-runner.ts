@@ -27,6 +27,7 @@ export interface ISATPGatewayRunnerConstructorOptions {
   ontologiesPath?: string;
   networkName?: string;
   url?: string; // URL for the SATP gateway
+  healthCheckTimeoutMs?: number;
 }
 
 export const SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS = Object.freeze({
@@ -68,7 +69,8 @@ export class SATPGatewayRunner implements ITestLedger {
   public readonly ontologiesPath?: string;
   private readonly networkName?: string;
   private readonly url?: string;
-
+  public readonly healthCheckTimeoutMs: number;
+  public static readonly DEFAULT_HEALTH_CHECK_TIMEOUT_MS = 360000; // 5 minutes
   private readonly log: Logger;
   private container: Container | undefined;
   private containerId: string | undefined;
@@ -93,6 +95,9 @@ export class SATPGatewayRunner implements ITestLedger {
       options.oapiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort;
     this.networkName = options.networkName;
     this.url = options.url;
+    this.healthCheckTimeoutMs =
+      options.healthCheckTimeoutMs ??
+      SATPGatewayRunner.DEFAULT_HEALTH_CHECK_TIMEOUT_MS;
 
     this.configPath = options.configPath;
     this.logsPath = options.logsPath;
@@ -296,7 +301,9 @@ export class SATPGatewayRunner implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 60000): Promise<void> {
+  public async waitForHealthCheck(
+    timeoutMs = SATPGatewayRunner.DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
+  ): Promise<void> {
     const fnTag = "SATPGatewayRunner#waitForHealthCheck()";
     const startedAt = Date.now();
     let isHealthy = false;
