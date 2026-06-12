@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
+  NODEJS_VERSION: v20.20.0
   IMAGE_NAME: cactus-cmd-api-server
 
 jobs:
@@ -20,14 +21,23 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       DOCKER_BUILDKIT: 1
-      DOCKERFILE_PATH: ./packages/cactus-cmd-api-server/Dockerfile
-      DOCKER_BUILD_DIR: ./
+      DOCKERFILE_PATH: ./packages/cactus-cmd-api-server/cmd-api-server.Dockerfile
+      DOCKER_BUILD_DIR: ./packages/cactus-cmd-api-server
     permissions:
       packages: write
       contents: read
 
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+
+      - name: configure_repo
+        uses: ./.github/actions/configure-repo/
+        with:
+          node_version: ${{ env.NODEJS_VERSION }}
+          yarn_hardened_mode: '0'
+
+      - name: build_ncc_bundle
+        run: yarn lerna run build:bundle --scope=@hyperledger-cacti/cactus-cmd-api-server
 
       - name: Build image
         run: docker build "$DOCKER_BUILD_DIR" --file "$DOCKERFILE_PATH" --tag "$IMAGE_NAME" --label "runnumber=${GITHUB_RUN_ID}"
