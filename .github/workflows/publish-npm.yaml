@@ -94,7 +94,7 @@ jobs:
           always-auth: true
           node-version: ${{ env.NODEJS_VERSION }}
           registry-url: "https://registry.npmjs.org/"
-          scope: "@hyperledger"
+          scope: "@hyperledger-cacti"
 
       - run: cat /home/runner/work/_temp/.npmrc
 
