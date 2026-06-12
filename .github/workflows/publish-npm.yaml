@@ -1,47 +1,198 @@
-name: publish-npm-manually
+name: publish-npm
 
 env:
   NODEJS_VERSION: v20.20.0
 
 on:
+  push:
+    tags:
+      - v*
   workflow_dispatch:
     inputs:
-      tag-pub:
-        type: string
-        description: Tag to publish
-        required: true
+      GIT_TAG_TO_PUBLISH:
+        description: 'The specific git tag to publish'
+        required: false
+        default: ''
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-
-  build-and-publish-packages:
+  build:
     runs-on: ubuntu-22.04
-    permissions: 
-      id-token: write
+    permissions:
+      contents: read
     steps:
-    - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
-      with:
-        ref: ${{ inputs.tag-pub }}
-    - run: git fetch --unshallow --prune
-    - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
-      with:
-        always-auth: true
-        node-version: ${{ env.NODEJS_VERSION }}
-        registry-url: 'https://registry.npmjs.org/'
-    - name: ./tools/ci.sh
-      run: ./tools/ci.sh
-      env:
-        DEV_BUILD_DISABLED: false
-        FULL_BUILD_DISABLED: false
-        JEST_TEST_RUNNER_DISABLED: true
-        TAPE_TEST_RUNNER_DISABLED: true
-    - name: lerna-publish
-      env:
-        NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        NPM_CONFIG_PROVENANCE: true
-      run: |
-        npm whoami
-        yarn lerna publish from-git --yes --loglevel=debug
+      - name: Check Version Format in Tag
+        uses: nowsprinting/check-version-format-action@976544c127ab571b88419766cc9d3b459f8d7b82 #v5.0.1
+        id: version
+        with:
+          prefix: 'v'
+
+      - name: Fail if version is invalid
+        if: steps.version.outputs.is_valid != 'true'
+        run: |
+          echo "Error: Tag '${{ github.ref_name }}' is not a valid semantic version."
+          exit 1
+
+      - name: Print Workflow inputs.GIT_TAG_TO_PUBLISH
+        run: |
+          echo "inputs.GIT_TAG_TO_PUBLISH=${{ inputs.GIT_TAG_TO_PUBLISH }}"
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        with:
+          ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
+
+      - run: git fetch --unshallow --prune
+
+      - run: git status --long --verbose
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - name: ./tools/ci.sh
+        run: ./tools/ci.sh
+        env:
+          DEV_BUILD_DISABLED: false
+          FULL_BUILD_DISABLED: false
+          JEST_TEST_RUNNER_DISABLED: true
+          TAPE_TEST_RUNNER_DISABLED: true
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: |
+            packages/cactus-*/dist
+            packages/cacti-*/dist
+            extensions/cactus-*/dist
+            extensions/cacti-*/dist
+            examples/cactus-*/dist
+            examples/cacti-*/dist
+            weaver/**/dist
+            !**/node_modules/**
+          retention-days: 1
+          if-no-files-found: error
+
+  publish-npmjs:
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        with:
+          ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
+
+      - run: git fetch --unshallow --prune
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
+        with:
+          always-auth: true
+          node-version: ${{ env.NODEJS_VERSION }}
+          registry-url: "https://registry.npmjs.org/"
+          scope: "@hyperledger"
+
+      - run: cat /home/runner/work/_temp/.npmrc
+
+      - name: yarn install (workspace tooling for lerna)
+        run: yarn install --immutable
+
+      - name: Download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .
+
+      - name: Check npm whoami with --registry set to npmjs
+        continue-on-error: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm whoami --registry=https://registry.npmjs.org/
+
+      - name: lerna-publish-npm
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
+        run: |
+          npm whoami
+          yarn lerna publish from-git --yes --loglevel=debug
+
+  publish-ghcr:
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        with:
+          ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
+
+      - run: git fetch --unshallow --prune
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
+        with:
+          always-auth: true
+          node-version: ${{ env.NODEJS_VERSION }}
+          registry-url: "https://npm.pkg.github.com/"
+          scope: "@${{ github.repository_owner }}"
+
+      - run: cat /home/runner/work/_temp/.npmrc
+
+      - name: yarn install (workspace tooling for lerna)
+        run: yarn install --immutable
+
+      # Re-initialize the registries so that the @iroha2 scope gets configured in .npmrc
+      - run: yarn run init-registries
+
+      - run: cat /home/runner/work/_temp/.npmrc
+
+      - name: Download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .
+
+      - name: Check npm whoami with no --registry parameter.
+        continue-on-error: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm whoami
+
+      - name: Check npm whoami with --registry set to GHCR
+        continue-on-error: true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm whoami --registry=https://npm.pkg.github.com/
+
+      - name: Configure git user and email
+        run: |
+          git config --global user.email "npm-ci@${{ github.repository_owner }}.org"
+          git config --global user.name "hyperledger-ghci"
+
+      - name: lerna-publish-ghcr
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          yarn lerna publish from-git --yes --loglevel=debug
+
+  cleanup:
+    needs: [publish-npmjs, publish-ghcr]
+    if: always()
+    runs-on: ubuntu-22.04
+    permissions:
+      actions: write
+    steps:
+      - name: Delete build-output artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api \
+            repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts \
+            --jq '.artifacts[] | select(.name=="build-output") | .id' \
+          | xargs -rI{} gh api -X DELETE \
+              repos/${{ github.repository }}/actions/artifacts/{}
