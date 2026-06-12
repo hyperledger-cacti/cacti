@@ -17,5 +17,10 @@
   ],
   "exclude": [
     "./src/main/typescript/infrastructure/fabric-contracts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/cactus-plugin-satp-hermes/tsconfig.json"
+    }
   ]
 }

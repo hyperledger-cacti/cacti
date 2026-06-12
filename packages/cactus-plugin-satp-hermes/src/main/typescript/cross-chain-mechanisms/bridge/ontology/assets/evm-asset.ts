@@ -26,8 +26,11 @@ export enum AssetParameterIdentifier {
 }
 
 export function getAssetParameterIdentifier(stringType: string) {
+  const normalized = stringType
+    .replace(/([a-z])([A-Z])/g, "$1_$2")
+    .toUpperCase();
   return AssetParameterIdentifier[
-    stringType.toUpperCase() as keyof typeof AssetParameterIdentifier
+    normalized as keyof typeof AssetParameterIdentifier
   ];
 }
 

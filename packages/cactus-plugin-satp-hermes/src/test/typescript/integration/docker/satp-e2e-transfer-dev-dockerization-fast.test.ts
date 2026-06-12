@@ -395,7 +395,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      pubKey: (gateway1KeyPair.publicKey as Buffer).toString("hex"),
     } as GatewayIdentity;
 
     // gateway setup:
@@ -420,7 +420,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      pubKey: (gateway2KeyPair.publicKey as Buffer).toString("hex"),
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -439,8 +439,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       remoteRepository: db_remote_config1,
       gatewayId: "gateway-1",
       gatewayKeyPair: {
-        privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
-        publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+        privateKey: (gateway1KeyPair.privateKey as Buffer).toString("hex"),
+        publicKey: (gateway1KeyPair.publicKey as Buffer).toString("hex"),
       },
     });
 
@@ -454,8 +454,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       remoteRepository: db_remote_config2,
       gatewayId: "gateway-2",
       gatewayKeyPair: {
-        privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
-        publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+        privateKey: (gateway2KeyPair.privateKey as Buffer).toString("hex"),
+        publicKey: (gateway2KeyPair.publicKey as Buffer).toString("hex"),
       },
     });
 
@@ -655,7 +655,7 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      pubKey: (gateway1KeyPair.publicKey as Buffer).toString("hex"),
     } as GatewayIdentity;
 
     // gateway setup:
@@ -680,7 +680,7 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      pubKey: (gateway2KeyPair.publicKey as Buffer).toString("hex"),
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -699,8 +699,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       remoteRepository: db_remote_config1,
       gatewayId: "gateway-1",
       gatewayKeyPair: {
-        privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
-        publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+        privateKey: (gateway1KeyPair.privateKey as Buffer).toString("hex"),
+        publicKey: (gateway1KeyPair.publicKey as Buffer).toString("hex"),
       },
     });
 
@@ -714,8 +714,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       remoteRepository: db_remote_config2,
       gatewayId: "gateway-2",
       gatewayKeyPair: {
-        privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
-        publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+        privateKey: (gateway2KeyPair.privateKey as Buffer).toString("hex"),
+        publicKey: (gateway2KeyPair.publicKey as Buffer).toString("hex"),
       },
     });
 

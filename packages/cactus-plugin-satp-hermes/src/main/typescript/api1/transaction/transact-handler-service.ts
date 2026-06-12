@@ -3,6 +3,7 @@ import { SATPManager } from "../../services/gateway/satp-manager";
 import { populateClientSessionData } from "../../core/session-utils";
 import {
   CredentialProfile,
+  ERCTokenStandard,
   LockType,
   SignatureAlgorithm,
 } from "../../generated/proto/cacti/satp/v02/common/message_pb";
@@ -11,6 +12,21 @@ import { GatewayOrchestrator } from "../../services/gateway/gateway-orchestrator
 import { GatewayIdentity } from "../../core/types";
 import { SATP_VERSION } from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";
+
+function ercStandardToEnum(standard: string | undefined): ERCTokenStandard {
+  switch (standard?.toUpperCase()) {
+    case "ERC20":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC20;
+    case "ERC721":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC721;
+    case "ERC1155":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC1155;
+    case "ERC6909":
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_ERC6909;
+    default:
+      return ERCTokenStandard.ERC_TOKEN_STANDARD_UNSPECIFIED;
+  }
+}
 
 export async function executeTransact(
   logLevel: LogLevelDesc,
@@ -82,6 +98,10 @@ export async function executeTransact(
     req.receiverAsset.referenceId,
     req.receiverAsset.networkId.ledgerType,
     req.receiverAsset.tokenType,
+    req.sourceAsset.uniqueDescriptor,
+    req.receiverAsset.uniqueDescriptor,
+    ercStandardToEnum(req.sourceAsset.ercTokenStandard),
+    ercStandardToEnum(req.receiverAsset.ercTokenStandard),
   );
   await manager.transfer(session);
 
