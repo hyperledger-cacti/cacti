@@ -1251,10 +1251,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           this.remoteRepository,
           this.auditRepository,
           this.oracleLogRepository,
-        ].filter(Boolean);
+        ].filter((r): r is NonNullable<typeof r> => r != null);
 
         for (const repo of repositories) {
-          await repo!.migrate();
+          await repo.migrate();
         }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
