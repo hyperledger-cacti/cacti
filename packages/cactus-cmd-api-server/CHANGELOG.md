@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha.6](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-alpha.6) (2026-06-12)
+
+### Bug Fixes
+
+* **api-server:** use Promise.allSettled in shutdown ([3505e73](https://github.com/hyperledger-cacti/cacti/commit/3505e735c0fa520a6efcef52de46bb4181d273e7)), closes [#4160](https://github.com/hyperledger-cacti/cacti/issues/4160)
+* fix cacti packages ([7a89d6b](https://github.com/hyperledger-cacti/cacti/commit/7a89d6b2d5b5d426191c81e5d07dd6e0a83889ba))
+* fix satp tests ([14c8e66](https://github.com/hyperledger-cacti/cacti/commit/14c8e66e3fedf1ac820628bf73e0fac120ecaecd))
+* fix SATP tests ([d25f155](https://github.com/hyperledger-cacti/cacti/commit/d25f1559e0c483b97173206a0f20fac4ab2fdc4e))
+* fix security alerts ([38553d7](https://github.com/hyperledger-cacti/cacti/commit/38553d7e8d7cf4d17424b4ca9c200514efe8a19b))
+* fix tests ([094a12b](https://github.com/hyperledger-cacti/cacti/commit/094a12b7e03e0731e250493f71b06d793ec4a958))
+* renaming JS/TS package namespaces ([0e106b9](https://github.com/hyperledger-cacti/cacti/commit/0e106b9446c0efbe67db979dc06d907b9ed3e378))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-cmd-api-server
