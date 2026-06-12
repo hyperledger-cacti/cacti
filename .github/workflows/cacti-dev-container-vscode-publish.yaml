@@ -1,7 +1,7 @@
-name: connector-fabric-publish
+name: cacti-dev-container-vscode-publish
 
 env:
-  NODEJS_VERSION: v20.3.0
+  NODEJS_VERSION: v20.20.0
   IMAGE_NAME: cacti-dev-container-vscode
 
 on:
@@ -21,8 +21,6 @@ jobs:
     runs-on: ubuntu-22.04
     env:
       DOCKER_BUILDKIT: 1
-      DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-fabric/Dockerfile
-      DOCKER_BUILD_DIR: ./packages/cactus-plugin-ledger-connector-fabric/
     permissions:
       packages: write
       contents: read
