@@ -113,13 +113,16 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm whoami --registry=https://registry.npmjs.org/
 
+      - name: lerna-run-prepublishOnly
+        run: yarn lerna run prepublishOnly --no-private --concurrency=1
+
       - name: lerna-publish-npm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         run: |
           npm whoami
-          yarn lerna publish from-git --yes --loglevel=debug
+          yarn lerna publish from-git --yes --ignore-scripts --loglevel=debug
 
   publish-ghcr:
     needs: build
@@ -174,11 +177,14 @@ jobs:
           git config --global user.email "npm-ci@${{ github.repository_owner }}.org"
           git config --global user.name "hyperledger-ghci"
 
+      - name: lerna-run-prepublishOnly
+        run: yarn lerna run prepublishOnly --no-private --concurrency=1
+
       - name: lerna-publish-ghcr
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          yarn lerna publish from-git --yes --loglevel=debug
+          yarn lerna publish from-git --yes --ignore-scripts --loglevel=debug
 
   cleanup:
     needs: [publish-npmjs, publish-ghcr]
