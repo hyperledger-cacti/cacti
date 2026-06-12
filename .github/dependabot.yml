@@ -1,0 +1,128 @@
+# Dependabot configuration
+# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Each ecosystem groups ALL of its updates into a single PR per run.
+#
+# NOTE: Dependabot does not support wildcards in `target-branch` (it accepts
+# exactly one branch name, and the default branch when omitted). To run on the
+# release/* branches, every release branch needs its own duplicated set of
+# entries with `target-branch` set. The default-branch entries (no
+# `target-branch`) plus one release branch are defined below; copy the release
+# block and change `target-branch` for any additional release/* branch.
+
+version: 2
+
+updates:
+  # ----------------------------------------------------------------------------
+  # Default branch
+  # ----------------------------------------------------------------------------
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      npm:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directories:
+      - "/"
+      - "/.github/actions/*"
+      - "/.github/workflows/*"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories:
+      - "**/*"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      docker:
+        patterns: ["*"]
+
+  - package-ecosystem: gomod
+    directories:
+      - "**/*"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      gomod:
+        patterns: ["*"]
+
+  - package-ecosystem: cargo
+    directories:
+      - "**/*"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      cargo:
+        patterns: ["*"]
+
+  # ----------------------------------------------------------------------------
+  # Release branch: release/v3.0.0-staging
+  # (duplicate this block per release/* branch — Dependabot has no branch globs)
+  # ----------------------------------------------------------------------------
+  - package-ecosystem: npm
+    directory: "/"
+    target-branch: "release/v3.0.0-staging"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      npm:
+        patterns: ["*"]
+
+  - package-ecosystem: github-actions
+    directories:
+      - "/"
+      - "/.github/actions/*"
+      - "/.github/workflows/*"
+    target-branch: "release/v3.0.0-staging"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      github-actions:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directories:
+      - "**/*"
+    target-branch: "release/v3.0.0-staging"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      docker:
+        patterns: ["*"]
+
+  - package-ecosystem: gomod
+    directories:
+      - "**/*"
+    target-branch: "release/v3.0.0-staging"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      gomod:
+        patterns: ["*"]
+
+  - package-ecosystem: cargo
+    directories:
+      - "**/*"
+    target-branch: "release/v3.0.0-staging"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      cargo:
+        patterns: ["*"]
