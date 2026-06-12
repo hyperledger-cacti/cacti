@@ -246,7 +246,6 @@ beforeAll(async () => {
     ontologiesPath: files.ontologiesPath,
     networkName: testNetwork,
     url: gatewayAddress,
-    healthCheckTimeoutMs: SATPGatewayRunner.DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
   };
 
   gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
