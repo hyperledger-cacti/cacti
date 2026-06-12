@@ -105,7 +105,7 @@
     "protobufjs": "7.4.0",
     "socket.io": "4.6.2",
     "tape-promise": "4.0.0",
-    "tsx": "4.19.0",
+    "tsx": "4.16.2",
     "uuid": "10.0.0",
     "web3-core": "1.6.1",
     "web3-eth": "1.6.1",
