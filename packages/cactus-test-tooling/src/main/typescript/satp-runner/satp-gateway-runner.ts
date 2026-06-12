@@ -70,7 +70,7 @@ export class SATPGatewayRunner implements ITestLedger {
   private readonly networkName?: string;
   private readonly url?: string;
   public readonly healthCheckTimeoutMs: number;
-  public static readonly DEFAULT_HEALTH_CHECK_TIMEOUT_MS = 360000; // 5 minutes
+  public static readonly DEFAULT_HEALTH_CHECK_TIMEOUT_MS = 1800000; // 30 minutes
   private readonly log: Logger;
   private container: Container | undefined;
   private containerId: string | undefined;
@@ -325,6 +325,20 @@ export class SATPGatewayRunner implements ITestLedger {
       const { Status, State } = await this.getContainerInfo();
       lastStatus = Status;
 
+      // Fail fast on genuine container death. `State` is the lifecycle string
+      // from `docker ps` (e.g. "running", "exited", "dead"). A long-running but
+      // still-initializing gateway reports "running" with "(unhealthy)" while it
+      // deploys Oracles, so we must NOT treat "(unhealthy)" as fatal here —
+      // only an actually dead/exited container short-circuits the wait.
+      if (State === "exited" || State === "dead") {
+        await this.logContainerDiagnostics();
+        throw new Error(
+          `${fnTag} Container is in terminal state "${State}". ` +
+            `Last status: "${Status}". The gateway process exited before ` +
+            `becoming healthy. Check container logs above for crash details.`,
+        );
+      }
+
       // Detect if the status indicates the container has crashed/restarted
       if (Status.includes("health: starting")) {
         // Check if it's been restarting by looking at the uptime resetting
@@ -338,10 +352,13 @@ export class SATPGatewayRunner implements ITestLedger {
         }
       }
 
-      // Check for unhealthy status
+      // Check for unhealthy status. This is expected during slow startup (e.g.
+      // Oracle deployment keeps port 4010 closed for several minutes), so we log
+      // it for diagnostics but keep waiting until the overall timeout.
       if (Status.includes("(unhealthy)")) {
-        this.log.error(`Container reported unhealthy status: ${Status}`);
-        await this.logContainerDiagnostics();
+        this.log.warn(
+          `Container reported unhealthy status (still waiting): ${Status}`,
+        );
       }
 
       this.log.debug(`ContainerInfo.Status=%o, State=%o`, Status, State);

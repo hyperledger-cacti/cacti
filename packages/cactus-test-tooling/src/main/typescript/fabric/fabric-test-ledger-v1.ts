@@ -516,17 +516,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const connectionProfilePath =
       orgName === "org1" || orgName === "org2"
         ? path.join(
-          "fabric-samples/test-network",
-          "organizations/peerOrganizations",
-          orgName + ".example.com",
-          "connection-" + orgName + ".json",
-        )
+            "fabric-samples/test-network",
+            "organizations/peerOrganizations",
+            orgName + ".example.com",
+            "connection-" + orgName + ".json",
+          )
         : path.join(
-          "add-org-" + orgName,
-          "organizations/peerOrganizations",
-          orgName + ".example.com",
-          "connection-" + orgName + ".json",
-        );
+            "add-org-" + orgName,
+            "organizations/peerOrganizations",
+            orgName + ".example.com",
+            "connection-" + orgName + ".json",
+          );
     const peer0Name = `peer0.${orgName}.example.com`;
     const peer1Name = `peer1.${orgName}.example.com`;
     const cInfo = await this.getContainerInfo();
@@ -1659,26 +1659,52 @@ export class FabricTestLedgerV1 implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 900000): Promise<void> {
+  private async getContainerHealthLog(): Promise<string> {
+    try {
+      const container = this.getContainer();
+      const inspectData = await container.inspect();
+      const healthLog = inspectData.State?.Health?.Log ?? [];
+      return healthLog
+        .map(
+          (entry: { ExitCode: number; Output: string }) =>
+            `[exit=${entry.ExitCode}] ${entry.Output?.trim()}`,
+        )
+        .join("\n");
+    } catch {
+      return "(could not retrieve health log)";
+    }
+  }
+
+  public async waitForHealthCheck(timeoutMs = 18000000): Promise<void> {
     const fnTag = "FabricTestLedgerV1#waitForHealthCheck()";
     const startedAt = Date.now();
     let reachable = false;
+    let lastStatus = "unknown";
+
     do {
       try {
         const { Status } = await this.getContainerInfo();
+        lastStatus = Status;
         reachable = Status.endsWith(" (healthy)");
-        if (!reachable && Date.now() >= startedAt + timeoutMs) {
-          throw new Error(
-            `${fnTag} timed out (${timeoutMs}ms) - container status: ${Status}`,
-          );
-        }
       } catch (ex) {
         reachable = false;
         if (Date.now() >= startedAt + timeoutMs) {
           throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex}`);
         }
       }
-      await new Promise((resolve2) => setTimeout(resolve2, 1000));
+
+      // Checked outside the try/catch so the timeout error is not re-caught
+      // and double-wrapped by the catch block above.
+      if (!reachable) {
+        if (Date.now() >= startedAt + timeoutMs) {
+          const healthLog = await this.getContainerHealthLog();
+          throw new Error(
+            `${fnTag} timed out (${timeoutMs}ms) - container status: ${lastStatus}\n` +
+              `Docker health check log:\n${healthLog}`,
+          );
+        }
+        await new Promise((resolve2) => setTimeout(resolve2, 1000));
+      }
     } while (!reachable);
   }
 
