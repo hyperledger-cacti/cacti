@@ -1,3 +1,3 @@
 // TODO replace with the official after the release
 export const SATP_DOCKER_IMAGE_NAME = "rafaelapb/cacti-satp-hermes-gateway";
-export const SATP_DOCKER_IMAGE_VERSION = "2026-06-10-dev-375a544e7";
+export const SATP_DOCKER_IMAGE_VERSION = "2026-06-12-dev-37975a30f";
