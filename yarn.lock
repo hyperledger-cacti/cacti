@@ -7371,7 +7371,7 @@ __metadata:
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
@@ -8211,7 +8211,7 @@ __metadata:
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -8235,7 +8235,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     axios: "npm:1.15.0"
     express: "npm:5.1.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
   languageName: unknown
@@ -8261,7 +8261,7 @@ __metadata:
     express: "npm:5.1.0"
     forge-std: "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
     web3js-quorum: "npm:22.4.0"
@@ -8456,7 +8456,7 @@ __metadata:
     http-errors: "npm:2.0.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     key-encoder: "npm:2.0.3"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
@@ -8521,7 +8521,7 @@ __metadata:
     http-errors-enhanced-cjs: "npm:2.0.1"
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     node-fetch: "npm:2.7.0"
     node-ssh: "npm:13.1.0"
     prom-client: "npm:15.1.3"
@@ -8623,7 +8623,7 @@ __metadata:
     http-status-codes: "npm:2.1.4"
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     js-yaml: "npm:4.1.1"
     json5: "npm:2.2.3"
     jsrsasign: "npm:11.0.0"
@@ -8714,7 +8714,7 @@ __metadata:
     http-errors-enhanced-cjs: "npm:2.0.1"
     http-status-codes: "npm:2.1.4"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     multer: "npm:2.1.1"
     ngo: "npm:2.6.2"
     openapi-types: "npm:12.1.3"
@@ -8766,7 +8766,7 @@ __metadata:
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -9213,7 +9213,7 @@ __metadata:
     internal-ip: "npm:6.2.0"
     is-port-reachable: "npm:3.0.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     js-yaml: "npm:4.1.0"
     keycloak-admin: "npm:1.14.22"
     lodash: "npm:4.18.1"
@@ -9397,7 +9397,7 @@ __metadata:
     jest: "npm:29.6.2"
     jest-extended: "npm:4.0.1"
     jest-junit: "npm:16.0.0"
-    joi: "npm:17.13.3"
+    joi: "npm:17.13.4"
     json5: "npm:2.2.3"
     license-report: "npm:6.4.0"
     lint-staged: "npm:11.2.6"
@@ -37028,16 +37028,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:17.13.3":
-  version: 17.13.3
-  resolution: "joi@npm:17.13.3"
+"joi@npm:17.13.4":
+  version: 17.13.4
+  resolution: "joi@npm:17.13.4"
   dependencies:
     "@hapi/hoek": "npm:^9.3.0"
     "@hapi/topo": "npm:^5.1.0"
     "@sideway/address": "npm:^4.1.5"
     "@sideway/formula": "npm:^3.0.1"
     "@sideway/pinpoint": "npm:^2.0.0"
-  checksum: 10/4c150db0c820c3a52f4a55c82c1fc5e144a5b5f4da9ffebc7339a15469d1a447ebb427ced446efcb9709ab56bd71a06c4c67c9381bc1b9f9ae63fc7c89209bdf
+  checksum: 10/0e407d4cc6cb0830b93c2d107f8b85113338473296025c31a931589359b58883e61fd183dd7532d3ab1ee014a01a20830a8fca90d9f0217d0c0894ee2cbf9ff5
   languageName: node
   linkType: hard
 
