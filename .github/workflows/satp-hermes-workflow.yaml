@@ -252,6 +252,7 @@ jobs:
   run-satp-tests-integration-gateway:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    timeout-minutes: 60
     permissions:
       actions: read
       checks: write
@@ -307,6 +308,7 @@ jobs:
   run-satp-tests-integration-docker:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    timeout-minutes: 60
     permissions:
       actions: read
       checks: write

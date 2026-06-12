@@ -1,10 +1,12 @@
 name: "Cacti CodeQL config"
 
-# Exclude auto-generated, vendored, build output, and test code from CodeQL
-# analysis. These paths are either machine-generated (OpenAPI/protobuf clients),
-# third-party, or non-production test fixtures and should not produce alerts.
+# Run the security-and-quality suite: security + maintainability/reliability queries.
+queries:
+  - uses: security-and-quality
+
 paths-ignore:
   - "**/generated/**"
+  - "**/test/**"
   - "**/node_modules/**"
   - "**/dist/**"
   - "**/build/**"
