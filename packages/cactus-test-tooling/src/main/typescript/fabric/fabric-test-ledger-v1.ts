@@ -1667,6 +1667,11 @@ export class FabricTestLedgerV1 implements ITestLedger {
       try {
         const { Status } = await this.getContainerInfo();
         reachable = Status.endsWith(" (healthy)");
+        if (!reachable && Date.now() >= startedAt + timeoutMs) {
+          throw new Error(
+            `${fnTag} timed out (${timeoutMs}ms) - container status: ${Status}`,
+          );
+        }
       } catch (ex) {
         reachable = false;
         if (Date.now() >= startedAt + timeoutMs) {

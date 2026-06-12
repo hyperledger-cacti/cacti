@@ -8295,7 +8295,6 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     tape-promise: "npm:4.0.0"
-    tsx: "npm:4.19.0"
     typescript-optional: "npm:2.0.1"
     uuid: "npm:10.0.0"
     web3: "npm:1.6.1"
