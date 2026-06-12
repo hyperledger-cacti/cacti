@@ -57,6 +57,11 @@ export interface IFabricTestEnvironment {
   claimFormat?: ClaimFormat;
   network?: string;
 }
+
+const FABRIC_TRANSACTION_RETRY_ATTEMPTS = 3;
+const FABRIC_TRANSACTION_RETRY_DELAY_MS = 1000;
+const FABRIC_ENDORSEMENT_POLICY_FAILURE = "ENDORSEMENT_POLICY_FAILURE";
+
 export class FabricTestEnvironment {
   public static readonly FABRIC_ASSET_ID: string = "FabricExampleAsset";
   public static readonly FABRIC_REFERENCE_ID: string = ExampleOntology.id;
@@ -297,6 +302,52 @@ export class FabricTestEnvironment {
 
   public getNetworkType(): LedgerType {
     return this.network.ledgerType;
+  }
+
+  private async transactWithFabricRetry(
+    request: Parameters<PluginLedgerConnectorFabric["transact"]>[0],
+  ): Promise<RunTransactionResponse> {
+    let lastError: unknown;
+
+    for (
+      let attempt = 1;
+      attempt <= FABRIC_TRANSACTION_RETRY_ATTEMPTS;
+      attempt++
+    ) {
+      try {
+        return await this.connector.transact(request);
+      } catch (error) {
+        lastError = error;
+        const errorMessage = this.getErrorMessage(error);
+
+        if (
+          !errorMessage.includes(FABRIC_ENDORSEMENT_POLICY_FAILURE) ||
+          attempt === FABRIC_TRANSACTION_RETRY_ATTEMPTS
+        ) {
+          throw error;
+        }
+
+        this.log.warn(
+          `Fabric transaction ${request.methodName} failed with ${FABRIC_ENDORSEMENT_POLICY_FAILURE}; retrying attempt ${
+            attempt + 1
+          }/${FABRIC_TRANSACTION_RETRY_ATTEMPTS}`,
+        );
+        await this.sleep(FABRIC_TRANSACTION_RETRY_DELAY_MS);
+      }
+    }
+
+    throw lastError;
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return String(error);
+  }
+
+  private async sleep(delayMs: number): Promise<void> {
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
   }
 
   // Creates and initializes a new FabricTestEnvironment instance
@@ -570,7 +621,7 @@ export class FabricTestEnvironment {
     amount: string,
     signingCredential: FabricSigningCredential,
   ): Promise<void> {
-    const responseBalance1 = await this.connector.transact({
+    const responseBalance1 = await this.transactWithFabricRetry({
       contractName: contractName,
       channelName: channelName,
       params: [account],
@@ -584,7 +635,7 @@ export class FabricTestEnvironment {
   }
 
   public async giveRoleToBridge(mspID: string): Promise<void> {
-    const setBridgeResponse = await this.connector.transact({
+    const setBridgeResponse = await this.transactWithFabricRetry({
       contractName: this.satpContractName,
       channelName: this.fabricChannelName,
       params: [mspID],
@@ -604,7 +655,7 @@ export class FabricTestEnvironment {
     bridgeAddress: string,
     amount: string,
   ): Promise<void> {
-    const response = await this.connector.transact({
+    const response = await this.transactWithFabricRetry({
       contractName: this.satpContractName,
       channelName: this.fabricChannelName,
       params: [bridgeAddress, amount],
@@ -782,7 +833,7 @@ export class FabricTestEnvironment {
     expect(queryCommitted).toBeTruthy();
     this.log.info("SATP Contract deployed");
 
-    const initializeResponse = await this.connector.transact({
+    const initializeResponse = await this.transactWithFabricRetry({
       contractName: this.satpContractName,
       channelName: this.fabricChannelName,
       params: [this.userIdentity.mspId, FabricTestEnvironment.FABRIC_ASSET_ID],
@@ -801,7 +852,7 @@ export class FabricTestEnvironment {
       throw new Error("Bridge MSPID is undefined");
     }
 
-    const responseClientId = await this.connector.transact({
+    const responseClientId = await this.transactWithFabricRetry({
       contractName: this.satpContractName,
       channelName: this.fabricChannelName,
       params: [],
@@ -954,7 +1005,7 @@ export class FabricTestEnvironment {
     expect(queryCommitted).toBeTruthy();
     this.log.info("Oracle Business Logic Contract deployed");
 
-    const initializeResponse = await this.connector.transact({
+    const initializeResponse = await this.transactWithFabricRetry({
       contractName: "oracle-bl-contract",
       channelName: this.fabricChannelName,
       params: [],
@@ -979,7 +1030,7 @@ export class FabricTestEnvironment {
     methodName: string,
     params: string[],
   ): Promise<RunTransactionResponse> {
-    const readData = await this.connector.transact({
+    const readData = await this.transactWithFabricRetry({
       contractName: contractName,
       channelName: this.fabricChannelName,
       params: params,
@@ -997,7 +1048,7 @@ export class FabricTestEnvironment {
     methodName: string,
     params: string[],
   ): Promise<RunTransactionResponse> {
-    const readData = await this.connector.transact({
+    const readData = await this.transactWithFabricRetry({
       contractName: contractName,
       channelName: this.fabricChannelName,
       params: params,
@@ -1011,7 +1062,7 @@ export class FabricTestEnvironment {
   }
 
   public async mintTokens(amount: string): Promise<void> {
-    const responseMint = await this.connector.transact({
+    const responseMint = await this.transactWithFabricRetry({
       contractName: this.satpContractName,
       channelName: this.fabricChannelName,
       params: [amount],
