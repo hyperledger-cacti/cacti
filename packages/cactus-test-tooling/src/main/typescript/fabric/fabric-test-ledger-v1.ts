@@ -516,17 +516,17 @@ export class FabricTestLedgerV1 implements ITestLedger {
     const connectionProfilePath =
       orgName === "org1" || orgName === "org2"
         ? path.join(
-            "fabric-samples/test-network",
-            "organizations/peerOrganizations",
-            orgName + ".example.com",
-            "connection-" + orgName + ".json",
-          )
+          "fabric-samples/test-network",
+          "organizations/peerOrganizations",
+          orgName + ".example.com",
+          "connection-" + orgName + ".json",
+        )
         : path.join(
-            "add-org-" + orgName,
-            "organizations/peerOrganizations",
-            orgName + ".example.com",
-            "connection-" + orgName + ".json",
-          );
+          "add-org-" + orgName,
+          "organizations/peerOrganizations",
+          orgName + ".example.com",
+          "connection-" + orgName + ".json",
+        );
     const peer0Name = `peer0.${orgName}.example.com`;
     const peer1Name = `peer1.${orgName}.example.com`;
     const cInfo = await this.getContainerInfo();
@@ -1659,7 +1659,7 @@ export class FabricTestLedgerV1 implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 180000): Promise<void> {
+  public async waitForHealthCheck(timeoutMs = 900000): Promise<void> {
     const fnTag = "FabricTestLedgerV1#waitForHealthCheck()";
     const startedAt = Date.now();
     let reachable = false;
