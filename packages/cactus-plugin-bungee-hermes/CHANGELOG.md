@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha.6](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-alpha.6) (2026-06-12)
+
+### Bug Fixes
+
+* fix bungee ports in test ([dddb671](https://github.com/hyperledger-cacti/cacti/commit/dddb6713ea6fc00935b95380222d72d95f914d94))
+* fix flaky tests ([cf92f90](https://github.com/hyperledger-cacti/cacti/commit/cf92f90318c3ebd8c9434cb8cbe624404988aec3))
+* renaming JS/TS package namespaces ([0e106b9](https://github.com/hyperledger-cacti/cacti/commit/0e106b9446c0efbe67db979dc06d907b9ed3e378))
+* skip Fabric tests in bungee ([274241d](https://github.com/hyperledger-cacti/cacti/commit/274241d81c575a21df4179f6f3437a69fb17acda))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-bungee-hermes

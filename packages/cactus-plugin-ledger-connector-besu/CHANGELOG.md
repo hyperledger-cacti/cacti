@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha.6](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-alpha.6) (2026-06-12)
+
+### Bug Fixes
+
+* bump dependencies and fix oracle ([e84c86f](https://github.com/hyperledger-cacti/cacti/commit/e84c86f41914f621cb6efdff09ffd645902e6b03))
+* fix satp tests ([9d9c68a](https://github.com/hyperledger-cacti/cacti/commit/9d9c68a65fba78f7bc40b2b8d7d892a2dda779ae))
+* fix satp tests ([783555e](https://github.com/hyperledger-cacti/cacti/commit/783555e05a04501e161e12a7db04b5d5ccf92191))
+* fix satp tests ([0e46d07](https://github.com/hyperledger-cacti/cacti/commit/0e46d07d4fb7cd276c2c764b5de1cd7ddf81cfcf))
+* fix tests ([094a12b](https://github.com/hyperledger-cacti/cacti/commit/094a12b7e03e0731e250493f71b06d793ec4a958))
+* renaming JS/TS package namespaces ([0e106b9](https://github.com/hyperledger-cacti/cacti/commit/0e106b9446c0efbe67db979dc06d907b9ed3e378))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 ### Bug Fixes
