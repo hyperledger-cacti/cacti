@@ -120,7 +120,7 @@ beforeAll(async () => {
   } catch (err) {
     log.warn(
       "Fabric ledger failed to start — Fabric describe blocks are already " +
-      "describe.skip so non-Fabric tests will proceed normally.",
+        "describe.skip so non-Fabric tests will proceed normally.",
       err,
     );
     fabricEnv = undefined as unknown as FabricTestEnvironment;

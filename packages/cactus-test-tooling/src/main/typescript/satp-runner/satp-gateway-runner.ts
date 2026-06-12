@@ -95,7 +95,9 @@ export class SATPGatewayRunner implements ITestLedger {
       options.oapiPort || SATP_GATEWAY_RUNNER_DEFAULT_OPTIONS.oapiPort;
     this.networkName = options.networkName;
     this.url = options.url;
-    this.healthCheckTimeoutMs = options.healthCheckTimeoutMs ?? SATPGatewayRunner.DEFAULT_HEALTH_CHECK_TIMEOUT_MS;
+    this.healthCheckTimeoutMs =
+      options.healthCheckTimeoutMs ??
+      SATPGatewayRunner.DEFAULT_HEALTH_CHECK_TIMEOUT_MS;
 
     this.configPath = options.configPath;
     this.logsPath = options.logsPath;
@@ -299,7 +301,9 @@ export class SATPGatewayRunner implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = SATPGatewayRunner.DEFAULT_HEALTH_CHECK_TIMEOUT_MS): Promise<void> {
+  public async waitForHealthCheck(
+    timeoutMs = SATPGatewayRunner.DEFAULT_HEALTH_CHECK_TIMEOUT_MS,
+  ): Promise<void> {
     const fnTag = "SATPGatewayRunner#waitForHealthCheck()";
     const startedAt = Date.now();
     let isHealthy = false;
@@ -313,9 +317,9 @@ export class SATPGatewayRunner implements ITestLedger {
         await this.logContainerDiagnostics();
         throw new Error(
           `${fnTag} timed out (${timeoutMs}ms). Last status: "${lastStatus}". ` +
-          `Container may have crashed ${unhealthyCount} times. ` +
-          `Last known exit status: ${lastExitStatus || "unknown"}. ` +
-          `Check container logs above for crash details.`,
+            `Container may have crashed ${unhealthyCount} times. ` +
+            `Last known exit status: ${lastExitStatus || "unknown"}. ` +
+            `Check container logs above for crash details.`,
         );
       }
       const { Status, State } = await this.getContainerInfo();
@@ -329,7 +333,7 @@ export class SATPGatewayRunner implements ITestLedger {
           unhealthyCount++;
           this.log.warn(
             `Container appears to have restarted (restart #${unhealthyCount}). ` +
-            `Status: ${Status}. This may indicate the gateway process is crashing.`,
+              `Status: ${Status}. This may indicate the gateway process is crashing.`,
           );
         }
       }

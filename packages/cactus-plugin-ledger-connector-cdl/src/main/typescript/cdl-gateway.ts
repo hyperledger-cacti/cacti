@@ -109,6 +109,7 @@ export class CDLGateway {
     this.log.debug(`cdl request ${httpMethod} ${url} executed`);
 
     try {
+      // codeql[js/request-forgery] - url is validated above to be a relative path; baseURL is operator-configured
       const requestResponse = await axios({
         httpsAgent,
         method: httpMethod,
