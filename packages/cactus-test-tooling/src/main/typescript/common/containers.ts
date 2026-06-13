@@ -17,7 +17,7 @@ import {
   Strings,
   ILoggerOptions,
   Logger,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { IDockerPullProgress } from "./i-docker-pull-progress";
 
 export interface IPruneDockerResourcesRequest {
@@ -551,10 +551,12 @@ export class Containers {
 
     const startedAt = Date.now();
     let reachable = false;
+    let lastError: unknown;
     do {
       try {
         const { Status } = await Containers.getById(containerId);
         reachable = Status.endsWith(" (healthy)");
+        lastError = undefined;
       } catch (ex) {
         // FIXME: if the container is slow to start this might trip with a
         // false positive because there is no container YET in the beginning.
@@ -563,12 +565,16 @@ export class Containers {
         //     `${fnTag} container crashed while awaiting healthheck -> ${ex.stack}`,
         //   );
         // }
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex.stack}`);
-        }
         reachable = false;
+        lastError = ex;
       }
-      await new Promise((resolve2) => setTimeout(resolve2, 1000));
+      if (!reachable && Date.now() >= startedAt + timeoutMs) {
+        const detail = lastError instanceof Error ? lastError.stack : lastError;
+        throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${detail}`);
+      }
+      if (!reachable) {
+        await new Promise((resolve2) => setTimeout(resolve2, 1000));
+      }
     } while (!reachable);
   }
 

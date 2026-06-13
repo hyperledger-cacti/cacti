@@ -1,8 +1,8 @@
 {
-  "name": "@hyperledger/cactus",
+  "name": "@hyperledger-cacti/cactus",
   "license": "Apache-2.0",
   "private": true,
-  "description": "Root project for Cactus which contains all core components and plugins developed by the project.",
+  "description": "Root project for Cacti which contains all core components and plugins developed by the project.",
   "workspaces": {
     "packages": [
       "packages/cactus-*",
@@ -27,9 +27,9 @@
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
-    "reset:yarn-lock": "yarn run init-registries && yarn install --update-checksums --force",
+    "reset:yarn-lock": "yarn config set npmScopes.iroha2.npmRegistryServer https://nexus.iroha.tech/repository/npm-group/ && yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
-    "configure": "yarn init-registries && yarn install && yarn build:dev:backend",
+    "configure": "yarn config set npmScopes.iroha2.npmRegistryServer https://nexus.iroha.tech/repository/npm-group/ && yarn install && yarn build:dev:backend",
     "set-yarn-version": "yarn set version stable",
     "enable-corepack": "npm i -g corepack && corepack enable && corepack prepare yarn@4.3.1 --activate",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
@@ -51,7 +51,6 @@
     "generate-api-server-config": "yarn node ./tools/generate-api-server-config.js",
     "sync-ts-config": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --loader ts-node/esm ./tools/sync-npm-deps-to-tsc-projects.ts",
     "start:api-server": "yarn node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
-    "start:example-supply-chain": "yarn build:dev && cd ./examples/cactus-example-supply-chain-backend/ && yarn start",
     "start:example-carbon-accounting": "CONFIG_FILE=examples/cactus-example-carbon-accounting-backend/example-config.json node examples/cactus-example-carbon-accounting-backend/dist/lib/main/typescript/carbon-accounting-app-cli.js",
     "start:example-cbdc-bridging-app": "node -r ts-node/register examples/cactus-example-cbdc-bridging-backend/dist/lib/main/typescript/cbdc-bridging-app-cli.js dotenv_config_path=examples/cactus-example-cbdc-bridging-backend/process.env",
     "purge-build-cache": "del-cli .build-cache/*",
@@ -63,6 +62,7 @@
     "spellcheck": "cspell lint --no-progress \"*/*/src/**/*.{js,ts}\"",
     "tsc": "NODE_OPTIONS=\"--max_old_space_size=3072\" tsc --build --verbose",
     "codegen": "run-s 'codegen:warmup-*' codegen:verify codegen:lerna codegen:cleanup",
+    "codegen:warmup-grpc-tools": "test -x \"$(yarn bin grpc_tools_node_protoc | sed 's/protoc\\.js$/protoc/')\" || yarn rebuild grpc-tools",
     "codegen:cleanup": "rm -f -v ./openapitools.json",
     "codegen:verify": "yarn exec openapi-generator-cli version",
     "codegen:lerna": "openapi-generator-cli version-manager set 6.6.0 && yarn exec lerna run codegen",
@@ -81,7 +81,7 @@
     "build:prod:frontend": "lerna run build:prod:frontend",
     "build:dev": "yarn build:dev:backend && yarn webpack:dev:web && yarn build:dev:frontend",
     "build:dev:backend": "NODE_OPTIONS=\"--max_old_space_size=3072\" yarn tsc && yarn build:dev:backend:postbuild",
-    "build:dev:frontend": "NODE_OPTIONS=\"--max_old_space_size=3072\" lerna run build:dev:frontend --scope='@hyperledger/cactus-example-*-frontend' --scope='@hyperledger/cacti-ledger-browser'",
+    "build:dev:frontend": "NODE_OPTIONS=\"--max_old_space_size=3072\" lerna run build:dev:frontend --scope='@hyperledger-cacti/cactus-example-*-frontend' --scope='@hyperledger-cacti/cacti-ledger-browser'",
     "build:dev:common": "lerna exec --stream --scope '*/*common' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:backend:postbuild": "lerna run build:dev:backend:postbuild",
     "test:cmd-api-server": "tap --ts --timeout=600 \"packages/cactus-*cmd-api-server/src/test/typescript/{unit,integration}/\"",
@@ -166,14 +166,14 @@
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
     "request-promise-native": "1.0.9",
-    "@angular/*": "17.3.11"
+    "@angular/*": "19.2.20"
   },
   "devDependencies": {
-    "@angular/common": "17.3.11",
+    "@angular/common": "19.2.20",
     "@angular/core": "19.2.20",
-    "@angular/platform-browser": "17.3.11",
-    "@angular/platform-browser-dynamic": "17.3.11",
-    "@angular/router": "17.3.11",
+    "@angular/platform-browser": "19.2.20",
+    "@angular/platform-browser-dynamic": "19.2.20",
+    "@angular/router": "19.2.20",
     "@arethetypeswrong/cli": "0.16.4",
     "@babel/parser": "7.24.7",
     "@babel/types": "7.24.7",
@@ -263,7 +263,7 @@
     "request": "2.88.2",
     "run-time-error": "1.4.0",
     "run-time-error-cjs": "1.4.0",
-    "rxjs": "^7.8.2",
+    "rxjs": "7.8.2",
     "secp256k1": "5.0.1",
     "semver-parser": "4.1.4",
     "shebang-loader": "0.0.1",
@@ -280,7 +280,7 @@
     "ts-loader": "9.4.4",
     "ts-node": "10.9.2",
     "tslib": "2.6.2",
-    "tsx": "4.16.2",
+    "tsx": "4.19.0",
     "typescript": "5.5.2",
     "web3": "4.1.1",
     "web3-core": "4.1.1",
@@ -290,7 +290,7 @@
     "webpack-cli": "4.10.0",
     "wget-improved": "3.4.0",
     "yargs": "17.7.2",
-    "zone.js": "^0.16.0"
+    "zone.js": "0.15.1"
   },
   "dependenciesMeta": {
     "@2060.io/ffi-napi": {

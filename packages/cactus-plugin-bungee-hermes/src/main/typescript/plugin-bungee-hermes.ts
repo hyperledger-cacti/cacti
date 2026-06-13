@@ -6,7 +6,7 @@ import {
   Logger,
   LoggerProvider,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { v4 as uuidV4 } from "uuid";
@@ -15,7 +15,7 @@ import {
   ICactusPluginOptions,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { State } from "./view-creation/state";
 import OAS from "../json/openapi.json";
 import type { Express } from "express";
@@ -50,7 +50,7 @@ import { MergeViewsEndpointV1 } from "./web-services/merge-views-endpoint";
 import { ProcessViewEndpointV1 } from "./web-services/process-view-endpoint";
 
 import { PrivacyPolicies } from "./view-creation/privacy-policies";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 export interface IKeyPair {
   publicKey: Uint8Array;
@@ -147,7 +147,7 @@ export class PluginBungeeHermes implements ICactusPlugin, IPluginWebService {
     this.log.info(`Shutting down ${this.className}...`);
   }
   public getPackageName(): string {
-    return `@hyperledger/cactus-plugin-bungee-hermes`;
+    return `@hyperledger-cacti/cactus-plugin-bungee-hermes`;
   }
 
   public async onPluginInit(): Promise<unknown> {

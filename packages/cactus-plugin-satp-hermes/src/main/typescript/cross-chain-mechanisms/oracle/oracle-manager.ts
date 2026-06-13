@@ -38,13 +38,13 @@
 import {
   type ILoggerOptions,
   type LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../core/satp-logger";
 // import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
 
 import { IOracleEntryBase, IOracleListenerBase } from "./oracle-types";
-import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
+import { IPluginBungeeHermesOptions } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
 import { INetworkOptions } from "../bridge/bridge-types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
@@ -54,11 +54,11 @@ import {
   TaskNotFoundError,
   UnsupportedNetworkError,
 } from "../common/errors";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { v4 as uuidv4 } from "uuid";
 import { IOracleEVMOptions, OracleEVM } from "./implementations/oracle-evm";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   IOracleFabricOptions,
   OracleFabric,
@@ -192,7 +192,7 @@ export class OracleManager {
       try {
         this.logger.debug(`${fnTag}, Deploying Oracle...`);
         this.logger.debug(
-          `${fnTag}, Oracle Network Options: ${JSON.stringify(oracleNetworkOptions)}`,
+          `${fnTag}, Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
         );
 
         this.logAndPersist(
@@ -228,9 +228,7 @@ export class OracleManager {
             case LedgerType.Besu2X:
               this.logger.debug(`${fnTag}, Deploying Besu Oracle...`);
               this.logger.debug(
-                `${fnTag}, Besu Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Besu Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               const besuNetworkOptions =
                 oracleNetworkOptions as unknown as IOracleBesuOptions;
@@ -251,9 +249,7 @@ export class OracleManager {
             case LedgerType.Ethereum:
               this.logger.debug(`${fnTag}, Deploying Ethereum Oracle...`);
               this.logger.debug(
-                `${fnTag}, Ethereum Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Ethereum Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               const ethereumNetworkOptions =
                 oracleNetworkOptions as unknown as IOracleEVMOptions;
@@ -274,9 +270,7 @@ export class OracleManager {
             case LedgerType.Fabric2:
               this.logger.debug(`${fnTag}, Deploying Fabric Oracle...`);
               this.logger.debug(
-                `${fnTag}, Fabric Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Fabric Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               if (
                 !(oracleNetworkOptions as Partial<IOracleFabricOptions>)

@@ -9,7 +9,7 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Checks,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   WatchBlocksV1,

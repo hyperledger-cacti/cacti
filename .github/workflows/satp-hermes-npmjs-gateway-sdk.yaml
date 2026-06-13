@@ -8,8 +8,8 @@ name: SATP Hermes Gateway SDK - NPM Publish
 # Package Registry (GPR) with support for both development and production releases.
 #
 # PACKAGE CONFIGURATION:
-#   Organization: @hyperledger
-#   Package: @hyperledger/cactus-plugin-satp-hermes
+#   Organization: @hyperledger-cacti
+#   Package: @hyperledger-cacti/cactus-plugin-satp-hermes
 #   Registry: https://registry.npmjs.org/
 #
 # VERSION STRATEGY:
@@ -48,7 +48,7 @@ name: SATP Hermes Gateway SDK - NPM Publish
 #     - Build configs, dev scripts
 #
 # REQUIRED SECRETS:
-#   NPM_TOKEN: NPM authentication token with publish permissions for @hyperledger
+#   NPM_TOKEN: NPM authentication token with publish permissions for @hyperledger-cacti
 #   GITHUB_TOKEN: Auto-provided by GitHub Actions for GPR publishing
 #
 # USAGE:
@@ -63,9 +63,9 @@ name: SATP Hermes Gateway SDK - NPM Publish
 #     5. Optionally set custom_version
 #
 # VERIFICATION:
-#   npm view @hyperledger/cactus-plugin-satp-hermes
-#   npm install @hyperledger/cactus-plugin-satp-hermes@dev
-#   npm install @hyperledger/cactus-plugin-satp-hermes@latest
+#   npm view @hyperledger-cacti/cactus-plugin-satp-hermes
+#   npm install @hyperledger-cacti/cactus-plugin-satp-hermes@dev
+#   npm install @hyperledger-cacti/cactus-plugin-satp-hermes@latest
 #
 # =============================================================================
 
@@ -150,7 +150,7 @@ jobs:
       npm_package_name: ${{ steps.set_tags.outputs.npm_package_name }}
       is_release: ${{ steps.set_tags.outputs.is_release }}
     steps:
-      - uses: actions/checkout@v4.1.7  
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
       - name: Set package tags
         id: set_tags
         run: |
@@ -177,7 +177,7 @@ jobs:
           fi
           
           # Standardized package name for Hyperledger organization
-          NPM_PACKAGE_NAME="@hyperledger/cactus-plugin-satp-hermes"
+          NPM_PACKAGE_NAME="@hyperledger-cacti/cactus-plugin-satp-hermes"
           
           {
             echo "package_version=${PACKAGE_VERSION}"
@@ -210,10 +210,10 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
         with:
           node-version: '22'
           cache: 'yarn'
@@ -221,7 +221,7 @@ jobs:
       
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -232,7 +232,7 @@ jobs:
         run: cd packages/cactus-plugin-satp-hermes           
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@c7450ba673e133f5ee30098b3b54f444d3a2ca2d #v1.8.0
         with:
           version: stable
 
@@ -245,7 +245,7 @@ jobs:
       - name: Build package
         id: build
         run: |
-          yarn lerna run build --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn lerna run build --scope=@hyperledger-cacti/cactus-plugin-satp-hermes
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Verify build artifacts
@@ -254,7 +254,7 @@ jobs:
           ls -la packages/cactus-plugin-satp-hermes/dist/
           
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: satp-hermes-build-artifacts
           path: |
@@ -279,18 +279,18 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
         with:
           node-version: '22'
           always-auth: true
           registry-url: 'https://registry.npmjs.org/'
-          scope: '@hyperledger'
+          scope: '@hyperledger-cacti'
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
         with:
           name: satp-hermes-build-artifacts
           path: packages/cactus-plugin-satp-hermes/
@@ -356,7 +356,7 @@ jobs:
           # Also add version-specific dist-tag for easier reference (e.g. 0.0.3-beta)
           PACKAGE_VERSION=$(node -e "console.log(require('./package.json').version)")
           echo "Published version ${PACKAGE_VERSION} with 'latest' and '${PACKAGE_VERSION}' tags"
-          npm dist-tag add "@hyperledger/cactus-plugin-satp-hermes@${PACKAGE_VERSION}" "${PACKAGE_VERSION}"
+          npm dist-tag add "@hyperledger-cacti/cactus-plugin-satp-hermes@${PACKAGE_VERSION}" "${PACKAGE_VERSION}"
 
   # Stage: Publish NPM package to GitHub Package Registry
   publish-satp-hermes-npm-package-ghcr:
@@ -365,18 +365,18 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: true  # Don't fail the workflow if GitHub Package Registry push fails
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
         with:
           node-version: '22'
           always-auth: true
           registry-url: 'https://npm.pkg.github.com/'
-          scope: '@hyperledger'
+          scope: '@hyperledger-cacti'
 
       - name: Download build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
         with:
           name: satp-hermes-build-artifacts
           path: packages/cactus-plugin-satp-hermes/

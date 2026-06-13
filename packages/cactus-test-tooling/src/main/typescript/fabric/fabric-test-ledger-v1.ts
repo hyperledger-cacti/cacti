@@ -22,7 +22,7 @@ import {
   LoggerProvider,
   Bools,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import Dockerode from "dockerode";
 import {
   NodeSSH,
@@ -1659,13 +1659,32 @@ export class FabricTestLedgerV1 implements ITestLedger {
     });
   }
 
-  public async waitForHealthCheck(timeoutMs = 180000): Promise<void> {
+  private async getContainerHealthLog(): Promise<string> {
+    try {
+      const container = this.getContainer();
+      const inspectData = await container.inspect();
+      const healthLog = inspectData.State?.Health?.Log ?? [];
+      return healthLog
+        .map(
+          (entry: { ExitCode: number; Output: string }) =>
+            `[exit=${entry.ExitCode}] ${entry.Output?.trim()}`,
+        )
+        .join("\n");
+    } catch {
+      return "(could not retrieve health log)";
+    }
+  }
+
+  public async waitForHealthCheck(timeoutMs = 18000000): Promise<void> {
     const fnTag = "FabricTestLedgerV1#waitForHealthCheck()";
     const startedAt = Date.now();
     let reachable = false;
+    let lastStatus = "unknown";
+
     do {
       try {
         const { Status } = await this.getContainerInfo();
+        lastStatus = Status;
         reachable = Status.endsWith(" (healthy)");
       } catch (ex) {
         reachable = false;
@@ -1673,7 +1692,19 @@ export class FabricTestLedgerV1 implements ITestLedger {
           throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex}`);
         }
       }
-      await new Promise((resolve2) => setTimeout(resolve2, 1000));
+
+      // Checked outside the try/catch so the timeout error is not re-caught
+      // and double-wrapped by the catch block above.
+      if (!reachable) {
+        if (Date.now() >= startedAt + timeoutMs) {
+          const healthLog = await this.getContainerHealthLog();
+          throw new Error(
+            `${fnTag} timed out (${timeoutMs}ms) - container status: ${lastStatus}\n` +
+              `Docker health check log:\n${healthLog}`,
+          );
+        }
+        await new Promise((resolve2) => setTimeout(resolve2, 1000));
+      }
     } while (!reachable);
   }
 

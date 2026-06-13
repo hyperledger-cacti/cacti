@@ -1,10 +1,10 @@
 import "jest-extended";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   ISATPGatewayRunnerConstructorOptions,
   pruneDockerContainersIfGithubAction,
   SATPGatewayRunner,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   DEFAULT_PORT_GATEWAY_OAPI,
   DEFAULT_PORT_GATEWAY_CLIENT,
