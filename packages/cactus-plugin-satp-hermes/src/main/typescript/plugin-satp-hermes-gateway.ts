@@ -92,7 +92,7 @@ import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
 import { ISignerKeyPair } from "@hyperledger/cactus-common";
 import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
 import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
-import knex, { Knex } from "knex";
+import { Knex } from "knex";
 import { PluginRegistry } from "@hyperledger/cactus-core";
 import { NetworkId } from "./public-api";
 import {
@@ -101,7 +101,6 @@ import {
   ConfigService,
 } from "@hyperledger/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
-import { createMigrationSource } from "./database/knex-migration-source";
 import { ExtensionsManager } from "./extensions/extensions-manager";
 import { MonitorService } from "./services/monitoring/monitor";
 import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
@@ -670,6 +669,21 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         useNullAsDefault: true,
       });
     }
+
+    this.onShutdown({
+      name: "destroy-db-repositories",
+      hook: async () => {
+        const repositories = [
+          this.localRepository,
+          this.remoteRepository,
+          this.auditRepository,
+          this.oracleLogRepository,
+        ].filter((r): r is NonNullable<typeof r> => r != null);
+        for (const repo of repositories) {
+          await repo.destroy();
+        }
+      },
+    });
 
     if (this.config.keyPair === undefined) {
       throw new Error("Key pair is undefined");
@@ -1247,25 +1261,16 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     await context.with(ctx, async () => {
       try {
-        if (!this.config.localRepository) {
-          this.logger.info(`${fnTag}: Local repository is not defined`);
-          this.logger.info(`${fnTag}: Using default local repository`);
-          this.config.localRepository = knexLocalInstance.default;
-        }
-        this.logger.info(`${fnTag}: Creating migration source`);
-        const migrationSource = await createMigrationSource();
-        this.logger.info(
-          `${fnTag}: Created migration source: ${JSON.stringify(migrationSource)}`,
-        );
-        const database = knex({
-          ...this.config.localRepository,
-          migrations: {
-            // This removes the problem with the migration source being in the file system
-            migrationSource: migrationSource,
-          },
-        });
+        const repositories = [
+          this.localRepository,
+          this.remoteRepository,
+          this.auditRepository,
+          this.oracleLogRepository,
+        ].filter((r): r is NonNullable<typeof r> => r != null);
 
-        await database.migrate.latest();
+        for (const repo of repositories) {
+          await repo.migrate();
+        }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
@@ -1521,9 +1526,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           this.logger.debug("Shutting down monitor service");
           await this.monitorService.shutdown();
         }
-        this.logger.debug("Shutting down audit repository");
-        await this.auditRepository?.destroy();
-
         return;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
