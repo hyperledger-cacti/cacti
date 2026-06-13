@@ -50,6 +50,47 @@ export interface ICarbonAccountingAppOptions {
 }
 
 export type ShutdownHook = () => Promise<void>;
+const SHUTDOWN_HOOK_TIMEOUT_MS = Number(process.env.SHUTDOWN_HOOK_TIMEOUT_MS) || 5_000;
+
+async function runShutdownHookWithTimeout(
+  log: Logger,
+  hook: ShutdownHook,
+  hookIndex: number,
+  fnTag: string,
+): Promise<void> {
+  let timedOut = false;
+  const hookPromise = Promise.resolve().then(() => hook());
+
+  hookPromise.catch((err: unknown) => {
+    if (timedOut) {
+      log.error(`${fnTag}: exit hook #%d rejected after timing out:`, hookIndex, err);
+    }
+  });
+
+  let timeoutId: NodeJS.Timeout | undefined;
+  const timeoutPromise = new Promise<string>((resolve) => {
+    timeoutId = setTimeout(() => {
+      timedOut = true;
+      resolve("timed-out");
+    }, SHUTDOWN_HOOK_TIMEOUT_MS);
+  });
+
+  try {
+    const result = await Promise.race([hookPromise.then(() => "completed"), timeoutPromise]);
+    if (result === "timed-out") {
+      log.warn(
+        `${fnTag}: exit hook #%d timed out after %d ms; continuing shutdown`,
+        hookIndex,
+        SHUTDOWN_HOOK_TIMEOUT_MS,
+      );
+      return;
+    }
+  } catch (err) {
+    log.error(`${fnTag}: exit hook #%d failed; continuing shutdown:`, hookIndex, err);
+  } finally {
+    if (timeoutId !== undefined) clearTimeout(timeoutId);
+  }
+}
 export class CarbonAccountingApp {
   private readonly log: Logger;
   private readonly shutdownHooks: ShutdownHook[];
@@ -197,8 +238,11 @@ export class CarbonAccountingApp {
   }
 
   public async stop(): Promise<void> {
+    const fnTag = "CarbonAccountingApp#stop()";
+    let i = 0;
     for (const hook of this.shutdownHooks) {
-      await hook(); // FIXME add timeout here so that shutdown does not hang
+      i++;
+      await runShutdownHookWithTimeout(this.log, hook, i, fnTag);
     }
   }
 
