@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger/cacti-weaver-sdk-besu",
-  "version": "2.1.0",
+  "name": "@hyperledger-cacti/cacti-weaver-sdk-besu",
+  "version": "3.0.0-alpha.6",
   "description": "Supplemental library for Web3JS based Besu client applications to enable interoperability using Weaver",
   "keywords": [
     "Hyperledger",
@@ -23,13 +23,14 @@
     "email": "cacti@lists.lfdecentralizedtrust.org",
     "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
   },
-  "main": "index.js",
+  "main": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-alpha.6",
     "log4js": "6.9.1",
     "web3": "1.10.0",
     "web3-utils": "1.10.0"
@@ -52,7 +53,7 @@
     "npm": ">=8"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/hyperledger-cacti"
+    "access": "public"
   },
   "tag": "latest"
 }

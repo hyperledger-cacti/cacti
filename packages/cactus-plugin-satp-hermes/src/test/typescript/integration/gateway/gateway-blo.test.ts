@@ -2,13 +2,16 @@ import "jest-extended";
 import {
   Containers,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import {
+  type LogLevelDesc,
+  LoggerProvider,
+} from "@hyperledger-cacti/cactus-common";
 import { PluginFactorySATPGateway } from "../../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   type IPluginFactoryOptions,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import type { SATPGatewayConfig } from "../../../../main/typescript/plugin-satp-hermes-gateway";
 import { createClient } from "../../test-utils";
@@ -16,7 +19,7 @@ import {
   HealthCheckResponseStatusEnum,
   StatusResponseStatusEnum,
 } from "../../../../main/typescript";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";

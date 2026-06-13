@@ -36,7 +36,7 @@ impl PluginKeychainMemoryWasm {
     // We have to allow snake case because the JS side expects it.
     #[allow(non_snake_case)]
     pub fn getPackageName(&self) -> String {
-        "@hyperledger/cactus-plugin-keychain-memory-wasm".to_string()
+        "@hyperledger-cacti/cactus-plugin-keychain-memory-wasm".to_string()
     }
 
     // We have to allow snake case because the JS side expects it.

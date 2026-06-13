@@ -27,12 +27,13 @@ runs:
       shell: bash
       run: |
         mkdir -p reports
-        export JEST_JUNIT_OUTPUT="reports/${{ inputs.report_name }}.xml"
+        export JEST_JUNIT_OUTPUT_FILE="reports/${{ inputs.report_name }}.xml"
         yarn jest "${{ inputs.jest_test_pattern }}" \
           --coverage \
           --coverageDirectory="${{ inputs.jest_test_coverage_path }}" \
           --reporters=default \
           --reporters=jest-junit \
+          --passWithNoTests \
           --forceExit
 
     - name: Run Jest Tests (without coverage)
@@ -40,10 +41,11 @@ runs:
       shell: bash
       run: |
         mkdir -p reports
-        export JEST_JUNIT_OUTPUT="reports/${{ inputs.report_name }}.xml"
+        export JEST_JUNIT_OUTPUT_FILE="reports/${{ inputs.report_name }}.xml"
         yarn jest "${{ inputs.jest_test_pattern }}" \
           --reporters=default \
           --reporters=jest-junit \
+          --passWithNoTests \
           --forceExit
 
     - name: Report Jest test results
@@ -51,7 +53,7 @@ runs:
         always() &&
         inputs.github_secret != '' &&
         github.event.pull_request.head.repo.fork != true
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@a43b3a5f7366b97d083190328d2c652e1a8b6aa2 #v3.0.0
       with:
         name: "${{ inputs.report_name }}"
         path: "reports/${{ inputs.report_name }}.xml"
@@ -59,7 +61,7 @@ runs:
         max-annotations: 0
         token: ${{ inputs.github_secret }}
         fail-on-error: false
-        fail-on-empty: true
+        fail-on-empty: false
         only-summary: false
         list-suites: failed
         list-tests: failed

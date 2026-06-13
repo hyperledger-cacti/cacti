@@ -14,9 +14,9 @@ import { v4 as uuidv4 } from "uuid";
 import {
   type IPluginFactoryOptions,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { PluginFactorySATPGateway } from "../../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import type { SATPGatewayConfig } from "../../../../main/typescript/plugin-satp-hermes-gateway";
 import {
   SATP_ARCHITECTURE_VERSION,

@@ -80,11 +80,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/unit/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@v4.1.7
-
-      - uses: ./.github/actions/docker-pull/
-        with:
-          image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -103,7 +99,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-satp-hermes-unit
           path: ./code-coverage-ts/**/
@@ -120,7 +116,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/bridge/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -131,7 +127,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.6
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -154,7 +150,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-satp-hermes-bridge
           path: ./code-coverage-ts/**/
@@ -170,7 +166,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/oracle/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -181,7 +177,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.6
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -203,7 +199,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-satp-hermes-oracle
           path: ./code-coverage-ts/**/
@@ -215,7 +211,7 @@ jobs:
         JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/admin/.*/*.test.ts
         JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
       steps:
-        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
         - name: CI environment clean-up
           run: ./tools/ci-env-clean-up.sh
@@ -226,7 +222,7 @@ jobs:
         
         - uses: ./.github/actions/docker-pull/
           with:
-            image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+            image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.6
         
         - uses: ./.github/actions/docker-pull/
           with:
@@ -244,18 +240,19 @@ jobs:
             jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
             jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
             github_secret: ${{ secrets.GITHUB_TOKEN }}
-            report_name: "satp-oracle-integration-tests-report"
+            report_name: "satp-admin-integration-tests-report"
 
         - name: Upload coverage reports as artifacts
           if: ${{ inputs.run_code_coverage == 'true' }}
-          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+          uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
           with:
-            name: coverage-reports-satp-hermes-oracle
+            name: coverage-reports-satp-hermes-admin
             path: ./code-coverage-ts/**/
 
   run-satp-tests-integration-gateway:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    timeout-minutes: 60
     permissions:
       actions: read
       checks: write
@@ -264,7 +261,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/gateway/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -275,11 +272,15 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.6
       
       - uses: ./.github/actions/docker-pull/
         with:
           image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+
+      - uses: ./.github/actions/docker-pull/
+        with:
+          image: rafaelapb/cacti-satp-hermes-gateway:2026-06-10-dev-375a544e7
 
       - name: build
         with:
@@ -298,7 +299,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-satp-hermes-gateway
           path: ./code-coverage-ts/**/
@@ -307,6 +308,7 @@ jobs:
   run-satp-tests-integration-docker:
     runs-on: ubuntu-22.04
     continue-on-error: true
+    timeout-minutes: 60
     permissions:
       actions: read
       checks: write
@@ -315,7 +317,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/docker/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -326,7 +328,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.6
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -334,7 +336,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: kubaya/cacti-satp-hermes-gateway:5f190f37f-2025-08-19
+          image: rafaelapb/cacti-satp-hermes-gateway:2026-06-10-dev-375a544e7
 
       - uses: ./.github/actions/docker-pull/
         with:
@@ -357,7 +359,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-satp-hermes-gateway-docker
           path: ./code-coverage-ts/**/
@@ -370,7 +372,7 @@ jobs:
       checks: write
       contents: read
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
       
       - name: build
         with:
@@ -379,7 +381,7 @@ jobs:
         uses: ./.github/actions/configure-repo/
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@c7450ba673e133f5ee30098b3b54f444d3a2ca2d #v1.8.0
         with:
           version: stable
 
@@ -399,7 +401,7 @@ jobs:
 
       - name: Upload SATP foundry test reports
         if: always()
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: satp-foundry-report-${{ github.job }}
           path: |
@@ -417,7 +419,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/recovery/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -428,7 +430,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.6
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -451,7 +453,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-satp-hermes-recovery
           path: ./code-coverage-ts/**/
@@ -467,7 +469,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/rollback/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -478,7 +480,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.6
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -501,7 +503,7 @@ jobs:
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-satp-hermes-rollback
           path: ./code-coverage-ts/**/
