@@ -1,33 +1,33 @@
-import js from '@eslint/js';
-import { FlatCompat } from '@eslint/eslintrc';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import js from "@eslint/js";
+import { FlatCompat } from "@eslint/eslintrc";
+import * as path from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Create a compat instance using the equivalent of your .eslintrc.js
 const compat = new FlatCompat({
-  baseDirectory: __dirname
+  baseDirectory: __dirname,
 });
 
 export default [
   {
     ignores: [
-      'node_modules/**',
-      'dist/**',
-      'build/**',
-      'public/**/*',
-      'src/main/typescript/generated/**',
-      'src/main/solidity/generated/**',  
-      'src/test/solidity/generated/**',
-      'src/test/typescript/fabric/contracts/**',
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      "public/**/*",
+      "src/main/typescript/generated/**",
+      "src/main/solidity/generated/**",
+      "src/test/solidity/generated/**",
+      "src/test/typescript/fabric/contracts/**",
     ],
   },
 
   // Include JS config
   js.configs.recommended,
-  
+
   // Main TypeScript configuration
   ...compat.config({
     parser: "@typescript-eslint/parser",
@@ -51,8 +51,8 @@ export default [
         "error",
         { ignoreRestSiblings: true },
       ],
-      "indent": ["off"],
-      "semi": ["error", "always"],
+      indent: ["off"],
+      semi: ["error", "always"],
       "new-cap": ["off"],
       "comma-dangle": ["warn", "always-multiline"],
       "no-constant-condition": "warn",
@@ -62,10 +62,27 @@ export default [
       "no-duplicate-case": "warn",
       "no-unreachable": "error",
       "no-unused-private-class-members": "warn",
-      "@typescript-eslint/no-unused-expressions": ["warn", { allowShortCircuit: true, allowTernary: true }],
+      "@typescript-eslint/no-unused-expressions": [
+        "warn",
+        { allowShortCircuit: true, allowTernary: true },
+      ],
     },
   }),
-  
+
+  // Node.js globals for server-side .mjs scripts (healthcheck, etc.)
+  {
+    files: ["**/*.mjs"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        console: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        Buffer: "readonly",
+      },
+    },
+  },
+
   // Special config for test files
   {
     files: ["**/*.test.js", "**/test/**/*.js"],
@@ -85,7 +102,7 @@ export default [
       "no-undef": "off",
     },
   },
-  
+
   // Special config for contract files
   {
     files: ["**/contracts/**/*.js"],
