@@ -57,6 +57,7 @@ export class StaticConsortiumRepository {
   private readonly packageConfigs: Map<string, unknown>;
 
   private readonly entitiesJWK: Map<string, JWK>;
+  private readonly seenJtis = new Map<string, number>();
 
   public get className(): string {
     return StaticConsortiumRepository.CLASS_NAME;
@@ -190,10 +191,6 @@ export class StaticConsortiumRepository {
       );
       return false;
     }
-    const result = await verifyOrganization(jwt, jwk, member.name);
-    if (typeof result === "string") {
-      throw new Error(fn + result);
-    }
-    return result;
+    return verifyOrganization(jwt, jwk, member.name, this.seenJtis);
   }
 }
