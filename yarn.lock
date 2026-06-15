@@ -9027,7 +9027,7 @@ __metadata:
     fabric-network: "npm:2.5.0-snapshot.23"
     fabric-protos: "npm:2.5.0-snapshot.23"
     fast-safe-stringify: "npm:2.1.1"
-    form-data: "npm:4.0.0"
+    form-data: "npm:4.0.6"
     fs-extra: "npm:11.2.0"
     http-errors: "npm:2.0.0"
     http-status-codes: "npm:2.1.4"
@@ -9087,7 +9087,7 @@ __metadata:
     bl: "npm:6.1.0"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.2.0"
-    form-data: "npm:4.0.0"
+    form-data: "npm:4.0.6"
     fs-extra: "npm:11.2.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     http-status-codes: "npm:2.1.4"
@@ -32808,14 +32808,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"form-data@npm:4.0.0":
-  version: 4.0.0
-  resolution: "form-data@npm:4.0.0"
+"form-data@npm:4.0.6":
+  version: 4.0.6
+  resolution: "form-data@npm:4.0.6"
   dependencies:
     asynckit: "npm:^0.4.0"
     combined-stream: "npm:^1.0.8"
-    mime-types: "npm:^2.1.12"
-  checksum: 10/7264aa760a8cf09482816d8300f1b6e2423de1b02bba612a136857413fdc96d7178298ced106817655facc6b89036c6e12ae31c9eb5bdc16aabf502ae8a5d805
+    es-set-tostringtag: "npm:^2.1.0"
+    hasown: "npm:^2.0.4"
+    mime-types: "npm:^2.1.35"
+  checksum: 10/de6614c8537c92fa5fa3ee7e827758f98f5a9c033f348b7de81855ef36e5cb867e75d9f405d9483ab8d724a4a20d4e79926a299fa8dbba38f530eb659f0884e4
   languageName: node
   linkType: hard
 
@@ -34600,7 +34602,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hasown@npm:^2.0.0, hasown@npm:^2.0.2, hasown@npm:^2.0.3":
+"hasown@npm:^2.0.0, hasown@npm:^2.0.2, hasown@npm:^2.0.3, hasown@npm:^2.0.4":
   version: 2.0.4
   resolution: "hasown@npm:2.0.4"
   dependencies:
