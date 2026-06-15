@@ -44,6 +44,18 @@ jobs:
         with:
           ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
 
+      - name: verify_lerna_version_matches_tag
+        run: |
+          LERNA_VERSION=$(jq -r '.version' lerna.json)
+          REF_NAME="${{ inputs.GIT_TAG_TO_PUBLISH || github.ref_name }}"
+          TAG_VERSION="${REF_NAME#v}"
+          echo "lerna.json version: $LERNA_VERSION"
+          echo "git tag (sans v):   $TAG_VERSION"
+          if [ "$LERNA_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::lerna.json version ($LERNA_VERSION) does not match git tag ($TAG_VERSION)"
+            exit 1
+          fi
+
       - run: git fetch --unshallow --prune
 
       - run: git status --long --verbose
@@ -121,6 +133,15 @@ jobs:
       - name: npm-publish-via-oidc
         run: |
           set -euo pipefail
+          LERNA_VERSION=$(jq -r '.version' lerna.json)
+          PRERELEASE_TAG=$(echo "$LERNA_VERSION" | sed -E -n 's/^[0-9]+\.[0-9]+\.[0-9]+-([a-zA-Z]+)(\..*)?$/\1/p')
+          PUBLISH_ARGS=(--access=public --ignore-scripts)
+          if [ -n "$PRERELEASE_TAG" ]; then
+            PUBLISH_ARGS+=(--tag "$PRERELEASE_TAG")
+            echo "Detected prerelease (${LERNA_VERSION}); using --tag ${PRERELEASE_TAG}"
+          else
+            echo "Stable release (${LERNA_VERSION}); npm will use default dist-tag"
+          fi
           yarn lerna list --json > /tmp/cacti-packages.json
           jq -r '.[] | select(.private == false) | .location' /tmp/cacti-packages.json \
           | while read -r pkg_dir; do
@@ -131,7 +152,7 @@ jobs:
                 continue
               fi
               echo "PUBLISH: ${pkg_name}@${pkg_version}"
-              npm publish "${pkg_dir}" --access=public --ignore-scripts
+              npm publish "${pkg_dir}" "${PUBLISH_ARGS[@]}"
             done
 
   publish-ghcr:
