@@ -92,12 +92,7 @@ function eciesDecryptMessage(
   const privKey = ecdsa.keyFromPrivate(recipientPrivateKey.prvKeyHex, "hex");
 
   const Z = privKey.derive(ephPubKey.pub); // 'z'
-  // Append missing leading zeros to Z
-  let ZArray = Z.toArray();
-  const zerosToAdd = 32 - ZArray.length;
-  for (let ii = 0; ii < zerosToAdd; ii++) {
-    ZArray = new Uint8Array([0, ...ZArray]);
-  }
+  const ZArray = bigNumToFixedBytes(Z, level);
   // The 'null's below correspond to 's1' and 's2',
   // which are both set to nil in golang implementation of the encryption function
   const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
@@ -172,10 +167,9 @@ function eciesEncryptMessage(
   );
   const Rb = ephKeyPair.pubKeyObj.pubKeyHex;
 
-  // Derive a shared secret field element z from the ephemeral secret key k
-  // and convert z to an octet string Z
   const Z = ephPrivKey.derive(pubKey.pub);
-  const kdfOutput = hkdf(Z.toArray(), ECIESKDFOutput, null, null, options);
+  const ZArray = bigNumToFixedBytes(Z, level);
+  const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
 
   const aesKey = kdfOutput.slice(0, aesKeyLength);
   const hmacKey = kdfOutput.slice(aesKeyLength, aesKeyLength + HMACKeyLength);
@@ -364,6 +358,17 @@ function createZeroBuffer(length) {
   const buf = Buffer.alloc(length);
   buf.fill(0);
   return buf;
+}
+
+// Converts a BigNumber to a byte array zero-padded to the field size of the curve,
+// ensuring leading zero bytes are preserved when the scalar is smaller than the field size.
+function bigNumToFixedBytes(bn, level) {
+  let arr = bn.toArray();
+  const fieldSize = Math.ceil(level / 8);
+  while (arr.length < fieldSize) {
+    arr = [0, ...arr];
+  }
+  return arr;
 }
 
 function isString(obj) {
