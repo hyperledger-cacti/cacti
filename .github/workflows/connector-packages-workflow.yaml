@@ -17,7 +17,7 @@ on:
       affected-packages:
         required: false
         type: string
-  
+
 concurrency:
   group: connector-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -310,7 +310,9 @@ jobs:
           path: ./code-coverage-ts/**/
   
   cpl-connector-iroha2:
-    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-iroha2')
+    # Gated off by default; set the `ENABLE_IROHA` repo variable to `true` to enable
+    # once the iroha2 connector is rebuilt against @iroha/* 0.2.0 (JSR).
+    if: ${{ vars.ENABLE_IROHA == 'true' && contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-iroha2') }}
     continue-on-error: false
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-iroha2/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts

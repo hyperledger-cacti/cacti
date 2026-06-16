@@ -344,9 +344,9 @@ jobs:
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
 
-      - uses: ./.github/actions/docker-pull/
-        with:
-          image: ghcr.io/hyperledger/cactus-iroha2-all-in-one:2023-07-29-f2bc772ee
+      # - uses: ./.github/actions/docker-pull/
+      #   with:
+      #     image: ghcr.io/hyperledger/cactus-iroha2-all-in-one:2023-07-29-f2bc772ee
 
       - uses: ./.github/actions/docker-pull/
         with:
