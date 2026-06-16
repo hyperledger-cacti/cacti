@@ -27,9 +27,9 @@
     "run-ci": "./tools/ci.sh",
     "reset:node-modules": "del-cli '**/node_modules'",
     "reset:git": "git clean -f -X",
-    "reset:yarn-lock": "yarn run init-registries && yarn install --update-checksums --force",
+    "reset:yarn-lock": "yarn install --update-checksums --force",
     "reset": "run-s reset:git reset:node-modules reset:yarn-lock configure",
-    "configure": "yarn init-registries && yarn install && yarn build:dev:backend",
+    "configure": "yarn install && yarn build:dev:backend",
     "set-yarn-version": "yarn set version stable",
     "enable-corepack": "npm i -g corepack && corepack enable && corepack prepare yarn@4.3.1 --activate",
     "custom-checks": "TS_NODE_PROJECT=./tools/tsconfig.json node --trace-deprecation --experimental-modules --abort-on-uncaught-exception --loader ts-node/esm --experimental-specifier-resolution=node ./tools/custom-checks/run-custom-checks.ts",
@@ -107,8 +107,7 @@
     "test:all": "NODE_OPTIONS=\"--experimental-vm-modules\" yarn test:jest:all && yarn test:tap:all",
     "lerna-publish-canary": "lerna publish --canary --force-publish --dist-tag $(git branch --show-current) --preid $(git branch --show-current) --loglevel=silly --ignore-scripts --ignore-prepublish",
     "preinstall": "curl -L https://foundry.paradigm.xyz | bash",
-    "prepare": "husky",
-    "init-registries": "yarn config set npmScopes.iroha2.npmRegistryServer https://nexus.iroha.tech/repository/npm-group/"
+    "prepare": "husky"
   },
   "resolutions": {
     "@babel/traverse": ">=7.23.2",

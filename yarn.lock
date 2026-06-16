@@ -8652,38 +8652,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger/cactus-plugin-ledger-connector-iroha2@npm:2.1.0, @hyperledger/cactus-plugin-ledger-connector-iroha2@workspace:packages/cactus-plugin-ledger-connector-iroha2":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger/cactus-plugin-ledger-connector-iroha2@workspace:packages/cactus-plugin-ledger-connector-iroha2"
-  dependencies:
-    "@hyperledger/cactus-common": "npm:2.1.0"
-    "@hyperledger/cactus-core": "npm:2.1.0"
-    "@hyperledger/cactus-core-api": "npm:2.1.0"
-    "@hyperledger/cactus-plugin-keychain-memory": "npm:2.1.0"
-    "@hyperledger/cactus-test-tooling": "npm:2.1.0"
-    "@iroha2/client": "npm:4.0.0"
-    "@iroha2/crypto-core": "npm:0.1.1"
-    "@iroha2/crypto-target-node": "npm:0.4.0"
-    "@iroha2/data-model": "npm:4.0.0"
-    "@types/body-parser": "npm:1.19.6"
-    "@types/express": "npm:5.0.1"
-    "@types/sanitize-html": "npm:2.9.5"
-    axios: "npm:1.15.0"
-    body-parser: "npm:1.20.3"
-    express: "npm:5.1.0"
-    fast-safe-stringify: "npm:2.1.1"
-    hada: "npm:0.0.8"
-    jest: "npm:29.6.2"
-    jest-extended: "npm:4.0.1"
-    rxjs: "npm:7.8.1"
-    sanitize-html: "npm:2.12.1"
-    socket.io: "npm:4.6.2"
-    socket.io-client-fixed-types: "npm:4.5.4"
-    undici: "npm:7.24.0"
-    uuid: "npm:10.0.0"
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger/cactus-plugin-ledger-connector-polkadot@workspace:packages/cactus-plugin-ledger-connector-polkadot":
   version: 0.0.0-use.local
   resolution: "@hyperledger/cactus-plugin-ledger-connector-polkadot@workspace:packages/cactus-plugin-ledger-connector-polkadot"
@@ -9274,7 +9242,6 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-corda": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-fabric": "npm:2.1.0"
-    "@hyperledger/cactus-plugin-ledger-connector-iroha2": "npm:2.1.0"
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "npm:2.1.0"
     jest-extended: "npm:7.0.0"
     rxjs: "npm:7.8.1"
@@ -9284,7 +9251,6 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-corda": 2.x
     "@hyperledger/cactus-plugin-ledger-connector-ethereum": 2.x
     "@hyperledger/cactus-plugin-ledger-connector-fabric": 2.x
-    "@hyperledger/cactus-plugin-ledger-connector-iroha2": 2.x
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": 2.x
   peerDependenciesMeta:
     "@hyperledger/cactus-plugin-ledger-connector-besu":
@@ -9294,8 +9260,6 @@ __metadata:
     "@hyperledger/cactus-plugin-ledger-connector-ethereum":
       optional: true
     "@hyperledger/cactus-plugin-ledger-connector-fabric":
-      optional: true
-    "@hyperledger/cactus-plugin-ledger-connector-iroha2":
       optional: true
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth":
       optional: true
@@ -9727,56 +9691,6 @@ __metadata:
   dependencies:
     multiformats: "npm:^14.0.0"
   checksum: 10/cea6b178e42be06d7108cbf2d0cd093e359b89ff974a7282a19c574f2f6482dfc9882e4f108e8f871376e35a88764b8c0d22c08f95a31c111d49692184be9ded
-  languageName: node
-  linkType: hard
-
-"@iroha2/client@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@iroha2/client@npm:4.0.0"
-  dependencies:
-    "@iroha2/crypto-core": "npm:^0.1.1"
-    "@iroha2/data-model": "npm:4.0.0"
-    "@types/ws": "npm:^8.2.2"
-    debug: "npm:^4.3.4"
-    emittery: "npm:^0.10.1"
-    json-bigint: "npm:^1.0.0"
-    ws: "npm:^8.4.0"
-  checksum: 10/8ac4bda3d1ae9dd56bb995046760d5b8db99d0a830ab48d8c4334bb637bd207ca9dba04c1a6461b89b19f7c448cd7092458da84bf225c47dc9b88a7ac154dd91
-  languageName: node
-  linkType: hard
-
-"@iroha2/crypto-core@npm:0.1.1, @iroha2/crypto-core@npm:^0.1.1":
-  version: 0.1.1
-  resolution: "@iroha2/crypto-core@npm:0.1.1"
-  checksum: 10/83dc315cadbade695c0f38acb03461476f5c3844f46a2c7faf8f61f479436a0ddd8ad6664d53cc5e4ab93442a8b5c43aea9303f540af47beb07fdbd6b59968f8
-  languageName: node
-  linkType: hard
-
-"@iroha2/crypto-target-node@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@iroha2/crypto-target-node@npm:0.4.0"
-  dependencies:
-    "@iroha2/crypto-core": "npm:^0.1.1"
-  checksum: 10/a58263f6b7aaadcf298099caf13459b31f019066ea38c986507fb00bf7c103d312ff1ed8434a2ba0e77c45d3e5812aec1ef69af845ed6b77db23b590f7d458d5
-  languageName: node
-  linkType: hard
-
-"@iroha2/data-model@npm:4.0.0":
-  version: 4.0.0
-  resolution: "@iroha2/data-model@npm:4.0.0"
-  dependencies:
-    "@iroha2/i64-fixnum": "npm:^0.4.2"
-    "@scale-codec/definition-runtime": "npm:^2.2.2"
-  checksum: 10/8172fe31991dd7c83bbedb19ce5ffccb7fc4e982db3dc97993f09981d81ff5dbadfa98961396dc88b3880c129d44becdff50aa873c180ffdd4a564765a629898
-  languageName: node
-  linkType: hard
-
-"@iroha2/i64-fixnum@npm:^0.4.2":
-  version: 0.4.2
-  resolution: "@iroha2/i64-fixnum@npm:0.4.2"
-  dependencies:
-    "@scale-codec/util": "npm:^1.1.1"
-  checksum: 10/7a675a70f85e6d03a02e88bea10f0bf743c0a4ddc5c03854b6a7256fd8647ea5a408ea58fec7de8a639fe37ae41176371a12db52d09e7ea1ca6546c72eed6524
   languageName: node
   linkType: hard
 
@@ -14826,42 +14740,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scale-codec/core@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@scale-codec/core@npm:1.1.1"
-  dependencies:
-    "@scale-codec/enum": "npm:^1.1.1"
-    "@scale-codec/util": "npm:^1.1.1"
-  checksum: 10/bda28f921d9a15a2e656bd896c17d6394e0ea3a649c1b3ce41effd30c54f1d351ff1d99286e5e204ccbc8911eb95e65b0493423aebd5c64b74e1ab8ee6ca2bad
-  languageName: node
-  linkType: hard
-
-"@scale-codec/definition-runtime@npm:^2.2.2":
-  version: 2.2.2
-  resolution: "@scale-codec/definition-runtime@npm:2.2.2"
-  dependencies:
-    "@scale-codec/core": "npm:^1.1.1"
-    "@scale-codec/util": "npm:^1.1.1"
-    fmt-subs: "npm:^1.1.1"
-    type-fest: "npm:^2.13.0"
-  checksum: 10/ffae122a183863bda1ee3ad13df2c189c120da1da015008b7d965cdf324224d911ae05f33c71a68efc8870009dda11dbaff8154f68dd3b07ab60622ba6e4f5a4
-  languageName: node
-  linkType: hard
-
-"@scale-codec/enum@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@scale-codec/enum@npm:1.1.1"
-  checksum: 10/a92a7c384d6cbc38927bb4a7c1dfdb8d86a66e4223afec04d7ac0d9edccf3e043f8ff536be138700e19ed585259bd34e534a78ebf66abbd917cd37c3d629e032
-  languageName: node
-  linkType: hard
-
-"@scale-codec/util@npm:^1.1.1":
-  version: 1.1.2
-  resolution: "@scale-codec/util@npm:1.1.2"
-  checksum: 10/a06c860b46562c5cc49b1a7783c095b495401a6b5703b6412c6e1c6b1a89a4299e26699b393d88f77a6fb07efd4c1d3abf575830d4ef94289352df45546f00d0
-  languageName: node
-  linkType: hard
-
 "@scarf/scarf@npm:=1.4.0":
   version: 1.4.0
   resolution: "@scarf/scarf@npm:1.4.0"
@@ -18614,7 +18492,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/ws@npm:^8.2.2, @types/ws@npm:^8.5.10, @types/ws@npm:^8.5.12, @types/ws@npm:^8.5.4, @types/ws@npm:^8.5.5":
+"@types/ws@npm:^8.5.10, @types/ws@npm:^8.5.12, @types/ws@npm:^8.5.4, @types/ws@npm:^8.5.5":
   version: 8.18.1
   resolution: "@types/ws@npm:8.18.1"
   dependencies:
@@ -27513,7 +27391,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emittery@npm:^0.10.1, emittery@npm:^0.10.2":
+"emittery@npm:^0.10.2":
   version: 0.10.2
   resolution: "emittery@npm:0.10.2"
   checksum: 10/fa86fc2b1f4c792d7d479a4de1a6a1f74b0b597770bae770336f0be6501e64be0995aa07d284ae502b269f5cec960cd0c44c91dd090d06d8deecee6d9787e396
@@ -31086,13 +30964,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fmt-subs@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "fmt-subs@npm:1.1.1"
-  checksum: 10/dbe8eba2e91a0d84beae9bc76dd5667e97f6f1a960b6a51e93f9e1683c0678d031ba5b6cccbbf9374b4143fd6240c8049129c3fafa1b471dc4ef0ef9277155f7
-  languageName: node
-  linkType: hard
-
 "fn.name@npm:1.x.x":
   version: 1.1.0
   resolution: "fn.name@npm:1.1.0"
@@ -32692,13 +32563,6 @@ __metadata:
   version: 0.5.2
   resolution: "hachure-fill@npm:0.5.2"
   checksum: 10/d78f1b992d1c8951a4fc893bf32045748132a8b481c15d6d31c77c05557f5fa86913a2b66b3c3a3c8ce46ca8e0a46b0b2aa11f979bc804d8edba77b8c30eb1ca
-  languageName: node
-  linkType: hard
-
-"hada@npm:0.0.8":
-  version: 0.0.8
-  resolution: "hada@npm:0.0.8"
-  checksum: 10/ef0fc4fad6c698afebbd95072dd7b90963731232d5cca1c2f84d5e1ed8557df2a706584cc481b60571df460d8510ab3faf9612045c1095da1f6522df993deef0
   languageName: node
   linkType: hard
 
@@ -53080,7 +52944,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"type-fest@npm:^2.13.0, type-fest@npm:^2.3.3, type-fest@npm:^2.5.1":
+"type-fest@npm:^2.3.3, type-fest@npm:^2.5.1":
   version: 2.19.0
   resolution: "type-fest@npm:2.19.0"
   checksum: 10/7bf9e8fdf34f92c8bb364c0af14ca875fac7e0183f2985498b77be129dc1b3b1ad0a6b3281580f19e48c6105c037fb966ad9934520c69c6434d17fd0af4eed78
@@ -53576,13 +53440,6 @@ __metadata:
   version: 6.11.1
   resolution: "undici@npm:6.11.1"
   checksum: 10/129480684630e5723b7f4a946c1d9f8120f9b5697cb2032d791d1e3d2898a90eed0ed63c6ef5641502569dca0112759948564354a932c8172fc96845aaf2dd28
-  languageName: node
-  linkType: hard
-
-"undici@npm:7.24.0":
-  version: 7.24.0
-  resolution: "undici@npm:7.24.0"
-  checksum: 10/663f08fe940e6cea3633748c82a77e975ab61d7e1d3fd9951a13213c4ddbc5c8196f741b57b52d0df9d08a34092b6aa31eeaff8cd545a0a23cacd0523c21a398
   languageName: node
   linkType: hard
 

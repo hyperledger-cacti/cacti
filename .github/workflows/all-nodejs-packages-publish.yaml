@@ -93,11 +93,6 @@ jobs:
 
       - run: cat /home/runner/work/_temp/.npmrc
 
-      # Re-initialize the registries so that the @iroha2 scope gets configured in .npmrc
-      - run: yarn run init-registries
-
-      - run: cat /home/runner/work/_temp/.npmrc
-
       - name: Check npm whoami with no --registry parameter.
         continue-on-error: true
         run: npm whoami
