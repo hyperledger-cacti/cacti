@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha.7](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-alpha.7) (2026-06-16)
+
+### Bug Fixes
+
+* angular dependencies ([ce738cc](https://github.com/hyperledger-cacti/cacti/commit/ce738ccc6dbd487c3ad220395e6d4eb3c4b89bef))
+* **api-server:** use Promise.allSettled in shutdown ([3505e73](https://github.com/hyperledger-cacti/cacti/commit/3505e735c0fa520a6efcef52de46bb4181d273e7)), closes [#4160](https://github.com/hyperledger-cacti/cacti/issues/4160)
+* bump dependencies and fix oracle ([5811ca1](https://github.com/hyperledger-cacti/cacti/commit/5811ca1a6e0de1d023718b47cd3e467818c0483d))
+* **cactus-cmd-api-server:** express 5 semantics ([10c576c](https://github.com/hyperledger-cacti/cacti/commit/10c576c25513c1ca8e487659f395a1e81ba290ca))
+* **cactus-plugin-ledger-connector-iroha2:** archive the package ([8b29e0c](https://github.com/hyperledger-cacti/cacti/commit/8b29e0cc8559c421d0b62968a176140fab20b341))
+* **ci:** fix besu tape brace pattern ([821daca](https://github.com/hyperledger-cacti/cacti/commit/821dacac8c3e4a8696f5e2a6094964f629abeda4))
+* **ci:** update compute-affected-packages.cjs ([15ac724](https://github.com/hyperledger-cacti/cacti/commit/15ac724d015d8d278134663b3370223e5b3dd533))
+* **docs:** add foundry as software requirement for cacti ([4c4860f](https://github.com/hyperledger-cacti/cacti/commit/4c4860f69ebf3c0c5abe64f4c3365888ada2f902))
+* fix bungee ports in test ([b3fc454](https://github.com/hyperledger-cacti/cacti/commit/b3fc454d6239b73467d28306fb3d739c4d1a4718))
+* fix cacti packages ([f391e4f](https://github.com/hyperledger-cacti/cacti/commit/f391e4fb39aef2794212d2e7d6cb8c580eb809a8))
+* fix ci ([482e0a3](https://github.com/hyperledger-cacti/cacti/commit/482e0a33d529543b6919e38336ed2282f868d602))
+* fix satp integration tests ([24774b8](https://github.com/hyperledger-cacti/cacti/commit/24774b82aff8c88d335d5834baab2315fefeaa11))
+* fix satp race condition ([c12db63](https://github.com/hyperledger-cacti/cacti/commit/c12db6353149472bad1df2a29f872562a02baed8))
+* fix satp tests ([7d33a67](https://github.com/hyperledger-cacti/cacti/commit/7d33a6753d249ba86ba680f160c1b9eb617ec74e))
+* fix satp tests ([457437c](https://github.com/hyperledger-cacti/cacti/commit/457437cd0b45d357d8358cfbd72d3ae8cff17e7b))
+* fix SATP tests ([11be7ab](https://github.com/hyperledger-cacti/cacti/commit/11be7aba6ed06c311dcacd412f67d29716a89892))
+* fix security alerts ([c2ce97e](https://github.com/hyperledger-cacti/cacti/commit/c2ce97ef72b80843bfce60a0bcff93b40bb0c6cb))
+* fix tests ([2710052](https://github.com/hyperledger-cacti/cacti/commit/271005297c7c0beaec47bd3ec6d1d21f71d871bd))
+* improve codeql job and increate timeout ([14e4af5](https://github.com/hyperledger-cacti/cacti/commit/14e4af59c9d21d64683ce3e20a56b7c2faa69edc))
+* renaming JS/TS package namespaces ([c493a99](https://github.com/hyperledger-cacti/cacti/commit/c493a99092e255a6768a26c50d82617479b056a8))
+* satp workflows ([798e8e8](https://github.com/hyperledger-cacti/cacti/commit/798e8e8ee9a8f4c653fdb088bc90b335ec7cd4fd))
+* **satp-hermes:** await async DB writes in Stage 0 and Stage 2 ([d82dfa5](https://github.com/hyperledger-cacti/cacti/commit/d82dfa520fe4cbea2a79e37dd0ae43b66c88c0c3)), closes [#4168](https://github.com/hyperledger-cacti/cacti/issues/4168) [#4177](https://github.com/hyperledger-cacti/cacti/issues/4177)
+* **satp-hermes:** await Stage 3 DB writes and restore body verifier ([e6b0052](https://github.com/hyperledger-cacti/cacti/commit/e6b00525152be132c4f6e8c9db5ffb484ceb4f90)), closes [#4167](https://github.com/hyperledger-cacti/cacti/issues/4167)
+* **satp-hermes:** fix inconsistencies for demo to work ([ae8219c](https://github.com/hyperledger-cacti/cacti/commit/ae8219c01d29a7baa0c1cd0cbf066693c82734ec))
+* **satp-hermes:** fix monitoring opt in/out ([afcaf51](https://github.com/hyperledger-cacti/cacti/commit/afcaf5131b4f738c47d90c2c967985876a18a2a6))
+* **satp-hermes:** missing gateway persistence file ([#4082](https://github.com/hyperledger-cacti/cacti/issues/4082)) ([6b757ab](https://github.com/hyperledger-cacti/cacti/commit/6b757aba40ca0ece13f3b13007a3ac6609a39054))
+* **security:** remove stale corda 4.6 test image default ([d6e8536](https://github.com/hyperledger-cacti/cacti/commit/d6e85365f5cd63fa21828bfd5d6ed86534afe8f3))
+* skip Fabric tests in bungee ([f345da6](https://github.com/hyperledger-cacti/cacti/commit/f345da68dd0105f31669bcd89183d5c9dbd0a33c))
+* skip flaky tests ([c6bd0bd](https://github.com/hyperledger-cacti/cacti/commit/c6bd0bd0afd904a5601aee1fb00cd5db8a56b83c))
+* **test-tooling:** enforce waitForHealthCheck ([1885f45](https://github.com/hyperledger-cacti/cacti/commit/1885f4531377d5437740dbf5118d1c79b9ddb421))
+* **weaver:** pin the dep versions to work with 1.20 ([37b842d](https://github.com/hyperledger-cacti/cacti/commit/37b842dca521b270c10d3bbcef704e6b44c6401d))
+* **weaver:** pin the version of net and crypto of go modules without replace ([82eb2df](https://github.com/hyperledger-cacti/cacti/commit/82eb2df3cdad6998a554909ac97bbc245a312afb))
+
+### Features
+
+* **ledger-browser:** show fabric network structure ([ccf25d1](https://github.com/hyperledger-cacti/cacti/commit/ccf25d111a9d016e32ebd0daa8e0b59dc6b1b5ae)), closes [#3837](https://github.com/hyperledger-cacti/cacti/issues/3837) [#3554](https://github.com/hyperledger-cacti/cacti/issues/3554)
+* **persistence-ethereum:** added support for erc1155 ([#3901](https://github.com/hyperledger-cacti/cacti/issues/3901)) ([cf20a6a](https://github.com/hyperledger-cacti/cacti/commit/cf20a6aad1d7b9c1e1b7b923854ceaaf146b7f00))
+* **satp-hermes:** add adapter layer ([8a940fd](https://github.com/hyperledger-cacti/cacti/commit/8a940fdc13ec1c74a64f71576fce971708db23c7))
+* **satp-hermes:** add audit endpoint improvements ([11a6ad1](https://github.com/hyperledger-cacti/cacti/commit/11a6ad1da291df137429db70aaa3b24ba3abdc27))
+* **satp-hermes:** add get ledgers endpoint ([d57fce3](https://github.com/hyperledger-cacti/cacti/commit/d57fce30fb92345343d3a3078a56d5dbc5ce7b6e))
+* **satp-hermes:** improve satp gateway configuration object ([4b614f1](https://github.com/hyperledger-cacti/cacti/commit/4b614f1992931ef1778d65e0efd5321abb41bd7c))
+* **satp-hermes:** persist oracle logs ([#4156](https://github.com/hyperledger-cacti/cacti/issues/4156)) ([f352040](https://github.com/hyperledger-cacti/cacti/commit/f35204030c052a71b3f6c53ba252a8d40b16fcd3)), closes [#3946](https://github.com/hyperledger-cacti/cacti/issues/3946)
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 ### Bug Fixes

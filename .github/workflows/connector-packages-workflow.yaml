@@ -247,7 +247,7 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.7
 
       - name: build
         with:
@@ -293,7 +293,7 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.7
 
       - name: build
         with:
