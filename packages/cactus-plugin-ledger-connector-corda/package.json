@@ -65,7 +65,7 @@
     "express-openapi-validator": "5.2.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "internal-ip": "6.2.0",
-    "joi": "17.13.3",
+    "joi": "17.13.4",
     "node-fetch": "2.7.0",
     "node-ssh": "13.1.0",
     "prom-client": "15.1.3",
