@@ -136,6 +136,7 @@
     "generate-sdk:typescript-axios-bol": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/bol/oapi-api1-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/gateway-client/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
     "lint": "run-s 'lint:*' 'lint-code'",
     "lint-code": "run-s format:eslint format:prettier",
+    "lint:ci": "npx eslint --config ./eslint.config.mjs '**/*.{js,ts}' --quiet",
     "lint:oapi": "vacuum lint --ignore-file vacuum-ignore.yml -d ./src/main/yml/bol/oapi-api1-bundled.yml",
     "lint:oapi:dashboard": "vacuum dashboard --watch ./src/main/yml/bol/oapi-api1-bundled.yml",
     "lint:protobuf": "buf lint --verbose",
