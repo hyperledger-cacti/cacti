@@ -21,7 +21,7 @@ jobs:
   yarn_lint:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       
       - name: build
         with:
@@ -45,7 +45,7 @@ jobs:
         id: print_env_git_index_file_count
         run: |
             echo "${{ env.GIT_INDEX_FILE_COUNT }}"
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         id: set-result-git_index_file_count
         with:
           script: |
@@ -60,7 +60,7 @@ jobs:
 
       - name: Check Lint Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         with:
           script: |
             const failMsg = "yarn lint script produced version control " +
@@ -75,7 +75,7 @@ jobs:
     continue-on-error: false
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -97,7 +97,7 @@ jobs:
 
       - name: Cache OpenAPI Generator JAR
         id: cache-openapi-generator-jar
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar
@@ -132,7 +132,7 @@ jobs:
         run: |
             echo "${{ env.GIT_INDEX_FILE_COUNT }}"
 
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         id: set-result-git_index_file_count
         with:
           script: |
@@ -147,7 +147,7 @@ jobs:
 
       - name: Check CodeGen Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         with:
           script: |
             const failMsg = "yarn codegen script produced version control " +
@@ -164,7 +164,7 @@ jobs:
       CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION: 3.0.3
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: build
         with:
@@ -179,7 +179,7 @@ jobs:
     continue-on-error: true
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: build
         with:
