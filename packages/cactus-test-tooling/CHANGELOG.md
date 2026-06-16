@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-alpha.7](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-alpha.7) (2026-06-16)
+
+### Bug Fixes
+
+* fix satp race condition ([c12db63](https://github.com/hyperledger-cacti/cacti/commit/c12db6353149472bad1df2a29f872562a02baed8))
+* fix satp tests ([7d33a67](https://github.com/hyperledger-cacti/cacti/commit/7d33a6753d249ba86ba680f160c1b9eb617ec74e))
+* fix satp tests ([457437c](https://github.com/hyperledger-cacti/cacti/commit/457437cd0b45d357d8358cfbd72d3ae8cff17e7b))
+* fix tests ([2710052](https://github.com/hyperledger-cacti/cacti/commit/271005297c7c0beaec47bd3ec6d1d21f71d871bd))
+* improve codeql job and increate timeout ([14e4af5](https://github.com/hyperledger-cacti/cacti/commit/14e4af59c9d21d64683ce3e20a56b7c2faa69edc))
+* renaming JS/TS package namespaces ([c493a99](https://github.com/hyperledger-cacti/cacti/commit/c493a99092e255a6768a26c50d82617479b056a8))
+* **security:** remove stale corda 4.6 test image default ([d6e8536](https://github.com/hyperledger-cacti/cacti/commit/d6e85365f5cd63fa21828bfd5d6ed86534afe8f3))
+* **test-tooling:** enforce waitForHealthCheck ([1885f45](https://github.com/hyperledger-cacti/cacti/commit/1885f4531377d5437740dbf5118d1c79b9ddb421))
+
+### Features
+
+* **satp-hermes:** add adapter layer ([8a940fd](https://github.com/hyperledger-cacti/cacti/commit/8a940fdc13ec1c74a64f71576fce971708db23c7))
+
 # [2.1.0](https://github.com/hyperledger/cactus/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-test-tooling

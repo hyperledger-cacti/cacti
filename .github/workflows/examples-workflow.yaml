@@ -150,7 +150,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   # ce-supply-chain-backend job removed: package depends on
-  # @hyperledger/cacti-plugin-consortium-static@2.1.0 which is not published
+  # @hyperledger/cacti-plugin-consortium-static@3.0.0-alpha.7 which is not published
   # to npm. Tests are skipped via testPathIgnorePatterns in jest.config.js
   # as part of the package archival cleanup (PR #4152).
 
@@ -173,7 +173,7 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-alpha.7
       
       - uses: ./.github/actions/docker-pull/
         with:
