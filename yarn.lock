@@ -7318,7 +7318,7 @@ __metadata:
     react-dom: "npm:18.2.0"
     react-router-dom: "npm:6.21.3"
     typescript: "npm:5.5.2"
-    vite: "npm:6.2.6"
+    vite: "npm:8.0.16"
     web3: "npm:4.1.1"
   languageName: unknown
   linkType: soft
