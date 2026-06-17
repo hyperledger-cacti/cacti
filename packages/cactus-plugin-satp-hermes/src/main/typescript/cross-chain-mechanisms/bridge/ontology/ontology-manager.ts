@@ -127,7 +127,7 @@ export class OntologyManager {
       this.managerKeyPair = managerKeyPair;
     }
     this.managerJsObjectSigner = new JsObjectSigner({
-      privateKey: this.managerKeyPair.privateKey,
+      privateKey: this.managerKeyPair.privateKey as Uint8Array | string,
     });
     this.publicKeys = publicKeys || [];
 

@@ -1,4 +1,9 @@
-import { Asset, FungibleAsset, NonFungibleAsset } from "./asset";
+import {
+  Asset,
+  FungibleAsset,
+  MultiTokenAsset,
+  NonFungibleAsset,
+} from "./asset";
 import { InteractionsRequest as EvmInteractionSignature } from "../../../../generated/SATPWrapperContract";
 import { getInteractionType, InteractionData } from "./interact-types";
 import {
@@ -6,6 +11,7 @@ import {
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger/cactus-common";
+import { toScreamingSnakeCase } from "../../../../core/satp-utils";
 
 export interface EvmAsset extends Asset {
   contractAddress: string;
@@ -13,6 +19,8 @@ export interface EvmAsset extends Asset {
 
 export interface EvmFungibleAsset extends EvmAsset, FungibleAsset {}
 export interface EvmNonFungibleAsset extends EvmAsset, NonFungibleAsset {}
+/** EVM asset for ERC-6909 / ERC-1155 multi-token standards. */
+export interface EvmMultiTokenAsset extends EvmAsset, MultiTokenAsset {}
 
 export enum AssetParameterIdentifier {
   CONTRACTADDRESS = 0,
@@ -26,8 +34,9 @@ export enum AssetParameterIdentifier {
 }
 
 export function getAssetParameterIdentifier(stringType: string) {
+  const normalized = toScreamingSnakeCase(stringType);
   return AssetParameterIdentifier[
-    stringType.toUpperCase() as keyof typeof AssetParameterIdentifier
+    normalized as keyof typeof AssetParameterIdentifier
   ];
 }
 

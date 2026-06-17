@@ -114,10 +114,24 @@ export interface Asset {
 
 export type Brand<K, T> = K & { __brand: T };
 export type Amount = Brand<number, "Amount">;
-export type UniqueTokenID = Brand<null, "UniqueTokenID">;
+export type UniqueTokenID = Brand<number, "UniqueTokenID">;
 
 export interface FungibleAsset extends Asset {
   amount: Amount;
+  uniqueDescriptor?: UniqueTokenID;
+}
+
+/**
+ * Fungible multi-token asset for ERC-6909 / ERC-1155 standards.
+ *
+ * Unlike plain FungibleAsset (where uniqueDescriptor is optional), a
+ * MultiTokenAsset always carries the chain-native token type ID so the bridge
+ * can dispatch the correct uniqueDescriptor overload on lock/mint/burn/assign.
+ * The uniqueDescriptor here is the uint256 token type ID from the on-chain
+ * contract, carried as a branded number (not the SATP-internal token_id).
+ */
+export interface MultiTokenAsset extends FungibleAsset {
+  uniqueDescriptor: UniqueTokenID;
 }
 
 export interface NonFungibleAsset extends Asset {
@@ -246,20 +260,33 @@ export function createAssetId(
  * @see {@link FungibleAsset} for fungible asset interface
  * @see {@link Asset} for base asset interface
  */
-export function instanceOfFungibleAsset(asset: Asset) {
+export function instanceOfFungibleAsset(asset: Asset): asset is FungibleAsset {
   return "amount" in asset;
+}
+
+/**
+ * Type guard for ERC-6909 / ERC-1155 multi-token assets.
+ *
+ * A MultiTokenAsset is fungible (has amount) AND carries a required
+ * uniqueDescriptor (the chain-native token type ID). This must be checked
+ * before instanceOfFungibleAsset when the distinction matters, because
+ * MultiTokenAsset satisfies both guards.
+ */
+export function instanceOfMultiTokenAsset(asset: Asset): asset is MultiTokenAsset {
+  return instanceOfFungibleAsset(asset) && (asset as FungibleAsset).uniqueDescriptor != null;
 }
 
 /**
  * Type guard to check if an asset is a non-fungible asset.
  *
  * @description
- * Determines whether an Asset includes the 'uniqueDescriptor' property,
- * indicating it represents a non-fungible token.
+ * Determines whether an Asset includes the 'uniqueDescriptor' property AND
+ * is not a fungible multi-token asset (ERC-6909/ERC-1155). Plain ERC-721
+ * NFTs have uniqueDescriptor but no amount field.
  *
  * @param asset - Asset to evaluate
- * @returns True if asset is non-fungible (has uniqueDescriptor), else false
+ * @returns True if asset is non-fungible (has uniqueDescriptor, no amount), else false
  */
-export function instanceOfNonFungibleAsset(asset: Asset) {
-  return "uniqueDescriptor" in asset;
+export function instanceOfNonFungibleAsset(asset: Asset): asset is NonFungibleAsset {
+  return "uniqueDescriptor" in asset && !instanceOfFungibleAsset(asset);
 }
