@@ -1,0 +1,20 @@
+[package]
+name = "cacti-test-program"
+version = "0.1.0"
+edition = "2021"
+description = "Minimal self-contained Anchor program used only by the Solana connector's tests."
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "cacti_test_program"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = "1.0.2"

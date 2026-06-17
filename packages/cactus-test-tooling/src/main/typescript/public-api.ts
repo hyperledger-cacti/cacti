@@ -9,6 +9,13 @@ export {
 } from "./besu/besu-test-ledger";
 
 export {
+  SolanaTestLedger,
+  ISolanaTestLedgerConstructorOptions,
+  SOLANA_TEST_LEDGER_DEFAULT_OPTIONS,
+  SOLANA_TEST_LEDGER_OPTIONS_JOI_SCHEMA,
+} from "./solana/solana-test-ledger";
+
+export {
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
 } from "./satp-runner/satp-gateway-runner";

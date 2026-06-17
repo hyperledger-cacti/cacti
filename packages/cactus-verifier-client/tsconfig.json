@@ -34,6 +34,9 @@
     },
     {
       "path": "../cactus-plugin-ledger-connector-sawtooth/tsconfig.json"
+    },
+    {
+      "path": "../cacti-plugin-ledger-connector-solana/tsconfig.json"
     }
   ]
 }

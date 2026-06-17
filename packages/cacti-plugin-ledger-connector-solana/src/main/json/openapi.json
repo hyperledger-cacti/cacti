@@ -1,0 +1,1407 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cacti Plugin - Ledger Connector Solana",
+    "description": "Can perform basic tasks on a Solana ledger",
+    "version": "2.1.0",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "schemas": {
+      "SolanaSigningCredentialType": {
+        "type": "string",
+        "enum": [
+          "PRIVATE_KEY_BASE58",
+          "CACTI_KEYCHAIN_REF",
+          "NONE"
+        ]
+      },
+      "SolanaSigningCredentialPrivateKeyBase58": {
+        "type": "object",
+        "required": [
+          "type",
+          "privateKeyBase58"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "PRIVATE_KEY_BASE58"
+            ]
+          },
+          "privateKeyBase58": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        }
+      },
+      "SolanaSigningCredentialCactiKeychainRef": {
+        "type": "object",
+        "required": [
+          "type",
+          "keychainId",
+          "keychainEntryKey"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "CACTI_KEYCHAIN_REF"
+            ]
+          },
+          "keychainId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "keychainEntryKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "SolanaSigningCredentialNone": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "NONE"
+            ]
+          }
+        }
+      },
+      "SolanaSigningCredential": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/SolanaSigningCredentialType"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SolanaSigningCredentialPrivateKeyBase58"
+          },
+          {
+            "$ref": "#/components/schemas/SolanaSigningCredentialCactiKeychainRef"
+          },
+          {
+            "$ref": "#/components/schemas/SolanaSigningCredentialNone"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type"
+        }
+      },
+      "SendTransactionV1Request": {
+        "type": "object",
+        "required": [
+          "serializedTransaction",
+          "signingCredential"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "serializedTransaction": {
+            "type": "string",
+            "description": "Base64-encoded serialized Solana transaction (partial or fully signed)."
+          },
+          "signingCredential": {
+            "$ref": "#/components/schemas/SolanaSigningCredential"
+          },
+          "skipPreflight": {
+            "type": "boolean",
+            "default": false
+          },
+          "timeoutMs": {
+            "type": "number",
+            "minimum": 0,
+            "default": 60000
+          }
+        }
+      },
+      "SendTransactionV1Response": {
+        "type": "object",
+        "required": [
+          "signature"
+        ],
+        "properties": {
+          "signature": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "number"
+          }
+        }
+      },
+      "GetBalanceV1Request": {
+        "type": "object",
+        "required": [
+          "publicKey"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "publicKey": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 44
+          }
+        }
+      },
+      "GetBalanceV1Response": {
+        "type": "object",
+        "required": [
+          "lamports"
+        ],
+        "properties": {
+          "lamports": {
+            "type": "number",
+            "description": "Account balance in lamports."
+          }
+        }
+      },
+      "GetAccountInfoV1Request": {
+        "type": "object",
+        "required": [
+          "publicKey"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "publicKey": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 44
+          }
+        }
+      },
+      "GetAccountInfoV1Response": {
+        "type": "object",
+        "required": [
+          "exists"
+        ],
+        "properties": {
+          "exists": {
+            "type": "boolean"
+          },
+          "lamports": {
+            "type": "number"
+          },
+          "owner": {
+            "type": "string"
+          },
+          "executable": {
+            "type": "boolean"
+          },
+          "rentEpoch": {
+            "type": "number"
+          },
+          "data": {
+            "type": "string",
+            "description": "Base64-encoded account data."
+          }
+        }
+      },
+      "TransferSolV1Request": {
+        "type": "object",
+        "required": [
+          "signingCredential",
+          "recipientPublicKey",
+          "lamports"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "signingCredential": {
+            "$ref": "#/components/schemas/SolanaSigningCredential"
+          },
+          "recipientPublicKey": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 44
+          },
+          "lamports": {
+            "type": "number",
+            "minimum": 1
+          },
+          "timeoutMs": {
+            "type": "number",
+            "minimum": 0,
+            "default": 60000
+          }
+        }
+      },
+      "TransferSolV1Response": {
+        "type": "object",
+        "required": [
+          "signature"
+        ],
+        "properties": {
+          "signature": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "number"
+          }
+        }
+      },
+      "RequestAirdropV1Request": {
+        "type": "object",
+        "required": [
+          "publicKey",
+          "lamports"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "publicKey": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 44
+          },
+          "lamports": {
+            "type": "number",
+            "minimum": 1
+          }
+        }
+      },
+      "RequestAirdropV1Response": {
+        "type": "object",
+        "required": [
+          "signature"
+        ],
+        "properties": {
+          "signature": {
+            "type": "string"
+          }
+        }
+      },
+      "DeployProgramV1Request": {
+        "type": "object",
+        "required": [
+          "programBinaryBase64",
+          "payerSigningCredential"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "programBinaryBase64": {
+            "type": "string",
+            "description": "Base64-encoded compiled Solana program (.so file)."
+          },
+          "payerSigningCredential": {
+            "$ref": "#/components/schemas/SolanaSigningCredential"
+          },
+          "programKeypairBase58": {
+            "type": "string",
+            "description": "Optional base58-encoded 64-byte keypair for deterministic program ID.",
+            "minLength": 80,
+            "maxLength": 90
+          },
+          "timeoutMs": {
+            "type": "number",
+            "minimum": 0,
+            "default": 120000
+          }
+        }
+      },
+      "DeployProgramV1Response": {
+        "type": "object",
+        "required": [
+          "programId",
+          "deploySignatures"
+        ],
+        "properties": {
+          "programId": {
+            "type": "string",
+            "description": "Public key (base58) of the deployed program."
+          },
+          "deploySignatures": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Transaction signatures involved in deploying the program."
+          }
+        }
+      },
+      "GetTransactionV1Request": {
+        "type": "object",
+        "required": [
+          "signature"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "signature": {
+            "type": "string",
+            "minLength": 86,
+            "maxLength": 88
+          }
+        }
+      },
+      "GetTransactionV1Response": {
+        "type": "object",
+        "required": [
+          "signature"
+        ],
+        "properties": {
+          "signature": {
+            "type": "string"
+          },
+          "slot": {
+            "type": "number",
+            "nullable": true
+          },
+          "blockTime": {
+            "type": "number",
+            "nullable": true
+          },
+          "fee": {
+            "type": "number",
+            "nullable": true
+          },
+          "err": {
+            "nullable": true
+          },
+          "logMessages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "preBalances": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "postBalances": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      },
+      "ErrorExceptionResponseV1": {
+        "type": "object",
+        "required": [
+          "message",
+          "error"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "nullable": false
+          },
+          "error": {
+            "type": "string",
+            "nullable": false
+          }
+        }
+      },
+      "SolanaAbiKind": {
+        "type": "string",
+        "enum": [
+          "ANCHOR"
+        ]
+      },
+      "SolanaAnchorAbiSpec": {
+        "type": "object",
+        "required": [
+          "kind",
+          "idl"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "ANCHOR"
+            ]
+          },
+          "idl": {
+            "type": "object",
+            "description": "The Anchor IDL JSON for the target program.",
+            "additionalProperties": true
+          }
+        }
+      },
+      "SolanaAbiSpec": {
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/SolanaAbiKind"
+          }
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/SolanaAnchorAbiSpec"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "kind"
+        }
+      },
+      "SolanaInstructionInvocation": {
+        "type": "object",
+        "required": [
+          "instruction"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "instruction": {
+            "type": "string",
+            "description": "Instruction name as it appears in the ABI (for Anchor, the camelCase IDL method)."
+          },
+          "args": {
+            "type": "array",
+            "description": "Positional arguments encoded per the ABI.",
+            "items": {}
+          },
+          "accounts": {
+            "type": "object",
+            "description": "Map of account name -> base58 public key.",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "InvokeInstructionV1Request": {
+        "type": "object",
+        "required": [
+          "abi",
+          "invocation",
+          "signingCredential"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "abi": {
+            "$ref": "#/components/schemas/SolanaAbiSpec"
+          },
+          "invocation": {
+            "$ref": "#/components/schemas/SolanaInstructionInvocation"
+          },
+          "signingCredential": {
+            "$ref": "#/components/schemas/SolanaSigningCredential"
+          },
+          "skipPreflight": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "InvokeInstructionV1Response": {
+        "type": "object",
+        "required": [
+          "signature"
+        ],
+        "properties": {
+          "signature": {
+            "type": "string"
+          }
+        }
+      },
+      "BuildInstructionV1Request": {
+        "type": "object",
+        "required": [
+          "abi",
+          "invocation",
+          "feePayer"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "abi": {
+            "$ref": "#/components/schemas/SolanaAbiSpec"
+          },
+          "invocation": {
+            "$ref": "#/components/schemas/SolanaInstructionInvocation"
+          },
+          "feePayer": {
+            "type": "string",
+            "description": "Base58 public key to set as the transaction fee payer."
+          }
+        }
+      },
+      "BuildInstructionV1Response": {
+        "type": "object",
+        "required": [
+          "serializedTransaction"
+        ],
+        "properties": {
+          "serializedTransaction": {
+            "type": "string",
+            "description": "Base64-encoded unsigned transaction for local signing + send-transaction."
+          }
+        }
+      },
+      "DecodeAccountV1Request": {
+        "type": "object",
+        "required": [
+          "abi",
+          "accountName"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "abi": {
+            "$ref": "#/components/schemas/SolanaAbiSpec"
+          },
+          "accountName": {
+            "type": "string",
+            "description": "Account name in the ABI (for Anchor, the camelCase account, e.g. 'registry')."
+          },
+          "publicKey": {
+            "type": "string",
+            "description": "Public key of the account to read + decode."
+          },
+          "data": {
+            "type": "string",
+            "description": "Raw account data (base64) to decode directly, instead of reading by publicKey."
+          }
+        }
+      },
+      "DecodeAccountV1Response": {
+        "type": "object",
+        "required": [
+          "exists"
+        ],
+        "properties": {
+          "exists": {
+            "type": "boolean"
+          },
+          "account": {
+            "type": "object",
+            "description": "The decoded account fields.",
+            "additionalProperties": true
+          }
+        }
+      },
+      "InvokeRpcV1Request": {
+        "type": "object",
+        "required": [
+          "method"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "Any Solana JSON-RPC method (e.g. getSlot, getProgramAccounts)."
+          },
+          "params": {
+            "type": "array",
+            "description": "Positional params for the RPC method.",
+            "items": {}
+          }
+        }
+      },
+      "InvokeRpcV1Response": {
+        "type": "object",
+        "additionalProperties": true,
+        "properties": {
+          "result": {
+            "description": "The raw JSON-RPC result (shape depends on the method)."
+          }
+        }
+      },
+      "GetFeeForTransactionV1Request": {
+        "type": "object",
+        "required": [
+          "serializedTransaction"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "serializedTransaction": {
+            "type": "string",
+            "description": "Base64 transaction whose message carries a recent blockhash + fee payer."
+          }
+        }
+      },
+      "GetFeeForTransactionV1Response": {
+        "type": "object",
+        "properties": {
+          "lamports": {
+            "type": "integer",
+            "format": "int64",
+            "nullable": true,
+            "description": "Fee in lamports, or null if the blockhash is no longer valid."
+          }
+        }
+      },
+      "SolanaDecodedEvent": {
+        "type": "object",
+        "required": [
+          "name",
+          "data"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "DecodeEventsV1Request": {
+        "type": "object",
+        "required": [
+          "abi"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "abi": {
+            "$ref": "#/components/schemas/SolanaAbiSpec"
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Program log lines to parse."
+          },
+          "signature": {
+            "type": "string",
+            "description": "Transaction signature whose logs the connector fetches + parses."
+          }
+        }
+      },
+      "DecodeEventsV1Response": {
+        "type": "object",
+        "required": [
+          "events"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SolanaDecodedEvent"
+            }
+          }
+        }
+      },
+      "WatchBlocksV1": {
+        "type": "string",
+        "enum": [
+          "org.hyperledger.cacti.api.solana.WatchBlocksV1.Subscribe",
+          "org.hyperledger.cacti.api.solana.WatchBlocksV1.Next",
+          "org.hyperledger.cacti.api.solana.WatchBlocksV1.Unsubscribe",
+          "org.hyperledger.cacti.api.solana.WatchBlocksV1.Error",
+          "org.hyperledger.cacti.api.solana.WatchBlocksV1.Complete"
+        ],
+        "x-enum-varnames": [
+          "Subscribe",
+          "Next",
+          "Unsubscribe",
+          "Error",
+          "Complete"
+        ]
+      },
+      "WatchBlocksV1Options": {
+        "type": "object",
+        "description": "Options for the WatchBlocks subscription. Reserved for future filtering options.",
+        "properties": {
+          "_placeholder": {
+            "type": "string",
+            "description": "Reserved for future use."
+          }
+        }
+      },
+      "WatchBlocksV1Progress": {
+        "type": "object",
+        "required": [
+          "slot"
+        ],
+        "properties": {
+          "slot": {
+            "type": "integer",
+            "description": "The slot number of the confirmed block."
+          },
+          "parent": {
+            "type": "integer",
+            "description": "The parent slot number."
+          },
+          "root": {
+            "type": "integer",
+            "description": "The root slot number."
+          }
+        }
+      },
+      "WatchLogsV1": {
+        "type": "string",
+        "enum": [
+          "org.hyperledger.cacti.api.solana.WatchLogsV1.Subscribe",
+          "org.hyperledger.cacti.api.solana.WatchLogsV1.Next",
+          "org.hyperledger.cacti.api.solana.WatchLogsV1.Unsubscribe",
+          "org.hyperledger.cacti.api.solana.WatchLogsV1.Error",
+          "org.hyperledger.cacti.api.solana.WatchLogsV1.Complete"
+        ],
+        "x-enum-varnames": [
+          "Subscribe",
+          "Next",
+          "Unsubscribe",
+          "Error",
+          "Complete"
+        ]
+      },
+      "WatchLogsV1Options": {
+        "type": "object",
+        "description": "Options for the WatchLogs subscription.",
+        "properties": {
+          "programId": {
+            "type": "string",
+            "description": "Base58 program ID to filter logs by. Omit to stream all transaction logs."
+          }
+        }
+      },
+      "WatchLogsV1Progress": {
+        "type": "object",
+        "required": [
+          "signature",
+          "err",
+          "logs",
+          "slot"
+        ],
+        "properties": {
+          "signature": {
+            "type": "string",
+            "description": "The transaction signature these logs belong to."
+          },
+          "err": {
+            "nullable": true,
+            "description": "Transaction error (null on success)."
+          },
+          "logs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Raw program log lines."
+          },
+          "slot": {
+            "type": "integer",
+            "description": "Slot the transaction was processed in."
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/send-transaction": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/send-transaction"
+          }
+        },
+        "operationId": "sendTransactionV1",
+        "summary": "Send a serialized Solana transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendTransactionV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendTransactionV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-balance": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-balance"
+          }
+        },
+        "operationId": "getBalanceV1",
+        "summary": "Get the SOL balance (in lamports) of a public key",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetBalanceV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Balance retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetBalanceV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-account-info": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-account-info"
+          }
+        },
+        "operationId": "getAccountInfoV1",
+        "summary": "Get on-chain account information for a public key",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetAccountInfoV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account info retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetAccountInfoV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/transfer-sol": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/transfer-sol"
+          }
+        },
+        "operationId": "transferSolV1",
+        "summary": "Transfer SOL from one account to another",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransferSolV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transfer completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferSolV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/request-airdrop": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/request-airdrop"
+          }
+        },
+        "operationId": "requestAirdropV1",
+        "summary": "Request a SOL airdrop (devnet/testnet/localnet only)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAirdropV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Airdrop requested",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RequestAirdropV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/deploy-program": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/deploy-program"
+          }
+        },
+        "operationId": "deployProgramV1",
+        "summary": "Deploy a compiled Solana program (.so binary)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployProgramV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Program deployed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployProgramV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-transaction": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-transaction"
+          }
+        },
+        "operationId": "getTransactionV1",
+        "summary": "Fetch a confirmed transaction by its signature",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTransactionV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transaction found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetTransactionV1Response"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Transaction not found"
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/invoke-instruction": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/invoke-instruction"
+          }
+        },
+        "operationId": "invokeInstructionV1",
+        "summary": "ABI-encode a program instruction, sign it server-side, and submit it",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvokeInstructionV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Instruction submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvokeInstructionV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/build-instruction": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/build-instruction"
+          }
+        },
+        "operationId": "buildInstructionV1",
+        "summary": "ABI-encode a program instruction and return an unsigned transaction (no keys)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuildInstructionV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Unsigned transaction built successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuildInstructionV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/decode-account": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/decode-account"
+          }
+        },
+        "operationId": "decodeAccountV1",
+        "summary": "ABI-decode on-chain account data",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecodeAccountV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Account decoded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecodeAccountV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/invoke-rpc": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/invoke-rpc"
+          }
+        },
+        "operationId": "invokeRpcV1",
+        "summary": "Forward an arbitrary Solana JSON-RPC method to the node",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvokeRpcV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "RPC result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvokeRpcV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-fee-for-transaction": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-fee-for-transaction"
+          }
+        },
+        "operationId": "getFeeForTransactionV1",
+        "summary": "Estimate the fee (lamports) for a built transaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetFeeForTransactionV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Fee in lamports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetFeeForTransactionV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/decode-events": {
+      "post": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/decode-events"
+          }
+        },
+        "operationId": "decodeEventsV1",
+        "summary": "ABI-decode program events from transaction logs",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecodeEventsV1Request"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Decoded events",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DecodeEventsV1Response"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-prometheus-exporter-metrics": {
+      "get": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-solana/get-prometheus-exporter-metrics"
+          }
+        },
+        "operationId": "getPrometheusExporterMetricsV1",
+        "summary": "Get the Prometheus metrics for this connector instance",
+        "responses": {
+          "200": {
+            "description": "Prometheus metrics in text/plain format",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    }
+  }
+}

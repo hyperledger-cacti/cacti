@@ -165,7 +165,8 @@
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
     "request-promise-native": "1.0.9",
-    "@angular/*": "17.3.11"
+    "@angular/*": "17.3.11",
+    "rpc-websockets/uuid": "9.0.0"
   },
   "devDependencies": {
     "@angular/common": "17.3.11",

@@ -65,6 +65,9 @@
       "path": "./packages/cactus-plugin-ledger-connector-ethereum/tsconfig.json"
     },
     {
+      "path": "./packages/cacti-plugin-ledger-connector-solana/tsconfig.json"
+    },
+    {
       "path": "./packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
     },
     {
@@ -102,6 +105,9 @@
     },
     {
       "path": "./packages/cactus-test-plugin-ledger-connector-ethereum/tsconfig.json"
+    },
+    {
+      "path": "./packages/cacti-test-plugin-ledger-connector-solana/tsconfig.json"
     },
     {
       "path": "./packages/cactus-plugin-ledger-connector-sawtooth/tsconfig.json"

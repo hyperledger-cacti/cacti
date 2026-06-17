@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist/lib",
+    "rootDir": "./src",
+    "tsBuildInfoFile": "../../.build-cache/cacti-plugin-ledger-connector-solana.tsbuildinfo",
+    "composite": true,
+    "resolveJsonModule": true,
+    "ignoreDeprecations": "5.0",
+    "declarationMap": true
+  },
+  "include": ["./src", "src/**/*.json"],
+  "exclude": ["./src/test/solana"],
+  "references": [
+    { "path": "../cactus-common" },
+    { "path": "../cactus-core" },
+    { "path": "../cactus-core-api" },
+    { "path": "../cactus-plugin-keychain-memory" },
+    { "path": "../cactus-test-tooling" }
+  ]
+}

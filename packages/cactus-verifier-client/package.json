@@ -47,6 +47,7 @@
     "@hyperledger/cactus-core-api": "2.1.0"
   },
   "devDependencies": {
+    "@hyperledger/cacti-plugin-ledger-connector-solana": "2.1.0",
     "@hyperledger/cactus-api-client": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.1.0",
     "@hyperledger/cactus-plugin-ledger-connector-corda": "2.1.0",
@@ -57,6 +58,7 @@
     "rxjs": "7.8.1"
   },
   "peerDependencies": {
+    "@hyperledger/cacti-plugin-ledger-connector-solana": "2.x",
     "@hyperledger/cactus-api-client": "2.x",
     "@hyperledger/cactus-plugin-ledger-connector-besu": "2.x",
     "@hyperledger/cactus-plugin-ledger-connector-corda": "2.x",
@@ -65,6 +67,9 @@
     "@hyperledger/cactus-plugin-ledger-connector-sawtooth": "2.x"
   },
   "peerDependenciesMeta": {
+    "@hyperledger/cacti-plugin-ledger-connector-solana": {
+      "optional": true
+    },
     "@hyperledger/cactus-plugin-ledger-connector-besu": {
       "optional": true
     },

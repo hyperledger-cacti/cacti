@@ -1,0 +1,15 @@
+[toolchain]
+anchor_version = "1.0.2"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+cacti_test_program = "4JfcF73r9QQ8pmL64UuzCTUt3cSACN2435BQJzWBSL5X"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]

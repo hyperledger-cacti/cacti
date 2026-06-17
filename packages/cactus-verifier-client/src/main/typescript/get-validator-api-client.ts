@@ -25,6 +25,10 @@ import type {
   SawtoothApiClient,
   SawtoothApiClientOptions,
 } from "@hyperledger/cactus-plugin-ledger-connector-sawtooth";
+import type {
+  SolanaApiClient,
+  SolanaApiClientOptions,
+} from "@hyperledger/cacti-plugin-ledger-connector-solana";
 
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
@@ -56,6 +60,10 @@ export type ClientApiConfig = {
   SAWTOOTH_1X: {
     in: SawtoothApiClientOptions;
     out: SawtoothApiClient;
+  };
+  SOLANA_2X: {
+    in: SolanaApiClientOptions;
+    out: SolanaApiClient;
   };
 };
 
@@ -93,6 +101,11 @@ export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
       const sawtoothPackage = require("@hyperledger/cactus-plugin-ledger-connector-sawtooth");
       return new sawtoothPackage.SawtoothApiClient(
         options as SawtoothApiClientOptions,
+      );
+    case "SOLANA_2X":
+      const solanaPackage = require("@hyperledger/cacti-plugin-ledger-connector-solana");
+      return new solanaPackage.SolanaApiClient(
+        options as SolanaApiClientOptions,
       );
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch

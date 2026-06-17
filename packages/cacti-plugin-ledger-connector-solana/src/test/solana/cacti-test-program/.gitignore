@@ -1,0 +1,6 @@
+/target
+!/target/deploy/
+/target/*
+!/target/deploy
+/target/deploy/*
+!/target/deploy/cacti_test_program-keypair.json

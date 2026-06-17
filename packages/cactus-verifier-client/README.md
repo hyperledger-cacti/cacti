@@ -13,6 +13,7 @@ This package provides `Verifier` and `VerifierFactory` components that can be us
 | CORDA_4X             | cactus-plugin-ledger-connector-corda    |
 | FABRIC_2X            | cactus-plugin-ledger-connector-fabric   |
 | SAWTOOTH_1X          | cactus-plugin-ledger-connector-sawtooth |
+| SOLANA_2X            | cacti-plugin-ledger-connector-solana   |
 
 ## VerifierFactory
 
