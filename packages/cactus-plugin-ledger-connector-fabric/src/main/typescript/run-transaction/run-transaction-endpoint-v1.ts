@@ -6,18 +6,18 @@ import {
   LogLevelDesc,
   Checks,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import { PluginLedgerConnectorFabric } from "../plugin-ledger-connector-fabric";
 import OAS from "../../json/openapi.json";
@@ -62,9 +62,9 @@ export class RunTransactionEndpointV1 implements IWebServiceEndpoint {
     return this.handleRequest.bind(this);
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction"
     ];
   }
 

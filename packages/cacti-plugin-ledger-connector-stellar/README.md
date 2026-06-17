@@ -169,7 +169,7 @@ docker run \
   --env API_MTLS_ENABLED=false \
   --env API_HOST=0.0.0.0 \
   --env LOG_LEVEL=INFO \
-  --env PLUGINS='[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "instanceId": "some-unique-stellar-connector-instance-id", "networkConfig": {}}}]' \
+  --env PLUGINS='[{"packageName": "@hyperledger-cacti/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "instanceId": "some-unique-stellar-connector-instance-id", "networkConfig": {}}}]' \
   ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255
 ```
 
@@ -196,13 +196,13 @@ docker run \
   --env LOG_LEVEL=INFO \
   ghcr.io/hyperledger/cactus-cmd-api-server:2024-07-03t18-38-45-dev-65adc3255 \
     node index.js \
-    --plugins='[{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "networkConfig":{}, "instanceId": "some-unique-stellar-connector-instance-id"}}]'
+    --plugins='[{"packageName": "@hyperledger-cacti/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "networkConfig":{}, "instanceId": "some-unique-stellar-connector-instance-id"}}]'
 ```
 
 Launch container with **configuration file** mounted from host machine:
 
 ```sh
-echo '{"plugins": [{"packageName": "@hyperledger/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "networkConfig":{}, "instanceId": "some-unique-stellar-connector-instance-id"}}]}' > .cacti-config.json
+echo '{"plugins": [{"packageName": "@hyperledger-cacti/cacti-plugin-ledger-connector-stellar", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "networkConfig":{}, "instanceId": "some-unique-stellar-connector-instance-id"}}]}' > .cacti-config.json
 ```
 
 ```sh
@@ -233,7 +233,7 @@ Don't have a Stellar network on hand to test with? Test or develop against our S
 **Usage Example**(refer to the integration tests for further examples):
 
 ```typescript
-import { StellarTestLedger } from "@hyperledger/cactus-test-tooling";
+import { StellarTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
 import { Network } from "stellar-plus/lib/stellar-plus";
 
 const logLevel: LogLevelDesc = "TRACE";

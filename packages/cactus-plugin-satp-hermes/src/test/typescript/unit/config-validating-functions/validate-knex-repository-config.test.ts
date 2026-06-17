@@ -282,9 +282,9 @@ describe("validateKnexRepositoryConfig", () => {
     );
   });
 
-  it("should throw if is a unknow client", () => {
+  it("should throw if is a unknown client", () => {
     const migrationsProperty = {
-      client: "unknow",
+      client: "unknown",
       connection: {
         host: "localhost",
         user: "user",
@@ -296,6 +296,6 @@ describe("validateKnexRepositoryConfig", () => {
       validateKnexRepositoryConfig({
         configValue: migrationsProperty,
       }),
-    ).toThrowError(`Unsupported client type: unknow`);
+    ).toThrowError(`Unsupported client type: unknown`);
   });
 });

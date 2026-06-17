@@ -48,6 +48,5 @@ module.exports = {
     `./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts`,
     `./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts`,
     `./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts`,
-    `./examples/cactus-example-supply-chain-backend/src/test/`,
   ],
 };

@@ -14,6 +14,7 @@
     "moduleResolution": "node",
     "noImplicitAny": false,
     "noImplicitThis": true,
+    "skipLibCheck": true,
     "sourceMap": false,
     "inlineSourceMap": true,
     "outDir": "build",

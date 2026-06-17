@@ -7,7 +7,7 @@
 import { GluegunCommand } from "gluegun";
 import logger from "../helper/logger";
 import { commandHelp } from "../helper/helper";
-import { HashFunctions } from "@hyperledger/cacti-weaver-sdk-besu";
+import { HashFunctions } from "@hyperledger-cacti/cacti-weaver-sdk-besu";
 
 const command: GluegunCommand = {
   name: "hash",

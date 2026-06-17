@@ -1,4 +1,4 @@
-import { LogLevelDesc, ILoggerOptions } from "@hyperledger/cactus-common";
+import { LogLevelDesc, ILoggerOptions } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { OracleAbstract } from "./oracle-abstract";
@@ -58,7 +58,8 @@ export class OracleSchedulerManager {
           throw new Error(`Poller with id "${id}" already exists.`);
         }
 
-        const interval = setInterval(callback, intervalMs);
+        const safeIntervalMs = Math.min(Math.max(intervalMs, 100), 3_600_000);
+        const interval = setInterval(callback, safeIntervalMs);
         this.pollers.set(id, interval);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });

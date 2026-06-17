@@ -2,12 +2,12 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
 import SATPNFTokenContract from "../../solidity/generated/SATPNFTokenContract.sol/SATPNFTokenContract.json";
 import SATPWrapperContract from "../../../main/solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import {
   EthContractInvocationType,
@@ -17,13 +17,13 @@ import {
   PluginLedgerConnectorEthereum,
   Web3SigningCredential,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
+import { IPluginBungeeHermesOptions } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
 import { expect } from "@jest/globals";
 import {
   GethTestLedger,
   WHALE_ACCOUNT_ADDRESS,
-} from "@hyperledger/cactus-test-geth-ledger";
+} from "@hyperledger-cacti/cactus-test-geth-ledger";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import {
   Asset,
@@ -31,7 +31,7 @@ import {
   AssetTokenTypeEnum,
   NetworkId,
 } from "../../../main/typescript";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntologyERC20 from "../../ontologies/ontology-satp-erc20-interact-ethereum.json";
 import ExampleOntologyERC721 from "../../ontologies/ontology-satp-erc721-interact-ethereum.json";

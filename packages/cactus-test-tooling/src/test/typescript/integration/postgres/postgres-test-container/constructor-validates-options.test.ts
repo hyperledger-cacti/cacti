@@ -2,7 +2,7 @@ import "jest-extended";
 import isPortReachable from "is-port-reachable";
 import { Container } from "dockerode";
 import { PostgresTestContainer } from "../../../../../main/typescript/public-api";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 const logLevel: LogLevelDesc = "INFO";
 

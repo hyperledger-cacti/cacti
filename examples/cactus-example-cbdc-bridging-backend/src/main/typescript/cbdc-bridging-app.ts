@@ -4,15 +4,15 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ApiServer,
   ICactusApiServerOptions,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
 import { CbdcBridgingAppDummyInfrastructure } from "./infrastructure/cbdc-bridging-app-dummy-infrastructure";
-import { DefaultApi as FabricApi } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
-import { DefaultApi as BesuApi } from "@hyperledger/cactus-plugin-ledger-connector-besu";
+import { DefaultApi as FabricApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
+import { DefaultApi as BesuApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 
 export interface ICbdcBridgingApp {
   apiHost: string;

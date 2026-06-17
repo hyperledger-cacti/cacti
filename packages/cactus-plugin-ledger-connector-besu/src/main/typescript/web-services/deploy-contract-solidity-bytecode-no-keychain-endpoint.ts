@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   Logger,
@@ -12,12 +12,12 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import { PluginLedgerConnectorBesu } from "../plugin-ledger-connector-besu";
 import type { DeployContractSolidityBytecodeNoKeychainV1Request } from "../generated/openapi/typescript-axios";
@@ -52,9 +52,9 @@ export class DeployContractSolidityBytecodeNoKeychainEndpoint
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode-no-keychain"
     ];
   }
 

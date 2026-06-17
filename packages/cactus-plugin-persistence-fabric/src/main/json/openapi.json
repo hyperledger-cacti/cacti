@@ -104,12 +104,12 @@
     }
   },
   "paths": {
-    "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/status": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/status": {
       "get": {
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/status"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/status"
           }
         },
         "operationId": "getStatusV1",
@@ -139,14 +139,14 @@
         }
       }
     },
-    "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network": {
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/discover-network": {
       "post": {
         "operationId": "discoverNetworkV1",
         "summary": "Refresh Fabric network structure in the database through discovery.",
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "post",
-            "path": "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/discover-network"
+            "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/discover-network"
           }
         },
         "parameters": [],

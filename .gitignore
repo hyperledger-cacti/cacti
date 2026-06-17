@@ -12,7 +12,7 @@ jspm_packages/
 generated-sources/
 coverage/
 .cache/
-
+output/
 # Optional npm cache directory
 .npm
 
@@ -81,3 +81,4 @@ supply-chain-attack-09082025-audit-scan.out
 packages/cactus-plugin-satp-hermes/.config
 
 *.sqlite3
+packages/cactus-cmd-api-server/src/main/proto/generated/openapi/.openapi-generator/FILES
