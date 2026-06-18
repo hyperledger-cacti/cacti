@@ -45,12 +45,6 @@ jobs:
           cat .npmrc
         working-directory: weaver/common/protos-js
 
-      - name: Build
-        run: |
-          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
-          make build
-        working-directory: weaver/common/protos-js
-
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
@@ -61,6 +55,13 @@ jobs:
           else
             echo "PROTOS_JS_PUBLISH=true" >> $GITHUB_ENV
           fi
+        working-directory: weaver/common/protos-js
+
+      - name: Build
+        if: ${{ env.PROTOS_JS_PUBLISH == 'true' }}
+        run: |
+          export PATH="$PATH:${GITHUB_WORKSPACE}/protoc/bin"
+          make build
         working-directory: weaver/common/protos-js
 
       - name: Publish
@@ -94,10 +95,6 @@ jobs:
           cat .npmrc
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
-      - name: Build
-        run: make build
-        working-directory: weaver/sdks/fabric/interoperation-node-sdk
-
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
@@ -108,6 +105,11 @@ jobs:
           else
             echo "WEAVER_FABRIC_SDK_PUBLISH=true" >> $GITHUB_ENV
           fi
+        working-directory: weaver/sdks/fabric/interoperation-node-sdk
+
+      - name: Build
+        if: ${{ env.WEAVER_FABRIC_SDK_PUBLISH == 'true' }}
+        run: make build
         working-directory: weaver/sdks/fabric/interoperation-node-sdk
 
       - name: Publish
@@ -139,10 +141,6 @@ jobs:
           cat .npmrc
         working-directory: weaver/sdks/besu/node
 
-      - name: Build
-        run: make build
-        working-directory: weaver/sdks/besu/node
-
       - name: Check if package already exists
         run : |
           PKG_NAME=$(node -p "require('./package.json').name")
@@ -153,6 +151,11 @@ jobs:
           else
             echo "WEAVER_BESU_SDK_PUBLISH=true" >> $GITHUB_ENV
           fi
+        working-directory: weaver/sdks/besu/node
+
+      - name: Build
+        if: ${{ env.WEAVER_BESU_SDK_PUBLISH == 'true' }}
+        run: make build
         working-directory: weaver/sdks/besu/node
 
       - name: Publish

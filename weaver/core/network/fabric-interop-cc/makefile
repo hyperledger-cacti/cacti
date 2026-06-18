@@ -15,8 +15,12 @@ list-names:
 	echo ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG)
 
 image:
+	docker build --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) .
+
+image-local:
 	(cd contracts/interop && make run-vendor && go mod tidy)
 	docker build --build-arg GIT_URL=$(GIT_URL) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) .
+	(cd contracts/interop && make undo-vendor)
 
 check-if-tag-exists:
 	!(DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $(DOCKER_REGISTRY)/$(DOCKER_IMAGE_NAME):$(DOCKER_TAG) > /dev/null)
