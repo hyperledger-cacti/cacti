@@ -10,7 +10,7 @@ build-local: clean
 
 .PHONE: publish
 publish: .npmrc
-	yarn npm publish --tolerate-republish
+	npm publish --no-workspaces
 
 clean:
 	rm -rf build node_modules package-lock.json .nyc_output coverage
