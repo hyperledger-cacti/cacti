@@ -59,8 +59,6 @@
     "build-local": "cd src/main/typescript && make build-local",
     "clean": "cd src/main/typescript && make clean",
     "clean-local": "cd src/main/typescript && make clean-local",
-    "publish": "cd src/main/typescript && make push-image && make push-image-latest",
-    "postpublish": "cd src/main/typescript && make push-image-latest",
     "watch": "npm-watch"
   },
   "engines": {
