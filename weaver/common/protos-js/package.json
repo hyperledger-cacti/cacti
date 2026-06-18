@@ -66,8 +66,7 @@
     "npm": ">=8"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://npm.pkg.github.com/hyperledger-cacti"
+    "access": "public"
   },
   "licenses": [
     {
