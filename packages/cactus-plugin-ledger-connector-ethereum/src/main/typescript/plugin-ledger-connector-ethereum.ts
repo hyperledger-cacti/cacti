@@ -643,11 +643,13 @@ export class PluginLedgerConnectorEthereum
       );
     }
 
+    // codeql[js/unvalidated-dynamic-method-call] - req.methodName is validated by isSafeToCallContractMethod above
     const methodRef = contractInstance.methods[req.methodName] as (
       ...args: unknown[]
     ) => PayableMethodObject;
     Checks.truthy(methodRef, `${fnTag} YourContract.${req.methodName}`);
 
+    // codeql[js/unvalidated-dynamic-method-call] - req.methodName is validated by isSafeToCallContractMethod above
     const method = methodRef(...req.params);
     if (req.invocationType === EthContractInvocationType.Call) {
       const callOutput = await method.call();
@@ -1237,12 +1239,23 @@ export class PluginLedgerConnectorEthereum
       });
     }
 
+    // codeql[js/unvalidated-dynamic-method-call] - contractMethod validated by isSafeToCallContractMethod above
     const methodRef = contract.methods[args.contractMethod] as (
       ...args: unknown[]
     ) => any;
-    return methodRef(...contractMethodArgs)[args.invocationType](
-      args.invocationParams,
-    );
+    const invocationResult = methodRef(...contractMethodArgs);
+    switch (args.invocationType) {
+      case EthContractInvocationWeb3Method.Send:
+        return invocationResult.send(args.invocationParams);
+      case EthContractInvocationWeb3Method.Call:
+        return invocationResult.call(args.invocationParams);
+      case EthContractInvocationWeb3Method.EncodeAbi:
+        return invocationResult.encodeABI(args.invocationParams);
+      case EthContractInvocationWeb3Method.EstimateGas:
+        return invocationResult.estimateGas(args.invocationParams);
+      default:
+        throw new Error(`Unsupported invocationType: ${args.invocationType}`);
+    }
   }
 
   public decodeEvent(

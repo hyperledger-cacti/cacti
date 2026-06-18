@@ -46,7 +46,10 @@ import {
   ConnectorOptionsError,
   ApproveAddressError,
 } from "../../common/errors";
-import { ISignerKeyPair, Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
+import {
+  ISignerKeyPair,
+  Secp256k1Keys,
+} from "@hyperledger-cacti/cactus-common";
 import SATPWrapperContract from "../../../../solidity/generated/SATPWrapperContract.sol/SATPWrapperContract.json";
 import { OntologyManager } from "../ontology/ontology-manager";
 import { Asset, UniqueTokenID, Amount } from "../ontology/assets/asset";

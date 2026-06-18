@@ -4,6 +4,7 @@ module.exports = {
   logHeapUsage: true,
   testEnvironment: "node",
   moduleNameMapper: {
+    "^(.+)/(.+)_pb\\.js$": "$1/$2_pb",
     "^(\\.\\.?\\/.+)\\.jsx?$": "$1",
   },
   modulePathIgnorePatterns: ["./weaver/core"],
@@ -11,9 +12,6 @@ module.exports = {
   maxConcurrency: 1,
   setupFilesAfterEnv: ["jest-extended/all", "./jest.setup.console.logs.js"],
   testTimeout: 60 * 60 * 1000,
-  moduleNameMapper: {
-    "^(.+)/(.+)_pb\\.js$": "$1/$2_pb",
-  },
   testMatch: [
     `**/cactus-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
     `**/cacti-*/src/test/typescript/{unit,integration,benchmark}/**/*.test.ts`,
@@ -48,6 +46,5 @@ module.exports = {
     `./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts`,
     `./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts`,
     `./examples/cactus-example-carbon-accounting-backend/src/test/typescript/integration/admin-enroll-v1-endpoint.test.ts`,
-    `./examples/cactus-example-supply-chain-backend/src/test/`,
   ],
 };

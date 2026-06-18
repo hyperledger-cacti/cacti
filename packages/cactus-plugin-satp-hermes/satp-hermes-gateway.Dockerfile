@@ -56,6 +56,7 @@ ARG APP_DIR=/opt/cacti/satp-hermes
 WORKDIR ${APP_DIR}
 
 RUN mkdir -p \
+    ${APP_DIR}/data \
     ${APP_DIR}/logs \
     ${APP_DIR}/config \
     ${APP_DIR}/ontologies \

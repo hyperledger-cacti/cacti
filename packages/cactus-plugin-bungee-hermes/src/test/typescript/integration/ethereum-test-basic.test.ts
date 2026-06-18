@@ -125,7 +125,7 @@ describe("Ethereum contract deploy and invoke using keychain", () => {
 
     const listenOptions: IListenOptions = {
       hostname: "127.0.0.1",
-      port: 5000,
+      port: 0,
       server,
     };
     addressInfo = (await Servers.listen(listenOptions)) as AddressInfo;

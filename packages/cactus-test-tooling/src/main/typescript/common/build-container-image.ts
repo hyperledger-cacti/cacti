@@ -79,12 +79,27 @@ export async function buildContainerImage(
   const buildErrors: IBuildImageResultFail[] = [];
   stream.on("data", (data: unknown) => {
     if (data instanceof Buffer) {
-      const logRowJson = data.toString("utf-8");
-      const logRow = JSON.parse(logRowJson);
-      if (isIBuildImageResultFail(logRow)) {
-        buildErrors.push(logRow);
+      const chunk = data.toString("utf-8");
+      // Docker BuildKit may concatenate multiple NDJSON objects in one chunk.
+      // Split on newlines and parse each non-empty line individually.
+      for (const line of chunk.split("\n")) {
+        const trimmed = line.trim();
+        if (!trimmed) {
+          continue;
+        }
+        let logRow: unknown;
+        try {
+          logRow = JSON.parse(trimmed);
+        } catch {
+          // Non-JSON progress line (e.g. plain-text BuildKit status) — skip.
+          log.debug("[Build raw]: %s", trimmed);
+          continue;
+        }
+        if (isIBuildImageResultFail(logRow)) {
+          buildErrors.push(logRow);
+        }
+        log.debug("[Build]: %s", trimmed);
       }
-      log.debug("[Build]: %s", logRowJson);
     }
   });
 

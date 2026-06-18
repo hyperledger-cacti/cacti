@@ -13,6 +13,7 @@ import {
 import {
   Address,
   GatewayIdentity,
+  SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
   setupGatewayDockerFiles,
@@ -207,6 +208,8 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     const address: Address = `http://${gateway1Address}`;
 
     // gateway setup:
+    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
     const gatewayIdentity = {
       id: "mockID",
       name: "CustomGateway",
@@ -219,6 +222,13 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       ],
       proofID: "mockProofID10",
       address,
+      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -236,6 +246,10 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       localRepository: db_local_config1,
       remoteRepository: db_remote_config1,
       gatewayId: "gateway-1",
+      gatewayKeyPair: {
+        privateKey: gateway1KeyPair.privateKey.toString("hex"),
+        publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     });
 
     // gatewayRunner setup:
@@ -395,7 +409,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // gateway setup:
@@ -420,7 +437,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -655,7 +675,10 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // gateway setup:
@@ -680,7 +703,10 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:

@@ -60,6 +60,10 @@ describe("ApiServer", () => {
           logLevel,
           rpcApiHttpHost: "http://127.0.0.1:8545",
           rpcApiWsHost: "ws://127.0.0.1:8546",
+          packageSrc: path.join(
+            __dirname,
+            "../../../../../../../packages/cactus-plugin-ledger-connector-besu",
+          ),
         },
       },
     ];

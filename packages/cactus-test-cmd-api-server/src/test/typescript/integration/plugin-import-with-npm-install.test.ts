@@ -63,6 +63,10 @@ describe(testcase, () => {
           instanceId: uuidv4(),
           keychainId: uuidv4(),
           logLevel,
+          packageSrc: path.join(
+            __dirname,
+            "../../../../../../packages/cactus-plugin-keychain-memory",
+          ),
         },
       },
       {
@@ -73,6 +77,10 @@ describe(testcase, () => {
           instanceId: uuidv4(),
           keyPairPem: keyPairPem,
           consortiumDatabase: db,
+          packageSrc: path.join(
+            __dirname,
+            "../../../../../../packages/cacti-plugin-consortium-static",
+          ),
         },
       },
     ];

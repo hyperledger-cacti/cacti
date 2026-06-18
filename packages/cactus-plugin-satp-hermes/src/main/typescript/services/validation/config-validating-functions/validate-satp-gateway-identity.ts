@@ -4,6 +4,8 @@ import {
   CurrentDrafts,
   type DraftVersions,
   type GatewayIdentity,
+  SupportedSigningAlgorithms,
+  type IdentificationCredential,
 } from "../../../core/types";
 import { NetworkId } from "../../../public-api";
 import { Logger } from "@hyperledger-cacti/cactus-common";
@@ -91,8 +93,9 @@ export function isGatewayIdentity(
     isPrivacyDraftVersionsArray((obj as Record<string, unknown>).version) &&
     (!("connectedDLTs" in obj) ||
       isNetworkIdArray((obj as Record<string, unknown>).connectedDLTs, log)) &&
-    (!("pubKey" in obj) ||
-      typeof (obj as Record<string, unknown>).pubKey === "string") &&
+    isIdentificationCredential(
+      (obj as Record<string, unknown>).identificationCredential,
+    ) &&
     (!("name" in obj) ||
       typeof (obj as Record<string, unknown>).name === "string") &&
     (!("proofID" in obj) ||
@@ -106,6 +109,23 @@ export function isGatewayIdentity(
     (!("gatewayUIPort" in obj) ||
       typeof (obj as Record<string, unknown>).gatewayUIPort === "number") &&
     (!("address" in obj) || isAddress((obj as Record<string, unknown>).address))
+  );
+}
+
+function isIdentificationCredential(
+  obj: unknown,
+): obj is IdentificationCredential {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "signingAlgorithm" in obj &&
+    Object.values(SupportedSigningAlgorithms).includes(
+      (obj as Record<string, unknown>)
+        .signingAlgorithm as SupportedSigningAlgorithms,
+    ) &&
+    "pubKey" in obj &&
+    typeof (obj as Record<string, unknown>).pubKey === "string" &&
+    ((obj as Record<string, unknown>).pubKey as string).length > 0
   );
 }
 

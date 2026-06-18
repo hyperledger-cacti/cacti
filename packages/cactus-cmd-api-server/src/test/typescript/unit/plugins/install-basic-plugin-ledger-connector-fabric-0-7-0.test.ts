@@ -50,6 +50,10 @@ test("can install plugin-ledger-connector-fabric", async (t: Test) => {
         logLevel,
         connectionProfile: {},
         peerBinary: "peer",
+        packageSrc: path.join(
+          __dirname,
+          "../../../../../../../packages/cactus-plugin-ledger-connector-fabric",
+        ),
       },
     },
   ];
