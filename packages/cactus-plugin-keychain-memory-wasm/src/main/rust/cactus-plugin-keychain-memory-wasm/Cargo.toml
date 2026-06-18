@@ -1,6 +1,6 @@
 [package]
 name = "cactus-plugin-keychain-memory-wasm"
-version = "2.1.0"
+version = "3.0.0-alpha.8"
 authors = ["Peter Somogyvari <peter.somogyvari@accenture.com>"]
 edition = "2018"
 
