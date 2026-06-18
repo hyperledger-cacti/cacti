@@ -115,8 +115,9 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status"]
-      .get.operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status"
+    ].get.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

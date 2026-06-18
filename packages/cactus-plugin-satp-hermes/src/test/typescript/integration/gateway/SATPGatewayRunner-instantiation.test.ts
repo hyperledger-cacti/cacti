@@ -1,5 +1,6 @@
 import "jest-extended";
-import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc, Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
+import { SupportedSigningAlgorithms } from "../../../../main/typescript/core/types";
 import {
   ISATPGatewayRunnerConstructorOptions,
   pruneDockerContainersIfGithubAction,
@@ -30,6 +31,8 @@ describe("Instantiate SATP Gateway Runner", () => {
   const address: Address = `http://localhost`;
 
   // gateway setup:
+  const gatewayKeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
   const gatewayIdentity = {
     id: "mockID",
     name: "CustomGateway",
@@ -45,6 +48,10 @@ describe("Instantiate SATP Gateway Runner", () => {
     gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
     gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
     gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+    identificationCredential: {
+      signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+      pubKey: Buffer.from(gatewayKeyPair.publicKey).toString("hex"),
+    },
   } as GatewayIdentity;
 
   const files = setupGatewayDockerFiles({
@@ -52,6 +59,10 @@ describe("Instantiate SATP Gateway Runner", () => {
     logLevel,
     counterPartyGateways: [], //only knows itself
     enableCrashRecovery: false, // Crash recovery disabled
+    gatewayKeyPair: {
+      privateKey: gatewayKeyPair.privateKey.toString("hex"),
+      publicKey: Buffer.from(gatewayKeyPair.publicKey).toString("hex"),
+    },
   });
 
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {

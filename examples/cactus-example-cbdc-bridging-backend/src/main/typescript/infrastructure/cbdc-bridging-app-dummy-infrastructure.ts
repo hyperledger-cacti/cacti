@@ -17,7 +17,10 @@ import {
   SATPGatewayConfig,
   TokenType,
 } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
-import { IWebServiceEndpoint, LedgerType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  IWebServiceEndpoint,
+  LedgerType,
+} from "@hyperledger-cacti/cactus-core-api";
 import { GatewayIdentity } from "@hyperledger-cacti/cactus-plugin-satp-hermes";
 import { SessionReference } from "../types";
 
@@ -62,9 +65,9 @@ export class CbdcBridgingAppDummyInfrastructure {
 
   private static readonly networkName = "CDBC_Network";
 
-  private static readonly DOCKER_IMAGE_VERSION = "5f190f37f-2025-08-19";
+  private static readonly DOCKER_IMAGE_VERSION = "612643f9f-2026-06-07";
   private static readonly DOCKER_IMAGE_NAME =
-    "kubaya/cacti-satp-hermes-gateway";
+    "rafaelapb/cacti-satp-hermes-gateway";
 
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;
@@ -429,6 +432,9 @@ export class CbdcBridgingAppDummyInfrastructure {
     }
 
     this.besuGatewayApproveAddress = reqApproveBesuAddress.data.approveAddress;
+    if (!this.besuGatewayApproveAddress) {
+      throw new Error("Besu approve address is undefined");
+    }
 
     this.besuEnvironment.setApproveAddress(this.besuGatewayApproveAddress);
 

@@ -26,6 +26,7 @@
  * @since 0.0.3-beta
  */
 
+import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
@@ -50,6 +51,13 @@ dotenv.config({ path: envPath });
  * @constant {Object.<string, Knex.Config>}
  * @since 0.0.3-beta
  */
+/** Shared data directory used for all gateway SQLite files */
+const DATA_DIR = (() => {
+  const dir = path.resolve(__dirname, "data");
+  fs.mkdirSync(dir, { recursive: true });
+  return dir;
+})();
+
 export const knexLocalInstance: { [key: string]: Knex.Config } = {
   /** Default SQLite configuration for local SATP gateway persistence */
   default: {
@@ -57,11 +65,7 @@ export const knexLocalInstance: { [key: string]: Knex.Config } = {
     client: "sqlite3",
     connection: {
       /** Unique SQLite file path to prevent instance conflicts */
-      filename: path.resolve(
-        __dirname,
-        "data",
-        `.dev.local-${uuidv4()}.sqlite3`,
-      ),
+      filename: path.join(DATA_DIR, `.dev.local-${uuidv4()}.sqlite3`),
     },
     migrations: {
       /** Directory containing database migration files */
@@ -76,3 +80,23 @@ export const knexLocalInstance: { [key: string]: Knex.Config } = {
     useNullAsDefault: true,
   },
 };
+
+/**
+ * Returns a Knex config for the oracle log SQLite database.
+ * Each gateway instance gets its own file under the shared data directory,
+ * named with the instanceId to prevent cross-instance collisions.
+ */
+export function createOracleLogKnexConfig(instanceId: string): Knex.Config {
+  return {
+    client: "sqlite3",
+    connection: {
+      filename: path.join(DATA_DIR, `.oracle-logs-${instanceId}.sqlite3`),
+    },
+    acquireConnectionTimeout: ACQUIRE_CONNECTION_TIMEOUT,
+    pool: {
+      ...SQLITE_POOL_CONFIG,
+      afterCreate: createSqliteAfterCreate(),
+    },
+    useNullAsDefault: true,
+  };
+}

@@ -108,6 +108,7 @@
     "IBFT",
     "immalleable",
     "imodule",
+    "initialised",
     "ipaddress",
     "ipfs",
     "IPFSHTTP",
@@ -250,7 +251,7 @@
   ,"Unregisters"
   ,"orquestrator"
   ,"intitialized"
-  ,"unknow"
+  ,"unvalidated"
   ,"amout"
   ,"recepient"
   ,"receipient"

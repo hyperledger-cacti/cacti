@@ -41,7 +41,9 @@ export class ApproveEndpointV1 implements IWebServiceEndpoint {
   }
 
   public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens"] {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens"];
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens"
+    ];
   }
 
   public async registerExpress(
@@ -61,8 +63,9 @@ export class ApproveEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens"]
-      .post.operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens"
+    ].post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

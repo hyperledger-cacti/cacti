@@ -28,17 +28,23 @@ import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 const testCase = "openapi validation on corda JVM implementation";
 const logLevel: LogLevelDesc = "TRACE";
 
+// TODO(cleanup): All Corda connector tape tests are skipped because the pinned
+// Kotlin server images pre-date the @hyperledger → @hyperledger-cacti namespace
+// rename, causing every API route to return 404. A new image must be built from
+// current Kotlin source and re-pinned before these can run. The connector is
+// considered legacy and may be deprecated in a future release.
+// See: https://github.com/hyperledger-cacti/cacti/issues
 test.onFailure(async () => {
   await Containers.logDiagnostics({ logLevel });
 });
 
-test("BEFORE " + testCase, async (t: Test) => {
+test.skip("BEFORE " + testCase, async (t: Test) => {
   const pruning = pruneDockerContainersIfGithubAction({ logLevel });
   await t.doesNotReject(pruning, "Pruning didn't throw OK");
   t.end();
 });
 
-test(testCase, async (t: Test) => {
+test.skip(testCase, async (t: Test) => {
   const ledger = new CordaTestLedger({
     imageName: "ghcr.io/hyperledger/cactus-corda-4-8-all-in-one-obligation",
     imageVersion: "2021-08-31--feat-889",

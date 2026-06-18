@@ -10,7 +10,10 @@ import {
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
 } from "@hyperledger-cacti/cactus-test-tooling";
-import { GatewayIdentity } from "../../../../main/typescript/core/types";
+import {
+  GatewayIdentity,
+  SupportedSigningAlgorithms,
+} from "../../../../main/typescript/core/types";
 import {
   setupGatewayDockerFiles,
   BesuTestEnvironment,
@@ -161,7 +164,7 @@ beforeAll(async () => {
   await setupDBTable(db_remote_host_config1);
   await setupDBTable(db_remote_host_config2);
 
-  {
+  try {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: satpContractName,
@@ -170,8 +173,13 @@ beforeAll(async () => {
       claimFormat: ClaimFormat.DEFAULT,
     });
     log.info("Fabric Ledger started successfully");
-
     await fabricEnv.deployAndSetupContracts();
+  } catch (err) {
+    log.warn(
+      "Fabric ledger failed to start, non-Fabric tests will proceed.",
+      err,
+    );
+    fabricEnv = undefined as unknown as FabricTestEnvironment;
   }
 
   {
@@ -250,7 +258,10 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // gateway setup:
@@ -275,7 +286,10 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -493,7 +507,10 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // gateway setup:
@@ -518,7 +535,10 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // fabricConfig Json object setup:
@@ -738,7 +758,10 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // gateway setup:
@@ -763,7 +786,10 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:

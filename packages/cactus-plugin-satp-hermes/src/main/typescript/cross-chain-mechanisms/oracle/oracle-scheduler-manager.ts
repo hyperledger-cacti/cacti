@@ -58,7 +58,8 @@ export class OracleSchedulerManager {
           throw new Error(`Poller with id "${id}" already exists.`);
         }
 
-        const interval = setInterval(callback, intervalMs);
+        const safeIntervalMs = Math.min(Math.max(intervalMs, 100), 3_600_000);
+        const interval = setInterval(callback, safeIntervalMs);
         this.pollers.set(id, interval);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });

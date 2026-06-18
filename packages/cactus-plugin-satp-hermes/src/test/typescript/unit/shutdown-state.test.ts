@@ -28,6 +28,7 @@ import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
+import { getFreePorts } from "../test-utils";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const monitorService = MonitorService.createOrGetMonitorService({
@@ -87,6 +88,7 @@ describe("Shutdown Verify State Tests", () => {
 
   test("Gateway waits to verify the sessions state before shutdown", async () => {
     const ontologiesPath = path.join(__dirname, "../../ontologies");
+    const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [] }),
@@ -102,8 +104,8 @@ describe("Shutdown Verify State Tests", () => {
         ],
         connectedDLTs: [],
         proofID: "mockProofID10",
-        gatewayServerPort: 3014,
-        gatewayClientPort: 3015,
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
         address: "https://localhost",
       },
       ontologyPath: ontologiesPath,
@@ -139,6 +141,7 @@ describe("Shutdown Verify State Tests", () => {
     jest.useFakeTimers();
 
     const ontologiesPath = path.join(__dirname, "../../ontologies");
+    const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [] }),
@@ -154,8 +157,8 @@ describe("Shutdown Verify State Tests", () => {
         ],
         connectedDLTs: [],
         proofID: "mockProofID10",
-        gatewayServerPort: 3014,
-        gatewayClientPort: 3015,
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
         address: "https://localhost",
       },
       ontologyPath: ontologiesPath,
@@ -206,6 +209,7 @@ describe("Shutdown Verify State Tests", () => {
 
   test("Gateway does not allow new transactions after shutdown is initiated", async () => {
     const ontologiesPath = path.join(__dirname, "../../ontologies");
+    const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {
       instanceId: uuidv4(),
       pluginRegistry: new PluginRegistry({ plugins: [] }),
@@ -221,8 +225,8 @@ describe("Shutdown Verify State Tests", () => {
         ],
         connectedDLTs: [],
         proofID: "mockProofID10",
-        gatewayServerPort: 3014,
-        gatewayClientPort: 3015,
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
         address: "https://localhost",
       },
       ontologyPath: ontologiesPath,

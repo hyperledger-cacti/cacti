@@ -56,7 +56,9 @@ const main = async (argv: string[], env: NodeJS.ProcessEnv) => {
   const pkgNameToPath = new Map();
   const pkgPathToName = new Map();
   tsConfigPaths.forEach((it) => {
-    const pkgName = "@hyperledger-cacti/".concat(path.basename(path.dirname(it)));
+    const pkgName = "@hyperledger-cacti/".concat(
+      path.basename(path.dirname(it)),
+    );
     pkgNameToPath.set(pkgName, it);
     pkgPathToName.set(it, pkgName);
   });

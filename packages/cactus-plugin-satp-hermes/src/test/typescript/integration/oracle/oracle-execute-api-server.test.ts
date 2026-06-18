@@ -58,6 +58,7 @@ const monitorService = MonitorService.createOrGetMonitorService({
 let oracleApi: OracleApi;
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
+// TODO(#3978): never assigned while the Fabric AIO is unstable; only read by the
 let fabricEnv: FabricTestEnvironment;
 let gateway: SATPGateway;
 let besuContractAddress: string;
@@ -65,158 +66,153 @@ let ethereumContractAddress: string;
 let data_hash: string;
 
 const TIMEOUT = 900000; // 15 minutes
-beforeAll(async () => {
-  pruneDockerContainersIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      log.error("Pruning didn't throw OK");
-    });
 
-  {
-    const businessLogicContract = "OracleTestContract";
+// TODO(#3978): The Fabric AIO container does not start reliably, so the
+// Fabric-dependent oracle tests below are marked `it.skip` and `beforeAll` does
+// NOT start a Fabric ledger (only Besu + Ethereum). The EVM/Ethereum oracle
+// tests still run. Re-enable the Fabric setup in `beforeAll` (and drop the
+// `it.skip`) together when the Fabric AIO is stable.
+// See docs/fabric-tests-to-fix.md and
+// https://github.com/hyperledger-cacti/cacti/issues/3978
+describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully", () => {
+  jest.setTimeout(TIMEOUT);
 
-    try {
-      besuEnv = await BesuTestEnvironment.setupTestEnvironment(
-        {
-          logLevel,
-        },
-        [
-          {
-            assetType: SupportedBesuContractTypes.ORACLE,
-            contractName: businessLogicContract,
-          },
-        ],
-      );
-      log.info("Besu Ledger started successfully");
-
-      ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
-        {
-          logLevel,
-        },
-        [
-          {
-            assetType: SupportedEthereumContractTypes.ORACLE,
-            contractName: businessLogicContract,
-          },
-        ],
-      );
-
-      fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
-        contractName: businessLogicContract,
-        logLevel,
+  beforeAll(async () => {
+    pruneDockerContainersIfGithubAction({ logLevel })
+      .then(() => {
+        log.info("Pruning throw OK");
+      })
+      .catch(async () => {
+        await Containers.logDiagnostics({ logLevel });
+        log.error("Pruning didn't throw OK");
       });
-    } catch (err) {
-      log.error("Error starting test ledgers: ", err);
-      throw err;
+
+    {
+      const businessLogicContract = "OracleTestContract";
+
+      try {
+        besuEnv = await BesuTestEnvironment.setupTestEnvironment(
+          {
+            logLevel,
+          },
+          [
+            {
+              assetType: SupportedBesuContractTypes.ORACLE,
+              contractName: businessLogicContract,
+            },
+          ],
+        );
+        log.info("Besu Ledger started successfully");
+
+        ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
+          {
+            logLevel,
+          },
+          [
+            {
+              assetType: SupportedEthereumContractTypes.ORACLE,
+              contractName: businessLogicContract,
+            },
+          ],
+        );
+      } catch (err) {
+        log.error("Error starting test ledgers: ", err);
+        throw err;
+      }
+
+      besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
+        ClaimFormat.BUNGEE,
+        "OracleTestContract",
+        OracleTestContract,
+      );
+
+      ethereumContractAddress = await ethereumEnv.deployAndSetupOracleContracts(
+        ClaimFormat.BUNGEE,
+        "OracleTestContract",
+        OracleTestContract,
+      );
     }
 
-    besuContractAddress = await besuEnv.deployAndSetupOracleContracts(
-      ClaimFormat.BUNGEE,
-      "OracleTestContract",
-      OracleTestContract,
-    );
+    //setup satp gateway
+    const factoryOptions: IPluginFactoryOptions = {
+      pluginImportType: PluginImportType.Local,
+    };
+    const factory = new PluginFactorySATPGateway(factoryOptions);
 
-    ethereumContractAddress = await ethereumEnv.deployAndSetupOracleContracts(
-      ClaimFormat.BUNGEE,
-      "OracleTestContract",
-      OracleTestContract,
-    );
+    const server1 = createServer();
+    await new Promise<void>((resolve) => server1.listen(0, resolve));
+    const gatewayServerPort = (server1.address() as AddressInfo).port;
+    await new Promise<void>((resolve) => server1.close(() => resolve()));
 
-    await fabricEnv.deployAndSetupContracts();
-  }
+    const server2 = createServer();
+    await new Promise<void>((resolve) => server2.listen(0, resolve));
+    const gatewayClientPort = (server2.address() as AddressInfo).port;
+    await new Promise<void>((resolve) => server2.close(() => resolve()));
 
-  //setup satp gateway
-  const factoryOptions: IPluginFactoryOptions = {
-    pluginImportType: PluginImportType.Local,
-  };
-  const factory = new PluginFactorySATPGateway(factoryOptions);
-
-  const server1 = createServer();
-  await new Promise<void>((resolve) => server1.listen(0, resolve));
-  const gatewayServerPort = (server1.address() as AddressInfo).port;
-  await new Promise<void>((resolve) => server1.close(() => resolve()));
-
-  const server2 = createServer();
-  await new Promise<void>((resolve) => server2.listen(0, resolve));
-  const gatewayClientPort = (server2.address() as AddressInfo).port;
-  await new Promise<void>((resolve) => server2.close(() => resolve()));
-
-  const gatewayIdentity = {
-    id: "mockID",
-    name: "CustomGateway",
-    version: [
-      {
-        Core: SATP_CORE_VERSION,
-        Architecture: SATP_ARCHITECTURE_VERSION,
-        Crash: SATP_CRASH_VERSION,
-      },
-    ],
-    proofID: "mockProofID10",
-    address: "http://localhost" as Address,
-    gatewayServerPort,
-    gatewayClientPort,
-  } as GatewayIdentity;
-
-  const ethNetworkOptions = ethereumEnv.createEthereumConfig();
-  const besuNetworkOptions = besuEnv.createBesuConfig();
-  const fabricNetworkOptions = fabricEnv.createFabricConfig();
-
-  const options: SATPGatewayConfig = {
-    instanceId: uuidv4(),
-    logLevel: "DEBUG",
-    gid: gatewayIdentity,
-    ccConfig: {
-      oracleConfig: [
-        ethNetworkOptions,
-        besuNetworkOptions,
-        fabricNetworkOptions,
+    const gatewayIdentity = {
+      id: "mockID",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
       ],
-    },
-    pluginRegistry: new PluginRegistry({ plugins: [] }),
-    monitorService: monitorService,
-  };
-  gateway = await factory.create(options);
-  expect(gateway).toBeInstanceOf(SATPGateway);
+      proofID: "mockProofID10",
+      address: "http://localhost" as Address,
+      gatewayServerPort,
+      gatewayClientPort,
+    } as GatewayIdentity;
 
-  const identity = gateway.Identity;
-  // default servers
-  expect(identity.gatewayServerPort).toBe(gatewayServerPort);
-  expect(identity.gatewayClientPort).toBe(gatewayClientPort);
-  expect(identity.address).toBe("http://localhost");
-  await gateway.startup();
+    const ethNetworkOptions = ethereumEnv.createEthereumConfig();
+    const besuNetworkOptions = besuEnv.createBesuConfig();
 
-  const apiServer = await gateway.getOrCreateHttpServer();
-  expect(apiServer).toBeInstanceOf(ApiServer);
+    const options: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      logLevel: "DEBUG",
+      gid: gatewayIdentity,
+      ccConfig: {
+        oracleConfig: [ethNetworkOptions, besuNetworkOptions],
+      },
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
+      monitorService: monitorService,
+    };
+    gateway = await factory.create(options);
+    expect(gateway).toBeInstanceOf(SATPGateway);
 
-  oracleApi = new OracleApi(
-    new Configuration({ basePath: gateway.getAddressOApiAddress() }),
-  );
-  expect(oracleApi).toBeTruthy();
-}, TIMEOUT);
+    const identity = gateway.Identity;
+    // default servers
+    expect(identity.gatewayServerPort).toBe(gatewayServerPort);
+    expect(identity.gatewayClientPort).toBe(gatewayClientPort);
+    expect(identity.address).toBe("http://localhost");
+    await gateway.startup();
 
-afterAll(async () => {
-  await gateway?.shutdown();
-  await besuEnv?.tearDown();
-  await ethereumEnv?.tearDown();
-  await fabricEnv?.tearDown();
+    const apiServer = await gateway.getOrCreateHttpServer();
+    expect(apiServer).toBeInstanceOf(ApiServer);
 
-  await pruneDockerContainersIfGithubAction({ logLevel })
-    .then(() => {
-      log.info("Pruning throw OK");
-    })
-    .catch(async () => {
-      await Containers.logDiagnostics({ logLevel });
-      log.error("Pruning didn't throw OK");
-    });
-}, TIMEOUT);
+    oracleApi = new OracleApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+    expect(oracleApi).toBeTruthy();
+  }, TIMEOUT);
 
-// TODO: Skipped — Fabric AIO container fails to start reliably.
-// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
-describe.skip("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully", () => {
-  jest.setTimeout(900000);
+  afterAll(async () => {
+    await gateway?.shutdown();
+    await besuEnv?.tearDown();
+    await ethereumEnv?.tearDown();
+    await fabricEnv?.tearDown();
+
+    await pruneDockerContainersIfGithubAction({ logLevel })
+      .then(() => {
+        log.info("Pruning throw OK");
+      })
+      .catch(async () => {
+        await Containers.logDiagnostics({ logLevel });
+        log.error("Pruning didn't throw OK");
+      });
+  }, TIMEOUT);
+
   it("should fail when writing to a contract calling a function that does not exist", async () => {
     data_hash = keccak256("Hello World!");
 
@@ -247,7 +243,10 @@ describe.skip("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successf
     expect(response.data.status).toBe(OracleTaskStatusEnum.Inactive);
   });
 
-  it("should write data to a contract calling a function with args (EVM and Fabric)", async () => {
+  // TODO(#3978): Fabric oracle path skipped — the Fabric AIO container does not
+  // start reliably. Re-enable together with the Fabric setup in `beforeAll`.
+  // https://github.com/hyperledger-cacti/cacti/issues/3978
+  it.skip("should write data to a contract calling a function with args (EVM and Fabric)", async () => {
     data_hash = keccak256("Hello World!");
 
     let response = await oracleApi.executeOracleTask({
@@ -303,7 +302,10 @@ describe.skip("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successf
     expect(response2.data.status).toBe(OracleTaskStatusEnum.Inactive);
   });
 
-  it("should read the data from the contract calling a function with args (EVM and Fabric)", async () => {
+  // TODO(#3978): Fabric oracle path skipped — the Fabric AIO container does not
+  // start reliably. Re-enable together with the Fabric setup in `beforeAll`.
+  // https://github.com/hyperledger-cacti/cacti/issues/3978
+  it.skip("should read the data from the contract calling a function with args (EVM and Fabric)", async () => {
     let response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
@@ -356,6 +358,23 @@ describe.skip("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successf
   });
 
   it("should read data and write it to another blockchain (EVM to Besu)", async () => {
+    data_hash = keccak256("Hello World!");
+    const seedResponse = await oracleApi.executeOracleTask({
+      destinationNetworkId: ethereumEnv.network,
+      destinationContract: {
+        contractName: ethereumEnv.getTestOracleContractName(),
+        contractAddress: ethereumContractAddress,
+        contractAbi: OracleTestContract.abi,
+        contractBytecode: OracleTestContract.bytecode.object,
+        methodName: "setData",
+        params: ["Hello World!"],
+      },
+      taskType: OracleExecuteRequestTaskTypeEnum.Update,
+    });
+    expect(seedResponse.data.operations?.[0]?.status).toBe(
+      OracleOperationStatusEnum.Success,
+    );
+
     const response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
