@@ -505,6 +505,33 @@ Ethereum-compatible networks use Web3 signing credentials and contract addresses
 }
 ```
 
+#### OpenTelemetry (Metrics, Traces, Logs)
+
+The gateway exports metrics, traces, and logs over OTLP/HTTP through its
+`MonitorService`. Telemetry is **opt-in**:
+- The `enabled` option is set to `true` when creating the gateway/monitor, or
+- An `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable is set 
+
+Exporter endpoints are resolved as follows:
+
+- If `OTEL_EXPORTER_OTLP_ENDPOINT` is set, the per-signal URLs are derived from
+  it (`/v1/metrics`, `/v1/traces`, `/v1/logs`).
+- Explicit `otelMetricsExporterUrl` / `otelTracesExporterUrl` /
+  `otelLogsExporterUrl` options take precedence over the environment variable.
+- If nothing is configured, the exporter endpoints are left **undefined** —
+  there is no implicit `http://localhost:4318` fallback.
+
+When telemetry **is** enabled but initialization fails (for example, a
+configured collector is unreachable), the gateway surfaces the error instead of
+silently continuing. A collector that was explicitly configured but cannot be
+reached is treated as a real misconfiguration that the operator should fix.
+
+```bash
+# Enable telemetry by pointing the gateway at a collector
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://otel-collector:4318"
+```
+
+
 ### Performance Configuration Choices
 
 #### Standard Performance

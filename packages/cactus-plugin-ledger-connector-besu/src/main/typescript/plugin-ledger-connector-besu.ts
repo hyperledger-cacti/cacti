@@ -216,10 +216,17 @@ export class PluginLedgerConnectorBesu
   }
 
   public async onPluginInit(): Promise<void> {
-    this.web3Quorum = Web3JsQuorum(this.web3);
     this.log.info("onPluginInit() querying networkId...");
-    const networkId = await this.web3.eth.net.getId();
-    this.log.info("onPluginInit() obtained networkId: %d", networkId);
+    try {
+      this.web3Quorum = Web3JsQuorum(this.web3);
+      const networkId = await this.web3.eth.net.getId();
+      this.log.info("onPluginInit() obtained networkId: %d", networkId);
+    } catch (ex: unknown) {
+      this.log.warn(
+        "onPluginInit() could not obtain networkId (node may be unreachable): %o",
+        ex,
+      );
+    }
   }
 
   public async shutdown(): Promise<void> {

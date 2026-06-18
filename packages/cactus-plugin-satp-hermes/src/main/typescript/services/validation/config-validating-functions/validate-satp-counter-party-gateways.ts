@@ -28,5 +28,5 @@ export function validateSatpCounterPartyGateways(
       `Invalid config.counterPartyGateways: ${JSON.stringify(opts.configValue)}`,
     );
   }
-  return opts.configValue;
+  return opts.configValue as GatewayIdentity[];
 }

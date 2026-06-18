@@ -145,7 +145,7 @@ const main = async (opts: { readonly argv: Readonly<Array<string>> }) => {
   try {
     const gitRootPath = path.join(
       __dirname,
-      "../../../../../../", // walk back up to the project root
+      "../../../../../../../", // walk back up to the project root
     );
 
     log.info("%s gitRootPath=%s", LOG_TAG, gitRootPath);

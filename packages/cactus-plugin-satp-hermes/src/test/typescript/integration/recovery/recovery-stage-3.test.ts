@@ -51,6 +51,7 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { getFreePorts } from "../../test-utils";
 
 let knexInstanceClient: Knex;
 let knexInstanceSourceRemote: Knex;
@@ -228,6 +229,8 @@ const createMockSession = (
 };
 
 beforeAll(async () => {
+  const [serverPort1, clientPort1, serverPort2, clientPort2] =
+    await getFreePorts(4);
   const factoryOptions: IPluginFactoryOptions = {
     pluginImportType: PluginImportType.Local,
   };
@@ -249,8 +252,8 @@ beforeAll(async () => {
     ],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3006,
-    gatewayClientPort: 3001,
+    gatewayServerPort: serverPort1,
+    gatewayClientPort: clientPort1,
   };
 
   const gatewayIdentity2: GatewayIdentity = {
@@ -269,8 +272,8 @@ beforeAll(async () => {
     ],
     proofID: "mockProofID11",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3228,
-    gatewayClientPort: 3211,
+    gatewayServerPort: serverPort2,
+    gatewayClientPort: clientPort2,
   };
 
   const migrationSource = await createMigrationSource();

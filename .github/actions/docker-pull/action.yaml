@@ -20,7 +20,7 @@ runs:
 
     - name: Cache docker image tar
       id: cache
-      uses: actions/cache@v4
+      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
       with:
         path: docker-image-${{ steps.prep.outputs.safe }}.tar
         key: docker-image-${{ steps.prep.outputs.key }}

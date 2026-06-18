@@ -41,32 +41,6 @@
       ]
     },
     {
-      "name": "Example: Supply Chain App",
-      "type": "node",
-      "request": "launch",
-      "protocol": "inspector",
-      "env": {
-        "TS_NODE_PROJECT": "${workspaceFolder}/tsconfig.json"
-      },
-      "args": [
-        "../cactus-example-supply-chain-backend/src/main/typescript/supply-chain-app-cli.ts",
-        "dotenv_config_path=process.env"
-      ],
-      "runtimeArgs": [
-        "-r",
-        "ts-node/register",
-        "-r",
-        "dotenv/config"
-      ],
-      "console": "integratedTerminal",
-      "sourceMaps": true,
-      "cwd": "${workspaceFolder}/examples/cactus-example-supply-chain-backend/",
-      "outFiles": [
-        "${workspaceFolder}/**/*.js",
-        "!**/node_modules/**"
-      ]
-    },
-    {
       "name": "Example: CBDC Bridging Fabric-EVM App",
       "type": "node",
       "request": "launch",

@@ -84,7 +84,11 @@ import {
 } from "./services/gateway/crash-manager";
 import { OraclePersistence } from "./database/oracle-persistence";
 import * as OAS from "../json/oapi-api1-bundled.json";
-import { knexLocalInstance } from "./database/knexfile";
+import {
+  knexLocalInstance,
+  createOracleLogKnexConfig,
+} from "./database/knexfile";
+import { knexAuditInstance } from "./database/knexfile-audit";
 import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
 import { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
@@ -652,8 +656,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       );
     } else {
       this.logger.info("Audit entries repository is not defined");
+      this.config.auditRepository = knexAuditInstance.default;
       this.auditRepository = new AuditEntryRepository(
-        knexLocalInstance.default,
+        this.config.auditRepository,
       );
     }
     if (this.config.oracleLogRepository) {
@@ -664,11 +669,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.info(
         "Oracle log repository is not defined. Setting up default config...",
       );
-      this.oracleLogRepository = new OracleLogRepository({
-        client: "sqlite3",
-        connection: { filename: ":memory:" },
-        useNullAsDefault: true,
-      });
+      this.oracleLogRepository = new OracleLogRepository(
+        createOracleLogKnexConfig(this.instanceId),
+      );
     }
 
     if (this.config.keyPair === undefined) {
@@ -1126,10 +1129,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     await context.with(this.initialSpanContext.context, async () => {
       try {
-        await Promise.all([
-          this.createDBRepository(),
-          this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!),
-        ]);
+        await this.createDBRepository();
+        await this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!);
 
         // start everything before starting the GOL server
         await this.startupGOLServer();
@@ -1266,6 +1267,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         });
 
         await database.migrate.latest();
+        await this.oracleLogRepository.database.migrate.latest();
+        await (
+          this.auditRepository as AuditEntryRepository
+        ).database.migrate.latest();
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
@@ -1517,12 +1522,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.info(`Closed ${connectionsClosed} connections`);
         this.logger.info("Gateway Coordinator shut down");
 
+        this.logger.debug("Shutting down audit repository");
+        await this.auditRepository?.destroy();
+
         if (this.monitorService) {
           this.logger.debug("Shutting down monitor service");
           await this.monitorService.shutdown();
         }
-        this.logger.debug("Shutting down audit repository");
-        await this.auditRepository?.destroy();
 
         return;
       } catch (err) {

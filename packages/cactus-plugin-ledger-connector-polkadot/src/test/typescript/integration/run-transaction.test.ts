@@ -9,7 +9,10 @@ import {
   LogLevelDesc,
   Servers,
 } from "@hyperledger-cacti/cactus-common";
-import { Configuration, PluginImportType } from "@hyperledger-cacti/cactus-core-api";
+import {
+  Configuration,
+  PluginImportType,
+} from "@hyperledger-cacti/cactus-core-api";
 import { pruneDockerContainersIfGithubAction } from "@hyperledger-cacti/cactus-test-tooling";
 import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";

@@ -601,7 +601,13 @@ export class PluginLedgerConnectorXdai
       }
 
       await new Promise((resolve) =>
-        setTimeout(resolve, consistencyStrategy.pollIntervalMs),
+        setTimeout(
+          resolve,
+          Math.min(
+            Math.max(consistencyStrategy.pollIntervalMs ?? 100, 100),
+            60000,
+          ),
+        ),
       );
 
       txReceipt = await this.web3.eth.getTransactionReceipt(txHash);

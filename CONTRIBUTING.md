@@ -231,7 +231,6 @@ The current directory structure is described as the following:
 > - examples/ : Example applications and demos
 >   - cactus-example-carbon-accounting-backend/
 >   - cactus-example-cbdc-bridging/
->   - cactus-example-supply-chain-backend/
 >   - cactus-example-discounted-asset-trade/
 >   - ... (additional examples)
 > - extensions/ : Optional extensions and plugins

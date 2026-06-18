@@ -304,8 +304,9 @@ describe("Docker cleanup and port conflict prevention", () => {
   });
 
   describe("Fabric AIO port bindings conflict scenario", () => {
-    // These are the hardcoded ports from FabricTestLedgerV1.start()
-    const FABRIC_AIO_PORTS = [30022, 7050, 7051, 7054, 8051, 8054, 9051, 10051];
+    // The gateway test environment requests random host ports via hostPortBindings,
+    // These are the container-internal ports used for the scenario check.
+    const FABRIC_AIO_PORTS = [22, 7050, 7051, 7054, 8051, 8054, 9051, 10051];
 
     it("should identify which Fabric ports are currently free", async () => {
       const results = await Promise.all(

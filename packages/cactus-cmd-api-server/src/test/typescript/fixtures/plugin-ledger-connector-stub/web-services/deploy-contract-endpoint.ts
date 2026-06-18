@@ -98,12 +98,12 @@ export class DeployContractEndpoint implements IWebServiceEndpoint {
     const reqBody: unknown = req.body;
     try {
       const resBody = await this.options.connector.deployContract(reqBody);
+      // codeql[js/reflected-xss] - test fixture stub; res.json sets application/json content-type, not HTML
       res.json(resBody);
     } catch (ex) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
       res.status(500).json({
         message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
       });
     }
   }

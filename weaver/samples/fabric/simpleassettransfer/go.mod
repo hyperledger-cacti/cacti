@@ -4,9 +4,9 @@ go 1.20
 
 require (
 	github.com/golang/protobuf v1.5.4
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.1.0
-	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.1.0
-	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20230907062207-cd6eb2f89fb4
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.2.0
+	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.2.0
+	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9
 	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v2 v2.1.0
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a
 	github.com/hyperledger/fabric-contract-api-go v1.2.1
@@ -41,5 +41,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace golang.org/x/net => golang.org/x/net v0.33.0

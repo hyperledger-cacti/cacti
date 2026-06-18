@@ -1,8 +1,9 @@
 import "jest-extended";
 import { validateSatpCounterPartyGateways } from "../../../../main/typescript/services/validation/config-validating-functions/validate-satp-counter-party-gateways";
-import type {
-  Address,
-  GatewayIdentity,
+import {
+  type Address,
+  type GatewayIdentity,
+  SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
   SATP_ARCHITECTURE_VERSION,
@@ -33,6 +34,10 @@ describe("validateSatpCounterPartyGateways", () => {
           ledgerType: "ETHEREUM",
         },
       ],
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: "0xdef456",
+      },
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
       gatewayOapiPort: 4010,
