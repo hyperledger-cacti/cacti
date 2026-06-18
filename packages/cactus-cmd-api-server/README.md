@@ -4,7 +4,6 @@
 - [Usage](#usage)
   - [Basic Example](#basic-example)
   - [Remote Plugin Imports at Runtime Example](#remote-plugin-imports-at-runtime-example)
-  - [Complete Example](#complete-example)
 - [Deployment Scenarios](#deployment-scenarios)
   - [Production Deployment Example](#production-deployment-example)
   - [Low Resource Deployment Example](#low-resource-deployment-example)
@@ -168,13 +167,6 @@ if (require.main === module) {
 }
 
 ```
-
-### Complete Example
-
-For a complete example of how to use the API server, read all the code of the
-supply chain example's backend package:
-
-https://github.com/hyperledger/cactus/tree/main/examples/cactus-example-supply-chain-backend/src/main/typescript
 
 ## Deployment Scenarios
 

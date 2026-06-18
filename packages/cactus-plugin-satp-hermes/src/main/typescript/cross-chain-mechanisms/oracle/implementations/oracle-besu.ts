@@ -77,8 +77,12 @@ export class OracleBesu extends OracleAbstract {
       this.monitorService,
     );
 
+    const { connectorOptions, ...optionsWithoutConnector } = options;
     this.logger.debug(
-      `${OracleBesu.CLASS_NAME}#constructor options: ${safeStableStringify(options)}`,
+      `${OracleBesu.CLASS_NAME}#constructor options: ${safeStableStringify(optionsWithoutConnector)}`,
+    );
+    this.logger.debug(
+      `${OracleBesu.CLASS_NAME}#constructor connectorOptions: ${safeStableStringify(connectorOptions)}`,
     );
 
     if (

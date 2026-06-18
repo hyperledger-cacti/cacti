@@ -46,6 +46,7 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { getFreePorts } from "../../test-utils";
 
 let knexInstanceClient: Knex;
 let knexInstanceSourceRemote: Knex;
@@ -205,6 +206,8 @@ afterAll(async () => {
 
 describe("Rollback Test stage 1", () => {
   it("should initiate stage-0 rollback strategy", async () => {
+    const [serverPort1, clientPort1, serverPort2, clientPort2] =
+      await getFreePorts(4);
     const factoryOptions: IPluginFactoryOptions = {
       pluginImportType: PluginImportType.Local,
     };
@@ -232,8 +235,8 @@ describe("Rollback Test stage 1", () => {
       ],
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3005,
-      gatewayClientPort: 3001,
+      gatewayServerPort: serverPort1,
+      gatewayClientPort: clientPort1,
     };
 
     const gatewayIdentity2: GatewayIdentity = {
@@ -258,8 +261,8 @@ describe("Rollback Test stage 1", () => {
       ],
       proofID: "mockProofID11",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3225,
-      gatewayClientPort: 3211,
+      gatewayServerPort: serverPort2,
+      gatewayClientPort: clientPort2,
     };
 
     const migrationSource = await createMigrationSource();

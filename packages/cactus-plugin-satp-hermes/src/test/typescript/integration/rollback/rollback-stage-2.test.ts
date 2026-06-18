@@ -11,7 +11,11 @@ import {
   pruneDockerContainersIfGithubAction,
   Containers,
 } from "@hyperledger-cacti/cactus-test-tooling";
-import { BesuTestEnvironment, FabricTestEnvironment } from "../../test-utils";
+import {
+  BesuTestEnvironment,
+  FabricTestEnvironment,
+  getFreePorts,
+} from "../../test-utils";
 import {
   AssetSchema,
   ClaimFormat,
@@ -296,6 +300,8 @@ describe.skip("Rollback Test stage 2", () => {
     expect(besuReceipt1).toBeDefined();
     log.info(`Besu Asset locked: ${besuReceipt1}`);
 
+    const [serverPort1, clientPort1, serverPort2, clientPort2] =
+      await getFreePorts(4);
     const factoryOptions: IPluginFactoryOptions = {
       pluginImportType: PluginImportType.Local,
     };
@@ -323,8 +329,8 @@ describe.skip("Rollback Test stage 2", () => {
       ],
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3005,
-      gatewayClientPort: 3001,
+      gatewayServerPort: serverPort1,
+      gatewayClientPort: clientPort1,
     };
 
     const gatewayIdentity2: GatewayIdentity = {
@@ -349,8 +355,8 @@ describe.skip("Rollback Test stage 2", () => {
       ],
       proofID: "mockProofID11",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3225,
-      gatewayClientPort: 3211,
+      gatewayServerPort: serverPort2,
+      gatewayClientPort: clientPort2,
     };
 
     const migrationSource = await createMigrationSource();
