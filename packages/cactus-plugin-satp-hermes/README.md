@@ -741,9 +741,13 @@ For the complete schema, refer to [src/main/typescript/adapters/adapter-config.t
 
 ### Getting Started (Adapter Layer)
 
-- **Testing Guide**: [src/examples/docker-adapter-testing.md](src/examples/docker-adapter-testing.md)
-- **Test Runner (Makefile)**: [src/examples/docker-adapter-test.mk](src/examples/docker-adapter-test.mk)
-- **Example Configuration**: [src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml](src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml)
+Runnable adapter-layer demos and end-to-end walkthrough material now live in the
+[hyperledger-cacti/cacti-demos](https://github.com/hyperledger-cacti/cacti-demos)
+repository so this package can stay focused on the SATP Hermes implementation.
+
+- **Demo Repository**:
+  [hyperledger-cacti/cacti-demos](https://github.com/hyperledger-cacti/cacti-demos)
+- **Package Fixtures**: `src/test/yaml/fixtures/`
 
 ### Adapter Layer Overview
 
