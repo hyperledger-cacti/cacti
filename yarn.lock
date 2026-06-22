@@ -698,15 +698,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/core@npm:19.2.20":
-  version: 19.2.20
-  resolution: "@angular/core@npm:19.2.20"
+"@angular/core@npm:20.3.25":
+  version: 20.3.25
+  resolution: "@angular/core@npm:20.3.25"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
+    "@angular/compiler": 20.3.25
     rxjs: ^6.5.3 || ^7.4.0
     zone.js: ~0.15.0
-  checksum: 10/41b44d4bc5e4cad237c575336dc2c32780d2fdd9a6cf2dcbffd28adbcd05de729e922ded8748a4f699cba127783c2478d70cd568fc763d440d00f370a8a0cb06
+  peerDependenciesMeta:
+    "@angular/compiler":
+      optional: true
+    zone.js:
+      optional: true
+  checksum: 10/ae40d42aa37d9599a9ca830f2520771646bad0e06ddaf71b9d69c155539786ef3b6fa27298ec6e19ab960bc8cc5d043f9bb7333f6578a730d7c2c8c56bbc24c0
   languageName: node
   linkType: hard
 
@@ -8782,7 +8788,7 @@ __metadata:
     "@angular/common": "npm:19.2.20"
     "@angular/compiler": "npm:19.2.20"
     "@angular/compiler-cli": "npm:19.2.20"
-    "@angular/core": "npm:19.2.20"
+    "@angular/core": "npm:20.3.25"
     "@angular/forms": "npm:19.2.20"
     "@angular/language-service": "npm:19.2.20"
     "@angular/platform-browser": "npm:19.2.20"
@@ -10040,7 +10046,7 @@ __metadata:
   resolution: "@hyperledger-cacti/cactus@workspace:."
   dependencies:
     "@angular/common": "npm:19.2.20"
-    "@angular/core": "npm:19.2.20"
+    "@angular/core": "npm:20.3.25"
     "@angular/platform-browser": "npm:19.2.20"
     "@angular/platform-browser-dynamic": "npm:19.2.20"
     "@angular/router": "npm:19.2.20"
