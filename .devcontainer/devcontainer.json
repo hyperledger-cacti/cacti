@@ -75,7 +75,10 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "echo \"source /usr/share/bash-completion/completions/git\" >> ~/.bashrc"
+	"postCreateCommand": "echo \"source /usr/share/bash-completion/completions/git\" >> ~/.bashrc",
+	"remoteEnv": {
+    	"YARN_NM_MODE": "classic"
+	}
 
 	// Configure tool-specific properties.
 	// "customizations": {},
