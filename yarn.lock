@@ -654,15 +654,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/common@npm:19.2.20":
-  version: 19.2.20
-  resolution: "@angular/common@npm:19.2.20"
+"@angular/common@npm:20.3.25":
+  version: 20.3.25
+  resolution: "@angular/common@npm:20.3.25"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/core": 19.2.20
+    "@angular/core": 20.3.25
     rxjs: ^6.5.3 || ^7.4.0
-  checksum: 10/ab58f2acc15a779f5e84cb5afc124558685bd365f89434075be8d19b900fd9aa59b1b9c059faddfe80627dd2381307ce8e3297d7e0cf37289022f86a93097f57
+  checksum: 10/c565d1654f48de091d47b6f021c7516b5042cfb572c198570c98513507be01991052fd189b0ec096478ff2f14b391b85ae352a161c0a0567526e7d868f559978
   languageName: node
   linkType: hard
 
@@ -8779,7 +8779,7 @@ __metadata:
     "@angular-builders/custom-webpack": "npm:19.0.1"
     "@angular-devkit/build-angular": "npm:19.2.20"
     "@angular/cli": "npm:19.2.20"
-    "@angular/common": "npm:19.2.20"
+    "@angular/common": "npm:20.3.25"
     "@angular/compiler": "npm:19.2.20"
     "@angular/compiler-cli": "npm:19.2.20"
     "@angular/core": "npm:19.2.20"
@@ -10039,7 +10039,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus@workspace:."
   dependencies:
-    "@angular/common": "npm:19.2.20"
+    "@angular/common": "npm:20.3.25"
     "@angular/core": "npm:19.2.20"
     "@angular/platform-browser": "npm:19.2.20"
     "@angular/platform-browser-dynamic": "npm:19.2.20"

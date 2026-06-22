@@ -168,7 +168,7 @@
     "@angular/*": "19.2.20"
   },
   "devDependencies": {
-    "@angular/common": "19.2.20",
+    "@angular/common": "20.3.25",
     "@angular/core": "19.2.20",
     "@angular/platform-browser": "19.2.20",
     "@angular/platform-browser-dynamic": "19.2.20",

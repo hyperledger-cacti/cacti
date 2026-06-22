@@ -48,7 +48,7 @@
     "start": "ng serve"
   },
   "dependencies": {
-    "@angular/common": "19.2.20",
+    "@angular/common": "20.3.25",
     "@angular/core": "19.2.20",
     "@angular/forms": "19.2.20",
     "@angular/platform-browser": "19.2.20",
