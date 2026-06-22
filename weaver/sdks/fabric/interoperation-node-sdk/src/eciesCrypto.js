@@ -37,6 +37,23 @@ const IVLength = 16; // bytes
 const CURVE_P_256_Size = 256;
 const CURVE_P_384_Size = 384;
 
+function deriveFixedLengthSecretBytes(sharedSecret, level) {
+  const secretLengthBytes = Math.ceil(level / 8);
+  const zBytes = sharedSecret.toArray();
+  if (zBytes.length > secretLengthBytes) {
+    throw new Error(
+      `Illegal shared secret length: ${zBytes.length} must be <= ${secretLengthBytes}`,
+    );
+  }
+  if (zBytes.length === secretLengthBytes) {
+    return zBytes;
+  }
+
+  const out = new Uint8Array(secretLengthBytes);
+  out.set(zBytes, secretLengthBytes - zBytes.length);
+  return out;
+}
+
 /** Decrypt a message.
  *
  * @param {object} recipientPrivateKey the private key object. Format
@@ -92,7 +109,7 @@ function eciesDecryptMessage(
   const privKey = ecdsa.keyFromPrivate(recipientPrivateKey.prvKeyHex, "hex");
 
   const Z = privKey.derive(ephPubKey.pub); // 'z'
-  const ZArray = bigNumToFixedBytes(Z, level);
+  const ZArray = deriveFixedLengthSecretBytes(Z, level);
   // The 'null's below correspond to 's1' and 's2',
   // which are both set to nil in golang implementation of the encryption function
   const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
@@ -168,7 +185,7 @@ function eciesEncryptMessage(
   const Rb = ephKeyPair.pubKeyObj.pubKeyHex;
 
   const Z = ephPrivKey.derive(pubKey.pub);
-  const ZArray = bigNumToFixedBytes(Z, level);
+  const ZArray = deriveFixedLengthSecretBytes(Z, level);
   const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
 
   const aesKey = kdfOutput.slice(0, aesKeyLength);
@@ -358,17 +375,6 @@ function createZeroBuffer(length) {
   const buf = Buffer.alloc(length);
   buf.fill(0);
   return buf;
-}
-
-// Converts a BigNumber to a byte array zero-padded to the field size of the curve,
-// ensuring leading zero bytes are preserved when the scalar is smaller than the field size.
-function bigNumToFixedBytes(bn, level) {
-  let arr = bn.toArray();
-  const fieldSize = Math.ceil(level / 8);
-  while (arr.length < fieldSize) {
-    arr = [0, ...arr];
-  }
-  return arr;
 }
 
 function isString(obj) {

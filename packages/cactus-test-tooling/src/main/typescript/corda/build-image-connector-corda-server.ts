@@ -1,6 +1,6 @@
 import path from "node:path";
 import { buildContainerImage } from "../public-api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 export interface IBuildImageConnectorCordaServerResponse {
   readonly imageName: Readonly<string>;

@@ -1,14 +1,14 @@
 ARG BUILD_TAG
 
 # Local Build
-# FROM node:16 AS builder-local
+# FROM node:18 AS builder-local
 # 
 # WORKDIR /driver/fabric
 
 # ADD protos-js /driver/fabric/protos-js
 
 # Remote build
-FROM node:16 AS builder-remote
+FROM node:18 AS builder-remote
 
 WORKDIR /driver/fabric
 
@@ -18,6 +18,7 @@ RUN npm install --unsafe-perm
 
 ADD server /driver/fabric/server
 ADD constants /driver/fabric/constants
+ADD config.json .
 ADD tsconfig.json .
 
 RUN npm run build
@@ -27,7 +28,7 @@ FROM builder-${BUILD_TAG} AS builder
 RUN rm -rf node_modules
 RUN npm ci --only=production
 
-FROM node:16-alpine AS prod
+FROM node:18-alpine AS prod
 
 RUN deluser --remove-home node
 RUN addgroup -g 1000 relay

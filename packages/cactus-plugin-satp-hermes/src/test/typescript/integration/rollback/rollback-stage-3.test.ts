@@ -1,5 +1,5 @@
 import "jest-extended";
-import { Secp256k1Keys } from "@hyperledger/cactus-common";
+import { Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   LocalLog,
@@ -10,8 +10,12 @@ import {
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
-import { BesuTestEnvironment, FabricTestEnvironment } from "../../test-utils";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import {
+  BesuTestEnvironment,
+  FabricTestEnvironment,
+  getFreePorts,
+} from "../../test-utils";
 import {
   AssetSchema,
   ClaimFormat,
@@ -31,9 +35,9 @@ import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import { Knex, knex } from "knex";
 import { create } from "@bufbuild/protobuf";
@@ -46,14 +50,14 @@ import {
   Stage3HashesSchema,
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
-import { FabricContractInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+import { FabricContractInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import { BesuLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/besu-leaf";
 import { FabricLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/fabric-leaf";
 import { EvmFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/evm-asset";
 import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/fabric-asset";
 import { OntologyManager } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import path from "path";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
@@ -374,6 +378,8 @@ describe.skip("Rollback Test stage 3", () => {
 
     log.info(`Mint asset response: ${JSON.stringify(responseMint)}`);
 
+    const [serverPort1, clientPort1, serverPort2, clientPort2] =
+      await getFreePorts(4);
     const factoryOptions: IPluginFactoryOptions = {
       pluginImportType: PluginImportType.Local,
     };
@@ -401,8 +407,8 @@ describe.skip("Rollback Test stage 3", () => {
       ],
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3005,
-      gatewayClientPort: 3001,
+      gatewayServerPort: serverPort1,
+      gatewayClientPort: clientPort1,
     };
 
     const gatewayIdentity2: GatewayIdentity = {
@@ -427,8 +433,8 @@ describe.skip("Rollback Test stage 3", () => {
       ],
       proofID: "mockProofID11",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3225,
-      gatewayClientPort: 3211,
+      gatewayServerPort: serverPort2,
+      gatewayClientPort: clientPort2,
     };
     const migrationSource = await createMigrationSource();
     knexInstanceClient = knex({
