@@ -8617,7 +8617,7 @@ __metadata:
     http-errors: "npm:1.6.3"
     http-terminator: "npm:3.2.0"
     jest-extended: "npm:7.0.0"
-    js-yaml: "npm:3.14.1"
+    js-yaml: "npm:4.2.0"
     jsonwebtoken: "npm:9.0.2"
     lodash: "npm:4.18.1"
     log4js: "npm:6.4.1"
@@ -9314,7 +9314,7 @@ __metadata:
     express: "npm:5.1.0"
     http-proxy-middleware: "npm:3.0.5"
     jest-extended: "npm:7.0.0"
-    js-yaml: "npm:4.1.0"
+    js-yaml: "npm:4.2.0"
     minimist: "npm:1.2.8"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -9378,7 +9378,7 @@ __metadata:
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
     joi: "npm:17.13.3"
-    js-yaml: "npm:4.1.1"
+    js-yaml: "npm:4.2.0"
     json5: "npm:2.2.3"
     jsrsasign: "npm:11.0.0"
     lodash: "npm:4.18.1"
@@ -9690,7 +9690,7 @@ __metadata:
     jest: "npm:29.5.0"
     jest-extended: "npm:7.0.0"
     jest-junit: "npm:16.0.0"
-    js-yaml: "npm:4.1.1"
+    js-yaml: "npm:4.2.0"
     jsonc: "npm:2.0.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.4"
@@ -9936,7 +9936,7 @@ __metadata:
     is-port-reachable: "npm:3.0.0"
     jest-extended: "npm:7.0.0"
     joi: "npm:17.13.3"
-    js-yaml: "npm:4.1.0"
+    js-yaml: "npm:4.2.0"
     keycloak-admin: "npm:1.14.22"
     lodash: "npm:4.18.1"
     node-forge: "npm:1.3.0"
@@ -39018,18 +39018,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:3.14.1":
-  version: 3.14.1
-  resolution: "js-yaml@npm:3.14.1"
-  dependencies:
-    argparse: "npm:^1.0.7"
-    esprima: "npm:^4.0.0"
-  bin:
-    js-yaml: bin/js-yaml.js
-  checksum: 10/9e22d80b4d0105b9899135365f746d47466ed53ef4223c529b3c0f7a39907743fdbd3c4379f94f1106f02755b5e90b2faaf84801a891135544e1ea475d1a1379
-  languageName: node
-  linkType: hard
-
 "js-yaml@npm:4.1.0":
   version: 4.1.0
   resolution: "js-yaml@npm:4.1.0"
@@ -39041,14 +39029,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:4.1.1":
-  version: 4.1.1
-  resolution: "js-yaml@npm:4.1.1"
+"js-yaml@npm:4.2.0, js-yaml@npm:^4.1.0, js-yaml@npm:^4.1.1":
+  version: 4.2.0
+  resolution: "js-yaml@npm:4.2.0"
   dependencies:
     argparse: "npm:^2.0.1"
   bin:
     js-yaml: bin/js-yaml.js
-  checksum: 10/a52d0519f0f4ef5b4adc1cde466cb54c50d56e2b4a983b9d5c9c0f2f99462047007a6274d7e95617a21d3c91fde3ee6115536ed70991cd645ba8521058b78f77
+  checksum: 10/51de2067a2b44b07ba5206132e56005f8b568ff279bb4d2f645068958c56fa4827d40a6841c983234671fa0a134bf094d0b0717873c2a3d319185297af145a6d
   languageName: node
   linkType: hard
 
@@ -39061,17 +39049,6 @@ __metadata:
   bin:
     js-yaml: bin/js-yaml.js
   checksum: 10/172e0b6007b0bf0fc8d2469c94424f7dd765c64a047d2b790831fecef2204a4054eabf4d911eb73ab8c9a3256ab8ba1ee8d655b789bf24bf059c772acc2075a1
-  languageName: node
-  linkType: hard
-
-"js-yaml@npm:^4.1.0, js-yaml@npm:^4.1.1":
-  version: 4.2.0
-  resolution: "js-yaml@npm:4.2.0"
-  dependencies:
-    argparse: "npm:^2.0.1"
-  bin:
-    js-yaml: bin/js-yaml.js
-  checksum: 10/51de2067a2b44b07ba5206132e56005f8b568ff279bb4d2f645068958c56fa4827d40a6841c983234671fa0a134bf094d0b0717873c2a3d319185297af145a6d
   languageName: node
   linkType: hard
 
