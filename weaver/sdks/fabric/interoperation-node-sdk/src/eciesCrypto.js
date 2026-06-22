@@ -184,6 +184,8 @@ function eciesEncryptMessage(
   );
   const Rb = ephKeyPair.pubKeyObj.pubKeyHex;
 
+  // Derive a shared secret field element z from the ephemeral secret key k
+  // and convert z to an octet string Z
   const Z = ephPrivKey.derive(pubKey.pub);
   const ZArray = deriveFixedLengthSecretBytes(Z, level);
   const kdfOutput = hkdf(ZArray, ECIESKDFOutput, null, null, options);
