@@ -69,7 +69,7 @@ The bookkeeping logic required to maintain records of locks can be abstracted aw
 What Weaver offers, therefore, is the following:
 
 - Lock management (bookkeeping) logic implemented in the Fabric Interoperation Chaincode that treats each asset as an abstract object and is agnostic of the assets' internals. This logic can be exercised in one of two ways:
-    - Importing the [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2) library from the Fabric Interoperation Chaincode into your application chaincode, or
+    - Importing the [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3) library from the Fabric Interoperation Chaincode into your application chaincode, or
     - Invoking them within the Fabric Interoperation Chaincode using a [chaincode-to-chaincode call](https://pkg.go.dev/github.com/hyperledger/fabric-chaincode-go/shim#ChaincodeStub.InvokeChaincode).
 - A set of template functions with sample (and extensible) code that must be added to the application chaincode to exercise the above lock management functions.
 
@@ -79,12 +79,12 @@ Below, we list the template functions with sample code that you, as a developer,
 |:------|
 | The instructions here apply only to chaincode implemented in Go, because Weaver presently offers only a Go version of the Fabric Interoperation Chaincode. |
 
-- _Using the [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2) Library_: This method doesn't require the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v2) to be installed. In your smart contract's `go.mod`, add the following in the `require` section (the sample below uses the current versions for dependency packages; update them to the latest versions offered by Cacti):
+- _Using the [`assetexchange`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3) Library_: This method doesn't require the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v3) to be installed. In your smart contract's `go.mod`, add the following in the `require` section (the sample below uses the current versions for dependency packages; update them to the latest versions offered by Cacti):
   ```go
   require(
       ...
-      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.0.0
-      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2 v2.0.0
+      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1
+      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.0-beta.1
       ...
   )
   ```
@@ -93,7 +93,7 @@ Below, we list the template functions with sample code that you, as a developer,
        ```go
        import (
            ...
-           "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v2"
+           "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3"
        )
        func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, assetExchangeAgreementSerializedProto64 string, lockInfoSerializedProto64 string) (string, error) {
            // Add some safety checks before calling LockAsset from library
@@ -171,13 +171,13 @@ Below, we list the template functions with sample code that you, as a developer,
 
   There is an alternative API to implement asset exchange using this library, which doesn't involve contract IDs. For details, see the [Asset Exchange Library README](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/network/fabric-interop-cc/libs/assetexchange/README.md#without-contractid).
         
-- _Using the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v2)_: This method requires the Fabric Interoperation Chaincode to be installed on all peers of the channel, using a special chaincode ID (e.g., `interop`, which is what we will use later in this document). Your application chaincode needs to implement the interface `github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2`.
+- _Using the [`Fabric Interoperation Chaincode`](https://pkg.go.dev/github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v3)_: This method requires the Fabric Interoperation Chaincode to be installed on all peers of the channel, using a special chaincode ID (e.g., `interop`, which is what we will use later in this document). Your application chaincode needs to implement the interface `github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2`.
   In your smart contract's `go.mod`, add the following in the `require` section (update the version to the latest Cacti version):
   ```go
   require(
       ...
-      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2 v2.0.0
-      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2 v2.0.0
+      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1
+      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0-beta.1
       ...
   )
   ```
@@ -185,7 +185,7 @@ Below, we list the template functions with sample code that you, as a developer,
   ```go
   import (
       ...
-      am "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v2"
+      am "github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3"
   )
   type SmartContract struct {
       contractapi.Contract
@@ -536,7 +536,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-relay-server
-  DOCKER_TAG=2.1.0
+  DOCKER_TAG=3.0.0-beta.1
   ```
     - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
     - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
@@ -630,7 +630,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   EXTERNAL_NETWORK=<docker-bridge-network>
   TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-driver-fabric
-  DOCKER_TAG=2.1.0
+  DOCKER_TAG=3.0.0-beta.1
   DRIVER_TLS=<true|false>
   DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
   DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver
