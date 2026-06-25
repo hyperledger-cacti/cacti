@@ -258,7 +258,14 @@ export class Stage2ServerService extends SATPService {
           throw new LockAssertionExpirationError(fnTag);
         }
 
-        sessionData.lockAssertionExpiration = request.lockAssertionExpiration; //todo check if expired
+        if (request.lockAssertionExpiration <= BigInt(Date.now())) {
+          throw new LockAssertionExpirationError(
+            fnTag,
+            "lock assertion already expired",
+          );
+        }
+
+        sessionData.lockAssertionExpiration = request.lockAssertionExpiration;
 
         if (
           sessionData.clientTransferNumber != "" &&
