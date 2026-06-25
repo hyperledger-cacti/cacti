@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782123422498,
+  "lastUpdate": 1782378858897,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -65,6 +65,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.39%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "id": "25e0fd3169dee9414fabe773b30557e5d08d9c03",
+          "message": "ci: validate PR type and verify PR title matches commit message\n\nAssisted-by: Google:Gemini\nSigned-off-by: Sandeep Nishad <sandeepn.official@gmail.com>",
+          "timestamp": "2026-05-18T08:26:42Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/25e0fd3169dee9414fabe773b30557e5d08d9c03"
+        },
+        "date": 1782378856207,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 638,
+            "range": "±2.71%",
+            "unit": "ops/sec",
+            "extra": "175 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 666,
+            "range": "±1.88%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
