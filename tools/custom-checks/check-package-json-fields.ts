@@ -17,8 +17,45 @@ const CACTI_BUGS = "https://github.com/hyperledger-cacti/cacti/issues";
 const CACTI_REPO = "git+https://github.com/hyperledger-cacti/cacti.git";
 const CACTI_MAIL_LIST = "cacti@lists.lfdecentralizedtrust.org";
 const CACTI_PROJECT_URI = "https://www.lfdecentralizedtrust.org/projects/cacti";
-// const CACTI_NODE_REQ = ">=18";
-// const CACTI_NPM_REQ = ">=8";
+const CACTI_MIN_NODE_MAJOR = 18;
+const CACTI_MIN_NPM_MAJOR = 8;
+
+function hasRequiredEngineMajor(
+  value: string,
+  minimumMajor: number,
+): boolean {
+  const trimmed = value.trim();
+  const match = /^(>=|>|=)?\s*(\d+)(?:\.\d+){0,2}(?:\s*)$/.exec(trimmed);
+  if (!match) {
+    return false;
+  }
+
+  const operator = match[1] ?? ">=";
+  const major = Number(match[2]);
+  if (!Number.isSafeInteger(major)) {
+    return false;
+  }
+
+  switch (operator) {
+    case ">":
+      return major >= minimumMajor - 1;
+    case ">=":
+    case "=":
+      return major >= minimumMajor;
+    default:
+      return false;
+  }
+}
+
+function requiredEngineMajorValidator(minimumMajor: number) {
+  return (
+    value: string,
+    helpers: Joi.CustomHelpers,
+  ): string | Joi.ErrorReport =>
+    hasRequiredEngineMajor(value, minimumMajor)
+      ? value
+      : helpers.error("any.invalid");
+}
 
 /**
  * Common schema for all cacti packages.
@@ -57,12 +94,14 @@ const schema = Joi.object({
     })
     .required(),
   files: Joi.array().items(Joi.string()),
-  // engines: Joi.object()
-  //   .valid({
-  //     node: CACTI_NODE_REQ,
-  //     npm: CACTI_NPM_REQ,
-  //   })
-  //   .required(),
+  engines: Joi.object({
+    node: Joi.string()
+      .custom(requiredEngineMajorValidator(CACTI_MIN_NODE_MAJOR))
+      .required(),
+    npm: Joi.string()
+      .custom(requiredEngineMajorValidator(CACTI_MIN_NPM_MAJOR))
+      .required(),
+  }).required(),
   publishConfig: Joi.object({ access: Joi.string().valid("public") })
     .unknown()
     .required(),
