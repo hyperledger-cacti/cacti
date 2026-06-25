@@ -65,7 +65,7 @@ jobs:
 
         - name: Publish
           if: steps.check.outputs.skip != 'true'
-          run: cargo publish --allow-dirty  # only for v3.0.0-alpha testing
+          run: cargo publish
           env:
             CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_CRATES_IO_TOKEN }}
           working-directory: weaver/common/protos-rs/pkg
