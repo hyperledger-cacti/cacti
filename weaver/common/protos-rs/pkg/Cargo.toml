@@ -22,3 +22,5 @@ serde = {version="1.0.193", features = ["derive"]}
 # Pinned exactly because cargo 1.72's resolver doesn't honor an open upper bound here.
 # Remove once the toolchain is upgraded.
 indexmap = "=2.6.0"
+# Transitive dep pin: zeroize >=1.9 requires edition 2024 (Rust >=1.85).
+zeroize = "=1.8.1"
