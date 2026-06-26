@@ -88,10 +88,14 @@ jobs:
               *test*|*spec*) continue ;;
             esac
 
-            # Source-code extension in remaining (i.e., shipped) paths → core
+            # Source-code extension under packages/ or weaver/ → core
             case "$file" in
-              *.js|*.mjs|*.ts|*.tsx|*.jsx|*.py|*.go|*.rs|*.kt|*.sol|*.java|*.cpp|*.c|*.h|*.cs|*.scala|*.rb)
-                HAS_CORE_CODE=true
+              packages/*|weaver/*)
+                case "$file" in
+                  *.js|*.mjs|*.ts|*.tsx|*.jsx|*.py|*.go|*.rs|*.kt|*.sol|*.java|*.cpp|*.c|*.h|*.cs|*.scala|*.rb)
+                    HAS_CORE_CODE=true
+                    ;;
+                esac
                 ;;
             esac
           done < changed_files.txt
