@@ -17,6 +17,7 @@ import {
   registerWebServiceEndpoint,
 } from "@hyperledger-cacti/cactus-core";
 import { TransactRequestSourceChainAssetTypeEnum } from "../generated/openapi/typescript-axios/api";
+import createHttpError from "http-errors"; // Import createHttpError
 
 export class GetBalanceEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetBalanceEndpointV1";
@@ -78,6 +79,12 @@ export class GetBalanceEndpointV1 implements IWebServiceEndpoint {
     const fnTag = `${this.className}#handleRequest()`;
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
+
+    const user = req.query.user as string;
+    if (!user) {
+      throw createHttpError(400, "User parameter is required.");
+    }
+
     try {
       let result;
       if (
@@ -86,11 +93,11 @@ export class GetBalanceEndpointV1 implements IWebServiceEndpoint {
       ) {
         result = await this.options.infrastructure
           .getBesuEnvironment()
-          .getBesuBalance(req.query.user as string);
+          .getBesuBalance(user);
       } else {
         result = await this.options.infrastructure
           .getFabricEnvironment()
-          .getFabricBalance(req.query.user as string);
+          .getFabricBalance(user);
       }
       res.status(200).json({
         amount: result,

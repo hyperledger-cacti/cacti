@@ -20,6 +20,7 @@ import {
   TransactRequestSourceChainAssetTypeEnum,
   TransferRequest,
 } from "../generated/openapi/typescript-axios/api";
+import createHttpError from "http-errors"; // Import createHttpError
 
 export class TransferEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "TransferEndpointV1";
@@ -83,6 +84,23 @@ export class TransferEndpointV1 implements IWebServiceEndpoint {
     this.log.debug(reqTag);
     const reqBody: TransferRequest = req.body;
     this.log.debug("reqBody: ", reqBody);
+
+    // Validate reqBody.from
+    if (!reqBody.from) {
+      throw createHttpError(400, "Sender (from) parameter is required.");
+    }
+
+    // Validate reqBody.to
+    if (!reqBody.to) {
+      throw createHttpError(400, "Receiver (to) parameter is required.");
+    }
+
+    // Validate reqBody.amount
+    const amountNum = parseInt(reqBody.amount);
+    if (isNaN(amountNum)) {
+      throw createHttpError(400, "Invalid amount provided for transfer. Must be a number.");
+    }
+
     try {
       let result;
       if (
@@ -96,7 +114,7 @@ export class TransferEndpointV1 implements IWebServiceEndpoint {
           .transferTokensBesu(
             reqBody.from,
             reqBody.to,
-            parseInt(reqBody.amount),
+            amountNum, // Use validated amountNum
           );
       } else if (
         reqBody.sourceChain.assetType ===
@@ -108,7 +126,7 @@ export class TransferEndpointV1 implements IWebServiceEndpoint {
           .getFabricEnvironment()
           .transferTokensFabric(reqBody.from, reqBody.to, reqBody.amount);
       } else {
-        throw new Error("Invalid chain combination");
+        throw createHttpError(400, "Invalid chain combination for transfer.");
       }
       res.status(200).json(result);
     } catch (ex) {
