@@ -66,6 +66,10 @@ jobs:
       - name: Build packages
         run: npm run configure
 
+      - name: Install Chrome for Puppeteer
+        run: yarn puppeteer browsers install chrome-headless-shell
+        working-directory: packages/cactus-plugin-satp-hermes
+
       - name: Build SATP Hermes diagrams
         run: yarn docs:diagrams
         working-directory: packages/cactus-plugin-satp-hermes
