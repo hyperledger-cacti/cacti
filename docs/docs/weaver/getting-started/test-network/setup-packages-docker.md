@@ -28,9 +28,9 @@ Before starting, make sure you have the following software installed on your hos
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 2 or higher)
-- Golang: [sample instructions](https://golang.org/dl/) (Version 1.20 or higher)
-- Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
-- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 11 to Version 16 Supported)
+- Golang: [sample instructions](https://golang.org/dl/) (Version 1.20)
+- Java (JDK and JRE): [sample instructions](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) (Version 17)
+- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 22 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 
 ### Credentials
@@ -43,7 +43,7 @@ Run `docker login ghcr.io`,  and provide GitHub email id as username and persona
 
 ## Getting the Code and Documentation
 
-Clone the [cacti](https://github.com/hyperledger/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
+Clone the [cacti](https://github.com/hyperledger-cacti/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
 ## Securing Components
 

@@ -17,7 +17,7 @@ import { AuditEntryNotFoundError } from "../../core/errors/satp-errors";
 import knex, { type Knex } from "knex";
 import { knexAuditInstance } from "../knexfile-audit";
 import { createMigrationSource } from "../knex-migration-source";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 /**
  * Knex.js-based implementation of local SATP gateway log repository.

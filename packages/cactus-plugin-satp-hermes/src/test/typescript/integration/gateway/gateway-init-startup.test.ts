@@ -5,10 +5,13 @@ import * as path from "path";
 import {
   Containers,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
-import { ApiClient } from "@hyperledger/cactus-api-client";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import {
+  type LogLevelDesc,
+  LoggerProvider,
+} from "@hyperledger-cacti/cactus-common";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 import knex from "knex";
 
 import {
@@ -21,7 +24,8 @@ import {
   type IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
+import { getFreePorts } from "../../test-utils";
 import type { ShutdownHook } from "../../../../main/typescript/core/types";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -30,7 +34,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { AdminApi, OracleApi } from "../../../../main/typescript";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
@@ -136,6 +140,7 @@ describe("SATPGateway initialization", () => {
   });
 
   it("should launch gateway server", async () => {
+    const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",
       pluginRegistry: new PluginRegistry(),
@@ -152,6 +157,8 @@ describe("SATPGateway initialization", () => {
         ],
         proofID: "mockProofID10",
         address: "https://localhost",
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
       },
       monitorService: monitorService,
     };
@@ -159,15 +166,15 @@ describe("SATPGateway initialization", () => {
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     const identity = gateway.Identity;
-    // default servers
-    expect(identity.gatewayServerPort).toBe(3010);
-    expect(identity.gatewayClientPort).toBe(3011);
+    expect(identity.gatewayServerPort).toBe(serverPort);
+    expect(identity.gatewayClientPort).toBe(clientPort);
     expect(identity.address).toBe("https://localhost");
     await gateway.startup();
     await gateway.shutdown();
   });
 
   it("shutdown hooks work", async () => {
+    const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",
       pluginRegistry: new PluginRegistry(),
@@ -182,8 +189,8 @@ describe("SATPGateway initialization", () => {
           },
         ],
         proofID: "mockProofID10",
-        gatewayServerPort: 3014,
-        gatewayClientPort: 3015,
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
         address: "https://localhost",
       },
       monitorService: monitorService,
@@ -297,6 +304,7 @@ describe("SATPGateway startup", () => {
   });
 
   test("Gateway server launches and shutsdown correctly", async () => {
+    const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",
       pluginRegistry: new PluginRegistry(),
@@ -312,8 +320,8 @@ describe("SATPGateway startup", () => {
           },
         ],
         proofID: "mockProofID10",
-        gatewayServerPort: 13010,
-        gatewayClientPort: 13011,
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
         address: "http://localhost",
       },
       monitorService: monitorService,
@@ -322,8 +330,8 @@ describe("SATPGateway startup", () => {
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     const identity = gateway.Identity;
-    expect(identity.gatewayServerPort).toBe(13010);
-    expect(identity.gatewayClientPort).toBe(13011);
+    expect(identity.gatewayServerPort).toBe(serverPort);
+    expect(identity.gatewayClientPort).toBe(clientPort);
     expect(identity.address).toBe("http://localhost");
 
     await gateway.startup();
@@ -460,6 +468,7 @@ describe("SATPGateway startup", () => {
   });
 
   test("Gateway launches without database config", async () => {
+    const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {
       instanceId: "gateway-orchestrator-instance-id",
       pluginRegistry: new PluginRegistry(),
@@ -475,8 +484,8 @@ describe("SATPGateway startup", () => {
           },
         ],
         proofID: "mockProofID10",
-        gatewayServerPort: 13010,
-        gatewayClientPort: 13011,
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
         address: "http://localhost",
       },
       monitorService: monitorService,
@@ -485,8 +494,8 @@ describe("SATPGateway startup", () => {
     expect(gateway).toBeInstanceOf(SATPGateway);
 
     const identity = gateway.Identity;
-    expect(identity.gatewayServerPort).toBe(13010);
-    expect(identity.gatewayClientPort).toBe(13011);
+    expect(identity.gatewayServerPort).toBe(serverPort);
+    expect(identity.gatewayClientPort).toBe(clientPort);
     expect(identity.address).toBe("http://localhost");
 
     await gateway.startup();

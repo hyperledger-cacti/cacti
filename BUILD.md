@@ -281,7 +281,7 @@ line of code for example.
 To figure out which script could work for rebuilding Cactus, please follow
 the following decision tree (and keep in mind that we have `npm run watch` too)
 
-![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
+![Build Script Decision Tree](./docs/docs/cactus/_images/build-script-decision-tree-2021-03-06.png)
 
 ## Running CI Checks Locally Before Pushing
 

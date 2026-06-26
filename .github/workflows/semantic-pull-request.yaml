@@ -16,6 +16,116 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-22.04
     steps:
-      - uses: amannn/action-semantic-pull-request@01d5fd8a8ebb9aafe902c40c53f0f4744f7381eb #v5.0.2
+      - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 #v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
+  validate-title-match:
+    name: Validate PR title match with latest commit message
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        with:
+          fetch-depth: 1
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Verify PR Title Matches Latest Commit
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          LATEST_COMMIT_MSG=$(git log -1 --pretty=%s)
+          
+          echo "PR Title: '$PR_TITLE'"
+          echo "Latest Commit Message: '$LATEST_COMMIT_MSG'"
+          
+          if [ "$PR_TITLE" != "$LATEST_COMMIT_MSG" ]; then
+            echo "❌ ERROR: PR Title does not match your latest commit message!"
+            echo "Your PR Title must match your Git commit message exactly."
+            echo "To fix this, either rename your PR title on GitHub, or run:"
+            echo "  git commit --amend -m \"$PR_TITLE\" && git push --force"
+            exit 1
+          fi
+          echo "✅ PR Title matches the latest commit message."
+  
+  validate-type:
+    name: Validate PR Type
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Changed Files
+        id: file-list
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr view ${{ github.event.pull_request.number }} \
+            --repo ${{ github.repository }} \
+            --json files --jq '.files[].path' > changed_files.txt
+          echo "Files changed:"
+          cat changed_files.txt
+
+      - name: Validate PR Title Prefix
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          PR_TYPE=$(echo "$PR_TITLE" | sed -E 's/^([a-z]+)(\(.*\))?:.*/\1/')
+
+          # Release PRs follow a fixed pattern and bypass classification
+          if echo "$PR_TITLE" | grep -Eq '^chore\(release\):'; then
+            echo "✅ Release commit detected — skipping classification."
+            exit 0
+          fi
+
+          CHANGELOG_TYPES="feat fix refactor build perf"
+          NON_CHANGELOG_TYPES="ci test chore docs style"
+
+          HAS_CORE_CODE=false
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+
+            # Non-core paths — never count as core regardless of extension
+            case "$file" in
+              .github/*|docs/*|*/docs/*|*.md|tools/*|examples/*|weaver/samples/*) continue ;;
+              *test*|*spec*) continue ;;
+            esac
+
+            # Source-code extension in remaining (i.e., shipped) paths → core
+            case "$file" in
+              *.js|*.mjs|*.ts|*.tsx|*.jsx|*.py|*.go|*.rs|*.kt|*.sol|*.java|*.cpp|*.c|*.h|*.cs|*.scala|*.rb)
+                HAS_CORE_CODE=true
+                ;;
+            esac
+          done < changed_files.txt
+
+          echo "Detected PR Prefix Type: '$PR_TYPE'"
+          echo "Has Core Code Changes:   $HAS_CORE_CODE"
+
+          in_set() { case " $2 " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
+
+          if [ "$HAS_CORE_CODE" = true ]; then
+            if in_set "$PR_TYPE" "$CHANGELOG_TYPES"; then
+              echo "✅ Core change with changelog-eligible type '$PR_TYPE'."
+              exit 0
+            fi
+            if in_set "$PR_TYPE" "$NON_CHANGELOG_TYPES"; then
+              echo "❌ ERROR: PR includes source-code changes."
+              echo "   Title must use one of: $CHANGELOG_TYPES"
+              echo "   Detected: '$PR_TYPE'"
+              exit 1
+            fi
+            echo "⚠️  Unrecognized type '$PR_TYPE' — leaving for reviewer to confirm."
+            exit 0
+          else
+            if in_set "$PR_TYPE" "$NON_CHANGELOG_TYPES"; then
+              echo "✅ Non-core change with non-changelog type '$PR_TYPE'."
+              exit 0
+            fi
+            if in_set "$PR_TYPE" "$CHANGELOG_TYPES"; then
+              echo "❌ ERROR: PR contains no source-code changes."
+              echo "   Title must use a non-changelog type: $NON_CHANGELOG_TYPES"
+              echo "   Detected: '$PR_TYPE' (would pollute CHANGELOG)."
+              exit 1
+            fi
+            echo "⚠️  Unrecognized type '$PR_TYPE' — leaving for reviewer to confirm."
+            exit 0
+          fi
+

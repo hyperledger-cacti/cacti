@@ -19,6 +19,9 @@ reports/junit/satp-hermes-tests-integration.xml
 # TypeDoc generated documentation
 public/typedoc/
 
+# DB
+src/knex/data
+
 # Generated diagrams (keep only .mmd source files)
 assets/diagrams/svg/
 assets/diagrams/png/

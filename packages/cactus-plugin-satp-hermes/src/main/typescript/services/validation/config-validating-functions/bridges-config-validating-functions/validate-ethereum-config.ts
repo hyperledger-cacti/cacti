@@ -5,17 +5,17 @@ import {
   type Web3SigningCredentialNone,
   type Web3SigningCredentialPrivateKeyHex,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { isEthereumOptionsJSON } from "./validate-ethereum-options";
 import { isClaimFormat } from "./validate-bungee-options";
 import { isGasConfig } from "../validate-cc-config";
 import { isNetworkId } from "../validate-satp-gateway-identity";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import {
   chainConfigElement,
   identifyAndCheckConfigFormat,
 } from "../../../utils";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { IEthereumNetworkConfig } from "../../../../cross-chain-mechanisms/bridge/bridge-types";
 import { NetworkId } from "../../../../public-api";
 

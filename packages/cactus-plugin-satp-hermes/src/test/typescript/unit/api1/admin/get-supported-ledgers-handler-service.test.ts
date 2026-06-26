@@ -1,4 +1,4 @@
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { executeGetSupportedLedgers } from "../../../../../main/typescript/api1/admin/get-supported-ledgers-handler-service";
 import { SATP_IMPLEMENTED_LEDGERS } from "../../../../../main/typescript/core/constants";
 import type { SATPManager } from "../../../../../main/typescript/services/gateway/satp-manager";

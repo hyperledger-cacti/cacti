@@ -3,13 +3,14 @@ import { validateSatpGatewayIdentity } from "../../../../main/typescript/service
 import {
   type Address,
   type GatewayIdentity,
+  SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 describe("validateSatpGatewayIdentity", () => {
   const logger = LoggerProvider.getOrCreate({
@@ -33,7 +34,10 @@ describe("validateSatpGatewayIdentity", () => {
           ledgerType: "ETHEREUM",
         },
       ],
-      publicKey: "0xdef456",
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: "0xdef456",
+      },
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
       gatewayOapiPort: 4010,

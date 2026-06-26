@@ -1,5 +1,5 @@
 import "jest-extended";
-import { Secp256k1Keys } from "@hyperledger/cactus-common";
+import { Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   LocalLog,
@@ -10,7 +10,7 @@ import {
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   AssetSchema,
   TokenType,
@@ -28,9 +28,9 @@ import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../../../main/typescript/core/satp-logger-provider";
 import { Knex, knex } from "knex";
 import { create } from "@bufbuild/protobuf";
@@ -41,11 +41,12 @@ import {
   Stage1HashesSchema,
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { getFreePorts } from "../../test-utils";
 
 let knexInstanceClient: Knex;
 let knexInstanceSourceRemote: Knex;
@@ -205,6 +206,8 @@ afterAll(async () => {
 
 describe("Rollback Test stage 1", () => {
   it("should initiate stage-0 rollback strategy", async () => {
+    const [serverPort1, clientPort1, serverPort2, clientPort2] =
+      await getFreePorts(4);
     const factoryOptions: IPluginFactoryOptions = {
       pluginImportType: PluginImportType.Local,
     };
@@ -232,8 +235,8 @@ describe("Rollback Test stage 1", () => {
       ],
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3005,
-      gatewayClientPort: 3001,
+      gatewayServerPort: serverPort1,
+      gatewayClientPort: clientPort1,
     };
 
     const gatewayIdentity2: GatewayIdentity = {
@@ -258,8 +261,8 @@ describe("Rollback Test stage 1", () => {
       ],
       proofID: "mockProofID11",
       address: "http://localhost" as Address,
-      gatewayServerPort: 3225,
-      gatewayClientPort: 3211,
+      gatewayServerPort: serverPort2,
+      gatewayClientPort: clientPort2,
     };
 
     const migrationSource = await createMigrationSource();

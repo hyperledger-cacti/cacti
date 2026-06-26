@@ -2,7 +2,7 @@ import "jest-extended";
 import * as grpc from "@grpc/grpc-js";
 import { RuntimeError } from "run-time-error-cjs";
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import {
   ApiServer,
