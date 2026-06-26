@@ -42,7 +42,7 @@ import {
   StatusResponseSubstatusEnum,
   Transact200ResponseStatusResponseOriginNetwork,
 } from "../../generated/gateway-client/typescript-axios/api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPManager } from "../../services/gateway/satp-manager";
 import {
   getSessionActualStage,
@@ -50,7 +50,7 @@ import {
   getStateName,
 } from "../../core/session-utils";
 import { State } from "../../generated/proto/cacti/satp/v02/session/session_pb";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
 /**
  * Execute status retrieval for a SATP session.

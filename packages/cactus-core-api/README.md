@@ -35,7 +35,7 @@ import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 ```
 
 ## Check If POJO is a Cactus Plugin

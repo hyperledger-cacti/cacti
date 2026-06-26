@@ -16,14 +16,14 @@ tags:
   - name: admin
     description: API endpoints for fetching information on SATP sessions
 paths:
-  /api/v1/@hyperledger/cactus-example-cbdc/transact:
+  /api/v1/@hyperledger-cacti/cactus-example-cbdc/transact:
     post:
       tags:
         - transact
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-example-cbdc/transact
+          path: /api/v1/@hyperledger-cacti/cactus-example-cbdc/transact
       summary: Submit a transaction intent
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transact
@@ -133,7 +133,7 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references:
+  /api/v1/@hyperledger-cacti/cactus-example-cbdc/get-sessions-references:
     get:
       tags:
         - get-sessions-references
@@ -143,7 +143,7 @@ paths:
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-example-cbdc/get-sessions-references
+          path: /api/v1/@hyperledger-cacti/cactus-example-cbdc/get-sessions-references
       parameters:
         - name: Ledger
           in: query
@@ -184,14 +184,14 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-example-cbdc/get-balance:
+  /api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance:
     get:
       tags:
         - get-balance
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-example-cbdc/get-balance
+          path: /api/v1/@hyperledger-cacti/cactus-example-cbdc/get-balance
       operationId: GetBalance
       parameters:
         - name: user
@@ -225,14 +225,14 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens:
+  /api/v1/@hyperledger-cacti/cactus-example-cbdc/mint-tokens:
     post:
       tags:
         - mint
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-example-cbdc/mint-tokens
+          path: /api/v1/@hyperledger-cacti/cactus-example-cbdc/mint-tokens
       summary: Submit a transaction intent
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Mint
@@ -309,14 +309,14 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens:
+  /api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens:
     post:
       tags:
         - approve
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-example-cbdc/approve-tokens
+          path: /api/v1/@hyperledger-cacti/cactus-example-cbdc/approve-tokens
       summary: Submit a transaction intent
       description: Approves a certain amount to be transferred from the user's account by the bridge.
       operationId: Approve
@@ -393,14 +393,14 @@ paths:
                     type: string
                     description: Timestamp of the error
                     example: '2021-07-21T17:32:28Z'
-  /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved:
+  /api/v1/@hyperledger-cacti/cactus-example-cbdc/get-amount-approved:
     get:
       tags:
         - get-amount-approved
       x-hyperledger-cacti:
         http:
           verbLowerCase: get
-          path: /api/v1/@hyperledger/cactus-example-cbdc/get-amount-approved
+          path: /api/v1/@hyperledger-cacti/cactus-example-cbdc/get-amount-approved
       summary: Get the amount approved for a transaction
       description: Get the amount approved for a transaction
       operationId: GetAmountApproved
@@ -430,14 +430,14 @@ paths:
           description: Transaction not found
         '500':
           description: Internal server error
-  /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens:
+  /api/v1/@hyperledger-cacti/cactus-example-cbdc/transfer-tokens:
     post:
       tags:
         - transfer
       x-hyperledger-cacti:
         http:
           verbLowerCase: post
-          path: /api/v1/@hyperledger/cactus-example-cbdc/transfer-tokens
+          path: /api/v1/@hyperledger-cacti/cactus-example-cbdc/transfer-tokens
       summary: Submit a transaction intent
       description: Allows users to queue intents for transactions based on specified parameters.
       operationId: Transfer

@@ -13,11 +13,11 @@ import {
   LoggerProvider,
   Servers,
   isGrpcStatusObjectWithCode,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   PluginLedgerConnectorBesu,
   createGrpcInsecureChannelCredentials,
@@ -29,15 +29,15 @@ import {
   watch_blocks_v1_progress_pb,
   watch_blocks_v1_request_pb,
   watch_blocks_v1_pb,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
   createGrpcServer,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
 const logLevel: LogLevelDesc = "INFO";
 
@@ -214,7 +214,8 @@ describe("BesuGrpcSvcOpenApi", () => {
     expect(block).toBeTruthy();
     expect(block).toBeObject();
     expect(block).not.toBeEmptyObject();
-    expect(block.number).toBeTruthy();
+    expect(typeof block.number).toBe("number");
+    expect(block.number).toBeGreaterThanOrEqual(0);
     expect(block.hash).toBeTruthy();
     expect(block.transactions).toBeArray();
   });

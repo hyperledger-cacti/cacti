@@ -113,7 +113,10 @@
       "path": "./weaver/common/protos-js/tsconfig.json"
     },
     {
-      "path" : "weaver/sdks/fabric/interoperation-node-sdk/tsconfig.cacti.json"
+      "path" : "weaver/sdks/fabric/interoperation-node-sdk/tsconfig.json"
+    },
+    {
+      "path" : "weaver/sdks/besu/node/tsconfig.json"
     },
     {
       "path": "./packages/cacti-plugin-copm-fabric/tsconfig.json"
@@ -141,15 +144,6 @@
     },
     {
       "path": "./examples/cactus-example-carbon-accounting-frontend/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-supply-chain-backend/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-supply-chain-business-logic-plugin/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
     },
     {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"

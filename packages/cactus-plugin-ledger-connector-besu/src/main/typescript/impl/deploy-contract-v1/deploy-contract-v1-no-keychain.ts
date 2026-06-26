@@ -2,7 +2,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   DeployContractSolidityBytecodeNoKeychainV1Request,
   DeployContractSolidityBytecodeV1Response,
@@ -11,7 +11,7 @@ import {
   Web3SigningCredentialPrivateKeyHex,
 } from "../../generated/openapi/typescript-axios";
 import { isWeb3SigningCredentialNone } from "../../model-type-guards";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { PrometheusExporter } from "../../prometheus-exporter/prometheus-exporter";
 import Web3 from "web3";
 import { transactV1Impl } from "../transact-v1/transact-v1-impl";

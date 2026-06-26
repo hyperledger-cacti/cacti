@@ -70,7 +70,7 @@ If updating Interop CorDapp version, update the dependency version for in:
 4) Run `make publish` to publish package to github packages.
 
 **NOTE:** Always publish to your fork first, and only after testing it well, then 
-after PR approval, publish it to `hyperledger/cacti`.
+after PR approval, publish it to `hyperledger-cacti/cacti`.
 To publish to your fork, replace `<your-git-name>` with your github username in `github.properties`:
 ```
 ...
@@ -89,8 +89,8 @@ and then follow above 4 steps.
 5) Add this to your build.gradle (change the version accordingly):
 ```
 dependencies {
-	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "2.1.0")
-	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "2.1.0")
+	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "3.0.0-beta.1")
+	compile(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "3.0.0-beta.1")
 }
 ```
 

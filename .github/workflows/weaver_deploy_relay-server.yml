@@ -25,7 +25,7 @@ jobs:
 
       steps:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
         - name: Install RUST Toolchain minimal stable with clippy and rustfmt
           uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
@@ -34,10 +34,40 @@ jobs:
             toolchain: stable
             components: rustfmt, clippy
             
+        - name: Read crate version from Cargo.toml
+          id: version
+          run: |
+            VER=$(grep -m1 '^version' Cargo.toml | sed -E 's/version *= *"([^"]+)".*/\1/')
+            echo "version=$VER" >> $GITHUB_OUTPUT
+            echo "Crate version: $VER"
+          working-directory: weaver/common/protos-rs/pkg
+
+        - name: Check if already published on crates.io
+          id: check
+          run: |
+            NAME=cacti_weaver_protos_rs
+            VER='${{ steps.version.outputs.version }}'
+            # crates.io rejects requests without a User-Agent (returns 403).
+            HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+              -A "cacti-ci (https://github.com/${{ github.repository }})" \
+              "https://crates.io/api/v1/crates/$NAME/$VER")
+            echo "GET https://crates.io/api/v1/crates/$NAME/$VER -> $HTTP"
+            if [ "$HTTP" = "200" ]; then
+              echo "$NAME@$VER already on crates.io — skipping publish"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            elif [ "$HTTP" = "404" ]; then
+              echo "$NAME@$VER not yet published — will publish"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "Unexpected HTTP $HTTP from crates.io — failing fast"
+              exit 1
+            fi
+
         - name: Publish
-          run: cargo publish --token ${CRATES_TOKEN}
+          if: steps.check.outputs.skip != 'true'
+          run: cargo publish
           env:
-            CRATES_TOKEN: ${{ secrets.CARGO_CRATES_IO_TOKEN }}
+            CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_CRATES_IO_TOKEN }}
           working-directory: weaver/common/protos-rs/pkg
     
   publish-relay-image:
@@ -49,10 +79,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
       
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a #v2.1.0
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee #v4.2.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

@@ -279,7 +279,6 @@ export default router;
 | Fabric | `@hyperledger/cactus-plugin-ledger-connector-fabric` | Hyperledger Fabric |
 | Corda | `@hyperledger/cactus-plugin-ledger-connector-corda` | R3 Corda |
 | Polkadot | `@hyperledger/cactus-plugin-ledger-connector-polkadot` | Polkadot/Substrate |
-| Iroha | `@hyperledger/cactus-plugin-ledger-connector-iroha2` | Hyperledger Iroha 2 |
 | Stellar | `@hyperledger/cacti-plugin-ledger-connector-stellar` | Stellar |
 
 ---

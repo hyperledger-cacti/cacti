@@ -40,7 +40,7 @@ import {
   AuditRequest,
   AuditResponse,
 } from "../../generated/gateway-client/typescript-axios/api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import type { IAuditEntryRepository } from "../../database/repository/interfaces/repository";
 
 import type { Audit } from "../../core/types";

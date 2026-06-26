@@ -2,8 +2,8 @@ import type { TokenCredential } from "@azure/identity";
 import type { AccessToken } from "@azure/core-auth";
 import { PublicClientApplication } from "@azure/msal-node";
 
-import type { Logger, LogLevelDesc } from "@hyperledger/cactus-common";
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import type { Logger, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 export interface IRefreshTokenCredentialOptions {
   readonly logLevel?: Readonly<LogLevelDesc>;

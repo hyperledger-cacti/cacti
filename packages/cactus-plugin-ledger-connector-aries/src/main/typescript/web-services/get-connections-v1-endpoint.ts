@@ -4,7 +4,7 @@ import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   Logger,
   Checks,
@@ -12,8 +12,8 @@ import {
   LoggerProvider,
   IAsyncProvider,
   safeStringifyException,
-} from "@hyperledger/cactus-common";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-common";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import { PluginLedgerConnectorAries } from "../plugin-ledger-connector-aries";
 import OAS from "../../json/openapi.json";
@@ -40,9 +40,9 @@ export class GetConnectionsEndpoint implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/get-connections"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-aries/get-connections"
     ];
   }
 
