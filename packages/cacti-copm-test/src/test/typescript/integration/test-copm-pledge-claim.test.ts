@@ -3,7 +3,7 @@ import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ClaimPledgedAssetV1Request,
   PledgeAssetV1Request,

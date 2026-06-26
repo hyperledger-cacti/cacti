@@ -20,7 +20,7 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     groups:
       npm:
         patterns: ["*"]
@@ -32,7 +32,7 @@ updates:
       - "/.github/workflows/*"
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     groups:
       github-actions:
         patterns: ["*"]
@@ -42,7 +42,7 @@ updates:
       - "**/*"
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     groups:
       docker:
         patterns: ["*"]
@@ -52,7 +52,7 @@ updates:
       - "**/*"
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     groups:
       gomod:
         patterns: ["*"]
@@ -62,67 +62,7 @@ updates:
       - "**/*"
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
-    groups:
-      cargo:
-        patterns: ["*"]
-
-  # ----------------------------------------------------------------------------
-  # Release branch: release/v3.0.0-staging
-  # (duplicate this block per release/* branch — Dependabot has no branch globs)
-  # ----------------------------------------------------------------------------
-  - package-ecosystem: npm
-    directory: "/"
-    target-branch: "release/v3.0.0-staging"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
-    groups:
-      npm:
-        patterns: ["*"]
-
-  - package-ecosystem: github-actions
-    directories:
-      - "/"
-      - "/.github/actions/*"
-      - "/.github/workflows/*"
-    target-branch: "release/v3.0.0-staging"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
-    groups:
-      github-actions:
-        patterns: ["*"]
-
-  - package-ecosystem: docker
-    directories:
-      - "**/*"
-    target-branch: "release/v3.0.0-staging"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
-    groups:
-      docker:
-        patterns: ["*"]
-
-  - package-ecosystem: gomod
-    directories:
-      - "**/*"
-    target-branch: "release/v3.0.0-staging"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
-    groups:
-      gomod:
-        patterns: ["*"]
-
-  - package-ecosystem: cargo
-    directories:
-      - "**/*"
-    target-branch: "release/v3.0.0-staging"
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 1
     groups:
       cargo:
         patterns: ["*"]

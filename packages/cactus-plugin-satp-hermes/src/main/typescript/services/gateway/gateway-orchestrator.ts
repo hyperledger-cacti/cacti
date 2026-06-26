@@ -15,7 +15,7 @@ import {
   ILoggerOptions,
   JsObjectSigner,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import {

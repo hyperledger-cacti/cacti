@@ -28,9 +28,9 @@ Before starting, make sure you have the following software installed on your hos
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 2 or higher)
-- Golang: [sample instructions](https://golang.org/dl/) (Version 1.20 or higher)
-- Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
-- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 16 Supported)
+- Golang: [sample instructions](https://golang.org/dl/) (Version 1.20)
+- Java (JDK and JRE): [sample instructions](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) (Version 17)
+- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 22 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Protoc (Protobuf compiler): _Golang should already be installed and configured._
     * Default method: Run the following with `sudo` if necessary. This will install both the protobuf compiler and the Go code generator plugins.
@@ -52,7 +52,7 @@ Before starting, make sure you have the following software installed on your hos
 
       | Notes |
       |:------|
-      | The latest version at present is `3.15.6`, but you should check the above link to find the most current version before running the above steps. |
+      | The latest version that has been tested is `3.15.6`, but you should check the above link to find the most current version before running the above steps. |
       | The latest version of `protoc-gen-go-grpc` that works with the Fabric test networks we will run below is `v1.4.0`, which is why that version is hardcoded here. |
 
 ### Credentials
@@ -60,7 +60,7 @@ Make sure you have an SSH or GPG key registered in https://github.com to allow s
 
 ## Getting the Code and Documentation
 
-Clone the [cacti](https://github.com/hyperledger/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
+Clone the [cacti](https://github.com/hyperledger-cacti/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
 ## Common Structures
 

@@ -2,7 +2,7 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import "jest-extended";
 
-import { LoggerProvider } from "@hyperledger/cactus-common";
+import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 import {
   IAuthorizationConfig,
@@ -29,6 +29,28 @@ describe("ConfigService", () => {
     const pluginManagerOptionsJson = JSON.stringify({ pluginsPath });
 
     exampleConfig.pluginManagerOptionsJson = pluginManagerOptionsJson;
+
+    // Override plugins to install from local workspace paths so the test does
+    // not depend on the packages being published to npm (e.g. on a staging
+    // branch before a release).
+    const pkgRoot = path.join(__dirname, "../../../../../../../");
+    exampleConfig.plugins = exampleConfig.plugins.map((plugin) => {
+      const localSrcByPkg: Record<string, string> = {
+        "@hyperledger-cacti/cactus-plugin-keychain-memory": path.join(
+          pkgRoot,
+          "packages/cactus-plugin-keychain-memory",
+        ),
+        "@hyperledger-cacti/cacti-plugin-consortium-static": path.join(
+          pkgRoot,
+          "packages/cacti-plugin-consortium-static",
+        ),
+      };
+      const packageSrc = localSrcByPkg[plugin.packageName];
+      if (packageSrc) {
+        return { ...plugin, options: { ...plugin.options, packageSrc } };
+      }
+      return plugin;
+    });
 
     // FIXME - this hack should not be necessary, we need to re-think how we
     // do configuration parsing. The convict library may not be the path forward.

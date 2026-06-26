@@ -54,7 +54,7 @@ For example:
             - Until merge and integration (see further below), users should examine, test, and use them separately as follows:
                 - Cactus code and documentation lies within this (root) folder, excluding the `weaver` folder. See [Cactus documentation](./README-cactus.md) to test and use Cactus.
                 - Weaver code and documentation lies within the [weaver](./weaver/) folder. See [Weaver documentation](./weaver/README.md) to test and use Weaver.
-              We will soon integrate the Github Workflows and publish packages under the `hyperledger/cacti` namespace. Watch out for updates!
+              We will soon integrate the Github Workflows and publish packages under the `hyperledger-cacti/cacti` namespace. Watch out for updates!
     - [V2.0-beta]
         - Date: April 2023 (planned)
         - Goal:

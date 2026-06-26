@@ -13,12 +13,12 @@ import {
 } from "jose";
 import Web3 from "web3";
 
-import { ApiClient } from "@hyperledger/cactus-api-client";
+import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import {
   CactusNode,
   Configuration,
@@ -27,25 +27,25 @@ import {
   ConsortiumMember,
   Ledger,
   LedgerType,
-} from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   DefaultApi as BesuApi,
   PluginLedgerConnectorBesu,
   ReceiptType,
   Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import {
   pruneDockerContainersIfGithubAction,
   BesuTestLedger,
-} from "@hyperledger/cactus-test-tooling";
-import { LogLevelDesc, Servers } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import { LogLevelDesc, Servers } from "@hyperledger-cacti/cactus-common";
 
 import {
   IPluginConsortiumStaticOptions,
   PluginConsortiumStatic,
   generateES256JWK,
-} from "@hyperledger/cacti-plugin-consortium-static";
+} from "@hyperledger-cacti/cacti-plugin-consortium-static";
 import { Account } from "web3-core";
 
 const logLevel: LogLevelDesc = "TRACE";

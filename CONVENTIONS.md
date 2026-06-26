@@ -18,7 +18,7 @@ For build setup, see [BUILD.md](./BUILD.md).
 - **Runtime**: Node.js v20.20.0+
 - **Package manager**: Yarn 4 (Corepack-managed, `yarn@4.3.1`)
 - **Monorepo tool**: Lerna (npm client: yarn, workspaces enabled)
-- **Current version**: 2.1.0
+- **Current version**: 3.0.0-beta.1
 
 ---
 
@@ -372,7 +372,7 @@ support.
 The `weaver/` subtree is a separate interoperability framework with its own
 SDKs, drivers, and sample applications integrated into the monorepo workspace.
 Weaver packages are published under the `cacti-weaver-` prefix (e.g.,
-`@hyperledger/cacti-weaver-sdk-fabric`, `@hyperledger/cacti-weaver-iin-agent`).
+`@hyperledger-cacti/cacti-weaver-sdk-fabric`, `@hyperledger-cacti/cacti-weaver-iin-agent`).
 
 ### API Server
 
@@ -383,7 +383,7 @@ exposes REST/gRPC APIs, and manages configuration.
 
 ## 14. Dependencies & Versioning
 
-- All packages share version `2.1.0` (Lerna fixed mode)
+- All packages share version `3.0.0-beta.1` (Lerna fixed mode)
 - Changelog preset: Angular
 - New dependencies must be added locally to the package that needs them
 - `cactus-test-tooling` is always a `devDependency`

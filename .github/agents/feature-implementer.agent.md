@@ -115,7 +115,7 @@ When the feature requires a brand new package:
 1. Create `packages/cacti-<type>-<name>/` with standard layout:
    ```
    packages/cacti-<type>-<name>/
-   ├── package.json          # @hyperledger/cacti-<type>-<name>
+   ├── package.json          # @hyperledger-cacti/cacti-<type>-<name>
    ├── tsconfig.json          # extends ../../tsconfig.base.json
    ├── CHANGELOG.md
    ├── README.md

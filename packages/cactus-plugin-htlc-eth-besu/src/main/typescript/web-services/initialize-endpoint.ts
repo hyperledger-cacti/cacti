@@ -5,13 +5,13 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core-api";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../json/openapi.json";
 
 import { InitializeRequest } from "../generated/openapi/typescript-axios";
@@ -38,9 +38,9 @@ export class InitializeEndpoint implements IWebServiceEndpoint {
     return InitializeEndpoint.CLASS_NAME;
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/initialize"] {
     return OAS.paths[
-      "/api/v1/plugins/@hyperledger/cactus-plugin-htlc-eth-besu/initialize"
+      "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu/initialize"
     ];
   }
 

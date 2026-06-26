@@ -1,7 +1,7 @@
 // this file contains a class that encapsulates the logic for managing the Oracle (read and write).
 // should inject satp gateway session data (having parameters/chains for transactions), and processes smart contract output
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";

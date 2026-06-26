@@ -54,11 +54,11 @@ yarn lerna version 1.1.3 --ignore-scripts --conventional-commits --exact --git-r
 yarn tools:bump-openapi-spec-dep-versions --target-version=1.1.3
 yarn codegen
 yarn build:dev
-./tools/weaver-update-version.sh 1.1.3 .
 ./tools/go-gen-checksum.sh 1.1.3 .
+./tools/weaver-update-version.sh 1.1.3 .
 ```
 
-- Do note the `.` as the last parameter in last two commands.
+- Maintain the order of commands and do note the `.` as the last parameter in last two commands.
 
 - The `./tools/weaver-update-version.sh` automation script seems slightly buggy at the moment so you'll have to manually update `./weaver/core/relay/Cargo.toml` yourself. See this comment for an example: https://github.com/hyperledger-cacti/cacti/pull/3427#discussion_r1686850372
 
@@ -69,13 +69,13 @@ of the package.json files so you have to do this manually with search and replac
 the entire repository...
 
 * The trick is to search for the previous release version within package.json 
-files or just search for "@hyperledger/cact*-*" or "@hyperledger-cacti/cact*-*" within the package.json files. 
+files or just search for "@hyperledger-cacti/cact*-*" within the package.json files. 
 
 With VSCode you can do a project wide search & replace where:
   1. Make sure that regex based replacing is enabled on the VSCode search UI (top right corner of the search panel)
   2. You set the files to include to "package.json" (so that only files named package.json are included in the search)
-  3. You set the search term to this to find the OLD versions (without the backticks if you are reading this in plain text) `@hyperledger/cactus-(.*): "1.1.2"`
-  4. You set the replacement term to this (so that it swaps the version numbers with the new one) `@hyperledger/cactus-$1: "1.1.3"`
+  3. You set the search term to this to find the OLD versions (without the backticks if you are reading this in plain text) `@hyperledger-cacti/cactus-(.*): "1.1.2"`
+  4. You set the replacement term to this (so that it swaps the version numbers with the new one) `@hyperledger-cacti/cactus-$1: "1.1.3"`
 
 - Also double check that the `"version": "?.?.?"` property has been updated in the package.json files all over the packages.
 

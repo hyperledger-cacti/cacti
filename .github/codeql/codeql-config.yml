@@ -1,0 +1,15 @@
+name: "Cacti CodeQL config"
+
+# Run the security-and-quality suite: security + maintainability/reliability queries.
+queries:
+  - uses: security-and-quality
+
+paths-ignore:
+  - "**/generated/**"
+  - "**/test/**"
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/build/**"
+  - "**/.nyc_output/**"
+  - "**/coverage/**"
+  - "**/*.generated.ts"
