@@ -42,43 +42,64 @@ The `npm run watch` script in action:
 
 ## Getting Started
 
-### VSCode Dev Container
-* Install prerequisites
-  * [Git](https://github.com/git-guides/install-git#install-git-on-mac)
-  * [Visual Studio Code](https://code.visualstudio.com/)
-  * [Docker Desktop](https://www.docker.com/) (Please ensure Docker Desktop running when using VSCode Dev Container)
-  * [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) (Download this extension in VSCode)
+### 🐳 Dev Container Quickstart (Recommended)
 
-* Direct Dev Container settings **(Suitable for Beginners)**
- 
-  * Clone the repository and open Cacti folder in VSCode
-  
-    ```
-    git clone https://github.com/hyperledger-cacti/cacti.git
-    ```
-  * Open the command palette (`F1` or `Ctrl+Shift+P`) and select **"Reopen in Container"**
-  * Wait for the container setup and start developing!
-    
-* Persistent Dev Environment settings with Docker Volume **(Suitable for Advanced Users)**
-  * Clone the repository and open Cacti folder in VSCode
-  
-    ```
-    git clone https://github.com/hyperledger-cacti/cacti.git
-    ```
-  * Create and run Docker Volume
+A Dev Container is a pre-configured Docker-based development environment that automatically installs all required tools (Node.js, Yarn, Go, Rust, etc.). This avoids manual setup and ensures consistency across contributors.
 
-    ```
-    docker volume create cacti_volume
-    docker run -v cacti_volume:/workspace -w /workspace -it node:20.20.0 bash
-    ```
-  * Add Docker volume configuration to devcontainer.json
-    ```
-    "mounts": [
-      "source=cacti_volume,target=/workspace,type=volume"
-    ],
-    ```
-  * Open the command palette (`F1` or `Ctrl+Shift+P`) and select **"Reopen in Container"**
-  * Wait for the container setup and start developing!
+#### 🔧 Prerequisites
+
+Before starting, install:
+
+* [Git](https://github.com/git-guides/install-git)
+* [Visual Studio Code](https://code.visualstudio.com/)
+* [Docker Desktop](https://www.docker.com/) (must be running)
+* [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension for VS Code
+
+#### 🚀 Step-by-Step Setup
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/hyperledger-cacti/cacti.git
+cd cacti
+code .
+```
+
+**2. Open in Dev Container**
+
+Once VS Code opens:
+* Look for popup: **“Reopen in Container”**
+* Click it
+
+If popup does not appear:
+* Press `Cmd + Shift + P` (Mac) or `Ctrl + Shift + P` (Windows/Linux)
+* Search: `Dev Containers: Reopen in Container`
+* Press `Enter`
+
+**3. Wait for setup**
+
+VS Code will:
+* Build Docker container
+* Install dependencies
+
+This may take several minutes.
+
+#### ⚠️ Known Issue (Important for New Contributors)
+
+During testing, the DevContainer setup may fail due to a Go version mismatch:
+* Current container installs Go 1.20.x
+* Some dependencies require Go ≥ 1.23
+
+This can cause container build failure.
+
+#### ✅ Workaround
+
+If DevContainer fails, run the project locally instead:
+```bash
+npm install -g yarn
+yarn install
+```
+
+💡 **Tip:** If you're new to open source, running locally is often faster and simpler than debugging container issues.
     
 ### MacOS 
 
