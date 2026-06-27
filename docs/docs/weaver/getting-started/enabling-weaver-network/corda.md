@@ -113,7 +113,7 @@ You also need to add the following to your application's `build.gradle` file:
 ```groovy
 repositories {
   maven {
-      url https://maven.pkg.github.com/hyperledger/cacti
+      url https://maven.pkg.github.com/hyperledger-cacti/cacti
       credentials {
           username <github-email>
           password <github-personal-access-token>
@@ -121,10 +121,10 @@ repositories {
   }
 }
 dependencies {
-  implementation(group: 'org.hyperledger.cacti.weaver.sdk.corda', name: 'weaver-sdk-corda', version: "2.1.0")
-  implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "2.1.0")
-  implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "2.1.0")
-  implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "2.1.0")
+  implementation(group: 'org.hyperledger.cacti.weaver.sdk.corda', name: 'weaver-sdk-corda', version: "3.0.0-beta.1")
+  implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-contracts', version: "3.0.0-beta.1")
+  implementation(group: 'org.hyperledger.cacti.weaver.imodule.corda', name: 'interop-workflows', version: "3.0.0-beta.1")
+  implementation(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "3.0.0-beta.1")
 }
 ```
 (Or check out the [package website](https://github.com/hyperledger-cacti/cacti/packages/1856827) and select a different version.)
@@ -444,8 +444,8 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   RELAY_NAME=<"name" in config.toml>
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-relay-server
-  DOCKER_TAG=2.1.0
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-relay-server
+  DOCKER_TAG=3.0.0-beta.1
   ```
     - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
     - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
@@ -535,8 +535,8 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   DRIVER_RPC_USERNAME=<driver-rpc-username>
   DRIVER_RPC_PASSWORD=<driver-rpc-username>
   EXTERNAL_NETWORK=<docker-bridge-network>
-  DOCKER_IMAGE_NAME=ghcr.io/hyperledger/cacti-weaver-driver-corda
-  DOCKER_TAG=2.1.0
+  DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-driver-corda
+  DOCKER_TAG=3.0.0-beta.1
   RELAY_TLS=<true|false>
   RELAY_TLSCA_TRUST_STORE=<truststore-jks-file-path>
   RELAY_TLSCA_TRUST_STORE_PASSWORD=<truststore-jks-file-password>

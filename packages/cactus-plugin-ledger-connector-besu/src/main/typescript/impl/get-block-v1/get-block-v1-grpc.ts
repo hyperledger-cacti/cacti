@@ -1,6 +1,6 @@
 import Web3 from "web3";
 
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
 import * as get_block_v1_response_pb from "../../generated/proto/protoc-gen-ts/models/get_block_v1_response_pb";
 import * as default_service from "../../generated/proto/protoc-gen-ts/services/default_service";

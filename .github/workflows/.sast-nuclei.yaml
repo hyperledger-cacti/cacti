@@ -1,0 +1,187 @@
+
+name: SAST Nuclei Scan
+
+concurrency:
+  group: sast-nuclei-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+
+  workflow_call:
+    inputs:
+      node_version:
+        type: string
+        required: false
+        default: "v20.20.0"
+        description: "Node.js version to use (threads from ci.yaml)"
+      scan_target:
+        type: string
+        required: false
+        default: "."
+        description: "Path (relative to repo root) passed to nuclei as the scan target"
+      nuclei_templates_tag:
+        type: string
+        required: false
+        default: ""
+        description: >-
+          nuclei-templates release tag to clone (e.g. v10.1.4).
+          Leave empty to use the latest commit on the default branch.
+          Verify available tags at github.com/projectdiscovery/nuclei-templates/releases
+
+jobs:
+  nuclei-scan:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: read
+      security-events: write   # required for codeql-action/upload-sarif
+
+    env:
+      NODEJS_VERSION: ${{ inputs.node_version || 'v20.20.0' }}
+
+    steps:
+      - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - name: Install jq
+        run: sudo apt update && sudo apt install -y jq
+
+      - name: Verify jq
+        run: jq --version
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c #v6.4.0
+        with:
+          go-version: 1.23
+
+      - run: go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@v3.8.0
+
+      - run: nuclei --version
+
+      # --- Nuclei templates --------------------------------------------------
+      # Clone at a specific release tag when provided; otherwise use the
+      # latest commit on the default branch.
+      - name: Download Nuclei templates
+        run: |
+          TAG="${{ inputs.nuclei_templates_tag }}"
+          if [ -n "$TAG" ]; then
+            git clone --depth 1 --branch "$TAG" \
+              https://github.com/projectdiscovery/nuclei-templates ~/nuclei-templates
+          else
+            git clone --depth 1 \
+              https://github.com/projectdiscovery/nuclei-templates ~/nuclei-templates
+          fi
+
+      # --- SAST scan ---------------------------------------------------------
+      # Pass 1 - Code scanning  : runs code/ templates against source files
+      # Pass 2 - File checks    : secrets, exposures, misconfiguration in files
+      #
+      # Both passes use || true so neither blocks the other; exit codes are
+      # evaluated later from the SARIF output, not the process exit code.
+      #
+      # -no-interactsh disables out-of-band callbacks (unnecessary for SAST).
+      - name: Run SAST scan
+        id: sast_scan
+        continue-on-error: true
+        run: |
+          SCAN_TARGET="${{ inputs.scan_target || '.' }}"
+
+          NUCLEI_COMMON_ARGS=(
+            -severity "medium,high,critical"
+            -timeout 10
+            -c 10
+            -duc
+            -stats
+            -no-interactsh
+          )
+
+          echo "=== Pass 1: Code security scan ==="
+          nuclei "${NUCLEI_COMMON_ARGS[@]}" \
+            -t ~/nuclei-templates/code/ \
+            -sarif-export nuclei-code.sarif \
+            -output nuclei-code.log \
+            "$SCAN_TARGET" \
+            || true
+
+          echo "=== Pass 2: File-based secret & exposure scan ==="
+          nuclei "${NUCLEI_COMMON_ARGS[@]}" \
+            -t ~/nuclei-templates/file/ \
+            -sarif-export nuclei-file.sarif \
+            -output nuclei-file.log \
+            "$SCAN_TARGET" \
+            || true
+
+      # --- Evaluate results --------------------------------------------------
+      # SARIF severity mapping used by nuclei:
+      #   critical / high  -> level: error
+      #   medium           -> level: warning
+      #   low              -> level: note
+      #
+      # Gate logic:
+      #   high/critical found  -> exit 1  (build fails)
+      #   medium only          -> exit 0  (build passes, ::warning annotation)
+      #   no findings          -> exit 0  (build passes cleanly)
+      - name: Evaluate SAST scan results
+        run: |
+          HIGH_CRITICAL=0
+          MEDIUM=0
+
+          for SARIF in nuclei-code.sarif nuclei-file.sarif; do
+            if [ -f "$SARIF" ]; then
+              HC=$(jq '[.runs[].results[] | select(.level == "error")] | length' "$SARIF" 2>/dev/null || echo 0)
+              MED=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$SARIF" 2>/dev/null || echo 0)
+              HIGH_CRITICAL=$((HIGH_CRITICAL + HC))
+              MEDIUM=$((MEDIUM + MED))
+              echo "[$SARIF] high/critical=$HC  medium=$MED"
+            else
+              echo "[$SARIF] not found -- nuclei may not have produced output for this pass"
+            fi
+          done
+
+          echo "Total high/critical : $HIGH_CRITICAL"
+          echo "Total medium        : $MEDIUM"
+
+          if [ "$HIGH_CRITICAL" -gt 0 ]; then
+            echo "::error::SAST scan found $HIGH_CRITICAL high/critical severity issue(s). Failing build."
+            exit 1
+          elif [ "$MEDIUM" -gt 0 ]; then
+            echo "::warning::SAST scan found $MEDIUM medium severity issue(s). Review recommended before merge."
+          else
+            echo "SAST scan passed -- no issues found."
+          fi
+
+      # --- SARIF upload ------------------------------------------------------
+      # Collect both SARIF files into a single directory so upload-sarif can
+      # ingest them in one call. The step always runs so results are visible
+      # in the GitHub Security tab even when the evaluate step failed.
+      - name: Collect SARIF files
+        if: always()
+        run: |
+          mkdir -p sarif-results
+          if [ -f nuclei-code.sarif ]; then cp nuclei-code.sarif sarif-results/; fi
+          if [ -f nuclei-file.sarif ]; then cp nuclei-file.sarif sarif-results/; fi
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e #v4.36.2
+        if: always()
+        with:
+          sarif_file: sarif-results
+          category: nuclei-sast
+
+      # --- Artifacts ---------------------------------------------------------
+      - name: Upload scan artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+        if: always()
+        with:
+          name: nuclei-sast-results
+          path: |
+            nuclei-code.log
+            nuclei-file.log
+            sarif-results/

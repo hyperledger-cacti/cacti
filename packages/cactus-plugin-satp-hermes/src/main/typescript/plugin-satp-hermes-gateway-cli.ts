@@ -103,7 +103,7 @@
  * @since 0.0.3-beta
  */
 
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   SATPGateway,
   type SATPGatewayConfig,
@@ -142,7 +142,7 @@ import { validateSatpKeyPairJSON } from "./services/validation/config-validating
 import { validateCCConfig } from "./services/validation/config-validating-functions/validate-cc-config";
 import { validateSatpEnableCrashRecovery } from "./services/validation/config-validating-functions/validate-satp-enable-crash-recovery";
 import { validateKnexRepositoryConfig } from "./services/validation/config-validating-functions/validate-knex-repository-config";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { validateInstanceId } from "./services/validation/config-validating-functions/validate-instance-id";
 import { v4 as uuidv4 } from "uuid";
 import { validateOntologyPath } from "./services/validation/config-validating-functions/validate-ontology-path";

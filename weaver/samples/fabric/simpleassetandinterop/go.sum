@@ -34,6 +34,8 @@ github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek
 github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9 h1:XM/5fXIiBBQonxiJ375XpSgbxvOIB5onvVFi8ue2css=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9/go.mod h1:0BojxsIV9fM9jFMQvzg3iYIyXCG5op/hvZaATGXSAoI=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a h1:HwSCxEeiBthwcazcAykGATQ36oG9M+HEQvGLvB7aLvA=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a/go.mod h1:TDSu9gxURldEnaGSFbH1eMlfSQBWQcMQfnDBcpQv5lU=
 github.com/hyperledger/fabric-contract-api-go v1.2.1 h1:Ww9cKH/qHl5s6WqF+Ts5ju5eaBxC/awB/BJE+rOsEkM=
@@ -109,8 +111,8 @@ golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACk
 golang.org/x/crypto v0.0.0-20190621222207-cc06ce4a13d4/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/net v0.0.0-20190311183353-d8887717615a/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
 golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3/go.mod h1:t9HGtf8HONx5eT2rtn7q6eTqICYqUVnKs3thJo3Qplg=
-golang.org/x/net v0.36.0 h1:vWF2fRbw4qslQsQzgFqZff+BItCvGFQqKzKIzx1rmoA=
-golang.org/x/net v0.36.0/go.mod h1:bFmbeoIPfrw4sMHNhb4J9f6+tPziuGjq7Jk/38fxi1I=
+golang.org/x/net v0.33.0 h1:74SYHlV8BIgHIFC/LrYkOGIwL19eTYXQ5wc6TBuO36I=
+golang.org/x/net v0.33.0/go.mod h1:HXLR5J+9DxmrqMwG9qjGCxZ+zKXxBru04zlTvWlWuN4=
 golang.org/x/sync v0.0.0-20190423024810-112230192c58/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sys v0.0.0-20181205085412-a5c9d58dba9a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
 golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
@@ -142,3 +144,7 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1 h1:V8uHcUOLCdmSus18nAra6TqzCwCFfi5O2JRmXLxXmIw=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1/go.mod h1:/lseTq2zQDQEi6RyVWQCGSsmkiaL3F5bLz5ke/2BoG4=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.0-beta.1 h1:J+a/3J9pm8Jyitd4PZqraNUPQUMS4nH6ow+K/H8Gyf8=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.0-beta.1/go.mod h1:lsuOmn7HLpmiTMa1/xQdDSAjdRPH0qAl2C4YGX8fMGg=

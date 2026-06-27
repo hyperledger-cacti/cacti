@@ -28,9 +28,9 @@ Before starting, make sure you have the following software installed on your hos
 - Git: [sample instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 - Docker: [sample instructions](https://docs.docker.com/engine/install/) (Latest version)
 - Docker-Compose: [sample instructions](https://docs.docker.com/compose/install/) (Version 2 or higher)
-- Golang: [sample instructions](https://golang.org/dl/) (Version 1.20 or higher)
-- Java (JDK and JRE): [sample instructions](https://openjdk.java.net/install/) (Version 8)
-- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 16 Supported)
+- Golang: [sample instructions](https://golang.org/dl/) (Version 1.20)
+- Java (JDK and JRE): [sample instructions](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) (Version 17)
+- Node.js and NPM: [sample instructions](https://nodejs.org/en/download/package-manager/) (Version 22 Supported)
 - Yarn: [sample instructions](https://classic.yarnpkg.com/en/docs/install/)
 - Rust: [sample instructions](https://www.rust-lang.org/tools/install)
     * To avoid errors during Weaver Relay compilation, update certain packages (on which the Weaver Relay is dependent) to their latest versions as follows:
@@ -46,7 +46,7 @@ Create a personal access token with `read:packages` access in GitHub in order to
 
 ## Getting the Code and Documentation
 
-Clone the [cacti](https://github.com/hyperledger/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
+Clone the [cacti](https://github.com/hyperledger-cacti/cacti) repository. The code to get a basic test network up and running and test data-sharing interoperation flows lies in the subfolder `weaver/tests/network-setups`, which should be your starting point, though the setups will rely on other parts of the repository, as you will find out in the instructions given on this page.
 
 ## Securing Components
 

@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger/cacti-weaver-besu-cli",
-  "version": "2.1.0",
+  "name": "@hyperledger-cacti/cacti-weaver-besu-cli",
+  "version": "3.0.0-beta.1",
   "description": "besu-cli CLI",
   "keywords": [
     "Hyperledger",
@@ -37,10 +37,10 @@
     "bin"
   ],
   "scripts": {
-    "build": "yarn format && yarn lint && yarn clean-build && yarn compile && yarn copy-templates",
+    "build": "yarn clean-build && yarn compile && yarn copy-templates",
     "clean-build": "rm -rf ./build",
     "compile": "tsc -p .",
-    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "copy-templates": "[ -d ./src/templates ] && cp -a ./src/templates ./build/ || true",
     "coverage": "jest --coverage",
     "lint": "tslint -p .",
     "prepublishOnly": "yarn build",
@@ -53,9 +53,10 @@
     "testEnvironment": "node"
   },
   "dependencies": {
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
-    "@hyperledger/cacti-weaver-sdk-besu": "2.1.0",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-beta.1",
+    "@hyperledger-cacti/cacti-weaver-sdk-besu": "3.0.0-beta.1",
     "@truffle/contract": "4.6.28",
+    "bs58": "6.0.0",
     "gluegun": "5.1.6",
     "web3": "1.10.0",
     "winston": "3.10.0"

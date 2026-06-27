@@ -8,22 +8,23 @@ import type {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   type Logger,
   Checks,
   LoggerProvider,
   type IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
 import { OracleStatusRequest } from "../../public-api";
+import { TaskNotFoundError } from "../../cross-chain-mechanisms/common/errors";
 
 export class GetOracleStatusEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "GetOracleStatusEndpointV1";
@@ -46,19 +47,23 @@ export class GetOracleStatusEndpointV1 implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/status"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status"
     ].get.operationId;
   }
 
@@ -100,6 +105,12 @@ export class GetOracleStatusEndpointV1 implements IWebServiceEndpoint {
         await this.options.dispatcher.OracleGetTaskStatus(statusRequest);
       res.status(200).json(result);
     } catch (ex) {
+      if (ex instanceof TaskNotFoundError) {
+        // Return 404 Not Found rather than 500 Internal Server Error when a
+        // task ID is unknown — this is a caller error, not a server fault.
+        res.status(404).json({ message: "NotFound", error: ex.message });
+        return;
+      }
       const errorMsg = `${reqTag} Failed to get status:`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }

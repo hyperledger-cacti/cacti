@@ -1,0 +1,337 @@
+# Reusable DAST Nuclei scan workflow for the Hyperledger Cacti monorepo.
+#
+# Can be triggered directly on push/PR, invoked as a reusable workflow by
+# other jobs in the CI fan-out (workflow_call), or run manually via
+# workflow_dispatch.
+#
+# Exit semantics
+# ──────────────
+#  high/critical findings  -> job fails (exit 1)
+#  medium findings only    -> job passes with a ::warning annotation
+#  no findings             -> job passes cleanly
+#
+# Template strategy
+# ─────────────────
+#  Pass 1 (dast_scan)    : nuclei-templates/dast/**  with -dast fuzzing mode
+#  Pass 2 (passive_scan) : http/misconfiguration/, http/exposures/,
+#                          http/vulnerabilities/generic/  (no fuzzing)
+# Both scans run regardless of each other's exit code so both SARIFs are
+# always produced and evaluated together.
+
+name: DAST Nuclei Scan - SATP Hermes
+
+concurrency:
+  group: dast-nuclei-satp-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+
+  workflow_call:
+    inputs:
+      node_version:
+        type: string
+        required: false
+        default: "v20.20.0"
+        description: "Node.js version to use (threads from ci.yaml)"
+      server_start_command:
+        type: string
+        required: false
+        default: "yarn start:api-server"
+        description: "Shell command that starts the target HTTP server"
+      server_healthcheck_url:
+        type: string
+        required: false
+        default: "https://localhost:4000/api/v1/api-server/healthcheck"
+        description: "URL polled until the server is ready to accept requests"
+      wait_on_timeout:
+        type: number
+        required: false
+        default: 120
+        description: "Seconds to wait for the server to become ready"
+      nuclei_templates_tag:
+        type: string
+        required: false
+        default: ""
+        description: >-
+          nuclei-templates release tag to clone (e.g. v10.1.4).
+          Leave empty to use the latest commit on the default branch.
+          Verify available tags at github.com/projectdiscovery/nuclei-templates/releases
+      urls:
+        type: string
+        required: false
+        description: >-
+          Newline-separated list of URLs to scan.
+          When omitted, the built-in default set covering all Cacti API server
+          endpoints (api-server, Fabric connector, Besu connector) is used.
+
+jobs:
+  nuclei-scan:
+    runs-on: ubuntu-22.04
+
+    permissions:
+      contents: read
+      security-events: write   # required for codeql-action/upload-sarif
+
+    env:
+      NODEJS_VERSION: ${{ inputs.node_version || 'v20.20.0' }}
+
+    steps:
+      - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+
+      - name: Install jq
+        run: sudo apt update && sudo apt install -y jq
+
+      - name: Verify jq
+        run: jq --version
+
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c #v6.4.0
+        with:
+          go-version: 1.23
+
+      - run: go install -v github.com/projectdiscovery/nuclei/v3/cmd/nuclei@v3.8.0
+
+      - run: nuclei --version
+
+      - run: yarn install
+
+      - run: yarn configure
+
+      # --- URL list -----------------------------------------------------------
+      # Use the caller-supplied list when available; otherwise generate the full
+      # default set covering every registered Cacti API server endpoint.
+      - name: Create URLs file for Nuclei
+        run: |
+          CUSTOM_URLS="${{ inputs.urls }}"
+          if [ -n "$CUSTOM_URLS" ]; then
+            printf '%s\n' "$CUSTOM_URLS" > urls.txt
+          else
+            echo https://localhost:4000/ > urls.txt
+            {
+            echo https://localhost:4000/api/v1/api-server/healthcheck
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/clientrequest
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationrequest
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase1/transferinitiationresponse
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommencerequest
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/transfercommenceresponse
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidencerequest
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase2/lockevidenceresponse
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationrequest
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitpreparationresponse
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalrequest
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/commitfinalresponse
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/phase3/transfercompleterequest
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/recovermessage
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdatemessage
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoverupdateackmessage
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/recoversuccessmessage
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackmessage
+            echo https://localhost:4000/api/v1/@hyperledger/cactus-plugin-satp-hermes/rollbackackmessage
+            } >> urls.txt
+          fi
+
+      # --- API server configuration ------------------------------------------
+      - run: yarn generate-api-server-config
+
+      # Delete the first and the second items in the array (remove keychain and manual consortium plugins)
+      - run: jq 'del(.plugins[0,1])' .config.json > .config2.json && mv .config2.json .config.json
+
+      - name: Install Keychain plugin into the API server
+        run: jq '.plugins += [{ "packageName":"@hyperledger/cactus-plugin-keychain-memory","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-keychain-memory/","instanceId":"0daacd05-d1cd-4eab-9332-4ad1aff4b909","keychainId":"d29d728e-eaa0-4e2d-b187-d132242b0d9a"}}]' .config.json > .config2.json && mv .config2.json .config.json
+
+      - name: Install SATP Hermes plugin into the API server
+        run: jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-satp-hermes","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-satp-hermes/","instanceId":"some-unique-satp-hermes-instance-id"}}]' .config.json > .config2.json && mv .config2.json .config.json
+
+      - name: Print API Server Config File - ./.config.json
+        run: cat .config.json
+
+      - name: Print Nuclei Config File - ./.nuclei-config.yaml
+        run: cat .nuclei-config.yaml
+
+      - name: Print Nuclei URL List File - ./urls.txt
+        run: cat urls.txt
+
+      # --- JWT generation ----------------------------------------------------
+      - name: Generate Audience and Issuer
+        id: generate_ids
+        run: |
+          echo "audience=$(uuidgen)" >> "$GITHUB_ENV"
+          echo "issuer=$(uuidgen)" >> "$GITHUB_ENV"
+
+      - name: Generate RSA Keys
+        run: |
+          openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+          openssl rsa -in private_key.pem -pubout -out public_key.pem
+
+      - run: jq '.expressJwtOptions.secret = "$(cat public_key.pem)" |
+                 .expressJwtOptions.algorithms = ["RS256"] |
+                 .expressJwtOptions.issuer = "${{ env.issuer }}" |
+                 .expressJwtOptions.audience = "${{ env.audience }}"' .config.json > .config2.json && mv .config2.json .config.json
+
+      - name: Generate Auth Bearer Token
+        run: |
+          HEADER_B64=$(echo '{"alg":"RS256"}' | openssl base64 -e -A | tr -d '=' | tr '/+' '_-')
+          PAYLOAD_B64=$(echo '{"scope":"read:health","iss":"${{ env.issuer }}","aud":"${{ env.audience }}"}' | openssl base64 -e -A | tr -d '=' | tr '/+' '_-')
+
+          SIGNATURE=$(echo -n "$HEADER_B64.$PAYLOAD_B64" | openssl dgst -sha256 -sign private_key.pem | openssl base64 -e -A | tr -d '=' | tr '/+' '_-')
+          JWT="$HEADER_B64.$PAYLOAD_B64.$SIGNATURE"
+          echo "dast_jwt=$JWT" >> "$GITHUB_ENV"
+
+      # --- Nuclei templates --------------------------------------------------
+      # Clone at a specific release tag when provided; otherwise use the
+      # latest commit on the default branch.
+      - name: Download Nuclei templates
+        run: |
+          TAG="${{ inputs.nuclei_templates_tag }}"
+          if [ -n "$TAG" ]; then
+            git clone --depth 1 --branch "$TAG" \
+              https://github.com/projectdiscovery/nuclei-templates ~/nuclei-templates
+          else
+            git clone --depth 1 \
+              https://github.com/projectdiscovery/nuclei-templates ~/nuclei-templates
+          fi
+
+      - name: Verify DAST templates are present
+        run: |
+          ls ~/nuclei-templates/dast/ || (echo "::error::DAST templates missing after clone" && exit 1)
+
+      # --- Scan script -------------------------------------------------------
+      # Written to a file so that both nuclei passes (DAST + passive) can run
+      # inside the single background-server-action command slot.
+      #
+      # Pass 1 - DAST fuzzing  : runs templates tagged for DAST with -dast mode
+      # Pass 2 - Passive checks: misconfiguration, exposures, generic vulns
+      #                          (no fuzzing, so -dast flag is omitted)
+      #
+      # Both passes use || true so neither blocks the other; exit codes are
+      # evaluated later from the SARIF output, not the process exit code.
+      - name: Create DAST scan script
+        run: |
+          cat > ~/run-dast-scan.sh << 'SCANEOF'
+          #!/bin/bash
+          set -euo pipefail
+
+          NUCLEI_COMMON_ARGS=(
+            -list urls.txt
+            -severity medium,high,critical
+            -rate-limit 50
+            -timeout 10
+            -c 10
+            -duc
+            -stats
+          )
+
+          echo "=== Pass 1: DAST fuzzing scan ==="
+          nuclei "${NUCLEI_COMMON_ARGS[@]}" \
+            -t ~/nuclei-templates/dast/ \
+            -dast \
+            -sarif-export nuclei-dast.sarif \
+            -output nuclei-dast.log \
+            || true
+
+          echo "=== Pass 2: Passive security checks ==="
+          nuclei "${NUCLEI_COMMON_ARGS[@]}" \
+            -t ~/nuclei-templates/http/misconfiguration/ \
+            -t ~/nuclei-templates/http/exposures/ \
+            -t ~/nuclei-templates/http/vulnerabilities/generic/ \
+            -sarif-export nuclei-passive.sarif \
+            -output nuclei-passive.log \
+            || true
+          SCANEOF
+          chmod +x ~/run-dast-scan.sh
+
+      # --- Run server + scan -------------------------------------------------
+      # continue-on-error: true ensures the evaluate/upload steps always run
+      # even if nuclei itself exits non-zero (e.g. found issues).
+      - name: Start API Server & Run DAST
+        id: dast_scan
+        continue-on-error: true
+        uses: BerniWittmann/background-server-action@fbfaacbe6c290e043ac0cc66c429d22f6eed87e2 #v1.1.1
+        env:
+          # Needed because wait-on otherwise rejects self-signed TLS certs on
+          # the test instance of the API server.
+          NODE_TLS_REJECT_UNAUTHORIZED: 0
+        with:
+          build: yarn --version
+          start: ${{ inputs.server_start_command || 'yarn start:api-server' }}
+          command: bash ~/run-dast-scan.sh
+          command-windows: echo "The project build is not supported on the Windows operating system. Please use Linux or macOS"
+          wait-on-timeout: ${{ inputs.wait_on_timeout || 120 }}
+          wait-on-command: |
+            curl -X GET ${{ inputs.server_healthcheck_url || 'https://localhost:4000/api/v1/api-server/healthcheck' }} -k -H "Authorization: Bearer ${{ env.dast_jwt }}"
+
+      # --- Evaluate results --------------------------------------------------
+      # SARIF severity mapping used by nuclei:
+      #   critical / high  -> level: error
+      #   medium           -> level: warning
+      #   low              -> level: note
+      #
+      # Gate logic:
+      #   high/critical found  -> exit 1  (build fails)
+      #   medium only          -> exit 0  (build passes, ::warning annotation)
+      #   no findings          -> exit 0  (build passes cleanly)
+      - name: Evaluate DAST scan results
+        run: |
+          HIGH_CRITICAL=0
+          MEDIUM=0
+
+          for SARIF in nuclei-dast.sarif nuclei-passive.sarif; do
+            if [ -f "$SARIF" ]; then
+              HC=$(jq '[.runs[].results[] | select(.level == "error")] | length' "$SARIF" 2>/dev/null || echo 0)
+              MED=$(jq '[.runs[].results[] | select(.level == "warning")] | length' "$SARIF" 2>/dev/null || echo 0)
+              HIGH_CRITICAL=$((HIGH_CRITICAL + HC))
+              MEDIUM=$((MEDIUM + MED))
+              echo "[$SARIF] high/critical=$HC  medium=$MED"
+            else
+              echo "[$SARIF] not found -- nuclei may not have produced output for this pass"
+            fi
+          done
+
+          echo "Total high/critical : $HIGH_CRITICAL"
+          echo "Total medium        : $MEDIUM"
+
+          if [ "$HIGH_CRITICAL" -gt 0 ]; then
+            echo "::error::DAST scan found $HIGH_CRITICAL high/critical severity issue(s). Failing build."
+            exit 1
+          elif [ "$MEDIUM" -gt 0 ]; then
+            echo "::warning::DAST scan found $MEDIUM medium severity issue(s). Review recommended before merge."
+          else
+            echo "DAST scan passed -- no issues found."
+          fi
+
+      # --- SARIF upload ------------------------------------------------------
+      # Collect both SARIF files into a single directory so upload-sarif can
+      # ingest them in one call. The step always runs so results are visible
+      # in the GitHub Security tab even when the evaluate step failed.
+      - name: Collect SARIF files
+        if: always()
+        run: |
+          mkdir -p sarif-results
+          if [ -f nuclei-dast.sarif    ]; then cp nuclei-dast.sarif    sarif-results/; fi
+          if [ -f nuclei-passive.sarif ]; then cp nuclei-passive.sarif sarif-results/; fi
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@8aad20d150bbac5944a9f9d289da16a4b0d87c1e #v4.36.2
+        if: always()
+        with:
+          sarif_file: sarif-results
+          category: nuclei-dast-satp
+
+      # --- Artifacts ---------------------------------------------------------
+      - name: Upload scan artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+        if: always()
+        with:
+          name: nuclei-dast-satp-results
+          path: |
+            nuclei-dast.log
+            nuclei-passive.log
+            sarif-results/

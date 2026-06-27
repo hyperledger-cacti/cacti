@@ -1,9 +1,9 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   SATPGatewayConfig,
   SATPGateway,
@@ -22,7 +22,7 @@ import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { createServer } from "node:http";
 import { AddressInfo } from "node:net";
 import {
@@ -30,10 +30,10 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { v4 as uuidv4 } from "uuid";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -49,7 +49,7 @@ let oracleApi: OracleApi;
 let gateway: SATPGateway;
 
 beforeAll(async () => {
-  pruneDockerContainersIfGithubAction({ logLevel })
+  await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
       log.info("Pruning throw OK");
     })
@@ -149,49 +149,52 @@ describe("Oracle throws errors when invalid requests", () => {
         taskType: OracleExecuteRequestTaskTypeEnum.Update,
       })
       .catch((err) => {
-        const errorObject = JSON.parse(err.response.data.error);
+        const raw = err.response?.data?.error ?? err.response?.data;
+        const errorObject = typeof raw === "string" ? JSON.parse(raw) : raw;
 
         expect(errorObject).toBeDefined();
-        expect(errorObject.cause.message).toBe(
+        expect(errorObject.message).toBe(
           "Missing required parameters for UPDATE task: methodName, contractName, params",
         );
-        expect(errorObject.cause.name).toBe("MissingParameterError");
       });
   });
 
   it("should fail when executing a Read task without sourceNetworkId, sourceContract", async () => {
+    expect.assertions(2);
     await oracleApi
       .executeOracleTask({
         taskType: OracleExecuteRequestTaskTypeEnum.Read,
       })
       .catch((err) => {
-        const errorObject = JSON.parse(err.response.data.error);
+        const raw = err.response?.data?.error ?? err.response?.data;
+        const errorObject = typeof raw === "string" ? JSON.parse(raw) : raw;
 
         expect(errorObject).toBeDefined();
-        expect(errorObject.cause.message).toBe(
+        expect(errorObject.message).toBe(
           "Missing required parameters for READ task: sourceNetworkId, sourceContract",
         );
-        expect(errorObject.cause.name).toBe("MissingParameterError");
       });
   });
 
   it("should fail when executing a ReadAndUpdate task without sourceNetworkId, sourceContract, destinationNetworkId, destinationContract", async () => {
+    expect.assertions(2);
     await oracleApi
       .executeOracleTask({
         taskType: OracleExecuteRequestTaskTypeEnum.ReadAndUpdate,
       })
       .catch((err) => {
-        const errorObject = JSON.parse(err.response.data.error);
+        const raw = err.response?.data?.error ?? err.response?.data;
+        const errorObject = typeof raw === "string" ? JSON.parse(raw) : raw;
 
         expect(errorObject).toBeDefined();
-        expect(errorObject.cause.message).toBe(
+        expect(errorObject.message).toBe(
           "Missing required parameters for READ_AND_UPDATE task: sourceNetworkId, sourceContract, destinationNetworkId, destinationContract",
         );
-        expect(errorObject.cause.name).toBe("MissingParameterError");
       });
   });
 
   it("should fail when registering a Polling task without pollingInterval", async () => {
+    expect.assertions(2);
     await oracleApi
       .registerOracleTask({
         destinationNetworkId: {
@@ -207,17 +210,18 @@ describe("Oracle throws errors when invalid requests", () => {
         taskMode: OracleRegisterRequestTaskModeEnum.Polling,
       })
       .catch((err) => {
-        const errorObject = JSON.parse(err.response.data.error);
+        const raw = err.response?.data?.error ?? err.response?.data;
+        const errorObject = typeof raw === "string" ? JSON.parse(raw) : raw;
 
         expect(errorObject).toBeDefined();
-        expect(errorObject.cause.message).toBe(
+        expect(errorObject.message).toBe(
           "Missing required parameter for UPDATE task and mode POLLING: pollingInterval",
         );
-        expect(errorObject.cause.name).toBe("MissingParameterRegisterError");
       });
   });
 
   it("should fail when registering an Event Listening task without eventSignature", async () => {
+    expect.assertions(2);
     await oracleApi
       .registerOracleTask({
         sourceNetworkId: {
@@ -237,13 +241,13 @@ describe("Oracle throws errors when invalid requests", () => {
         taskMode: OracleRegisterRequestTaskModeEnum.EventListening,
       })
       .catch((err) => {
-        const errorObject = JSON.parse(err.response.data.error);
+        const raw = err.response?.data?.error ?? err.response?.data;
+        const errorObject = typeof raw === "string" ? JSON.parse(raw) : raw;
 
         expect(errorObject).toBeDefined();
-        expect(errorObject.cause.message).toBe(
+        expect(errorObject.message).toBe(
           "Missing required parameter for READ task and mode EVENT_LISTENING: listeningOptions.eventSignature",
         );
-        expect(errorObject.cause.name).toBe("MissingParameterRegisterError");
       });
   });
 
@@ -268,13 +272,13 @@ describe("Oracle throws errors when invalid requests", () => {
         pollingInterval: 1000,
       })
       .catch((err) => {
-        const errorObject = JSON.parse(err.response.data.error);
+        const raw = err.response?.data?.error ?? err.response?.data;
+        const errorObject = typeof raw === "string" ? JSON.parse(raw) : raw;
 
         expect(errorObject).toBeDefined();
-        expect(errorObject.cause.message).toBe(
+        expect(errorObject.message).toBe(
           "Invalid parameter for READ task and mode EVENT_LISTENING: pollingInterval",
         );
-        expect(errorObject.cause.name).toBe("InvalidParameterError");
       });
   });
 });

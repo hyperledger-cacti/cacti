@@ -41,7 +41,9 @@ The current Cacti code base contains the legacy Cactus and Weaver source code in
 
 ## Documentation
 
-See the official [Hyperledger Cacti documentation](https://hyperledger-cacti.github.io/cacti/) to get all your questions answered about the project, to get started with setup, testing, and evaluation, and to get hands-on with code and configurations. Here, you can find separate (and specific) instructions for getting started with running and experimenting with [Cactus modules](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver modules](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) respectively.
+See the official [Confluence high-level project overview](https://lf-hyperledger.atlassian.net/wiki/spaces/cactus/overview?homepageId=20414469).
+
+For project vision and goals, technical details, and more, see the official [Hyperledger Cacti documentation](https://hyperledger-cacti.github.io/cacti/) to get all your questions answered about the project, to get started with setup, testing, and evaluation, and to get hands-on with code and configurations. Here, you can find separate (and specific) instructions for getting started with running and experimenting with [Cactus modules](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver modules](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) respectively.
 
 ## Roadmap
 

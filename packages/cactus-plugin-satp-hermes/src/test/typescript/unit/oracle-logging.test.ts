@@ -5,6 +5,7 @@ import {
   OraclePersistence,
   type OracleLogEntry,
 } from "../../../main/typescript/database/oracle-persistence";
+import { createOracleLogKnexConfig } from "../../../main/typescript/database/knexfile";
 import type { OracleLog } from "../../../main/typescript/core/types";
 import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 import { OracleManager } from "../../../main/typescript/cross-chain-mechanisms/oracle/oracle-manager";
@@ -264,6 +265,78 @@ describe("Oracle Logging", () => {
       const exposedRepo = persistence.getOracleLogRepository();
       expect(exposedRepo).toBe(repo);
     });
+
+    it("stores a very large data payload without throwing (regression)", async () => {
+      const huge = "x".repeat(256 * 1024); // 256 KB
+
+      const entry: OracleLogEntry = {
+        taskId: "oversized-task",
+        type: "fail",
+        operation: "deploy-oracle",
+        data: huge,
+        sequenceNumber: 0,
+      };
+
+      await expect(persistence.storeOracleLog(entry)).resolves.toBeUndefined();
+
+      const logs = await repo.readByTaskId("oversized-task");
+      expect(logs).toHaveLength(1);
+      expect(logs[0].data).toBe(huge);
+    });
+
+    it("stores a very large taskId without throwing", async () => {
+      const hugeTaskId = "t".repeat(4096);
+
+      await expect(
+        persistence.storeOracleLog({
+          taskId: hugeTaskId,
+          type: "init",
+          operation: "deploy-oracle",
+          data: "ok",
+          sequenceNumber: 0,
+        }),
+      ).resolves.toBeUndefined();
+
+      const logs = await repo.readByTaskId(hugeTaskId);
+      expect(logs).toHaveLength(1);
+      expect(logs[0].taskId).toBe(hugeTaskId);
+    });
+
+    it("serializes non-string data into JSON without throwing", async () => {
+      const payload = { nested: { deep: { value: 42 } }, list: [1, 2, 3] };
+
+      await persistence.storeOracleLog({
+        taskId: "json-task",
+        type: "exec",
+        operation: "execute-task",
+        data: payload as unknown as string,
+        sequenceNumber: 0,
+      });
+
+      const logs = await repo.readByTaskId("json-task");
+      expect(logs).toHaveLength(1);
+      expect(() => JSON.parse(logs[0].data)).not.toThrow();
+      expect(JSON.parse(logs[0].data)).toEqual(payload);
+    });
+
+    it("does not throw when serializing values with cycles", async () => {
+      const cyclic: Record<string, unknown> = { name: "cycle" };
+      cyclic.self = cyclic;
+
+      await expect(
+        persistence.storeOracleLog({
+          taskId: "cycle-task",
+          type: "exec",
+          operation: "execute-task",
+          data: cyclic as unknown as string,
+          sequenceNumber: 0,
+        }),
+      ).resolves.toBeUndefined();
+
+      const logs = await repo.readByTaskId("cycle-task");
+      expect(logs).toHaveLength(1);
+      expect(logs[0].data).toContain("[Circular]");
+    });
   });
 
   describe("OracleManager with persistence", () => {
@@ -341,5 +414,96 @@ describe("Oracle Logging", () => {
         expect(log.timestamp).toBeDefined();
       }
     });
+  });
+});
+
+describe("SQLite oracle log database isolation", () => {
+  it("two repos with the same instanceId share the same file database", async () => {
+    // Two KnexOracleLogRepository instances backed by the same file path
+    // behave as connections to the same database.
+    const instanceId = "same-db-test";
+    const repoA = new KnexOracleLogRepository(
+      createOracleLogKnexConfig(instanceId),
+    );
+    await repoA.database.migrate.latest();
+
+    // Open a second handle to the same file (simulates pool connection #2).
+    const repoB = new KnexOracleLogRepository(
+      createOracleLogKnexConfig(instanceId),
+    );
+
+    // Insert via repoA, read back via repoB.
+    const log: OracleLog = {
+      key: "shared-key-1",
+      taskId: "shared-task",
+      type: "init",
+      operation: "deploy-oracle",
+      data: "hello",
+      timestamp: Date.now().toString(),
+      sequenceNumber: 0,
+    };
+    await repoA.create(log);
+
+    const result = await repoB.readById("shared-key-1");
+    expect(result).toBeDefined();
+    expect(result.data).toBe("hello");
+
+    await repoA.destroy();
+    await repoB.destroy();
+  });
+
+  it("two file-based databases with different instanceIds are isolated", async () => {
+    const repoAlpha = new KnexOracleLogRepository(
+      createOracleLogKnexConfig("alpha"),
+    );
+    const repoBeta = new KnexOracleLogRepository(
+      createOracleLogKnexConfig("beta"),
+    );
+
+    await repoAlpha.database.migrate.latest();
+    await repoBeta.database.migrate.latest();
+
+    const logAlpha: OracleLog = {
+      key: "alpha-key-1",
+      taskId: "alpha-task",
+      type: "init",
+      operation: "deploy-oracle",
+      data: "alpha-data",
+      timestamp: Date.now().toString(),
+      sequenceNumber: 0,
+    };
+    await repoAlpha.create(logAlpha);
+
+    // beta database must not contain the row written to alpha.
+    const inBeta = await repoBeta.readByTaskId("alpha-task");
+    expect(inBeta).toHaveLength(0);
+
+    await repoAlpha.destroy();
+    await repoBeta.destroy();
+  });
+
+  it("migrate.latest() then insert does not produce 'no such table' error", async () => {
+    const instanceId = "migrate-then-insert";
+    const repo = new KnexOracleLogRepository(
+      createOracleLogKnexConfig(instanceId),
+    );
+    await repo.database.migrate.latest();
+
+    const log: OracleLog = {
+      key: "mti-key-1",
+      taskId: "mti-task",
+      type: "exec",
+      operation: "execute-task",
+      data: "ok",
+      timestamp: Date.now().toString(),
+      sequenceNumber: 0,
+    };
+
+    await expect(repo.create(log)).resolves.toBeDefined();
+
+    const rows = await repo.readByTaskId("mti-task");
+    expect(rows).toHaveLength(1);
+
+    await repo.destroy();
   });
 });
