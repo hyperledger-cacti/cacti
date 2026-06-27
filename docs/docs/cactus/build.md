@@ -232,6 +232,6 @@ By creating a PR for the edited `ci.yml` file, this will the CI to run their tes
 
 Click on the `CI Cactus workflow`. There should be a new job you’ve created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what’s you’ve named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh \*\*\*\*\*\*\*\*\*\*:\*\*\*\*\*\*\*\*\*\*\*@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
 
-[Previous](introduction.md "Welcome to Hyperledger Cactus documentation!") [Next](examples.md "Examples")
+[Previous](introduction.md "Welcome to Hyperledger Cacti documentation!") [Next](examples.md "Examples")
 
 * * *

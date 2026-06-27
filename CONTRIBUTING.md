@@ -27,7 +27,7 @@
 Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
 
-First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
+First things first, please review the [LF Decentralized Trust Code of Conduct](https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct) before participating.
 If you use AI or LLM tooling in your contributions, please also review our [AI Guidelines](./AI_GUIDELINES.md).
 
 There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
@@ -108,7 +108,7 @@ including concrete examples.
 ## PR Checklist - Contributor/Developer
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
-1. Fork [hyperledger/cacti](https://github.com/hyperledger-cacti/cacti) via Github UI
+1. Fork [hyperledger-cacti/cacti](https://github.com/hyperledger-cacti/cacti) via Github UI
    - If you are using the Git client on the Windows operating system, you will need to enable long paths for git
      which you can do in PowerShell by executing the command below.
      To clarify, this may also apply if you are using any Git GUI application on Windows such as `Github Desktop` or others.
@@ -682,4 +682,3 @@ Bottom line: Do not use the the `^`, `~` and `*` syntax elements while declaring
 Further details:
 - https://reproducible-builds.org/
 - https://spin.atomicobject.com/2016/12/16/reproducible-builds-npm-yarn/
-
