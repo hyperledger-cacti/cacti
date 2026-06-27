@@ -133,10 +133,6 @@ export class Verifier<LedgerApiType extends ISocketApiClient<unknown>>
    * @param appId - ID of application that requested the monitoring.
    */
   stopMonitor(appId: string): void {
-    if (!this.ledgerApi.watchBlocksV1) {
-      throw new Error("stopMonitor not supported on this ledger");
-    }
-
     const watchBlocksSub = this.runningMonitors.get(appId);
     if (!watchBlocksSub) {
       throw new Error("No monitor running with appId: " + appId);
