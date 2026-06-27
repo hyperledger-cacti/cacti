@@ -1,7 +1,7 @@
 Cactus Components
 ====================================================================
 
-This section contains the components to form Hyperledger Cactus.
+This section contains the components to form Hyperledger Cacti.
 
 *   [Api Client](packages/cactus-api-client.md)
 *   [CMD Api Server](packages/cactus-cmd-api-server.md)
