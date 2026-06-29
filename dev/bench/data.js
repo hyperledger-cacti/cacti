@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782379248402,
+  "lastUpdate": 1782726305602,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -130,6 +130,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.60%",
             "unit": "ops/sec",
             "extra": "179 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Mustafa Sayyed",
+            "username": "mustafa-sayyed",
+            "email": "mustafasayyed2429@gmail.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "id": "e9803814046525539f03cdc046105ccde86ca141",
+          "message": "docs: fix image path in Build.md\n\nSigned-off-by: Mustafa Sayyed <mustafasayyed2429@gmail.com>",
+          "timestamp": "2026-05-10T18:45:51Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/e9803814046525539f03cdc046105ccde86ca141"
+        },
+        "date": 1782726302749,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 622,
+            "range": "±3.06%",
+            "unit": "ops/sec",
+            "extra": "175 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 636,
+            "range": "±2.04%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
