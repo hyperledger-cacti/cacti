@@ -38,7 +38,7 @@ It also supports re-running the OpenAPI generator when you update any
 
 The `npm run watch` script in action:
 
-![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
+![Fast Developer Flow / Code Iterations](./images/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
 
 ## Getting Started
 
@@ -281,7 +281,7 @@ line of code for example.
 To figure out which script could work for rebuilding Cactus, please follow
 the following decision tree (and keep in mind that we have `npm run watch` too)
 
-![Build Script Decision Tree](./docs/docs/cactus/_images/build-script-decision-tree-2021-03-06.png)
+![Build Script Decision Tree](./images/build-script-decision-tree-2021-03-06.png)
 
 ## Running CI Checks Locally Before Pushing
 

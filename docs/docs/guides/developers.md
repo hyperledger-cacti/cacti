@@ -18,4 +18,4 @@ For more detailed information, please refer to:
 - [Cacti Contributions guide](../contributing/how-to-contribute.md) - How to contribute to the project
 - [Project best practices](../references/best-practices.md) - Coding standards and conventions
 - [Architecture overview](../architecture.md) - Understanding the integrated architecture
-- [Cactus packages](../cactus/packages.md) - Documentation for individual components
+- [API Specifications](../references/openapi/index.md) - OpenAPI specs for Cacti components

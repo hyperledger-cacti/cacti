@@ -878,9 +878,9 @@ main().catch(console.error);
 
 ## Next Steps
 
-- **Level 1**: Check out the [connector documentation](../cactus/packages.md) for your target ledger
-- **Level 2**: See the [API Server configuration guide](../cactus/packages/cactus-cmd-api-server.md)
-- **Level 3**: Study the [Supply Chain Example](../cactus/examples/supply-chain-app.md) as a complete reference
+- **Level 1**: Check out the specific ledger connector package READMEs under `packages/`
+- **Level 2**: See the `@hyperledger/cactus-cmd-api-server` package README on GitHub
+- **Level 3**: Study the example applications under `examples/`
 
 ## Getting Help
 
