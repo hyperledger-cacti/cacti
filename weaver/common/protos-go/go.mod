@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3
 
-go 1.20
+go 1.25.0
 
 require (
 	github.com/hyperledger/fabric-protos-go v0.3.3
@@ -10,8 +10,8 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.4 // indirect
-	golang.org/x/net v0.33.0 // indirect
-	golang.org/x/sys v0.30.0 // indirect
-	golang.org/x/text v0.22.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/sys v0.45.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
 )
