@@ -161,7 +161,7 @@ export function checkConfigElementFormat<T>(
       return false;
     } else {
       if (ccElement.configSubElementType) {
-        obj[ccElement.configElement].forEach((subEl: unknown) => {
+        for (const subEl of obj[ccElement.configElement]) {
           if (
             typeof subEl !== ccElement.configSubElementType ||
             subEl === null
@@ -171,9 +171,9 @@ export function checkConfigElementFormat<T>(
             );
             return false;
           }
-        });
+        }
       } else if (ccElement.configSubElementFunctionTypeguard) {
-        obj[ccElement.configElement].forEach((subEl: unknown) => {
+        for (const subEl of obj[ccElement.configElement]) {
           if (
             !ccElement.configSubElementFunctionTypeguard!(subEl, log) ||
             subEl === null
@@ -183,7 +183,7 @@ export function checkConfigElementFormat<T>(
             );
             return false;
           }
-        });
+        }
       } else {
         return true;
       }
