@@ -32,6 +32,7 @@ The plugin supports both bidirectional and unidirectional asset transfers with t
 - [Containerization](#containerization)
 - [Running local Gateway with Docker Compose](#running-local-gateway-with-docker-compose)
 - [Contributing](#contributing)
+- [Release Process](#release-process)
 - [License](#license)
 
 ## Assumptions
@@ -1021,8 +1022,10 @@ We welcome contributions to Hyperledger Cacti in many forms, and there’s alway
 
 Please review [CONTRIBUTING.md](https://github.com/hyperledger-cacti/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
 
-## Release process
-TBD. For each release, a commit in the form: "chore(satp-hermes): version X release" will be made.
+## Release Process
+
+See [docs/satp-release-process.md](docs/satp-release-process.md) for the full release process, including the dev and production build types and the release checklist.
+
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.
