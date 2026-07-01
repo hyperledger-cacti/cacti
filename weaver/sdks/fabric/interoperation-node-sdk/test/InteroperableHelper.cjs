@@ -20,7 +20,9 @@ const { Wallets } = require("fabric-network");
 const { ContractImpl } = require("fabric-network/lib/contract");
 const { NetworkImpl } = require("fabric-network/lib/network");
 const { Transaction } = require("fabric-network/lib/transaction");
+const rewire = require("rewire");
 const ecies = require("../src/eciesCrypto");
+const eciesRewire = rewire("../src/eciesCrypto");
 const {
   decryptRemoteProposalResponse,
   decryptRemoteChaincodeOutput,
@@ -184,6 +186,51 @@ describe("InteroperableHelper", () => {
           expect(decryptedData.toString()).to.equal(data);
         }).to.not.throw();
       }).to.not.throw();
+    });
+
+    it("encrypt and decrypt succeeds when ECDH shared secret has leading zero bytes", () => {
+      // This ephemeral key pair produces a 31-byte ECDH shared secret (instead of 32)
+      // with the test certificate's public key — i.e. the x-coordinate has a leading zero byte.
+      // Before the fix, eciesEncryptMessage passed the unpadded 31-byte Z to the KDF while
+      // eciesDecryptMessage padded it to 32 bytes, causing both sides to derive different AES
+      // keys and making decryption silently produce garbage.
+      const EPH_PRV_KEY_HEX =
+        "892accb7d43be70e35d3aaec462fdd7a1ec26d4165b7664870ae85e6659e935c";
+      const EPH_PUB_KEY_HEX =
+        "04c02a5125227af6b07e65c28a81cf523ce8a1e99abfbd299ff96cc68d589130fcff29ab5277e6c15a0953e68ec73b170481f16dcacad482987e128c9591d90adb";
+
+      const data = '{ "data": "xyz" }';
+      const privKeyFile = `${__dirname}/data/privKey.pem`;
+      const privKeyPEM = fs.readFileSync(privKeyFile).toString();
+      const privKey = keyutil.getKeyFromPlainPrivatePKCS8PEM(privKeyPEM);
+      const signCertFile = `${__dirname}/data/signCert.pem`;
+      const signCertPEM = fs.readFileSync(signCertFile).toString();
+      const pubKey = keyutil.getKey(signCertPEM);
+      const cryptoOptions = { hashAlgorithm: "SHA2" };
+
+      const jsrsa = eciesRewire.__get__("jsrsa");
+      const stub = sinon.stub(jsrsa.KEYUTIL, "generateKeypair").returns({
+        prvKeyObj: { prvKeyHex: EPH_PRV_KEY_HEX },
+        pubKeyObj: { pubKeyHex: EPH_PUB_KEY_HEX },
+      });
+
+      try {
+        const encryptedData = eciesRewire.eciesEncryptMessage(
+          pubKey,
+          Buffer.from(data),
+          cryptoOptions,
+          32,
+        );
+        const decryptedData = ecies.eciesDecryptMessage(
+          privKey,
+          encryptedData,
+          cryptoOptions,
+          32,
+        );
+        expect(decryptedData.toString()).to.equal(data);
+      } finally {
+        stub.restore();
+      }
     });
   });
 
