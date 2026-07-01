@@ -10,7 +10,7 @@ If you take on the burden of implementing a feature yourself no one should stop 
 
 For example: 
 * Support being added for new ledgers by implementing new connector plugins is always welcome.
-* On the other hand, if you want to repurpose Cacti to be the operating system for a driverless ice-cream truck you are developing that that **may** not get accepted by the maintainers even if you are happy to do all the work yourself.
+* On the other hand, if you want to repurpose Cacti to be the operating system for a driverless ice-cream truck you are developing that **may** not get accepted by the maintainers even if you are happy to do all the work yourself.
 
 # Breakdown by each release
 

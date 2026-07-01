@@ -161,7 +161,7 @@ message CreateAssetRequest {
 }
 ```
 
-Commit-ready (3.3): Gateway G2 sends a commit-ready message to G1 indicating that it is ready to carry-out the last steps of the commitment subprotocol. Note that that the entire asset transfer session can be aborted before this step without affecting the asset state in the respective networks:
+Commit-ready (3.3): Gateway G2 sends a commit-ready message to G1 indicating that it is ready to carry-out the last steps of the commitment subprotocol. Note that the entire asset transfer session can be aborted before this step without affecting the asset state in the respective networks:
 
 ```protobuf
 message CommitReadyRequest {
