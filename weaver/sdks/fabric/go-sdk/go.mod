@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v3
 
-go 1.20
+go 1.21
 
 require (
 	github.com/golang/protobuf v1.5.4
@@ -8,7 +8,7 @@ require (
 	github.com/hyperledger/fabric-admin-sdk v0.0.0
 	github.com/hyperledger/fabric-gateway v1.2.1
 	github.com/hyperledger/fabric-protos-go v0.3.3
-	github.com/sirupsen/logrus v1.8.1
+	github.com/sirupsen/logrus v1.8.3
 	github.com/stretchr/testify v1.8.1
 	google.golang.org/grpc v1.64.1
 	google.golang.org/protobuf v1.36.5
