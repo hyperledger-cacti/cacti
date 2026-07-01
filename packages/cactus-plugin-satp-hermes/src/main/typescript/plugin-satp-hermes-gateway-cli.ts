@@ -359,6 +359,21 @@ export async function launchGateway(
       validateKnexRepositoryConfig({ configValue: config.remoteRepository }),
   );
 
+  const auditRepository = await runValidation(
+    "Audit Repository Config",
+    logger,
+    () => validateKnexRepositoryConfig({ configValue: config.auditRepository }),
+  );
+
+  const oracleLogRepository = await runValidation(
+    "Oracle Log Repository Config",
+    logger,
+    () =>
+      validateKnexRepositoryConfig({
+        configValue: config.oracleLogRepository,
+      }),
+  );
+
   const enableCrashRecovery = await runValidation(
     "SATP Enable Crash Recovery",
     logger,
@@ -407,6 +422,8 @@ export async function launchGateway(
     enableCrashRecovery,
     localRepository,
     remoteRepository,
+    auditRepository,
+    oracleLogRepository,
     extensions,
     adapterConfig,
     pluginRegistry: new PluginRegistry({ plugins: [] }),

@@ -105,7 +105,6 @@ import {
   ConfigService,
 } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
-import { createMigrationSource } from "./database/knex-migration-source";
 import { ExtensionsManager } from "./extensions/extensions-manager";
 import { MonitorService } from "./services/monitoring/monitor";
 import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
@@ -673,6 +672,21 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         createOracleLogKnexConfig(this.instanceId),
       );
     }
+
+    this.onShutdown({
+      name: "destroy-db-repositories",
+      hook: async () => {
+        const repositories = [
+          this.localRepository,
+          this.remoteRepository,
+          this.auditRepository,
+          this.oracleLogRepository,
+        ].filter((r): r is NonNullable<typeof r> => r != null);
+        for (const repo of repositories) {
+          await repo.destroy();
+        }
+      },
+    });
 
     if (this.config.keyPair === undefined) {
       throw new Error("Key pair is undefined");
@@ -1248,29 +1262,16 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     await context.with(ctx, async () => {
       try {
-        if (!this.config.localRepository) {
-          this.logger.info(`${fnTag}: Local repository is not defined`);
-          this.logger.info(`${fnTag}: Using default local repository`);
-          this.config.localRepository = knexLocalInstance.default;
-        }
-        this.logger.info(`${fnTag}: Creating migration source`);
-        const migrationSource = await createMigrationSource();
-        this.logger.info(
-          `${fnTag}: Created migration source: ${JSON.stringify(migrationSource)}`,
-        );
-        const database = knex({
-          ...this.config.localRepository,
-          migrations: {
-            // This removes the problem with the migration source being in the file system
-            migrationSource: migrationSource,
-          },
-        });
+        const repositories = [
+          this.localRepository,
+          this.remoteRepository,
+          this.auditRepository,
+          this.oracleLogRepository,
+        ].filter((r): r is NonNullable<typeof r> => r != null);
 
-        await database.migrate.latest();
-        await this.oracleLogRepository.database.migrate.latest();
-        await (
-          this.auditRepository as AuditEntryRepository
-        ).database.migrate.latest();
+        for (const repo of repositories) {
+          await repo.migrate();
+        }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
