@@ -60,6 +60,9 @@ jobs:
           yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
           echo "success=true" >> "$GITHUB_OUTPUT"
 
+      - name: Lint
+        run: yarn lerna run lint:ci --scope=@hyperledger/cactus-plugin-satp-hermes
+
       # Upload build artifacts for reuse in other jobs
       - name: Upload build output
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1

@@ -131,6 +131,7 @@
     "forge:build:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
     "forge:test": "forge test --out ./src/test/solidity/generated",
     "format:eslint": "npx eslint --config ./eslint.config.mjs '**/*.{js,ts}' --quiet --fix",
+    "lint:ci": "npx eslint --config ./eslint.config.mjs '**/*.{js,ts}' --quiet",
     "format:prettier": "prettier --write --config ../../.prettierrc.js --ignore-path .prettierignore \"**/{openapi.json,*.ts,*.js}\"",
     "generate-sdk": "run-s 'generate-sdk:*'",
     "generate-sdk:typescript-axios-bol": "yarn bundle-openapi-yaml && yarn bundle-openapi-json && openapi-generator-cli generate -i ./src/main/yml/bol/oapi-api1-bundled.yml -g typescript-axios -o ./src/main/typescript/generated/gateway-client/typescript-axios/ --reserved-words-mappings protected=protected --enable-post-process-file",
