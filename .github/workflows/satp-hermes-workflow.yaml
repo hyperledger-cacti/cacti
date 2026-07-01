@@ -11,7 +11,7 @@ name: SATP Hermes Package Workflow
         #   This workflow has been modularized into separate stage-specific workflows:
         #   - Unit and integration testing
         #   - Docker image building and publishing
-        #   - .github/workflows/satp-hermes-release.yaml - GitHub release creation
+        #   - .github/workflows/satp-hermes-manual-release.yaml - GitHub release creation
         #
         # Triggers:
         #   - workflow_call: invoked by packages-workflow.yaml when the SATP Hermes package is affected

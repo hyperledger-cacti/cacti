@@ -1,4 +1,4 @@
-name: SATP Hermes Gateway Release
+name: SATP Hermes Gateway Manual Release
 
 on:
   workflow_call:
@@ -55,7 +55,7 @@ jobs:
   # It creates a proper GitHub release with changelog and Docker image information
 
   create-github-release:
-    if: inputs.is_release == 'true'
+    if: ${{ inputs.is_release }}
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
@@ -76,7 +76,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: satp-v${{ inputs.tag_version }}
+          tag_name: v${{ inputs.tag_version }}
           release_name: SATP Hermes Gateway v${{ inputs.tag_version }}
           body: |
             # SATP Hermes Gateway Release v${{ inputs.tag_version }}
@@ -87,14 +87,14 @@ jobs:
             
             **Docker Hub:**
             ```bash
-            docker pull hyperledger/satp-hermes-gateway:${{ inputs.tag_version }}
-            docker pull hyperledger/satp-hermes-gateway:latest
+            docker pull hyperledger/cacti-satp-hermes-gateway:${{ inputs.tag_version }}
+            docker pull hyperledger/cacti-satp-hermes-gateway:latest
             ```
             
             **GitHub Container Registry:**
             ```bash
-            docker pull ghcr.io/hyperledger/satp-hermes-gateway:${{ inputs.tag_version }}
-            docker pull ghcr.io/hyperledger/satp-hermes-gateway:latest
+            docker pull ghcr.io/hyperledger-cacti/cacti-satp-hermes-gateway:${{ inputs.tag_version }}
+            docker pull ghcr.io/hyperledger-cacti/cacti-satp-hermes-gateway:latest
             ```
             
             ## Release Information
