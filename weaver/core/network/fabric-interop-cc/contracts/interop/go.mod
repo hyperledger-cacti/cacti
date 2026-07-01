@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v3
 
-go 1.20
+go 1.21
 
 require (
 	github.com/ethereum/go-ethereum v1.13.15
@@ -9,7 +9,7 @@ require (
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a
 	github.com/hyperledger/fabric-contract-api-go v1.2.1
 	github.com/hyperledger/fabric-protos-go v0.3.3
-	github.com/sirupsen/logrus v1.9.0
+	github.com/sirupsen/logrus v1.9.1
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/crypto v0.31.0
 	google.golang.org/protobuf v1.36.5
