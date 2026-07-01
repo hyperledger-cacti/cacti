@@ -36,15 +36,15 @@ import type {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   type Logger,
   Checks,
   LoggerProvider,
   type IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
-import { registerWebServiceEndpoint } from "@hyperledger/cactus-core";
+import { registerWebServiceEndpoint } from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
@@ -113,7 +113,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    */
   public getPath(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"];
+      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit"];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
@@ -128,7 +128,7 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    */
   public getVerbLowerCase(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"];
+      OAS.paths["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit"];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
@@ -142,8 +142,9 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    * @since 0.0.3-beta
    */
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/audit"].get
-      .operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit"
+    ].get.operationId;
   }
 
   /**
@@ -199,6 +200,34 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
   }
 
   /**
+   * Helper method to parse and validate required ISO-8601 timestamp parameters.
+   *
+   * Validates that the input value is a string and can be parsed as a valid
+   * ISO-8601 date. Throws an error with appropriate status code if validation
+   * fails.
+   * @param value
+   * @param name
+   * @returns
+   */
+  private parseRequiredIso(value: unknown, name: string): Date {
+    if (typeof value !== "string") {
+      const err = new Error(`${name} must be an ISO-8601 string`);
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    const date = new Date(value);
+
+    if (isNaN(date.getTime())) {
+      const err = new Error(`${name} must be a valid ISO-8601 timestamp`);
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    return date;
+  }
+
+  /**
    * Handle HTTP requests for audit operations.
    *
    * Processes audit requests by parsing query parameters for timestamp
@@ -214,27 +243,45 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
   public async handleRequest(req: Request, res: Response): Promise<void> {
     const reqTag = `${this.getVerbLowerCase()} - ${this.getPath()}`;
     this.log.debug(reqTag);
+
     try {
-      const parseTimestamp = (value: unknown): number | null => {
-        if (typeof value === "string" || typeof value === "number") {
-          const num = Number(value);
-          return isNaN(num) ? null : num;
-        }
-        return null;
-      };
+      const startDate = this.parseRequiredIso(
+        req.query["startTimestamp"],
+        "startTimestamp",
+      );
+
+      const endDate =
+        req.query["endTimestamp"] !== undefined
+          ? this.parseRequiredIso(req.query["endTimestamp"], "endTimestamp")
+          : new Date();
+
+      if (startDate.getTime() > endDate.getTime()) {
+        const err = new Error(
+          "startTimestamp must be less than or equal to endTimestamp",
+        );
+        (err as any).statusCode = 400;
+        throw err;
+      }
 
       const auditRequest: AuditRequest = {
-        startTimestamp: parseTimestamp(req.query["startTimestamp"]) || 0,
-        endTimestamp: parseTimestamp(req.query["endTimestamp"]) || Date.now(),
+        startTimestamp: startDate.toISOString(),
+        endTimestamp: endDate.toISOString(),
       };
 
       const result = await this.options.dispatcher.PerformAudit(auditRequest);
+
       res.status(200).json(result);
-    } catch (ex) {
+    } catch (ex: any) {
       this.log.error(`Crash while serving ${reqTag}`, ex);
-      res.status(500).json({
-        message: "Internal Server Error",
-        error: ex?.stack || ex?.message,
+
+      const status = ex?.statusCode ?? 500;
+
+      res.status(status).json({
+        error: status === 400 ? "InvalidParameter" : "InternalError",
+        message:
+          status === 400
+            ? ex?.message ?? "Invalid parameter"
+            : "Internal Server Error",
       });
     }
   }

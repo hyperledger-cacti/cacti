@@ -9,6 +9,90 @@ This document tracks SATP version updates.
 - 🐛 [Open issues](https://github.com/hyperledger-cacti/cacti/issues?q=is%3Aissue%20state%3Aopen%20label%3AIETF-SATP-Hermes)
 - 🏁 [Milestones](https://github.com/hyperledger-cacti/cacti/milestones)
 
+## SATP v0.1.0-alpha
+
+> Previous release: [satp/v0.0.4-beta](https://github.com/hyperledger-cacti/cacti/releases/tag/satp%2Fv0.0.4-beta) (commit [`0c120549`](https://github.com/hyperledger-cacti/cacti/commit/0c120549fd4dc0b8e47e044cdd855d920bdaf1f3))
+>
+> Full diff: [`satp/v0.0.4-beta...satp/v0.1.0-alpha`](https://github.com/hyperledger-cacti/cacti/compare/satp/v0.0.4-beta...satp/v0.1.0-alpha)
+
+
+### 🌟 Key highlights
+
+- **DB write safety**: Fix missing `await` on `storeProof()` and `persistLogEntry()` calls across all stage services (Stage 0, 2, and 3), preventing silent proof loss ([`d82dfa520`](https://github.com/hyperledger-cacti/cacti/commit/d82dfa520), [`e6b005251`](https://github.com/hyperledger-cacti/cacti/commit/e6b005251), issues [#4177](https://github.com/hyperledger-cacti/cacti/issues/4177), [#4167](https://github.com/hyperledger-cacti/cacti/issues/4167))
+- **Stage 3 body verifier fix**: Restore `commonBodyVerifier` enforcement in Stage 3 server service — all SATP protocol checks (version, sequence number, session id, gateway pubkeys, hash chain integrity, message type) are now correctly applied before critical blockchain operations ([`e6b005251`](https://github.com/hyperledger-cacti/cacti/commit/e6b005251))
+- **Audit endpoint improvements**: Dedicated `KnexAuditRepository` backed by a new SQLite database and migration; `startTimestamp`/`endTimestamp` are now required, validated ISO-8601 strings (range-checked) with proper HTTP 400 responses instead of generic 500s; audit service decoupled from `SATPManager` and now takes `IAuditEntryRepository` directly; new `AuditEntryInvalidTimestampError`; updated OpenAPI spec and 3 new unit test suites ([`11a6ad1da`](https://github.com/hyperledger-cacti/cacti/commit/11a6ad1da))
+
+
+
+## What's Changed
+
+### ✨ Features
+
+- feat(satp-hermes): add audit endpoint improvements by Rodolfo Carapau ([`11a6ad1da`](https://github.com/hyperledger-cacti/cacti/commit/11a6ad1da))
+  - New `KnexAuditRepository` with dedicated SQLite DB and migration (`20260118174651_create_audit_entries_table`)
+  - `startTimestamp` now required; both timestamps validated as ISO-8601 with range check (`start ≤ end`)
+  - Structured HTTP 400 (`InvalidParameter`) / 500 (`InternalError`) error responses replacing generic 500s
+  - Audit service (`executeAudit`/`getAuditData`) decoupled from `SATPManager` — takes `IAuditEntryRepository` directly
+  - New `AuditEntryInvalidTimestampError` error type; updated OpenAPI spec; 3 new unit test suites
+
+### 🐛 Bug Fixes
+
+- fix(satp-hermes): await async DB writes in Stage 0 and Stage 2 by [@mn-ram](https://github.com/mn-ram) ([`d82dfa520`](https://github.com/hyperledger-cacti/cacti/commit/d82dfa520)) (issue [#4177](https://github.com/hyperledger-cacti/cacti/issues/4177))
+- fix(satp-hermes): await Stage 3 DB writes and restore body verifier by [@mn-ram](https://github.com/mn-ram) ([`e6b005251`](https://github.com/hyperledger-cacti/cacti/commit/e6b005251)) (issue [#4167](https://github.com/hyperledger-cacti/cacti/issues/4167))
+
+### 📝 Documentation
+
+- docs(satp-hermes): add 0.1.0-alpha release by [@RafaelAPB](https://github.com/RafaelAPB) ([`e294fd3ee`](https://github.com/hyperledger-cacti/cacti/commit/e294fd3ee))
+
+### 🧪 Tests
+
+- test(satp-hermes): fix tests by [@RafaelAPB](https://github.com/RafaelAPB) ([`eea3bb9f4`](https://github.com/hyperledger-cacti/cacti/commit/eea3bb9f4))
+
+### 🧹 Chores / Maintenance
+
+- chore: archive packages by [@RafaelAPB](https://github.com/RafaelAPB) ([`13148f610`](https://github.com/hyperledger-cacti/cacti/commit/13148f610))
+- chore: update yarn by [@RafaelAPB](https://github.com/RafaelAPB) ([`1837c1d26`](https://github.com/hyperledger-cacti/cacti/commit/1837c1d26))
+- chore(root): fix broken scripts and update documentation year by Dev10-sys ([`090ffef36`](https://github.com/hyperledger-cacti/cacti/commit/090ffef36))
+- build(deps): consolidate npm_and_yarn group updates across all dirs by [@sandeepnRES](https://github.com/sandeepnRES) ([`9fd9b6e1a`](https://github.com/hyperledger-cacti/cacti/commit/9fd9b6e1a))
+
+## 📊 Release Summary
+
+| Metric | Value |
+|--------|-------|
+| 🏷️ **Tag** | `satp/v0.1.0-alpha` |
+| ⏮️ **Previous tag** | [`satp/v0.0.4-beta`](https://github.com/hyperledger-cacti/cacti/releases/tag/satp%2Fv0.0.4-beta) |
+| 📅 **Date range** | 2026-04-13 (v0.0.4-beta) — 2026-05-28 |
+| 🔢 **SATP commits** | 4 |
+| 🔢 **Total commits** | 27 |
+| 📁 **SATP files changed** | 63 |
+| ➕ **SATP lines added** | +4,236 |
+| ➖ **SATP lines removed** | −795 |
+| 👥 **Contributors** | 9 |
+
+### 📈 Contributions by type
+
+| Category | Count |
+|----------|------:|
+| ✨ Features | 1 |
+| 🐛 Bug Fixes | 2 |
+| 📝 Documentation | 1 |
+| 🧪 Tests | 1 |
+| 🧹 Chores / Maintenance | 4 |
+
+## 👥 Contributors
+
+- [@RafaelAPB](https://github.com/RafaelAPB)
+- [@mn-ram](https://github.com/mn-ram)
+- Rodolfo Carapau
+- [@sandeepnRES](https://github.com/sandeepnRES)
+- [@VRamakrishna](https://github.com/VRamakrishna)
+- [@malsomesh9](https://github.com/malsomesh9)
+- Dev10-sys
+- Rahul Tripathi
+- Michal Bajer
+
+---
+
 ## SATP v0.0.4-beta
 
 > Release tracking issue: [chore(satp-hermes): release 0.0.4-beta #4021](https://github.com/hyperledger-cacti/cacti/issues/4021)

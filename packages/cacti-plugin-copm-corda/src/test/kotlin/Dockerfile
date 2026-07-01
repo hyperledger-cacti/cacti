@@ -12,7 +12,10 @@ WORKDIR /kotlin-spring/src/test/kotlin
 RUN gradle clean build
 WORKDIR /
 
-FROM openjdk:24-slim-bookworm
+# eclipse-temurin is the maintained successor to the deprecated `openjdk`
+# Docker Hub images. `openjdk:24-slim-bookworm` was delisted, breaking CI.
+# JRE 17 matches the JDK 17 used by the gradle builder stage above.
+FROM eclipse-temurin:17-jre-jammy
 
 ARG APP=/usr/src/app
 ENV APP=/usr/src/app

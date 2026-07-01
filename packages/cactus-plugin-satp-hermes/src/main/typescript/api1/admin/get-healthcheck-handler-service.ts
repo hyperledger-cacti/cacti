@@ -1,6 +1,6 @@
 import { GetStatusError } from "../../core/errors/satp-errors";
 import { HealthCheckResponse } from "../../generated/gateway-client/typescript-axios/api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPManager } from "../../services/gateway/satp-manager";
 
 export async function executeGetHealthCheck(

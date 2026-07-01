@@ -22,6 +22,15 @@ concurrency:
   group: core-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Default for every job in this workflow: read-only checkout/build plus
+# `checks: write` for dorny/test-reporter inside the jest-runner action.
+# Jobs that need more (e.g. `cactus-cmd-api-server` pushing benchmark data)
+# declare their own job-level `permissions:` block.
+permissions:
+  contents: read
+  actions: read
+  checks: write
+
 jobs:
   cactus-api-client:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-api-client')
@@ -31,7 +40,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-api-client
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -50,13 +59,21 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-1
           path: ./code-coverage-ts/**/
 
   cactus-cmd-api-server:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-cmd-api-server')
+    # Override of the workflow-level default. Required scopes:
+    #   contents: write     -> auto-push to gh-pages on main + commit-comment alerts
+    #   actions: read       -> restore previous benchmark from actions/cache
+    #   checks: write       -> dorny/test-reporter in jest-runner action
+    permissions:
+      contents: write
+      actions: read
+      checks: write
     continue-on-error: false
     env:
       JEST_TEST_PATTERN: packages/cactus-cmd-api-server/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
@@ -65,7 +82,7 @@ jobs:
         --files={./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/certificates-work-for-mutual-tls.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/config/self-signed-certificate-generator/generates-working-certificates.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-js-proto-loader-client-healthcheck.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/grpc-proto-gen-ts-client-m-tls-enabled.test.ts,./packages/cactus-cmd-api-server/src/test/typescript/unit/plugins/install-basic-plugin-ledger-connector-fabric-0-7-0.test.ts}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -92,13 +109,13 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-2
           path: ./code-coverage-ts/**/
       
       - name: build_ncc_bundle
-        run: yarn lerna run build:bundle --scope=@hyperledger/cactus-cmd-api-server
+        run: yarn lerna run build:bundle --scope=@hyperledger-cacti/cactus-cmd-api-server
 
       - name: ghcr.io/hyperledger/cactus-cmd-api-server
         run: |
@@ -111,7 +128,7 @@ jobs:
 
       - if: ${{ inputs.run_trivy_scan == 'true' && github.event.name == 'schedule' }}
         name: Run Trivy vulnerability scan for cmd-api-server
-        uses: aquasecurity/trivy-action@d710430a6722f083d3b36b8339ff66b32f22ee55 #0.19.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 #v0.36.0
         with:
           image-ref: 'cmd-api-server'
           format: 'table'
@@ -126,7 +143,7 @@ jobs:
 
      # Download previous benchmark result from cache (if exists)
       - name: Download previous benchmark data
-        uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf #v4.2.2
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
         with:
           path: .tmp/benchmark-results/cmd-api-server/
           key: ${{ runner.os }}-benchmark
@@ -136,7 +153,7 @@ jobs:
         run: yarn run benchmark
 
       - name: Store benchmark result
-        uses: benchmark-action/github-action-benchmark@4de1bed97a47495fc4c5404952da0499e31f5c29 #v1.20.3
+        uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba #v1.22.1
         with:
           tool: 'benchmarkjs'
           output-file-path: .tmp/benchmark-results/cmd-api-server/run-cmd-api-server-benchmark.ts.log
@@ -150,7 +167,7 @@ jobs:
           alert-threshold: '200%'
           comment-on-alert: true
           fail-on-alert: true
-          alert-comment-cc-users: '@hyperledger/cacti-maintainers'
+          alert-comment-cc-users: '@hyperledger-cacti/cacti-maintainers'
 
   cactus-common:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-common')
@@ -160,7 +177,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-common
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -179,7 +196,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-4
           path: ./code-coverage-ts/**/
@@ -192,7 +209,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core-api
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -211,7 +228,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-6
           path: ./code-coverage-ts/**/
@@ -224,7 +241,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-core
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -243,7 +260,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-5
           path: ./code-coverage-ts/**/
@@ -256,7 +273,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-api-client
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -275,7 +292,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-37
           path: ./code-coverage-ts/**/
@@ -288,7 +305,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-cmd-api-server
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: build
         with:
@@ -307,7 +324,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-38
           path: ./code-coverage-ts/**/
@@ -322,14 +339,14 @@ jobs:
         --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
 
-      - uses: ./.github/actions/docker-pull/
-        with:
-          image: ghcr.io/hyperledger/cactus-iroha2-all-in-one:2023-07-29-f2bc772ee
+      # - uses: ./.github/actions/docker-pull/
+      #   with:
+      #     image: ghcr.io/hyperledger/cactus-iroha2-all-in-one:2023-07-29-f2bc772ee
 
       - uses: ./.github/actions/docker-pull/
         with:
@@ -357,7 +374,7 @@ jobs:
         
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 #v4.3.3
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: coverage-reports-45
           path: ./code-coverage-ts/**/

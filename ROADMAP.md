@@ -10,7 +10,7 @@ If you take on the burden of implementing a feature yourself no one should stop 
 
 For example: 
 * Support being added for new ledgers by implementing new connector plugins is always welcome.
-* On the other hand, if you want to repurpose Cacti to be the operating system for a driverless ice-cream truck you are developing that that **may** not get accepted by the maintainers even if you are happy to do all the work yourself.
+* On the other hand, if you want to repurpose Cacti to be the operating system for a driverless ice-cream truck you are developing that **may** not get accepted by the maintainers even if you are happy to do all the work yourself.
 
 # Breakdown by each release
 
@@ -54,7 +54,7 @@ For example:
             - Until merge and integration (see further below), users should examine, test, and use them separately as follows:
                 - Cactus code and documentation lies within this (root) folder, excluding the `weaver` folder. See [Cactus documentation](./README-cactus.md) to test and use Cactus.
                 - Weaver code and documentation lies within the [weaver](./weaver/) folder. See [Weaver documentation](./weaver/README.md) to test and use Weaver.
-              We will soon integrate the Github Workflows and publish packages under the `hyperledger/cacti` namespace. Watch out for updates!
+              We will soon integrate the Github Workflows and publish packages under the `hyperledger-cacti/cacti` namespace. Watch out for updates!
     - [V2.0-beta]
         - Date: April 2023 (planned)
         - Goal:

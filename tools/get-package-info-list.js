@@ -7,7 +7,7 @@ import fs from "fs-extra";
 /**
  * Example:
  * {
- *   name: '@hyperledger/cactus-core-api',
+ *   name: '@hyperledger-cacti/cactus-core-api',
  *   version: '0.2.0',
  *   private: false,
  *   location: '/home/peter/a/blockchain/blockchain-integration-framework/packages/cactus-core-api'

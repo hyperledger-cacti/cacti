@@ -1,13 +1,32 @@
 #!/usr/bin/env node
 /**
  * Computes affected workspace packages for a PR/commit.
+ *
+ * Usage:
+ *   node tools/compute-affected-packages.cjs <baseRef> <forceAll>
+ *
+ * Arguments (positional, both optional):
+ *   <baseRef>  Git ref to diff HEAD against. Default: "origin/main".
+ *              The CI workflow passes e.g. "origin/main" or "origin/dev"
+ *              based on `github.base_ref`.
+ *   <forceAll> Literal string "true" / "false". When "true", bypasses
+ *              diffing entirely and returns every workspace package.
+ *              Used by scheduled / workflow_dispatch runs where there is
+ *              no PR base to diff against.
+ *
+ * Algorithm:
  * 1. Scans packages/ examples/ extensions/ for package.json files.
- * 2. Builds a reverse dependency graph (who depends on whom).
- * 3. Diffs the current HEAD against a base ref (default origin/main) and:
- *    - If .github/ changed -> all packages affected.
- *    - Ignores pure docs or comment/whitespace-only changes.
- * 4. Finds directly changed packages and recursively adds their dependents.
- * 5. Outputs a JSON array of affected package directories (for CI matrix).
+ * 2. Builds a reverse dependency graph (who depends on whom), including
+ *    dependencies, devDependencies, peerDependencies and optionalDependencies.
+ * 3. Diffs HEAD against the base ref (three-dot, i.e. since merge-base):
+ *    - If anything under .github/ changed -> every package is affected.
+ *      This is intentional: a CI change can alter how every package is
+ *      built/tested, so we re-run the whole matrix to be safe.
+ *    - If every changed file is documentation -> no packages affected.
+ *    - Else, if the entire diff is comments/whitespace -> no packages.
+ * 4. Finds directly changed packages by path-prefix and recursively adds
+ *    their dependents.
+ * 5. Outputs a JSON array of affected package directories (for the CI matrix).
  */
 const os = require("os");
 
@@ -49,25 +68,30 @@ function buildDependentsGraph(packages) {
     dependents[pkg.name] = new Set();
   }
 
+  // All dependency kinds are considered so that a change to a workspace
+  // package re-tests every consumer regardless of how it is depended on.
+  const DEP_KINDS = [
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "optionalDependencies",
+  ];
+
   for (const pkg of Object.values(packages)) {
-    for (const depName of Object.keys(pkg.pkg.dependencies || {})) {
-      if (packages[depName]) {
-        dependents[depName].add(pkg.name);
-      }
-    }
-    for (const depName of Object.keys(pkg.pkg.devDependencies || {})) {
-      if (packages[depName]) {
-        dependents[depName].add(pkg.name);
+    for (const kind of DEP_KINDS) {
+      for (const depName of Object.keys(pkg.pkg[kind] || {})) {
+        if (packages[depName]) {
+          dependents[depName].add(pkg.name);
+        }
       }
     }
   }
   return dependents;
 }
 
-function detectChangedPackages(packages) {
-  const baseRef = process.argv[2] || "origin/main";
-
+function detectChangedPackages(packages, baseRef) {
   try {
+    // Strip an `origin/` prefix when fetching by remote-ref name.
     execSync(`git fetch origin ${baseRef.replace("origin/", "")}`, {
       stdio: "inherit",
     });
@@ -78,7 +102,10 @@ function detectChangedPackages(packages) {
 
   const tmpFile = path.join(os.tmpdir(), `changed-files-${process.pid}.txt`);
 
-  execSync(`git diff --name-only origin/main...HEAD > "${tmpFile}"`, {
+  // Three-dot form (`A...B`) is used deliberately: it diffs the merge-base
+  // of A and B against B, so we only see changes contributed by HEAD and
+  // not unrelated commits that have landed on the base branch since fork.
+  execSync(`git diff --name-only ${baseRef}...HEAD > "${tmpFile}"`, {
     stdio: ["ignore", "inherit", "inherit"],
   });
 
@@ -88,7 +115,12 @@ function detectChangedPackages(packages) {
     .filter(Boolean);
   fs.unlinkSync(tmpFile);
 
+  // CI / workflow changes can alter how every package is built or tested
+  // (composite actions, jest-runner, codegen steps, etc.). Re-run the whole
+  // matrix to be safe. This rule intentionally takes precedence over the
+  // docs/comment-only short-circuits below.
   if (changedFiles.some((f) => f.startsWith(".github/"))) {
+    console.warn(".github/ change detected -> all packages affected.");
     return Object.keys(packages);
   }
 
@@ -108,10 +140,11 @@ function detectChangedPackages(packages) {
     return [];
   }
 
-  // Full diff for comment detection (stream to file to avoid ENOBUFS)
+  // Full diff for comment detection (stream to file to avoid ENOBUFS).
+  // Three-dot form matches the file-list diff above.
   const tmpDiffFile = path.join(os.tmpdir(), `full-diff-${process.pid}.txt`);
 
-  execSync(`git diff ${baseRef} HEAD > "${tmpDiffFile}"`, {
+  execSync(`git diff ${baseRef}...HEAD > "${tmpDiffFile}"`, {
     stdio: ["ignore", "inherit", "inherit"],
   });
 
@@ -122,10 +155,16 @@ function detectChangedPackages(packages) {
    * Regex: identifies added/removed lines that are REAL CODE.
    *
    * A real code line starts with + or - (but not ++ or -- from diff headers)
+   * and is NOT one of: blank line, single-line `//` comment, single-line
+   * `/* ... *\/` comment, shell/python `#` comment, SQL `--` comment, or HTML
+   * `<!-- ... -->` comment. This is a heuristic, not a parser: it will
+   * over-count for some pathological inputs (e.g. a TypeScript file that
+   * starts a statement with a leading `;` on its own line). The downside of
+   * over-counting is only extra test runs, not test skips, so the bias is
+   * acceptable.
    **/
-
   const realCodeChangeRegex =
-    /^[-+](?![-+])(?!\s*$|\s*\/\/.*$|\s*\/\*.*\*\/\s*$|\s*#.*$|\s*--.*$|\s*;.*$|\s*<!--.*?-->\s*$).+/m;
+    /^[-+](?![-+])(?!\s*$|\s*\/\/.*$|\s*\/\*.*\*\/\s*$|\s*#.*$|\s*--.*$|\s*<!--.*?-->\s*$).+/m;
 
   const normalizedDiff = diff
     .split("\n")
@@ -133,12 +172,6 @@ function detectChangedPackages(packages) {
     .join("\n");
 
   const codeWasModified = realCodeChangeRegex.test(normalizedDiff);
-
-  // If everything changed is docs, return []
-  if (onlyDocsFiles) {
-    console.warn("Only documentation changes detected.");
-    return [];
-  }
 
   // If code was not modified at all, return []
   if (!codeWasModified) {
@@ -181,8 +214,15 @@ function findAllAffected(changed, dependents) {
 // --- MAIN ---
 const packages = getAllPackages();
 
-if (process.argv[2] === "true") {
-  const affectedDirs = packages.map((pkgName) => packages[pkgName].dir);
+// Invoked by CI as:
+//   node tools/compute-affected-packages.cjs <baseRef> <forceAll>
+// argv[2] = base ref to diff against, argv[3] = "true"/"false".
+const baseRef = process.argv[2] || "origin/main";
+const forceAll = process.argv[3] === "true";
+
+if (forceAll) {
+  console.warn("forceAll=true -> emitting every workspace package.");
+  const affectedDirs = Object.values(packages).map((p) => p.dir);
   process.stdout.write(JSON.stringify(affectedDirs));
   process.exit(0);
 }
@@ -194,7 +234,7 @@ console.warn(
   Object.keys(dependents).length,
   "packages.",
 );
-const changed = detectChangedPackages(packages);
+const changed = detectChangedPackages(packages, baseRef);
 console.warn("Changed packages:", changed);
 console.warn(Object.keys(dependents).length, "packages changed.");
 const affected = findAllAffected(changed, dependents);

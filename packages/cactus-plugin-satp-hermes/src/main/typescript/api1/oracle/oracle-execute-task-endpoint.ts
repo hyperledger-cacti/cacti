@@ -8,22 +8,66 @@ import type {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   type Logger,
   Checks,
   LoggerProvider,
   type IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
-import { OracleExecuteRequest } from "../../public-api";
+import {
+  OracleExecuteRequest,
+  OracleExecuteRequestTaskTypeEnum,
+} from "../../public-api";
+import { BridgeInternalError } from "../../cross-chain-mechanisms/common/errors";
+
+function validateExecuteTaskRequest(
+  reqBody: OracleExecuteRequest,
+): string | null {
+  if (reqBody.taskType === OracleExecuteRequestTaskTypeEnum.Update) {
+    if (!reqBody.destinationNetworkId || !reqBody.destinationContract) {
+      return "Missing required parameters for UPDATE task: destinationNetworkId, destinationContract";
+    }
+    if (
+      !reqBody.destinationContract.methodName ||
+      !reqBody.destinationContract.contractName ||
+      !reqBody.destinationContract.params
+    ) {
+      return "Missing required parameters for UPDATE task: methodName, contractName, params";
+    }
+  } else if (reqBody.taskType === OracleExecuteRequestTaskTypeEnum.Read) {
+    if (!reqBody.sourceNetworkId || !reqBody.sourceContract) {
+      return "Missing required parameters for READ task: sourceNetworkId, sourceContract";
+    }
+    if (
+      !reqBody.sourceContract.methodName ||
+      !reqBody.sourceContract.contractName ||
+      !reqBody.sourceContract.params
+    ) {
+      return "Missing required parameters for READ task: methodName, contractName, params";
+    }
+  } else if (
+    reqBody.taskType === OracleExecuteRequestTaskTypeEnum.ReadAndUpdate
+  ) {
+    if (
+      !reqBody.sourceNetworkId ||
+      !reqBody.sourceContract ||
+      !reqBody.destinationNetworkId ||
+      !reqBody.destinationContract
+    ) {
+      return "Missing required parameters for READ_AND_UPDATE task: sourceNetworkId, sourceContract, destinationNetworkId, destinationContract";
+    }
+  }
+  return null;
+}
 
 export class OracleExecuteTaskEndpointV1 implements IWebServiceEndpoint {
   public static readonly CLASS_NAME = "OracleExecuteTaskEndpointV1";
@@ -47,7 +91,7 @@ export class OracleExecuteTaskEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.path;
   }
@@ -55,14 +99,14 @@ export class OracleExecuteTaskEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/execute"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute"
     ].post.operationId;
   }
 
@@ -95,11 +139,31 @@ export class OracleExecuteTaskEndpointV1 implements IWebServiceEndpoint {
     this.log.debug("reqBody: ", reqBody);
 
     try {
+      const validationError = validateExecuteTaskRequest(reqBody);
+      if (validationError !== null) {
+        res.status(400).json({ message: validationError });
+        return;
+      }
+
       const result = await this.options.dispatcher.OracleExecuteTask(reqBody);
       res.status(200).json(result);
     } catch (ex) {
       const errorMsg = `${reqTag} Failed to execute task:`;
-      handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
+      if (
+        ex instanceof BridgeInternalError &&
+        ex.code >= 400 &&
+        ex.code < 500
+      ) {
+        this.log.warn(`${errorMsg} ${ex.message}`);
+        res.status(ex.code).json({ message: ex.message });
+      } else {
+        handleRestEndpointException({
+          errorMsg,
+          log: this.log,
+          error: ex,
+          res,
+        });
+      }
     }
   }
 }

@@ -29,7 +29,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { Resource } from "@opentelemetry/resources";
 import { UninitializedMonitorServiceError } from "../../cross-chain-mechanisms/common/errors";
 
@@ -79,9 +79,9 @@ export class MonitorService {
   public readonly label: string = "MonitorService";
   private readonly logger: Logger;
   private sdk: NodeSDK | undefined;
-  private readonly otelMetricsExporterUrl: string;
-  private readonly otelLogsExporterUrl: string;
-  private readonly otelTracesExporterUrl: string;
+  private readonly otelMetricsExporterUrl: string | undefined;
+  private readonly otelLogsExporterUrl: string | undefined;
+  private readonly otelTracesExporterUrl: string | undefined;
   private readonly isEnabled: boolean;
   private static instance: MonitorService | undefined;
 
@@ -114,21 +114,27 @@ export class MonitorService {
       options.otelMetricsExporterUrl ??
       (process.env.OTEL_EXPORTER_OTLP_ENDPOINT
         ? `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/metrics`
-        : "http://localhost:4318/v1/metrics");
+        : undefined);
 
     this.otelTracesExporterUrl =
       options.otelTracesExporterUrl ??
       (process.env.OTEL_EXPORTER_OTLP_ENDPOINT
         ? `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/traces`
-        : "http://localhost:4318/v1/traces");
+        : undefined);
 
     this.otelLogsExporterUrl =
       options.otelLogsExporterUrl ??
       (process.env.OTEL_EXPORTER_OTLP_ENDPOINT
         ? `${process.env.OTEL_EXPORTER_OTLP_ENDPOINT}/v1/logs`
-        : "http://localhost:4318/v1/logs");
+        : undefined);
 
-    this.isEnabled = options.enabled ?? process.env.NODE_ENV !== "test";
+    // Telemetry is opt-in: enable it only when explicitly requested, or when an
+    // OTLP collector endpoint has been configured. When telemetry IS enabled
+    // and later fails to initialize, that failure is surfaced (thrown) rather
+    // than swallowed - a configured collector that cannot be reached is a real
+    // misconfiguration the operator should know about.
+    this.isEnabled =
+      options.enabled ?? Boolean(process.env.OTEL_EXPORTER_OTLP_ENDPOINT);
   }
 
   /**

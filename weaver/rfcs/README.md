@@ -9,7 +9,7 @@ These RFCs capture abstractions, models, protocols and data formats for facilita
 
 If you are new to Weaver (or to blockchain interoperability), we recommend starting with the [protocol overview document](../OVERVIEW.md).
 
-If you wish to see Weaver in action, test it, or apply it to your own application, you can switch to the [Getting Started Tutorial](https://labs.hyperledger.org/weaver-dlt-interoperability/docs/external/getting-started/guide).
+If you wish to see Weaver in action, test it, or apply it to your own application, you can switch to the [Getting Started Tutorial](https://hyperledger-cacti.github.io/cacti/weaver/getting-started/guide/).
 
 Instead, if you wish to find out more details about the Weaver design and wish to contribute to the code base, you can explore these RFCs, beginning with the [models](./models). Protocol engineers will find in [RFC: 01-009](./models/infrastructure/relays.md) a useful overview of the relay model, and may then progress on to reading one of the existing protocols' design and implementation; e.g., the data sharing protocol in [RFC: 02-001](./protocols/data-sharing/generic.md). If you are interested in adding support for a new ledger technology, see the [existing driver implementations](../core/drivers) and [existing interoperability module implementations](../core/network). Where relevant we use [ABNF](https://tools.ietf.org/html/rfc5234) for formal syntax definitions.
 

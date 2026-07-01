@@ -31,7 +31,7 @@
  * @see {@link NetworkId} for network identification
  */
 
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { BLODispatcher } from "../api1/dispatcher";
 import { SATPSession } from "./satp-session";
 import { ConnectRouter } from "@connectrpc/connect";
@@ -257,3 +257,20 @@ export enum CrashStatus {
   /** System encountered an error during recovery */
   ERROR = "ERROR",
 }
+
+export interface AuditEntry {
+  auditEntryId: string;
+  session: LocalLog;
+  timestamp: number;
+}
+
+export interface Audit {
+  auditEntries: AuditEntry[];
+}
+
+//TODO
+export type SessionData = {
+  sessionId: string;
+  localLog: LocalLog;
+  proof: string;
+};

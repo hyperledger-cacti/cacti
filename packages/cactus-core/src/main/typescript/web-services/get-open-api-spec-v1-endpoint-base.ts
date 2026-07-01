@@ -6,13 +6,13 @@ import {
   LogLevelDesc,
   LoggerProvider,
   IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { PluginRegistry } from "../plugin-registry";
 
@@ -40,16 +40,16 @@ export interface IGetOpenApiSpecV1EndpointBaseOptions<S, P> {
  * import {
  *   GetOpenApiSpecV1EndpointBase,
  *   IGetOpenApiSpecV1EndpointBaseOptions,
- * } from "@hyperledger/cactus-core";
+ * } from "@hyperledger-cacti/cactus-core";
  *
- * import { Checks, LogLevelDesc } from "@hyperledger/cactus-common";
- * import { IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
+ * import { Checks, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+ * import { IWebServiceEndpoint } from "@hyperledger-cacti/cactus-core-api";
  *
  * import OAS from "../../json/openapi.json";
  *
  * export const OasPathGetOpenApiSpecV1 =
  *   OAS.paths[
- *     "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"
+ *     "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec"
  *   ];
  *
  * export type OasPathTypeGetOpenApiSpecV1 = typeof OasPathGetOpenApiSpecV1;
@@ -84,12 +84,12 @@ export interface IGetOpenApiSpecV1EndpointBaseOptions<S, P> {
  * complain about missing paths)
  *
  * ```json
- * "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec": {
+ * "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec": {
  *   "get": {
  *     "x-hyperledger-cacti": {
  *       "http": {
  *         "verbLowerCase": "get",
- *         "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-open-api-spec"
+ *         "path": "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-open-api-spec"
  *       }
  *     },
  *     "operationId": "getOpenApiSpecV1",

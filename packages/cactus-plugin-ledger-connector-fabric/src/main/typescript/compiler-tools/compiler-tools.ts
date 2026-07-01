@@ -4,7 +4,7 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import Joi from "joi";
 import Docker, { Container, ContainerInfo } from "dockerode";
 import Dockerode from "dockerode";

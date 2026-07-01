@@ -1,4 +1,4 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 
 /**
  * @fileoverview SATP Utility Functions - Enum conversion helpers

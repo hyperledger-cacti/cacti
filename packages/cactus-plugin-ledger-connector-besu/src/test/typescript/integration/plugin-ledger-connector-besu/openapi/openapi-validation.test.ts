@@ -1,7 +1,7 @@
 import "jest-extended";
 import { v4 as uuidv4 } from "uuid";
 import { Server as SocketIoServer } from "socket.io";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   Web3SigningCredentialType,
   PluginLedgerConnectorBesu,
@@ -19,11 +19,11 @@ import {
   GetBesuRecordV1Request,
   RunTransactionResponse,
 } from "../../../../../main/typescript/public-api";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   BesuTestLedger,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import KeyEncoder from "key-encoder";
 import {
   IListenOptions,
@@ -32,8 +32,8 @@ import {
   LoggerProvider,
   Secp256k1Keys,
   Servers,
-} from "@hyperledger/cactus-common";
-import { Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import express from "express";
 import bodyParser from "body-parser";
 import http from "http";
@@ -41,7 +41,7 @@ import HelloWorldContractJson from "../../../../solidity/hello-world-contract/He
 import { AddressInfo } from "net";
 import { BesuApiClientOptions } from "../../../../../main/typescript/api-client/besu-api-client";
 
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../../../../main/json/openapi.json";
 import { Account } from "web3-core";
 
@@ -671,36 +671,11 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   test(`${testCase} - ${fPastLogs} - ${cWithoutParams}`, async () => {
-    try {
-      const parameters = {};
-      const response = await apiClient.getPastLogsV1(
-        parameters as GetPastLogsV1Request,
-      );
-      console.log(
-        "e.response.status should be 400 but actually is,",
-        response.status,
-      );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: { readonly path: string }) =>
-        param.path.replace("/body/", ""),
-      );
-      expect(fields.includes("address")).toBeTrue();
-    }
-
-    //since status code is actually 200 refactored approach does not work
-
-    // const parameters = {}; // Empty parameters object
-
-    // await expect(apiClient.getPastLogsV1(parameters as GetPastLogsV1Request))
-    // .rejects.toMatchObject({
-    //   response: {
-    //     status: 400,
-    //     data: expect.arrayContaining([
-    //       expect.objectContaining({ path: expect.stringContaining("/body/address") })
-    //     ])
-    //   }
-    // });
+    const parameters = {};
+    const res = await apiClient.getPastLogsV1(
+      parameters as GetPastLogsV1Request,
+    );
+    expect(res.status).toEqual(200);
   });
 
   test(`${testCase} - ${fPastLogs} - ${cInvalidParams}`, async () => {
@@ -761,36 +736,11 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   test(`${testCase} - ${fRecord} - ${cWithoutParams}`, async () => {
-    try {
-      const parameters = {};
-      const response = await apiClient.getBesuRecordV1(
-        parameters as GetBesuRecordV1Request,
-      );
-      console.log(
-        "e.response.status should be 400 but actually is,",
-        response.status,
-      );
-    } catch (e) {
-      expect(e.response.status).toEqual(400);
-      const fields = e.response.data.map((param: any) =>
-        param.path.replace("/body/", ""),
-      );
-      expect(fields.includes("transactionHash")).toBeTrue();
-    }
-
-    // since status code is actually 200 refactored approach does not work
-
-    // const parameters = {}; // Empty parameters object
-
-    // await expect(apiClient.getBesuRecordV1(parameters as GetBesuRecordV1Request))
-    //   .rejects.toMatchObject({
-    //     response: {
-    //       status: 400,
-    //       data: expect.arrayContaining([
-    //         expect.objectContaining({ path: expect.stringContaining("/body/transactionHash") })
-    //       ])
-    //     }
-    //   });
+    const parameters = {};
+    const res = await apiClient.getBesuRecordV1(
+      parameters as GetBesuRecordV1Request,
+    );
+    expect(res.status).toEqual(200);
   });
 
   test(`${testCase} - ${fRecord} - ${cInvalidParams}`, async () => {

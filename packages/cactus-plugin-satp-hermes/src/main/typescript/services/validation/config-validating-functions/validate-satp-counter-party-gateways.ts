@@ -1,4 +1,4 @@
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import type { GatewayIdentity } from "../../../core/types";
 import { isGatewayIdentity } from "./validate-satp-gateway-identity";
 
@@ -28,5 +28,5 @@ export function validateSatpCounterPartyGateways(
       `Invalid config.counterPartyGateways: ${JSON.stringify(opts.configValue)}`,
     );
   }
-  return opts.configValue;
+  return opts.configValue as GatewayIdentity[];
 }

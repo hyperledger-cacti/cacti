@@ -1,4 +1,4 @@
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   RunTransactionRequest,
   RunTransactionResponse,
@@ -7,7 +7,7 @@ import {
 } from "../../generated/openapi/typescript-axios";
 import Web3 from "web3";
 import { transactV1Signed } from "./transact-v1-signed";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import Web3JsQuorum from "web3js-quorum";
 import { RuntimeError } from "run-time-error-cjs";
 import { PrometheusExporter } from "../../prometheus-exporter/prometheus-exporter";

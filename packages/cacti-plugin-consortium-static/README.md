@@ -1,4 +1,4 @@
-# `@hyperledger/cacti-plugin-consortium-static`
+# `@hyperledger-cacti/cacti-plugin-consortium-static`
 
 ## Cacti Consortium Static
 
@@ -50,7 +50,5 @@ The model is in an early stage, and serves only as a POC for now. The goal is to
 
 
 ## Notes
-
-Please reffer to package "@hyperledger/cactus-plugin-consortium-manual" as the documentation there applies to this one, namely information about the Prometheus Exporter.
 
 For usage, check the tests in the /integration folder

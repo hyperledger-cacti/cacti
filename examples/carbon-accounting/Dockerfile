@@ -39,7 +39,7 @@ RUN source ~/.bashrc && \
     npm install --location=global yarn && \
     yarn config set nodeLinker node-modules && \
     yarn set version 4.1.0 && \
-    yarn add @hyperledger/cactus-example-carbon-accounting-backend@2.1.0
+    yarn add @hyperledger-cacti/cactus-example-carbon-accounting-backend@3.0.0-beta.1
     
 SHELL ["/bin/bash", "--login", "-c"]
 
@@ -48,7 +48,7 @@ COPY --chown=${APP_USER}:${APP_USER} ./examples/carbon-accounting/healthcheck.sh
 
 ENV AUTHORIZATION_CONFIG_JSON="{}"
 ENV AUTHORIZATION_PROTOCOL=NONE
-ENV COCKPIT_WWW_ROOT=/usr/src/app/node_modules/@hyperledger/cactus-example-carbon-accounting-frontend/www/
+ENV COCKPIT_WWW_ROOT=/usr/src/app/node_modules/@hyperledger-cacti/cactus-example-carbon-accounting-frontend/www/
 ENV COCKPIT_TLS_ENABLED=false
 ENV COCKPIT_CORS_DOMAIN_CSV=\*
 ENV COCKPIT_MTLS_ENABLED=false

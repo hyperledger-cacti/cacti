@@ -2,8 +2,8 @@ import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { BesuTestLedger } from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-common";
+import { BesuTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
 import {
   EthContractInvocationType as BesuContractInvocationType,
   InvokeContractV1Response,
@@ -12,12 +12,12 @@ import {
   ReceiptType,
   Web3SigningCredential,
   Web3SigningCredentialType as Web3SigningCredentialTypeBesu,
-} from "@hyperledger/cactus-plugin-ledger-connector-besu";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
 import SATPNFTokenContract from "../../solidity/generated/SATPNFTokenContract.sol/SATPNFTokenContract.json";
 import Web3 from "web3";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { expect } from "@jest/globals";
 import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
@@ -27,7 +27,7 @@ import {
   NetworkId,
   AssetErcTokenStandardEnum,
 } from "../../../main/typescript";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntologyERC20 from "../../ontologies/ontology-satp-erc20-interact-besu.json";
 import ExampleOntologyERC721 from "../../ontologies/ontology-satp-erc721-interact-besu.json";
@@ -123,7 +123,11 @@ export class BesuTestEnvironment {
   ): Promise<void> {
     this.ledger = new BesuTestLedger({
       emitContainerLogs: true,
-      envVars: ["BESU_NETWORK=dev"],
+      envVars: [
+        "BESU_NETWORK=dev",
+        "BESU_HOST_ALLOWLIST=*",
+        "BESU_RPC_WS_HOST_ALLOWLIST=*",
+      ],
       containerImageVersion: "v2.2.0-rc.2",
       containerImageName: "ghcr.io/hyperledger-cacti/besu-all-in-one",
       networkName: this.dockerNetwork,
@@ -293,8 +297,8 @@ export class BesuTestEnvironment {
       wrapperContractAddress: this.besuConfig.wrapperContractAddress,
       gasConfig: this.besuConfig.gasConfig,
       connectorOptions: {
-        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(),
-        rpcApiWsHost: await this.ledger.getRpcApiWsHost(),
+        rpcApiHttpHost: await this.ledger.getRpcApiHttpHost(false),
+        rpcApiWsHost: await this.ledger.getRpcApiWsHost(false),
       },
       claimFormats: this.besuConfig.claimFormats,
     } as INetworkOptions;
@@ -797,7 +801,15 @@ export class BesuTestEnvironment {
 
   // Stops and destroys the test ledger
   public async tearDown(): Promise<void> {
-    await this.ledger.stop();
-    await this.ledger.destroy();
+    try {
+      await this.ledger.stop();
+    } catch (err) {
+      this.log.warn("BesuTestEnvironment#tearDown() stop failed:", err);
+    }
+    try {
+      await this.ledger.destroy();
+    } catch (err) {
+      this.log.warn("BesuTestEnvironment#tearDown() destroy failed:", err);
+    }
   }
 }
