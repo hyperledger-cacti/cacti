@@ -96,6 +96,7 @@ nav:
       - Overview: cactus/examples.md
       - Supply Chain Application: cactus/examples/supply-chain-app.md
     - Governance: cactus/governance.md
+    - Security Review Program: cactus/security-review-program.md
     - Code of Conduct: cactus/code-of-conduct.md
     - Contributing: cactus/contributing.md
     - Whitepaper: cactus/whitepaper.md
