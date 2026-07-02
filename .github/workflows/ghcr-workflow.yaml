@@ -28,7 +28,7 @@ jobs:
     ghcr-besu-all-in-one:
       runs-on: ubuntu-22.04
       steps:
-        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
           with:
             fetch-depth: 0
         - id: changed
@@ -50,14 +50,14 @@ jobs:
       if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-corda')
       runs-on: ubuntu-22.04
       steps:
-        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
         - name: ghcr.io/hyperledger-cacti/cactus-connector-corda-server
           run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
           
     ghcr-corda-all-in-one-flowdb:
       runs-on: ubuntu-22.04
       steps:
-        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
           with:
             fetch-depth: 0
         - id: changed
@@ -80,7 +80,7 @@ jobs:
       env:
         IMAGE_NAME: cacti-dev-container-vscode
       steps:
-        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
           with:
             fetch-depth: 0
         - id: changed
@@ -109,7 +109,7 @@ jobs:
     ghcr-fabric2-all-in-one:
       runs-on: ubuntu-22.04
       steps:
-        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
           with:
             fetch-depth: 0
         - id: changed
@@ -130,7 +130,7 @@ jobs:
     ghcr-daml-all-in-one:
       runs-on: ubuntu-22.04
       steps:
-        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
           with:
             fetch-depth: 0
         - id: changed

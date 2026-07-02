@@ -45,7 +45,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-persistent-ethereum
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - uses: ./.github/actions/docker-pull/
         with:
@@ -81,7 +81,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-persistent-fabric
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -121,7 +121,7 @@ jobs:
       TAPE_TEST_PATTERN: '--files={./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts,./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts}'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: build
         with:
@@ -158,7 +158,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-bungee-hermes
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
@@ -205,7 +205,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-geth-ledger
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: build
         with:
@@ -237,7 +237,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-static
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: build
         with:
