@@ -61,7 +61,7 @@ jobs:
       ghcr_image: ${{ steps.set_tags.outputs.ghcr_image }}
       is_release: ${{ steps.set_tags.outputs.is_release }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       - name: Set image tags
         id: set_tags
         run: |
@@ -124,7 +124,7 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
@@ -135,7 +135,7 @@ jobs:
       
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae #v5.0.5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 #v6.1.0
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -163,10 +163,10 @@ jobs:
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 #v4.1.0
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c #v4.2.0
 
       - name: Build Docker image (no push)
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf #v7.2.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a #v7.3.0
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -191,7 +191,7 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
@@ -213,10 +213,10 @@ jobs:
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 #v4.1.0
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c #v4.2.0
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee #v4.2.0
+        uses: docker/login-action@c99871dec2022cc055c062a10cc1a1310835ceb4 #v4.3.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -224,7 +224,7 @@ jobs:
 
       - name: Build and push to GHCR (Release)
         if: needs.set-docker-tags.outputs.is_release == 'true'
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf #v7.2.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a #v7.3.0
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -237,7 +237,7 @@ jobs:
 
       - name: Build and push to GHCR (Development)
         if: needs.set-docker-tags.outputs.is_release != 'true'
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf #v7.2.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a #v7.3.0
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -254,7 +254,7 @@ jobs:
     runs-on: ubuntu-22.04
     continue-on-error: true  # Don't fail the workflow if Docker Hub push fails
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: Setup Node.js
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
@@ -276,17 +276,17 @@ jobs:
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 #v4.1.0
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c #v4.2.0
 
       - name: Login to Docker Hub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee #v4.2.0
+        uses: docker/login-action@c99871dec2022cc055c062a10cc1a1310835ceb4 #v4.3.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PAT }}
 
       - name: Build and push to Docker Hub (Release)
         if: needs.set-docker-tags.outputs.is_release == 'true'
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf #v7.2.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a #v7.3.0
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
@@ -299,7 +299,7 @@ jobs:
 
       - name: Build and push to Docker Hub (Development)
         if: needs.set-docker-tags.outputs.is_release != 'true'
-        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf #v7.2.0
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a #v7.3.0
         with:
           context: ./packages/cactus-plugin-satp-hermes
           file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
