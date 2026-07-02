@@ -32,6 +32,13 @@ export class CertDatastore {
     await keychain.set(keychainRef, JSON.stringify(iData));
   }
 
-  // TODO has
-  // TODO delete
+  async has(keychainId: string, keychainRef: string): Promise<boolean> {
+    const keychain = this.pluginRegistry.findOneByKeychainId(keychainId);
+    return await keychain.has(keychainRef);
+  }
+
+  async delete(keychainId: string, keychainRef: string): Promise<void> {
+    const keychain = this.pluginRegistry.findOneByKeychainId(keychainId);
+    await keychain.delete(keychainRef);
+  }
 }
