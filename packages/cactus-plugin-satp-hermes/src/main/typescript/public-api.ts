@@ -181,6 +181,17 @@ export {
 export { IBesuNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-types";
 
 /**
+ * Ethereum Network Configuration - Ethereum mainnet and compatible network integration options.
+ *
+ * @description
+ * Configuration interface for connecting SATP gateways to Ethereum networks,
+ * enabling cross-chain asset transfers between Ethereum and other supported networks.
+ *
+ * @see {@link INetworkOptions} for general network configuration interface
+ */
+export { IEthereumNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-types";
+
+/**
  * Gateway Identity Management - Gateway identification and network discovery.
  *
  * @description
@@ -226,7 +237,6 @@ export {
   type StepTagValidationResult,
 } from "./core/satp-protocol-map";
 
-/**
 /**
  * Fabric Network Validation - Hyperledger Fabric configuration validation utilities.
  *
