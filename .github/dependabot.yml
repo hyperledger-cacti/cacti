@@ -1,7 +1,10 @@
 # Dependabot configuration
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 #
-# Each ecosystem groups ALL of its updates into a single PR per run.
+# Each ecosystem groups ALL of its updates into a single PR per run. Both regular
+# version updates and security fixes are grouped, so Dependabot opens at most one
+# PR per ecosystem (security updates are otherwise opened individually and
+# ungrouped by default). Every grouped PR lands on its own Dependabot branch.
 #
 # NOTE: Dependabot does not support wildcards in `target-branch` (it accepts
 # exactly one branch name, and the default branch when omitted). To run on the
@@ -23,6 +26,10 @@ updates:
     open-pull-requests-limit: 1
     groups:
       npm:
+        applies-to: version-updates
+        patterns: ["*"]
+      npm-security:
+        applies-to: security-updates
         patterns: ["*"]
 
   - package-ecosystem: github-actions
@@ -35,6 +42,10 @@ updates:
     open-pull-requests-limit: 1
     groups:
       github-actions:
+        applies-to: version-updates
+        patterns: ["*"]
+      github-actions-security:
+        applies-to: security-updates
         patterns: ["*"]
 
   - package-ecosystem: docker
@@ -45,6 +56,10 @@ updates:
     open-pull-requests-limit: 1
     groups:
       docker:
+        applies-to: version-updates
+        patterns: ["*"]
+      docker-security:
+        applies-to: security-updates
         patterns: ["*"]
 
   - package-ecosystem: gomod
@@ -55,6 +70,10 @@ updates:
     open-pull-requests-limit: 1
     groups:
       gomod:
+        applies-to: version-updates
+        patterns: ["*"]
+      gomod-security:
+        applies-to: security-updates
         patterns: ["*"]
 
   - package-ecosystem: cargo
@@ -65,4 +84,8 @@ updates:
     open-pull-requests-limit: 1
     groups:
       cargo:
+        applies-to: version-updates
+        patterns: ["*"]
+      cargo-security:
+        applies-to: security-updates
         patterns: ["*"]
