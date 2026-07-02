@@ -21,7 +21,7 @@ This component allows viewing ledger data in Supabase or other PostgreSQL compat
 
 Clone the git repository on your local machine.
 
-See [docs/docs/cactus/ledger-browser/setup.md](../../docs/docs/cactus/ledger-browser/setup.md) for detailed information on how to setup and use this package.
+See [docs/setup.md](docs/setup.md) for detailed information on how to setup and use this package.
 
 ## Contributing
 

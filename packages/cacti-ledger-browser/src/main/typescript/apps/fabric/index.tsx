@@ -17,9 +17,9 @@ import { AppCategory } from "../../common/app-category";
 const fabricBrowserAppDefinition: AppDefinition = {
   appName: "Hyperledger Fabric Browser",
   appDocumentationURL:
-    "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/fabric-browser/",
+    "https://github.com/hyperledger-cacti/cacti/blob/main/packages/cacti-ledger-browser/README.md",
   appSetupGuideURL:
-    "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/fabric-browser/#setup",
+    "https://github.com/hyperledger-cacti/cacti/blob/main/packages/cacti-ledger-browser/docs/setup.md",
   category: AppCategory.LedgerBrowser,
   defaultInstanceName: "My Fabric Browser",
   defaultDescription:

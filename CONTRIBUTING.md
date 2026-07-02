@@ -42,7 +42,7 @@ As a developer:
 
 We welcome contributions to this project in many forms, whether it is to fix a bug, improve the documentation, add a new feature, or add support for any new DLT platform.
 
-Please familiarize yourself with the [documentation](https://hyperledger-cacti.github.io/cacti/). In particular, review the [vision and design methodology](https://hyperledger-cacti.github.io/cacti/vision/) and [system architecture](https://hyperledger-cacti.github.io/cacti/architecture/). Follow the tutorial instructions to test the [Cactus](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) features respectively. (For a deeper understanding of the Weaver design and specifications, also check out the [Weaver RFCs](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/rfcs).)
+Please familiarize yourself with the [documentation](https://hyperledger-cacti.github.io/cacti/). In particular, review the [vision and design methodology](https://hyperledger-cacti.github.io/cacti/vision/) and [system architecture](https://hyperledger-cacti.github.io/cacti/architecture/). Follow the tutorial instructions to test the [Cactus](https://hyperledger-cacti.github.io/cacti/) and [Weaver](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) features respectively. (For a deeper understanding of the Weaver design and specifications, also check out the [Weaver RFCs](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/rfcs).)
 
 ## Git Know How / Reading List
 

@@ -14,9 +14,9 @@ import { AppCategory } from "../../common/app-category";
 const ethBrowserAppDefinition: AppDefinition = {
   appName: "Ethereum Browser",
   appDocumentationURL:
-    "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/ethereum-browser/",
+    "https://github.com/hyperledger-cacti/cacti/blob/main/packages/cacti-ledger-browser/README.md",
   appSetupGuideURL:
-    "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/ethereum-browser/#setup",
+    "https://github.com/hyperledger-cacti/cacti/blob/main/packages/cacti-ledger-browser/docs/setup.md",
   category: AppCategory.LedgerBrowser,
   defaultInstanceName: "My Eth Browser",
   defaultDescription:
