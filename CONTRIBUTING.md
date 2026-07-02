@@ -27,7 +27,7 @@
 Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
 
-First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
+First things first, please review the [Hyperledger Code of Conduct](https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct) before participating.
 If you use AI or LLM tooling in your contributions, please also review our [AI Guidelines](./AI_GUIDELINES.md).
 
 There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
