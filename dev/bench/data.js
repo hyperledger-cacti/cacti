@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782983623945,
+  "lastUpdate": 1782983969519,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -231,6 +231,35 @@ window.BENCHMARK_DATA = {
             "range": "±2.08%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Abhayraj Jaiswal",
+            "username": "abhayrajjais01",
+            "email": "abhayraj916146@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "42a45fe4e1ba3c85715624bd350b94eddd81d91f",
+          "message": "fix(cmd-api-server): make gRPC bind host configurable (#4311)\n\nSigned-off-by: abhayrajjais01 <abhayraj916146@gmail.com>",
+          "timestamp": "2026-07-01T16:15:38Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/42a45fe4e1ba3c85715624bd350b94eddd81d91f"
+        },
+        "date": 1782983966824,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 925,
+            "range": "±3.63%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
