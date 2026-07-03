@@ -4351,7 +4351,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@braintree/sanitize-url@npm:^7.1.1":
+"@braintree/sanitize-url@npm:^7.1.1, @braintree/sanitize-url@npm:^7.1.2":
   version: 7.1.2
   resolution: "@braintree/sanitize-url@npm:7.1.2"
   checksum: 10/d9626ff8f8eb5e192cd055e6e743449c21102c76bb59e405b7028fe56230fa080bfcc80dfb1e21850a6876e75adda9f7b3c888cf0685942bb74da4d2866d6ec3
@@ -4667,7 +4667,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@chevrotain/types@npm:~11.1.1":
+"@chevrotain/types@npm:~11.1.2":
   version: 11.1.2
   resolution: "@chevrotain/types@npm:11.1.2"
   checksum: 10/ad39d7651a20b05ead9b4374f98afc39915118dda29678c2b623571aa3da3018a0f3fb799d1809605cafcae59cba637d640855ea0f97b9b01d0900d77d6781fe
@@ -7598,6 +7598,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-free@npm:^6.0.0 || ^7.0.1":
+  version: 7.3.0
+  resolution: "@fortawesome/fontawesome-free@npm:7.3.0"
+  checksum: 10/256440bd43917a3e90c412d9b8ad27eb53804a7815dfd4623d9e6895b4967182b59e95953cd690f685e73887892399e17195962c61ffe6ca86af3d52a5506535
+  languageName: node
+  linkType: hard
+
 "@foundry-rs/easy-foundryup@npm:^0.1.3":
   version: 0.1.3
   resolution: "@foundry-rs/easy-foundryup@npm:0.1.3"
@@ -9625,7 +9632,7 @@ __metadata:
     "@hyperledger-cacti/cactus-test-geth-ledger": "npm:3.0.0-beta.1"
     "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-beta.1"
     "@jest/globals": "npm:29.7.0"
-    "@mermaid-js/mermaid-cli": "npm:11.12.0"
+    "@mermaid-js/mermaid-cli": "npm:11.16.0"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@opentelemetry/api": "npm:1.9.0"
     "@opentelemetry/api-logs": "npm:0.57.2"
@@ -10060,7 +10067,7 @@ __metadata:
     "@lerna-lite/publish": "npm:3.7.0"
     "@lerna-lite/run": "npm:3.7.0"
     "@lerna-lite/version": "npm:3.7.0"
-    "@mermaid-js/mermaid-cli": "npm:11.12.0"
+    "@mermaid-js/mermaid-cli": "npm:11.16.0"
     "@openapitools/openapi-generator-cli": "npm:2.7.0"
     "@redocly/openapi-core": "npm:1.15.0"
     "@types/adm-zip": "npm:0.5.0"
@@ -12231,20 +12238,51 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mermaid-js/mermaid-cli@npm:11.12.0":
-  version: 11.12.0
-  resolution: "@mermaid-js/mermaid-cli@npm:11.12.0"
+"@mermaid-js/layout-elk@npm:^0.1.5 || ^0.2.0":
+  version: 0.2.2
+  resolution: "@mermaid-js/layout-elk@npm:0.2.2"
   dependencies:
+    d3: "npm:^7.9.0"
+    elkjs: "npm:^0.9.3"
+  peerDependencies:
+    mermaid: ^11.0.2
+  checksum: 10/151fb5320e72f4e64a9bef76e2be3dd76dbd417c22fd67b81f543f0e784eeeceb512365ae567c21bdb051dfa1ce70072fdee182a2831564c59c4b89d9a5ccf18
+  languageName: node
+  linkType: hard
+
+"@mermaid-js/layout-tidy-tree@npm:^0.2.1":
+  version: 0.2.2
+  resolution: "@mermaid-js/layout-tidy-tree@npm:0.2.2"
+  dependencies:
+    d3: "npm:^7.9.0"
+  peerDependencies:
+    mermaid: ^11.0.2
+  checksum: 10/4e2fa51c9f66ab31a0a1459842d09a6505cfcbcf4a4340b301fd39360c1fb6e8801d925794c22b56f26d2071e23cd8ace79f25c049b7322538906015e345311c
+  languageName: node
+  linkType: hard
+
+"@mermaid-js/mermaid-cli@npm:11.16.0":
+  version: 11.16.0
+  resolution: "@mermaid-js/mermaid-cli@npm:11.16.0"
+  dependencies:
+    "@fortawesome/fontawesome-free": "npm:^6.0.0 || ^7.0.1"
+    "@mermaid-js/layout-elk": "npm:^0.1.5 || ^0.2.0"
+    "@mermaid-js/layout-tidy-tree": "npm:^0.2.1"
     "@mermaid-js/mermaid-zenuml": "npm:^0.2.0"
     chalk: "npm:^5.0.1"
-    commander: "npm:^14.0.0"
+    commander: "npm:^13.1.0"
     import-meta-resolve: "npm:^4.1.0"
-    mermaid: "npm:^11.0.2"
+    katex: "npm:^0.16.25"
+    mermaid: "npm:^11.14.0"
+    p-limit: "npm:^6.2.0"
   peerDependencies:
-    puppeteer: ^23
+    puppeteer: ^23 || ^24 || ^25
+  dependenciesMeta:
+    "@mermaid-js/layout-tidy-tree":
+      optional: true
   bin:
     mmdc: src/cli.js
-  checksum: 10/eca6ccb41aa436e597e891d7cb8d5860c5a1ecaef73469d288c9998147af07f5c083cbaa40ee00b986250799a45b292400ec3dc2dab4a58fb41a32a95dd8d787
+  checksum: 10/0beb2b0bddf6e92823e2725186d7a867c614810a4abc4527a154c0667e24c87ec5b0ca6382bef989299db7f29f56378713acafa320ccc18d0443692aa884a51b
   languageName: node
   linkType: hard
 
@@ -12268,12 +12306,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mermaid-js/parser@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@mermaid-js/parser@npm:1.1.1"
+"@mermaid-js/parser@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@mermaid-js/parser@npm:1.2.0"
   dependencies:
-    "@chevrotain/types": "npm:~11.1.1"
-  checksum: 10/9f3645fd055c0800c16a3e7eab1ce7f05736c352ab48996e9c64fb21b27c25a5987636040816b1bb16384a4434744cecbdf746c152ef80e0bc712972cb58deed
+    "@chevrotain/types": "npm:~11.1.2"
+  checksum: 10/278ae28edd452c9bcee3723a2d45a6a3f174700cb80fc907b9a5212f2ce449c9a5a6f7d45372bb18b6d633f8040dff4c4d2533b6a3c8d3f021903b3d6ccea799
   languageName: node
   linkType: hard
 
@@ -25790,10 +25828,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^14.0.0":
-  version: 14.0.3
-  resolution: "commander@npm:14.0.3"
-  checksum: 10/dfa9ebe2a433d277de5cb0252d23b10a543d245d892db858d23b516336a835c50fd4f52bee4cd13c705cc8acb6f03dc632c73dd806f7d06d3353eb09953dd17a
+"commander@npm:^13.1.0":
+  version: 13.1.0
+  resolution: "commander@npm:13.1.0"
+  checksum: 10/d3b4b79e6be8471ddadacbb8cd441fe82154d7da7393b50e76165a9e29ccdb74fa911a186437b9a211d0fc071db6051915c94fb8ef16d77511d898e9dbabc6af
   languageName: node
   linkType: hard
 
@@ -27446,10 +27484,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytoscape@npm:^3.29.3, cytoscape@npm:^3.33.1":
+"cytoscape@npm:^3.29.3":
   version: 3.33.3
   resolution: "cytoscape@npm:3.33.3"
   checksum: 10/1a5aa931936bf7afb055ea0e26905b1fa7062fc34011f8da44d64514cc7b8142a3c6a944cf382e11950ac32d288bdadb85cce5bede45cf620da5be53424018b0
+  languageName: node
+  linkType: hard
+
+"cytoscape@npm:^3.33.3":
+  version: 3.34.0
+  resolution: "cytoscape@npm:3.34.0"
+  checksum: 10/5bbc169798829b1a0eaadcad2707e7762e7ba1a2bcd5dbeaf75b89eb2d2ab9211e51d96b24c1f5807e329ac44c50913062464e2af11c528a1255969a36b45268
   languageName: node
   linkType: hard
 
@@ -27964,10 +28009,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.18, dayjs@npm:^1.11.19":
+"dayjs@npm:^1.11.18":
   version: 1.11.20
   resolution: "dayjs@npm:1.11.20"
   checksum: 10/5347533f21a55b8bb1b1ef559be9b805514c3a8fb7e68b75fb7e73808131c59e70909c073aa44ce8a0d159195cd110cdd4081cf87ab96cb06fee3edacae791c6
+  languageName: node
+  linkType: hard
+
+"dayjs@npm:^1.11.20":
+  version: 1.11.21
+  resolution: "dayjs@npm:1.11.21"
+  checksum: 10/dd16f9f2706b61b90e3c346a3211ac3afd9e26193136ce0e87f70bf74d1c17a447bceb230a88b175467fc9f5e3243d8c1544b9897092a12d9c80ee44d338dcb6
   languageName: node
   linkType: hard
 
@@ -29019,6 +29071,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dompurify@npm:^3.3.3":
+  version: 3.4.11
+  resolution: "dompurify@npm:3.4.11"
+  dependencies:
+    "@types/trusted-types": "npm:^2.0.7"
+  dependenciesMeta:
+    "@types/trusted-types":
+      optional: true
+  checksum: 10/d0473e1a22ed9cc23d86ef426717bce866913d1a725512a9478985bd917b272e0faba5f1d6ad8b2e37f3f4219206c4385162d7c984cfedcd23396e1e6ae0bc5e
+  languageName: node
+  linkType: hard
+
 "domutils@npm:^1.7.0":
   version: 1.7.0
   resolution: "domutils@npm:1.7.0"
@@ -29316,6 +29380,13 @@ __metadata:
   version: 1.5.356
   resolution: "electron-to-chromium@npm:1.5.356"
   checksum: 10/22e0e117d347520e7eaf2dffc840ecff3fce90f3758d35b50a76f0ec126823076c8bbb2507d28dfcd790953b47db783532fae72bd8f5dfa1d5895bec059dd706
+  languageName: node
+  linkType: hard
+
+"elkjs@npm:^0.9.3":
+  version: 0.9.3
+  resolution: "elkjs@npm:0.9.3"
+  checksum: 10/397986e271827a5e13d2722b1883aea3557006d2777be8c34568f8fe743e81f4f71210e4e81b9958f597b0af8e96afaa883d2705eba84a3d5d0973bcb02fa59e
   languageName: node
   linkType: hard
 
@@ -39610,6 +39681,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"katex@npm:^0.16.45":
+  version: 0.16.47
+  resolution: "katex@npm:0.16.47"
+  dependencies:
+    commander: "npm:^8.3.0"
+  bin:
+    katex: cli.js
+  checksum: 10/e0286b45d9e0c8443cf0381205619ecbab3919ea5fb6616408f46f0cb471ce2222e83f46aef52cdaacdcbfd4485e00fcfbcf36bd85a8a9a81e22b45827c27ced
+  languageName: node
+  linkType: hard
+
 "keccak@npm:3.0.2":
   version: 3.0.2
   resolution: "keccak@npm:3.0.2"
@@ -42171,32 +42253,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:^11.0.2":
-  version: 11.15.0
-  resolution: "mermaid@npm:11.15.0"
+"mermaid@npm:^11.14.0":
+  version: 11.16.0
+  resolution: "mermaid@npm:11.16.0"
   dependencies:
-    "@braintree/sanitize-url": "npm:^7.1.1"
+    "@braintree/sanitize-url": "npm:^7.1.2"
     "@iconify/utils": "npm:^3.0.2"
-    "@mermaid-js/parser": "npm:^1.1.1"
+    "@mermaid-js/parser": "npm:^1.2.0"
     "@types/d3": "npm:^7.4.3"
     "@upsetjs/venn.js": "npm:^2.0.0"
-    cytoscape: "npm:^3.33.1"
+    cytoscape: "npm:^3.33.3"
     cytoscape-cose-bilkent: "npm:^4.1.0"
     cytoscape-fcose: "npm:^2.2.0"
     d3: "npm:^7.9.0"
     d3-sankey: "npm:^0.12.3"
     dagre-d3-es: "npm:7.0.14"
-    dayjs: "npm:^1.11.19"
-    dompurify: "npm:^3.3.1"
+    dayjs: "npm:^1.11.20"
+    dompurify: "npm:^3.3.3"
     es-toolkit: "npm:^1.45.1"
-    katex: "npm:^0.16.25"
+    katex: "npm:^0.16.45"
     khroma: "npm:^2.1.0"
     marked: "npm:^16.3.0"
     roughjs: "npm:^4.6.6"
     stylis: "npm:^4.3.6"
     ts-dedent: "npm:^2.2.0"
     uuid: "npm:^11.1.0 || ^12 || ^13 || ^14.0.0"
-  checksum: 10/4a3f8ac77aba326c96adc2325f550421b6f05f1592998fcf80dfeb9fbcd751e2a0a030092559bd258e45bba60c0ad1e7415ad46ff5c165b1d9a469835e927e9a
+  checksum: 10/9984131ac3e3c7d49dbbb7847a995d69766a26c88409188bbabce8775b93496a3e435e7b6407119342b8c429435184b81a361a43e12bca48650c108873e0d5bd
   languageName: node
   linkType: hard
 
@@ -45231,7 +45313,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"p-limit@npm:^6.0.0":
+"p-limit@npm:^6.0.0, p-limit@npm:^6.2.0":
   version: 6.2.0
   resolution: "p-limit@npm:6.2.0"
   dependencies:

@@ -299,17 +299,18 @@ jobs:
           name: satp-hermes-build-artifacts
           path: packages/cactus-plugin-satp-hermes/
 
-      - name: Configure git user
-        run: |
-          git config --global user.email "npm-ci@hyperledger.org"
-          git config --global user.name "hyperledger-ghci"
-
       - name: Set package version
+        env:
+          NEW_VERSION: ${{ needs.set-npm-tags.outputs.tag_version }}
         run: |
-          cd packages/cactus-plugin-satp-hermes
-          npm version "${{ needs.set-npm-tags.outputs.tag_version }}" --no-git-tag-version --allow-same-version
-          echo "Publishing ${{ needs.set-npm-tags.outputs.tag_version }} under dist-tag '${{ needs.set-npm-tags.outputs.dist_tag }}'"
-          grep version package.json
+          node -e "
+            const fs = require('fs');
+            const pkgPath = 'packages/cactus-plugin-satp-hermes/package.json';
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+            pkg.version = process.env.NEW_VERSION;
+            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\\n');
+            console.log('Set version to:', pkg.version);
+          "
 
       - name: Verify package contents
         run: |
@@ -350,15 +351,18 @@ jobs:
           name: satp-hermes-build-artifacts
           path: packages/cactus-plugin-satp-hermes/
 
-      - name: Configure git user
-        run: |
-          git config --global user.email "npm-ci@hyperledger.org"
-          git config --global user.name "hyperledger-ghci"
-
       - name: Set package version
+        env:
+          NEW_VERSION: ${{ needs.set-npm-tags.outputs.tag_version }}
         run: |
-          cd packages/cactus-plugin-satp-hermes
-          npm version "${{ needs.set-npm-tags.outputs.tag_version }}" --no-git-tag-version --allow-same-version
+          node -e "
+            const fs = require('fs');
+            const pkgPath = 'packages/cactus-plugin-satp-hermes/package.json';
+            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+            pkg.version = process.env.NEW_VERSION;
+            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\\n');
+            console.log('Set version to:', pkg.version);
+          "
 
       - name: Publish to GitHub Package Registry
         env:
