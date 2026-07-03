@@ -1,12 +1,10 @@
 #!/bin/sh
-# Cacti commit-msg hook runner.
-# Delegates to executable scripts in .husky/commit-msg.d/*.sh (lexical order).
-# Each script receives the commit-message file path as $1.
-# Bypass the whole hook with:  HUSKY=0 git commit ...
+# Cacti pre-push hook runner.
+# Bypass the whole hook with:  HUSKY=0 git push ...
 
 set -e
 
-STAGE=commit-msg
+STAGE=pre-push
 HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
 D="$HOOK_DIR/$STAGE.d"
 
