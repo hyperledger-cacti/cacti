@@ -190,6 +190,13 @@ If a PR closes/fixes an issue, keep naming aligned:
 
 They should describe the same change using the same Conventional Commit intent.
 
+## 7. Signed commits
+Have git sign-off at the end of the commit message (`Signed-off-by: Name <email>`) to certify the [Developer Certificate of Origin (DCO)](https://developercertificate.org/). Use the `-s` flag with `git commit`. See [signing commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) for more information. **AI agents must not add Signed-off-by tags** — only the human submitter may certify the DCO (see [AI Guidelines §7](./AI_GUIDELINES.md)).
+
+## 8. Character limits
+
+Pull Request Title and Commit Subject must not exceed 72 characters (including spaces and special characters). Commit Message per line must not exceed 80 characters (including spaces and special characters).
+
 ---
 
 ## Quick Reference
