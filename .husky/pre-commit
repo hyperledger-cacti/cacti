@@ -1,7 +1,23 @@
 #!/bin/sh
-echo  "pre-commit hook, running yarn run lint"
-yarn run lint
-if [ $? -ne 0 ]; then
-	echo "Lint failed. Please fix errors before committing."
-	exit 1
-fi
+# Cacti pre-commit hook runner.
+#
+# Delegates to executable scripts in .husky/pre-commit.d/*.sh, run in
+# Bypass the whole hook with:  HUSKY=0 git commit ...
+
+set -e
+
+STAGE=pre-commit
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+D="$HOOK_DIR/$STAGE.d"
+
+[ -d "$D" ] || exit 0
+
+for script in "$D"/*.sh; do
+	[ -e "$script" ] || continue   # no matches -> literal glob
+	[ -x "$script" ] || continue   # disabled via chmod -x
+	name="$(basename "$script")"
+	echo "[$STAGE] >>> $name"
+	"$script" "$@"
+done
+
+
