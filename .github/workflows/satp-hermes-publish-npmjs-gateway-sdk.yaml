@@ -1,74 +1,38 @@
-name: SATP Hermes Gateway SDK - NPM Publish
+name: SATP Hermes Gateway SDK - GitHub Package Registry Publish
 
 # =============================================================================
-# NPM + GHCR DOCKER PUBLISHING WORKFLOW
+# NPM PUBLISHING WORKFLOW (GitHub Package Registry only)
 # =============================================================================
 #
 # This workflow publishes the SATP Hermes Gateway SDK to the GitHub Package
-# Registry (GPR) for both development and production builds. npmjs.org
-# publishing is owned by the repo-wide publish-npm.yaml (the single npm OIDC
-# trusted publisher), so it is intentionally not done here.
+# Registry (GPR) at npm.pkg.github.com.
+
 #
 # PACKAGE CONFIGURATION:
 #   Organization: @hyperledger-cacti
 #   Package: @hyperledger-cacti/cactus-plugin-satp-hermes
-#   Registry: https://npm.pkg.github.com/ (GitHub Packages)
+#   Registry: https://npm.pkg.github.com/
 #
 # VERSION STRATEGY:
-#   Version Source: package.json version (0.0.3-beta)
-#   Note: package.json "version" field is the single source of truth.
-#   
+#   Version Source: package.json version (single source of truth).
+#
 #   Development Builds:
-#     Format: {base-version}-dev.{timestamp}
-#     Example: 0.0.3-beta-dev.20250106120000
+#     Format: {base-version}-dev.{short-sha}
 #     NPM Tag: dev
 #     Trigger: Push to main, satp-dev, or satp-stg branches
-#   
+#
 #   Release Builds:
 #     Format: {base-version} or custom version
-#     Example: 0.0.3-beta
-#     NPM Tags: latest (primary) + version tag (0.0.3-beta)
-#     Trigger: Manual workflow dispatch with is_release=true
-#     Note: Production releases are tagged with both 'latest' and the specific version
-#
-# PACKAGE CONTENTS:
-#   Files Included (package.json "files" field):
-#     - dist/lib/main/**/*.js      # Compiled JavaScript
-#     - dist/lib/main/**/*.d.ts    # TypeScript definitions
-#     - dist/lib/main/**/*.json    # JSON configs, OpenAPI specs, Solidity ABIs
-#     - README.md                  # Package documentation
-#     - CHANGELOG.md               # Version history
-#     - LICENSE                    # Apache-2.0 license
-#   
-#   Package Size: ~900 KB compressed, ~5.6 MB unpacked
-#   
-#   Files Excluded:
-#     - Source TypeScript (src/)
-#     - Test files
-#     - Docker bundle (dist/bundle/)
-#     - Examples (dist/lib/examples/)
-#     - Build configs, dev scripts
+#     NPM Tags: latest (primary) + version tag
+#     Trigger: Push of a vX.Y.Z tag, or manual workflow dispatch with is_release=true
 #
 # AUTH:
 #   GPR:       GITHUB_TOKEN, auto-provided by GitHub Actions.
 #   npmjs.org: not published here — handled by publish-npm.yaml via npm OIDC
 #              trusted publishing (no NPM_TOKEN anywhere).
 #
-# USAGE:
-#   Development Release (Automatic):
-#     git push origin main
-#   
-#   Production Release (Manual):
-#     1. Go to Actions tab
-#     2. Select "SATP Hermes Gateway SDK - NPM Publish"
-#     3. Click "Run workflow"
-#     4. Set is_release=true
-#     5. Optionally set custom_version
-#
 # VERIFICATION:
-#   npm view @hyperledger-cacti/cactus-plugin-satp-hermes
-#   npm install @hyperledger-cacti/cactus-plugin-satp-hermes@dev
-#   npm install @hyperledger-cacti/cactus-plugin-satp-hermes@latest
+#   npm view --registry=https://npm.pkg.github.com/ @hyperledger-cacti/cactus-plugin-satp-hermes
 #
 # =============================================================================
 
