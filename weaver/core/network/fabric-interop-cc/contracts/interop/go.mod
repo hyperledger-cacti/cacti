@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/contracts/interop/v3
 
-go 1.20
+go 1.26
 
 require (
 	github.com/ethereum/go-ethereum v1.13.15

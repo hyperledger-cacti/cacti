@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v3
 
-go 1.20
+go 1.26
 
 require (
 	github.com/golang/protobuf v1.5.4
@@ -26,5 +26,3 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace golang.org/x/net => golang.org/x/net v0.33.0

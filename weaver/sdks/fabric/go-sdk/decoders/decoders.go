@@ -28,7 +28,7 @@ func DeserializeRemoteProposal(proposalBytes []byte) (*peer.Proposal, error) {
 	proposal := &peer.Proposal{}
 	err := proto.Unmarshal(proposalBytes, proposal)
 	if err != nil {
-		return proposal, logThenErrorf(err.Error())
+		return proposal, logThenErrorf("%s", err.Error())
 	}
 
 	return proposal, nil
@@ -38,7 +38,7 @@ func DeserializeRemoteProposalResponse(proposalResponseBytes []byte) (*peer.Prop
 	proposalResponse := &peer.ProposalResponse{}
 	err := proto.Unmarshal(proposalResponseBytes, proposalResponse)
 	if err != nil {
-		return proposalResponse, logThenErrorf(err.Error())
+		return proposalResponse, logThenErrorf("%s", err.Error())
 	}
 
 	return proposalResponse, nil
@@ -77,7 +77,7 @@ func DeserializeRemoteProposalResponseBase64(proposalResponseBytesBase64 []byte)
 func SerializeRemoteProposalResponse(proposalResponse *peer.ProposalResponse) ([]byte, error) {
 	proposalResponseBytes, err := proto.Marshal(proposalResponse)
 	if err != nil {
-		return nil, logThenErrorf(err.Error())
+		return nil, logThenErrorf("%s", err.Error())
 	}
 
 	return proposalResponseBytes, nil

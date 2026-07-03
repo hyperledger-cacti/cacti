@@ -180,7 +180,7 @@ func handleRequest(s *SmartContract, ctx contractapi.TransactionContextInterface
 			// Use already authenticated certificate as the source of the public key for encryption
 			payload, err = generateConfidentialInteropPayloadAndHash(pbResp.Payload, query.Certificate)
 			if err != nil {
-				return "", logThenErrorf(err.Error())
+				return "", logThenErrorf("%s", err.Error())
 			}
 		} else {
 			payload = pbResp.Payload

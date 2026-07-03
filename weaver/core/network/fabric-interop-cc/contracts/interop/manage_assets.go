@@ -39,11 +39,11 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	// First, verify that this call is legal
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	interopChaincodeID, err := ctx.GetStub().GetState(wutils.GetInteropChaincodeIDKey())
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID == string(interopChaincodeID) {
 		return "", logThenErrorf("Illegal access: LockAsset being called directly by client")
@@ -58,7 +58,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 	// Associate lock with chaincode ID of caller.
 	err = ctx.GetStub().PutState(generateContractIdMapCCKey(contractId), []byte(callerChaincodeID))
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	return contractId, nil
@@ -68,7 +68,7 @@ func (s *SmartContract) LockAsset(ctx contractapi.TransactionContextInterface, a
 func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) error {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 
 	contractId, err := assetexchange.UnlockAsset(ctx, callerChaincodeID, assetAgreementBytesBase64)
@@ -88,7 +88,7 @@ func (s *SmartContract) UnlockAsset(ctx contractapi.TransactionContextInterface,
 func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (bool, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 
 	return assetexchange.IsAssetLocked(ctx, callerChaincodeID, assetAgreementBytesBase64)
@@ -98,7 +98,7 @@ func (s *SmartContract) IsAssetLocked(ctx contractapi.TransactionContextInterfac
 func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string, claimInfoBytesBase64 string) error {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 
 	contractId, err := assetexchange.ClaimAsset(ctx, callerChaincodeID, assetAgreementBytesBase64, claimInfoBytesBase64)
@@ -118,13 +118,13 @@ func (s *SmartContract) ClaimAsset(ctx contractapi.TransactionContextInterface, 
 func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) error {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 
 	// Verify that this call comes from the same chaincode the lock instruction came from
 	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID != string(lockerChaincodeID) {
 		return logThenErrorf("Illegal access: UnlockAssetUsingContractId being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
@@ -148,13 +148,13 @@ func (s *SmartContract) UnlockAssetUsingContractId(ctx contractapi.TransactionCo
 func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 
 	// Verify that this call comes from the same chaincode the lock instruction came from
 	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID != string(lockerChaincodeID) {
 		return logThenErrorf("Illegal access: ClaimAssetUsingContractId being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
@@ -178,13 +178,13 @@ func (s *SmartContract) ClaimAssetUsingContractId(ctx contractapi.TransactionCon
 func (s *SmartContract) IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 
 	// Verify that this call comes from the same chaincode the lock instruction came from
 	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID != string(lockerChaincodeID) {
 		return false, logThenErrorf("Illegal access: IsAssetLockedQueryUsingContractId being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
@@ -199,11 +199,11 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	// First, verify that this call comes from another chaincode rather than directly from the client
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	interopChaincodeID, err := ctx.GetStub().GetState(wutils.GetInteropChaincodeIDKey())
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID == string(interopChaincodeID) {
 		return "", logThenErrorf("Illegal access: LockFungibleAsset being called directly by client")
@@ -218,7 +218,7 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 	// Associate lock with chaincode ID of caller.
 	err = ctx.GetStub().PutState(generateContractIdMapCCKey(contractId), []byte(callerChaincodeID))
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	return contractId, nil
@@ -228,13 +228,13 @@ func (s *SmartContract) LockFungibleAsset(ctx contractapi.TransactionContextInte
 func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contractId string) (bool, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 
 	// Verify that this call comes from the same chaincode the lock instruction came from
 	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID != string(lockerChaincodeID) {
 		return false, logThenErrorf("Illegal access: IsFungibleAssetLocked being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
@@ -248,13 +248,13 @@ func (s *SmartContract) IsFungibleAssetLocked(ctx contractapi.TransactionContext
 func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string, claimInfoBytesBase64 string) error {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 
 	// Verify that this call comes from the same chaincode the lock instruction came from
 	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID != string(lockerChaincodeID) {
 		return logThenErrorf("Illegal access: ClaimFungibleAsset being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
@@ -278,13 +278,13 @@ func (s *SmartContract) ClaimFungibleAsset(ctx contractapi.TransactionContextInt
 func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId string) error {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 
 	// Verify that this call comes from the same chaincode the lock instruction came from
 	lockerChaincodeID, err := ctx.GetStub().GetState(generateContractIdMapCCKey(contractId))
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	if callerChaincodeID != string(lockerChaincodeID) {
 		return logThenErrorf("Illegal access: UnlockFungibleAsset being called from chaincode Id %s; expected %s", callerChaincodeID, string(lockerChaincodeID))
@@ -307,7 +307,7 @@ func (s *SmartContract) UnlockFungibleAsset(ctx contractapi.TransactionContextIn
 func (s *SmartContract) GetHTLCHash(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	return assetexchange.GetHTLCHash(ctx, callerChaincodeID, assetAgreementBytesBase64)
 }
@@ -319,7 +319,7 @@ func (s *SmartContract) GetHTLCHashByContractId(ctx contractapi.TransactionConte
 func (s *SmartContract) GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, assetAgreementBytesBase64 string) (string, error) {
 	callerChaincodeID, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	return assetexchange.GetHTLCHashPreImage(ctx, callerChaincodeID, assetAgreementBytesBase64)
 }

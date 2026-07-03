@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simplestate
 
-go 1.20
+go 1.26
 
 require (
 	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9

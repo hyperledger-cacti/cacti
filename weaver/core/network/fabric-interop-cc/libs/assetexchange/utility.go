@@ -28,19 +28,19 @@ func GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID,
     assetAgreement := &common.AssetExchangeAgreement{}
     err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
     if err != nil {
-        return "", logThenErrorf(err.Error())
+        return "", logThenErrorf("%s", err.Error())
     }
     //display the requested asset agreement
     log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
     assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
     if err != nil {
-        return "", logThenErrorf(err.Error())
+        return "", logThenErrorf("%s", err.Error())
     }
 
     assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
     if err != nil {
-        return "", logThenErrorf(err.Error())
+        return "", logThenErrorf("%s", err.Error())
     }
 
     if assetLockValBytes == nil {
@@ -60,7 +60,7 @@ func GetHTLCHash(ctx contractapi.TransactionContextInterface, callerChaincodeID,
 func GetHTLCHashByContractId(ctx contractapi.TransactionContextInterface, contractId string) (string, error) {
     _, assetLockVal, err := fetchLockStateUsingContractId(ctx, contractId)
     if err != nil {
-        return "", logThenErrorf(err.Error())
+        return "", logThenErrorf("%s", err.Error())
     }
 
     return getHTLCHashHelper(ctx, assetLockVal.GetLockInfo())
@@ -75,19 +75,19 @@ func GetHTLCHashPreImage(ctx contractapi.TransactionContextInterface, callerChai
     assetAgreement := &common.AssetExchangeAgreement{}
     err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
     if err != nil {
-        return "", logThenErrorf(err.Error())
+        return "", logThenErrorf("%s", err.Error())
     }
     //display the requested asset agreement
     log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
     claimAssetLockKey, err := GenerateClaimAssetLockKey(ctx, callerChaincodeID, assetAgreement)
     if err != nil {
-        return "", logThenErrorf(err.Error())
+        return "", logThenErrorf("%s", err.Error())
     }
     
     contractIdBytes, err := ctx.GetStub().GetState(claimAssetLockKey)
     if err != nil {
-        return "", logThenErrorf(err.Error())
+        return "", logThenErrorf("%s", err.Error())
     }
     if contractIdBytes == nil {
         return "", logThenErrorf("key %s is not associated with any claimed asset", claimAssetLockKey)

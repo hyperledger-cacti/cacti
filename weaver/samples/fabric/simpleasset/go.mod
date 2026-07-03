@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simpleasset
 
-go 1.20
+go 1.26
 
 require (
 	github.com/golang/protobuf v1.5.4

@@ -227,14 +227,14 @@ func populateWallet(wallet *gateway.Wallet, connProfilePath string, networkName 
 	// read the certificate pem
 	cert, err := ioutil.ReadFile(filepath.Clean(certPath))
 	if err != nil {
-		return identity, logThenErrorf(err.Error())
+		return identity, logThenErrorf("%s", err.Error())
 	}
 
 	keyDir := filepath.Join(credPath, "keystore")
 	// there's a single file in this dir containing the private key
 	files, err := ioutil.ReadDir(keyDir)
 	if err != nil {
-		return identity, logThenErrorf(err.Error())
+		return identity, logThenErrorf("%s", err.Error())
 	}
 	if len(files) != 1 {
 		return identity, logThenErrorf("keystore folder should contain one file")
@@ -242,14 +242,14 @@ func populateWallet(wallet *gateway.Wallet, connProfilePath string, networkName 
 	keyPath := filepath.Join(keyDir, files[0].Name())
 	key, err := ioutil.ReadFile(filepath.Clean(keyPath))
 	if err != nil {
-		return identity, logThenErrorf(err.Error())
+		return identity, logThenErrorf("%s", err.Error())
 	}
 
 	identity = gateway.NewX509Identity(mspId, string(cert), string(key))
 
 	err = wallet.Put(userString, identity)
 	if err != nil {
-		return identity, logThenErrorf(err.Error())
+		return identity, logThenErrorf("%s", err.Error())
 	}
 
 	return identity, nil
@@ -327,7 +327,7 @@ func GenerateMembership(channel, contractName, connProfilePath, networkName, msp
 
 	membershipBytes, err := formatMSP()
 	if err != nil {
-		logThenErrorf(err.Error())
+		logThenErrorf("%s", err.Error())
 	}
 	err = ioutil.WriteFile(filepath.Join(credentialsPath, "membership.json"), membershipBytes, 0755)
 	if err != nil {
