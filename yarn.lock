@@ -10104,6 +10104,7 @@ __metadata:
     eslint-plugin-standard: "npm:5.0.0"
     fast-safe-stringify: "npm:2.1.1"
     fs-extra: "npm:11.2.0"
+    github-actionlint: "npm:1.7.12"
     globby: "npm:12.2.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -21614,6 +21615,13 @@ __metadata:
   version: 0.4.16
   resolution: "adm-zip@npm:0.4.16"
   checksum: 10/897003d21a445bfce251d5a328706035dc03af53cd4c66bb0a4558496939f89767ae5e7c67d10a5a9ad0146081a339bed3361405d6cca648a4378198573e9cad
+  languageName: node
+  linkType: hard
+
+"adm-zip@npm:^0.5.16":
+  version: 0.5.18
+  resolution: "adm-zip@npm:0.5.18"
+  checksum: 10/6eaa298828b92e543241fa24d01af774ad8709b80539b3fa60d4ba6f69fd5a15a19d8177e6d739f18f4e0933610ed555215dc6553b51c532534414702c255167
   languageName: node
   linkType: hard
 
@@ -33994,6 +34002,18 @@ __metadata:
   dependencies:
     git-up: "npm:^7.0.0"
   checksum: 10/3bbf1182cd5a57c5ba2bd2c722f7391b771edb7d8bd37e060e25bd48b4f2a444bc5b5709fee0075f058a51b1233a65e4124b53715b5e091b34586b9a263ae2c3
+  languageName: node
+  linkType: hard
+
+"github-actionlint@npm:1.7.12":
+  version: 1.7.12
+  resolution: "github-actionlint@npm:1.7.12"
+  dependencies:
+    adm-zip: "npm:^0.5.16"
+    tar: "npm:^7.4.0"
+  bin:
+    github-actionlint: dist/bin/actionlint.js
+  checksum: 10/a626cb9da75c0eef504c7ba951a791d6ee90ed08529c3c80d88124df04afbc74039b6d8364ff42aee90db71bffb13c3562f92744315c492b41960aa339387080
   languageName: node
   linkType: hard
 
