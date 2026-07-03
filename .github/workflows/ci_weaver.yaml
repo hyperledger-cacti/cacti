@@ -61,7 +61,42 @@ jobs:
       run_all: $RUN_ALL 
     uses: ./.github/workflows/test_weaver-asset-exchange-besu.yaml
   go:
-    with: 
+    with:
       run_all: $RUN_ALL
     uses: ./.github/workflows/test_weaver-go.yaml
+
+  # Single rollup gate for the entire Weaver CI tree. Every job above still
+  # runs (and still appears individually in the Checks tab), but branch
+  # protection only needs to require THIS one check instead of the dozens of
+  # `go / ...`, `docker-build / ...`, `asset-exchange-* / ...` contexts.
+  #
+  # `if: always()` makes this job run even when a dependency fails or is
+  # skipped. A `skipped` dependency (e.g. gated out by check_code_changed) is
+  # treated as passing; only `failure` or `cancelled` fails the gate.
+  weaver-ci-success:
+    name: Weaver CI Success
+    needs:
+      - fabric-fabric-satp
+      - asset-exchange-corda
+      - asset-transfer
+      - relay
+      - corda-interop-app
+      - pre-release
+      - asset-exchange-fabric
+      - data-sharing
+      - node-pkgs
+      - docker-build
+      - asset-exchange-besu
+      - go
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Fail if any required job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "One or more Weaver CI jobs failed or were cancelled:"
+          echo '${{ toJSON(needs) }}'
+          exit 1
+      - name: All Weaver CI jobs passed
+        run: echo "All Weaver CI jobs succeeded (skipped jobs are treated as passing)."
 

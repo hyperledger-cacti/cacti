@@ -84,3 +84,35 @@ jobs:
       run_trivy_scan: ${{ needs.env-setup.outputs.run_trivy_scan }}
       affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}
 
+  # Single rollup gate for the entire Cacti CI tree. Every leaf job above still
+  # runs (and still shows up individually in the Checks tab), but branch
+  # protection only needs to require THIS one check instead of dozens of
+  # `packages-workflow / ...`, `checks-and-build / ...`, etc. contexts.
+  #
+  # `if: always()` makes this job run even when a dependency fails or is
+  # skipped. A dependency that is `skipped` (e.g. a package gated out by the
+  # affected-packages filter) is treated as passing; only `failure` or
+  # `cancelled` fails the gate.
+  #
+  # `examples-workflow` and `ghcr-workflow` are intentionally NOT listed here:
+  # they still run on every PR but are non-blocking, matching the pre-rollup
+  # branch-protection policy. Add them back to `needs` to make them required.
+  ci-success:
+    name: Cacti CI Success
+    needs:
+      - env-setup
+      - checks-and-build
+      - code-quality-checks
+      - packages-workflow
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Fail if any required job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "One or more Cacti CI jobs failed or were cancelled:"
+          echo '${{ toJSON(needs) }}'
+          exit 1
+      - name: All Cacti CI jobs passed
+        run: echo "All Cacti CI jobs succeeded (skipped jobs are treated as passing)."
+
