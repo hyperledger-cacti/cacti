@@ -25,7 +25,8 @@ name: SATP Hermes Gateway - Docker Publish
 #
 # REQUIRED SECRETS:
 #   GITHUB_TOKEN:    Auto-provided for GHCR publishing
-#   DOCKERHUB_TOKEN: Docker Hub organization access token
+#   DOCKERHUB_USERNAME: Docker Hub username
+#   DOCKERHUB_PAT:      Docker Hub personal access token
 #
 # =============================================================================
 
@@ -95,7 +96,8 @@ permissions:
   packages: write
 
 env:
-  DOCKERHUB_IMAGE: hyperledger/cacti-satp-hermes-gateway
+  DOCKERHUB_USERNAME: hyperledger
+  DOCKERHUB_IMAGE: "${DOCKERHUB_USERNAME}/cacti-satp-hermes-gateway"
   GHCR_IMAGE: hyperledger-cacti/cacti-satp-hermes-gateway
 
 jobs:
@@ -148,7 +150,6 @@ jobs:
             echo "Building ${TAG_SUFFIX} version: ${TAG_VERSION}"
           fi
 
-          # Image names come from the workflow-level env (DOCKERHUB_IMAGE, GHCR_IMAGE).
           {
             echo "package_version=${PACKAGE_VERSION}"
             echo "tag_suffix=${TAG_SUFFIX}"
@@ -316,8 +317,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee #v4.2.0
         with:
-          username: hyperledger
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PAT }}
 
       - name: Tag and push to Docker Hub
         run: |
