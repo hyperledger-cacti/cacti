@@ -119,8 +119,44 @@ function detectChangedPackages(packages, baseRef) {
   // (composite actions, jest-runner, codegen steps, etc.). Re-run the whole
   // matrix to be safe. This rule intentionally takes precedence over the
   // docs/comment-only short-circuits below.
-  if (changedFiles.some((f) => f.startsWith(".github/"))) {
-    console.warn(".github/ change detected -> all packages affected.");
+  //
+  // Not every `.github/` file has package-wide impact though. Weaver-scoped
+  // workflows, publish/deploy pipelines, and pure lint/analysis workflows
+  // don't touch how `packages/*` are built or tested — those fall through
+  // to the normal path-based detection below.
+  const AFFECTS_ALL_GITHUB_DIRS = [".github/actions/", ".github/codeql/"];
+
+  const NON_PACKAGES_WORKFLOWS = [
+    // Weaver-scoped (any workflow with "weaver" in the filename)
+    /^\.github\/workflows\/[^/]*weaver[^/]*\.ya?ml$/,
+    // Publish workflows
+    /^\.github\/workflows\/.*publish.*\.ya?ml$/,
+    // Deploy workflows
+    /^\.github\/workflows\/deploy_/,
+    // GHCR image builds — internally gate on their own file changes
+    /^\.github\/workflows\/ghcr-workflow\.yaml$/,
+    // Lint / meta / analysis (no build impact)
+    /^\.github\/workflows\/semantic-pull-request\.yaml$/,
+    /^\.github\/workflows\/scorecard\.yml$/,
+    /^\.github\/workflows\/commitlint-pull-request\.yaml$/,
+    /^\.github\/workflows\/code-quality-checks\.yaml$/,
+    /^\.github\/workflows\/ai-config-lint\.yaml$/,
+    /^\.github\/workflows\/actionlint\.yaml$/,
+    /^\.github\/workflows\/codeql-analysis\.yml$/,
+    /^\.github\/workflows\/gg-shield-action\.yaml$/,
+    /^\.github\/workflows\/coverage_ts\.yaml$/,
+  ];
+
+  const affectsPackages = (f) => {
+    if (AFFECTS_ALL_GITHUB_DIRS.some((d) => f.startsWith(d))) return true;
+    if (f.startsWith(".github/workflows/")) {
+      return !NON_PACKAGES_WORKFLOWS.some((re) => re.test(f));
+    }
+    return false; // other .github/ files (issue templates, CODEOWNERS, dependabot.yml, etc.)
+  };
+
+  if (changedFiles.some(affectsPackages)) {
+    console.warn(".github/ change affecting packages detected -> all packages affected.");
     return Object.keys(packages);
   }
 
