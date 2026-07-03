@@ -76,7 +76,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor || echo "If this steps fails and asks to run 'go mod tidy' then run the script 'tools/go-mod-tidy.sh' to update all go modules"
@@ -101,7 +101,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -125,7 +125,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -145,7 +145,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -165,7 +165,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -189,7 +189,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -209,7 +209,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -233,7 +233,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -257,7 +257,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -281,7 +281,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -305,7 +305,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
 
     - name: Vendor
       run: make run-vendor
@@ -329,7 +329,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
       with:
-        go-version: '1.20.2'
+        go-version: '1.26.4'
         
     # FABRIC NETWORK
     - name: Start Fabric Network

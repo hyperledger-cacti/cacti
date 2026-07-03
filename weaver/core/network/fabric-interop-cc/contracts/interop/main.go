@@ -49,7 +49,7 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	err = ctx.GetStub().PutState(e2eConfidentialityKey, []byte(confFlag))
 	if err != nil {
 		errMsg := fmt.Sprintf("Error saving E2E-Confidentiality Flag: %s", err.Error())
-		fmt.Printf(errMsg)
+		fmt.Printf("%s\n", errMsg)
 		return errors.New(errMsg)
 	}
 
@@ -57,21 +57,21 @@ func (s *SmartContract) InitLedger(ctx contractapi.TransactionContextInterface) 
 	localCCId, err := wutils.GetLocalChaincodeID(ctx.GetStub())
 	if err != nil {
 		errMsg := fmt.Sprintf("Error getting this chaincode's ID: %s", err.Error())
-		fmt.Printf(errMsg)
+		fmt.Printf("%s\n", errMsg)
 		return errors.New(errMsg)
 	}
 	// Record local chaincode ID for lookup during asset lock management
 	err = ctx.GetStub().PutState(wutils.GetLocalChaincodeIDKey(), []byte(localCCId))
 	if err != nil {
 		errMsg := fmt.Sprintf("Error saving this chaincode's ID: %s", err.Error())
-		fmt.Printf(errMsg)
+		fmt.Printf("%s\n", errMsg)
 		return errors.New(errMsg)
 	}
 	// This is the Interop chaincode; record its ID for lookup during asset lock management
 	err = ctx.GetStub().PutState(wutils.GetInteropChaincodeIDKey(), []byte(localCCId))
 	if err != nil {
 		errMsg := fmt.Sprintf("Error saving this chaincode's ID: %s", err.Error())
-		fmt.Printf(errMsg)
+		fmt.Printf("%s\n", errMsg)
 		return errors.New(errMsg)
 	}
 

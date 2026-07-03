@@ -32,7 +32,7 @@ func LockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, a
 	assetAgreement := &common.AssetExchangeAgreement{}
 	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
@@ -44,19 +44,19 @@ func LockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, a
 
 	lockInfo, expiryTimeSecs, err := getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	assetLockKey, contractId, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	assetLockVal := AssetLockValue{ContractId: contractId, Locker: assetAgreement.Locker, Recipient: assetAgreement.Recipient, LockInfo: lockInfo, ExpiryTimeSecs: expiryTimeSecs}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	if assetLockValBytes != nil {
@@ -70,7 +70,7 @@ func LockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, a
 
 	err = ctx.GetStub().PutState(assetLockKey, assetLockValBytes)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	assetLockKeyBytes, err := json.Marshal(assetLockKey)
@@ -80,7 +80,7 @@ func LockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, a
 
 	err = ctx.GetStub().PutState(generateContractIdMapKey(contractId), assetLockKeyBytes)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	return contractId, nil
 }
@@ -109,7 +109,7 @@ func LockFungibleAsset(ctx contractapi.TransactionContextInterface, callerChainc
 
 	lockInfo, expiryTimeSecs, err := getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// generate the contractId for the fungible asset lock agreement
@@ -152,7 +152,7 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, 
 	assetAgreement := &common.AssetExchangeAgreement{}
 	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	// display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v\n", assetAgreement)
@@ -164,12 +164,12 @@ func ClaimAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID, 
 
 	assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	if assetLockValBytes == nil {
@@ -194,7 +194,7 @@ func ClaimFungibleAsset(ctx contractapi.TransactionContextInterface, contractId,
 
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	
 	return claimAssetCommon(ctx, assetLockVal.LockInfo, assetLockVal.ExpiryTimeSecs, assetLockVal.Recipient, "", contractId, claimInfoBytesBase64)
@@ -205,7 +205,7 @@ func ClaimAssetUsingContractId(ctx contractapi.TransactionContextInterface, cont
 
 	assetLockKey, assetLockVal, err := fetchLockStateUsingContractId(ctx, contractId)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	
 	return claimAssetCommon(ctx, assetLockVal.GetLockInfo(), assetLockVal.GetExpiryTimeSecs(), assetLockVal.GetRecipient(), assetLockKey, contractId, claimInfoBytesBase64)
@@ -226,7 +226,7 @@ func claimAssetCommon(ctx contractapi.TransactionContextInterface, lockInfo inte
 
 	claimInfo, err := getClaimInfo(claimInfoBytesBase64)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 
 	// Check if expiry time is elapsed
@@ -288,7 +288,7 @@ func UnlockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID,
 	assetAgreement := &common.AssetExchangeAgreement{}
 	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
@@ -300,12 +300,12 @@ func UnlockAsset(ctx contractapi.TransactionContextInterface, callerChaincodeID,
 
 	assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	if assetLockValBytes == nil {
@@ -331,7 +331,7 @@ func UnlockFungibleAsset(ctx contractapi.TransactionContextInterface, contractId
 
 	assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	
 	return unlockAssetCommon(ctx, assetLockVal.ExpiryTimeSecs, assetLockVal.Locker, "", contractId)
@@ -342,7 +342,7 @@ func UnlockAssetUsingContractId(ctx contractapi.TransactionContextInterface, con
 
 	assetLockKey, assetLockVal, err := fetchLockStateUsingContractId(ctx, contractId)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	
 	return unlockAssetCommon(ctx, assetLockVal.GetExpiryTimeSecs(), assetLockVal.GetLocker(), assetLockKey, contractId)
@@ -395,19 +395,19 @@ func IsAssetLocked(ctx contractapi.TransactionContextInterface, callerChaincodeI
 	assetAgreement := &common.AssetExchangeAgreement{}
 	err = proto.Unmarshal([]byte(assetAgreementBytes), assetAgreement)
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 	//display the requested asset agreement
 	log.Infof("assetExchangeAgreement: %+v", assetAgreement)
 
 	assetLockKey, _, err := GenerateAssetLockKeyAndContractId(ctx, callerChaincodeID, assetAgreement)
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 
 	assetLockValBytes, err := ctx.GetStub().GetState(assetLockKey)
 	if err != nil {
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 
 	if assetLockValBytes == nil {
@@ -451,7 +451,7 @@ func IsFungibleAssetLocked(ctx contractapi.TransactionContextInterface, contract
 		if err.Error() == errStr {
 			return false, nil
 		}
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 
 	// Check if expiry time is elapsed
@@ -475,7 +475,7 @@ func IsAssetLockedQueryUsingContractId(ctx contractapi.TransactionContextInterfa
 		if err.Error() == errStr || err.Error() == errStrFungible {
 			return false, nil
 		}
-		return false, logThenErrorf(err.Error())
+		return false, logThenErrorf("%s", err.Error())
 	}
 
 	// Check if expiry time is elapsed

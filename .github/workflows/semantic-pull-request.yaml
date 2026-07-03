@@ -79,11 +79,15 @@ jobs:
           NON_CHANGELOG_TYPES="ci test chore docs style"
 
           HAS_CORE_CODE=false
+          HAS_DEP_MANIFEST=false
           while IFS= read -r file; do
             [ -z "$file" ] && continue
 
-            # Non-core paths — never count as core regardless of extension
+            # Non-core paths — never count as core regardless of extension.
+            # Workflow/action files under .github/ are handled by the dep-manifest
+            # classifier below (they pin action versions), so let them through.
             case "$file" in
+              .github/workflows/*|.github/actions/*) ;;
               .github/*|docs/*|*/docs/*|*.md|tools/*|examples/*|weaver/samples/*) continue ;;
               *test*|*spec*) continue ;;
             esac
@@ -98,10 +102,32 @@ jobs:
                 esac
                 ;;
             esac
+
+            # Dependency manifests — mark as changelog-worthy dep bump
+            case "$file" in
+              # go
+              go.mod|go.sum|*/go.mod|*/go.sum) HAS_DEP_MANIFEST=true ;;
+              # rust
+              Cargo.toml|Cargo.lock|*/Cargo.toml|*/Cargo.lock) HAS_DEP_MANIFEST=true ;;
+              # node
+              package.json|package-lock.json|yarn.lock|pnpm-lock.yaml|*/package.json|*/package-lock.json|*/yarn.lock|*/pnpm-lock.yaml) HAS_DEP_MANIFEST=true ;;
+              # docker
+              Dockerfile|*.Dockerfile|*/Dockerfile) HAS_DEP_MANIFEST=true ;;
+              # docker-compose
+              docker-compose*.yml|docker-compose*.yaml|*/docker-compose*.yml|*/docker-compose*.yaml) HAS_DEP_MANIFEST=true ;;
+              # github actions (workflow / composite action version pins)
+              .github/workflows/*.yml|.github/workflows/*.yaml) HAS_DEP_MANIFEST=true ;;
+              .github/actions/*/action.yml|.github/actions/*/action.yaml) HAS_DEP_MANIFEST=true ;;
+              # java / kotlin / gradle / maven
+              build.gradle|build.gradle.kts|settings.gradle|settings.gradle.kts|gradle.properties|constants.properties|versions.properties|libs.versions.toml|pom.xml) HAS_DEP_MANIFEST=true ;;
+              */build.gradle|*/build.gradle.kts|*/settings.gradle|*/settings.gradle.kts|*/gradle.properties|*/constants.properties|*/versions.properties|*/libs.versions.toml|*/pom.xml) HAS_DEP_MANIFEST=true ;;
+              gradle/wrapper/gradle-wrapper.properties|*/gradle/wrapper/gradle-wrapper.properties) HAS_DEP_MANIFEST=true ;;
+            esac
           done < changed_files.txt
 
-          echo "Detected PR Prefix Type: '$PR_TYPE'"
-          echo "Has Core Code Changes:   $HAS_CORE_CODE"
+          echo "Detected PR Prefix Type:  '$PR_TYPE'"
+          echo "Has Core Code Changes:    $HAS_CORE_CODE"
+          echo "Has Dep Manifest Changes: $HAS_DEP_MANIFEST"
 
           in_set() { case " $2 " in *" $1 "*) return 0 ;; *) return 1 ;; esac; }
 
@@ -118,6 +144,19 @@ jobs:
             fi
             echo "⚠️  Unrecognized type '$PR_TYPE' — leaving for reviewer to confirm."
             exit 0
+          elif [ "$HAS_DEP_MANIFEST" = true ]; then
+            if echo "$PR_TITLE" | grep -Eq '^build\(deps.*\):'; then
+              echo "✅ Dependency bump with 'build(deps*)' scope."
+              exit 0
+            fi
+            if in_set "$PR_TYPE" "$NON_CHANGELOG_TYPES"; then
+              echo "✅ Dep manifest change with non-changelog type '$PR_TYPE'."
+              exit 0
+            fi
+            echo "❌ ERROR: PR only touches dep manifests."
+            echo "   Title must use 'build(deps):' scope or one of: $NON_CHANGELOG_TYPES"
+            echo "   Detected: '$PR_TYPE'"
+            exit 1
           else
             if in_set "$PR_TYPE" "$NON_CHANGELOG_TYPES"; then
               echo "✅ Non-core change with non-changelog type '$PR_TYPE'."

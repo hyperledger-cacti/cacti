@@ -1,4 +1,4 @@
-FROM golang:1.14.6-alpine AS build
+FROM golang:1.26-alpine AS build
 
 COPY . /go/src/github.com/simplestate
 WORKDIR /go/src/github.com/simplestate
