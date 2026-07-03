@@ -1,4 +1,13 @@
-name: "Lint PR"
+# Structural PR checks (commit lint, PR title/body validation) consolidated into
+# a single workflow so branch protection can require ONE rollup gate
+# (`PR Structural Checks Success`) instead of every individual structural
+# context. The package/CI build check leaves stay individual on purpose — only
+# these structural, PR-metadata checks are aggregated here.
+#
+# External app checks (DCO, dpulls, mergefreeze) are separate status contexts
+# emitted by GitHub Apps and cannot be pulled into a workflow's `needs` graph;
+# they remain standalone required checks.
+name: "PR Structural Checks"
 
 on:
   pull_request:
@@ -12,14 +21,43 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  main:
+  commitlint:
+    name: Commit Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Display commit messages with line details
+        run: |
+          echo "📝 Analyzing commit messages..."
+          echo "================================"
+          git log --format=%H origin/main..HEAD | while read -r hash; do
+            echo ""
+            echo "Commit: ${hash}"
+            echo "--------------------------------"
+            git log --format=%B -n 1 "${hash}" | awk '{printf "%3d [%3d chars] %s\n", NR, length($0), $0}'
+            echo "--------------------------------"
+          done
+
+      - uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed #v6.2.1
+        with:
+          configFile: commitlint.config.mjs
+          failOnWarnings: false
+          failOnErrors: true
+          helpURL: 'https://github.com/conventional-changelog/commitlint/#what-is-commitlint'
+        env:
+          VERBOSE: true
+
+  validate-pr-title:
     name: Validate PR title
     runs-on: ubuntu-22.04
     steps:
       - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 #v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
   validate-title-match:
     name: Validate PR title match with latest commit message
     runs-on: ubuntu-latest
@@ -35,10 +73,10 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: |
           LATEST_COMMIT_MSG=$(git log -1 --pretty=%s)
-          
+
           echo "PR Title: '$PR_TITLE'"
           echo "Latest Commit Message: '$LATEST_COMMIT_MSG'"
-          
+
           if [ "$PR_TITLE" != "$LATEST_COMMIT_MSG" ]; then
             echo "❌ ERROR: PR Title does not match your latest commit message!"
             echo "Your PR Title must match your Git commit message exactly."
@@ -47,7 +85,7 @@ jobs:
             exit 1
           fi
           echo "✅ PR Title matches the latest commit message."
-  
+
   validate-type:
     name: Validate PR Type
     runs-on: ubuntu-latest
@@ -174,3 +212,26 @@ jobs:
             exit 0
           fi
 
+  # Single rollup gate for the structural PR checks above. Branch protection
+  # only needs to require THIS one context instead of `Commit Lint`,
+  # `Validate PR title`, `Validate PR title match ...`, and `Validate PR Type`
+  # individually. `if: always()` runs it even when a dependency fails; a
+  # `skipped` dependency is treated as passing, only `failure`/`cancelled` fail.
+  structural-checks-success:
+    name: PR Structural Checks Success
+    needs:
+      - commitlint
+      - validate-pr-title
+      - validate-title-match
+      - validate-type
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Fail if any structural check failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "One or more structural PR checks failed or were cancelled:"
+          echo '${{ toJSON(needs) }}'
+          exit 1
+      - name: All structural PR checks passed
+        run: echo "All structural PR checks succeeded (skipped jobs are treated as passing)."
