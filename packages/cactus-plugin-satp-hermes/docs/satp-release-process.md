@@ -5,12 +5,16 @@
 The release is driven by a single entrypoint workflow,
 `satp-hermes-release-pipeline.yaml`, which orchestrates publishing two artifacts
 from `packages/cactus-plugin-satp-hermes`:
-the NPM package `@hyperledger-cacti/cactus-plugin-satp-hermes` (to npmjs.org and
-the GitHub Package Registry under the `hyperledger-cacti` org) via
+the NPM package `@hyperledger-cacti/cactus-plugin-satp-hermes` to the GitHub
+Package Registry (`npm.pkg.github.com` under `hyperledger-cacti`) via
 `satp-hermes-publish-npmjs-gateway-sdk.yaml`, and the Docker image
 `cacti-satp-hermes-gateway` (to GHCR under `hyperledger-cacti` and to
 [Docker Hub](https://hub.docker.com/r/hyperledger/cacti-satp-hermes-gateway)
 under the `hyperledger` org) via `satp-hermes-publish-docker.yaml`.
+
+Publishing to npmjs.org is handled separately by the repo-wide
+`publish-npm.yaml` workflow (OIDC trusted publishing via the `lfdt-npm`
+account), not by this pipeline.
 
 ## Build Types
 
