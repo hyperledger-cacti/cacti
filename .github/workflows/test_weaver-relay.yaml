@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
-      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d #v4.0.1
+      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 #v4.0.2
         id: changes
         with:
           filters: |
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af #v1.0.7
         with:
           profile: minimal
           toolchain: stable
@@ -96,7 +96,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af #v1.0.7
         with:
           profile: minimal
           toolchain: stable
@@ -148,7 +148,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af #v1.0.7
         with:
           profile: minimal
           toolchain: stable
@@ -188,7 +188,7 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-        uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af #v1.0.7
         with:
           profile: minimal
           toolchain: stable
