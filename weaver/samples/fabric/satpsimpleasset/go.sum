@@ -33,9 +33,16 @@ github.com/gobuffalo/packr/v2 v2.5.1/go.mod h1:8f9c96ITobJlPzI44jj+4tHnEKNt0xXWS
 github.com/golang/protobuf v1.5.4 h1:i7eJL8qZTpSEXOPTxNKhASYpMn+8e5Q6AdndVa1dWek=
 github.com/golang/protobuf v1.5.4/go.mod h1:lnTiLA8Wa4RWRcIUkrtSVa5nRhsEGBg48fD6rSs7xps=
 github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
+github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1 h1:V8uHcUOLCdmSus18nAra6TqzCwCFfi5O2JRmXLxXmIw=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1/go.mod h1:/lseTq2zQDQEi6RyVWQCGSsmkiaL3F5bLz5ke/2BoG4=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0-beta.1 h1:GjLjmJE6agCDpJkXx63HHY6H32LQ92hQzavJKWtjmQU=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0-beta.1/go.mod h1:6Pw7AD6AA1OIKFT1pCZ8oMV/JvCZGXNdZmOERKsjnEU=
 github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9 h1:XM/5fXIiBBQonxiJ375XpSgbxvOIB5onvVFi8ue2css=
 github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9/go.mod h1:0BojxsIV9fM9jFMQvzg3iYIyXCG5op/hvZaATGXSAoI=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3 v3.0.0-beta.1 h1:jceDe+otvJ4e5dK3kuYV4N/yO7OH53K19BkE0DqowCs=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3 v3.0.0-beta.1/go.mod h1:puMdhlkQypT+skJL3RkGgoSvdV8GCZIVEZAVYUOstD0=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a h1:HwSCxEeiBthwcazcAykGATQ36oG9M+HEQvGLvB7aLvA=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230228194215-b84622ba6a7a/go.mod h1:TDSu9gxURldEnaGSFbH1eMlfSQBWQcMQfnDBcpQv5lU=
 github.com/hyperledger/fabric-contract-api-go v1.2.1 h1:Ww9cKH/qHl5s6WqF+Ts5ju5eaBxC/awB/BJE+rOsEkM=
@@ -53,6 +60,7 @@ github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxv
 github.com/konsorten/go-windows-terminal-sequences v1.0.2/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/pretty v0.1.0/go.mod h1:dAy3ld7l9f0ibDNOQOHHMYYIIbhfbHSm3C4ZsoJORNo=
 github.com/kr/pretty v0.3.0 h1:WgNl7dwNpEZ6jJ9k1snq4pZsg7DOEN8hP9Xw0Tsjwk0=
+github.com/kr/pretty v0.3.0/go.mod h1:640gp4NfQd8pI5XOwp5fnNeVWj67G7CFk/SaSQn7NBk=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
@@ -136,6 +144,7 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8
 gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
+gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
 gopkg.in/errgo.v2 v2.1.0/go.mod h1:hNsd1EY+bozCKY1Ytp96fpM3vjJbqLJn88ws8XvfDNI=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=
@@ -144,9 +153,3 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1 h1:V8uHcUOLCdmSus18nAra6TqzCwCFfi5O2JRmXLxXmIw=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1/go.mod h1:/lseTq2zQDQEi6RyVWQCGSsmkiaL3F5bLz5ke/2BoG4=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0-beta.1 h1:GjLjmJE6agCDpJkXx63HHY6H32LQ92hQzavJKWtjmQU=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0-beta.1/go.mod h1:6Pw7AD6AA1OIKFT1pCZ8oMV/JvCZGXNdZmOERKsjnEU=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3 v3.0.0-beta.1 h1:jceDe+otvJ4e5dK3kuYV4N/yO7OH53K19BkE0DqowCs=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3 v3.0.0-beta.1/go.mod h1:puMdhlkQypT+skJL3RkGgoSvdV8GCZIVEZAVYUOstD0=

@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3
 
-go 1.20
+go 1.26
 
 require (
 	github.com/golang/protobuf v1.5.4

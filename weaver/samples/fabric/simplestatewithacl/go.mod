@@ -1,6 +1,6 @@
 module github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simplestatewithacl
 
-go 1.20
+go 1.26
 
 require (
 	github.com/golang/protobuf v1.5.4
@@ -20,7 +20,7 @@ require (
 	github.com/gobuffalo/envy v1.10.1 // indirect
 	github.com/gobuffalo/packd v1.0.1 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1 // indirect
 	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/utils/v3 v3.0.0-beta.1
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
