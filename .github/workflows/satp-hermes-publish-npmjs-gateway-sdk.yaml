@@ -4,13 +4,15 @@ name: SATP Hermes Gateway SDK - NPM Publish
 # NPM + GHCR DOCKER PUBLISHING WORKFLOW
 # =============================================================================
 #
-# This workflow publishes the SATP Hermes Gateway SDK to npmjs.org and GitHub
-# Package Registry (GPR) with support for both development and production releases.
+# This workflow publishes the SATP Hermes Gateway SDK to the GitHub Package
+# Registry (GPR) for both development and production builds. npmjs.org
+# publishing is owned by the repo-wide publish-npm.yaml (the single npm OIDC
+# trusted publisher), so it is intentionally not done here.
 #
 # PACKAGE CONFIGURATION:
 #   Organization: @hyperledger-cacti
 #   Package: @hyperledger-cacti/cactus-plugin-satp-hermes
-#   Registry: https://registry.npmjs.org/
+#   Registry: https://npm.pkg.github.com/ (GitHub Packages)
 #
 # VERSION STRATEGY:
 #   Version Source: package.json version (0.0.3-beta)
@@ -47,9 +49,10 @@ name: SATP Hermes Gateway SDK - NPM Publish
 #     - Examples (dist/lib/examples/)
 #     - Build configs, dev scripts
 #
-# REQUIRED SECRETS:
-#   NPM_TOKEN: NPM authentication token with publish permissions for @hyperledger-cacti
-#   GITHUB_TOKEN: Auto-provided by GitHub Actions for GPR publishing
+# AUTH:
+#   GPR:       GITHUB_TOKEN, auto-provided by GitHub Actions.
+#   npmjs.org: not published here — handled by publish-npm.yaml via npm OIDC
+#              trusted publishing (no NPM_TOKEN anywhere).
 #
 # USAGE:
 #   Development Release (Automatic):
@@ -126,7 +129,6 @@ on:
 permissions:
   contents: read
   packages: write
-  id-token: write
 
 env:
   NPM_PACKAGE_NAME: '@hyperledger-cacti/cactus-plugin-satp-hermes'
@@ -270,62 +272,14 @@ jobs:
           retention-days: 1
 
   # =============================================================================
-  # STAGE: PUBLISH NPM PACKAGES
+  # STAGE: PUBLISH NPM PACKAGE
   # =============================================================================
-  # The following two jobs run in parallel on push events to release branches
-  # for faster deployment.
-
-  # Stage: Publish NPM package to npmjs.org
-  publish-satp-hermes-npm-package-npmjs:
-    needs: [build-satp-hermes-npm-package, set-npm-tags]
-    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg' || startsWith(github.ref, 'refs/tags/'))) || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    # Production publishes run under the `prod` environment so maintainers can
-    # gate them with required reviewers / scoped secrets; dev builds use none.
-    environment: ${{ needs.set-npm-tags.outputs.is_release == 'true' && 'prod' || '' }}
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
-        with:
-          node-version: '22'
-          registry-url: 'https://registry.npmjs.org/'
-          scope: '@hyperledger-cacti'
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
-        with:
-          name: satp-hermes-build-artifacts
-          path: packages/cactus-plugin-satp-hermes/
-
-      - name: Set package version
-        env:
-          NEW_VERSION: ${{ needs.set-npm-tags.outputs.tag_version }}
-        run: |
-          node -e "
-            const fs = require('fs');
-            const pkgPath = 'packages/cactus-plugin-satp-hermes/package.json';
-            const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
-            pkg.version = process.env.NEW_VERSION;
-            fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\\n');
-            console.log('Set version to:', pkg.version);
-          "
-
-      - name: Verify package contents
-        run: |
-          cd packages/cactus-plugin-satp-hermes
-          echo "Package contents to be published:"
-          npm pack --dry-run
-
-      - name: Publish to npmjs.org
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: ${{ needs.set-npm-tags.outputs.is_release == 'true' }}
-        run: |
-          cd packages/cactus-plugin-satp-hermes
-          npm whoami
-          npm publish --tag "${{ needs.set-npm-tags.outputs.dist_tag }}" --access public
+  # npmjs.org publishing for this package is owned by the repo-wide
+  # publish-npm.yaml, which is the single npm OIDC trusted publisher and
+  # publishes every non-private package (this one included) on `v*` release
+  # tags. npm allows only one trusted publisher per package and matches it
+  # against the top-level workflow, so this pipeline does NOT publish to
+  # npmjs.org; it only publishes dev/release builds to GitHub Packages.
 
   # Stage: Publish NPM package to GitHub Package Registry
   publish-satp-hermes-npm-package-ghcr:
@@ -367,7 +321,17 @@ jobs:
       - name: Publish to GitHub Package Registry
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PKG_NAME: ${{ needs.set-npm-tags.outputs.npm_package_name }}
+          PKG_VERSION: ${{ needs.set-npm-tags.outputs.tag_version }}
+          DIST_TAG: ${{ needs.set-npm-tags.outputs.dist_tag }}
+          REGISTRY: https://npm.pkg.github.com/
         run: |
           cd packages/cactus-plugin-satp-hermes
-          npm whoami --registry=https://npm.pkg.github.com/
-          npm publish --tag "${{ needs.set-npm-tags.outputs.dist_tag }}" --access public --registry=https://npm.pkg.github.com/
+          # Idempotency guard: skip when this exact version already exists
+          # (a re-run of the same commit republishes an identical dev version).
+          if npm view "${PKG_NAME}@${PKG_VERSION}" version --registry="${REGISTRY}" >/dev/null 2>&1; then
+            echo "::notice::${PKG_NAME}@${PKG_VERSION} already on GitHub Packages; skipping publish."
+            exit 0
+          fi
+          npm whoami --registry="${REGISTRY}"
+          npm publish --tag "${DIST_TAG}" --access public --registry="${REGISTRY}"

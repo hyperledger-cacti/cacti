@@ -29,10 +29,11 @@ on:
   workflow_dispatch:
 
 # Least privilege for the pipeline; child workflows request their own.
+# npmjs publishing (and its OIDC id-token) is owned by publish-npm.yaml, not
+# this pipeline, so no id-token permission is needed here.
 permissions:
   contents: write # create the GitHub release
   packages: write # GHCR + GitHub Package Registry
-  id-token: write # npm publish provenance
 
 concurrency:
   group: satp-hermes-release-${{ github.ref }}
@@ -112,7 +113,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
     uses: ./.github/workflows/satp-hermes-publish-npmjs-gateway-sdk.yaml
     secrets: inherit
 
