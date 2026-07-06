@@ -5,6 +5,15 @@ on:
       - main
       - dev
 
+  # Required for GitHub merge queue support.
+  # merge_group is a distinct event from pull_request and push; without it,
+  # required status checks are never reported for queued PRs and the merge
+  # queue stalls indefinitely.
+  merge_group:
+    branches:
+      - main
+      - dev
+
   workflow_dispatch:
     
   schedule:

@@ -7,6 +7,7 @@ on:
       - ".github/skills/**"
       - ".github/instructions/**"
       - "tools/ai-config-lint.mjs"
+  merge_group:
 
 permissions:
   contents: read

@@ -6,8 +6,8 @@ applyTo: ".github/workflows/**/*.yaml"
 
 ## CI Architecture
 
-Entry point is `ci.yaml`, triggered on PRs to `main`/`dev`, `workflow_dispatch`,
-and a cron schedule. It fans out through reusable `workflow_call` workflows:
+Entry point is `ci.yaml`, triggered on PRs to `main`/`dev`, `merge_group` (merge queue),
+`workflow_dispatch`, and a cron schedule. It fans out through reusable `workflow_call` workflows:
 
 ```
 ci.yaml
@@ -112,3 +112,32 @@ before tests.
 - Runner: `ubuntu-22.04` for all jobs.
 - Node version is centrally defined in `ci.yaml` as `v20.20.0` and threaded
   through inputs — never hardcode it in downstream workflows.
+
+## Merge Queue Support
+
+Any top-level workflow that is configured as a **required status check** on a
+protected branch MUST also include the `merge_group` trigger, or the merge
+queue will stall (required checks are never reported for queued PRs).
+
+```yaml
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+  merge_group:
+    branches:
+      - main
+      - dev
+```
+
+- `merge_group` is a distinct event from `pull_request` and `push`; it is
+  fired when GitHub builds the temporary `gh-readonly-queue/<base>/*` branch.
+- `workflow_call`-only workflows do not need a `merge_group` entry — they
+  inherit the trigger from their caller.
+- PR-title validation (`semantic-pull-request.yaml`) is omitted because merge
+  queue branches carry generated names, not user PR titles. Do not add
+  `merge_group` to it.
+- The concurrency group `${{ github.event.pull_request.number || github.ref }}`
+  already handles merge queue gracefully because `github.ref` resolves to the
+  unique temporary branch name.

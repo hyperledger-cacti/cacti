@@ -13,6 +13,12 @@ on:
     branches:
       - main
 
+  # Required for GitHub merge queue: GitGuardian must scan the combined
+  # merge-group commit before it lands on main.
+  merge_group:
+    branches:
+      - main
+
 jobs:
   scanning:
     name: GitGuardian scan

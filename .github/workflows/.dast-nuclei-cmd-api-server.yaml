@@ -10,6 +10,9 @@ on:
   pull_request:
     branches: [main, dev]
 
+  merge_group:
+    branches: [main, dev]
+
 jobs:
   nuclei-scan:
     runs-on: ubuntu-22.04
