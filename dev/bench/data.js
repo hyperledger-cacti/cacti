@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783330291093,
+  "lastUpdate": 1783330605404,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -296,6 +296,35 @@ window.BENCHMARK_DATA = {
             "range": "±1.90%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Ry Jones",
+            "username": "ryjones",
+            "email": "ry@linux.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "07f22920cc65244d89114b750787859fd0381baf",
+          "message": "ci(satp-hermes): stop publishing to npmjs; GPR-only + idempotent\n\nThe satp npm workflow published to npmjs.org with a legacy NPM_TOKEN that now\n401s. npm moved to OIDC trusted publishing, but a package may have only one\ntrusted publisher and npm matches it against the top-level workflow, not a\nreusable child. The repo-wide publish-npm.yaml already is that single trusted\npublisher and publishes every non-private package (satp included) on v* tags.\n\nSo this pipeline can neither reuse nor duplicate that publisher for npmjs.\nRemove the npmjs publish job entirely: npmjs is owned by publish-npm.yaml on\nreleases, and this workflow now publishes dev/release builds only to the GitHub\nPackage Registry (GITHUB_TOKEN). No npm tokens anywhere.\n\nAlso add an idempotency guard to the GitHub Packages publish: dev versions are\nkeyed on the short SHA, so re-running the pipeline on an unchanged commit\nrepublishes an identical version and the registry 409s. Skip when the exact\nversion already exists.\n\nDrop the now-unused id-token: write from this workflow and the caller pipeline.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nSigned-off-by: Ry Jones <ry@linux.com>",
+          "timestamp": "2026-07-03T17:02:55Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/07f22920cc65244d89114b750787859fd0381baf"
+        },
+        "date": 1783330602689,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 908,
+            "range": "±3.30%",
+            "unit": "ops/sec",
+            "extra": "181 samples"
           }
         ]
       }
