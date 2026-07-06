@@ -1057,23 +1057,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aries-framework/anoncreds-rs@npm:0.5.0-alpha.97":
-  version: 0.5.0-alpha.97
-  resolution: "@aries-framework/anoncreds-rs@npm:0.5.0-alpha.97"
-  dependencies:
-    "@aries-framework/anoncreds": "npm:0.5.0-alpha.97+adc7d4ec"
-    "@aries-framework/core": "npm:0.5.0-alpha.97+adc7d4ec"
-    class-transformer: "npm:^0.5.1"
-    class-validator: "npm:0.14.0"
-    rxjs: "npm:^7.2.0"
-    tsyringe: "npm:^4.8.0"
-  peerDependencies:
-    "@hyperledger/anoncreds-shared": ^0.2.0-dev.5
-  checksum: 10/9bf9626c109652e4e29de0a3a53faba7ce59716768434249edbf1578712bcbfef25e510cff774dd5919504fc9c07c629402902716a91026eef6258818cdbc03b
-  languageName: node
-  linkType: hard
-
-"@aries-framework/anoncreds@npm:0.5.0-alpha.97, @aries-framework/anoncreds@npm:0.5.0-alpha.97+adc7d4ec":
+"@aries-framework/anoncreds@npm:0.5.0-alpha.97+adc7d4ec":
   version: 0.5.0-alpha.97
   resolution: "@aries-framework/anoncreds@npm:0.5.0-alpha.97"
   dependencies:
@@ -8811,39 +8795,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-plugin-ledger-connector-aries@workspace:packages/cactus-plugin-ledger-connector-aries":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-aries@workspace:packages/cactus-plugin-ledger-connector-aries"
-  dependencies:
-    "@aries-framework/anoncreds": "npm:0.5.0-alpha.97"
-    "@aries-framework/anoncreds-rs": "npm:0.5.0-alpha.97"
-    "@aries-framework/askar": "npm:0.5.0-alpha.97"
-    "@aries-framework/core": "npm:0.5.0-alpha.97"
-    "@aries-framework/indy-vdr": "npm:0.5.0-alpha.97"
-    "@aries-framework/node": "npm:0.5.0-alpha.97"
-    "@hyperledger-cacti/cactus-common": "npm:3.0.0-beta.1"
-    "@hyperledger-cacti/cactus-core": "npm:3.0.0-beta.1"
-    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-beta.1"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-beta.1"
-    "@hyperledger/anoncreds-nodejs": "npm:0.3.4"
-    "@hyperledger/aries-askar-nodejs": "npm:0.2.3"
-    "@hyperledger/aries-askar-shared": "npm:0.2.3"
-    "@hyperledger/indy-vdr-nodejs": "npm:0.2.3"
-    "@types/body-parser": "npm:1.19.4"
-    "@types/express": "npm:5.0.1"
-    "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.15.0"
-    body-parser: "npm:1.20.3"
-    express: "npm:5.1.0"
-    jest: "npm:29.6.2"
-    jest-extended: "npm:4.0.1"
-    rxjs: "npm:7.8.1"
-    socket.io: "npm:4.6.2"
-    socket.io-client-fixed-types: "npm:4.5.4"
-    uuid: "npm:10.0.0"
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger-cacti/cactus-plugin-ledger-connector-besu@npm:3.0.0-beta.1, @hyperledger-cacti/cactus-plugin-ledger-connector-besu@workspace:packages/cactus-plugin-ledger-connector-besu":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus-plugin-ledger-connector-besu@workspace:packages/cactus-plugin-ledger-connector-besu"
@@ -9853,28 +9804,6 @@ __metadata:
       built: false
   languageName: unknown
   linkType: soft
-
-"@hyperledger/anoncreds-nodejs@npm:0.3.4":
-  version: 0.3.4
-  resolution: "@hyperledger/anoncreds-nodejs@npm:0.3.4"
-  dependencies:
-    "@2060.io/ffi-napi": "npm:^4.0.9"
-    "@2060.io/ref-napi": "npm:^3.0.6"
-    "@hyperledger/anoncreds-shared": "npm:0.3.4"
-    ref-array-di: "npm:1.2.2"
-    ref-struct-di: "npm:1.1.1"
-  checksum: 10/2d50cabf3677bbb2c90a91915ef759db7c93c7cf536a36c7fdafd267c32ed6a557d3d6e8bfaf864c8e761be927a356248f2b603db5129fdfe8e28b332e8ac4a7
-  languageName: node
-  linkType: hard
-
-"@hyperledger/anoncreds-shared@npm:0.3.4":
-  version: 0.3.4
-  resolution: "@hyperledger/anoncreds-shared@npm:0.3.4"
-  dependencies:
-    tar: "npm:^7.4.3"
-  checksum: 10/076b4afe87111ba38acd332aaaed61ab1761b24d56208d6e107466ce7ac306e1fb9803586ac011eda9c481a1f9bf60f4a1859a6b1736eacc82b1d07f7fd057b3
-  languageName: node
-  linkType: hard
 
 "@hyperledger/aries-askar-nodejs@npm:0.2.3":
   version: 0.2.3
@@ -24947,7 +24876,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"class-transformer@npm:0.5.1, class-transformer@npm:^0.5.1":
+"class-transformer@npm:0.5.1":
   version: 0.5.1
   resolution: "class-transformer@npm:0.5.1"
   checksum: 10/750327e3e9a5cf233c5234252f4caf6b06c437bf68a24acbdcfb06c8e0bfff7aa97c30428184813e38e08111b42871f20c5cf669ea4490f8ae837c09f08b31e7
@@ -49032,7 +48961,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ref-array-di@npm:1.2.2, ref-array-di@npm:^1.2.2":
+"ref-array-di@npm:^1.2.2":
   version: 1.2.2
   resolution: "ref-array-di@npm:1.2.2"
   dependencies:
@@ -49043,7 +48972,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ref-struct-di@npm:1.1.1, ref-struct-di@npm:^1.1.0, ref-struct-di@npm:^1.1.1":
+"ref-struct-di@npm:^1.1.0, ref-struct-di@npm:^1.1.1":
   version: 1.1.1
   resolution: "ref-struct-di@npm:1.1.1"
   dependencies:

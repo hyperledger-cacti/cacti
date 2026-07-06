@@ -35,8 +35,8 @@ This finalizes the list of packages reviewed.
 
 | Outcome | Count |
 |---------|-------|
-| **Retain** | 28 |
-| **Remove/Archive** | 13 ✅ (completed) |
+| **Retain** | 27 |
+| **Remove/Archive** | 14 ✅ (completed) |
 | **No Vote** | 22 |
 
 
@@ -46,7 +46,7 @@ This finalizes the list of packages reviewed.
 
 The following packages have been approved for removal based on community vote:
 
-### Packages (8)
+### Packages (9)
 
 | Package | Path | Status | Removed |
 |---------|------|--------|--------|
@@ -60,7 +60,8 @@ The following packages have been approved for removal based on community vote:
 | `cactus-test-plugin-keychain-memory` | `packages/cactus-test-plugin-keychain-memory` | ✅ Removed | 2026-07-06 |
 | `cactus-plugin-ledger-connector-iroha2` | `packages/cactus-plugin-ledger-connector-iroha2` | ✅ Removed | 2026-07-06 |
 | `cactus-plugin-ledger-connector-cdl` | `packages/cactus-plugin-ledger-connector-cdl` | ✅ Removed | 2026-07-07 |
-
+| `cactus-plugin-ledger-connector-aries` | `packages/cactus-plugin-ledger-connector-aries` | ✅ Removed |
+2026-07-07 |
 ### Examples (4)
 
 | Package | Path | Status |
@@ -74,6 +75,8 @@ The following packages have been approved for removal based on community vote:
 **Keychain Cleanup Completed:** 2026-07-06 — `cleanup/keychain`  
 **Iroha2 Connector Removal Completed:** 2026-07-06 — `cleanup/archive-iroha`
 **CDL Connector Removal Completed:** 2026-07-07 — `satp-fix-ci`
+
+**Aries Removal Completed:** 2026-07-06 — `satp-fix-ci`
 
 ---
 
@@ -117,7 +120,7 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-plugin-keychain-memory | ✓ |  |  |  |
 | cactus-plugin-keychain-memory-wasm | ❌ | N/A | N/A | N/A |
 | cactus-plugin-keychain-vault | ❌ | N/A | N/A | N/A |
-| cactus-plugin-ledger-connector-aries | ✓ |  |  |  |
+| cactus-plugin-ledger-connector-aries | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-besu | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-cdl | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-corda | ✓ |  |  |  |

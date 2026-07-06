@@ -11,7 +11,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-plugin-htlc-eth-besu",
   "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20",
   "@hyperledger-cacti/cactus-plugin-keychain-memory",
-  "@hyperledger-cacti/cactus-plugin-ledger-connector-aries",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-besu",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-corda",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum",
