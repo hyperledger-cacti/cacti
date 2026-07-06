@@ -36,7 +36,6 @@ jobs:
   unit_test_relay_local:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.relay_changed == 'true'
-    # if: ${{ false }}
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -89,7 +88,6 @@ jobs:
   unit_test_relay_tls_local:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.relay_changed == 'true'
-    # if: ${{ false }}
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -141,7 +139,7 @@ jobs:
 
   unit_test_relay:
     needs: check_code_changed
-    if: ${{ false && needs.check_code_changed.outputs.relay_changed == 'true' }}
+    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.relay_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -181,7 +179,7 @@ jobs:
 
   unit_test_relay_tls:
     needs: check_code_changed
-    if: ${{ false && needs.check_code_changed.outputs.relay_changed == 'true' }}
+    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.relay_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it

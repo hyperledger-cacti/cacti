@@ -90,9 +90,9 @@ jobs:
           
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION
