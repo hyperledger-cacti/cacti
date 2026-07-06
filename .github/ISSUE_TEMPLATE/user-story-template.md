@@ -1,8 +1,8 @@
 ---
 name: User Story template
-about: Create a user story for Hyperledger Cactus
+about: Create a user story for Hyperledger Cacti
 title: ''
-labels: ''
+labels: 'Triage_Needed'
 assignees: ''
 
 ---

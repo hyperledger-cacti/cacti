@@ -9,9 +9,9 @@ There are many ways to contribute to Hyperledger Cactus, both as a user and as a
 
 As a user, this can include:
 
-*   [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&amp;labels=enhancement&amp;template=feature_request.md&amp;title=)
+*   [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?template=feature_request.yml)
     
-*   [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&amp;labels=bug&amp;template=bug_report.md&amp;title=)
+*   [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?template=bug_report.yml)
     
 
 As a developer:

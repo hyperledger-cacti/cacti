@@ -1,0 +1,93 @@
+name: Bug report
+description: Report a problem with Hyperledger Cacti
+labels: ["bug", "Triage_Needed"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! Please search
+        [existing issues](https://github.com/hyperledger-cacti/cacti/issues)
+        first to avoid duplicates. A maintainer will triage this and add
+        the `Triage_Ready` label when it is confirmed and ready to work on.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: >
+        A clear description of the bug, including what you expected to happen
+        instead.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: >
+        A minimal code snippet, test, or sequence of commands that reliably
+        reproduces the problem is ideal.
+    validations:
+      required: true
+  - type: input
+    id: cacti-version
+    attributes:
+      label: Cacti version or commit SHA
+      description: >
+        Semantic version (e.g. `2.1.0`) or the output of
+        `git rev-parse --short HEAD`.
+      placeholder: "e.g. 2.1.0 or a1b2c3d"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: >
+        Node.js version, Docker version, OS name/version/architecture.
+        Run `node -v && docker --version && uname -srm` and paste the output.
+      render: shell
+    validations:
+      required: true
+  - type: dropdown
+    id: connectors
+    attributes:
+      label: Affected package(s) / connector(s)
+      description: Select all packages most relevant to this bug.
+      multiple: true
+      options:
+        - cactus-plugin-ledger-connector-besu
+        - cactus-plugin-ledger-connector-ethereum
+        - cactus-plugin-ledger-connector-fabric
+        - cactus-plugin-ledger-connector-corda
+        - cactus-plugin-satp-hermes
+        - cactus-cmd-api-server
+        - cactus-core / cactus-core-api
+        - cactus-verifier-client
+        - weaver
+        - other / not sure
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or stack traces
+      description: Paste any relevant output. It will be rendered as code automatically.
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: >
+        Screenshots, links to related issues, cloud provider or hardware
+        configuration, or anything else that may help maintainers reproduce
+        the problem.
+    validations:
+      required: false

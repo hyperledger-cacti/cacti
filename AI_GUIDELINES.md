@@ -162,6 +162,47 @@ convention violations, AI slop (unnecessary restating comments,
 over-engineered abstractions, hallucinated APIs), or deviations from
 established patterns.
 
+### 2.6 Triage Gate for Agents
+
+An AI agent must not open a pull request unless the issue it references
+has been triaged and carries the `Triage_Ready` label assigned by a maintainer. This applies to every
+change — trivial fixes included. Triage confirms that the bug report is valid or that the design
+has been discussed and approved.
+
+### 2.7 Low-Effort Automated Submissions Will Be Closed
+
+Non-verified AI issues, pull requests and work without a corresponding `Triage_Ready` label waste maintainer time
+and will be closed without further review.
+
+This includes:
+
+- PRs from an LLM without human review of the diff.
+- Issues filed by an agent without a human verifying the report is valid.
+
+### 2.8 Run the Build Locally Before Submitting
+
+Git hooks must be installed and must not be bypassed. The hooks in `.husky/pre-commit.d/` and `.husky/pre-push.d/` run
+linting, commit-message validation, and other fast checks automatically.
+This requirement applies to AI-assisted contributions as well. The human
+operator is responsible for ensuring the build passed before the PR is
+submitted, regardless of whether the code was written by hand or generated
+by a tool.
+
+### 2.9 Keep Agent Configuration In Sync with `AGENTS.md`
+
+The repository root contains an [`AGENTS.md`](./AGENTS.md) file.
+
+If you operate an AI agent:
+
+- Point it at the repository root; it will pick up `AGENTS.md` and the
+  path-scoped instruction files under `.github/instructions/` automatically.
+- Please refrain from duplicating rules from `AGENTS.md` in a private agent
+  configuration. If a rule is missing or incorrect, open a PR to
+  update `AGENTS.md` so the whole community benefits.
+- Keep any custom agent configuration in sync with `AGENTS.md`; stale
+  private configs that contradict `AGENTS.md` can cause agents to
+  produce non-compliant contributions.
+
 ---
 
 ## 3. Scope of Applicability
@@ -301,6 +342,10 @@ defensively. Cacti encourages the use of AI for:
   tools flag or approve code, the project's review requirements
   (at least two maintainer reviews) still apply.
 
+- AI agents must not open a PR against an issue that still carries
+  `Triage_Needed`. The referenced issue must carry `Triage_Ready`
+  before any PR is opened.
+
 ---
 
 ## 8. Evolving Guidelines
@@ -330,11 +375,15 @@ any other project documentation.
 - [Napier University — LLM-Driven Exploitation Research](https://www.youtube.com/watch?v=1sd26pWhfmg)
 - [Linux Kernel — AI Coding Assistants](https://github.com/torvalds/linux/blob/78d979db6cef557c171d6059cbce06c3db89c7ee/Documentation/process/coding-assistants.rst)
 - [Kubernetes — AI Guidance for Pull Requests](https://www.kubernetes.dev/docs/guide/pull-requests/#ai-guidance)
+- [Hypernate — Contributing with AI Agents](https://lf-decentralized-trust-labs.github.io/hypernate/contributing/ai-agents/)
+- [LF Decentralized Trust — AI Guidelines (WIP)](https://github.com/LF-Decentralized-Trust/governance/pull/321)
 - [Cacti SECURITY.md](./SECURITY.md)
 - [Cacti CONTRIBUTING.md](./CONTRIBUTING.md)
 - [Cacti CONVENTIONS.md](./CONVENTIONS.md)
 - [Cacti GOVERNANCE.md](./GOVERNANCE.md)
 - [Cacti CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- [Cacti PULL.md §9 — Linked Issue and Traceability](./PULL.md#9-linked-issue-and-traceability)
+- [Cacti PULL.md §10 — Automated Linked-Issue Check (Planned)](./PULL.md#10-automated-linked-issue-check-planned)
 - [Cacti Copilot Instructions](.github/copilot-instructions.md)
 - [Cacti Repository Instruction Files](.github/instructions/)
 
