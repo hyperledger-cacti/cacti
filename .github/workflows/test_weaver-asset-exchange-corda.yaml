@@ -38,7 +38,7 @@ jobs:
 
   asset-exchange-corda:
     needs: check_code_changed
-    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
+    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.status == 'true' }}
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
@@ -57,14 +57,18 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/cacti"
+          } >> github.properties
 
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.main.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-cacti/cacti" >> github.main.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/hyperledger-cacti/cacti"
+          } >> github.main.properties
 
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
 
@@ -231,7 +235,7 @@ jobs:
 
   house-token-exchange-corda:
     needs: check_code_changed
-    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
+    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.status == 'true' }}
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
@@ -258,14 +262,18 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_ACTOR}/cacti"
+          } >> github.properties
 
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.main.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.main.properties
-          echo "url=https://maven.pkg.github.com/hyperledger-cacti/cacti" >> github.main.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/hyperledger-cacti/cacti"
+          } >> github.main.properties
 
           ./scripts/get-cordapps.sh || mv github.main.properties github.properties
 

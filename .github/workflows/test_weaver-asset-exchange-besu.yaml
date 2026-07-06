@@ -36,7 +36,7 @@ jobs:
 
   asset-exchange-besu:
     needs: check_code_changed
-    if: ${{ false }}
+    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' }}
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 

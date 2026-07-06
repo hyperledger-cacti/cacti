@@ -35,9 +35,11 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/common/protos-java-kt
 
@@ -88,9 +90,11 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/core/network/corda-interop-app
         
@@ -150,9 +154,11 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/sdks/corda
         
@@ -208,9 +214,11 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/core/drivers/corda-driver
 

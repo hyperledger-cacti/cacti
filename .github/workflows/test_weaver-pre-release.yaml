@@ -50,7 +50,7 @@ jobs:
           # Split PR title by space, and take 3rd word
           VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
-          VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "$VERSION"
 
@@ -159,7 +159,7 @@ jobs:
           # Split PR title by space, and take 3rd word
           VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
-          VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "$VERSION"
       

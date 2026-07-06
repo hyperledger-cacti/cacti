@@ -41,7 +41,7 @@ jobs:
 
   asset-exchange-fabric:
     needs: check_code_changed
-    if: ${{ false && needs.check_code_changed.outputs.status == 'true' }}
+    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.status == 'true' }}
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
@@ -120,7 +120,6 @@ jobs:
   asset-exchange-fabric-local:
     needs: check_code_changed
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.status == 'true' }}
-    # if: ${{ false }}
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 

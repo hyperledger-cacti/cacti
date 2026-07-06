@@ -93,7 +93,6 @@ jobs:
   unit_test_assetmgmt:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true'
-    # if: ${{ false }}  # disable
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
@@ -157,7 +156,7 @@ jobs:
       
   unit_test_sdk:
     needs: check_code_changed
-    if:  inputs.run_all == 'true' ||  ${{ needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed   == 'true' }}
+    if: ${{ inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
