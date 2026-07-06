@@ -1,0 +1,13 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions and discussion
+    url: https://discord.com/channels/905194001349627914/908379338716631050
+    about: Ask questions and chat with the community on Discord.
+  - name: Documentation
+    url: https://hyperledger-cacti.github.io/cacti/
+    about: Read the Hyperledger Cacti documentation.
+  - name: Security vulnerability
+    url: https://github.com/hyperledger-cacti/cacti/security/advisories/new
+    about: >-
+      Report a security vulnerability privately — do NOT open a public issue
+      (see SECURITY.md).

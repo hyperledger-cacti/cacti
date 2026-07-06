@@ -199,6 +199,41 @@ Pull Request Title and Commit Subject must not exceed 72 characters (including s
 
 ---
 
+## 9. Linked Issue and Traceability
+
+Every PR description (and ideally the commit body) **must** contain a
+keyword that links the PR to an issue:
+
+| Keyword | When to use |
+|---------|-------------|
+| `Closes #N` / `Fixes #N` / `Resolves #N` | The PR fully resolves the issue. GitHub closes the issue on merge. |
+| `Addresses #N` / `Refs #N` | The PR makes partial progress. The issue stays open. |
+
+The referenced issue must carry the `Triage_Ready` label — meaning a
+maintainer has approved the design. PRs that reference
+an issue still marked `Triage_Needed`, or that reference no issue at all might be closed immediatly.
+
+### Examples of compliant commit bodies:
+
+```
+fix(connector-besu): handle null receipt in transact()
+
+Resolves #1234
+
+Signed-off-by: Your Name <you@example.com>
+```
+
+```
+feat(satp-hermes): add oracle log persistence
+
+Addresses #5678 — persistence of oracle logs is wired in;
+step 3 of the broader oracle observability epic remains open.
+
+Signed-off-by: Your Name <you@example.com>
+```
+
+---
+
 ## Quick Reference
 
 | Rule | Severity | Consequence |
@@ -209,6 +244,33 @@ Pull Request Title and Commit Subject must not exceed 72 characters (including s
 | 4. PR template checklist | Required | Sent back before review |
 | 5. CONTRIBUTING.md compliance | Required | Blocks merge |
 | 6. Commit type and title discipline | Required | Sent back before review |
+| 7. Signed commits (DCO) | Required | Blocks merge |
+| 8. Character limits (72 / 80 chars) | Required | Sent back before review |
+| 9. Linked `Triage_Ready` issue | Required | Flagged; PR cannot merge |
+
+---
+
+## PR Author Checklist
+
+The [PR Template](./.github/PULL_REQUEST_TEMPLATE.md) includes this
+checklist. Every item must be ticked before you mark the PR ready for review.
+
+- [ ] This PR is linked to a `Triage_Ready` issue (see §9 above).
+- [ ] `yarn tsc` passes with no errors.
+- [ ] `yarn lint` passes and produces no unstaged file changes.
+- [ ] Git hooks are installed and were not bypassed (`yarn install` runs
+      `husky` via the `prepare` script; do **not** use `HUSKY=0` or
+      `--no-verify`).
+- [ ] I added or updated tests where appropriate.
+- [ ] I updated documentation (README, OpenAPI spec, inline comments)
+      where appropriate.
+- [ ] My commits are signed off (`git commit -s`) per the
+      [DCO](https://developercertificate.org/).
+- [ ] My commit messages follow
+      [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary).
+- [ ] The PR title matches my latest commit subject exactly.
+- [ ] If AI tools were used, the commit includes an `Assisted-by` tag per
+      [AI Guidelines §2.2](./AI_GUIDELINES.md#22-disclosure).
 
 ---
 
@@ -217,7 +279,9 @@ Pull Request Title and Commit Subject must not exceed 72 characters (including s
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — full contributor workflow
 - [CONVENTIONS.md §8](./CONVENTIONS.md#8-commit--pr-conventions) —
   commit and PR conventions
-- [AI_GUIDELINES.md §2.4](./AI_GUIDELINES.md#24-compliance-with-project-standards) —
-  AI tooling compliance
+- [AI_GUIDELINES.md §2.2](./AI_GUIDELINES.md#22-disclosure) —
+  AI disclosure requirements
+- [AI_GUIDELINES.md §2.6](./AI_GUIDELINES.md#26-triage-gate-for-agents) —
+  triage gate rule for AI agents
 - [PR Template](./.github/PULL_REQUEST_TEMPLATE.md) — the checklist
   you fill in when opening a PR

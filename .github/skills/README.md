@@ -20,8 +20,10 @@ conversation when invoked. Each skill lives in its own directory under
 
 | Skill | Directory | Description |
 |-------|-----------|-------------|
+| Code Review | `code-review/` | PR review checklist: scope, commits, TypeScript, public API, testing, security, AI slop detection, CI pre-checks |
 | CodeQL Scanning | `codeql-scanning/` | Security vulnerability pattern matching (injection, XSS, prototype pollution, path traversal) |
 | Doublecheck | `doublecheck/` | Cross-verification checklist for assertions, logic, and correctness |
+| Package Removal | `package-removal/` | 10-step checklist for safely removing packages: dependency scan, import audit, CI cleanup, lockfile regeneration |
 | Refactor Plan | `refactor-plan/` | Structured refactoring plan generation with phased approach and risk assessment |
 
 ## SKILL.md Frontmatter Schema
@@ -46,9 +48,13 @@ description: "One-sentence explanation of what the skill provides."
 ├── README.md              ← this file
 ├── _template/
 │   └── SKILL.md           ← scaffold for new skills
+├── code-review/
+│   └── SKILL.md
 ├── codeql-scanning/
 │   └── SKILL.md
 ├── doublecheck/
+│   └── SKILL.md
+├── package-removal/
 │   └── SKILL.md
 └── refactor-plan/
     └── SKILL.md

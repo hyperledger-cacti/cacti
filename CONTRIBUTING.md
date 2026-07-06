@@ -33,8 +33,8 @@ If you use AI or LLM tooling in your contributions, please also review our [AI G
 There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
 
 As a user, this can include:
-* [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
-* [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
+* [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?template=feature_request.yml)
+* [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?template=bug_report.yml)
 
 As a developer:
 * if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger-cacti/cacti/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger-cacti/cacti/labels/good%20first%20issue) task
