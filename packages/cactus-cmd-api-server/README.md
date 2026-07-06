@@ -126,7 +126,7 @@ const main = async () => {
       // npm package name of the plugin you are installing
       // Since this will be imported at runtime, you are responsible for
       // installing the package yourself prior to launching the API server.
-      packageName: "@hyperledger-cacti/cactus-plugin-keychain-vault",
+      packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
       // The REMOTE value means that a different plugin factory will be imported and
       // called to obtain the plugin instance. This way plugins can support them
       // being imported by the API server regardless of the language the plugin

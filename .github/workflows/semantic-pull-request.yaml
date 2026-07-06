@@ -88,8 +88,10 @@ jobs:
             # classifier below (they pin action versions), so let them through.
             case "$file" in
               .github/workflows/*|.github/actions/*) ;;
-              .github/*|docs/*|*/docs/*|*.md|tools/*|examples/*|weaver/samples/*) continue ;;
+              .github/*|docs/*|*/docs/*|*.md|tools/*|.husky/*|examples/*|weaver/samples/*) continue ;;
               *test*|*spec*) continue ;;
+              # Exclude auto-generated code
+              */generated/*) continue ;;
             esac
 
             # Source-code extension under packages/ or weaver/ → core

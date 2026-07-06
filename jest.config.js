@@ -20,9 +20,6 @@ module.exports = {
   // Ignore the tests that are still using tap/tape for as their test runner
   testPathIgnorePatterns: [
     `./packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/manual/geth-alchemy-integration-manual-check.test.ts`,
-    `./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts`,
-    `./packages/cactus-plugin-keychain-aws-sm/src/test/typescript/integration/plugin-factory-keychain.test.ts`,
-    `./packages/cactus-plugin-keychain-azure-kv/src/test/typescript/integration/plugin-keychain-azure-kv.test.ts`,
     `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts`,
     `./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts`,
     `./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts`,
