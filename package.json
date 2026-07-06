@@ -57,6 +57,8 @@
     "purge-build-cache": "del-cli .build-cache/*",
     "clean": "yarn purge-build-cache && del-cli \"./{packages,examples,extensions}/cactus-*/{dist,.nyc_output,src/main/kotlin/generated/openapi/kotlin-client/*,src/main/proto/generated/*,src/main/typescript/generated/openapi/typescript-axios/*,src/main-server/kotlin/gen/kotlin-spring/src/**/{model,api}/*}\" \"!**/.openapi-generator-ignore\"",
     "lint": "run-s format:eslint format:prettier spellcheck",
+    "lint:files": "eslint --quiet --fix",
+    "format:files": "prettier --write --config .prettierrc.js",
     "lint:actions": "sh ./tools/lint-actions.sh",
     "check:circular-deps": "lerna exec --no-bail -- madge --circular --extensions ts ./src/main/typescript/",
     "format:eslint": "eslint '**/*.{js,ts}' --quiet --fix",
