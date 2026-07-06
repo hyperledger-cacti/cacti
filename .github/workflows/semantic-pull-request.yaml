@@ -76,7 +76,7 @@ jobs:
           fi
 
           CHANGELOG_TYPES="feat fix refactor build perf"
-          NON_CHANGELOG_TYPES="ci test chore docs style"
+          NON_CHANGELOG_TYPES="ci test chore docs style refactor"
 
           HAS_CORE_CODE=false
           HAS_DEP_MANIFEST=false
