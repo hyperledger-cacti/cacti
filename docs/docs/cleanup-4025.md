@@ -35,7 +35,7 @@ This finalizes the list of packages reviewed.
 
 | Outcome | Count |
 |---------|-------|
-| **Retain** | 29 |
+| **Retain** | 28 |
 | **Remove/Archive** | 13 ✅ (completed) |
 | **No Vote** | 22 |
 
@@ -59,6 +59,7 @@ The following packages have been approved for removal based on community vote:
 | `cactus-plugin-keychain-memory-wasm` | `packages/cactus-plugin-keychain-memory-wasm` | ✅ Removed | 2026-07-06 |
 | `cactus-test-plugin-keychain-memory` | `packages/cactus-test-plugin-keychain-memory` | ✅ Removed | 2026-07-06 |
 | `cactus-plugin-ledger-connector-iroha2` | `packages/cactus-plugin-ledger-connector-iroha2` | ✅ Removed | 2026-07-06 |
+| `cactus-plugin-ledger-connector-cdl` | `packages/cactus-plugin-ledger-connector-cdl` | ✅ Removed | 2026-07-07 |
 
 ### Examples (4)
 
@@ -72,6 +73,7 @@ The following packages have been approved for removal based on community vote:
 **Initial Removal Completed:** March 2026 — `chore/cleanup-4025-package-removal`  
 **Keychain Cleanup Completed:** 2026-07-06 — `cleanup/keychain`  
 **Iroha2 Connector Removal Completed:** 2026-07-06 — `cleanup/archive-iroha`
+**CDL Connector Removal Completed:** 2026-07-07 — `satp-fix-ci`
 
 ---
 
@@ -117,7 +119,7 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-plugin-keychain-vault | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-aries | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-besu | ✓ |  |  |  |
-| cactus-plugin-ledger-connector-cdl | ✓ |  |  |  |
+| cactus-plugin-ledger-connector-cdl | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-corda | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-ethereum | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-fabric | ✓ |  |  |  |
