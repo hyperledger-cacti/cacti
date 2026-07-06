@@ -75,13 +75,6 @@ export {
 } from "./indy/indy-test-ledger";
 
 export {
-  Iroha2TestLedger,
-  IIroha2TestLedgerOptions,
-  IROHA2_TEST_LEDGER_DEFAULT_OPTIONS,
-  Iroha2ClientConfig,
-} from "./iroha/iroha2-test-ledger";
-
-export {
   PostgresTestContainer,
   IPostgresTestContainerConstructorOptions,
   POSTGRES_TEST_CONTAINER_DEFAULT_OPTIONS,

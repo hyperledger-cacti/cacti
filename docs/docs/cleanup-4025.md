@@ -35,8 +35,8 @@ This finalizes the list of packages reviewed.
 
 | Outcome | Count |
 |---------|-------|
-| **Retain** | 30 |
-| **Remove/Archive** | 12 ✅ (completed) |
+| **Retain** | 29 |
+| **Remove/Archive** | 13 ✅ (completed) |
 | **No Vote** | 22 |
 
 
@@ -58,6 +58,7 @@ The following packages have been approved for removal based on community vote:
 | `cactus-plugin-keychain-google-sm` | `packages/cactus-plugin-keychain-google-sm` | ✅ Removed | 2026-07-06 |
 | `cactus-plugin-keychain-memory-wasm` | `packages/cactus-plugin-keychain-memory-wasm` | ✅ Removed | 2026-07-06 |
 | `cactus-test-plugin-keychain-memory` | `packages/cactus-test-plugin-keychain-memory` | ✅ Removed | 2026-07-06 |
+| `cactus-plugin-ledger-connector-iroha2` | `packages/cactus-plugin-ledger-connector-iroha2` | ✅ Removed | 2026-07-06 |
 
 ### Examples (4)
 
@@ -69,7 +70,8 @@ The following packages have been approved for removal based on community vote:
 | `test-run-transaction` | `examples/test-run-transaction` | ✅ Removed |
 
 **Initial Removal Completed:** March 2026 — `chore/cleanup-4025-package-removal`  
-**Keychain Cleanup Completed:** 2026-07-06 — `cleanup/keychain`
+**Keychain Cleanup Completed:** 2026-07-06 — `cleanup/keychain`  
+**Iroha2 Connector Removal Completed:** 2026-07-06 — `cleanup/archive-iroha`
 
 ---
 
@@ -119,7 +121,7 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-plugin-ledger-connector-corda | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-ethereum | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-fabric | ✓ |  |  |  |
-| cactus-plugin-ledger-connector-iroha2 | ✓ |  |  |  |
+| cactus-plugin-ledger-connector-iroha2 | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-polkadot | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-sawtooth | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-xdai | ✓ |  |  |  |
