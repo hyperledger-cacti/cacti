@@ -527,44 +527,6 @@ jobs:
           name: coverage-reports-46
           path: ./code-coverage-ts/**/
 
-  # cpl-connector-aries job disabled: tests cannot load due to native
-  # module failure in @2060.io/ref-napi + @2060.io/ffi-napi (transitive deps
-  # of @aries-framework/node@0.5.0-alpha.97 via PostgresPlugin) on Node 20.
-  # node-gyp-build cannot find prebuilt binaries for Node 20 ABI and the
-  # upstream package is deprecated (succeeded by @credo-ts/node). Re-enable
-  # after migrating off @aries-framework/* to @credo-ts/*.
-  # cpl-connector-aries:
-  #   if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-aries')
-  #   continue-on-error: false
-  #   env:
-  #     JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-aries/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-  #     JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-aries
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
-  #
-  #     - name: build
-  #       with:
-  #         node_version: ${{ inputs.node_version }}
-  #         yarn_hardened_mode: '0'
-  #       uses: ./.github/actions/configure-repo/
-  #
-  #     - name: Run Jest Tests
-  #       uses: ./.github/actions/jest-runner/
-  #       with:
-  #         run_code_coverage: ${{ inputs.run_code_coverage }}
-  #         jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
-  #         jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
-  #         github_secret: ${{ secrets.GITHUB_TOKEN }}
-  #         report_name: cpl-connector-aries-report
-  #
-  #     - name: Upload coverage reports as artifacts
-  #       if: ${{ inputs.run_code_coverage == 'true' }}
-  #       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
-  #       with:
-  #         name: coverage-reports-23
-  #         path: ./code-coverage-ts/**/
-
   cpl-connector-stellar:
     if: contains(fromJson(inputs.affected-packages), 'packages/cacti-plugin-ledger-connector-stellar')
     continue-on-error: false

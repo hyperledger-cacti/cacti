@@ -35,9 +35,6 @@
       "path": "./packages/cactus-plugin-keychain-memory/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-ledger-connector-aries/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-plugin-ledger-connector-besu/tsconfig.json"
     },
     {
