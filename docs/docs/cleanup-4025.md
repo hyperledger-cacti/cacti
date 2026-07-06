@@ -31,13 +31,14 @@ This finalizes the list of packages reviewed.
 | Examples | 16 |
 | **Total** | **59 packages** |
 
-## Decision Summary
+## Removed packages
 
 | Outcome | Count |
 |---------|-------|
 | **Retain** | 30 |
-| **Remove/Archive** | 7 ✅ (completed) |
+| **Remove/Archive** | 12 ✅ (completed) |
 | **No Vote** | 22 |
+
 
 ---
 
@@ -45,13 +46,18 @@ This finalizes the list of packages reviewed.
 
 The following packages have been approved for removal based on community vote:
 
-### Packages (3)
+### Packages (8)
 
-| Package | Path | Status |
-|---------|------|--------|
-| `cactus-plugin-ccmodel-hephaestus` | `packages/cactus-plugin-ccmodel-hephaestus` | ✅ Removed |
-| `cactus-plugin-consortium-manual` | `packages/cactus-plugin-consortium-manual` | ✅ Removed |
-| `cactus-plugin-keychain-vault` | `packages/cactus-plugin-keychain-vault` | ✅ Removed |
+| Package | Path | Status | Removed |
+|---------|------|--------|--------|
+| `cactus-plugin-ccmodel-hephaestus` | `packages/cactus-plugin-ccmodel-hephaestus` | ✅ Removed | March 2026 |
+| `cactus-plugin-consortium-manual` | `packages/cactus-plugin-consortium-manual` | ✅ Removed | March 2026 |
+| `cactus-plugin-keychain-vault` | `packages/cactus-plugin-keychain-vault` | ✅ Removed | March 2026 |
+| `cactus-plugin-keychain-aws-sm` | `packages/cactus-plugin-keychain-aws-sm` | ✅ Removed | 2026-07-06 |
+| `cactus-plugin-keychain-azure-kv` | `packages/cactus-plugin-keychain-azure-kv` | ✅ Removed | 2026-07-06 |
+| `cactus-plugin-keychain-google-sm` | `packages/cactus-plugin-keychain-google-sm` | ✅ Removed | 2026-07-06 |
+| `cactus-plugin-keychain-memory-wasm` | `packages/cactus-plugin-keychain-memory-wasm` | ✅ Removed | 2026-07-06 |
+| `cactus-test-plugin-keychain-memory` | `packages/cactus-test-plugin-keychain-memory` | ✅ Removed | 2026-07-06 |
 
 ### Examples (4)
 
@@ -62,8 +68,8 @@ The following packages have been approved for removal based on community vote:
 | `cactus-example-electricity-trade` | `examples/cactus-example-electricity-trade` | ✅ Removed |
 | `test-run-transaction` | `examples/test-run-transaction` | ✅ Removed |
 
-**Removal Completed:** March 2026  
-**Branch:** `chore/cleanup-4025-package-removal`
+**Initial Removal Completed:** March 2026 — `chore/cleanup-4025-package-removal`  
+**Keychain Cleanup Completed:** 2026-07-06 — `cleanup/keychain`
 
 ---
 
@@ -101,11 +107,11 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-plugin-consortium-manual | ❌ | N/A | N/A | N/A |
 | cactus-plugin-htlc-eth-besu | ✓ |  |  |  |
 | cactus-plugin-htlc-eth-besu-erc20 | − |  |  |  |
-| cactus-plugin-keychain-aws-sm | − |  |  |  |
-| cactus-plugin-keychain-azure-kv | − |  |  |  |
-| cactus-plugin-keychain-google-sm | − |  |  |  |
+| cactus-plugin-keychain-aws-sm | ❌ | N/A | N/A | N/A |
+| cactus-plugin-keychain-azure-kv | ❌ | N/A | N/A | N/A |
+| cactus-plugin-keychain-google-sm | ❌ | N/A | N/A | N/A |
 | cactus-plugin-keychain-memory | ✓ |  |  |  |
-| cactus-plugin-keychain-memory-wasm | − |  |  |  |
+| cactus-plugin-keychain-memory-wasm | ❌ | N/A | N/A | N/A |
 | cactus-plugin-keychain-vault | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-aries | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-besu | ✓ |  |  |  |
@@ -126,7 +132,7 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-test-plugin-consortium-manual | − |  |  |  |
 | cactus-test-plugin-htlc-eth-besu | − |  |  |  |
 | cactus-test-plugin-htlc-eth-besu-erc20 | − |  |  |  |
-| cactus-test-plugin-keychain-memory | − |  |  |  |
+| cactus-test-plugin-keychain-memory | ❌ | N/A | N/A | N/A |
 | cactus-test-plugin-ledger-connector-besu | − |  |  |  |
 | cactus-test-plugin-ledger-connector-ethereum | − |  |  |  |
 | cactus-test-tooling | − |  |  |  |

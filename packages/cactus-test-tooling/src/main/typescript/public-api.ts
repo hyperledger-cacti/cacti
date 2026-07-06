@@ -89,14 +89,6 @@ export {
 } from "./postgres/postgres-test-container";
 
 export {
-  CactusKeychainVaultServer,
-  ICactusKeychainVaultServerOptions,
-  K_DEFAULT_KEYCHAIN_VAULT_HTTP_PORT,
-  K_DEFAULT_KEYCHAIN_VAULT_IMAGE_NAME,
-  K_DEFAULT_KEYCHAIN_VAULT_IMAGE_VERSION,
-} from "./cactus-keychain-vault-server/cactus-keychain-vault-server";
-
-export {
   IVaultTestServerOptions,
   VaultTestServer,
   K_DEFAULT_VAULT_IMAGE_NAME,

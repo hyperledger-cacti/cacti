@@ -10,11 +10,7 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-common",
   "@hyperledger-cacti/cactus-plugin-htlc-eth-besu",
   "@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20",
-  "@hyperledger-cacti/cactus-plugin-keychain-aws-sm",
-  "@hyperledger-cacti/cactus-plugin-keychain-azure-kv",
-  "@hyperledger-cacti/cactus-plugin-keychain-google-sm",
   "@hyperledger-cacti/cactus-plugin-keychain-memory",
-  "@hyperledger-cacti/cactus-plugin-keychain-memory-wasm",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-aries",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-besu",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-cdl",
@@ -51,7 +47,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cacti-weaver-besu-simpleasset",
   "@hyperledger-cacti/cacti-weaver-besu-simplestate",
   "@hyperledger-cacti/cacti-weaver-sdk-besu",
-  "@hyperledger-cacti/cactus-test-plugin-keychain-memory",
   "@hyperledger-cacti/cactus",
 ];
 
