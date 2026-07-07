@@ -36,8 +36,8 @@ This finalizes the list of packages reviewed.
 | Outcome | Count |
 |---------|-------|
 | **Retain** | 24 |
-| **Remove/Archive** | 17 ✅ (completed) |
-| **No Vote** | 22 |
+| **Remove/Archive** | 22 ✅ (completed) |
+| **No Vote** | 17 |
 
 
 ---
@@ -46,7 +46,7 @@ This finalizes the list of packages reviewed.
 
 The following packages have been approved for removal based on community vote:
 
-### Packages (10)
+### Packages (11)
 
 | Package | Path | Status | Removed |
 |---------|------|--------|--------|
@@ -64,6 +64,7 @@ The following packages have been approved for removal based on community vote:
 | `cactus-plugin-ledger-connector-aries` | `packages/cactus-plugin-ledger-connector-aries` | ✅ Removed |
 2026-07-07 |
 | `cactus-plugin-ledger-connector-polkadot` | `packages/cactus-plugin-ledger-connector-polkadot` | ✅ Removed | 2026-07-07 |
+| `cactus-plugin-ledger-connector-xdai` | `packages/cactus-plugin-ledger-connector-xdai` | ✅ Removed | 2026-07-08 |
 
 ### Examples (4)
 
@@ -73,6 +74,10 @@ The following packages have been approved for removal based on community vote:
 | `cactus-example-discounted-asset-trade-client` | `examples/cactus-example-discounted-asset-trade-client` | ✅ Removed |
 | `cactus-example-electricity-trade` | `examples/cactus-example-electricity-trade` | ✅ Removed |
 | `test-run-transaction` | `examples/test-run-transaction` | ✅ Removed |
+| `cactus-example-carbon-accounting-backend` | `examples/cactus-example-carbon-accounting-backend` | ✅ Removed | 2026-07-08 |
+| `cactus-example-carbon-accounting-business-logic-plugin` | `examples/cactus-example-carbon-accounting-business-logic-plugin` | ✅ Removed | 2026-07-08 |
+| `cactus-example-carbon-accounting-frontend` | `examples/cactus-example-carbon-accounting-frontend` | ✅ Removed | 2026-07-08 |
+| `carbon-accounting` | `examples/carbon-accounting` | ✅ Removed | 2026-07-08 |
 
 **Initial Removal Completed:** March 2026 — `chore/cleanup-4025-package-removal`  
 **Keychain Cleanup Completed:** 2026-07-06 — `cleanup/keychain`  
@@ -83,6 +88,8 @@ The following packages have been approved for removal based on community vote:
 **Sawtooth Connector Removal Completed:** 2026-07-07 — `cleanup/archive-sawtooth`
 
 **Aries Removal Completed:** 2026-07-06 — `satp-fix-ci`
+
+**Xdai Connector & Carbon Accounting Examples Removal Completed:** 2026-07-08 — `cleanup/archive-xdai`
 
 ---
 
@@ -135,7 +142,7 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-plugin-ledger-connector-iroha2 | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-polkadot | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-sawtooth | ❌ | N/A | N/A | N/A |
-| cactus-plugin-ledger-connector-xdai | ✓ |  |  |  |
+| cactus-plugin-ledger-connector-xdai | ❌ | N/A | N/A | N/A |
 | cactus-plugin-persistence-ethereum | − |  |  |  |
 | cactus-plugin-persistence-fabric | − |  |  |  |
 | cactus-plugin-satp-hermes | ✓ |  |  |  |
@@ -157,9 +164,9 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | Example | keep? | Documentation updates | Security review | Automatize onboarding |
 | ------- |:-----:| --------------------- | --------------- | --------------------- |
 | cactus-common-example-server | − |  |  |  |
-| cactus-example-carbon-accounting-backend | − |  |  |  |
-| cactus-example-carbon-accounting-business-logic-plugin | − |  |  |  |
-| cactus-example-carbon-accounting-frontend | − |  |  |  |
+| cactus-example-carbon-accounting-backend | ❌ | N/A | N/A | N/A |
+| cactus-example-carbon-accounting-business-logic-plugin | ❌ | N/A | N/A | N/A |
+| cactus-example-carbon-accounting-frontend | ❌ | N/A | N/A | N/A |
 | cactus-example-cbdc-bridging | ✓ |  |  |  |
 | cactus-example-cbdc-bridging-backend | ✓ |  |  |  |
 | cactus-example-cbdc-bridging-frontend | ✓ |  |  |  |
@@ -170,6 +177,6 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-example-supply-chain-business-logic-plugin | − |  |  |  |
 | cactus-example-supply-chain-frontend | − |  |  |  |
 | cactus-workshop-examples-2022-11-14 | ✓ |  |  |  |
-| carbon-accounting | − |  |  |  |
+| carbon-accounting | ❌ | N/A | N/A | N/A |
 | test-run-transaction | ❌ | N/A | N/A | N/A |
 

@@ -15,8 +15,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-plugin-ledger-connector-corda",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
-
-  "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai",
   "@hyperledger-cacti/cactus-plugin-persistence-ethereum",
   "@hyperledger-cacti/cactus-plugin-persistence-fabric",
   "@hyperledger-cacti/cactus-plugin-satp-hermes",
@@ -31,9 +29,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu",
   "@hyperledger-cacti/cactus-plugin-object-store-ipfs",
   "@hyperledger-cacti/cactus-common-example-server",
-  "@hyperledger-cacti/cactus-example-carbon-accounting-backend",
-  "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin",
-  "@hyperledger-cacti/cactus-example-carbon-accounting-frontend",
   "@hyperledger-cacti/cactus-example-cbdc-bridging-backend",
   "@hyperledger-cacti/cacti-example-cbdc-bridging-frontend",
   "@hyperledger-cacti/cacti-weaver-protos-js",
