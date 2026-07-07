@@ -19,21 +19,13 @@ import {
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
-  DefaultApi as XdaiApi,
-  Web3SigningCredential,
-} from "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai";
-
-import {
   DefaultApi as FabricApi,
   PluginLedgerConnectorFabric,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
 import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
-import {
-  ICarbonAccountingFabricContractDeploymentInfo,
-  ICarbonAccountingXdaiContractDeploymentInfo,
-} from "../i-carbon-accounting-contract-deployment-info";
+import { ICarbonAccountingFabricContractDeploymentInfo } from "../i-carbon-accounting-contract-deployment-info";
 
 import { GetAllowanceEndpoint } from "./web-services/dao-token/get-allowance-endpoint";
 
@@ -57,13 +49,10 @@ export interface ICarbonAccountingPluginOptions {
   instanceId: string;
   keychainId: string;
   pluginRegistry: PluginRegistry;
-  xdaiApiClient: XdaiApi;
   fabricApiClient: FabricApi;
   fabricPlugin: PluginLedgerConnectorFabric;
-  web3SigningCredential?: Web3SigningCredential;
   fabricEnvironment?: NodeJS.ProcessEnv;
   fabricContracts: ICarbonAccountingFabricContractDeploymentInfo;
-  xdaiContracts: ICarbonAccountingXdaiContractDeploymentInfo;
 }
 
 export class CarbonAccountingPlugin

@@ -129,7 +129,6 @@ nav:
       - R3 Corda: cactus/support/corda.md
       - Hyperledger Fabric: cactus/support/fabric.md
       - Hyperledger Iroha: cactus/support/iroha.md
-      - xDai: cactus/support/xdai.md
   - Weaver:
     - Framework: weaver/introduction.md
     - Getting Started:

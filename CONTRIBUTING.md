@@ -229,8 +229,7 @@ The current directory structure is described as the following:
 >   - docs/ : Documentation source files
 >   - assets/ : Static assets for documentation
 > - examples/ : Example applications and demos
->   - cactus-example-carbon-accounting-backend/
->   - cactus-example-cbdc-bridging/
+ >   - cactus-example-cbdc-bridging/
 >   - cactus-example-discounted-asset-trade/
 >   - ... (additional examples)
 > - extensions/ : Optional extensions and plugins

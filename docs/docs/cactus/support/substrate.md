@@ -15,6 +15,6 @@ Substrate chains include Polkadot, Kusama, Rococco, etc. The deployContract feat
 
 </details>
 
-[Previous](xdai.md "xDai Support")
+[Previous](fabric.md "Fabric Support")
 
 * * *
