@@ -15,7 +15,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-plugin-ledger-connector-corda",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
-  "@hyperledger-cacti/cactus-plugin-ledger-connector-polkadot",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth",
   "@hyperledger-cacti/cactus-plugin-ledger-connector-xdai",
   "@hyperledger-cacti/cactus-plugin-persistence-ethereum",
