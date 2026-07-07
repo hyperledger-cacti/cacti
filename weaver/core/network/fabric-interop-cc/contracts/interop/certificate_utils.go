@@ -9,6 +9,7 @@ package main
 
 import (
 	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/hmac"
 	"crypto/rand"
 	"crypto/sha256"
@@ -37,6 +38,24 @@ const (
 // ECDSASignature represents an ECDSA signature
 type ECDSASignature struct {
 	R, S *big.Int
+}
+
+// eciesCurve adapts a standard library elliptic.Curve to go-ethereum's
+// crypto.EllipticCurve interface, which ecies requires for point marshaling
+// as of go-ethereum v1.17.0. It delegates to the elliptic package functions,
+// so the wire encoding stays SEC1 uncompressed form and the produced
+// ciphertext remains byte-compatible with the pre-bump output and with the
+// Node SDK decryptor (weaver/sdks/fabric/interoperation-node-sdk/src/eciesCrypto.js).
+type eciesCurve struct {
+	elliptic.Curve
+}
+
+func (c eciesCurve) Marshal(x, y *big.Int) []byte {
+	return elliptic.Marshal(c.Curve, x, y)
+}
+
+func (c eciesCurve) Unmarshal(data []byte) (x, y *big.Int) {
+	return elliptic.Unmarshal(c.Curve, data)
 }
 
 func getCertChainOptions(rootCerts []interface{}, intermediateCerts []interface{}) (x509.VerifyOptions, error) {
@@ -283,6 +302,10 @@ func encryptWithCert(message []byte, cert *x509.Certificate) ([]byte, error) {
 func encryptWithECDSAPublicKey(message []byte, pubKey *ecdsa.PublicKey) ([]byte, error) {
 	if pubKey != nil {
 		publicKey := ecies.ImportECDSAPublic(pubKey)
+		// Wrap the curve so it satisfies go-ethereum's crypto.EllipticCurve
+		// interface (required for point marshaling since v1.17.0). Params was
+		// already resolved from the original curve by ImportECDSAPublic.
+		publicKey.Curve = eciesCurve{publicKey.Curve}
 		encBytes, err := ecies.Encrypt(rand.Reader, publicKey, message, nil, nil)
 		if err != nil {
 			return []byte(""), err

@@ -346,6 +346,9 @@ func decryptDataWithPrivKeyFile(privKeyFile string, data []byte) ([]byte, error)
 
 func decryptDataWithPrivKey(privKeyECDSA *ecdsa.PrivateKey, data []byte) ([]byte, error) {
 	privKey := ecies.ImportECDSA(privKeyECDSA)
+	// Wrap the curve so it satisfies go-ethereum's crypto.EllipticCurve
+	// interface (required for point unmarshaling since v1.17.0).
+	privKey.PublicKey.Curve = eciesCurve{privKey.PublicKey.Curve}
 
 	// Decrypt response and match
 	return privKey.Decrypt(data, nil, nil)
