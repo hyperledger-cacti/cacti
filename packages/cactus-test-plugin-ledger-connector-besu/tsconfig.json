@@ -30,9 +30,6 @@
     },
     {
       "path": "../cactus-test-tooling/tsconfig.json"
-    },
-    {
-      "path": "../cactus-verifier-client/tsconfig.json"
     }
   ]
 }

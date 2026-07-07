@@ -52,9 +52,6 @@
 
     },
     {
-      "path": "./packages/cactus-verifier-client/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-plugin-persistence-ethereum/tsconfig.json"
     },
     {
@@ -101,9 +98,6 @@
     },
     {
       "path": "./packages/cactus-test-tooling/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-test-verifier-client/tsconfig.json"
     },
     {
       "path": "./examples/cactus-common-example-server/tsconfig.json"
