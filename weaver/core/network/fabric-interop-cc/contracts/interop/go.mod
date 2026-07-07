@@ -11,7 +11,7 @@ require (
 	github.com/hyperledger/fabric-protos-go v0.3.3
 	github.com/sirupsen/logrus v1.9.1
 	github.com/stretchr/testify v1.11.1
-	golang.org/x/crypto v0.51.0
+	golang.org/x/crypto v0.52.0
 	google.golang.org/protobuf v1.36.11
 )
 
