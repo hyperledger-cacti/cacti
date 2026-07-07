@@ -52,20 +52,6 @@ jobs:
 
     - run: npm run configure
 
-    - name: build-cactus-plugin-ledger-connector-corda-kotlin-client
-      run: |
-        WDIR=$(pwd)
-        cd "${WDIR}/packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client"
-        chmod +x gradlew
-        ./gradlew clean
-        ./gradlew build
-
-    - name: publish-cactus-plugin-ledger-connector-corda-kotlin-client
-      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
-      with:
-        name: cactus-plugin-ledger-connector-corda-kotlin-client-${{ env.GITVERSION }}.jar
-        path: packages/cactus-plugin-ledger-connector-corda/src/main/kotlin/generated/openapi/kotlin-client/build/libs/kotlin-client-1.0.0.jar
-
     - name: build-cactus-cmd-api-server-kotlin-client
       run: |
         WDIR=$(pwd)

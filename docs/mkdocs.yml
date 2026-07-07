@@ -107,7 +107,6 @@ nav:
       - Cactus Common: cactus/packages/cactus-common.md
       - Cactus Core: cactus/packages/cactus-core.md
       - Connector Besu: cactus/packages/cactus-plugin-ledger-connector-besu.md
-      - Connector Corda: cactus/packages/cactus-plugin-ledger-connector-corda.md
       - Connector Fabric: cactus/packages/cactus-plugin-ledger-connector-fabric.md
       - Test Api Client: cactus/packages/cactus-test-api-client.md
       - Test CMD Api Server: cactus/packages/cactus-test-cmd-api-server.md

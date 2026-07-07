@@ -35,8 +35,8 @@ This finalizes the list of packages reviewed.
 
 | Outcome | Count |
 |---------|-------|
-| **Retain** | 27 |
-| **Remove/Archive** | 14 ✅ (completed) |
+| **Retain** | 25 |
+| **Remove/Archive** | 16 ✅ (completed) |
 | **No Vote** | 22 |
 
 
@@ -46,7 +46,7 @@ This finalizes the list of packages reviewed.
 
 The following packages have been approved for removal based on community vote:
 
-### Packages (9)
+### Packages (10)
 
 | Package | Path | Status | Removed |
 |---------|------|--------|--------|
@@ -60,8 +60,11 @@ The following packages have been approved for removal based on community vote:
 | `cactus-test-plugin-keychain-memory` | `packages/cactus-test-plugin-keychain-memory` | ✅ Removed | 2026-07-06 |
 | `cactus-plugin-ledger-connector-iroha2` | `packages/cactus-plugin-ledger-connector-iroha2` | ✅ Removed | 2026-07-06 |
 | `cactus-plugin-ledger-connector-cdl` | `packages/cactus-plugin-ledger-connector-cdl` | ✅ Removed | 2026-07-07 |
+| `cactus-plugin-ledger-connector-corda` | `packages/cactus-plugin-ledger-connector-corda` | ✅ Removed | 2026-07-07 |
 | `cactus-plugin-ledger-connector-aries` | `packages/cactus-plugin-ledger-connector-aries` | ✅ Removed |
 2026-07-07 |
+| `cactus-plugin-ledger-connector-polkadot` | `packages/cactus-plugin-ledger-connector-polkadot` | ✅ Removed | 2026-07-07 |
+
 ### Examples (4)
 
 | Package | Path | Status |
@@ -75,6 +78,8 @@ The following packages have been approved for removal based on community vote:
 **Keychain Cleanup Completed:** 2026-07-06 — `cleanup/keychain`  
 **Iroha2 Connector Removal Completed:** 2026-07-06 — `cleanup/archive-iroha`
 **CDL Connector Removal Completed:** 2026-07-07 — `satp-fix-ci`
+**Polkadot Connector Removal Completed:** 2026-07-07 — `cleanup/archive-corda`
+**Corda Connector Removal Completed:** 2026-07-07 — `cleanup/archive-corda`
 
 **Aries Removal Completed:** 2026-07-06 — `satp-fix-ci`
 
@@ -123,11 +128,11 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-plugin-ledger-connector-aries | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-besu | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-cdl | ❌ | N/A | N/A | N/A |
-| cactus-plugin-ledger-connector-corda | ✓ |  |  |  |
+| cactus-plugin-ledger-connector-corda | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-ethereum | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-fabric | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-iroha2 | ❌ | N/A | N/A | N/A |
-| cactus-plugin-ledger-connector-polkadot | ✓ |  |  |  |
+| cactus-plugin-ledger-connector-polkadot | ❌ | N/A | N/A | N/A |
 | cactus-plugin-ledger-connector-sawtooth | ✓ |  |  |  |
 | cactus-plugin-ledger-connector-xdai | ✓ |  |  |  |
 | cactus-plugin-persistence-ethereum | − |  |  |  |

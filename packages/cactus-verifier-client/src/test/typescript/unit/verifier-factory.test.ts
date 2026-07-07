@@ -80,7 +80,7 @@ describe("getVerifier Tests", () => {
 
   test("Throws when requested client type differs from configured type", async () => {
     try {
-      await sut.getVerifier("myBesuValidatorId", "CORDA_4X");
+      await sut.getVerifier("myBesuValidatorId", "FABRIC_2X");
       expect(1).toBe(
         "getVerifier with invalid verifier type should throw an error!",
       );

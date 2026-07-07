@@ -105,13 +105,6 @@ export {
 } from "./localstack/localstack-container";
 
 export {
-  CORDA_CONNECTOR_DEFAULT_OPTIONS,
-  CORDA_CONNECTOR_OPTIONS_JOI_SCHEMA,
-  CordaConnectorContainer,
-  ICordaConnectorContainerOptions,
-} from "./corda-connector/corda-connector-container";
-
-export {
   IKeycloakContainerOptions,
   K_DEFAULT_KEYCLOAK_HTTP_PORT,
   K_DEFAULT_KEYCLOAK_IMAGE_NAME,
@@ -205,12 +198,6 @@ export {
   IBuildContainerImageRequest,
   buildContainerImage,
 } from "./common/build-container-image";
-
-export {
-  IBuildImageConnectorCordaServerRequest,
-  IBuildImageConnectorCordaServerResponse,
-  buildImageConnectorCordaServer,
-} from "./corda/build-image-connector-corda-server";
 
 export {
   IBuildImageCordaAllInOneV412Request,

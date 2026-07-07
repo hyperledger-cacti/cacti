@@ -38,7 +38,7 @@ historical occurrence, the verified cause, and the fix.
 
 - **Signal**: `Exceeded timeout of 3600000 ms for a hook` or
   `... 1000000 ms for a hook`.
-- **Where (historical)**: `cpl-connector-besu`, `cpl-connector-corda`,
+- **Where (historical)**: `cpl-connector-besu`, `cpl-connector-fabric`,
   `cp-bungee-hermes`, `ce-cbdc-bridging`.
 - **Cause**: Slow Docker startup on shared runners; not a code bug.
 - **Action**: Mark as pre-existing flake in the report. Do NOT block PR

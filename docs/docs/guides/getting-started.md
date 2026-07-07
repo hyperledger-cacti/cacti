@@ -277,7 +277,6 @@ export default router;
 | Ethereum | `@hyperledger/cactus-plugin-ledger-connector-ethereum` | Ethereum, Geth, etc. |
 | Besu | `@hyperledger/cactus-plugin-ledger-connector-besu` | Hyperledger Besu |
 | Fabric | `@hyperledger/cactus-plugin-ledger-connector-fabric` | Hyperledger Fabric |
-| Corda | `@hyperledger/cactus-plugin-ledger-connector-corda` | R3 Corda |
 | Polkadot | `@hyperledger/cactus-plugin-ledger-connector-polkadot` | Polkadot/Substrate |
 | Stellar | `@hyperledger/cacti-plugin-ledger-connector-stellar` | Stellar |
 

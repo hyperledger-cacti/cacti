@@ -46,35 +46,6 @@ jobs:
         - name: ghcr.io/hyperledger-cacti/cactus-besu-all-in-one
           if: contains(steps.changed.outputs.files, 'tools/docker/besu-all-in-one/') || contains(steps.changed.outputs.files, '.github/workflows/ghcr-workflow.yaml')
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
-    ghcr-connector-corda-server:
-      if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-corda')
-      runs-on: ubuntu-22.04
-      steps:
-        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
-        - name: ghcr.io/hyperledger-cacti/cactus-connector-corda-server
-          run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
-          
-    ghcr-corda-all-in-one-flowdb:
-      runs-on: ubuntu-22.04
-      steps:
-        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
-          with:
-            fetch-depth: 0
-        - id: changed
-          run: |
-            BASE_REF="${{ github.base_ref }}"
-            if [[ -z "$BASE_REF" ]]; then
-              echo "files=tools/docker/ .github/workflows/" >> "$GITHUB_OUTPUT"
-            else
-              git fetch origin "$BASE_REF"
-              BASE=$(git merge-base HEAD "origin/$BASE_REF")
-              FILES=$(git diff --name-only "$BASE" HEAD | tr '\n' ' ')
-              echo "files=$FILES" >> "$GITHUB_OUTPUT"
-            fi
-        - name: ghcr.io/hyperledger-cacti/cactus-corda-all-in-one-flowdb
-          if: contains(steps.changed.outputs.files, 'tools/docker/corda-all-in-one/corda-v4_8-flowdb/') || contains(steps.changed.outputs.files, '.github/workflows/ghcr-workflow.yaml')
-          run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
-
     ghcr-dev-container-vscode:
       runs-on: ubuntu-22.04
       env:

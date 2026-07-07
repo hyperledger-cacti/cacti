@@ -101,8 +101,6 @@
     "build:dev:example-supply-chain-backend": "lerna exec --stream --scope '*/*example-supply-chain-b*' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --display-modules --env=dev --target=node --config ../../webpack.config.js'",
     "build:dev:example-carbon-accounting-backend": "lerna exec --stream --scope '*/*carbon-accounting-b*' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --display-modules --env=dev --target=node --config ../../webpack.config.js' && cp -r examples/cactus-example-carbon-accounting-backend/src/utility-emissions-channel/ examples/cactus-example-carbon-accounting-backend/dist/lib/",
     "build:dev:sdk": "lerna exec --stream --scope '*/*sdk' -- 'del-cli dist/** && tsc --project ./tsconfig.json && webpack --env=dev --target=node --config ../../webpack.config.js'",
-    "build:dev:plugin-ledger-connector-corda": "lerna exec --stream --scope '*/*connector-corda' -- 'del-cli dist/** && yarn tsc && webpack --env=dev --target=node --config ../../webpack.config.js'",
-    "test:plugin-ledger-connector-corda": "tap --ts --jobs=1 --timeout=600 \"packages/cactus-*-corda/src/test/typescript/{unit,integration}/\"",
     "webpack": "lerna run webpack:dev",
     "webpack:dev:web": "lerna run webpack:dev:web",
     "webpack:dev:node": "lerna run webpack:dev:node",

@@ -8,7 +8,6 @@ This section contains the components to form Hyperledger Cactus.
 *   [Cactus Common](packages/cactus-common.md)
 *   [Cactus Core](packages/cactus-core.md)
 *   [Connector Besu](packages/cactus-plugin-ledger-connector-besu.md)
-*   [Connector Corda](packages/cactus-plugin-ledger-connector-corda.md)
 *   [Connector Fabric](packages/cactus-plugin-ledger-connector-fabric.md)
 *   [Test Api Client](packages/cactus-test-api-client.md)
 *   [Test CMD Api Server](packages/cactus-test-cmd-api-server.md)

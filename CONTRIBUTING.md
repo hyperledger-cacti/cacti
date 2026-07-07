@@ -244,7 +244,6 @@ The current directory structure is described as the following:
 >     - cacti-plugin-ledger-connector-besu/
 >     - cacti-plugin-ledger-connector-fabric/
 >     - cacti-plugin-ledger-connector-ethereum/
->     - cacti-plugin-ledger-connector-corda/
 >     - ... (additional connectors)
 >   - cacti-plugin-keychain-*/ : Keychain plugins
 >   - cacti-plugin-satp-hermes/ : SATP (Secure Asset Transfer Protocol) implementation
@@ -547,9 +546,8 @@ chosen ledger's maintainers provide an adequate docker image, then you might not
 need to develop this yourself, but this is rarely the case so YMMV.
 
 To see an existing set of examples for `besu` and `quorum` images take a peek at
-the `tools/docker/besu-all-in-one` and `tools/docker/corda-all-in-one` folders.
-These produce the `ghcr.io/hyperledger/cactus-besu-all-in-one` and
-`ghcr.io/hyperledger/cactus-corda-all-in-one` images respectively. Both of these are
+the `tools/docker/besu-all-in-one` folder.
+These produce the `ghcr.io/hyperledger/cactus-besu-all-in-one` images which are
 used in the test cases that are written for the specific ledger connector
 plugins at:
 * `packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts`

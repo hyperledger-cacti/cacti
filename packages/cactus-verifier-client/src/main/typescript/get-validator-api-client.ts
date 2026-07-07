@@ -14,10 +14,6 @@ import type {
   EthereumApiClientOptions,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import type {
-  CordaApiClient,
-  CordaApiClientOptions,
-} from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
-import type {
   FabricApiClient,
   FabricApiClientOptions,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
@@ -44,10 +40,6 @@ export type ClientApiConfig = {
   ETH_1X: {
     in: EthereumApiClientOptions;
     out: EthereumApiClient;
-  };
-  CORDA_4X: {
-    in: CordaApiClientOptions;
-    out: CordaApiClient;
   };
   FABRIC_2X: {
     in: FabricApiClientOptions;
@@ -81,9 +73,6 @@ export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
       return new ethereumPackage.EthereumApiClient(
         options as EthereumApiClientOptions,
       );
-    case "CORDA_4X":
-      const cordaPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-corda");
-      return new cordaPackage.CordaApiClient(options as CordaApiClientOptions);
     case "FABRIC_2X":
       const fabricPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-fabric");
       return new fabricPackage.FabricApiClient(

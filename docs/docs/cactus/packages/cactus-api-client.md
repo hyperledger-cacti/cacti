@@ -10,8 +10,6 @@ The Hyperledger Cactus API Client package is designed to be a generic extension 
     
 *   [**Besu Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-besu/src/main/typescript/generated/openapi/typescript-axios)
     
-*   [**Corda Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-corda/src/main/typescript/generated/openapi/typescript-axios)
-    
 *   [**Fabric Connector** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-plugin-ledger-connector-fabric/src/main/typescript/generated/openapi/typescript-axios)
     
 *   [**API Server** Typescript Axios API Client](https://github.com/hyperledger/cactus/tree/main/packages/cactus-cmd-api-server/src/main/typescript/generated/openapi/typescript-axios)
