@@ -150,12 +150,6 @@ export {
 } from "./corda/sample-cordapp-enum";
 
 export {
-  ISawtoothTestLedgerOptions,
-  SAWTOOTH_LEDGER_DEFAULT_OPTIONS,
-  SawtoothTestLedger,
-} from "./sawtooth/sawtooth-test-ledger";
-
-export {
   IStellarTestLedgerOptions,
   StellarTestLedger,
 } from "./stellar/stellar-test-ledger";
