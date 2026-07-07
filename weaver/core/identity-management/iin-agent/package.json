@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@grpc/grpc-js": "1.13.3",
+    "@grpc/grpc-js": "1.12.7",
     "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-beta.1",
     "@hyperledger-cacti/cacti-weaver-sdk-fabric": "3.0.0-beta.1",
     "dotenv": "8.6.0",
