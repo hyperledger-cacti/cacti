@@ -33,9 +33,6 @@
     },
     {
       "path": "../cactus-test-geth-ledger/tsconfig.json"
-    },
-    {
-      "path": "../cactus-verifier-client/tsconfig.json"
     }
   ]
 }

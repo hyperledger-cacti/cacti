@@ -65,6 +65,8 @@ The following packages have been approved for removal based on community vote:
 2026-07-07 |
 | `cactus-plugin-ledger-connector-polkadot` | `packages/cactus-plugin-ledger-connector-polkadot` | ✅ Removed | 2026-07-07 |
 | `cactus-plugin-ledger-connector-xdai` | `packages/cactus-plugin-ledger-connector-xdai` | ✅ Removed | 2026-07-08 |
+| `cactus-verifier-client` | `packages/cactus-verifier-client` | ✅ Removed | 2026-07-08 |
+| `cactus-test-verifier-client` | `packages/cactus-test-verifier-client` | ✅ Removed | 2026-07-08 |
 
 ### Examples (4)
 
@@ -89,7 +91,8 @@ The following packages have been approved for removal based on community vote:
 
 **Aries Removal Completed:** 2026-07-06 — `satp-fix-ci`
 
-**Xdai Connector & Carbon Accounting Examples Removal Completed:** 2026-07-08 — `cleanup/archive-xdai`
+**Xdai Connector & Carbon Accounting Examples Removal Completed:** 2026-07-08 — `cleanup/archive-xdai`  
+**Verifier Client Removal Completed:** 2026-07-08 — `cleanup/archive-cactus-verifier`
 
 ---
 
@@ -156,8 +159,8 @@ Note: First column is package name, second column `keep?` shows voting result (�
 | cactus-test-plugin-ledger-connector-besu | − |  |  |  |
 | cactus-test-plugin-ledger-connector-ethereum | − |  |  |  |
 | cactus-test-tooling | − |  |  |  |
-| cactus-test-verifier-client | − |  |  |  |
-| cactus-verifier-client | − |  |  |  |
+| cactus-test-verifier-client | ❌ | N/A | N/A | N/A |
+| cactus-verifier-client | ❌ | N/A | N/A | N/A |
 
 ### Examples
 

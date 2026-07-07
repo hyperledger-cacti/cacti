@@ -25,7 +25,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-test-plugin-ledger-connector-besu",
   "@hyperledger-cacti/cactus-test-plugin-ledger-connector-ethereum",
   "@hyperledger-cacti/cactus-test-tooling",
-  "@hyperledger-cacti/cactus-test-verifier-client",
   "@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu",
   "@hyperledger-cacti/cactus-plugin-object-store-ipfs",
   "@hyperledger-cacti/cactus-common-example-server",
