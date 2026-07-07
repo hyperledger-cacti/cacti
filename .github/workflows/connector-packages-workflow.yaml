@@ -245,14 +245,16 @@ jobs:
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
 
+      # Pre-pull the AIO tag the tests actually boot: openapi-validation uses
+      # FABRIC_25_LTS_AIO_IMAGE_VERSION (v2.1.0) from cactus-test-tooling.
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-beta.1
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
 
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'         
+          yarn_hardened_mode: '0'
         uses: ./.github/actions/configure-repo/
 
       - name: Run Jest Tests
@@ -291,9 +293,13 @@ jobs:
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
 
+      # Pre-pull the AIO tag the tests actually boot: all test files resolve
+      # to v2.1.0 via FABRIC_25_LTS_AIO_IMAGE_VERSION or
+      # DEFAULT_FABRIC_2_AIO_IMAGE_VERSION, both defined in
+      # cactus-test-tooling/src/main/typescript/fabric/fabric-test-ledger-v1.ts.
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-beta.1
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
 
       - name: build
         with:

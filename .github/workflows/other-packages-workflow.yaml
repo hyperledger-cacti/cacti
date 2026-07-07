@@ -88,7 +88,7 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-beta.1
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
 
       - name: build
         with:
@@ -169,7 +169,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0-beta.1
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
       
       - uses: ./.github/actions/docker-pull/
         with:
