@@ -78,7 +78,7 @@
     "bluebird": "3.7.2",
     "body-parser": "1.20.3",
     "compression": "1.7.4",
-    "convict": "6.2.4",
+    "convict": "6.2.5",
     "convict-format-with-validator": "6.2.0",
     "cors": "2.8.5",
     "express": "5.1.0",
@@ -137,7 +137,7 @@
     "grpc-tools": "1.12.4",
     "grpc_tools_node_protoc_ts": "5.3.3",
     "jest-extended": "7.0.0",
-    "protobufjs": ">=7.4.0",
+    "protobufjs": "8.6.6",
     "tap": "16.3.8",
     "tape-promise": "4.0.0",
     "ts-node": "10.9.2"
