@@ -21,10 +21,6 @@ import type {
   FabricApiClient,
   FabricApiClientOptions,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
-import type {
-  SawtoothApiClient,
-  SawtoothApiClientOptions,
-} from "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth";
 
 /**
  * Configuration of ApiClients currently supported by Verifier and VerifierFactory
@@ -52,10 +48,6 @@ export type ClientApiConfig = {
   FABRIC_2X: {
     in: FabricApiClientOptions;
     out: FabricApiClient;
-  };
-  SAWTOOTH_1X: {
-    in: SawtoothApiClientOptions;
-    out: SawtoothApiClient;
   };
 };
 
@@ -88,11 +80,6 @@ export async function getValidatorApiClient<K extends keyof ClientApiConfig>(
       const fabricPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-fabric");
       return new fabricPackage.FabricApiClient(
         options as FabricApiClientOptions,
-      );
-    case "SAWTOOTH_1X":
-      const sawtoothPackage = require("@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth");
-      return new sawtoothPackage.SawtoothApiClient(
-        options as SawtoothApiClientOptions,
       );
     default:
       // Will not compile if any ClientApiConfig key was not handled by this switch

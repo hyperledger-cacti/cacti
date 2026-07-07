@@ -51,7 +51,6 @@
     "@hyperledger-cacti/cactus-plugin-ledger-connector-corda": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "3.0.0-beta.1",
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth": "3.0.0-beta.1",
     "jest-extended": "7.0.0",
     "rxjs": "7.8.1"
   },
@@ -59,8 +58,7 @@
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "2.x",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-corda": "2.x",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "2.x",
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "2.x",
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth": "2.x"
+    "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "2.x"
   },
   "peerDependenciesMeta": {
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": {
@@ -73,9 +71,6 @@
       "optional": true
     },
     "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": {
-      "optional": true
-    },
-    "@hyperledger-cacti/cactus-plugin-ledger-connector-sawtooth": {
       "optional": true
     }
   },
