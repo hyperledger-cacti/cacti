@@ -68,7 +68,7 @@
     "@types/http-errors": "2.0.2",
     "jest-extended": "7.0.0",
     "node-mocks-http": "1.14.0",
-    "uuid": "10.0.0"
+    "uuid": "14.0.0"
   },
   "engines": {
     "node": ">=18",
