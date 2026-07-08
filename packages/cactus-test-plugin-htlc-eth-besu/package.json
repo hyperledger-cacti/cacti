@@ -58,7 +58,7 @@
     "@hyperledger-cacti/cactus-plugin-keychain-memory": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-test-tooling": "3.0.0-beta.1",
-    "axios": "1.15.0",
+    "axios": "1.16.0",
     "key-encoder": "2.0.3",
     "web3": "1.6.1",
     "web3js-quorum": "22.4.0"
