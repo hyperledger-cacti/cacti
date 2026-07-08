@@ -58,7 +58,7 @@
     "@hyperledger-cacti/cactus-core-api": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "3.0.0-beta.1",
     "jose": "4.15.5",
-    "uuid": "10.0.0",
+    "uuid": "14.0.0",
     "web3": "1.6.1"
   },
   "devDependencies": {
