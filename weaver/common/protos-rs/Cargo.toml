@@ -3,7 +3,7 @@ name = "build-protos-rs"
 # Don't update this version, update the one in "pkg/Cargo.toml".
 version = "3.0.0-beta.1"
 authors = ["Peter Somogyvari  <peter.somogyvari@accenture.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
-edition = "2021"
+edition = "2024"
 
 [lib]
 name = "weaverpb"

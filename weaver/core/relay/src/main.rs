@@ -59,7 +59,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Log level: {}", log_level);
 
     // Set the RUST_LOG environment variable
-    env::set_var("RUST_LOG", &log_level);
+    // SAFETY: Runs at the start of main() before any threads or the tokio
+    // runtime are spawned, so no concurrent environment access is possible.
+    unsafe { env::set_var("RUST_LOG", &log_level) };
 
     // // Initialize the logger
     // env_logger::init();
