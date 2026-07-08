@@ -2,7 +2,7 @@
 name = "relay"
 version = "3.0.0-beta.1"
 authors = ["Antony Targett <atargett@au1.ibm.com>", "Nick Waywood <nwaywood@au1.ibm.com>", "Sandeep Nishad <sandeep.nishad1@ibm.com"]
-edition = "2021"
+edition = "2024"
 
 [[bin]]
 name = "server"
