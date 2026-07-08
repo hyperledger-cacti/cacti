@@ -3452,52 +3452,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@chevrotain/cst-dts-gen@npm:11.0.3":
-  version: 11.0.3
-  resolution: "@chevrotain/cst-dts-gen@npm:11.0.3"
-  dependencies:
-    "@chevrotain/gast": "npm:11.0.3"
-    "@chevrotain/types": "npm:11.0.3"
-    lodash-es: "npm:4.17.21"
-  checksum: 10/601d23fa3312bd0e32816bd3f9ca2dcba775a52192a082fd6c5e4a2e8ee068523401191babbe2c346d6d2551900a67b549f2f74d7ebb7d5b2ee1b6fa3c8857a0
-  languageName: node
-  linkType: hard
-
-"@chevrotain/gast@npm:11.0.3":
-  version: 11.0.3
-  resolution: "@chevrotain/gast@npm:11.0.3"
-  dependencies:
-    "@chevrotain/types": "npm:11.0.3"
-    lodash-es: "npm:4.17.21"
-  checksum: 10/7169453a8fbfa994e91995523dea09eab87ab23062ad93f6e51f4a3b03f5e2958e0a8b99d5ca6fa067fccfbbbb8bcf1a4573ace2e1b5a455f6956af9eaccb35a
-  languageName: node
-  linkType: hard
-
-"@chevrotain/regexp-to-ast@npm:11.0.3":
-  version: 11.0.3
-  resolution: "@chevrotain/regexp-to-ast@npm:11.0.3"
-  checksum: 10/7387a1c61c5a052de41e1172b33eaaedea166fcdb1ffe4c381b86d00051a8014855a031d28fb658768a62c833ef5f5b0689d0c40de3d7bed556f8fea24396e69
-  languageName: node
-  linkType: hard
-
-"@chevrotain/types@npm:11.0.3":
-  version: 11.0.3
-  resolution: "@chevrotain/types@npm:11.0.3"
-  checksum: 10/49a82b71d2de8ceb2383ff2709fa61d245f2ab2e42790b70c57102c80846edaa318d0b3645aedc904d23ea7bd9be8a58f2397b1341760a15eb5aa95a1336e2a9
-  languageName: node
-  linkType: hard
-
 "@chevrotain/types@npm:~11.1.2":
   version: 11.1.2
   resolution: "@chevrotain/types@npm:11.1.2"
   checksum: 10/ad39d7651a20b05ead9b4374f98afc39915118dda29678c2b623571aa3da3018a0f3fb799d1809605cafcae59cba637d640855ea0f97b9b01d0900d77d6781fe
-  languageName: node
-  linkType: hard
-
-"@chevrotain/utils@npm:11.0.3":
-  version: 11.0.3
-  resolution: "@chevrotain/utils@npm:11.0.3"
-  checksum: 10/29b5d84373a7761ad055c53e2f540a67b5b56550d5be1c473149f6b8923eef87ff391ce021c06ac7653843b0149f6ff0cf30b5e48c3f825d295eb06a6c517bd3
   languageName: node
   linkType: hard
 
@@ -6819,7 +6777,7 @@ __metadata:
     fabric-network: "npm:2.2.20"
     fs-extra: "npm:11.2.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -6856,7 +6814,7 @@ __metadata:
     ts-loader: "npm:9.5.1"
     ts-node: "npm:10.9.2"
     typescript: "npm:5.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     webpack: "npm:5.104.1"
     webpack-cli: "npm:5.1.4"
     webpack-dev-server: "npm:5.2.5"
@@ -6916,7 +6874,7 @@ __metadata:
     prom-client: "npm:15.1.3"
     safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -6995,7 +6953,7 @@ __metadata:
     socket.io-client-fixed-types: "npm:4.5.4"
     stellar-plus: "npm:0.8.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7106,7 +7064,7 @@ __metadata:
     ts-jest: "npm:29.1.1"
     ts-node: "npm:10.9.1"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     winston: "npm:3.10.0"
   bin:
     fabric-cli: bin/fabric-cli
@@ -7141,7 +7099,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7209,7 +7167,7 @@ __metadata:
     ts-node: "npm:10.9.1"
     typedoc: "npm:0.26.2"
     typescript: "npm:5.5.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7290,7 +7248,7 @@ __metadata:
     express-jwt: "npm:8.4.1"
     express-openapi-validator: "npm:5.2.0"
     express-rate-limit: "npm:6.7.0"
-    fastify: "npm:5.8.3"
+    fastify: "npm:5.8.5"
     fs-extra: "npm:11.2.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -7313,7 +7271,7 @@ __metadata:
     tape-promise: "npm:4.0.0"
     ts-node: "npm:10.9.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7382,7 +7340,7 @@ __metadata:
     sanitize-html: "npm:2.12.1"
     secp256k1: "npm:5.0.1"
     sha3: "npm:2.1.4"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7435,7 +7393,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     safe-stable-stringify: "npm:2.5.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7471,10 +7429,10 @@ __metadata:
     jose: "npm:4.15.5"
     json-stable-stringify: "npm:1.0.2"
     openapi-types: "npm:12.1.3"
-    qs: "npm:6.14.2"
+    qs: "npm:6.15.2"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -7500,7 +7458,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7629,7 +7587,7 @@ __metadata:
     ts-results: "npm:3.3.0"
     typescript: "npm:5.8.3"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -7671,7 +7629,7 @@ __metadata:
     safe-stable-stringify: "npm:2.5.0"
     socket.io: "npm:4.6.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -7705,7 +7663,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-eth-abi: "npm:4.2.1"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -7776,7 +7734,7 @@ __metadata:
     npm-run-all2: "npm:6.1.2"
     prom-client: "npm:15.1.3"
     rxjs: "npm:7.8.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7821,7 +7779,7 @@ __metadata:
     socket.io-client-fixed-types: "npm:4.5.4"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -7862,7 +7820,7 @@ __metadata:
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
     urlcat: "npm:3.1.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -7901,7 +7859,7 @@ __metadata:
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-eth: "npm:4.4.0"
     web3-eth-accounts: "npm:4.1.1"
@@ -7978,7 +7936,7 @@ __metadata:
     tar-fs: "npm:3.0.10"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     ws-identity-client: "npm:1.0.2"
     ws-wallet: "npm:1.1.5"
   languageName: unknown
@@ -8006,7 +7964,7 @@ __metadata:
     tape: "npm:5.6.1"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-eth: "npm:1.6.1"
@@ -8038,7 +7996,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     tape-promise: "npm:4.0.0"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8069,7 +8027,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.0.3"
     web3-eth-accounts: "npm:4.0.3"
     web3-utils: "npm:4.3.0"
@@ -8102,7 +8060,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8206,7 +8164,7 @@ __metadata:
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.4"
     make-dir-cli: "npm:3.1.0"
-    mermaid: "npm:11.12.0"
+    mermaid: "npm:11.15.0"
     node-schedule: "npm:2.1.1"
     node-ssh: "npm:13.2.0"
     npm-run-all: "npm:4.1.5"
@@ -8228,7 +8186,7 @@ __metadata:
     typedoc: "npm:0.28.13"
     typescript: "npm:5.5.2"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-utils: "npm:1.6.1"
   languageName: unknown
@@ -8249,7 +8207,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
   languageName: unknown
@@ -8268,7 +8226,7 @@ __metadata:
     express-jwt-authz: "npm:2.4.1"
     jest-extended: "npm:7.0.0"
     jose: "npm:4.15.5"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8307,7 +8265,7 @@ __metadata:
     body-parser: "npm:1.20.3"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3-eth-abi: "npm:4.0.3"
     web3-utils: "npm:4.2.1"
   languageName: unknown
@@ -8334,7 +8292,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     key-encoder: "npm:2.0.3"
     tape-promise: "npm:4.0.0"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
   languageName: unknown
@@ -8362,7 +8320,7 @@ __metadata:
     jest-extended: "npm:7.0.0"
     key-encoder: "npm:2.0.3"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3js-quorum: "npm:22.4.0"
@@ -8387,7 +8345,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     jest-extended: "npm:7.0.0"
     lodash: "npm:4.18.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:4.4.0"
     web3-eth-contract: "npm:4.2.0"
   languageName: unknown
@@ -8444,7 +8402,7 @@ __metadata:
     tar-stream: "npm:2.2.0"
     temp: "npm:0.9.4"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.6.1"
     web3-core: "npm:1.6.1"
     web3-utils: "npm:1.6.1"
@@ -8471,7 +8429,7 @@ __metadata:
     express: "npm:5.1.0"
     log4js: "npm:6.4.1"
     socket.io: "npm:4.6.2"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
     web3: "npm:1.7.3"
     web3-core: "npm:1.7.3"
     web3-eth-accounts: "npm:4.0.3"
@@ -8520,7 +8478,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     kubo-rpc-client: "npm:3.0.1"
     typescript-optional: "npm:2.0.1"
-    uuid: "npm:10.0.0"
+    uuid: "npm:14.0.0"
   languageName: unknown
   linkType: soft
 
@@ -8627,7 +8585,7 @@ __metadata:
     secp256k1: "npm:5.0.1"
     semver-parser: "npm:4.1.4"
     shebang-loader: "npm:0.0.1"
-    simple-git: "npm:3.32.3"
+    simple-git: "npm:3.36.0"
     sort-package-json: "npm:1.57.0"
     source-map-loader: "npm:4.0.1"
     stream-browserify: "npm:3.0.0"
@@ -8786,7 +8744,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@iconify/utils@npm:^3.0.1, @iconify/utils@npm:^3.0.2":
+"@iconify/utils@npm:^3.0.2":
   version: 3.1.4
   resolution: "@iconify/utils@npm:3.1.4"
   dependencies:
@@ -10757,16 +10715,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mermaid-js/parser@npm:^0.6.2":
-  version: 0.6.3
-  resolution: "@mermaid-js/parser@npm:0.6.3"
-  dependencies:
-    langium: "npm:3.3.1"
-  checksum: 10/ab8bbdeaf2ef556871f3267541c0b3621d70c4d108ddac36383adc7eb1c7e6bed28d068b4ad196b54314877f263f939f90f0a1a3cfe8576fab30f4514732aa2f
-  languageName: node
-  linkType: hard
-
-"@mermaid-js/parser@npm:^1.2.0":
+"@mermaid-js/parser@npm:^1.1.1, @mermaid-js/parser@npm:^1.2.0":
   version: 1.2.0
   resolution: "@mermaid-js/parser@npm:1.2.0"
   dependencies:
@@ -15213,6 +15162,22 @@ __metadata:
     "@sigstore/core": "npm:^2.0.0"
     "@sigstore/protobuf-specs": "npm:^0.4.1"
   checksum: 10/ff2aa8c441fd45b20a048b8746fa1d6096e3385a7098352b24703bca790d0555383d21f29b0ce8223c36dd98e14ed7dae82d044ff005c76e0e68c240f0a0458d
+  languageName: node
+  linkType: hard
+
+"@simple-git/args-pathspec@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@simple-git/args-pathspec@npm:1.0.3"
+  checksum: 10/74bcc00123cd0da800fc5a6417f83f2f4fce66eb38749efc2ca3b6e4c431c6edaabe80c5834714c155f6ba07582069b182420eda27a601353fb5a3b48917d7e0
+  languageName: node
+  linkType: hard
+
+"@simple-git/argv-parser@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "@simple-git/argv-parser@npm:1.1.1"
+  dependencies:
+    "@simple-git/args-pathspec": "npm:^1.0.3"
+  checksum: 10/89f49ee1e9a936318d443a21b04fa8adcd7a3fa4d2d9ebc947d6d4f347d65db5fbcfec37f3d75711f2724d7886506f3003144735e244e1eea6badef58696d99f
   languageName: node
   linkType: hard
 
@@ -23037,31 +23002,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chevrotain-allstar@npm:~0.3.0":
-  version: 0.3.1
-  resolution: "chevrotain-allstar@npm:0.3.1"
-  dependencies:
-    lodash-es: "npm:^4.17.21"
-  peerDependencies:
-    chevrotain: ^11.0.0
-  checksum: 10/a12c0e408c17920b5f8fc095b7981d15609a63b3795946005fdfc77a5bbc692bbdb196ea29ad4655f55bfa7c93bbcbe7fe2e5782475bf65761b33f13a4aa1a77
-  languageName: node
-  linkType: hard
-
-"chevrotain@npm:~11.0.3":
-  version: 11.0.3
-  resolution: "chevrotain@npm:11.0.3"
-  dependencies:
-    "@chevrotain/cst-dts-gen": "npm:11.0.3"
-    "@chevrotain/gast": "npm:11.0.3"
-    "@chevrotain/regexp-to-ast": "npm:11.0.3"
-    "@chevrotain/types": "npm:11.0.3"
-    "@chevrotain/utils": "npm:11.0.3"
-    lodash-es: "npm:4.17.21"
-  checksum: 10/8fa6253e51320dd4c3d386315b925734943e509d7954a2cd917746c0604461191bea57b0fb8fbab1903e0508fd94bfd35ebd0f8eace77cd0f3f42a9ee4f8f676
-  languageName: node
-  linkType: hard
-
 "chokidar@npm:3.5.3":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
@@ -25454,7 +25394,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cytoscape@npm:^3.29.3, cytoscape@npm:^3.33.3":
+"cytoscape@npm:^3.33.1, cytoscape@npm:^3.33.3":
   version: 3.34.0
   resolution: "cytoscape@npm:3.34.0"
   checksum: 10/5bbc169798829b1a0eaadcad2707e7762e7ba1a2bcd5dbeaf75b89eb2d2ab9211e51d96b24c1f5807e329ac44c50913062464e2af11c528a1255969a36b45268
@@ -25834,16 +25774,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dagre-d3-es@npm:7.0.11":
-  version: 7.0.11
-  resolution: "dagre-d3-es@npm:7.0.11"
-  dependencies:
-    d3: "npm:^7.9.0"
-    lodash-es: "npm:^4.17.21"
-  checksum: 10/5ea2faab020019a51e60791237239fc528bc20215503a846ad725c2e32dde6a270a16caf2ed6ec712b11e1c6616595b2b26e2c58f4f0e012218135629833e09b
-  languageName: node
-  linkType: hard
-
 "dagre-d3-es@npm:7.0.14":
   version: 7.0.14
   resolution: "dagre-d3-es@npm:7.0.14"
@@ -25972,7 +25902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.18, dayjs@npm:^1.11.20":
+"dayjs@npm:^1.11.19, dayjs@npm:^1.11.20":
   version: 1.11.21
   resolution: "dayjs@npm:1.11.21"
   checksum: 10/dd16f9f2706b61b90e3c346a3211ac3afd9e26193136ce0e87f70bf74d1c17a447bceb230a88b175467fc9f5e3243d8c1544b9897092a12d9c80ee44d338dcb6
@@ -27015,7 +26945,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:^3.2.5, dompurify@npm:^3.3.1, dompurify@npm:^3.3.3":
+"dompurify@npm:^3.3.1, dompurify@npm:^3.3.3":
   version: 3.4.11
   resolution: "dompurify@npm:3.4.11"
   dependencies:
@@ -30487,9 +30417,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:5.8.3":
-  version: 5.8.3
-  resolution: "fastify@npm:5.8.3"
+"fastify@npm:5.8.5":
+  version: 5.8.5
+  resolution: "fastify@npm:5.8.5"
   dependencies:
     "@fastify/ajv-compiler": "npm:^4.0.5"
     "@fastify/error": "npm:^4.0.0"
@@ -30506,7 +30436,7 @@ __metadata:
     secure-json-parse: "npm:^4.0.0"
     semver: "npm:^7.6.0"
     toad-cache: "npm:^3.7.0"
-  checksum: 10/01e117c900ffaffc747c195d244ae2fb39c26a74b31336950b64660ed01f24a225e9a984ef0eb2a6e03c2902b3fb28bc27986fead53f21fdc7aea234928046ea
+  checksum: 10/286054e09964743b3e36ae7fb5d78a46662adb818ac305efca6a09560c9f7346881b0f1ef51736bdd334f5bfecab4461dacdb55bef10e6b64829bbfcc397474d
   languageName: node
   linkType: hard
 
@@ -37453,7 +37383,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"katex@npm:^0.16.22, katex@npm:^0.16.25, katex@npm:^0.16.45":
+"katex@npm:^0.16.25, katex@npm:^0.16.45":
   version: 0.16.47
   resolution: "katex@npm:0.16.47"
   dependencies:
@@ -37787,19 +37717,6 @@ __metadata:
   version: 1.14.3
   resolution: "ky@npm:1.14.3"
   checksum: 10/afd6a6ff10e33138d5338c014a051ca920c6ced7f8452748dfe960c26fb5456f36e103cd8b5868ebf2a38bf13c2b3f53b74cbea44a1b53923e1921bb9a6447b1
-  languageName: node
-  linkType: hard
-
-"langium@npm:3.3.1":
-  version: 3.3.1
-  resolution: "langium@npm:3.3.1"
-  dependencies:
-    chevrotain: "npm:~11.0.3"
-    chevrotain-allstar: "npm:~0.3.0"
-    vscode-languageserver: "npm:~9.0.1"
-    vscode-languageserver-textdocument: "npm:~1.0.11"
-    vscode-uri: "npm:~3.0.8"
-  checksum: 10/6b2e5bc1ff47c6048ec24471333f3397ddb4d6419f1c2262268faff00a8f0839ac4bd4877907261273e91e82f239951249155c3aff8d395ee5e3372dfc285e04
   languageName: node
   linkType: hard
 
@@ -38778,13 +38695,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash-es@npm:4.17.21":
-  version: 4.17.21
-  resolution: "lodash-es@npm:4.17.21"
-  checksum: 10/03f39878ea1e42b3199bd3f478150ab723f93cc8730ad86fec1f2804f4a07c6e30deaac73cad53a88e9c3db33348bb8ceeb274552390e7a75d7849021c02df43
-  languageName: node
-  linkType: hard
-
 "lodash-es@npm:^4.17.21, lodash-es@npm:^4.2.1":
   version: 4.18.1
   resolution: "lodash-es@npm:4.18.1"
@@ -39659,7 +39569,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"marked@npm:^16.2.1, marked@npm:^16.3.0":
+"marked@npm:^16.3.0":
   version: 16.4.2
   resolution: "marked@npm:16.4.2"
   bin:
@@ -39997,31 +39907,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:11.12.0":
-  version: 11.12.0
-  resolution: "mermaid@npm:11.12.0"
+"mermaid@npm:11.15.0":
+  version: 11.15.0
+  resolution: "mermaid@npm:11.15.0"
   dependencies:
     "@braintree/sanitize-url": "npm:^7.1.1"
-    "@iconify/utils": "npm:^3.0.1"
-    "@mermaid-js/parser": "npm:^0.6.2"
+    "@iconify/utils": "npm:^3.0.2"
+    "@mermaid-js/parser": "npm:^1.1.1"
     "@types/d3": "npm:^7.4.3"
-    cytoscape: "npm:^3.29.3"
+    "@upsetjs/venn.js": "npm:^2.0.0"
+    cytoscape: "npm:^3.33.1"
     cytoscape-cose-bilkent: "npm:^4.1.0"
     cytoscape-fcose: "npm:^2.2.0"
     d3: "npm:^7.9.0"
     d3-sankey: "npm:^0.12.3"
-    dagre-d3-es: "npm:7.0.11"
-    dayjs: "npm:^1.11.18"
-    dompurify: "npm:^3.2.5"
-    katex: "npm:^0.16.22"
+    dagre-d3-es: "npm:7.0.14"
+    dayjs: "npm:^1.11.19"
+    dompurify: "npm:^3.3.1"
+    es-toolkit: "npm:^1.45.1"
+    katex: "npm:^0.16.25"
     khroma: "npm:^2.1.0"
-    lodash-es: "npm:^4.17.21"
-    marked: "npm:^16.2.1"
+    marked: "npm:^16.3.0"
     roughjs: "npm:^4.6.6"
     stylis: "npm:^4.3.6"
     ts-dedent: "npm:^2.2.0"
-    uuid: "npm:^11.1.0"
-  checksum: 10/2f15c62f5150282127374a0579ec2a91531eb30d86b8f0a28d492787f6034400ec41d0149f66713b1335e4e3747ca17f7995f994ab357db928839cd505d0bd36
+    uuid: "npm:^11.1.0 || ^12 || ^13 || ^14.0.0"
+  checksum: 10/4a3f8ac77aba326c96adc2325f550421b6f05f1592998fcf80dfeb9fbcd751e2a0a030092559bd258e45bba60c0ad1e7415ad46ff5c165b1d9a469835e927e9a
   languageName: node
   linkType: hard
 
@@ -46224,12 +46135,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:6.14.2":
-  version: 6.14.2
-  resolution: "qs@npm:6.14.2"
+"qs@npm:6.15.2":
+  version: 6.15.2
+  resolution: "qs@npm:6.15.2"
   dependencies:
     side-channel: "npm:^1.1.0"
-  checksum: 10/682933a85bb4b7bd0d66e13c0a40d9e612b5e4bcc2cb9238f711a9368cd22d91654097a74fff93551e58146db282c56ac094957dfdc60ce64ea72c3c9d7779ac
+  checksum: 10/7a934b2dba40654cf9878dab7c1e7ad56c6186265509727fbece67dadc38fd5d67715b61b6ef938e5a0475faeee701d18ec0a7ce420ad64367caad7f1bdb66e2
   languageName: node
   linkType: hard
 
@@ -49591,14 +49502,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git@npm:3.32.3":
-  version: 3.32.3
-  resolution: "simple-git@npm:3.32.3"
+"simple-git@npm:3.36.0":
+  version: 3.36.0
+  resolution: "simple-git@npm:3.36.0"
   dependencies:
     "@kwsites/file-exists": "npm:^1.1.1"
     "@kwsites/promise-deferred": "npm:^1.1.1"
+    "@simple-git/args-pathspec": "npm:^1.0.3"
+    "@simple-git/argv-parser": "npm:^1.1.0"
     debug: "npm:^4.4.0"
-  checksum: 10/9ec8d0cb7a1f813fe56be71cfaf85f44960befa03528560b0d8234eab957cf2a11e62e7b90e0c88066b6db314c8559698f9c13c64602aec56e0834c7508e4c83
+  checksum: 10/79a745464798bce17fc5c286ff4a44ba07d368a745d03d31f3c3cef51bd63b98dc29e72f55dda087b64e5db90e5e9f91a7429543ddf08d105d9a069c525e6818
   languageName: node
   linkType: hard
 
@@ -54105,12 +54018,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:10.0.0, uuid@npm:^10.0.0":
-  version: 10.0.0
-  resolution: "uuid@npm:10.0.0"
+"uuid@npm:14.0.0":
+  version: 14.0.0
+  resolution: "uuid@npm:14.0.0"
   bin:
-    uuid: dist/bin/uuid
-  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
+    uuid: dist-node/bin/uuid
+  checksum: 10/8ee9b98f9650e25555515f7a28d3c3ae9364e72f7bb19b9e08b681bc135338beba5509b2830f6ae1cfaba4d45401da0d16d4d109b977097bc3d6ba0c5583341b
   languageName: node
   linkType: hard
 
@@ -54139,12 +54052,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"uuid@npm:^11.1.0":
-  version: 11.1.1
-  resolution: "uuid@npm:11.1.1"
+"uuid@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "uuid@npm:10.0.0"
   bin:
-    uuid: dist/esm/bin/uuid
-  checksum: 10/16411d3dc12a08d6691616c09a75e66a7f900ba1beef6628a76fe0602f82fae2ee537b564d0b7bc95c24f58d059ca9b58c75a1e806118efb50e17822ff00ddd2
+    uuid: dist/bin/uuid
+  checksum: 10/35aa60614811a201ff90f8ca5e9ecb7076a75c3821e17f0f5ff72d44e36c2d35fcbc2ceee9c4ac7317f4cc41895da30e74f3885e30313bee48fda6338f250538
   languageName: node
   linkType: hard
 
@@ -54383,45 +54296,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vscode-jsonrpc@npm:8.2.0":
-  version: 8.2.0
-  resolution: "vscode-jsonrpc@npm:8.2.0"
-  checksum: 10/6d57c3aed591d0bc89d1c226061d265b04de528582bef183f5998cac5de78a736887e5238fe48b9f6a14ec32f05d8fda71599f92862ac5dacc7f26bf7399b532
-  languageName: node
-  linkType: hard
-
-"vscode-languageserver-protocol@npm:3.17.5":
-  version: 3.17.5
-  resolution: "vscode-languageserver-protocol@npm:3.17.5"
-  dependencies:
-    vscode-jsonrpc: "npm:8.2.0"
-    vscode-languageserver-types: "npm:3.17.5"
-  checksum: 10/aeb9c190184c365fa6b835e5aa7574c86cb3ecb2789386bcff76a09b22bc8b8e0d5da47c28193a9c73cfb32c10a12a91191779280324a38efb401e3ef7bad294
-  languageName: node
-  linkType: hard
-
-"vscode-languageserver-textdocument@npm:^1.0.11, vscode-languageserver-textdocument@npm:~1.0.11":
+"vscode-languageserver-textdocument@npm:^1.0.11":
   version: 1.0.13
   resolution: "vscode-languageserver-textdocument@npm:1.0.13"
   checksum: 10/0962cd125e932d81f18667eb5048da34b93f9060c3f7bc808138ead7741d1672bcebe638e4dd3634398b0ab0175c1d1e58ad5c418ee7afed30717c20c788354b
-  languageName: node
-  linkType: hard
-
-"vscode-languageserver-types@npm:3.17.5":
-  version: 3.17.5
-  resolution: "vscode-languageserver-types@npm:3.17.5"
-  checksum: 10/900d0b81df5bef8d90933e75be089142f6989cc70fdb2d5a3a5f11fa20feb396aaea23ccffc8fbcc83a2f0e1b13c6ee48ff8151f236cbd6e61a4f856efac1a58
-  languageName: node
-  linkType: hard
-
-"vscode-languageserver@npm:~9.0.1":
-  version: 9.0.1
-  resolution: "vscode-languageserver@npm:9.0.1"
-  dependencies:
-    vscode-languageserver-protocol: "npm:3.17.5"
-  bin:
-    installServerIntoExtension: bin/installServerIntoExtension
-  checksum: 10/1cb643b1b1f41a620aaf4a62e152acad694c22b4d98de73fa614a0bddf3b4b4832460465bdbc43f27ba23dad7e61aba533e77b8bfac74cc8de310c39623a7ba1
   languageName: node
   linkType: hard
 
@@ -54429,13 +54307,6 @@ __metadata:
   version: 3.1.0
   resolution: "vscode-uri@npm:3.1.0"
   checksum: 10/80c2a2421f44b64008ef1f91dfa52a2d68105cbb4dcea197dbf5b00c65ccaccf218b615e93ec587f26fc3ba04796898f3631a9406e3b04cda970c3ca8eadf646
-  languageName: node
-  linkType: hard
-
-"vscode-uri@npm:~3.0.8":
-  version: 3.0.8
-  resolution: "vscode-uri@npm:3.0.8"
-  checksum: 10/e882d6b679e0d053cbc042893c0951a135d899a192b62cd07f0a8924f11ae722067a8d6b1b5b147034becf57faf9fff9fb543b17b749fd0f17db1f54f783f07c
   languageName: node
   linkType: hard
 
