@@ -59,7 +59,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [v18.18.2, v22.18.0]
+        node-version: [v20.20.2, v22.18.0]
         exclude:
           - node-version: ${{ needs.check_code_changed.outputs.fabric_sdk_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
@@ -100,7 +100,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [v18.18.2, v22.18.0]
+        node-version: [v20.20.2, v22.18.0]
         exclude:
           - node-version: ${{ needs.check_code_changed.outputs.iin_agent_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
