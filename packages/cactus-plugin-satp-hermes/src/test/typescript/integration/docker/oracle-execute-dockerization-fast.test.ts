@@ -56,7 +56,7 @@ import {
 } from "../../constants";
 import { keccak256 } from "web3-utils";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
-import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({

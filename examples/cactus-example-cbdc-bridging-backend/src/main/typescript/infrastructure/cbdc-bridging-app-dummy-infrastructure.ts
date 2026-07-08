@@ -436,7 +436,9 @@ export class CbdcBridgingAppDummyInfrastructure {
       throw new Error("Besu approve address is undefined");
     }
 
-    this.besuEnvironment.setApproveAddress(this.besuGatewayApproveAddress);
+    this.besuEnvironment.setApproveAddress(
+      reqApproveBesuAddress.data.approveAddress,
+    );
 
     const fabricGatewayApproveAddressApi = new GetApproveAddressApi(
       new Configuration({

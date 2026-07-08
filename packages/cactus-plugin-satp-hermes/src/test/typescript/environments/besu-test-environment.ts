@@ -15,6 +15,7 @@ import {
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import SATPTokenContract from "../../solidity/generated/SATPTokenContract.sol/SATPTokenContract.json";
 import SATPNFTokenContract from "../../solidity/generated/SATPNFTokenContract.sol/SATPNFTokenContract.json";
+import SATMultiTokenContract from "../../solidity/generated/SATMultiTokenContract.sol/SATMultiTokenContract.json";
 import Web3 from "web3";
 import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
@@ -31,6 +32,7 @@ import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { OntologyManager } from "../../../main/typescript/cross-chain-mechanisms/bridge/ontology/ontology-manager";
 import ExampleOntologyERC20 from "../../ontologies/ontology-satp-erc20-interact-besu.json";
 import ExampleOntologyERC721 from "../../ontologies/ontology-satp-erc721-interact-besu.json";
+import ExampleOntologyERC6909 from "../../ontologies/ontology-satp-erc6909-interact-besu.json";
 import {
   IBesuLeafOptions,
   IBesuNetworkConfig,
@@ -46,6 +48,7 @@ export interface IBesuTestEnvironment {
 export enum SupportedContractTypes {
   FUNGIBLE = "FUNGIBLE",
   NONFUNGIBLE = "NONFUNGIBLE",
+  MULTITOKEN = "MULTITOKEN",
   WRAPPER = "WRAPPER",
   ORACLE = "ORACLE",
 }
@@ -56,11 +59,15 @@ export interface tokenContractName {
 export class BesuTestEnvironment {
   public static readonly BESU_ASSET_ID: string = "BesuExampleAsset";
   public static readonly BESU_ASSET_ID2: string = "BesuExampleAsset2";
+  public static readonly BESU_MULTI_TOKEN_ASSET_ID: string =
+    "BesuExampleMultiToken";
   public static readonly BESU_REFERENCE_ID: Record<TokenType, string> = {
     [TokenType.NONSTANDARD_FUNGIBLE]: ExampleOntologyERC20.id,
     [TokenType.NONSTANDARD_NONFUNGIBLE]: ExampleOntologyERC721.id,
     [TokenType.UNSPECIFIED]: "",
   };
+  public static readonly ERC6909_REFERENCE_ID: string =
+    ExampleOntologyERC6909.id;
   public static readonly BESU_NETWORK_ID: string = "BesuLedgerTestNetwork";
   public readonly network: NetworkId = {
     id: BesuTestEnvironment.BESU_NETWORK_ID,
@@ -73,6 +80,7 @@ export class BesuTestEnvironment {
   public keychainPluginWrapper!: PluginKeychainMemory;
   public keychainPluginFungible!: PluginKeychainMemory;
   public keychainPluginNonFungible!: PluginKeychainMemory;
+  public keychainPluginMultiToken!: PluginKeychainMemory;
 
   public besuKeyPair!: { privateKey: string };
   public keychainEntryKey!: string;
@@ -191,6 +199,13 @@ export class BesuTestEnvironment {
       logLevel,
     });
 
+    this.keychainPluginMultiToken = new PluginKeychainMemory({
+      instanceId: uuidv4(),
+      keychainId: uuidv4(),
+      backend: new Map([[this.keychainEntryKey, this.keychainEntryValue]]),
+      logLevel,
+    });
+
     if (this.tokenContracts.has(SupportedContractTypes.FUNGIBLE)) {
       this.keychainPluginFungible.set(
         this.tokenContracts.get(SupportedContractTypes.FUNGIBLE) ?? "",
@@ -213,11 +228,23 @@ export class BesuTestEnvironment {
       );
     }
 
+    if (this.tokenContracts.has(SupportedContractTypes.MULTITOKEN)) {
+      this.keychainPluginMultiToken.set(
+        this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+        JSON.stringify(SATMultiTokenContract),
+      );
+      this.tokenContractCodes.set(
+        SupportedContractTypes.MULTITOKEN,
+        SATMultiTokenContract,
+      );
+    }
+
     // Plugin Registry setup
     const pluginRegistry = new PluginRegistry({
       plugins: [
         this.keychainPluginFungible,
         this.keychainPluginNonFungible,
+        this.keychainPluginMultiToken,
         this.keychainPluginWrapper,
       ],
     });
@@ -352,6 +379,12 @@ export class BesuTestEnvironment {
           SupportedContractTypes.NONFUNGIBLE,
         );
         break;
+      case SupportedContractTypes.MULTITOKEN:
+        contractKeyChainId = this.keychainPluginMultiToken.getKeychainId();
+        contractCode = this.tokenContractCodes.get(
+          SupportedContractTypes.MULTITOKEN,
+        );
+        break;
       default:
         throw new Error(`Unsupported asset type: ${assetType}`);
     }
@@ -391,6 +424,9 @@ export class BesuTestEnvironment {
     }
     if (this.tokenContracts.has(SupportedContractTypes.NONFUNGIBLE)) {
       await this.deployAndSetupContract(SupportedContractTypes.NONFUNGIBLE);
+    }
+    if (this.tokenContracts.has(SupportedContractTypes.MULTITOKEN)) {
+      await this.deployAndSetupContract(SupportedContractTypes.MULTITOKEN);
     }
 
     this.besuConfig = {
@@ -553,6 +589,28 @@ export class BesuTestEnvironment {
         "BRIDGE_ROLE given over Non Fungible Token to SATPWrapperContract successfully",
       );
     }
+    if (this.tokenContracts.has(SupportedContractTypes.MULTITOKEN)) {
+      const giveRoleRes = await this.connector.invokeContract({
+        contractName:
+          this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+        keychainId: this.keychainPluginMultiToken.getKeychainId(),
+        invocationType: BesuContractInvocationType.Send,
+        methodName: "grantBridgeRole",
+        params: [wrapperAddress],
+        signingCredential: {
+          ethAccount: this.firstHighNetWorthAccount,
+          secret: this.besuKeyPair.privateKey,
+          type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
+        },
+        gas: 1000000,
+      });
+
+      expect(giveRoleRes).toBeTruthy();
+      expect(giveRoleRes.success).toBeTruthy();
+      this.log.info(
+        "BRIDGE_ROLE given over Multi-Token contract to SATPWrapperContract successfully",
+      );
+    }
   }
 
   public async approveAssets(
@@ -608,6 +666,9 @@ export class BesuTestEnvironment {
   public getTestNonFungibleContractName(): string {
     return this.tokenContracts.get(SupportedContractTypes.NONFUNGIBLE) ?? "";
   }
+  public getTestMultiTokenContractName(): string {
+    return this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "";
+  }
   public getTestOracleContractName(): string {
     return this.tokenContracts.get(SupportedContractTypes.ORACLE) ?? "";
   }
@@ -622,12 +683,20 @@ export class BesuTestEnvironment {
       this.assetContractAddresses.get(SupportedContractTypes.NONFUNGIBLE) ?? ""
     );
   }
+  public getTestMultiTokenContractAddress(): string {
+    return (
+      this.assetContractAddresses.get(SupportedContractTypes.MULTITOKEN) ?? ""
+    );
+  }
 
   public getTestFungibleContractAbi(): any {
     return this.tokenContractCodes.get(SupportedContractTypes.FUNGIBLE).abi;
   }
   public getTestNonFungibleContractAbi(): any {
     return this.tokenContractCodes.get(SupportedContractTypes.NONFUNGIBLE).abi;
+  }
+  public getTestMultiTokenContractAbi(): any {
+    return this.tokenContractCodes.get(SupportedContractTypes.MULTITOKEN).abi;
   }
 
   public getTestOwnerAccount(): string {
@@ -678,6 +747,62 @@ export class BesuTestEnvironment {
     expect(responseBalanceBridge.callOutput).toBe(amount);
   }
 
+  /**
+   * Mint ERC-6909 multi-tokens of a given type to `firstHighNetWorthAccount`.
+   * The deployer owns BRIDGE_ROLE on SATMultiTokenContract so can mint directly.
+   */
+  public async mintMultiTokens(
+    amount: string,
+    tokenTypeId: number,
+  ): Promise<void> {
+    const responseMint = await this.connector.invokeContract({
+      contractName:
+        this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+      keychainId: this.keychainPluginMultiToken.getKeychainId(),
+      invocationType: BesuContractInvocationType.Send,
+      methodName: "mint",
+      params: [this.firstHighNetWorthAccount, amount, tokenTypeId],
+      signingCredential: {
+        ethAccount: this.firstHighNetWorthAccount,
+        secret: this.besuKeyPair.privateKey,
+        type: Web3SigningCredentialTypeBesu.PrivateKeyHex,
+      },
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
+    });
+    expect(responseMint).toBeTruthy();
+    expect(responseMint.success).toBeTruthy();
+    this.log.info(
+      `Minted ${amount} of tokenTypeId ${tokenTypeId} to firstHighNetWorthAccount`,
+    );
+  }
+
+  /**
+   * Check the ERC-6909 balance of `account` for a specific `tokenTypeId`.
+   * Uses the auto-generated `balances(uint256,address)` getter.
+   */
+  public async checkMultiTokenBalance(
+    contractAddress: string,
+    account: string,
+    tokenTypeId: number,
+    expectedAmount: string,
+    signingCredential: Web3SigningCredential,
+  ): Promise<void> {
+    const response = await this.connector.invokeContract({
+      contractName:
+        this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+      contractAddress,
+      contractAbi: SATMultiTokenContract.abi,
+      invocationType: BesuContractInvocationType.Call,
+      methodName: "balances",
+      params: [tokenTypeId, account],
+      signingCredential: signingCredential,
+      gas: Number(this.besuConfig.gasConfig?.gasLimit),
+    });
+    expect(response).toBeTruthy();
+    expect(response.success).toBeTruthy();
+    expect(response.callOutput.toString()).toBe(expectedAmount);
+  }
+
   // Gets the default asset configuration for testing
   public get defaultAsset(): Asset {
     return {
@@ -710,6 +835,22 @@ export class BesuTestEnvironment {
       networkId: this.network,
       tokenType: AssetTokenTypeEnum.Nonfungible,
       ercTokenStandard: AssetErcTokenStandardEnum.Erc721,
+    };
+  }
+
+  public get multiTokenDefaultAsset(): Asset {
+    return {
+      id: BesuTestEnvironment.BESU_MULTI_TOKEN_ASSET_ID,
+      referenceId: BesuTestEnvironment.ERC6909_REFERENCE_ID,
+      owner: this.firstHighNetWorthAccount,
+      contractName:
+        this.tokenContracts.get(SupportedContractTypes.MULTITOKEN) ?? "",
+      contractAddress:
+        this.assetContractAddresses.get(SupportedContractTypes.MULTITOKEN) ??
+        "",
+      networkId: this.network,
+      tokenType: AssetTokenTypeEnum.Fungible,
+      ercTokenStandard: AssetErcTokenStandardEnum.Erc6909,
     };
   }
 

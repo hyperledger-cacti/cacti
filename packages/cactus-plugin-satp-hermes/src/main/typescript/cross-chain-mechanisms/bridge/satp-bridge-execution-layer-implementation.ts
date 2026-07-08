@@ -75,8 +75,10 @@ import {
   UniqueTokenID,
   Asset,
   FungibleAsset,
+  MultiTokenAsset,
   NonFungibleAsset,
   instanceOfFungibleAsset,
+  instanceOfMultiTokenAsset,
   instanceOfNonFungibleAsset,
 } from "./ontology/assets/asset";
 import {
@@ -289,8 +291,10 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
      * @param asset - Asset subject of the operation
      * @throws {TransactionIdUndefinedError} When underlying response lacks transaction id
      */
+    // MultiTokenAsset (ERC-6909/ERC-1155) satisfies instanceOfFungibleAsset too,
+    // so it must be checked first to keep the routing unambiguous.
     let bridgeEndPoint: BridgeLeafFungible | BridgeLeafNonFungible;
-    if (instanceOfFungibleAsset(asset)) {
+    if (instanceOfMultiTokenAsset(asset) || instanceOfFungibleAsset(asset)) {
       bridgeEndPoint = this.bridgeEndPoint as unknown as BridgeLeafFungible;
     } else if (instanceOfNonFungibleAsset(asset)) {
       bridgeEndPoint = this.bridgeEndPoint as unknown as BridgeLeafNonFungible;
@@ -308,10 +312,18 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         response = await bridgeEndPoint.unwrapAsset(asset.id);
         break;
       case SATPStageOperations.LOCK:
-        if (instanceOfFungibleAsset(asset)) {
+        if (instanceOfMultiTokenAsset(asset)) {
+          // ERC-6909: uniqueDescriptor is required — always forward it
+          response = await (bridgeEndPoint as BridgeLeafFungible).lockAsset(
+            asset.id,
+            Number((asset as MultiTokenAsset).amount) as Amount,
+            (asset as MultiTokenAsset).uniqueDescriptor,
+          );
+        } else if (instanceOfFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafFungible).lockAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor,
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafNonFungible).lockAsset(
@@ -323,10 +335,17 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         }
         break;
       case SATPStageOperations.UNLOCK:
-        if (instanceOfFungibleAsset(asset)) {
+        if (instanceOfMultiTokenAsset(asset)) {
+          response = await (bridgeEndPoint as BridgeLeafFungible).unlockAsset(
+            asset.id,
+            Number((asset as MultiTokenAsset).amount) as Amount,
+            (asset as MultiTokenAsset).uniqueDescriptor,
+          );
+        } else if (instanceOfFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafFungible).unlockAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor,
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (
@@ -340,10 +359,17 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         }
         break;
       case SATPStageOperations.MINT:
-        if (instanceOfFungibleAsset(asset)) {
+        if (instanceOfMultiTokenAsset(asset)) {
+          response = await (bridgeEndPoint as BridgeLeafFungible).mintAsset(
+            asset.id,
+            Number((asset as MultiTokenAsset).amount) as Amount,
+            (asset as MultiTokenAsset).uniqueDescriptor,
+          );
+        } else if (instanceOfFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafFungible).mintAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor,
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafNonFungible).mintAsset(
@@ -353,10 +379,17 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         }
         break;
       case SATPStageOperations.BURN:
-        if (instanceOfFungibleAsset(asset)) {
+        if (instanceOfMultiTokenAsset(asset)) {
+          response = await (bridgeEndPoint as BridgeLeafFungible).burnAsset(
+            asset.id,
+            Number((asset as MultiTokenAsset).amount) as Amount,
+            (asset as MultiTokenAsset).uniqueDescriptor,
+          );
+        } else if (instanceOfFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafFungible).burnAsset(
             asset.id,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor,
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafNonFungible).burnAsset(
@@ -366,11 +399,19 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         }
         break;
       case SATPStageOperations.ASSIGN:
-        if (instanceOfFungibleAsset(asset)) {
+        if (instanceOfMultiTokenAsset(asset)) {
+          response = await (bridgeEndPoint as BridgeLeafFungible).assignAsset(
+            asset.id,
+            asset.owner,
+            Number((asset as MultiTokenAsset).amount) as Amount,
+            (asset as MultiTokenAsset).uniqueDescriptor,
+          );
+        } else if (instanceOfFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafFungible).assignAsset(
             asset.id,
             asset.owner,
             Number((asset as FungibleAsset).amount) as Amount,
+            (asset as FungibleAsset).uniqueDescriptor,
           );
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (

@@ -64,6 +64,22 @@ import {
   UniqueTokenID,
 } from "../../cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { NetworkId } from "../../public-api";
+
+/**
+ * Converts a bigint or numeric string to a number, throwing if the result
+ * is not a safe integer (e.g. precision loss beyond Number.MAX_SAFE_INTEGER,
+ * or NaN from a non-numeric string).
+ */
+function toSafeNumber(value: bigint | string, fieldName: string): number {
+  const converted = Number(value);
+  if (!Number.isSafeInteger(converted)) {
+    throw new Error(
+      `Cannot safely convert ${fieldName} "${value}" to a Number: exceeds Number.MAX_SAFE_INTEGER or is not an integer`,
+    );
+  }
+  return converted;
+}
+
 /**
  * Converts internal fungible asset representation to Protocol Buffer format.
  *
@@ -166,6 +182,11 @@ export function assetToProto(asset: Asset, networkId: NetworkId): ProtoAsset {
       switch (asset.type) {
         case TokenType.NONSTANDARD_FUNGIBLE:
           protoAsset.amount = BigInt((asset as EvmFungibleAsset).amount);
+          if ((asset as FungibleAsset).uniqueDescriptor !== undefined) {
+            protoAsset.uniqueDescriptor = String(
+              (asset as FungibleAsset).uniqueDescriptor,
+            );
+          }
           protoAsset.contractAddress = (
             asset as EvmFungibleAsset
           ).contractAddress;
@@ -278,10 +299,20 @@ export function protoToAsset(asset: ProtoAsset, networkId: NetworkId): Asset {
     ercTokenStandard: asset.ercTokenStandard,
   };
   if (asset.tokenType == TokenType.NONSTANDARD_FUNGIBLE) {
-    (assetObj as FungibleAsset).amount = Number(asset.amount) as Amount;
-  } else if (asset.tokenType == TokenType.NONSTANDARD_NONFUNGIBLE) {
-    (assetObj as NonFungibleAsset).uniqueDescriptor = Number(
+    (assetObj as FungibleAsset).amount = toSafeNumber(
       asset.amount,
+      "amount",
+    ) as Amount;
+    if (asset.uniqueDescriptor) {
+      (assetObj as FungibleAsset).uniqueDescriptor = toSafeNumber(
+        asset.uniqueDescriptor,
+        "uniqueDescriptor",
+      ) as UniqueTokenID;
+    }
+  } else if (asset.tokenType == TokenType.NONSTANDARD_NONFUNGIBLE) {
+    (assetObj as NonFungibleAsset).uniqueDescriptor = toSafeNumber(
+      asset.amount,
+      "amount",
     ) as UniqueTokenID;
   }
   if (asset.mspId) {
@@ -398,6 +429,7 @@ export function compareProtoAsset(
     asset1.mspId === asset2.mspId &&
     asset1.channelName === asset2.channelName &&
     asset1.contractAddress === asset2.contractAddress &&
-    asset1.ercTokenStandard === asset2.ercTokenStandard
+    asset1.ercTokenStandard === asset2.ercTokenStandard &&
+    asset1.uniqueDescriptor === asset2.uniqueDescriptor
   );
 }
