@@ -42,7 +42,7 @@ import { keccak256 } from "web3-utils";
 import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
-import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 import { createServer } from "node:http";
 import { AddressInfo } from "node:net";
 

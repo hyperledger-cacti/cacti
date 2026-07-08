@@ -49,7 +49,7 @@ import { knexLocalInstance } from "../../../../main/typescript/database/knexfile
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
-import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 
 const logLevel: LogLevelDesc = "DEBUG";
 const log = LoggerProvider.getOrCreate({
@@ -121,12 +121,15 @@ beforeEach(() => {
     });
 }, TIMEOUT);
 
+const ERC6909_TOKEN_TYPE_ID = 42;
+
 beforeAll(async () => {
   // Fabric setup skipped — all Fabric describe blocks are describe.skip
 
   {
     const erc20TokenContract = "SATPContract";
     const erc721TokenContract = "SATPNonFungibleContract";
+    const erc6909TokenContract = "SATMultiToken";
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(
       {
         logLevel,
@@ -140,6 +143,10 @@ beforeAll(async () => {
           assetType: SupportedBesuContractTypes.NONFUNGIBLE,
           contractName: erc721TokenContract,
         },
+        {
+          assetType: SupportedBesuContractTypes.MULTITOKEN,
+          contractName: erc6909TokenContract,
+        },
       ],
     );
     log.info("Besu Ledger started successfully");
@@ -149,6 +156,7 @@ beforeAll(async () => {
   {
     const erc20TokenContract = "SATPContract";
     const erc721TokenContract = "SATPNonFungibleContract";
+    const erc6909TokenContract = "SATMultiToken";
     ethereumEnv = await EthereumTestEnvironment.setupTestEnvironment(
       {
         logLevel,
@@ -161,6 +169,10 @@ beforeAll(async () => {
         {
           assetType: SupportedEthereumContractTypes.NONFUNGIBLE,
           contractName: erc721TokenContract,
+        },
+        {
+          assetType: SupportedEthereumContractTypes.MULTITOKEN,
+          contractName: erc6909TokenContract,
         },
       ],
     );
@@ -176,6 +188,16 @@ beforeAll(async () => {
     "100",
     besuEnv.getTestOwnerSigningCredential(),
   );
+  // Mint 100 ERC-6909 multi-tokens of TOKEN_TYPE_ID=42 to the owner account on Besu
+  await besuEnv.mintMultiTokens("100", ERC6909_TOKEN_TYPE_ID);
+  await besuEnv.checkMultiTokenBalance(
+    besuEnv.getTestMultiTokenContractAddress(),
+    besuEnv.getTestOwnerAccount(),
+    ERC6909_TOKEN_TYPE_ID,
+    "100",
+    besuEnv.getTestOwnerSigningCredential(),
+  );
+  log.info("Minted 100 ERC-6909 multi-tokens on Besu successfully");
 }, TIMEOUT);
 
 // TODO: Skipped — Fabric AIO container fails to start reliably.
@@ -264,7 +286,7 @@ describe.skip("2 SATPGateways sending a token from Besu to Fabric", () => {
         migrationSource: migrationSource,
       },
     });
-    await knexSourceRemoteClient.migrate.latest();
+    await knexTargetRemoteClient.migrate.latest();
 
     const fabricNetworkOptions = fabricEnv.createFabricConfig();
     const besuNetworkOptions = besuEnv.createBesuConfig();
@@ -530,7 +552,7 @@ describe.skip("2 SATPGateways sending a token from Fabric to Besu", () => {
         migrationSource: migrationSource,
       },
     });
-    await knexSourceRemoteClient.migrate.latest();
+    await knexTargetRemoteClient.migrate.latest();
 
     const fabricNetworkOptions = fabricEnv.createFabricConfig();
     const besuNetworkOptions = besuEnv.createBesuConfig();
@@ -792,7 +814,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
         migrationSource: migrationSource,
       },
     });
-    await knexSourceRemoteClient.migrate.latest();
+    await knexTargetRemoteClient.migrate.latest();
 
     const besuNetworkOptions = besuEnv.createBesuConfig();
     const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
@@ -1102,7 +1124,7 @@ describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", ()
         migrationSource: migrationSource,
       },
     });
-    await knexSourceRemoteClient.migrate.latest();
+    await knexTargetRemoteClient.migrate.latest();
 
     const besuNetworkOptions = besuEnv.createBesuConfig();
     const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
@@ -1318,6 +1340,280 @@ describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", ()
     );
     log.info(
       "Non fungible token was transferred correctly to the Owner account at Ethereum",
+    );
+  });
+});
+
+describe("2 SATPGateways sending an ERC6909 multi-token from Besu to Ethereum", () => {
+  jest.setTimeout(TIMEOUT);
+  it("should realize an ERC6909 transfer", async () => {
+    const [
+      serverPort1,
+      clientPort1,
+      oapiPort1,
+      serverPort2,
+      clientPort2,
+      oapiPort2,
+    ] = await getFreePorts(6);
+    const factoryOptions: IPluginFactoryOptions = {
+      pluginImportType: PluginImportType.Local,
+    };
+    const factory = new PluginFactorySATPGateway(factoryOptions);
+
+    const gatewayIdentity1 = {
+      id: "mockID-1",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      connectedDLTs: [
+        {
+          id: BesuTestEnvironment.BESU_NETWORK_ID,
+          ledgerType: LedgerType.Besu2X,
+        },
+      ],
+      proofID: "mockProofID10",
+      address: "http://localhost" as Address,
+      gatewayOapiPort: oapiPort1,
+      gatewayServerPort: serverPort1,
+      gatewayClientPort: clientPort1,
+    } as GatewayIdentity;
+
+    const gatewayIdentity2 = {
+      id: "mockID-2",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      connectedDLTs: [
+        {
+          id: EthereumTestEnvironment.ETH_NETWORK_ID,
+          ledgerType: LedgerType.Ethereum,
+        },
+      ],
+      proofID: "mockProofID11",
+      address: "http://localhost" as Address,
+      gatewayOapiPort: oapiPort2,
+      gatewayServerPort: serverPort2,
+      gatewayClientPort: clientPort2,
+    } as GatewayIdentity;
+
+    const migrationSource = await createMigrationSource();
+    knexLocalClient = knex({
+      ...knexLocalInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+
+    knexSourceRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexSourceRemoteClient.migrate.latest();
+
+    knexTargetRemoteClient = knex({
+      ...knexRemoteInstance.default,
+      migrations: {
+        migrationSource: migrationSource,
+      },
+    });
+    await knexTargetRemoteClient.migrate.latest();
+
+    const besuNetworkOptions = besuEnv.createBesuConfig();
+    const ethereumNetworkOptions = ethereumEnv.createEthereumConfig();
+
+    const ontologiesPath = path.join(__dirname, "../../../ontologies");
+
+    const options1: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      logLevel: "DEBUG",
+      gid: gatewayIdentity1,
+      ccConfig: {
+        bridgeConfig: [besuNetworkOptions],
+      },
+      counterPartyGateways: [gatewayIdentity2],
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
+      ontologyPath: ontologiesPath,
+      monitorService: monitorService,
+    };
+
+    const options2: SATPGatewayConfig = {
+      instanceId: uuidv4(),
+      logLevel: "DEBUG",
+      gid: gatewayIdentity2,
+      ccConfig: {
+        bridgeConfig: [ethereumNetworkOptions],
+      },
+      counterPartyGateways: [gatewayIdentity1],
+      localRepository: knexLocalInstance.default,
+      remoteRepository: knexRemoteInstance.default,
+      pluginRegistry: new PluginRegistry({ plugins: [] }),
+      ontologyPath: ontologiesPath,
+      monitorService: monitorService,
+    };
+
+    gateway1 = await factory.create(options1);
+    expect(gateway1).toBeInstanceOf(SATPGateway);
+    await gateway1.onPluginInit();
+
+    gateway2 = await factory.create(options2);
+    expect(gateway2).toBeInstanceOf(SATPGateway);
+    await gateway2.onPluginInit();
+
+    const identity1 = gateway1.Identity;
+    expect(identity1.gatewayServerPort).toBe(serverPort1);
+    expect(identity1.gatewayClientPort).toBe(clientPort1);
+    expect(identity1.address).toBe("http://localhost");
+
+    const identity2 = gateway2.Identity;
+    expect(identity2.gatewayServerPort).toBe(serverPort2);
+    expect(identity2.gatewayClientPort).toBe(clientPort2);
+    expect(identity2.address).toBe("http://localhost");
+
+    const apiServer1 = await gateway1.getOrCreateHttpServer();
+    expect(apiServer1).toBeInstanceOf(ApiServer);
+
+    const apiServer2 = await gateway2.getOrCreateHttpServer();
+    expect(apiServer2).toBeInstanceOf(ApiServer);
+
+    const approveAddressApi1 = new GetApproveAddressApi(
+      new Configuration({ basePath: gateway1.getAddressOApiAddress() }),
+    );
+
+    const approveAddressApi2 = new GetApproveAddressApi(
+      new Configuration({ basePath: gateway2.getAddressOApiAddress() }),
+    );
+
+    // Get the wrapper (bridge) address on the Besu side and grant it BRIDGE_ROLE
+    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
+      besuEnv.network,
+      TokenType.Fungible,
+    );
+
+    if (!reqApproveBesuAddress?.data.approveAddress) {
+      throw new Error("Besu approve address is undefined");
+    }
+    expect(reqApproveBesuAddress.data.approveAddress).toBeDefined();
+
+    await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
+    log.debug(
+      `Granted BRIDGE_ROLE on Besu multi-token contract to wrapper: ${reqApproveBesuAddress.data.approveAddress}`,
+    );
+
+    // Get the wrapper (bridge) address on the Ethereum side and grant it BRIDGE_ROLE
+    const reqApproveEthereumAddress =
+      await approveAddressApi2.getApproveAddress(
+        ethereumEnv.network,
+        TokenType.Fungible,
+      );
+
+    if (!reqApproveEthereumAddress?.data.approveAddress) {
+      throw new Error("Ethereum approve address is undefined");
+    }
+    expect(reqApproveEthereumAddress.data.approveAddress).toBeDefined();
+
+    await ethereumEnv.giveRoleToBridge(
+      reqApproveEthereumAddress.data.approveAddress,
+    );
+    log.debug(
+      `Granted BRIDGE_ROLE on Ethereum multi-token contract to wrapper: ${reqApproveEthereumAddress.data.approveAddress}`,
+    );
+
+    const satpApi1 = new TransactionApi(
+      new Configuration({ basePath: gateway1.getAddressOApiAddress() }),
+    );
+    const adminApi = new AdminApi(
+      new Configuration({ basePath: gateway1.getAddressOApiAddress() }),
+    );
+
+    // Build the transact request for ERC-6909 multi-token
+    const sourceAsset = {
+      ...besuEnv.multiTokenDefaultAsset,
+      amount: "100",
+      uniqueDescriptor: String(ERC6909_TOKEN_TYPE_ID),
+    };
+    const receiverAsset = {
+      ...ethereumEnv.multiTokenDefaultAsset,
+      amount: "100",
+      uniqueDescriptor: String(ERC6909_TOKEN_TYPE_ID),
+    };
+
+    const req = {
+      contextID: "mockContextERC6909",
+      sourceAsset,
+      receiverAsset,
+    };
+
+    const res = await satpApi1.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
+    expect(res?.status).toBe(200);
+
+    const statusResponse = await adminApi.getStatus(res.data.sessionID);
+    expect(statusResponse?.data.startTime).toBeDefined();
+    expect(statusResponse?.data.status).toBe("DONE");
+    expect(statusResponse?.data.substatus).toBe("COMPLETED");
+    expect(statusResponse?.data.stage).toBe("SATP_STAGE_3");
+
+    // Verify: owner on Besu should have 0 tokens of this type after transfer
+    await besuEnv.checkMultiTokenBalance(
+      besuEnv.getTestMultiTokenContractAddress(),
+      besuEnv.getTestOwnerAccount(),
+      ERC6909_TOKEN_TYPE_ID,
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "ERC-6909 token was transferred correctly from the Owner account at Besu",
+    );
+
+    // Verify: wrapper on Besu should have 0 tokens (burned/locked and forwarded)
+    await besuEnv.checkMultiTokenBalance(
+      besuEnv.getTestMultiTokenContractAddress(),
+      reqApproveBesuAddress.data.approveAddress,
+      ERC6909_TOKEN_TYPE_ID,
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "ERC-6909 token was transferred correctly from the Wrapper account at Besu",
+    );
+
+    // Verify: wrapper on Ethereum should have 0 tokens (minted then assigned to owner)
+    await ethereumEnv.checkMultiTokenBalance(
+      ethereumEnv.getTestMultiTokenContractAddress(),
+      reqApproveEthereumAddress.data.approveAddress,
+      ERC6909_TOKEN_TYPE_ID,
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "ERC-6909 token was transferred correctly from the Bridge account at Ethereum",
+    );
+
+    // Verify: owner on Ethereum should now hold 100 tokens of this type
+    await ethereumEnv.checkMultiTokenBalance(
+      ethereumEnv.getTestMultiTokenContractAddress(),
+      ethereumEnv.getTestOwnerAccount(),
+      ERC6909_TOKEN_TYPE_ID,
+      "100",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info(
+      "ERC-6909 token was transferred correctly to the Owner account at Ethereum",
     );
   });
 });

@@ -62,7 +62,7 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
-import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 import { Amount } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 
 let besuEnv: BesuTestEnvironment;
@@ -225,7 +225,7 @@ beforeAll(async () => {
       },
       [
         {
-          assetType: SupportedEthereumContractTypes.FUNGIBLE,
+          assetType: SupportedBesuContractTypes.FUNGIBLE,
           contractName: erc20TokenContract,
         },
       ],

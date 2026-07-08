@@ -46,7 +46,7 @@ import {
   SATP_DOCKER_IMAGE_VERSION,
 } from "../../constants";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
-import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/ethereum-test-environment";
+import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 
 const logLevel: LogLevelDesc = "TRACE";

@@ -126,7 +126,7 @@ describe("OntologyManager", () => {
       checkPermission: [
         {
           functionSignature: "hasPermission",
-          variables: ["bridgeMSPID"],
+          variables: ["bridgemspid"],
         },
       ],
     },
@@ -214,7 +214,7 @@ describe("OntologyManager", () => {
     checkPermission: [
       {
         functionSignature: "hasPermission",
-        variables: ["bridgeMSPID"],
+        variables: ["bridgemspid"],
       },
     ],
   };

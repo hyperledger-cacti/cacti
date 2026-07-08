@@ -4,6 +4,7 @@ import {
   InteractionData,
   InteractionType,
 } from "./interact-types";
+import { toScreamingSnakeCase } from "../../../../core/satp-utils";
 
 export interface FabricAsset extends Asset {
   mspId: string;
@@ -28,8 +29,9 @@ export enum AssetParameterIdentifier {
 }
 
 export function getVarTypes(stringType: string) {
+  const normalized = toScreamingSnakeCase(stringType);
   return AssetParameterIdentifier[
-    stringType.toUpperCase() as keyof typeof AssetParameterIdentifier
+    normalized as keyof typeof AssetParameterIdentifier
   ];
 }
 

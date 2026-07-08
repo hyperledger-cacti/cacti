@@ -346,6 +346,9 @@ Asset:
       type: string
     ercTokenStandard:
       $ref: ./schemas.yml#/ERCTokenStandard
+    uniqueDescriptor:
+      type: string
+      description: "Token ID or unique descriptor for ERC6909/ERC1155 tokens."
 
 TransactRequest:
   description: "Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks."
@@ -1334,6 +1337,7 @@ ERCTokenStandard:
     - ERC20
     - ERC721
     - ERC1155
+    - ERC6909
   description: The ERC token standard.
 DraftVersions:
   type: object
