@@ -41,7 +41,7 @@
     "fabric-ca-client": "2.2.20",
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
-    "uuid": "11.1.1"
+    "uuid": "14.0.0"
   },
   "devDependencies": {
     "@types/jsrsasign": "10.5.11",

@@ -233,7 +233,7 @@
     "jsonc": "2.0.0",
     "knex": "2.4.0",
     "kubo-rpc-client": "3.0.1",
-    "mermaid": "11.12.0",
+    "mermaid": "11.15.0",
     "node-schedule": "2.1.1",
     "node-ssh": "13.2.0",
     "npm-run-all": "4.1.5",
@@ -247,7 +247,7 @@
     "swagger-ui-express": "5.0.0",
     "ts-results": "3.3.0",
     "typescript-optional": "2.0.1",
-    "uuid": "11.1.1",
+    "uuid": "14.0.0",
     "web3": "4.4.0",
     "web3-utils": "1.6.1"
   },
