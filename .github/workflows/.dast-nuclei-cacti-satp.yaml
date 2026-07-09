@@ -64,6 +64,8 @@ on:
           Newline-separated list of URLs to scan.
           When omitted, the built-in default set covering all Cacti API server
           endpoints (api-server, Fabric connector, Besu connector) is used.
+permissions:
+  contents: read
 
 jobs:
   nuclei-scan:

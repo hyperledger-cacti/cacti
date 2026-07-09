@@ -6,6 +6,8 @@ on:
       lint_success:
         description: "Whether the lint was successful"
         value: ${{ jobs.lint-satp.outputs.lint_success }}
+permissions:
+  contents: read
 
 jobs:
   lint-satp:

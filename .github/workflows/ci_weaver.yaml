@@ -14,6 +14,9 @@ on:
 env:
   RUN_ALL: "${{github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}"
 
+permissions:
+  contents: read
+
 jobs:
 
   fabric-fabric-satp:

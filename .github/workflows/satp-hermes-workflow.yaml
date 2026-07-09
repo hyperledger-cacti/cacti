@@ -66,6 +66,8 @@ on:
 concurrency:
   group: satp-hermes-package-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
   # Test execution jobs: run unit and integration tests in parallel

@@ -6,6 +6,8 @@ on:
       build_success:
         description: "Whether the build was successful"
         value: ${{ jobs.build-satp.outputs.build_success }}
+permissions:
+  contents: read
 
 jobs:
   build-satp:

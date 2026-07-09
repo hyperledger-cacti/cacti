@@ -18,6 +18,8 @@ on:
 concurrency:
   group: htlc-packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
   cp-htlc-coordinator-besu:

@@ -22,16 +22,18 @@ concurrency:
   group: packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-# Dispatcher only; pass-through cap for the package workflows below.
-# Must include `contents: write` because connector-packages and core-packages
-# each have one benchmark job that pushes to gh-pages on main.
+# Dispatcher only; least-privilege default. Each job below sets its own cap
+# for the reusable workflow it calls.
 permissions:
-  contents: write
-  actions: read
-  checks: write
+  contents: read
 
 jobs:
   core-packages:
+    # cactus-cmd-api-server pushes benchmark data to gh-pages on main.
+    permissions:
+      contents: write
+      actions: read
+      checks: write
     uses: ./.github/workflows/core-packages-workflow.yaml
     with:
       node_version: ${{ inputs.node_version }}
@@ -40,6 +42,11 @@ jobs:
       affected-packages: ${{ inputs.affected-packages }}
 
   connector-packages:
+    # cpl-connector-besu pushes benchmark data to gh-pages on main.
+    permissions:
+      contents: write
+      actions: read
+      checks: write
     uses: ./.github/workflows/connector-packages-workflow.yaml
     with:
       node_version: ${{ inputs.node_version }}
@@ -48,6 +55,11 @@ jobs:
       affected-packages: ${{ inputs.affected-packages }}
 
   keychain-packages:
+    # dorny/test-reporter (checks: write) + benchmark cache restore (actions: read).
+    permissions:
+      contents: read
+      actions: read
+      checks: write
     uses: ./.github/workflows/keychain-packages-workflow.yaml
     with:
       node_version: ${{ inputs.node_version }}
@@ -56,15 +68,25 @@ jobs:
       affected-packages: ${{ inputs.affected-packages }}
 
   other-packages:
+    # dorny/test-reporter (checks: write) + benchmark cache restore (actions: read).
+    permissions:
+      contents: read
+      actions: read
+      checks: write
     uses: ./.github/workflows/other-packages-workflow.yaml
     with:
       node_version: ${{ inputs.node_version }}
       run_code_coverage:  ${{ inputs.run_code_coverage }}
       run_trivy_scan:  ${{ inputs.run_trivy_scan }}
       affected-packages: ${{ inputs.affected-packages }}
-      
+
   satp-hermes-workflow:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-satp-hermes')
+    # dorny/test-reporter (checks: write) + benchmark cache restore (actions: read).
+    permissions:
+      contents: read
+      actions: read
+      checks: write
     uses: ./.github/workflows/satp-hermes-workflow.yaml
     with:
       node_version: ${{ inputs.node_version }}

@@ -1,6 +1,8 @@
 name: Lint GitHub Actions workflows
 on:
   workflow_call:
+permissions:
+  contents: read
 
 jobs:
   Lint_GitHub_Actions:

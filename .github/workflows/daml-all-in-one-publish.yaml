@@ -12,6 +12,8 @@ concurrency:
 
 env:
   IMAGE_NAME: cacti-daml-all-in-one
+permissions:
+  contents: read
 
 jobs:
   # Push image to GitHub Packages.

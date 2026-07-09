@@ -92,7 +92,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
 
 env:
   NPM_PACKAGE_NAME: '@hyperledger-cacti/cactus-plugin-satp-hermes'
@@ -250,6 +249,9 @@ jobs:
     needs: [build-satp-hermes-npm-package, set-npm-tags]
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg' || startsWith(github.ref, 'refs/tags/'))) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # publish package to GitHub Package Registry
     continue-on-error: true  # Don't fail the workflow if GitHub Package Registry push fails
     # Production publishes run under the `prod` environment; dev builds use none.
     environment: ${{ needs.set-npm-tags.outputs.is_release == 'true' && 'prod' || '' }}

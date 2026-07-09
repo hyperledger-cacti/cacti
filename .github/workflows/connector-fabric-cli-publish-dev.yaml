@@ -16,9 +16,15 @@ concurrency:
 env:
   IMAGE_NAME: cactus-connector-fabric-cli
 
-jobs:      
+permissions:
+  contents: read
+
+jobs:
   pr-build-container:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write # push image to GHCR
     env:
       DOCKER_BUILDKIT: 1
       DOCKERFILE_PATH: ./packages/cactus-plugin-ledger-connector-fabric/cli.Dockerfile
