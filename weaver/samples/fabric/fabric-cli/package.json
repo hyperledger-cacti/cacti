@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger/cacti-weaver-fabric-cli",
-  "version": "2.1.0",
+  "name": "@hyperledger-cacti/cacti-weaver-fabric-cli",
+  "version": "3.0.0-beta.1",
   "description": "fabric-cli CLI",
   "keywords": [
     "Hyperledger",
@@ -36,14 +36,14 @@
     "bin"
   ],
   "scripts": {
-    "build": "yarn clean-build && yarn compile && yarn copy-templates && yarn copy-data && yarn copy-basic-wallets && yarn copy-credentials",
+    "build": "yarn clean-build && yarn compile && yarn copy-templates && yarn copy-data && yarn copy-config && yarn copy-basic-wallets && yarn copy-credentials",
     "clean-build": "rm -rf ./build",
     "compile": "tsc -p .",
     "copy-basic-wallets": "cp -a ./src/wallet-network1 ./build/ && cp -a ./src/wallet-network2 ./build/",
-    "copy-config": "if [ -f ./config.json ]; then cp ./config.json ./build/; fi",
-    "copy-credentials": "if [ -e ./src/credentials ]; then cp -a ./src/credentials ./build/; fi",
-    "copy-data": "if [ -e ./src/data ]; then cp -a ./src/data ./build/; fi",
-    "copy-templates": "if [ -e ./src/templates ]; then cp -a ./src/templates ./build/; fi",
+    "copy-config": "[ -f ./config.json ] && cp ./config.json ./build/ || true",
+    "copy-credentials": "[ -d ./src/credentials ] && cp -a ./src/credentials ./build/ || true",
+    "copy-data": "[ -d ./src/data ] && cp -a ./src/data ./build/ || true",
+    "copy-templates": "[ -f ./src/templates ] && cp -a ./src/templates ./build/ || true",
     "coverage": "jest --coverage",
     "prepublishOnly": "yarn build",
     "snapupdate": "jest --updateSnapshot",
@@ -56,8 +56,8 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@hyperledger/cacti-weaver-protos-js": "2.1.0",
-    "@hyperledger/cacti-weaver-sdk-fabric": "2.1.0",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-beta.1",
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "3.0.0-beta.1",
     "body-parser": "1.20.3",
     "dotenv": "8.6.0",
     "express": "5.1.0",
@@ -65,18 +65,18 @@
     "fabric-common": "2.2.20",
     "fabric-network": "2.2.20",
     "gluegun": "5.1.6",
-    "uuid": "10.0.0",
+    "uuid": "11.1.1",
     "winston": "3.10.0"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.13.3",
+    "@grpc/grpc-js": "1.14.4",
     "@grpc/proto-loader": "0.7.13",
     "@types/express": "5.0.1",
     "@types/node": "18.11.9",
     "google-protobuf": "3.21.4",
     "jest": "29.6.2",
     "pkg": "5.8.1",
-    "protobufjs": "7.4.0",
+    "protobufjs": "8.6.6",
     "ts-jest": "29.1.1",
     "ts-node": "10.9.1",
     "typescript": "5.5.2"

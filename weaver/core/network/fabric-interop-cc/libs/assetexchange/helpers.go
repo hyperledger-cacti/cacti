@@ -17,7 +17,7 @@ import (
     "fmt"
 
     "github.com/golang/protobuf/proto"
-    "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+    "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3/common"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
     mspProtobuf "github.com/hyperledger/fabric-protos-go/msp"
     log "github.com/sirupsen/logrus"
@@ -77,7 +77,7 @@ func getECertOfTxCreatorBase64(ctx contractapi.TransactionContextInterface) (str
 func validateAndSetLockerOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
     txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
     if err != nil {
-        return logThenErrorf(err.Error())
+        return logThenErrorf("%s", err.Error())
     }
     if len(assetAgreement.Locker) == 0 {
         assetAgreement.Locker = txCreatorECertBase64
@@ -96,7 +96,7 @@ func validateAndSetLockerOfAssetAgreement(ctx contractapi.TransactionContextInte
 func validateAndSetLockerOfFungibleAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.FungibleAssetExchangeAgreement) error {
     txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
     if err != nil {
-        return logThenErrorf(err.Error())
+        return logThenErrorf("%s", err.Error())
     }
     if len(assetAgreement.Locker) == 0 {
         assetAgreement.Locker = txCreatorECertBase64
@@ -115,7 +115,7 @@ func validateAndSetLockerOfFungibleAssetAgreement(ctx contractapi.TransactionCon
 func validateAndSetRecipientOfAssetAgreement(ctx contractapi.TransactionContextInterface, assetAgreement *common.AssetExchangeAgreement) error {
     txCreatorECertBase64, err := getECertOfTxCreatorBase64(ctx)
     if err != nil {
-        return logThenErrorf(err.Error())
+        return logThenErrorf("%s", err.Error())
     }
     if len(assetAgreement.Recipient) == 0 {
         assetAgreement.Recipient = txCreatorECertBase64
@@ -137,7 +137,7 @@ func getLockInfoAndExpiryTimeSecs(lockInfoBytesBase64 string) (interface{}, uint
     lockInfo := &common.AssetLock{}
     err = proto.Unmarshal([]byte(lockInfoBytes), lockInfo)
     if err != nil {
-        return lockInfoVal, 0, logThenErrorf(err.Error())
+        return lockInfoVal, 0, logThenErrorf("%s", err.Error())
     }
 
     // process lock details here (lockInfo.LockInfo contains value based on the lock mechanism used)
@@ -244,7 +244,7 @@ func fetchAssetLockedUsingContractId(ctx contractapi.TransactionContextInterface
     var assetLockKey string = ""
     assetLockKeyBytes, err := ctx.GetStub().GetState(generateContractIdMapKey(contractId))
     if err != nil {
-        return assetLockKey, assetLockVal, logThenErrorf(err.Error())
+        return assetLockKey, assetLockVal, logThenErrorf("%s", err.Error())
     }
 
     if assetLockKeyBytes == nil {
@@ -302,7 +302,7 @@ func fetchLockStateUsingContractId(ctx contractapi.TransactionContextInterface, 
     if err != nil {
         assetLockVal, err := fetchFungibleAssetLocked(ctx, contractId)
         if err != nil {
-            return "", assetLockVal, logThenErrorf(err.Error())
+            return "", assetLockVal, logThenErrorf("%s", err.Error())
         }
         return "", assetLockVal, nil
     }

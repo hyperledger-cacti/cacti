@@ -12,11 +12,16 @@ concurrency:
   group: code-quality-checks-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Lint / codegen-drift checks. github-script usages only call
+# core.setFailed() -- no GitHub API writes -- so checkout-only suffices.
+permissions:
+  contents: read
+
 jobs:
   yarn_lint:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: build
         with:
@@ -40,7 +45,7 @@ jobs:
         id: print_env_git_index_file_count
         run: |
             echo "${{ env.GIT_INDEX_FILE_COUNT }}"
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         id: set-result-git_index_file_count
         with:
           script: |
@@ -55,7 +60,7 @@ jobs:
 
       - name: Check Lint Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         with:
           script: |
             const failMsg = "yarn lint script produced version control " +
@@ -70,13 +75,13 @@ jobs:
     continue-on-error: false
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@b00af27efadbc7b4ca8b82abbd903b17cc874d2a #v1.9.0
         with:
           version: stable
 
@@ -92,7 +97,7 @@ jobs:
 
       - name: Cache OpenAPI Generator JAR
         id: cache-openapi-generator-jar
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 #v6.1.0
         with:
           path: |
             node_modules/@openapitools/openapi-generator-cli/versions/6.6.0.jar
@@ -127,7 +132,7 @@ jobs:
         run: |
             echo "${{ env.GIT_INDEX_FILE_COUNT }}"
 
-      - uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         id: set-result-git_index_file_count
         with:
           script: |
@@ -142,7 +147,7 @@ jobs:
 
       - name: Check CodeGen Side-effects
         if: ${{ steps.set-result-git_index_file_count.outputs.result != 0 }}
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea #v7.0.1
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
         with:
           script: |
             const failMsg = "yarn codegen script produced version control " +
@@ -159,7 +164,7 @@ jobs:
       CACTI_CUSTOM_CHECKS_REQUIRED_OPENAPI_SPEC_VERSION: 3.0.3
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: build
         with:
@@ -174,7 +179,7 @@ jobs:
     continue-on-error: true
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: build
         with:

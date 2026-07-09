@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger/cacti-plugin-weaver-driver-fabric",
-  "version": "2.1.0",
+  "name": "@hyperledger-cacti/cacti-plugin-weaver-driver-fabric",
+  "version": "3.0.0-beta.1",
   "description": "Driver Server for communication with a Fabric Network as part of Weaver data sharing protocol",
   "keywords": [
     "Hyperledger",
@@ -59,8 +59,6 @@
     "build-local": "cd src/main/typescript && make build-local",
     "clean": "cd src/main/typescript && make clean",
     "clean-local": "cd src/main/typescript && make clean-local",
-    "publish": "cd src/main/typescript && make push-image && make push-image-latest",
-    "postpublish": "cd src/main/typescript && make push-image-latest",
     "watch": "npm-watch"
   },
   "engines": {

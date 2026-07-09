@@ -1,4 +1,22 @@
 #!/bin/sh
+# Cacti commit-msg hook runner.
+# Delegates to executable scripts in .husky/commit-msg.d/*.sh (lexical order).
+# Each script receives the commit-message file path as $1.
+# Bypass the whole hook with:  HUSKY=0 git commit ...
 
-# Validate commit message
-npx --no-install commitlint --edit "$1"
+set -e
+
+STAGE=commit-msg
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+D="$HOOK_DIR/$STAGE.d"
+
+[ -d "$D" ] || exit 0
+
+for script in "$D"/*.sh; do
+	[ -e "$script" ] || continue
+	[ -x "$script" ] || continue
+	name="$(basename "$script")"
+	echo "[$STAGE] >>> $name"
+	"$script" "$@"
+done
+

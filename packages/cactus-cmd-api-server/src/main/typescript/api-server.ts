@@ -49,14 +49,14 @@ import {
   isIPluginGrpcService,
   isIPluginCrpcService,
   ICrpcSvcRegistration,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import {
   PluginRegistry,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
-import { installOpenapiValidationMiddleware } from "@hyperledger/cactus-core";
+import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
 
 import {
   bigIntToDecimalStringReplacer,
@@ -66,7 +66,7 @@ import {
   LoggerProvider,
   newRex,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { ICactusApiServerOptions } from "./config/config-service";
 import OAS from "../json/openapi.json";
@@ -811,8 +811,7 @@ export class ApiServer {
     const pluginRegistry = await this.getOrInitPluginRegistry();
 
     return new Promise((resolve, reject) => {
-      // const grpcHost = "0.0.0.0"; // FIXME - make this configurable (config-service.ts)
-      const grpcHost = "127.0.0.1"; // FIXME - make this configurable (config-service.ts)
+      const grpcHost = this.options.config.grpcHost;
       const grpcHostAndPort = `${grpcHost}:${this.options.config.grpcPort}`;
 
       const grpcTlsCredentials = this.options.config.grpcMtlsEnabled

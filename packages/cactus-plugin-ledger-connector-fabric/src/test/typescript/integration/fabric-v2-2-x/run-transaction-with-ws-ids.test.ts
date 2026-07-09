@@ -1,8 +1,8 @@
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { v4 as uuidv4 } from "uuid";
-import { LogLevelDesc } from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import {
   DefaultEventHandlerStrategy,
   FabricSigningCredentialType,
@@ -21,7 +21,7 @@ import {
   DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
   FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import { WsWallet } from "ws-wallet";
 import { WsIdentityClient } from "ws-identity-client";
 

@@ -35,19 +35,19 @@ import {
   IAsyncProvider,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { Express, Request, Response } from "express";
 import type { IRequestOptions } from "../../core/types";
 import OAS from "../../../json/oapi-api1-bundled.json";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 import { TransactRequest } from "../../generated/gateway-client/typescript-axios/api";
 import { SATPInternalError } from "../../core/errors/satp-errors";
 import { getEnumKeyByValue } from "../../services/utils";
@@ -87,15 +87,17 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
   constructor(public readonly options: IRequestOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.dispatcher, `${fnTag} arg options.connector`);
+    Checks.truthy(options.dispatcher, `${fnTag} arg options.dispatcher`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact"] {
-    return OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact"];
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"] {
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"
+    ];
   }
 
   public async registerExpress(
@@ -115,8 +117,9 @@ export class TransactEndpointV1 implements IWebServiceEndpoint {
   }
 
   public getOperationId(): string {
-    return OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/transact"]
-      .post.operationId;
+    return OAS.paths[
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact"
+    ].post.operationId;
   }
 
   getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {

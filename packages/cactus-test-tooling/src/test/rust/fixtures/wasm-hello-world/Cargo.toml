@@ -1,6 +1,6 @@
 [package]
 name = "hello-world"
-version = "2.1.0"
+version = "3.0.0-beta.1"
 authors = ["Hyperledger Cactus Contributors"]
 edition = "2018"
 

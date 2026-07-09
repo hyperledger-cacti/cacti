@@ -48,6 +48,12 @@ module.exports = {
       path: require.resolve("path-browserify"),
       stream: require.resolve("stream-browserify"),
       zlib: require.resolve("browserify-zlib"),
+      // Node-only modules pulled in by prom-client's default metrics. They have
+      // no browser equivalent, so stub them out for the web bundle.
+      cluster: false,
+      fs: false,
+      perf_hooks: false,
+      v8: false,
     },
   },
   optimization: {

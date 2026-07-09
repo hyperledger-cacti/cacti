@@ -31,7 +31,13 @@
  * @since 0.0.3-beta
  */
 
-import type { LocalLog, OracleLog, RemoteLog } from "../../../core/types";
+import type {
+  LocalLog,
+  OracleLog,
+  RemoteLog,
+  AuditEntry,
+  Audit,
+} from "../../../core/types";
 
 /**
  * Base repository interface for generic data persistence operations.
@@ -164,6 +170,52 @@ export interface IRemoteLogRepository extends IRepository<RemoteLog, string> {
   destroy(): any;
   /** Reset repository to initial state */
   reset(): any;
+}
+
+/**
+ * Repository interface for audit entry persistence.
+ *
+ * Extends the base repository interface to provide specialized operations
+ * for SATP audit trail management and compliance reporting. Enables
+ * timestamp-based audit log retrieval, audit entry creation, and
+ * regulatory compliance verification required for SATP protocol auditing.
+ *
+ * Key capabilities:
+ * - Time-interval based audit log retrieval
+ * - Audit entry creation and persistence
+ * - Compliance reporting and verification
+ * - Database lifecycle management
+ *
+ * @interface IAuditEntryRepository
+ * @extends IRepository<AuditEntry, string>
+ * @since 0.0.3-beta
+ * @example
+ * ```typescript
+ * const auditRepo: IAuditEntryRepository = new KnexAuditEntryRepository(config);
+ *
+ * // Create audit entry
+ * const auditEntry: AuditEntry = {
+ *   auditEntryId: uuidv4(),
+ *   session: localLog,
+ *   timestamp: Date.now()
+ * };
+ * await auditRepo.create(auditEntry);
+ *
+ * // Retrieve audit data for time range
+ * const auditData = await auditRepo.readByTimeInterval(startTime, endTime);
+ * ```
+ */
+export interface IAuditEntryRepository extends IRepository<AuditEntry, string> {
+  readById(auditId: string): Promise<AuditEntry>;
+  readByTimeInterval(
+    startTimestamp: number,
+    endTimestamp: number,
+  ): Promise<Audit>;
+  create(auditEntry: AuditEntry): Promise<AuditEntry>;
+  /** Clean up repository resources and connections */
+  destroy(): Promise<void>;
+  /** Reset repository to initial state */
+  reset(): Promise<void>;
 }
 
 /**

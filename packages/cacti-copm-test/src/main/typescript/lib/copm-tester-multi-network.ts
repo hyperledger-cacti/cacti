@@ -3,7 +3,7 @@ import { DLAccount, DefaultService } from "@hyperledger-cacti/cacti-copm-core";
 import { CopmTester } from "../interfaces/copm-tester";
 import { copmTesterFactory } from "./copm-tester-factory";
 import { TestAssets } from "../interfaces/test-assets";
-import { Logger } from "@hyperledger/cactus-common";
+import { Logger } from "@hyperledger-cacti/cactus-common";
 import { CopmNetworkMode } from "./types";
 
 export class CopmTestertMultiNetwork implements CopmTester {

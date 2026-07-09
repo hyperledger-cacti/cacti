@@ -23,9 +23,6 @@
       "path": "./packages/cactus-plugin-bungee-hermes/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-consortium-manual/tsconfig.json"
-    },
-    {
       "path": "./packages/cacti-plugin-consortium-static/tsconfig.json"
     },
     {
@@ -35,33 +32,13 @@
       "path": "./packages/cactus-plugin-htlc-eth-besu-erc20/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-keychain-aws-sm/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-keychain-azure-kv/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-keychain-google-sm/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-plugin-keychain-memory/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-keychain-memory-wasm/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-keychain-vault/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-ledger-connector-aries/tsconfig.json"
     },
     {
       "path": "./packages/cactus-plugin-ledger-connector-besu/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-ledger-connector-polkadot/tsconfig.json"
-    },
-    {
+
       "path": "./packages/cactus-plugin-ledger-connector-corda/tsconfig.json"
     },
     {
@@ -72,12 +49,7 @@
     },
     {
       "path": "./packages/cactus-plugin-ledger-connector-fabric/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-ledger-connector-cdl/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-plugin-ledger-connector-xdai/tsconfig.json"
+
     },
     {
       "path": "./packages/cactus-verifier-client/tsconfig.json"
@@ -95,16 +67,10 @@
       "path": "./packages/cactus-test-geth-ledger/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-test-plugin-consortium-manual/tsconfig.json"
-    },
-    {
       "path": "./packages/cactus-test-plugin-htlc-eth-besu/tsconfig.json"
     },
     {
       "path": "./packages/cactus-test-plugin-htlc-eth-besu-erc20/tsconfig.json"
-    },
-    {
-      "path": "./packages/cactus-test-plugin-keychain-memory/tsconfig.json"
     },
     {
       "path": "./packages/cactus-test-plugin-ledger-connector-besu/tsconfig.json"
@@ -113,16 +79,16 @@
       "path": "./packages/cactus-test-plugin-ledger-connector-ethereum/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-plugin-ledger-connector-sawtooth/tsconfig.json"
-    },
-    {
       "path": "./packages/cacti-copm-core/tsconfig.json"
     },
     {
       "path": "./weaver/common/protos-js/tsconfig.json"
     },
     {
-      "path" : "weaver/sdks/fabric/interoperation-node-sdk/tsconfig.cacti.json"
+      "path" : "weaver/sdks/fabric/interoperation-node-sdk/tsconfig.json"
+    },
+    {
+      "path" : "weaver/sdks/besu/node/tsconfig.json"
     },
     {
       "path": "./packages/cacti-plugin-copm-fabric/tsconfig.json"
@@ -150,24 +116,6 @@
     },
     {
       "path": "./examples/cactus-example-carbon-accounting-frontend/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-supply-chain-backend/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-supply-chain-business-logic-plugin/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-supply-chain-frontend/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-electricity-trade/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-discounted-asset-trade/tsconfig.json"
-    },
-    {
-      "path": "./examples/cactus-example-discounted-asset-trade-client/tsconfig.json"
     },
     {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"

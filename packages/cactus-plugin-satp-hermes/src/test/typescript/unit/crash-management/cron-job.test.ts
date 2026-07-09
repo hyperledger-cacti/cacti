@@ -4,7 +4,7 @@ import {
   Secp256k1Keys,
   JsObjectSigner,
   IJsObjectSignerOptions,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { ICrashRecoveryManagerOptions } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   GatewayIdentity,
@@ -41,7 +41,7 @@ import { LocalLog } from "../../../../main/typescript/core/types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import knex, { Knex } from "knex";
 import { Type } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import path from "path";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
@@ -191,6 +191,8 @@ afterAll(async () => {
   monitorService.shutdown();
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("CrashManager Tests", () => {
   it("Default config test", async () => {
     const mock = jest

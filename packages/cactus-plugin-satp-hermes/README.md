@@ -32,6 +32,7 @@ The plugin supports both bidirectional and unidirectional asset transfers with t
 - [Containerization](#containerization)
 - [Running local Gateway with Docker Compose](#running-local-gateway-with-docker-compose)
 - [Contributing](#contributing)
+- [Release Process](#release-process)
 - [License](#license)
 
 ## Assumptions
@@ -505,6 +506,33 @@ Ethereum-compatible networks use Web3 signing credentials and contract addresses
 }
 ```
 
+#### OpenTelemetry (Metrics, Traces, Logs)
+
+The gateway exports metrics, traces, and logs over OTLP/HTTP through its
+`MonitorService`. Telemetry is **opt-in**:
+- The `enabled` option is set to `true` when creating the gateway/monitor, or
+- An `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable is set 
+
+Exporter endpoints are resolved as follows:
+
+- If `OTEL_EXPORTER_OTLP_ENDPOINT` is set, the per-signal URLs are derived from
+  it (`/v1/metrics`, `/v1/traces`, `/v1/logs`).
+- Explicit `otelMetricsExporterUrl` / `otelTracesExporterUrl` /
+  `otelLogsExporterUrl` options take precedence over the environment variable.
+- If nothing is configured, the exporter endpoints are left **undefined** —
+  there is no implicit `http://localhost:4318` fallback.
+
+When telemetry **is** enabled but initialization fails (for example, a
+configured collector is unreachable), the gateway surfaces the error instead of
+silently continuing. A collector that was explicitly configured but cannot be
+reached is treated as a real misconfiguration that the operator should fix.
+
+```bash
+# Enable telemetry by pointing the gateway at a collector
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://otel-collector:4318"
+```
+
+
 ### Performance Configuration Choices
 
 #### Standard Performance
@@ -741,9 +769,13 @@ For the complete schema, refer to [src/main/typescript/adapters/adapter-config.t
 
 ### Getting Started (Adapter Layer)
 
-- **Testing Guide**: [src/examples/docker-adapter-testing.md](src/examples/docker-adapter-testing.md)
-- **Test Runner (Makefile)**: [src/examples/docker-adapter-test.mk](src/examples/docker-adapter-test.mk)
-- **Example Configuration**: [src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml](src/examples/config/adapter/satp-gateway1-simple-deployed-adapter.adapter-config.yml)
+Runnable adapter-layer demos and end-to-end walkthrough material now live in the
+[hyperledger-cacti/cacti-demos](https://github.com/hyperledger-cacti/cacti-demos)
+repository so this package can stay focused on the SATP Hermes implementation.
+
+- **Demo Repository**:
+  [hyperledger-cacti/cacti-demos](https://github.com/hyperledger-cacti/cacti-demos)
+- **Package Fixtures**: `src/test/yaml/fixtures/`
 
 ### Adapter Layer Overview
 
@@ -988,10 +1020,12 @@ docker-compose -f docker-compose-satp.yml ps
 ## Contributing
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always interesting challenges!
 
-Please review [CONTRIBUTING.md](https://github.com/hyperledger/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
+Please review [CONTRIBUTING.md](https://github.com/hyperledger-cacti/cacti/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
 
-## Release process
-TBD. For each release, a commit in the form: "chore(satp-hermes): version X release" will be made.
+## Release Process
+
+See [docs/satp-release-process.md](docs/satp-release-process.md) for the full release process, including the dev and production build types and the release checklist.
+
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.

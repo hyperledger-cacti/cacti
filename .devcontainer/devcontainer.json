@@ -38,11 +38,11 @@
 			"profile": "complete"
 		},
 		"ghcr.io/devcontainers-extra/features/curl-apt-get:1": {},
-		"ghcr.io/devcontainers-extra/features/protoc:1": {
-			"version": "v3.20.3"
+		"ghcr.io/devcontainers-extra/features/apt-packages:1": {
+			"packages": "protobuf-compiler"
 		},
 		"ghcr.io/dhoeric/features/trivy:1.0.0": {
-			"version": "0.61.0"
+			"version": "0.70.0"
 		}
 	},
 	"customizations": {
@@ -75,7 +75,10 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "echo \"source /usr/share/bash-completion/completions/git\" >> ~/.bashrc"
+	"postCreateCommand": "echo \"source /usr/share/bash-completion/completions/git\" >> ~/.bashrc",
+	"remoteEnv": {
+    	"YARN_NM_MODE": "classic"
+	}
 
 	// Configure tool-specific properties.
 	// "customizations": {},

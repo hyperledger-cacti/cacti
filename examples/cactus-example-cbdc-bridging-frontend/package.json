@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger/cacti-example-cbdc-bridging-frontend",
-  "version": "2.1.0",
+  "name": "@hyperledger-cacti/cacti-example-cbdc-bridging-frontend",
+  "version": "3.0.0-beta.1",
   "description": "Frontend for CBDC sample application.",
   "keywords": [
     "Hyperledger",
@@ -64,7 +64,7 @@
   "dependencies": {
     "@emotion/react": "11.11.1",
     "@emotion/styled": "11.11.0",
-    "@hyperledger/cactus-example-cbdc-bridging-backend": "2.1.0",
+    "@hyperledger-cacti/cactus-example-cbdc-bridging-backend": "3.0.0-beta.1",
     "@mui/icons-material": "6.1.1",
     "@mui/material": "6.1.1",
     "@testing-library/jest-dom": "5.17.0",
@@ -75,7 +75,7 @@
     "@types/node": "18.11.9",
     "@types/react": "18.2.39",
     "@types/react-dom": "18.2.17",
-    "axios": "1.15.0",
+    "axios": "1.16.0",
     "copy-webpack-plugin": "12.0.2",
     "css-loader": "7.1.2",
     "html-webpack-plugin": "5.6.0",
@@ -86,10 +86,10 @@
     "style-loader": "4.0.0",
     "ts-node": "10.9.2",
     "typescript": "5.6.2",
-    "uuid": "10.0.0",
+    "uuid": "11.1.1",
     "webpack": "5.104.1",
     "webpack-cli": "5.1.4",
-    "webpack-dev-server": "5.1.0"
+    "webpack-dev-server": "5.2.5"
   },
   "devDependencies": {
     "@types/customize-cra": "1",

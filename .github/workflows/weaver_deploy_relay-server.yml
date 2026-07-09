@@ -25,19 +25,49 @@ jobs:
 
       steps:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-        - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
         - name: Install RUST Toolchain minimal stable with clippy and rustfmt
-          uses: actions-rs/toolchain@b2417cde72dcf67f306c0ae8e0828a81bf0b189f #v1.0.6
+          uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af #v1.0.7
           with:
             profile: minimal
             toolchain: stable
             components: rustfmt, clippy
             
+        - name: Read crate version from Cargo.toml
+          id: version
+          run: |
+            VER=$(grep -m1 '^version' Cargo.toml | sed -E 's/version *= *"([^"]+)".*/\1/')
+            echo "version=$VER" >> $GITHUB_OUTPUT
+            echo "Crate version: $VER"
+          working-directory: weaver/common/protos-rs/pkg
+
+        - name: Check if already published on crates.io
+          id: check
+          run: |
+            NAME=cacti_weaver_protos_rs
+            VER='${{ steps.version.outputs.version }}'
+            # crates.io rejects requests without a User-Agent (returns 403).
+            HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+              -A "cacti-ci (https://github.com/${{ github.repository }})" \
+              "https://crates.io/api/v1/crates/$NAME/$VER")
+            echo "GET https://crates.io/api/v1/crates/$NAME/$VER -> $HTTP"
+            if [ "$HTTP" = "200" ]; then
+              echo "$NAME@$VER already on crates.io — skipping publish"
+              echo "skip=true" >> $GITHUB_OUTPUT
+            elif [ "$HTTP" = "404" ]; then
+              echo "$NAME@$VER not yet published — will publish"
+              echo "skip=false" >> $GITHUB_OUTPUT
+            else
+              echo "Unexpected HTTP $HTTP from crates.io — failing fast"
+              exit 1
+            fi
+
         - name: Publish
-          run: cargo publish --token ${CRATES_TOKEN}
+          if: steps.check.outputs.skip != 'true'
+          run: cargo publish
           env:
-            CRATES_TOKEN: ${{ secrets.CARGO_CRATES_IO_TOKEN }}
+            CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_CRATES_IO_TOKEN }}
           working-directory: weaver/common/protos-rs/pkg
     
   publish-relay-image:
@@ -49,10 +79,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a #v2.1.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 #v4.4.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -60,9 +90,9 @@ jobs:
           
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION

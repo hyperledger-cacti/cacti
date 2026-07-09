@@ -41,10 +41,5 @@ sudo find ~/.afj/data/wallet/ -iname '*cacti*' -exec rm -fr {} \;
 
 ## Test
 
-### cactus-example-discounted-asset-trade-client
-- `cactus-example-discounted-asset-trade-client` can be used to quickly check if this ledger is working correctly.
-- Use `setup-credentials` from that package to register, issue and proof employment credential between `Issuer` and `Alice` agents.
-- Run `cactus-example-discounted-asset-trade` for complete example scenario.
-
 ### Typescript Setup Class
 - There's no typescript setup class yet (TODO)

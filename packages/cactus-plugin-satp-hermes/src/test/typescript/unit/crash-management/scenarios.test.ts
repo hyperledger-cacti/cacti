@@ -4,7 +4,7 @@ import {
   Secp256k1Keys,
   JsObjectSigner,
   type IJsObjectSignerOptions,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import { CrashStatus } from "../../../../main/typescript/core/types";
 import type { ICrashRecoveryManagerOptions } from "../../../../main/typescript/services/gateway/crash-manager";
@@ -195,6 +195,8 @@ afterAll(async () => {
   monitorService.shutdown();
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("CrashManager Tests", () => {
   it("should reconstruct session by fetching logs", async () => {
     mockSession = createMockSession("1000", "3");

@@ -18,7 +18,7 @@ import {
   type IJsObjectSignerOptions,
   LogLevelDesc,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { type SATPLogger as Logger } from "./core/satp-logger";
 import { SATPLoggerProvider as LoggerProvider } from "./core/satp-logger-provider";
@@ -57,9 +57,13 @@ import { bufArray2HexStr } from "./utils/gateway-utils";
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
+  IAuditEntryRepository,
+  IOracleLogRepository,
 } from "./database/repository/interfaces/repository";
 import { KnexRemoteLogRepository as RemoteLogRepository } from "./database/repository/knex-remote-log-repository";
 import { KnexLocalLogRepository as LocalLogRepository } from "./database/repository/knex-local-log-repository";
+import { KnexAuditEntryRepository as AuditEntryRepository } from "./database/repository/knex-audit-repository";
+import { KnexOracleLogRepository as OracleLogRepository } from "./database/repository/knex-oracle-log-repository";
 import { BLODispatcher, type BLODispatcherOptions } from "./api1/dispatcher";
 import { type JsonObject } from "swagger-ui-express";
 import type {
@@ -67,8 +71,8 @@ import type {
   ICactusPlugin,
   IWebServiceEndpoint,
   ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   ICrossChainMechanismsOptions,
   type ISATPCrossChainManagerOptions,
@@ -79,25 +83,27 @@ import {
   type ICrashRecoveryManagerOptions,
 } from "./services/gateway/crash-manager";
 import { OraclePersistence } from "./database/oracle-persistence";
-import { KnexOracleLogRepository } from "./database/repository/knex-oracle-log-repository";
-
 import * as OAS from "../json/oapi-api1-bundled.json";
-import { knexLocalInstance } from "./database/knexfile";
+import {
+  knexLocalInstance,
+  createOracleLogKnexConfig,
+} from "./database/knexfile";
+import { knexAuditInstance } from "./database/knexfile-audit";
 import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
 import { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
 import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
-import { ISignerKeyPair } from "@hyperledger/cactus-common";
-import { IPrivacyPolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
-import { IMergePolicyValue } from "@hyperledger/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
+import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
+import { IPrivacyPolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
+import { IMergePolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
 import knex, { Knex } from "knex";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { NetworkId } from "./public-api";
 import {
   ApiServer,
   AuthorizationProtocol,
   ConfigService,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
 import { createMigrationSource } from "./database/knex-migration-source";
 import { ExtensionsManager } from "./extensions/extensions-manager";
@@ -283,6 +289,30 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
    * @see {@link RemoteLogRepository} for remote persistence implementation
    */
   remoteRepository?: Knex.Config;
+
+  /**
+   * Local database configuration for audit entry persistence.
+   * @description
+   * Knex.js configuration for local database persistence of SATP session data,
+   * transaction logs, and recovery checkpoints. Essential for crash recovery
+   * and maintaining gateway state across restarts.
+   *
+   * @see {@link Knex.Config} for database configuration options
+   * @see {@link AuditEntryRepository} for local persistence implementation
+   */
+  auditRepository?: Knex.Config;
+
+  /**
+   * Local database configuration for oracle log persistence.
+   * @description
+   * Knex.js configuration for local database persistence of oracle logs used in
+   * SATP protocol operations. Supports logging of oracle interactions and
+   * evidence generation for cross-chain asset transfers.
+   *
+   * @see {@link Knex.Config} for database configuration options
+   * @see {@link OracleLogRepository} for oracle log persistence implementation
+   */
+  oracleLogRepository?: Knex.Config;
 
   /**
    * Enable crash recovery mechanisms.
@@ -504,6 +534,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   public claimFormat?: ClaimFormat;
   public localRepository?: ILocalLogRepository;
   public remoteRepository?: IRemoteLogRepository;
+  public auditRepository: IAuditEntryRepository;
+  public oracleLogRepository!: IOracleLogRepository;
   private readonly shutdownHooks: ShutdownHook[];
   private crashManager?: CrashManager;
   private readonly monitorService: MonitorService;
@@ -618,6 +650,30 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       this.logger.info("Remote repository is not defined");
     }
 
+    if (this.config.auditRepository) {
+      this.auditRepository = new AuditEntryRepository(
+        this.config.auditRepository,
+      );
+    } else {
+      this.logger.info("Audit entries repository is not defined");
+      this.config.auditRepository = knexAuditInstance.default;
+      this.auditRepository = new AuditEntryRepository(
+        this.config.auditRepository,
+      );
+    }
+    if (this.config.oracleLogRepository) {
+      this.oracleLogRepository = new OracleLogRepository(
+        this.config.oracleLogRepository,
+      );
+    } else {
+      this.logger.info(
+        "Oracle log repository is not defined. Setting up default config...",
+      );
+      this.oracleLogRepository = new OracleLogRepository(
+        createOracleLogKnexConfig(this.instanceId),
+      );
+    }
+
     if (this.config.keyPair === undefined) {
       throw new Error("Key pair is undefined");
     }
@@ -684,9 +740,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           throw new Error("GatewayIdentity is not defined");
         }
 
-        const oracleLogRepository = new KnexOracleLogRepository(undefined);
         const oracleDbLogger = new OraclePersistence({
-          oracleLogRepository,
+          oracleLogRepository: this.oracleLogRepository,
           logLevel: this.config.logLevel,
           monitorService: this.monitorService,
         });
@@ -734,6 +789,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           pubKey: this.pubKey,
           localRepository: this.localRepository,
           remoteRepository: this.remoteRepository,
+          auditRepository: this.auditRepository,
           claimFormat: this.claimFormat,
           monitorService: this.monitorService,
           adapterManager: this.adapterManager,
@@ -781,7 +837,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-plugin-satp-hermes";
+    return "@hyperledger-cacti/cactus-plugin-satp-hermes";
   }
 
   public async onPluginInit(): Promise<undefined> {
@@ -1073,10 +1129,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     await context.with(this.initialSpanContext.context, async () => {
       try {
-        await Promise.all([
-          this.createDBRepository(),
-          this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!),
-        ]);
+        await this.createDBRepository();
+        await this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!);
 
         // start everything before starting the GOL server
         await this.startupGOLServer();
@@ -1213,6 +1267,10 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         });
 
         await database.migrate.latest();
+        await this.oracleLogRepository.database.migrate.latest();
+        await (
+          this.auditRepository as AuditEntryRepository
+        ).database.migrate.latest();
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
@@ -1464,10 +1522,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.info(`Closed ${connectionsClosed} connections`);
         this.logger.info("Gateway Coordinator shut down");
 
+        this.logger.debug("Shutting down audit repository");
+        await this.auditRepository?.destroy();
+
         if (this.monitorService) {
           this.logger.debug("Shutting down monitor service");
           await this.monitorService.shutdown();
         }
+
         return;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });

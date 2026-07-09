@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
+
+### Bug Fixes
+
+* renaming JS/TS package namespaces ([ed4e680](https://github.com/hyperledger-cacti/cacti/commit/ed4e680f2c0d44ffad4e55d88118e7e042d257d0))
+
+### Features
+
+* **persistence-ethereum:** added support for erc1155 ([#3901](https://github.com/hyperledger-cacti/cacti/issues/3901)) ([cf20a6a](https://github.com/hyperledger-cacti/cacti/commit/cf20a6aad1d7b9c1e1b7b923854ceaaf146b7f00))
+
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 
 **Note:** Version bump only for package @hyperledger/cactus-plugin-persistence-ethereum

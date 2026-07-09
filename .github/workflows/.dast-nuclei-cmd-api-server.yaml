@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:        
       - name: Set up NodeJS ${{ env.NODEJS_VERSION }}
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b #v4.0.3
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
         with:
           node-version: ${{ env.NODEJS_VERSION }}
 
@@ -25,12 +25,12 @@ jobs:
       - name: Verify jq
         run: jq --version
 
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
 
-      - uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
         with:
           go-version: 1.23
 
@@ -47,24 +47,21 @@ jobs:
           echo https://localhost:4000/ > urls.txt
           {
           echo https://localhost:4000/api/v1/api-server/healthcheck
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/node/jws
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/consortium/jws
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-consortium-manual/get-prometheus-exporter-metrics
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/deploy-contract
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-balance
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-block
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-transaction
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-past-logs
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/invoke-contract
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/sign-transaction
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
-          echo https://localhost:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-besu-record
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract-go-source
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/deploy-contract-solidity-bytecode
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-balance
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-block
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/run-transaction
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-transaction
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-past-logs
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/invoke-contract
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/sign-transaction
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
+          echo https://localhost:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-besu-record
           } >> urls.txt
 
       - run: yarn generate-api-server-config
@@ -73,17 +70,17 @@ jobs:
       - run: jq 'del(.plugins[0,1])' .config.json > .config2.json && mv .config2.json .config.json
 
       - name: Install Keychain manual plugin into the API server
-        run: jq '.plugins += [{ "packageName":"@hyperledger/cactus-plugin-keychain-memory","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-keychain-memory/","instanceId":"0daacd05-d1cd-4eab-9332-4ad1aff4b909","keychainId":"d29d728e-eaa0-4e2d-b187-d132242b0d9a"}}]' .config.json > .config2.json && mv .config2.json .config.json
+        run: jq '.plugins += [{ "packageName":"@hyperledger-cacti/cactus-plugin-keychain-memory","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-keychain-memory/","instanceId":"0daacd05-d1cd-4eab-9332-4ad1aff4b909","keychainId":"d29d728e-eaa0-4e2d-b187-d132242b0d9a"}}]' .config.json > .config2.json && mv .config2.json .config.json
 
       - name: Install Fabric connector into the API server
-        run: jq '.plugins += [{ "packageName":"@hyperledger/cactus-plugin-ledger-connector-fabric", "type":"org.hyperledger.cactus.plugin_import_type.LOCAL", "action":"org.hyperledger.cactus.plugin_import_action.INSTALL",  "options":{ "packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-ledger-connector-fabric/", "instanceId":"some-unique-fabric-connector-instance-id", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile":"{}", "dockerBinary":"usr/local/bin/docker","cliContainerEnv":{"CORE_PEER_LOCALMSPID":"Org1MSP","CORE_PEER_ADDRESS":"peer0.org1.example.com:7051","CORE_PEER_MSPCONFIGPATH":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp","CORE_PEER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt","ORDERER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"},"discoveryOptions":{"enabled":true,"asLocalhost":true}}}] ' .config.json > .config2.json && mv .config2.json .config.json
+        run: jq '.plugins += [{ "packageName":"@hyperledger-cacti/cactus-plugin-ledger-connector-fabric", "type":"org.hyperledger.cactus.plugin_import_type.LOCAL", "action":"org.hyperledger.cactus.plugin_import_action.INSTALL",  "options":{ "packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-ledger-connector-fabric/", "instanceId":"some-unique-fabric-connector-instance-id", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile":"{}", "dockerBinary":"usr/local/bin/docker","cliContainerEnv":{"CORE_PEER_LOCALMSPID":"Org1MSP","CORE_PEER_ADDRESS":"peer0.org1.example.com:7051","CORE_PEER_MSPCONFIGPATH":"/opt/gopath/src/github.com/hyperledger-cacti/fabric/peer/crypto/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp","CORE_PEER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger-cacti/fabric/peer/crypto/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt","ORDERER_TLS_ROOTCERT_FILE":"/opt/gopath/src/github.com/hyperledger-cacti/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem"},"discoveryOptions":{"enabled":true,"asLocalhost":true}}}] ' .config.json > .config2.json && mv .config2.json .config.json
 
       - name: Install Besu connector into the API server
-        run: jq '.plugins += [{"packageName":"@hyperledger/cactus-plugin-ledger-connector-besu","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-ledger-connector-besu/", "rpcApiHttpHost":"http://127.0.0.1:8545", "rpcApiWsHost":"ws://127.0.0.1:8546", "instanceId":"some-unique-besu-connector-instance-id"}}]' .config.json > .config2.json && mv .config2.json .config.json
+        run: jq '.plugins += [{"packageName":"@hyperledger-cacti/cactus-plugin-ledger-connector-besu","type":"org.hyperledger.cactus.plugin_import_type.LOCAL","action":"org.hyperledger.cactus.plugin_import_action.INSTALL","options":{"packageSrc":"/home/runner/work/cacti/cacti/packages/cactus-plugin-ledger-connector-besu/", "rpcApiHttpHost":"http://127.0.0.1:8545", "rpcApiWsHost":"ws://127.0.0.1:8546", "instanceId":"some-unique-besu-connector-instance-id"}}]' .config.json > .config2.json && mv .config2.json .config.json
 
       - name: Run Besu all-in-one image
         run: |
-          docker run -d -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger/cactus-besu-all-in-one:v2.0.0-rc.7
+          docker run -d -p 0.0.0.0:8545:8545/tcp  -p 0.0.0.0:8546:8546/tcp  -p 0.0.0.0:8888:8888/tcp  -p 0.0.0.0:9001:9001/tcp  -p 0.0.0.0:9545:9545/tcp ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
           until curl --fail -X POST --data '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' localhost:8545; do sleep 5;  done
 
       - name: Print API Server Config File - ./.config.json
@@ -121,7 +118,7 @@ jobs:
           echo "dast_jwt=$JWT" >> "$GITHUB_ENV"
 
       - name: Start API Server & Run DAST
-        uses: BerniWittmann/background-server-action@4cd0c67a97c1d490dd4ac7e303a528ce56394e29 #v1.1.0
+        uses: BerniWittmann/background-server-action@fbfaacbe6c290e043ac0cc66c429d22f6eed87e2 #v1.1.1
         env:
           # Needed because the wait-on syntax otherwise keeps thinking that
           # there is a problem due to our self signed certificates on the
@@ -141,7 +138,7 @@ jobs:
         run: "nuclei -list=urls.txt -dast -severity=high,critical -sarif-export ~/nuclei.sarif -output=nuclei.log"
 
       - name: GitHub Workflow artifacts
-        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 #v4.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: nuclei.log
           path: nuclei.log

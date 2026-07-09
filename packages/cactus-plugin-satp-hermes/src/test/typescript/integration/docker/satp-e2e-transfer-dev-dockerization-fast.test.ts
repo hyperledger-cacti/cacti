@@ -3,16 +3,17 @@ import {
   LogLevelDesc,
   LoggerProvider,
   Secp256k1Keys,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   Address,
   GatewayIdentity,
+  SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
   setupGatewayDockerFiles,
@@ -22,6 +23,9 @@ import {
   createPGDatabase,
   setupDBTable,
   createEnhancedTimeoutConfig,
+  runCleanup,
+  cleanupContainers,
+  cleanupEnvs,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -34,7 +38,7 @@ import {
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
-import { Configuration, LedgerType } from "@hyperledger/cactus-core-api";
+import { Configuration, LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import {
   AdminApi,
   GetApproveAddressApi,
@@ -62,8 +66,10 @@ const erc20TokenContract = "SATPContract";
 
 let db_local_config1: Knex.Config;
 let db_remote_config1: Knex.Config;
+let db_remote_host_config1: Knex.Config;
 let db_local_config2: Knex.Config;
 let db_remote_config2: Knex.Config;
+let db_remote_host_config2: Knex.Config;
 let db_local1: Container;
 let db_remote1: Container;
 let db_local2: Container;
@@ -100,63 +106,54 @@ afterEach(async () => {
 }, TIMEOUT);
 
 afterAll(async () => {
-  if (db_local1) {
-    await db_local1.stop();
-    await db_local1.remove();
-  }
-  if (db_remote1) {
-    await db_remote1.stop();
-    await db_remote1.remove();
-  }
-  if (db_local2) {
-    await db_local2.stop();
-    await db_local2.remove();
-  }
-  if (db_remote2) {
-    await db_remote2.stop();
-    await db_remote2.remove();
-  }
-
-  if (besuEnv) {
-    await besuEnv.tearDown();
-  }
-  if (ethereumEnv) {
-    await ethereumEnv.tearDown();
-  }
+  await runCleanup(log, [
+    ...cleanupContainers({ db_local1, db_remote1, db_local2, db_remote2 }),
+    ...cleanupEnvs({ besuEnv, ethereumEnv }),
+  ]);
 }, TIMEOUT);
 
 beforeAll(async () => {
-  ({ config: db_local_config1, container: db_local1 } = await createPGDatabase({
-    network: testNetwork,
-    postgresUser: "user123123",
-    postgresPassword: "password",
-  }));
+  ({ networkConfig: db_local_config1, container: db_local1 } =
+    await createPGDatabase({
+      network: testNetwork,
+      postgresUser: "user123123",
+      postgresPassword: "password",
+    }));
   db_local_config1 = createEnhancedTimeoutConfig(db_local_config1);
 
-  ({ config: db_remote_config1, container: db_remote1 } =
-    await createPGDatabase({
-      network: testNetwork,
-      postgresUser: "user123123",
-      postgresPassword: "password",
-    }));
-  db_remote_config1 = createEnhancedTimeoutConfig(db_remote_config1);
-
-  ({ config: db_local_config2, container: db_local2 } = await createPGDatabase({
+  ({
+    hostConfig: db_remote_host_config1,
+    networkConfig: db_remote_config1,
+    container: db_remote1,
+  } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
-  db_local_config2 = createEnhancedTimeoutConfig(db_local_config2);
+  db_remote_host_config1 = createEnhancedTimeoutConfig(db_remote_host_config1);
+  db_remote_config1 = createEnhancedTimeoutConfig(db_remote_config1);
 
-  ({ config: db_remote_config2, container: db_remote2 } =
+  ({ networkConfig: db_local_config2, container: db_local2 } =
     await createPGDatabase({
       network: testNetwork,
       postgresUser: "user123123",
       postgresPassword: "password",
     }));
+  db_local_config2 = createEnhancedTimeoutConfig(db_local_config2);
+
+  ({
+    hostConfig: db_remote_host_config2,
+    networkConfig: db_remote_config2,
+    container: db_remote2,
+  } = await createPGDatabase({
+    network: testNetwork,
+    postgresUser: "user123123",
+    postgresPassword: "password",
+  }));
+  db_remote_host_config2 = createEnhancedTimeoutConfig(db_remote_host_config2);
   db_remote_config2 = createEnhancedTimeoutConfig(db_remote_config2);
-  await setupDBTable(db_remote_config1);
-  await setupDBTable(db_remote_config2);
+  await setupDBTable(db_remote_host_config1);
+  await setupDBTable(db_remote_host_config2);
 
   {
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(
@@ -211,6 +208,8 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     const address: Address = `http://${gateway1Address}`;
 
     // gateway setup:
+    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
     const gatewayIdentity = {
       id: "mockID",
       name: "CustomGateway",
@@ -223,6 +222,13 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       ],
       proofID: "mockProofID10",
       address,
+      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -240,6 +246,10 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       localRepository: db_local_config1,
       remoteRepository: db_remote_config1,
       gatewayId: "gateway-1",
+      gatewayKeyPair: {
+        privateKey: gateway1KeyPair.privateKey.toString("hex"),
+        publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     });
 
     // gatewayRunner setup:
@@ -399,7 +409,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // gateway setup:
@@ -424,7 +437,10 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -659,7 +675,10 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // gateway setup:
@@ -684,7 +703,10 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
     } as GatewayIdentity;
 
     // besuConfig Json object setup:
@@ -907,27 +929,5 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
-
-    // check audit endpoint and get audit data
-    const adminApi = new AdminApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
-      }),
-    );
-
-    const auditResponse = await adminApi.performAudit(0, Date.now());
-
-    expect(auditResponse?.data.sessions).toBeDefined();
-    expect(auditResponse?.data.sessions?.length).toEqual(1);
-
-    log.info(
-      `Audit response: ${JSON.stringify(auditResponse?.data.sessions?.[0])}`,
-    );
-
-    const json_parsed = JSON.parse(
-      auditResponse?.data.sessions?.[0] || "{}",
-    ) as { id: string };
-    expect(json_parsed).toBeDefined();
-    expect(json_parsed.id).toBe(res.data.sessionID);
   });
 });

@@ -1,0 +1,64 @@
+name: Feature request
+description: Suggest an idea or enhancement for Hyperledger Cacti
+labels: ["enhancement", "Triage_Needed"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please search
+        [existing issues](https://github.com/hyperledger-cacti/cacti/issues)
+        first to avoid duplicates. A maintainer will triage this and add
+        the `Triage_Ready` label when the design is confirmed and ready to
+        work on.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: >
+        What problem are you trying to solve? Describe the use case, not just
+        the solution you have in mind.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How would you like it to work?
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches or workarounds you have considered.
+    validations:
+      required: false
+  - type: dropdown
+    id: packages
+    attributes:
+      label: Affected package(s)
+      description: Select all packages most relevant to this request.
+      multiple: true
+      options:
+        - cactus-plugin-ledger-connector-besu
+        - cactus-plugin-ledger-connector-ethereum
+        - cactus-plugin-ledger-connector-fabric
+        - cactus-plugin-ledger-connector-corda
+        - cactus-plugin-satp-hermes
+        - cactus-cmd-api-server
+        - cactus-core / cactus-core-api
+        - cactus-verifier-client
+        - weaver
+        - new package / cross-cutting
+        - other / not sure
+    validations:
+      required: false
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: >
+        Add any other context, screenshots, or links about the feature request
+        here.
+    validations:
+      required: false
