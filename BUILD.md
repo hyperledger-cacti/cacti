@@ -45,11 +45,11 @@ The `npm run watch` script in action:
 
 ## Getting Started
 
-### 🐳 Dev Container Quickstart (Recommended)
+### Dev Container Quickstart (Recommended)
 
 A Dev Container is a pre-configured Docker-based development environment that automatically installs all required tools (Node.js, Yarn, Go, Rust, etc.). This avoids manual setup and ensures consistency across contributors.
 
-#### 🔧 Prerequisites
+#### Prerequisites
 
 Before starting, install:
 
@@ -58,7 +58,7 @@ Before starting, install:
 * [Docker Desktop](https://www.docker.com/) (must be running)
 * [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension for VS Code
 
-#### 🚀 Step-by-Step Setup
+#### Step-by-Step Setup
 
 **1. Clone the repository**
 ```bash
@@ -86,7 +86,7 @@ VS Code will:
 
 This may take several minutes.
 
-#### ⚠️ Known Issue (Important for New Contributors)
+#### Known Issue (Important for New Contributors)
 
 During testing, the DevContainer setup may fail due to a Go version mismatch:
 * Current container installs Go 1.20.x
@@ -94,7 +94,7 @@ During testing, the DevContainer setup may fail due to a Go version mismatch:
 
 This can cause container build failure.
 
-#### ✅ Workaround
+#### Workaround
 
 If DevContainer fails, run the project locally instead:
 ```bash
@@ -102,7 +102,7 @@ npm install -g yarn
 yarn install
 ```
 
-💡 **Tip:** If you're new to open source, running locally is often faster and simpler than debugging container issues.
+**Tip:** If you're new to open source, running locally is often faster and simpler than debugging container issues.
     
 ### MacOS 
 
