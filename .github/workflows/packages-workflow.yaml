@@ -22,6 +22,14 @@ concurrency:
   group: packages-workflows-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Dispatcher only; pass-through cap for the package workflows below.
+# Must include `contents: write` because connector-packages and core-packages
+# each have one benchmark job that pushes to gh-pages on main.
+permissions:
+  contents: write
+  actions: read
+  checks: write
+
 jobs:
   core-packages:
     uses: ./.github/workflows/core-packages-workflow.yaml

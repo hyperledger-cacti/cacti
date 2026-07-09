@@ -5,37 +5,31 @@ import { Server as SecureServer } from "https";
 import { v4 as uuidv4 } from "uuid";
 import exitHook, { IAsyncExitHookDoneCallback } from "async-exit-hook";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   LogLevelDesc,
   Logger,
   LoggerProvider,
   Servers,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   ApiServer,
   ConfigService,
   Configuration,
   ICactusApiServerOptions,
-} from "@hyperledger/cactus-cmd-api-server";
+} from "@hyperledger-cacti/cactus-cmd-api-server";
 
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
 import {
   PluginLedgerConnectorFabric,
   DefaultApi as FabricApi,
   DefaultEventHandlerStrategy,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
-import { CarbonAccountingPlugin } from "@hyperledger/cactus-example-carbon-accounting-business-logic-plugin";
-
-import {
-  PluginLedgerConnectorXdai,
-  DefaultApi as XdaiApi,
-  Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
+import { CarbonAccountingPlugin } from "@hyperledger-cacti/cactus-example-carbon-accounting-business-logic-plugin";
 
 import { CarbonAccountingAppDummyInfrastructure } from "./infrastructure/carbon-accounting-app-dummy-infrastructure";
 
@@ -99,8 +93,6 @@ export class CarbonAccountingApp {
     await this.ledgers.start();
     this.onShutdown(() => this.ledgers.stop());
 
-    const xdaiAccount = await this.ledgers.xdai.createEthTestAccount();
-
     const connectionProfile =
       await this.ledgers.fabric.getConnectionProfileOrg1();
     const enrollAdminOut = await this.ledgers.fabric.enrollAdmin();
@@ -129,13 +121,9 @@ export class CarbonAccountingApp {
 
     const config = new Configuration({ basePath: nodeApiHost });
 
-    const xdaiApiClient = new XdaiApi(config);
     const fabricApiClient = new FabricApi(config);
 
     this.log.info(`Configuring Cactus Node for Ledger A...`);
-    const rpcApiHostA = await this.ledgers.xdai.getRpcApiHttpHost();
-
-    await this.keychain.set(xdaiAccount.address, xdaiAccount.privateKey);
 
     const pluginRegistry = new PluginRegistry({ plugins: [this.keychain] });
 
@@ -155,18 +143,6 @@ export class CarbonAccountingApp {
       dockerNetworkName: this.ledgers.fabric.getNetworkName(),
     });
 
-    const xdaiPlugin = new PluginLedgerConnectorXdai({
-      instanceId: "PluginLedgerConnectorBesu_A",
-      rpcApiHttpHost: rpcApiHostA,
-      pluginRegistry: pluginRegistry,
-      logLevel: this.options.logLevel || "INFO",
-    });
-
-    const xdaiContracts = await this.ledgers.deployXdaiContracts(
-      xdaiPlugin,
-      this.keychain,
-    );
-
     const fabricContracts = await this.ledgers.deployFabricContracts(
       this.keychain,
       fabricPlugin,
@@ -174,22 +150,14 @@ export class CarbonAccountingApp {
 
     const businessLogicPlugin = new CarbonAccountingPlugin({
       logLevel: this.options.logLevel || "INFO",
-      xdaiContracts,
       fabricContracts,
       fabricPlugin,
       pluginRegistry,
       keychainId: this.keychainId,
       instanceId: uuidv4(),
-      xdaiApiClient,
       fabricApiClient,
-      web3SigningCredential: {
-        keychainEntryKey: xdaiAccount.address,
-        keychainId: this.keychainId,
-        type: Web3SigningCredentialType.CactusKeychainRef,
-      },
     });
 
-    pluginRegistry.add(xdaiPlugin);
     pluginRegistry.add(fabricPlugin);
     pluginRegistry.add(businessLogicPlugin);
 

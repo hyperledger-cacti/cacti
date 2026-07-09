@@ -75,26 +75,11 @@ export {
 } from "./indy/indy-test-ledger";
 
 export {
-  Iroha2TestLedger,
-  IIroha2TestLedgerOptions,
-  IROHA2_TEST_LEDGER_DEFAULT_OPTIONS,
-  Iroha2ClientConfig,
-} from "./iroha/iroha2-test-ledger";
-
-export {
   PostgresTestContainer,
   IPostgresTestContainerConstructorOptions,
   POSTGRES_TEST_CONTAINER_DEFAULT_OPTIONS,
   POSTGRES_TEST_CONTAINER_OPTIONS_JOI_SCHEMA,
 } from "./postgres/postgres-test-container";
-
-export {
-  CactusKeychainVaultServer,
-  ICactusKeychainVaultServerOptions,
-  K_DEFAULT_KEYCHAIN_VAULT_HTTP_PORT,
-  K_DEFAULT_KEYCHAIN_VAULT_IMAGE_NAME,
-  K_DEFAULT_KEYCHAIN_VAULT_IMAGE_VERSION,
-} from "./cactus-keychain-vault-server/cactus-keychain-vault-server";
 
 export {
   IVaultTestServerOptions,
@@ -163,12 +148,6 @@ export {
   SAMPLE_CORDAPP_DATA,
   SampleCordappEnum,
 } from "./corda/sample-cordapp-enum";
-
-export {
-  ISawtoothTestLedgerOptions,
-  SAWTOOTH_LEDGER_DEFAULT_OPTIONS,
-  SawtoothTestLedger,
-} from "./sawtooth/sawtooth-test-ledger";
 
 export {
   IStellarTestLedgerOptions,

@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -33,9 +33,9 @@ jobs:
         
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION
@@ -54,7 +54,7 @@ jobs:
       - name: Create Release
         if: ${{ env.PROTOS_GO_RELEASE == 'true' }}
         id: protos-go-release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -78,12 +78,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
         with:
-          go-version: '1.20.2'
+          go-version: '1.26.4'
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -95,9 +95,9 @@ jobs:
         
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION
@@ -120,7 +120,7 @@ jobs:
       - name: Create Release
         if: ${{ env.LIB_UTILS_RELEASE == 'true' }}
         id: lib-utils-release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -144,12 +144,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
         with:
-          go-version: '1.20.2'
+          go-version: '1.26.4'
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -161,9 +161,9 @@ jobs:
         
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION
@@ -186,7 +186,7 @@ jobs:
       - name: Create Release
         if: ${{ env.LIB_ASSET_EXCHANGE_RELEASE == 'true' }}
         id: lib-asset-exchange-release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -210,12 +210,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
         with:
-          go-version: '1.20.2'
+          go-version: '1.26.4'
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -227,9 +227,9 @@ jobs:
         
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION
@@ -252,7 +252,7 @@ jobs:
       - name: Create Release
         if: ${{ env.INTERFACE_ASSET_MGMT_RELEASE == 'true' }}
         id: asset-mgmt-release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -276,12 +276,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
         with:
-          go-version: '1.20.2'
+          go-version: '1.26.4'
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -293,9 +293,9 @@ jobs:
         
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION
@@ -318,7 +318,7 @@ jobs:
       - name: Create Release
         if: ${{ env.INTEROPCC_RELEASE == 'true' }}
         id: interop-cc-release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -342,12 +342,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up Go
-        uses: actions/setup-go@4d34df0c2316fe8122ab82dc22947d607c0c91f9 #v4.0.0
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
         with:
-          go-version: '1.20.2'
+          go-version: '1.26.4'
           
       - name: Set current date as env
         run: echo "RELEASE_DATE=$(date +%b\ %d,\ %Y)" >> $GITHUB_ENV
@@ -359,9 +359,9 @@ jobs:
           
       - name: Update version
         run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          VERSION="${GITHUB_REF##*/}"
           # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          [[ "$GITHUB_REF" == refs/tags/* ]] && VERSION="${VERSION#v}"
           echo "$VERSION"
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+[A-Za-z\-]*$ ]]; then
             echo -n $VERSION > VERSION
@@ -384,7 +384,7 @@ jobs:
       - name: Create Release
         if: ${{ env.WEAVER_FABRIC_GO_SDK == 'true' }}
         id: go-sdk-release
-        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e #v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
@@ -408,10 +408,10 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 #v3.3.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 #v4.4.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}

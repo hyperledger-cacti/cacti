@@ -54,6 +54,6 @@ https://datatracker.ietf.org/doc/draft-hargreaves-odap/ https://datatracker.ietf
 
 There are some more standards in section 6.2 of https://deepai.org/publication/a-survey-on-blockchain-interoperability-past-present-and-future-trends
 
-[Previous](whitepaper.md "Hyperledger Cactus White Paper") [Next](packages.md "Cactus Components")
+[Previous](whitepaper.md "Hyperledger Cacti White Paper") [Next](packages.md "Cacti Components")
 
 * * *

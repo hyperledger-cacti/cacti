@@ -17,6 +17,18 @@ env:
   RUN_CODE_COVERAGE: true
   NODE_OPTIONS: --max-old-space-size=8192
 
+# Top-level cap for every reusable workflow called from this file.
+# Must be >= the union of all transitively reachable job-level scopes.
+# `contents: write` is required by `cpl-connector-besu` (connector-packages)
+# and `cactus-cmd-api-server` (core-packages) because they push benchmark
+# results to the gh-pages branch on main and write commit-comment alerts.
+# `actions: read` is used by the benchmark cache restore.
+# `checks: write` is used by dorny/test-reporter inside jest-runner.
+permissions:
+  contents: write
+  actions: read
+  checks: write
+
 jobs:
   env-setup:
     outputs:
@@ -48,7 +60,7 @@ jobs:
       node_version: ${{ needs.env-setup.outputs.node_version }}
       
   packages-workflow:
-    needs: [checks-and-build, code-quality-checks, env-setup]
+    needs: [checks-and-build, env-setup]
     uses: ./.github/workflows/packages-workflow.yaml
     with:
       affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}
@@ -57,7 +69,7 @@ jobs:
       run_trivy_scan: ${{ needs.env-setup.outputs.run_trivy_scan }}
 
   examples-workflow:
-    needs: [checks-and-build, code-quality-checks, env-setup]
+    needs: [checks-and-build, env-setup]
     uses: ./.github/workflows/examples-workflow.yaml
     with:
       affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}

@@ -5,7 +5,7 @@ Note
 
 The deployContract feature is for development and test case authoring only, not recommended to be used in production environments for managing smart contracts.
 
-Hyperledger Cactus v0.9.0
+Hyperledger Cacti v0.9.0
 
 Corda version
 

@@ -13,7 +13,7 @@
  *
  * @example
  * ```typescript
- * // POST /api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide
+ * // POST /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide
  * const response = await fetch('/api/v1/webhook/inbound/decide', {
  *   method: 'POST',
  *   headers: { 'Content-Type': 'application/json' },
@@ -41,18 +41,18 @@ import type {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   type Logger,
   Checks,
   LoggerProvider,
   type IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   registerWebServiceEndpoint,
   handleRestEndpointException,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
@@ -108,9 +108,9 @@ export class DecideInboundWebhookEndpointV1 implements IWebServiceEndpoint {
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/webhook/inbound/decide"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide"
     ];
   }
 

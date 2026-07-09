@@ -69,8 +69,8 @@ Propagation: `ci.yaml` → `packages-workflow` → `satp-hermes-workflow` → `j
 Pin all third-party actions to full SHA. Comment the version tag for readability:
 
 ```yaml
-uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
-uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 #v6.2.0
+uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
 ```
 
 Never use floating tags like `@v4` or `@latest`.

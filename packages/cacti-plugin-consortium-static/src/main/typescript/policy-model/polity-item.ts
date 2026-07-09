@@ -1,5 +1,5 @@
 import { IPolicy } from "./i-policy";
-import { Checks } from "@hyperledger/cactus-common";
+import { Checks } from "@hyperledger-cacti/cactus-common";
 export interface IPolicyItemOptions {
   name: string;
   caption: string;

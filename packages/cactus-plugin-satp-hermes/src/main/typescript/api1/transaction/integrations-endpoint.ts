@@ -35,19 +35,19 @@ import {
   type IAsyncProvider,
   type Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import type {
   IEndpointAuthzOptions,
   IExpressRequestHandler,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import type { Express, Request, Response } from "express";
 import type { IRequestOptions } from "../../core/types";
 import OAS from "../../../json/oapi-api1-bundled.json";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 /**
  * Web service endpoint for SATP integration operations.
@@ -83,16 +83,16 @@ export class IntegrationsEndpointV1 implements IWebServiceEndpoint {
   constructor(public readonly options: IRequestOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.dispatcher, `${fnTag} arg options.connector`);
+    Checks.truthy(options.dispatcher, `${fnTag} arg options.dispatcher`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
     this.log = LoggerProvider.getOrCreate({ level, label });
   }
 
-  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations"] {
+  public get oasPath(): (typeof OAS.paths)["/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"] {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
     ];
   }
 
@@ -105,19 +105,23 @@ export class IntegrationsEndpointV1 implements IWebServiceEndpoint {
 
   public getPath(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
 
   public getVerbLowerCase(): string {
     const apiPath =
-      OAS.paths["/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations"];
+      OAS.paths[
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
+      ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/integrations"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
     ].get.operationId;
   }
 

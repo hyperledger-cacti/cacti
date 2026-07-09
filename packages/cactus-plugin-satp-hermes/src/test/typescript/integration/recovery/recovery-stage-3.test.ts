@@ -1,5 +1,5 @@
 import "jest-extended";
-import { Secp256k1Keys } from "@hyperledger/cactus-common";
+import { Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
 import { CrashManager } from "../../../../main/typescript/services/gateway/crash-manager";
 import {
   LocalLog,
@@ -22,7 +22,7 @@ import {
   IPluginFactoryOptions,
   LedgerType,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import { bufArray2HexStr } from "../../../../main/typescript/utils/gateway-utils";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
@@ -46,11 +46,12 @@ import {
   State,
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/session/session_pb";
 import { Knex, knex } from "knex";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { createMigrationSource } from "../../../../main/typescript/database/knex-migration-source";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
+import { getFreePorts } from "../../test-utils";
 
 let knexInstanceClient: Knex;
 let knexInstanceSourceRemote: Knex;
@@ -228,6 +229,8 @@ const createMockSession = (
 };
 
 beforeAll(async () => {
+  const [serverPort1, clientPort1, serverPort2, clientPort2] =
+    await getFreePorts(4);
   const factoryOptions: IPluginFactoryOptions = {
     pluginImportType: PluginImportType.Local,
   };
@@ -249,8 +252,8 @@ beforeAll(async () => {
     ],
     proofID: "mockProofID10",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3006,
-    gatewayClientPort: 3001,
+    gatewayServerPort: serverPort1,
+    gatewayClientPort: clientPort1,
   };
 
   const gatewayIdentity2: GatewayIdentity = {
@@ -269,8 +272,8 @@ beforeAll(async () => {
     ],
     proofID: "mockProofID11",
     address: "http://localhost" as Address,
-    gatewayServerPort: 3228,
-    gatewayClientPort: 3211,
+    gatewayServerPort: serverPort2,
+    gatewayClientPort: clientPort2,
   };
 
   const migrationSource = await createMigrationSource();
@@ -372,6 +375,8 @@ afterAll(async () => {
   }
 });
 
+// TODO: Do not re-enable until crash recovery is implemented:
+// https://github.com/hyperledger-cacti/cacti/issues/4042
 describe.skip("Stage 3 Recovery Test", () => {
   it("should recover Stage 3 hashes and timestamps and update session state to RECOVERED", async () => {
     crashManager1 = gateway1["crashManager"] as CrashManager;

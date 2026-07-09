@@ -5,14 +5,14 @@ import {
   FabricContractInvocationType,
   RunTransactionRequest,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 import { NetworkDetails, ObtainLedgerStrategy } from "./obtain-ledger-strategy";
 import {
   Checks,
   LogLevelDesc,
   Logger,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { Transaction } from "../view-creation/transaction";
 import { State } from "../view-creation/state";

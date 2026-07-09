@@ -1,6 +1,0 @@
-tslint.json
-package-lock.json
-test
-.gitignore
-dist
-node_modules

@@ -24,10 +24,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up JDK 17
-        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a #v5.5.0
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -35,19 +35,37 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/common/protos-java-kt
-        
-      - name: Publish
+
+      - name: Check if already published on GitHub Packages
+        id: check
+        working-directory: weaver/common/protos-java-kt
         run: |
-          make publish > out 2> error
-          exitStatus=$?
-          cat out
-          cat error
-          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
+          ART=protos-java-kt
+          GROUP=$(grep -oE '^group=.*' gradle.properties | cut -d= -f2-)
+          VER=$(grep -oE '^version=.*' gradle.properties | cut -d= -f2-)
+          GROUP_PATH=$(echo "$GROUP" | tr . /)
+          URL="https://maven.pkg.github.com/${{ github.repository_owner }}/cacti/$GROUP_PATH/$ART/$VER/$ART-$VER.pom"
+          HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+            -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$URL")
+          echo "GET $URL -> $HTTP"
+          if [ "$HTTP" = "200" ]; then
+            echo "$ART:$VER already on GitHub Packages — skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "$ART:$VER not yet published — will publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Publish
+        if: steps.check.outputs.skip != 'true'
+        run: make publish
         working-directory: weaver/common/protos-java-kt
         
 
@@ -61,10 +79,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up JDK 17
-        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a #v5.5.0
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -72,23 +90,47 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/core/network/corda-interop-app
         
+      - name: Check if already published on GitHub Packages
+        id: check
+        working-directory: weaver/core/network/corda-interop-app
+        run: |
+          GROUP=org.hyperledger.cacti.weaver.imodule.corda
+          VER=$(grep -oE '^version=.*' gradle.properties | cut -d= -f2-)
+          GROUP_PATH=$(echo "$GROUP" | tr . /)
+          ALL_PUBLISHED=true
+          for ART in interop-contracts interop-workflows; do
+            URL="https://maven.pkg.github.com/${{ github.repository_owner }}/cacti/$GROUP_PATH/$ART/$VER/$ART-$VER.pom"
+            HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+              -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$URL")
+            echo "GET $URL -> $HTTP"
+            if [ "$HTTP" != "200" ]; then
+              ALL_PUBLISHED=false
+            fi
+          done
+          if [ "$ALL_PUBLISHED" = "true" ]; then
+            echo "interop-contracts & interop-workflows @ $VER already on GitHub Packages — skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "At least one artifact not yet published — will publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build
+        if: steps.check.outputs.skip != 'true'
         run: make build
         working-directory: weaver/core/network/corda-interop-app
-        
+
       - name: Publish
-        run: |
-          make publish > out 2> error
-          exitStatus=$?
-          cat out
-          cat error
-          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
+        if: steps.check.outputs.skip != 'true'
+        run: make publish
         working-directory: weaver/core/network/corda-interop-app
         
   publish-sdk:
@@ -101,10 +143,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Set up JDK 17
-        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 #v3.11.0
+        uses: actions/setup-java@0f481fcb613427c0f801b606911222b5b6f3083a #v5.5.0
         with:
           java-version: '17'
           distribution: 'adopt'
@@ -112,23 +154,42 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/sdks/corda
         
+      - name: Check if already published on GitHub Packages
+        id: check
+        working-directory: weaver/sdks/corda
+        run: |
+          ART=weaver-sdk-corda
+          GROUP=$(grep -oE '^group=.*' gradle.properties | cut -d= -f2-)
+          VER=$(grep -oE '^version=.*' gradle.properties | cut -d= -f2-)
+          GROUP_PATH=$(echo "$GROUP" | tr . /)
+          URL="https://maven.pkg.github.com/${{ github.repository_owner }}/cacti/$GROUP_PATH/$ART/$VER/$ART-$VER.pom"
+          HTTP=$(curl -sSL -o /dev/null -w "%{http_code}" \
+            -u "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" "$URL")
+          echo "GET $URL -> $HTTP"
+          if [ "$HTTP" = "200" ]; then
+            echo "$ART:$VER already on GitHub Packages — skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "$ART:$VER not yet published — will publish"
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build
+        if: steps.check.outputs.skip != 'true'
         run: make build
         working-directory: weaver/sdks/corda
-        
+
       - name: Publish
-        run: |
-          make publish > out 2> error
-          exitStatus=$?
-          cat out
-          cat error
-          (cat error | grep "Received status code 409 from server: Conflict" && exit 0) || exit $exitStatus
+        if: steps.check.outputs.skip != 'true'
+        run: make publish
         working-directory: weaver/sdks/corda
     
   publish-driver-image:
@@ -141,10 +202,10 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a #v2.1.0
+        uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 #v4.4.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -153,9 +214,11 @@ jobs:
       - name: Generate github.properties
         run: |
           echo "Using ${GITHUB_ACTOR} user."
-          echo "username=${GITHUB_ACTOR}" >> github.properties
-          echo "password=${{ secrets.GITHUB_TOKEN }}" >> github.properties
-          echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti" >> github.properties
+          {
+            echo "username=${GITHUB_ACTOR}"
+            echo "password=${{ secrets.GITHUB_TOKEN }}"
+            echo "url=https://maven.pkg.github.com/${GITHUB_REPOSITORY_OWNER}/cacti"
+          } >> github.properties
           cat github.properties
         working-directory: weaver/core/drivers/corda-driver
 

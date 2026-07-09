@@ -23,17 +23,17 @@ jobs:
     steps:
       # Install Cacti pre-requisites
       - name: Use Node.js
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
         with:
           node-version: v22.18.0
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
         with:
           submodules: recursive
   
       - id: yarn-cache
         name: Initialize Yarn Cache
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 #v6.1.0
         with:
           key: ${{ runner.os }}-yarn-${{ hashFiles('./yarn.lock') }}
           path: ./.yarn/
@@ -44,7 +44,7 @@ jobs:
         run: cd packages/cactus-plugin-satp-hermes && pwd            
 
       - name: Install Foundry
-        uses: foundry-rs/foundry-toolchain@v1
+        uses: foundry-rs/foundry-toolchain@b00af27efadbc7b4ca8b82abbd903b17cc874d2a #v1.9.0
         with:
           version: stable
 
@@ -62,7 +62,7 @@ jobs:
 
       # Upload build artifacts for reuse in other jobs
       - name: Upload build output
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: satp-hermes-build-output
           path: packages/cactus-plugin-satp-hermes/dist/
@@ -83,7 +83,7 @@ jobs:
 
       - name: Upload .yarn cache artifact
         if: steps.upload_yarn_cache.outputs.found == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: satp-hermes-yarn-cache
           path: ./.yarn/
@@ -104,7 +104,7 @@ jobs:
 
       - name: Upload package .yarn cache artifact (fallback)
         if: steps.upload_yarn_cache_package.outputs.found == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
           name: satp-hermes-yarn-cache
           path: packages/cactus-plugin-satp-hermes/.yarn/

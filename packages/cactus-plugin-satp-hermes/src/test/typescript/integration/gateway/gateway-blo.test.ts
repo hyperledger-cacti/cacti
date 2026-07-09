@@ -2,21 +2,24 @@ import "jest-extended";
 import {
   Containers,
   pruneDockerContainersIfGithubAction,
-} from "@hyperledger/cactus-test-tooling";
-import { type LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-test-tooling";
+import {
+  type LogLevelDesc,
+  LoggerProvider,
+} from "@hyperledger-cacti/cactus-common";
 import { PluginFactorySATPGateway } from "../../../../main/typescript/factory/plugin-factory-gateway-orchestrator";
 import {
   type IPluginFactoryOptions,
   PluginImportType,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import type { SATPGatewayConfig } from "../../../../main/typescript/plugin-satp-hermes-gateway";
-import { createClient } from "../../test-utils";
+import { createClient, getFreePorts } from "../../test-utils";
 import {
   HealthCheckResponseStatusEnum,
   StatusResponseStatusEnum,
 } from "../../../../main/typescript";
-import { PluginRegistry } from "@hyperledger/cactus-core";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -32,6 +35,8 @@ const monitorService = MonitorService.createOrGetMonitorService({
   enabled: false,
 });
 
+let options: SATPGatewayConfig;
+
 beforeAll(async () => {
   pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
@@ -41,29 +46,31 @@ beforeAll(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
-});
 
-const options: SATPGatewayConfig = {
-  logLevel: logLevel,
-  instanceId: "gateway-orchestrator-instance-id",
-  gid: {
-    id: "mockID",
-    name: "CustomGateway",
-    version: [
-      {
-        Core: "v1",
-        Architecture: "v1",
-        Crash: "v1",
-      },
-    ],
-    proofID: "mockProofID10",
-    gatewayServerPort: 3010,
-    gatewayClientPort: 3011,
-    address: "http://localhost",
-  },
-  pluginRegistry: new PluginRegistry({ plugins: [] }),
-  monitorService: monitorService,
-};
+  const [serverPort, clientPort, oapiPort] = await getFreePorts(3);
+  options = {
+    logLevel: logLevel,
+    instanceId: "gateway-orchestrator-instance-id",
+    gid: {
+      id: "mockID",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: "v1",
+          Architecture: "v1",
+          Crash: "v1",
+        },
+      ],
+      proofID: "mockProofID10",
+      gatewayServerPort: serverPort,
+      gatewayClientPort: clientPort,
+      gatewayOapiPort: oapiPort,
+      address: "http://localhost",
+    },
+    pluginRegistry: new PluginRegistry({ plugins: [] }),
+    monitorService: monitorService,
+  };
+});
 
 describe("GetStatus Endpoint and Functionality testing", () => {
   test("GetStatus endpoint returns error for non-existent session", async () => {
@@ -86,9 +93,10 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         adminApiClient.getStatus(statusRequest.sessionID),
       ).rejects.toMatchObject({
         response: {
-          data: {
+          data: expect.objectContaining({
+            message: expect.stringContaining("Internal Server Error"),
             error: expect.stringContaining("Session not found"),
-          },
+          }),
         },
       });
     } finally {
@@ -193,9 +201,11 @@ describe("GetStatus Endpoint and Functionality testing", () => {
         oracleApiClient.getOracleTaskStatus("test-task-id"),
       ).rejects.toMatchObject({
         response: {
-          data: {
+          status: 404,
+          data: expect.objectContaining({
+            message: expect.stringContaining("NotFound"),
             error: expect.stringContaining("test-task-id not found"),
-          },
+          }),
         },
       });
     } finally {

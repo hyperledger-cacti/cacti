@@ -9,14 +9,14 @@ import {
   LoggerProvider,
   Logger,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import {
   ConsortiumDatabase,
   Constants,
   PluginImport,
   PluginImportType,
   PluginImportAction,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 import { FORMAT_PLUGIN_ARRAY } from "./convict-plugin-array-format";
 import { SelfSignedPkiGenerator, IPki } from "./self-signed-pki-generator";
@@ -55,6 +55,7 @@ export interface ICactusApiServerOptions {
   apiTlsCertPem: string;
   apiTlsKeyPem: string;
   apiTlsClientCaPem: string;
+  grpcHost: string;
   grpcPort: number;
   grpcMtlsEnabled: boolean;
   plugins: PluginImport[];
@@ -107,7 +108,7 @@ export class ConfigService {
           "This option is optional and defaults to an empty array which means that" +
           "all of the plugins will have the OpenAPI request validation enabled by default." +
           "   @example Setting this configuration parameter to" +
-          '["@hyperledger/cactus-plugin-ledger-connector-ethereum"]' +
+          '["@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum"]' +
           "will disable OpenAPI validation for the Ethereum connector plugin.",
       },
       crpcHost: {
@@ -259,12 +260,11 @@ export class ConfigService {
         default: 3000,
       },
       cockpitWwwRoot: {
-        doc: "The file-system path pointing to the static files of web application served as the cockpit by the API server.",
+        doc: "The file-system path pointing to the static files of web application served as the cockpit by the API server. NOTE: The @hyperledger/cactus-cockpit package has been removed from this repository. This configuration option is deprecated and its default value is now an empty string. If you still use a custom cockpit UI, provide a valid path via this setting or the COCKPIT_WWW_ROOT environment variable.",
         format: "*",
         env: "COCKPIT_WWW_ROOT",
         arg: "cockpit-www-root",
-        default:
-          "packages/cactus-cmd-api-server/node_modules/@hyperledger/cactus-cockpit/www/",
+        default: "",
       },
       cockpitCorsDomainCsv: {
         doc:
@@ -400,6 +400,13 @@ export class ConfigService {
         arg: "api-tls-key-pem",
         default: null as string | null,
       },
+      grpcHost: {
+        doc: "The host to bind the gRPC server to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host.",
+        format: "ipaddress",
+        env: "GRPC_HOST",
+        arg: "grpc-host",
+        default: "127.0.0.1",
+      },
       grpcPort: {
         doc: "The gRPC port to serve web services on.",
         format: "port",
@@ -500,6 +507,7 @@ export class ConfigService {
     const apiPort = (schema.apiPort as SchemaObj).default;
     const apiProtocol = apiTlsEnabled ? "https:" : "http";
     const apiBaseUrl = `${apiProtocol}//${apiHost}:${apiPort}`;
+    const grpcHost = (schema.grpcHost as SchemaObj).default;
     const grpcPort = (schema.grpcPort as SchemaObj).default;
     const grpcMtlsEnabled = (schema.grpcMtlsEnabled as SchemaObj).default;
     const enableShutdownHook = (schema.enableShutdownHook as SchemaObj).default;
@@ -549,7 +557,7 @@ export class ConfigService {
 
     const plugins: PluginImport[] = [
       {
-        packageName: "@hyperledger/cactus-plugin-keychain-memory",
+        packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {
@@ -558,7 +566,7 @@ export class ConfigService {
         },
       },
       {
-        packageName: "@hyperledger/cactus-plugin-consortium-manual",
+        packageName: "@hyperledger-cacti/cacti-plugin-consortium-static",
         type: PluginImportType.Local,
         action: PluginImportAction.Install,
         options: {
@@ -607,6 +615,7 @@ export class ConfigService {
       apiTlsCertPem: pkiServer.certificatePem,
       apiTlsKeyPem: pkiServer.privateKeyPem,
       apiTlsClientCaPem: "-", // API mTLS is off so this will not crash the server
+      grpcHost,
       grpcPort,
       grpcMtlsEnabled,
       cockpitEnabled: (schema.cockpitEnabled as SchemaObj).default,

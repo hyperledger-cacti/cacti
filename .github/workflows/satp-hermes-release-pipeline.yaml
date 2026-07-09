@@ -1,0 +1,134 @@
+name: SATP Hermes Gateway - Release Pipeline
+
+# =============================================================================
+# SINGLE ENTRY POINT for SATP Hermes publishing — dev and production.
+# =============================================================================
+#
+# Dev builds:  a push to main / satp-dev / satp-stg that touches SATP files
+#              publishes a `-dev.<sha>` build (no test gate, fast).
+# Production:  pushing a `vX.Y.Z` tag (Cacti's repo-wide release scheme) runs
+#              the full test suite, publishes the exact version to every
+#              registry (moving `latest`, or `rc` for `-rc` tags), then cuts
+#              the GitHub Release.
+#
+#   git tag v3.0.0
+#   git push origin v3.0.0
+#
+# The heavy build/publish logic lives in reusable building blocks called here.
+# Each derives the same version from the triggering ref (`github.ref` is
+# inherited across `workflow_call`), so they cannot drift:
+#   satp-hermes-publish-docker.yaml            (Docker image → GHCR + Docker Hub)
+#   satp-hermes-publish-npmjs-gateway-sdk.yaml (npm package → GitHub Package Registry)
+#   satp-hermes-manual-release.yaml            (GitHub Release)
+# =============================================================================
+
+on:
+  push:
+    branches: [main, satp-dev, satp-stg]
+    tags: ['v[0-9]*']
+  workflow_dispatch:
+
+# Least privilege for the pipeline; child workflows request their own.
+# npmjs publishing (and its OIDC id-token) is owned by publish-npm.yaml, not
+# this pipeline, so no id-token permission is needed here.
+permissions:
+  contents: write # create the GitHub release
+  packages: write # GHCR + GitHub Package Registry
+
+concurrency:
+  group: satp-hermes-release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Dev path filter. SATP change detection lives
+  # here and is only consulted for branch (dev) builds.
+  # ---------------------------------------------------------------------------
+  changes:
+    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    outputs:
+      satp: ${{ steps.filter.outputs.satp }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 #v4.0.2
+        id: filter
+        with:
+          filters: |
+            satp:
+              - 'packages/cactus-plugin-satp-hermes/**'
+              - '.github/workflows/satp-hermes-*.yaml'
+
+  # ---------------------------------------------------------------------------
+  # Production test gate — tag pushes only. Publish jobs require this to pass;
+  # dev builds skip it entirely and stay fast. (Individual suites in
+  # satp-hermes-workflow.yaml currently use `continue-on-error`)
+  # ---------------------------------------------------------------------------
+  test:
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      actions: read
+      checks: write
+      contents: read
+    uses: ./.github/workflows/satp-hermes-workflow.yaml
+    with:
+      node_version: "v20.20.0"
+      run_code_coverage: ${{ 'false' }}
+
+  # ---------------------------------------------------------------------------
+  # Publish the Docker image (GHCR + Docker Hub). Runs for production (after
+  # tests pass), for manual dispatch, or for a dev push that touched SATP.
+  # ---------------------------------------------------------------------------
+  publish-docker:
+    needs: [changes, test]
+    if: >-
+      always() &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped') &&
+      (
+        startsWith(github.ref, 'refs/tags/') ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.changes.outputs.satp == 'true'
+      )
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/satp-hermes-publish-docker.yaml
+    secrets: inherit
+
+  # ---------------------------------------------------------------------------
+  # Publish the npm package to the GitHub Package Registry (npm.pkg.github.com).
+  # ---------------------------------------------------------------------------
+  publish-npm-gpr:
+    needs: [changes, test]
+    if: >-
+      always() &&
+      (needs.test.result == 'success' || needs.test.result == 'skipped') &&
+      (
+        startsWith(github.ref, 'refs/tags/') ||
+        github.event_name == 'workflow_dispatch' ||
+        needs.changes.outputs.satp == 'true'
+      )
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/satp-hermes-publish-npmjs-gateway-sdk.yaml
+    secrets: inherit
+
+  # ---------------------------------------------------------------------------
+  # Create the GitHub Release for the pushed tag — production only, once the
+  # Docker image and GPR npm package publish. The version comes from the Docker
+  # job so all jobs agree. npmjs.org publishing is handled separately by
+  # publish-npm.yaml.
+  # ---------------------------------------------------------------------------
+  release:
+    needs: [publish-docker, publish-npm-gpr]
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    uses: ./.github/workflows/satp-hermes-manual-release.yaml
+    with:
+      is_release: true
+      tag_version: ${{ needs.publish-docker.outputs.tag_version }}
+    secrets: inherit

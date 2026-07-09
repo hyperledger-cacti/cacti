@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger/cacti-ledger-browser",
-  "version": "2.1.0",
+  "name": "@hyperledger-cacti/cacti-ledger-browser",
+  "version": "3.0.0-beta.1",
   "description": "Cacti GUI for visualizing ledger data build on react.",
   "keywords": [
     "Hyperledger",
@@ -63,7 +63,7 @@
     "@supabase/supabase-js": "1.35.6",
     "@tanstack/react-query": "5.29.2",
     "apexcharts": "3.45.2",
-    "axios": "1.15.0",
+    "axios": "1.16.0",
     "buffer": "6.0.3",
     "ethers": "6.12.1",
     "react": "18.2.0",
@@ -79,7 +79,7 @@
     "@types/react-dom": "18.2.17",
     "@vitejs/plugin-react": "5.1.0",
     "typescript": "5.5.2",
-    "vite": "6.2.6"
+    "vite": "8.1.3"
   },
   "engines": {
     "node": ">=18",

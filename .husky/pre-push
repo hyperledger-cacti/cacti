@@ -1,0 +1,20 @@
+#!/bin/sh
+# Cacti pre-push hook runner.
+# Bypass the whole hook with:  HUSKY=0 git push ...
+
+set -e
+
+STAGE=pre-push
+HOOK_DIR="$(cd "$(dirname "$0")" && pwd)"
+D="$HOOK_DIR/$STAGE.d"
+
+[ -d "$D" ] || exit 0
+
+for script in "$D"/*.sh; do
+	[ -e "$script" ] || continue
+	[ -x "$script" ] || continue
+	name="$(basename "$script")"
+	echo "[$STAGE] >>> $name"
+	"$script" "$@"
+done
+

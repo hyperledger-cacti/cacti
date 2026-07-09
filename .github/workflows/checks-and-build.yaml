@@ -18,6 +18,10 @@ concurrency:
   group: checks-and-build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# actionlint, dco-lint, and codegen only need to read the checkout.
+permissions:
+  contents: read
+
 jobs: 
   ActionLint:
     uses: ./.github/workflows/actionlint.yaml
@@ -60,7 +64,7 @@ jobs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       - name: Set output
         id: set-output
         run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
@@ -68,7 +72,7 @@ jobs:
   build-dev:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       - name: build
         uses:  ./.github/actions/configure-repo/
         with:
@@ -79,11 +83,11 @@ jobs:
     outputs:
       affected_packages: ${{ steps.compute-affected-packages.outputs.affected_packages }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
         with:
           fetch-depth: 0
       - name: Set up Node.js
-        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 #v6.2.0
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
         with:
           node-version: ${{ inputs.node_version }}
       - id: compute-affected-packages

@@ -25,9 +25,9 @@ In particular, all contributors to the project should have enough time to voice 
 Significant changes can be marked as such via the predefined label with the same name. This is a tool that helps maintainers identify the most important issues/discussions to be had at any given time through the GitHub web interface.
 
 To easily access the list of significant changes, navigate to the label:
-https://github.com/hyperledger/cactus/labels/Significant_Change
+https://github.com/hyperledger-cacti/cacti/labels/Significant_Change
 
-We also recommend reading our CONTRIBUTING.md file (https://github.com/hyperledger/cactus/blob/main/CONTRIBUTING.md) for more information about contributing.
+We also recommend reading our CONTRIBUTING.md file (https://github.com/hyperledger-cacti/cacti/blob/main/CONTRIBUTING.md) for more information about contributing.
 
 **Approving Pull Requests**
 
@@ -58,7 +58,7 @@ One point to mention about meetings is that new feature/enhancement proposals as
 The Cactus maintainers are required to maintain a roadmap.  There is a technical roadmap, with all of the issues as they directly relate to code, and a more public-friendly roadmap that anyone can digest.  The required features to be implemented will be maintained as issues at the official github repository of Cactus with tag string ‘for current release’ or ‘for future release’. The task which is not volunteered to work, will be dispatched to specific contributors following consensus among the majority of maintainers.
 
 The technical roadmap is implicitly derived from the Github “milestones” feature. To access the list of milestones for Cactus use this link:
-https://github.com/hyperledger/cactus/milestones
+https://github.com/hyperledger-cacti/cacti/milestones
 
 **Communications**
 

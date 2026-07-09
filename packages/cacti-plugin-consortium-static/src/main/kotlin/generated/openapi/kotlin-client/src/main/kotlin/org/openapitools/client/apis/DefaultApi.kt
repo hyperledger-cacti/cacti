@@ -113,7 +113,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/add-node",
+            path = "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/add-node",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -185,7 +185,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/consortium/jws",
+            path = "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/consortium/jws",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -257,7 +257,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/node/jws",
+            path = "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/node/jws",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -324,7 +324,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         
         return RequestConfig(
             method = RequestMethod.GET,
-            path = "/api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/get-prometheus-exporter-metrics",
+            path = "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/get-prometheus-exporter-metrics",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,
@@ -396,7 +396,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
 
         return RequestConfig(
             method = RequestMethod.POST,
-            path = "/api/v1/plugins/@hyperledger/cacti-plugin-consortium-static/receive-broadcast",
+            path = "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/receive-broadcast",
             query = localVariableQuery,
             headers = localVariableHeaders,
             requiresAuthentication = false,

@@ -1,14 +1,14 @@
 ARG BUILD_TAG
 
 # Local Build
-# FROM node:16 AS builder-local
+# FROM node:18 AS builder-local
 # 
 # WORKDIR /opt/iinagent
 
 # ADD protos-js /opt/iinagent/protos-js
 
 # Remote build
-FROM node:16 AS builder-remote
+FROM node:18 AS builder-remote
 
 WORKDIR /opt/iinagent
 
@@ -26,7 +26,7 @@ FROM builder-${BUILD_TAG} AS builder
 RUN rm -rf node_modules
 RUN npm ci --only=production
 
-FROM node:16-alpine AS prod
+FROM node:18-alpine AS prod
 
 RUN deluser --remove-home node
 RUN addgroup -g 1000 iinagent

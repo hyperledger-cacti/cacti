@@ -27,14 +27,14 @@
 Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
 
-First things first, please review the [Hyperledger Code of Conduct](https://wiki.hyperledger.org/display/HYP/Hyperledger+Code+of+Conduct) before participating.
+First things first, please review the [LF Decentralized Trust Code of Conduct](https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct) before participating.
 If you use AI or LLM tooling in your contributions, please also review our [AI Guidelines](./AI_GUIDELINES.md).
 
 There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
 
 As a user, this can include:
-* [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=)
-* [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?assignees=&labels=bug&template=bug_report.md&title=)
+* [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?template=feature_request.yml)
+* [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?template=bug_report.yml)
 
 As a developer:
 * if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger-cacti/cacti/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger-cacti/cacti/labels/good%20first%20issue) task
@@ -102,10 +102,13 @@ Small, focused PRs significantly reduce the cognitive load on
 reviewers, speed up the review cycle, and keep the git history clean
 and bisectable.
 
+See [PULL.md](./PULL.md) for the full Pull Request Guidelines,
+including concrete examples.
+
 ## PR Checklist - Contributor/Developer
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
-1. Fork [hyperledger/cacti](https://github.com/hyperledger/cacti) via Github UI
+1. Fork [hyperledger-cacti/cacti](https://github.com/hyperledger-cacti/cacti) via Github UI
    - If you are using the Git client on the Windows operating system, you will need to enable long paths for git
      which you can do in PowerShell by executing the command below.
      To clarify, this may also apply if you are using any Git GUI application on Windows such as `Github Desktop` or others.
@@ -173,7 +176,7 @@ To protect the Hyperledger Cacti source code, GitHub pull requests are accepted 
 2. Setup your local fork to keep up-to-date (optional)
    ```
    # Add 'upstream' repo to list of remotes
-   git remote add upstream https://github.com/hyperledger/cacti.git
+   git remote add upstream https://github.com/hyperledger-cacti/cacti.git
 
    # Verify the new remote named 'upstream'
    git remote -v
@@ -226,9 +229,7 @@ The current directory structure is described as the following:
 >   - docs/ : Documentation source files
 >   - assets/ : Static assets for documentation
 > - examples/ : Example applications and demos
->   - cactus-example-carbon-accounting-backend/
->   - cactus-example-cbdc-bridging/
->   - cactus-example-supply-chain-backend/
+ >   - cactus-example-cbdc-bridging/
 >   - cactus-example-discounted-asset-trade/
 >   - ... (additional examples)
 > - extensions/ : Optional extensions and plugins
@@ -299,7 +300,7 @@ Example (cacti-plugin-satp-hermes):
 > - jest.config-unit.ts
 > - jest.config-integration.ts
 
-4. In the `package.json` file, change the name to `@hyperledger/<your-package-name>`. Example: `@hyperledger/cacti-plugin-satp-hermes`;
+4. In the `package.json` file, change the name to `@hyperledger-cacti/<your-package-name>`. Example: `@hyperledger-cacti/cacti-plugin-satp-hermes`;
 5. In the `tsconfig.json` file, ensure it extends the Hyperledger Cacti base `tsconfig.ts` file. You can do it by following this example:
    ``` 
    { 
@@ -418,7 +419,7 @@ below applies to all tests regardless of their nature.
          t.end(); // yaay, test coverage
       });
       ```
-  - An [end to end test case](./packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/security-isolation-via-api-server-ports.ts) showcasing everything in action
+  - An end to end test case showcasing everything in action
   that is being preached in this document about test automation
 - Focus/verify a single bug-fix/feature/etc.
 - Clearly separated from non-test (aka `main`) source code.
@@ -483,7 +484,7 @@ for both them separately anyway:
   - An integration test:
 
       ```sh
-      yarn jest packages/cactus-test-plugin-consortium-manual/src/test/typescript/integration/plugin-consortium-manual/get-consortium-jws-endpoint.test.ts
+      yarn jest packages/cacti-plugin-consortium-static/src/test/typescript/integration/get-consortium-jws-endpoint.test.ts
       ```
 
   - A unit test:
@@ -628,7 +629,7 @@ compiled. It is all part of the `npm run build:dev:backend` task which you can r
 or as part of the CI script (`./tools/ci.sh`).
 
 The API client code is automatically generated from the respective `openapi.json` file of each package that exposes ay web serices (REST/SocketIO/gRPC/etc.) and can be dependend on by
-other packages where applicable. There's a dedicated `@hyperledger/cactus-api-client` package that is meant to contain common functionality among the rest of API clients. The concept here is similar to abstract classes and their sub-class implementations. 
+other packages where applicable. There's a dedicated `@hyperledger-cacti/cactus-api-client` package that is meant to contain common functionality among the rest of API clients. The concept here is similar to abstract classes and their sub-class implementations. 
 
 Each `openapi.json` produces its own API client via the code generator that also contains relevant model definitions, such as interfaces describing the request/response bodies of all possible operations and validation constraints as well. 
 
@@ -645,7 +646,7 @@ Example:
 # Adds "got" as a dependency to the `cactus-common` package
 # Note that you must specify the fully qualified package name as present in
 # the package.json file
-yarn workspace @hyperledger/cactus-common add got --save-exact
+yarn workspace @hyperledger-cacti/cactus-common add got --save-exact
 ```
 
 You need to know which package of the monorepo will be using the package and then
@@ -680,4 +681,3 @@ Bottom line: Do not use the the `^`, `~` and `*` syntax elements while declaring
 Further details:
 - https://reproducible-builds.org/
 - https://spin.atomicobject.com/2016/12/16/reproducible-builds-npm-yarn/
-

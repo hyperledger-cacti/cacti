@@ -8,7 +8,7 @@ import { coerceUnknownToError } from "./coerce-unknown-to-error";
  * property of the built-in `Error` type in combination
  * with the `asError(unknown)` utility function:
  * ```typescript
- * import { asError } from "@hyperledger/cactus-common";
+ * import { asError } from "@hyperledger-cacti/cactus-common";
  *
  * try {
  *   await performSomeImportantOperation();
@@ -119,7 +119,7 @@ export function createRuntimeErrorWithCause(
  * property of the built-in `Error` type in combination
  * with the `asError(unknown)` utility function:
  * ```typescript
- * import { asError } from "@hyperledger/cactus-common";
+ * import { asError } from "@hyperledger-cacti/cactus-common";
  *
  * try {
  *   await performSomeImportantOperation();

@@ -19,6 +19,6 @@ npm install
 npm run build
 docker build . \-t \[image\-name\]
 
-[Previous](cactus-test-cmd-api-server.md "@hyperledger/cactus-test-cmd-api-server") [Next](../support.md "Ledger Support for Connectors")
+[Previous](cactus-test-cmd-api-server.md "@hyperledger-cacti/cactus-test-cmd-api-server") [Next](../support.md "Ledger Support for Connectors")
 
 * * *

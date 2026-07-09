@@ -3,8 +3,8 @@ import "jest-extended";
 import { BAD_REQUEST, OK } from "http-errors-enhanced-cjs";
 import { v4 as internalIpV4 } from "internal-ip";
 
-import { Configuration } from "@hyperledger/cactus-core-api";
-import { LoggerProvider, LogLevelDesc } from "@hyperledger/cactus-common";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
+import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import {
   buildImageConnectorCordaServer,
   buildImageCordaAllInOneV412,
@@ -12,11 +12,11 @@ import {
   CordaTestLedger,
   pruneDockerContainersIfGithubAction,
   SAMPLE_CORDAPP_DATA,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   SampleCordappEnum,
   CordaConnectorContainer,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 
 import {
   CordappDeploymentConfig,

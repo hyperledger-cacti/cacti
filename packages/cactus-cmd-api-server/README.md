@@ -4,7 +4,6 @@
 - [Usage](#usage)
   - [Basic Example](#basic-example)
   - [Remote Plugin Imports at Runtime Example](#remote-plugin-imports-at-runtime-example)
-  - [Complete Example](#complete-example)
 - [Deployment Scenarios](#deployment-scenarios)
   - [Production Deployment Example](#production-deployment-example)
   - [Low Resource Deployment Example](#low-resource-deployment-example)
@@ -60,7 +59,7 @@ means that the API servers
 
 import { ApiServer } from "../api-server";
 import { ConfigService } from "../config/config-service";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "cactus-api",
@@ -104,10 +103,10 @@ if (require.main === module) {
 ### Remote Plugin Imports at Runtime Example
 
 ```typescript
-import { PluginImportType, PluginImportAction } from "@hyperledger/cactus-core-api";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { PluginImportType, PluginImportAction } from "@hyperledger-cacti/cactus-core-api";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const main = async () => {
 
@@ -127,7 +126,7 @@ const main = async () => {
       // npm package name of the plugin you are installing
       // Since this will be imported at runtime, you are responsible for
       // installing the package yourself prior to launching the API server.
-      packageName: "@hyperledger/cactus-plugin-keychain-vault",
+      packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
       // The REMOTE value means that a different plugin factory will be imported and
       // called to obtain the plugin instance. This way plugins can support them
       // being imported by the API server regardless of the language the plugin
@@ -168,13 +167,6 @@ if (require.main === module) {
 }
 
 ```
-
-### Complete Example
-
-For a complete example of how to use the API server, read all the code of the
-supply chain example's backend package:
-
-https://github.com/hyperledger/cactus/tree/main/examples/cactus-example-supply-chain-backend/src/main/typescript
 
 ## Deployment Scenarios
 
@@ -280,7 +272,7 @@ Once you've built the container, the following commands should work:
     --env LOG_LEVEL=INFO \
     cas \
       node index.js \
-      --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "version": "dev", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}]'
+      --plugins='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "version": "dev", "peerBinary":"/fabric-samples/bin/peer", "connectionProfile": {}, "instanceId": "some-unique-instance-id"}}]'
   ```
 
 - Launch container with plugin configuration as an **environment variable**:
@@ -299,7 +291,7 @@ Once you've built the container, the following commands should work:
     --env API_MTLS_ENABLED=false \
     --env API_HOST=0.0.0.0 \
     --env LOG_LEVEL=INFO \
-    --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
+    --env PLUGINS='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
     cas
   ```
 
@@ -321,13 +313,13 @@ Once you've built the container, the following commands should work:
     --env LOG_LEVEL=INFO \
     cas \
       node index.js \
-      --plugins='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]'
+      --plugins='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]'
   ```
 
 - Launch container with **configuration file** mounted from host machine:
   ```sh
 
-  echo '{"plugins": [{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]}' > .cacti-config.json
+  echo '{"plugins": [{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]}' > .cacti-config.json
 
   docker run \
     --rm \
@@ -375,7 +367,7 @@ docker run \
   --env API_MTLS_ENABLED=false \
   --env API_HOST=0.0.0.0 \
   --env LOG_LEVEL=DEBUG \
-  --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "packageSrc": "/usr/src/cacti/packages/cactus-plugin-ledger-connector-besu", "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
+  --env PLUGINS='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "packageSrc": "/usr/src/cacti/packages/cactus-plugin-ledger-connector-besu", "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
   cas
 ```
 
@@ -409,7 +401,7 @@ Don't have a Besu network on hand to test with? Test or develop against our Besu
       --env API_MTLS_ENABLED=false \
       --env API_HOST=0.0.0.0 \
       --env LOG_LEVEL=INFO \
-      --env PLUGINS='[{"packageName": "@hyperledger/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
+      --env PLUGINS='[{"packageName": "@hyperledger-cacti/cactus-plugin-ledger-connector-besu", "type": "org.hyperledger.cactus.plugin_import_type.LOCAL", "action": "org.hyperledger.cactus.plugin_import_action.INSTALL",  "options": { "rpcApiWsHost": "http://127.0.0.1:8546", "rpcApiHttpHost": "http://127.0.0.1:8545", "instanceId": "some-unique-besu-connector-instance-id"}}]' \
       cas
     ```
 
@@ -494,7 +486,7 @@ Once Prometheus is setup, the corresponding scrape_config needs to be added to t
     - targets: ['{host}:{port}']
 ```
 
-Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-consortium-manual/src/test/typescript/unit/consortium/get-node-jws-endpoint-v1.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
+Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases expose it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
 `Metrics URL: http://0.0.0.0:42379/api/v1/api-server/get-prometheus-exporter-metrics/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.

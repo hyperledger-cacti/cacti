@@ -35,7 +35,7 @@
  * @see {@link ILoggerOptions} for logger configuration options
  */
 
-import { ILoggerOptions, LogLevelDesc } from "@hyperledger/cactus-common";
+import { ILoggerOptions, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLogger } from "./satp-logger";
 import { MonitorService } from "../services/monitoring/monitor";
 

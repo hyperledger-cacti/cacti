@@ -8,32 +8,24 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   ICactusPlugin,
   IPluginWebService,
   IWebServiceEndpoint,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
-import { PluginRegistry } from "@hyperledger/cactus-core";
-
-import {
-  DefaultApi as XdaiApi,
-  Web3SigningCredential,
-} from "@hyperledger/cactus-plugin-ledger-connector-xdai";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
 import {
   DefaultApi as FabricApi,
   PluginLedgerConnectorFabric,
-} from "@hyperledger/cactus-plugin-ledger-connector-fabric";
+} from "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric";
 
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 
-import {
-  ICarbonAccountingFabricContractDeploymentInfo,
-  ICarbonAccountingXdaiContractDeploymentInfo,
-} from "../i-carbon-accounting-contract-deployment-info";
+import { ICarbonAccountingFabricContractDeploymentInfo } from "../i-carbon-accounting-contract-deployment-info";
 
 import { GetAllowanceEndpoint } from "./web-services/dao-token/get-allowance-endpoint";
 
@@ -57,13 +49,10 @@ export interface ICarbonAccountingPluginOptions {
   instanceId: string;
   keychainId: string;
   pluginRegistry: PluginRegistry;
-  xdaiApiClient: XdaiApi;
   fabricApiClient: FabricApi;
   fabricPlugin: PluginLedgerConnectorFabric;
-  web3SigningCredential?: Web3SigningCredential;
   fabricEnvironment?: NodeJS.ProcessEnv;
   fabricContracts: ICarbonAccountingFabricContractDeploymentInfo;
-  xdaiContracts: ICarbonAccountingXdaiContractDeploymentInfo;
 }
 
 export class CarbonAccountingPlugin
@@ -138,7 +127,7 @@ export class CarbonAccountingPlugin
   }
 
   public getPackageName(): string {
-    return "@hyperledger/cactus-example-carbon-accounting-backend";
+    return "@hyperledger-cacti/cactus-example-carbon-accounting-backend";
   }
 
   public async onPluginInit(): Promise<unknown> {

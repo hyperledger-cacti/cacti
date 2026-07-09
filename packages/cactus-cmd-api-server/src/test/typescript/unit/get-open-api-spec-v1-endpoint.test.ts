@@ -9,9 +9,9 @@ import {
 import {
   IJoseFittingJwtParams,
   LogLevelDesc,
-} from "@hyperledger/cactus-common";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { Constants } from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-common";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import type { AuthorizeOptions as SocketIoJwtOptions } from "@thream/socketio-jwt";
 import type { Params as ExpressJwtOptions } from "express-jwt";
 import "jest-extended";

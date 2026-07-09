@@ -35,7 +35,7 @@ func ConfigureAll(networkId string) error {
 
 	networkConfig, err := helpers.GetNetworkConfig(networkId)
 	if err != nil {
-		return logThenErrorf(err.Error())
+		return logThenErrorf("%s", err.Error())
 	}
 	connProfilePath := networkConfig.ConnProfilePath
 

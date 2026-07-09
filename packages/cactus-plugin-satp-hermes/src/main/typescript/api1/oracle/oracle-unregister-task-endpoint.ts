@@ -8,18 +8,18 @@ import type {
   IWebServiceEndpoint,
   IExpressRequestHandler,
   IEndpointAuthzOptions,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 import {
   type Logger,
   Checks,
   LoggerProvider,
   type IAsyncProvider,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
-} from "@hyperledger/cactus-core";
+} from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
 import type { IRequestOptions } from "../../core/types";
@@ -37,7 +37,7 @@ export class OracleUnregisterTaskEndpointV1 implements IWebServiceEndpoint {
   constructor(public readonly options: IRequestOptions) {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
-    Checks.truthy(options.dispatcher, `${fnTag} arg options.connector`);
+    Checks.truthy(options.dispatcher, `${fnTag} arg options.dispatcher`);
 
     const level = this.options.logLevel || "INFO";
     const label = this.className;
@@ -47,7 +47,7 @@ export class OracleUnregisterTaskEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.path;
   }
@@ -55,14 +55,14 @@ export class OracleUnregisterTaskEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-        "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister"
       ];
     return apiPath.post["x-hyperledger-cacti"].http.verbLowerCase;
   }
 
   public getOperationId(): string {
     return OAS.paths[
-      "/api/v1/@hyperledger/cactus-plugin-satp-hermes/oracle/unregister"
+      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister"
     ].post.operationId;
   }
 

@@ -139,8 +139,8 @@ class SomeCoolFlow {
 2. Decide on your flow invocation type which largely comes down to answering the question of: Does your invocation follow a request/response pattern or more like a channel subscription where multiple updates at different times are streamed to the client in response to the invocation request? In our example we assume the simpler request/response communication pattern and therefore will set the `flowInvocationType` to `FlowInvocationType.FLOWDYNAMIC`
 3. Invoke the flow via the API client with the `params` argument being specified as an empty array `[]`
     ```typescript
-    import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
-    import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+    import { DefaultApi as CordaApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
+    import { FlowInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
 
     const apiUrl = "your-cactus-host.example.com"; // don't forget to specify the port if applicable
     const apiClient = new CordaApi({ basePath: apiUrl });
@@ -190,8 +190,8 @@ After having determined the above, you can construct your first `JvmObject` JSON
     ```
 1. Invoke the flow via the API client with the `params` populated as explained above:
     ```typescript
-    import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
-    import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+    import { DefaultApi as CordaApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
+    import { FlowInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
 
     // don't forget to specify the port if applicable
     const apiUrl = "your-cactus-host.example.com";
@@ -261,8 +261,8 @@ cordaRpcClient.startFlowDynamic(
 **Cactus Invocation JSON DLS Equivalent to the Above Java Snippet**
 
 ```typescript
-import { DefaultApi as CordaApi } from "@hyperledger/cactus-plugin-ledger-connector-corda";
-import { FlowInvocationType } from "@hyperledger/cactus-plugin-ledger-connector-corda";
+import { DefaultApi as CordaApi } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
+import { FlowInvocationType } from "@hyperledger-cacti/cactus-plugin-ledger-connector-corda";
 
 // don't forget to specify the port if applicable
 const apiUrl = "your-cactus-host.example.com";

@@ -30,7 +30,7 @@
  *   SATPGateway,
  *   PluginFactorySATPGateway,
  *   DEFAULT_PORT_GATEWAY_SERVER
- * } from '@hyperledger/cactus-plugin-satp-hermes';
+ * } from '@hyperledger-cacti/cactus-plugin-satp-hermes';
  *
  * const factory = new PluginFactorySATPGateway();
  * const gateway = await factory.create({
@@ -46,7 +46,7 @@
  * @example
  * Cross-chain asset transfer execution:
  * ```typescript
- * import { SATPGateway, ClientV1Request } from '@hyperledger/cactus-plugin-satp-hermes';
+ * import { SATPGateway, ClientV1Request } from '@hyperledger-cacti/cactus-plugin-satp-hermes';
  *
  * const transferRequest: ClientV1Request = {
  *   version: 'v02',
