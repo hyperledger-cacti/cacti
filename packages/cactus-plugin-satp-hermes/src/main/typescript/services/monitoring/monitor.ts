@@ -20,17 +20,16 @@ import {
 import * as logsAPI from "@opentelemetry/api-logs";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import {
-  ExplicitBucketHistogramAggregation,
+  AggregationType,
   InstrumentType,
   PeriodicExportingMetricReader,
-  View,
 } from "@opentelemetry/sdk-metrics";
 import {
   Logger,
   LoggerProvider,
   LogLevelDesc,
 } from "@hyperledger-cacti/cactus-common";
-import { Resource } from "@opentelemetry/resources";
+import { resourceFromAttributes } from "@opentelemetry/resources";
 import { UninitializedMonitorServiceError } from "../../cross-chain-mechanisms/common/errors";
 
 /**
@@ -149,13 +148,13 @@ export class MonitorService {
       return;
     }
 
-    const resource = new Resource({
+    const resource = resourceFromAttributes({
       "service.name": process.env.OTEL_SERVICE_NAME || "satp-hermes-gateway",
     });
 
     if (!this.sdk) {
       this.sdk = new NodeSDK({
-        resource: resource,
+        resource,
         traceExporter: new OTLPTraceExporter({
           url: this.otelTracesExporterUrl,
         }),
@@ -167,33 +166,36 @@ export class MonitorService {
         }),
         instrumentations: [getNodeAutoInstrumentations()],
         views: [
-          new View({
+          {
             instrumentType: InstrumentType.HISTOGRAM,
-            aggregation: new ExplicitBucketHistogramAggregation([
-              10, 50, 100, 500, 1000, 5000, 10000, 60000,
-            ]),
-          }),
+            aggregation: {
+              type: AggregationType.EXPLICIT_BUCKET_HISTOGRAM,
+              options: {
+                boundaries: [10, 50, 100, 500, 1000, 5000, 10000, 60000],
+              },
+            },
+          },
         ],
       });
 
-      // Set up logs
+      // Set up logs. In OpenTelemetry 2.x, log record processors are supplied
+      // via the LoggerProvider constructor (addLogRecordProcessor was removed).
       const loggerProvider = new OtelLoggerProvider({
         resource,
+        processors: [
+          new BatchLogRecordProcessor(
+            new OTLPLogExporter({
+              url: this.otelLogsExporterUrl,
+            }),
+            {
+              maxQueueSize: 2048,
+              scheduledDelayMillis: 5000,
+              exportTimeoutMillis: 3000,
+              maxExportBatchSize: 512,
+            },
+          ),
+        ],
       });
-
-      loggerProvider.addLogRecordProcessor(
-        new BatchLogRecordProcessor(
-          new OTLPLogExporter({
-            url: this.otelLogsExporterUrl,
-          }),
-          {
-            maxQueueSize: 2048,
-            scheduledDelayMillis: 5000,
-            exportTimeoutMillis: 3000,
-            maxExportBatchSize: 512,
-          },
-        ),
-      );
       logsAPI.logs.setGlobalLoggerProvider(loggerProvider);
 
       this.sdk.start();
