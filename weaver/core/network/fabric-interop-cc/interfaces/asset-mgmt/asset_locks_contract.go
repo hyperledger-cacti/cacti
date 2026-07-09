@@ -13,7 +13,7 @@ import (
     "github.com/golang/protobuf/proto"
     "github.com/hyperledger/fabric-contract-api-go/contractapi"
     log "github.com/sirupsen/logrus"
-    "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+    "github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3/common"
 )
 
 
@@ -92,7 +92,7 @@ func (amc *AssetManagementContract) ContractIdAssetsLookupMap(ctx contractapi.Tr
     }
     assetLockKey, err := getAssetLockLookupMapKey(ctx, assetType, assetId)
     if err != nil {
-        return logThenErrorf(err.Error())
+        return logThenErrorf("%s", err.Error())
     }
     err = ctx.GetStub().PutState(assetLockKey, []byte(contractId))
     if err != nil {
@@ -110,7 +110,7 @@ func (amc *AssetManagementContract) DeleteAssetLookupMapsUsingContractId(ctx con
     // delete the lookup maps
     assetLockKey, err := getAssetLockLookupMapKey(ctx, assetType, assetId)
     if err != nil {
-        return logThenErrorf(err.Error())
+        return logThenErrorf("%s", err.Error())
     }
     err = ctx.GetStub().DelState(assetLockKey)
     if err != nil {
@@ -137,7 +137,7 @@ func (amc *AssetManagementContract) DeleteAssetLookupMapsOnlyUsingContractId(ctx
     }
     assetLockKey, err := getAssetLockLookupMapKey(ctx, contractedAsset.Type, contractedAsset.Id)
     if err != nil {
-        return logThenErrorf(err.Error())
+        return logThenErrorf("%s", err.Error())
     }
     err = ctx.GetStub().DelState(assetLockKey)
     if err != nil {
@@ -164,7 +164,7 @@ func (amc *AssetManagementContract) DeleteAssetLookupMaps(ctx contractapi.Transa
     // delete the lookup details
     assetLockKey, err := getAssetLockLookupMapKey(ctx, assetType, assetId)
     if err != nil {
-        return logThenErrorf(err.Error())
+        return logThenErrorf("%s", err.Error())
     }
     contractIdBytes, err := ctx.GetStub().GetState(assetLockKey)
     if err != nil {
@@ -220,14 +220,14 @@ func (amc *AssetManagementContract) ValidateAndExtractAssetAgreement(assetAgreem
     // Decoding from base64
     assetAgreementSerializedProto, err := base64.StdEncoding.DecodeString(assetAgreementSerializedProto64)
     if err != nil {
-      return assetAgreement, logThenErrorf(err.Error())
+      return assetAgreement, logThenErrorf("%s", err.Error())
     }
     if len(assetAgreementSerializedProto) == 0 {
         return assetAgreement, logThenErrorf("empty asset agreement")
     }
     err = proto.Unmarshal([]byte(assetAgreementSerializedProto), assetAgreement)
     if err != nil {
-        return assetAgreement, logThenErrorf(err.Error())
+        return assetAgreement, logThenErrorf("%s", err.Error())
     }
 
     return assetAgreement, nil
@@ -238,14 +238,14 @@ func (amc *AssetManagementContract) ValidateAndExtractFungibleAssetAgreement(fun
     // Decoding from base64
     fungibleAssetExchangeAgreementSerializedProto, err := base64.StdEncoding.DecodeString(fungibleAssetExchangeAgreementSerializedProto64)
     if err != nil {
-      return assetAgreement, logThenErrorf(err.Error())
+      return assetAgreement, logThenErrorf("%s", err.Error())
     }
     if len(fungibleAssetExchangeAgreementSerializedProto) == 0 {
         return assetAgreement, logThenErrorf("empty asset agreement")
     }
     err = proto.Unmarshal([]byte(fungibleAssetExchangeAgreementSerializedProto), assetAgreement)
     if err != nil {
-        return assetAgreement, logThenErrorf(err.Error())
+        return assetAgreement, logThenErrorf("%s", err.Error())
     }
 
     return assetAgreement, nil
@@ -256,14 +256,14 @@ func (amc *AssetManagementContract) ValidateAndExtractLockInfo(lockInfoSerialize
     // Decoding from base64
     lockInfoSerializedProto, err := base64.StdEncoding.DecodeString(lockInfoSerializedProto64)
     if err != nil {
-      return lockInfo, logThenErrorf(err.Error())
+      return lockInfo, logThenErrorf("%s", err.Error())
     }
     if len(lockInfoSerializedProto) == 0 {
         return lockInfo, logThenErrorf("empty lock info")
     }
     err = proto.Unmarshal([]byte(lockInfoSerializedProto), lockInfo)
     if err != nil {
-        return lockInfo, logThenErrorf(err.Error())
+        return lockInfo, logThenErrorf("%s", err.Error())
     }
 
     return lockInfo, nil
@@ -274,14 +274,14 @@ func (amc *AssetManagementContract) ValidateAndExtractClaimInfo(claimInfoSeriali
     // Decode from base64
     claimInfoSerializedProto, err := base64.StdEncoding.DecodeString(claimInfoSerializedProto64)
     if err != nil {
-      return claimInfo, logThenErrorf(err.Error())
+      return claimInfo, logThenErrorf("%s", err.Error())
     }
     if len(claimInfoSerializedProto) == 0 {
         return claimInfo, logThenErrorf("empty claim info")
     }
     err = proto.Unmarshal([]byte(claimInfoSerializedProto), claimInfo)
     if err != nil {
-        return claimInfo, logThenErrorf(err.Error())
+        return claimInfo, logThenErrorf("%s", err.Error())
     }
 
     return claimInfo, nil

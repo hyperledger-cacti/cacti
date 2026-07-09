@@ -1,6 +1,6 @@
 {
-  "name": "@hyperledger/cacti-weaver-protos-js",
-  "version": "2.1.0",
+  "name": "@hyperledger-cacti/cacti-weaver-protos-js",
+  "version": "3.0.0-beta.1",
   "description": "Interop protos for Node JS (Weaver)",
   "keywords": [
     "Hyperledger",
@@ -52,7 +52,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.13.3",
+    "@grpc/grpc-js": "1.14.4",
     "@grpc/proto-loader": "0.7.13",
     "@types/node": "18.19.0",
     "google-protobuf": "3.21.4",
@@ -66,8 +66,7 @@
     "npm": ">=8"
   },
   "publishConfig": {
-    "access": "public",
-    "registry": "https://npm.pkg.github.com/hyperledger-cacti"
+    "access": "public"
   },
   "licenses": [
     {

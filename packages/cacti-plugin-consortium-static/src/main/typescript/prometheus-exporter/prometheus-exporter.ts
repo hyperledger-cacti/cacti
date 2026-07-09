@@ -2,7 +2,7 @@ import promClient, { Registry } from "prom-client";
 import { NodeCount } from "./response.type";
 import {
   totalTxCount,
-  K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT,
+  K_CACTUS_CONSORTIUM_STATIC_TOTAL_NODE_COUNT,
 } from "./metrics";
 
 export interface IPrometheusExporterOptions {
@@ -25,13 +25,13 @@ export class PrometheusExporter {
   public setNodeCount(nodeCount: number): void {
     this.nodeCount.counter = nodeCount;
     totalTxCount
-      .labels(K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT)
+      .labels(K_CACTUS_CONSORTIUM_STATIC_TOTAL_NODE_COUNT)
       .set(this.nodeCount.counter);
   }
 
   public async getPrometheusMetrics(): Promise<string> {
     const result = await this.registry.getSingleMetricAsString(
-      K_CACTUS_CONSORTIUM_MANUAL_TOTAL_NODE_COUNT,
+      K_CACTUS_CONSORTIUM_STATIC_TOTAL_NODE_COUNT,
     );
     return result;
   }

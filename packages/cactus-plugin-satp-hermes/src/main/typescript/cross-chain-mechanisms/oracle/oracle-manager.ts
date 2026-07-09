@@ -38,13 +38,13 @@
 import {
   type ILoggerOptions,
   type LogLevelDesc,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../../core/satp-logger";
 // import { OracleNotificationDispatcher } from "./oracle-notification-dispatcher";
 
 import { IOracleEntryBase, IOracleListenerBase } from "./oracle-types";
-import { IPluginBungeeHermesOptions } from "@hyperledger/cactus-plugin-bungee-hermes";
+import { IPluginBungeeHermesOptions } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
 import { INetworkOptions } from "../bridge/bridge-types";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
@@ -54,11 +54,11 @@ import {
   TaskNotFoundError,
   UnsupportedNetworkError,
 } from "../common/errors";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { v4 as uuidv4 } from "uuid";
 import { IOracleEVMOptions, OracleEVM } from "./implementations/oracle-evm";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
 import {
   IOracleFabricOptions,
   OracleFabric,
@@ -151,25 +151,93 @@ export class OracleManager {
     return this.schedulerManager;
   }
 
-  private logAndPersist(
+  private async logAndPersist(
     taskId: string,
     type: string,
     operation: string,
     data: string,
     sequenceNumber: number,
     operationId?: string,
-  ): void {
+  ): Promise<void> {
     this.logger.info(
       `${operation}-${type} [taskId=${taskId}, seq=${sequenceNumber}]`,
     );
-    this.dbLogger?.storeOracleLog({
+    if (!this.dbLogger) {
+      return;
+    }
+
+    await this.persistOracleLog(
       taskId,
       type,
       operation,
       data,
       sequenceNumber,
       operationId,
-    });
+    );
+  }
+
+  private async persistOracleLog(
+    taskId: string,
+    type: string,
+    operation: string,
+    data: string,
+    sequenceNumber: number,
+    operationId?: string,
+  ): Promise<void> {
+    if (!this.dbLogger) {
+      return;
+    }
+    try {
+      await this.dbLogger.storeOracleLog({
+        taskId,
+        type,
+        operation,
+        data,
+        sequenceNumber,
+        operationId,
+      });
+    } catch (persistErr) {
+      const errMsg =
+        persistErr instanceof Error ? persistErr.message : String(persistErr);
+      this.logger.warn(
+        `${OracleManager.CLASS_NAME}#persistOracleLog - failed to persist oracle log [taskId=${taskId}, op=${operation}, type=${type}]: ${errMsg}`,
+      );
+    }
+  }
+
+  /**
+   * Builds a minimal, bounded summary of an error suitable for persistence.
+   *
+   * Avoids serializing nested `cause` chains, connector instances or huge
+   * stack traces verbatim — these have historically produced
+   * `RangeError: Invalid string length` when written into oracle logs.
+   */
+  private buildErrorLogPayload(err: unknown): string {
+    const name = err instanceof Error ? err.name : "UnknownError";
+    const message = err instanceof Error ? err.message : String(err);
+    const stack =
+      err instanceof Error && typeof err.stack === "string"
+        ? err.stack.split("\n").slice(0, 8).join("\n")
+        : undefined;
+    return safeStableStringify({ name, message, stack }) ?? message;
+  }
+
+  /**
+   * Returns a slim, side-effect-free summary of network options that is safe
+   * to persist. Strips `connectorOptions` (which can hold web3/RPC clients,
+   * plugin registries and other large/cyclic objects) and signing
+   * credentials.
+   */
+  private summarizeOracleNetworkOptions(
+    oracleNetworkOptions: INetworkOptions,
+  ): string {
+    return (
+      safeStableStringify({
+        ...oracleNetworkOptions,
+        connectorOptions: "[redacted]",
+        signingCredential: "[redacted]",
+      }) ?? ""
+    );
   }
 
   /**
@@ -192,14 +260,17 @@ export class OracleManager {
       try {
         this.logger.debug(`${fnTag}, Deploying Oracle...`);
         this.logger.debug(
-          `${fnTag}, Oracle Network Options: ${JSON.stringify(oracleNetworkOptions)}`,
+          `${fnTag}, Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
         );
 
-        this.logAndPersist(
+        const summarizedOptions =
+          this.summarizeOracleNetworkOptions(oracleNetworkOptions);
+
+        await this.logAndPersist(
           networkId,
           "deploy-oracle",
           "init",
-          safeStableStringify(oracleNetworkOptions) ?? "",
+          summarizedOptions,
           0,
         );
 
@@ -214,11 +285,11 @@ export class OracleManager {
         }
 
         try {
-          this.logAndPersist(
+          await this.logAndPersist(
             networkId,
             "deploy-oracle",
             "exec",
-            safeStableStringify(oracleNetworkOptions) ?? "",
+            summarizedOptions,
             0,
           );
 
@@ -228,9 +299,7 @@ export class OracleManager {
             case LedgerType.Besu2X:
               this.logger.debug(`${fnTag}, Deploying Besu Oracle...`);
               this.logger.debug(
-                `${fnTag}, Besu Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Besu Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               const besuNetworkOptions =
                 oracleNetworkOptions as unknown as IOracleBesuOptions;
@@ -251,9 +320,7 @@ export class OracleManager {
             case LedgerType.Ethereum:
               this.logger.debug(`${fnTag}, Deploying Ethereum Oracle...`);
               this.logger.debug(
-                `${fnTag}, Ethereum Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Ethereum Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               const ethereumNetworkOptions =
                 oracleNetworkOptions as unknown as IOracleEVMOptions;
@@ -274,9 +341,7 @@ export class OracleManager {
             case LedgerType.Fabric2:
               this.logger.debug(`${fnTag}, Deploying Fabric Oracle...`);
               this.logger.debug(
-                `${fnTag}, Fabric Oracle Network Options: ${JSON.stringify(
-                  oracleNetworkOptions,
-                )}`,
+                `${fnTag}, Fabric Oracle Network Options: ${safeStableStringify({ ...oracleNetworkOptions, connectorOptions: "[redacted]" })}`,
               );
               if (
                 !(oracleNetworkOptions as Partial<IOracleFabricOptions>)
@@ -338,20 +403,21 @@ export class OracleManager {
           }
           this.oracles.get(networkKey)?.set(oracle.getId(), oracle);
 
-          this.logAndPersist(
+          await this.logAndPersist(
             networkId,
             "deploy-oracle",
             "done",
-            safeStableStringify(oracleNetworkOptions) ?? "",
+            summarizedOptions,
             0,
           );
         } catch (error) {
-          this.logger.debug(`${fnTag}, Error deploying oracle: ${error}`);
-          this.logAndPersist(
+          const errMsg = error instanceof Error ? error.message : String(error);
+          this.logger.debug(`${fnTag}, Error deploying oracle: ${errMsg}`);
+          await this.logAndPersist(
             networkId,
             "deploy-oracle",
             "fail",
-            safeStableStringify(oracleNetworkOptions) ?? "",
+            this.buildErrorLogPayload(error),
             0,
           );
           throw new DeployOracleError(error);
@@ -459,7 +525,7 @@ export class OracleManager {
           `${fnTag}: Registering task. ${safeStableStringify(task)}`,
         );
 
-        this.logAndPersist(
+        await this.logAndPersist(
           task.taskID,
           "register-task",
           "init",
@@ -468,7 +534,7 @@ export class OracleManager {
         );
 
         try {
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "register-task",
             "exec",
@@ -534,7 +600,7 @@ export class OracleManager {
           }
 
           this.logger.info(`${fnTag}: Task registered successfully`);
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "register-task",
             "done",
@@ -544,7 +610,7 @@ export class OracleManager {
           return task;
         } catch (error) {
           this.logger.debug(`${fnTag}: Error registering task: ${error}`);
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "register-task",
             "fail",
@@ -567,7 +633,7 @@ export class OracleManager {
   public async unregisterTask(taskId: string): Promise<OracleTask> {
     const fnTag = `${OracleManager.CLASS_NAME}#unregisterTask()`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
+    return context.with(ctx, async () => {
       try {
         this.logger.info(`${fnTag}: Unregistering task with id ${taskId}`);
 
@@ -576,7 +642,7 @@ export class OracleManager {
           throw new Error(`${fnTag}: Task with id ${taskId} not found`);
         }
 
-        this.logAndPersist(
+        await this.logAndPersist(
           taskId,
           "unregister-task",
           "init",
@@ -585,7 +651,7 @@ export class OracleManager {
         );
 
         try {
-          this.logAndPersist(
+          await this.logAndPersist(
             taskId,
             "unregister-task",
             "exec",
@@ -607,7 +673,7 @@ export class OracleManager {
           task.status = OracleTaskStatusEnum.Inactive;
 
           this.logger.info(`${fnTag}: Task with id ${taskId} unregistered`);
-          this.logAndPersist(
+          await this.logAndPersist(
             taskId,
             "unregister-task",
             "done",
@@ -617,7 +683,7 @@ export class OracleManager {
 
           return task;
         } catch (innerErr) {
-          this.logAndPersist(
+          await this.logAndPersist(
             taskId,
             "unregister-task",
             "fail",
@@ -643,7 +709,7 @@ export class OracleManager {
       try {
         this.logger.info(`${fnTag}: Executing task with id ${task.taskID}`);
 
-        this.logAndPersist(
+        await this.logAndPersist(
           task.taskID,
           "execute-task",
           "init",
@@ -655,7 +721,7 @@ export class OracleManager {
         task.timestamp = Date.now();
 
         try {
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "execute-task",
             "exec",
@@ -666,7 +732,7 @@ export class OracleManager {
           task = await this.processTask(task);
           this.logger.info(`${fnTag}: Task executed successfully`);
 
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "execute-task",
             "done",
@@ -674,7 +740,7 @@ export class OracleManager {
             task.operations.length,
           );
         } catch (error) {
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "execute-task",
             "fail",
@@ -722,7 +788,7 @@ export class OracleManager {
       try {
         this.logger.debug(`${fnTag}: Processing task ${task.taskID}`);
 
-        this.logAndPersist(
+        await this.logAndPersist(
           task.taskID,
           "process-task",
           "init",
@@ -735,7 +801,7 @@ export class OracleManager {
         // only one operation, but a READ_AND_UPDATE task is decomposed into two operations,
         // one READ and one UPDATE with the data read from the first operation.
 
-        this.logAndPersist(
+        await this.logAndPersist(
           task.taskID,
           "process-task",
           "exec",
@@ -817,7 +883,7 @@ export class OracleManager {
         }
 
         this.logger.debug(`${fnTag}: Task ${task.taskID} processed.`);
-        this.logAndPersist(
+        await this.logAndPersist(
           task.taskID,
           "process-task",
           "done",
@@ -826,7 +892,7 @@ export class OracleManager {
         );
         return task;
       } catch (err) {
-        this.logAndPersist(
+        await this.logAndPersist(
           task.taskID,
           "process-task",
           "fail",
@@ -857,7 +923,7 @@ export class OracleManager {
           `${fnTag}: Relaying operation ${operation.id} to network ${safeStableStringify(operation.networkId)}`,
         );
 
-        this.logAndPersist(
+        await this.logAndPersist(
           task.taskID,
           "relay-operation",
           "init",
@@ -868,7 +934,7 @@ export class OracleManager {
         let response: OracleResponse;
 
         try {
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "relay-operation",
             "exec",
@@ -893,7 +959,7 @@ export class OracleManager {
           );
           task.operations.push(operation);
 
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "relay-operation",
             "done",
@@ -908,7 +974,7 @@ export class OracleManager {
           this.logger.error(
             `${fnTag}: Error relaying operation ${operation.id}: ${error}`,
           );
-          this.logAndPersist(
+          await this.logAndPersist(
             task.taskID,
             "relay-operation",
             "fail",

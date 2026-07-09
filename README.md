@@ -23,7 +23,7 @@ We are conducting an initiative called "Cacti cleanup". The initiative focuses o
 5. Enhance onboarding: Making it easier for new contributors to get started
 6. Optimize the CI/CD pipelines by reducing runtime and costs
 
-Please refer to [the overview of this initiative (+ the SATP-Hermes initiative)](https://www.youtube.com/watch?v=pN1m0vgV7bY), and the [public Github project board](https://github.com/orgs/hyperledger-cacti/projects/2). Please contribute and vote on the different aspects of the initiative [on the Discord threads](https://discord.com/channels/905194001349627914/908379338716631050/1428405972992266343).
+Please refer to [the overview of this initiative (+ the SATP-Hermes initiative)](https://www.youtube.com/watch?v=pN1m0vgV7bY), and the [public GitHub project board](https://github.com/orgs/hyperledger-cacti/projects/2). Please contribute and vote on the different aspects of the initiative [on the Discord threads](https://discord.com/channels/905194001349627914/908379338716631050/1428405972992266343).
 
 ## Scope of Project
 
@@ -37,11 +37,13 @@ As a fusion of two earlier systems (Cactus and Weaver) that have similar philoso
 
 The current Cacti code base contains the legacy Cactus and Weaver source code in aggregated form with their original folder structures intact. But the packages built from the two sections of code are unified and released under a common `cacti` namespace, and the CI/CD pipelines for testing and releases are also integrated under a common set of GitHub Actions. A _deeper_ merge and integration of source code is part of our roadmap, and will be carried out over a longer time period, but the current setup of code and release packages makes it easy for new users to navigate Cacti and for legacy users to carry out seamless upgrades.
 
-(Reference for legacy users: Cactus source code lies here (i.e., the root folder), excluding the `weaver` folder. Weaver source code lies within the [weaver](./weaver/) folder.
+For legacy users: Cactus source code is in the repository root (excluding the `weaver` folder), and Weaver source code is in the `weaver` directory.
 
 ## Documentation
 
-See the official [Hyperledger Cacti documentation](https://hyperledger-cacti.github.io/cacti/) to get all your questions answered about the project, to get started with setup, testing, and evaluation, and to get hands-on with code and configurations. Here, you can find separate (and specific) instructions for getting started with running and experimenting with [Cactus modules](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver modules](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) respectively.
+See the official [Confluence high-level project overview](https://lf-hyperledger.atlassian.net/wiki/spaces/cactus/overview?homepageId=20414469).
+
+For project vision and goals, technical details, and more, see the official [Hyperledger Cacti documentation](https://hyperledger-cacti.github.io/cacti/) to get all your questions answered about the project, to get started with setup, testing, and evaluation, and to get hands-on with code and configurations. Here, you can find separate (and specific) instructions for getting started with running and experimenting with [Cactus modules](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver modules](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) respectively.
 
 ## Roadmap
 
@@ -60,7 +62,7 @@ deny list" to "white list and black list".
 writing inclusive documentation might not look like a huge improvement, it's a
 first step in the right direction.
 - We suggest to refer to
-[Microsoft bias free writing guidelines](https://docs.microsoft.com/en-us/style-guide/bias-free-communication)
+[Microsoft bias free writing guidelines](https://learn.microsoft.com/en-us/style-guide/bias-free-communication)
 and
 [Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation)
 as starting points.

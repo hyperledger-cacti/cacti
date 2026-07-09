@@ -47,12 +47,12 @@ import {
   Checks,
   type LogLevelDesc,
   type JsObjectSigner,
-} from "@hyperledger/cactus-common";
+} from "@hyperledger-cacti/cactus-common";
 
 import { SATPLoggerProvider as LoggerProvider } from "../core/satp-logger-provider";
 import type { SATPLogger as Logger } from "../core/satp-logger";
 
-import { type IWebServiceEndpoint } from "@hyperledger/cactus-core-api";
+import { type IWebServiceEndpoint } from "@hyperledger-cacti/cactus-core-api";
 
 //import { GatewayIdentity, GatewayChannel } from "../core/types";
 //import { GetStatusError, NonExistantGatewayIdentity } from "../core/errors";
@@ -99,6 +99,7 @@ import { AddCounterpartyGatewayEndpointV1 } from "./admin/add-counterparty-gatew
 import type {
   ILocalLogRepository,
   IRemoteLogRepository,
+  IAuditEntryRepository,
 } from "../database/repository/interfaces/repository";
 import { GatewayShuttingDownError } from "./gateway-errors";
 import {
@@ -108,7 +109,7 @@ import {
 import { GetApproveAddressEndpointV1 } from "./transaction/get-approve-address-endpoint";
 import { getEnumValueByKey } from "../services/utils";
 import { GatewayIdentity } from "../core/types";
-import { LedgerType } from "@hyperledger/cactus-core-api";
+import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 
 import { OracleExecuteTaskEndpointV1 } from "./oracle/oracle-execute-task-endpoint";
 import { registerTask } from "./oracle/oracle-register-task-handler-service";
@@ -179,6 +180,8 @@ export interface BLODispatcherOptions {
   localRepository: ILocalLogRepository;
   /** Optional remote repository for distributed logging */
   remoteRepository?: IRemoteLogRepository;
+  /** Local repository for audit entries persistence */
+  auditRepository: IAuditEntryRepository;
   /** Optional claim format specification (defaults to JWT) */
   claimFormat?: ClaimFormat;
   /** Monitoring service for telemetry and metrics */
@@ -252,6 +255,7 @@ export class BLODispatcher {
   private localRepository: ILocalLogRepository;
   /** Remote log repository for distributed coordination */
   private remoteRepository: IRemoteLogRepository | undefined;
+  private auditRepository: IAuditEntryRepository;
   /** Shutdown flag to prevent new requests during shutdown */
   private isShuttingDown = false;
   /** Monitoring service for telemetry and metrics */
@@ -310,6 +314,7 @@ export class BLODispatcher {
     const ourGateway = this.orchestrator.ourGateway;
     this.localRepository = options.localRepository;
     this.remoteRepository = options.remoteRepository;
+    this.auditRepository = options.auditRepository;
     this.ccManager = options.ccManager;
 
     context.with(ctx, () => {
@@ -323,6 +328,7 @@ export class BLODispatcher {
           pubKey: options.pubKey,
           localRepository: this.localRepository,
           remoteRepository: this.remoteRepository,
+          auditRepository: this.auditRepository,
           claimFormat: options.claimFormat,
           monitorService: this.monitorService,
           adapterManager: this.adapterManager,
@@ -815,13 +821,17 @@ export class BLODispatcher {
     const { span, context: ctx } = this.monitorService.startSpan(
       "API1#performAudit()",
     );
-    return context.with(ctx, () => {
+    return context.with(ctx, async () => {
       try {
         this.logger.info(`Perform Audit request: ${safeStableStringify(req)}`);
-        if (!this.manager) {
-          throw new Error("SATPManager is not defined");
-        }
-        return executeAudit(this.level, req, this.manager);
+
+        const result = await executeAudit(
+          this.level,
+          this.auditRepository,
+          req,
+        );
+
+        return result;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

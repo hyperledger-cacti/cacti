@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v2/common"
+	"github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3/common"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/golang/protobuf/proto"
@@ -41,7 +41,7 @@ func createAssetExchangeAgreementSerializedBase64(assetType string, assetId stri
 	}
 	assetAgreementBytes, err := proto.Marshal(assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	return base64.StdEncoding.EncodeToString(assetAgreementBytes), nil
@@ -57,7 +57,7 @@ func createFungibleAssetExchangeAgreementSerializedBase64(assetType string, numU
 	}
 	assetAgreementBytes, err := proto.Marshal(assetAgreement)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	return base64.StdEncoding.EncodeToString(assetAgreementBytes), nil
@@ -72,7 +72,7 @@ func createAssetLockInfoSerializedBase64(hashBase64 string, expiryTimeSecs uint6
 	}
 	lockInfoHTLCBytes, err := proto.Marshal(lockInfoHTLC)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	lockInfo := &common.AssetLock{
@@ -81,7 +81,7 @@ func createAssetLockInfoSerializedBase64(hashBase64 string, expiryTimeSecs uint6
 	}
 	lockInfoBytes, err := proto.Marshal(lockInfo)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	return base64.StdEncoding.EncodeToString(lockInfoBytes), nil
@@ -94,7 +94,7 @@ func createAssetClaimInfoSerializedBase64(hashPreimageBase64 string) (string, er
 	}
 	claimInfoHTLCBytes, err := proto.Marshal(claimInfoHTLC)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	claimInfo := &common.AssetClaim{
@@ -103,7 +103,7 @@ func createAssetClaimInfoSerializedBase64(hashPreimageBase64 string) (string, er
 	}
 	claimInfoBytes, err := proto.Marshal(claimInfo)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	return base64.StdEncoding.EncodeToString(claimInfoBytes), nil
@@ -143,11 +143,11 @@ func CreateHTLC(contract GatewayContract, assetType string, assetId string, reci
 
 	assetExchangeAgreementStr, err := createAssetExchangeAgreementSerializedBase64(assetType, assetId, recipientECertBase64, "")
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	lockInfoStr, err := createAssetLockInfoSerializedBase64(hashBase64, expiryTimeSecs)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// Normal invoke function
@@ -183,11 +183,11 @@ func CreateFungibleHTLC(contract GatewayContract, assetType string, numUnits uin
 
 	assetExchangeAgreementStr, err := createFungibleAssetExchangeAgreementSerializedBase64(assetType, numUnits, recipientECertBase64, "")
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 	lockInfoStr, err := createAssetLockInfoSerializedBase64(hashBase64, expiryTimeSecs)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// Normal invoke function
@@ -219,7 +219,7 @@ func IsAssetLockedInHTLC(contract GatewayContract, assetType string, assetId str
 
 	assetExchangeAgreementStr, err := createAssetExchangeAgreementSerializedBase64(assetType, assetId, recipientECertBase64, lockerECertBase64)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// Normal invoke function
@@ -286,12 +286,12 @@ func ClaimAssetInHTLC(contract GatewayContract, assetType string, assetId string
 
 	claimInfoStr, err := createAssetClaimInfoSerializedBase64(hashPreimageBase64)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	assetExchangeAgreementStr, err := createAssetExchangeAgreementSerializedBase64(assetType, assetId, "", lockerECertBase64)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// Normal invoke function
@@ -316,7 +316,7 @@ func ClaimFungibleAssetInHTLC(contract GatewayContract, contractId string, hashP
 
 	claimInfoStr, err := createAssetClaimInfoSerializedBase64(hashPreimageBase64)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// Normal invoke function
@@ -341,7 +341,7 @@ func ClaimAssetInHTLCusingContractId(contract GatewayContract, contractId string
 
 	claimInfoStr, err := createAssetClaimInfoSerializedBase64(hashPreimageBase64)
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// Normal invoke function
@@ -369,7 +369,7 @@ func ReclaimAssetInHTLC(contract GatewayContract, assetType string, assetId stri
 
 	assetExchangeAgreementStr, err := createAssetExchangeAgreementSerializedBase64(assetType, assetId, recipientECertBase64, "")
 	if err != nil {
-		return "", logThenErrorf(err.Error())
+		return "", logThenErrorf("%s", err.Error())
 	}
 
 	// Normal invoke function

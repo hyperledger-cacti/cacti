@@ -1,5 +1,5 @@
 import { DLAccount, DefaultService } from "@hyperledger-cacti/cacti-copm-core";
-import { LogLevelDesc, Logger } from "@hyperledger/cactus-common";
+import { LogLevelDesc, Logger } from "@hyperledger-cacti/cactus-common";
 import * as fs from "fs";
 import * as path from "path";
 import { createPromiseClient, PromiseClient } from "@connectrpc/connect";
@@ -9,15 +9,15 @@ import { CopmTester } from "../interfaces/copm-tester";
 import { TestAssets } from "../interfaces/test-assets";
 import { CopmNetworkMode } from "../lib/types";
 import { TestAssetsCordaCli } from "./test-assets-corda-cli";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { ConfigService } from "@hyperledger/cactus-cmd-api-server";
-import { AuthorizationProtocol } from "@hyperledger/cactus-cmd-api-server";
+import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
+import { ConfigService } from "@hyperledger-cacti/cactus-cmd-api-server";
+import { AuthorizationProtocol } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { v4 as uuidV4 } from "uuid";
 import { PluginCopmCorda } from "@hyperledger-cacti/cacti-plugin-copm-corda";
 import { AddressInfo } from "node:net";
-import { Servers } from "@hyperledger/cactus-common";
+import { Servers } from "@hyperledger-cacti/cactus-common";
 import http from "node:http";
-import { ApiServer } from "@hyperledger/cactus-cmd-api-server";
+import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { CopmCordaContainer } from "./copm-corda-container";
 import { CordaRPCConfig } from "./corda-rpc-config";
 

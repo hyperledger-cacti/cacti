@@ -2,10 +2,10 @@
 
 ## Clone the repository
 
-Clone the [cacti git repository](https://github.com/hyperledger/cacti) on your local machine. Follow these instructions to get a copy of the project up and running for development and testing purposes.
+Clone the [cacti git repository](https://github.com/hyperledger-cacti/cacti) on your local machine. Follow these instructions to get a copy of the project up and running for development and testing purposes.
 
 ```sh
-git clone https://github.com/hyperledger/cacti.git
+git clone https://github.com/hyperledger-cacti/cacti.git
 cd cacti/packages/cacti-ledger-browser/
 ```
 

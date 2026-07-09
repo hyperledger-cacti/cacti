@@ -1,6 +1,10 @@
 {
   "*/*/src/**/*.{js,ts}": [
     "eslint --fix",
-    "cspell --no-must-find-files --config .cspell.json"
+    "cspell --no-must-find-files --config .cspell.json",
+    "prettier --write --config .prettierrc.js"
+  ],
+  "**/openapi.json": [
+    "prettier --write --config .prettierrc.js"
   ]
 }

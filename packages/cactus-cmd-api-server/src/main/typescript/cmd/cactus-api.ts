@@ -2,7 +2,7 @@
 
 import { ApiServer } from "../api-server";
 import { ConfigService } from "../config/config-service";
-import { Logger, LoggerProvider } from "@hyperledger/cactus-common";
+import { Logger, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 const log: Logger = LoggerProvider.getOrCreate({
   label: "cactus-api",

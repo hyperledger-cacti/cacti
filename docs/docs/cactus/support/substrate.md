@@ -7,7 +7,7 @@ Substrate chains include Polkadot, Kusama, Rococco, etc. The deployContract feat
 ```
 
 <details>
-  <summary>Hyperledger Cactus v1.0.0-rc3</summary>
+  <summary>Hyperledger Cacti v1.0.0-rc3</summary>
 
   | Substrate API version | deployContract* | invokeContract | runTransaction |
   | --- | :---: | :---: | :---: |
@@ -15,6 +15,6 @@ Substrate chains include Polkadot, Kusama, Rococco, etc. The deployContract feat
 
 </details>
 
-[Previous](xdai.md "xDai Support")
+[Previous](fabric.md "Fabric Support")
 
 * * *

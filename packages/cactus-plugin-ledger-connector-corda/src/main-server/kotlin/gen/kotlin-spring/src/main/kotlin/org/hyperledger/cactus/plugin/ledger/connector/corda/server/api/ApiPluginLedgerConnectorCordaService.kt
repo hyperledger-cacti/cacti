@@ -30,7 +30,7 @@ import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.VaultQu
 interface ApiPluginLedgerConnectorCordaService {
 
     /**
-     * DELETE /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/clear-monitor-transactions : Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
+     * DELETE /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions : Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
      *
      * @param clearMonitorTransactionsV1Request  (required)
      * @return OK (status code 200)
@@ -39,7 +39,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun clearMonitorTransactionsV1(clearMonitorTransactionsV1Request: ClearMonitorTransactionsV1Request): ClearMonitorTransactionsV1Response
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/deploy-contract-jars : Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars : Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
      *
      * @param deployContractJarsV1Request  (required)
      * @return OK (status code 200)
@@ -49,7 +49,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun deployContractJarsV1(deployContractJarsV1Request: DeployContractJarsV1Request): DeployContractJarsSuccessV1Response
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/diagnose-node
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node
      * Responds with diagnostic information about the Corda node
      *
      * @param diagnoseNodeV1Request  (optional)
@@ -59,7 +59,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun diagnoseNodeV1(diagnoseNodeV1Request: DiagnoseNodeV1Request?): DiagnoseNodeV1Response
 
     /**
-     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-flow-cid : This method gets the current status of the specified flow instance.
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid : This method gets the current status of the specified flow instance.
      *
      * @param getFlowCidV1Request This method gets the current status of the specified flow instance. (required)
      * @return OK (status code 200)
@@ -70,7 +70,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun getFlowV1(getFlowCidV1Request: GetFlowCidV1Request): GetFlowCidV1Response
 
     /**
-     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-monitor-transactions : Get transactions for monitored state classes.
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions : Get transactions for monitored state classes.
      *
      * @param getMonitorTransactionsV1Request  (required)
      * @return OK (status code 200)
@@ -79,7 +79,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun getMonitorTransactionsV1(getMonitorTransactionsV1Request: GetMonitorTransactionsV1Request): GetMonitorTransactionsV1Response
 
     /**
-     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics : Get the Prometheus Metrics
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics : Get the Prometheus Metrics
      *
      * @return OK (status code 200)
      * @see ApiPluginLedgerConnectorCorda#getPrometheusMetricsV1
@@ -87,7 +87,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun getPrometheusMetricsV1(): kotlin.String
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/invoke-contract : Invokes a contract on a Corda ledger (e.g. a flow)
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract : Invokes a contract on a Corda ledger (e.g. a flow)
      *
      * @param invokeContractV1Request  (required)
      * @return OK (status code 200)
@@ -96,7 +96,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun invokeContractV1(invokeContractV1Request: InvokeContractV1Request): InvokeContractV1Response
 
     /**
-     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-cpi : List all CPIs uploaded to the cluster
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi : List all CPIs uploaded to the cluster
      *
      * @param listCpiV1Request  (required)
      * @return OK (status code 200)
@@ -105,7 +105,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun listCpiV1(listCpiV1Request: ListCpiV1Request): ListCpiV1Response
 
     /**
-     * GET /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flow : This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow : This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
      *
      * @param getFlowCidV1Request This method gets the current status of the specified flow instance. (required)
      * @return OK (status code 200)
@@ -116,7 +116,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun listFlowV1(getFlowCidV1Request: GetFlowCidV1Request): FlowStatusV1Responses
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/list-flows
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows
      * Responds with a list of the flows on the Corda node.
      *
      * @param listFlowsV1Request  (optional)
@@ -126,7 +126,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun listFlowsV1(listFlowsV1Request: ListFlowsV1Request?): ListFlowsV1Response
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/network-map
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map
      * Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List&lt;NodeInfo&gt;
      *
      * @param body  (optional)
@@ -136,7 +136,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun networkMapV1(body: kotlin.Any?): List<NodeInfo>
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-flow : This method starts a new instance for the specified flow for the specified holding identity.
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow : This method starts a new instance for the specified flow for the specified holding identity.
      *
      * @param startFlowV1Request Request body for starting a flow (required)
      * @return OK (status code 200)
@@ -145,7 +145,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun startFlowV1(startFlowV1Request: StartFlowV1Request): StartFlowV1Response
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/start-monitor : Start monitoring corda changes (transactions) of given state class
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor : Start monitoring corda changes (transactions) of given state class
      *
      * @param startMonitorV1Request  (required)
      * @return OK (status code 200)
@@ -154,7 +154,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun startMonitorV1(startMonitorV1Request: StartMonitorV1Request): StartMonitorV1Response
 
     /**
-     * DELETE /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/stop-monitor : Stop monitoring corda changes (transactions) of given state class
+     * DELETE /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor : Stop monitoring corda changes (transactions) of given state class
      *
      * @param stopMonitorV1Request  (required)
      * @return OK (status code 200)
@@ -163,7 +163,7 @@ interface ApiPluginLedgerConnectorCordaService {
     fun stopMonitorV1(stopMonitorV1Request: StopMonitorV1Request): StopMonitorV1Response
 
     /**
-     * POST /api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-corda/vault-query
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query
      * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
      *
      * @param vaultQueryV1Request  (required)

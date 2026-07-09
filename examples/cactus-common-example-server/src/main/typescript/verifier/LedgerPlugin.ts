@@ -9,7 +9,7 @@ export {
   IVerifier,
   LedgerEvent,
   IVerifierEventListener,
-} from "@hyperledger/cactus-core-api";
+} from "@hyperledger-cacti/cactus-core-api";
 
 export class ApiInfo {
   apiType = "";

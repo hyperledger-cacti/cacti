@@ -25,7 +25,7 @@ runs:
     # 1. Setup Node.js + yarn cache
     - name: Use Node.js ${{ inputs.node_version }}
       id: setup-node
-      uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 #v6.2.0
+      uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e #v6.4.0
       with:
         cache: yarn
         cache-dependency-path: yarn.lock
@@ -37,7 +37,7 @@ runs:
       run: |
         corepack enable
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 #v6.1.0
       with:
         path: ~/.cache/yarn
         key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}

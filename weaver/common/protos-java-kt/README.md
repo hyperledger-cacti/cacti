@@ -19,7 +19,7 @@ If updating Protos version for Java/Kotlin, update the dependency version for in
 5) Run `make publish` to publish package to github packages.
 
 **NOTE:** Always publish to your fork first, and only after testing it well, then 
-after PR approval, publish it to `hyperledger/cacti`.
+after PR approval, publish it to `hyperledger-cacti/cacti`.
 To publish to your fork, replace `<your-git-name>` with your github username in `github.properties`:
 ```
 ...
@@ -38,6 +38,6 @@ and then follow above 4 steps.
 5) Add this to your build.gradle (change the version accordingly):
 ```
 dependencies {
-	compile(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "2.1.0")
+	compile(group: 'org.hyperledger.cacti.weaver.protos', name: 'protos-java-kt', version: "3.0.0-beta.1")
 }
 ```

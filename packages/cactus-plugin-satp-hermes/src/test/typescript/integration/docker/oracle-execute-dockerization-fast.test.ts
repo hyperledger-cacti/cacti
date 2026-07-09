@@ -1,11 +1,16 @@
 import "jest-extended";
-import { LogLevelDesc, LoggerProvider } from "@hyperledger/cactus-common";
+import {
+  LogLevelDesc,
+  LoggerProvider,
+  Secp256k1Keys,
+} from "@hyperledger-cacti/cactus-common";
+import { SupportedSigningAlgorithms } from "../../../../main/typescript/core/types";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
   SATPGatewayRunner,
   ISATPGatewayRunnerConstructorOptions,
-} from "@hyperledger/cactus-test-tooling";
+} from "@hyperledger-cacti/cactus-test-tooling";
 import {
   Address,
   GatewayIdentity,
@@ -18,6 +23,10 @@ import {
   BesuTestEnvironment,
   CI_TEST_TIMEOUT,
   createEnhancedTimeoutConfig,
+  runCleanup,
+  cleanupContainers,
+  cleanupEnvs,
+  cleanupGatewayRunners,
 } from "../../test-utils";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
@@ -30,7 +39,7 @@ import {
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
-import { Configuration } from "@hyperledger/cactus-core-api";
+import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 import {
   NetworkId,
   OracleApi,
@@ -60,6 +69,7 @@ let ethereumEnv: EthereumTestEnvironment;
 
 let db_local_config: Knex.Config;
 let db_remote_config: Knex.Config;
+let db_remote_host_config: Knex.Config;
 let db_local: Container;
 let db_remote: Container;
 let gatewayRunner: SATPGatewayRunner;
@@ -73,25 +83,11 @@ let ethereumContractAddress: string;
 let besuContractAddress: string;
 
 afterAll(async () => {
-  if (gatewayRunner) {
-    await gatewayRunner.stop();
-    await gatewayRunner.destroy();
-  }
-  if (db_local) {
-    await db_local.stop();
-    await db_local.remove();
-  }
-  if (db_remote) {
-    await db_remote.stop();
-    await db_remote.remove();
-  }
-
-  if (besuEnv) {
-    await besuEnv.tearDown();
-  }
-  if (ethereumEnv) {
-    await ethereumEnv.tearDown();
-  }
+  await runCleanup(log, [
+    ...cleanupGatewayRunners({ gatewayRunner }),
+    ...cleanupContainers({ db_local, db_remote }),
+    ...cleanupEnvs({ besuEnv, ethereumEnv }),
+  ]);
 
   await pruneDockerContainersIfGithubAction({ logLevel })
     .then(() => {
@@ -124,21 +120,27 @@ beforeAll(async () => {
       fail("Pruning didn't throw OK");
     });
 
-  ({ config: db_local_config, container: db_local } = await createPGDatabase({
-    network: testNetwork,
-    postgresUser: "user123123",
-    postgresPassword: "password",
-  }));
+  ({ networkConfig: db_local_config, container: db_local } =
+    await createPGDatabase({
+      network: testNetwork,
+      postgresUser: "user123123",
+      postgresPassword: "password",
+    }));
   db_local_config = createEnhancedTimeoutConfig(db_local_config);
 
-  ({ config: db_remote_config, container: db_remote } = await createPGDatabase({
+  ({
+    hostConfig: db_remote_host_config,
+    networkConfig: db_remote_config,
+    container: db_remote,
+  } = await createPGDatabase({
     network: testNetwork,
     postgresUser: "user123123",
     postgresPassword: "password",
   }));
+  db_remote_host_config = createEnhancedTimeoutConfig(db_remote_host_config);
   db_remote_config = createEnhancedTimeoutConfig(db_remote_config);
 
-  await setupDBTable(db_remote_config);
+  await setupDBTable(db_remote_host_config);
 
   const businessLogicContract = "OracleTestContract";
 
@@ -188,6 +190,8 @@ beforeAll(async () => {
   const address: Address = `http://${gatewayAddress}`;
 
   // gateway setup:
+  const gatewayKeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
   const gatewayIdentity = {
     id: "mockID",
     name: "CustomGateway",
@@ -203,6 +207,12 @@ beforeAll(async () => {
     gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
     gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
     gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+    identificationCredential: {
+      signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+      pubKey: Buffer.from(gatewayKeyPair.publicKey as Uint8Array).toString(
+        "hex",
+      ),
+    },
   } as GatewayIdentity;
 
   // besuConfig Json object setup:
@@ -236,6 +246,14 @@ beforeAll(async () => {
     ccConfig: { oracleConfig: [besuConfig, ethereumConfig] },
     localRepository: db_local_config,
     remoteRepository: db_remote_config,
+    gatewayKeyPair: {
+      privateKey: Buffer.from(gatewayKeyPair.privateKey as Buffer).toString(
+        "hex",
+      ),
+      publicKey: Buffer.from(gatewayKeyPair.publicKey as Uint8Array).toString(
+        "hex",
+      ),
+    },
   });
 
   // gatewayRunner setup:

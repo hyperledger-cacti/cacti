@@ -21,7 +21,7 @@ jobs:
       status: ${{ steps.early.outputs.status }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Ignore if not a release PR
         id: early
@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Get release verison from PR title
         env:
@@ -50,7 +50,7 @@ jobs:
           # Split PR title by space, and take 3rd word
           VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
-          VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "$VERSION"
 
@@ -149,7 +149,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #v4.1.7
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
       
       - name: Get release verison from PR title
         env:
@@ -159,7 +159,7 @@ jobs:
           # Split PR title by space, and take 3rd word
           VERSION=$(echo "${TITLE}" | cut -d ' ' -f 3)
           # Strip "v" from version
-          VERSION=$(echo "$VERSION" | sed -e 's/^v//')
+          VERSION="${VERSION#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "$VERSION"
       

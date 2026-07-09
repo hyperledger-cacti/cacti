@@ -9,6 +9,9 @@
   - [Configure Cacti](#configure-cacti)
 - [Build Script Decision Tree](#build-script-decision-tree)
 - [Running CI Checks Locally Before Pushing](#running-ci-checks-locally-before-pushing)
+  - [Quick Checklist](#quick-checklist)
+  - [Individual Steps](#individual-steps)
+  - [Docker Tests](#docker-tests)
 - [Configuring SSH to use upterm](#configuring-ssh-to-use-upterm)
 
 ## Hyperledger Cacti Build Instructions
@@ -302,7 +305,7 @@ line of code for example.
 To figure out which script could work for rebuilding Cactus, please follow
 the following decision tree (and keep in mind that we have `npm run watch` too)
 
-![Build Script Decision Tree](./docs/images/build-script-decision-tree-2021-03-06.png)
+![Build Script Decision Tree](./docs/docs/cactus/_images/build-script-decision-tree-2021-03-06.png)
 
 ## Running CI Checks Locally Before Pushing
 
@@ -361,9 +364,9 @@ Locate the `ci.yml` within `.github/workflows` and add to the `ci.yml` code list
     with:
       repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v4.1.1) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details, see the [Debug your GitHub Actions by using ssh](https://github.com/marketplace/actions/debugging-with-ssh).
+Keep in mind that the SSH upterm session should come after the checkout step (uses: actions/checkout@v4.1.1) to ensure that the CI doesn't hang without before the debugging step occurs. Editing the `ci.yml` will create a new upterm session within `.github/workflows` by adding a new build step. For more details, see the [Debug with SSH action](https://github.com/marketplace/actions/debug-with-ssh).
 
-By creating a PR for the edited `ci.yml` file, this will the CI to run their tests. There are two ways to navigate to CIs.
+By creating a PR for the edited `ci.yml` file, this will allow the CI to run their tests. There are two ways to navigate to CIs.
   1) Go to the PR and click the `checks` tab
   2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
 
