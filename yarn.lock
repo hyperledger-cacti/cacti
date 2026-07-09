@@ -6405,7 +6405,7 @@ __metadata:
     "@types/bn.js": "npm:5.2.0"
     "@types/express": "npm:5.0.1"
     axios: "npm:1.16.0"
-    bn.js: "npm:5.2.2"
+    bn.js: "npm:4.12.3"
     dotenv: "npm:16.3.1"
     ds-test: "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
     ethers: "npm:6.12.1"
@@ -6603,7 +6603,7 @@ __metadata:
     "@types/uuid": "npm:10.0.0"
     axios: "npm:1.16.0"
     bl: "npm:6.1.0"
-    bn.js: "npm:4.12.0"
+    bn.js: "npm:4.12.3"
     body-parser: "npm:1.20.3"
     dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.1"
@@ -6804,7 +6804,7 @@ __metadata:
     "@vercel/ncc": "npm:0.38.1"
     axios: "npm:1.16.0"
     bignumber.js: "npm:9.1.2"
-    bn.js: "npm:5.2.1"
+    bn.js: "npm:4.12.3"
     body-parser: "npm:1.20.3"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"
@@ -18860,24 +18860,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bn.js@npm:4.12.0":
-  version: 4.12.0
-  resolution: "bn.js@npm:4.12.0"
-  checksum: 10/10f8db196d3da5adfc3207d35d0a42aa29033eb33685f20ba2c36cadfe2de63dad05df0a20ab5aae01b418d1c4b3d4d205273085262fa020d17e93ff32b67527
-  languageName: node
-  linkType: hard
-
-"bn.js@npm:5.2.1":
-  version: 5.2.1
-  resolution: "bn.js@npm:5.2.1"
-  checksum: 10/7a7e8764d7a6e9708b8b9841b2b3d6019cc154d2fc23716d0efecfe1e16921b7533c6f7361fb05471eab47986c4aa310c270f88e3507172104632ac8df2cfd84
-  languageName: node
-  linkType: hard
-
-"bn.js@npm:5.2.2":
-  version: 5.2.2
-  resolution: "bn.js@npm:5.2.2"
-  checksum: 10/51ebb2df83b33e5d8581165206e260d5e9c873752954616e5bf3758952b84d7399a9c6d00852815a0aeefb1150a7f34451b62d4287342d457fa432eee869e83e
+"bn.js@npm:4.12.3":
+  version: 4.12.3
+  resolution: "bn.js@npm:4.12.3"
+  checksum: 10/57ed5a055f946f3e009f1589c45a5242db07f3dddfc72e4506f0dd9d8b145f0dbee4edabc2499288f3fc338eb712fb96a1c623a2ed2bcd49781df1a64db64dd1
   languageName: node
   linkType: hard
 
