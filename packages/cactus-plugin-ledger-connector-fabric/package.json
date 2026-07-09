@@ -62,7 +62,7 @@
     "@hyperledger-cacti/cactus-core-api": "3.0.0-beta.1",
     "axios": "1.16.0",
     "bl": "6.1.0",
-    "bn.js": "4.12.0",
+    "bn.js": "4.12.3",
     "dockerode": "3.3.0",
     "elliptic": "6.6.1",
     "express": "5.1.0",
