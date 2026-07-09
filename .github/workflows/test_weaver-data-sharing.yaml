@@ -23,6 +23,9 @@ concurrency:
   cancel-in-progress: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+permissions:
+  contents: read
+
 jobs:
   check_code_changed:
     outputs:

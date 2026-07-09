@@ -6,6 +6,8 @@ on:
       codegen_success:
         description: "Whether the code generation was successful"
         value: ${{ jobs.codegen-satp.outputs.codegen_success }}
+permissions:
+  contents: read
 
 jobs:
   codegen-satp: 

@@ -9,7 +9,10 @@
          - Cactus_CI
         types:
           - completed
-    
+
+    permissions:
+      contents: read
+
     jobs:
       generate_coverage_report:
         runs-on: ubuntu-22.04

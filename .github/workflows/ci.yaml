@@ -22,12 +22,10 @@ env:
 # `contents: write` is required by `cpl-connector-besu` (connector-packages)
 # and `cactus-cmd-api-server` (core-packages) because they push benchmark
 # results to the gh-pages branch on main and write commit-comment alerts.
-# `actions: read` is used by the benchmark cache restore.
-# `checks: write` is used by dorny/test-reporter inside jest-runner.
+# Least-privilege default; jobs that call reusable workflows needing more
+# declare their own permissions block (which caps the called workflow).
 permissions:
-  contents: write
-  actions: read
-  checks: write
+  contents: read
 
 jobs:
   env-setup:
@@ -61,6 +59,11 @@ jobs:
       
   packages-workflow:
     needs: [checks-and-build, env-setup]
+    # core-packages/connector-packages push benchmark data to gh-pages on main.
+    permissions:
+      contents: write
+      actions: read
+      checks: write
     uses: ./.github/workflows/packages-workflow.yaml
     with:
       affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}
@@ -70,6 +73,11 @@ jobs:
 
   examples-workflow:
     needs: [checks-and-build, env-setup]
+    # dorny/test-reporter (checks: write) + benchmark cache restore (actions: read).
+    permissions:
+      contents: read
+      actions: read
+      checks: write
     uses: ./.github/workflows/examples-workflow.yaml
     with:
       affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}

@@ -28,12 +28,12 @@ on:
     tags: ['v[0-9]*']
   workflow_dispatch:
 
-# Least privilege for the pipeline; child workflows request their own.
-# npmjs publishing (and its OIDC id-token) is owned by publish-npm.yaml, not
-# this pipeline, so no id-token permission is needed here.
+# Least privilege for the pipeline; every job below declares its own
+# permissions (which cap the reusable workflows they call), so no writes are
+# needed at the top level. npmjs publishing (and its OIDC id-token) is owned by
+# publish-npm.yaml, not this pipeline, so no id-token permission is needed here.
 permissions:
-  contents: write # create the GitHub release
-  packages: write # GHCR + GitHub Package Registry
+  contents: read
 
 concurrency:
   group: satp-hermes-release-${{ github.ref }}

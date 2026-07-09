@@ -47,6 +47,9 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 jobs:
   # =============================================================================
   # STAGE 8: CREATE GITHUB RELEASE (MANUAL RELEASE MODE ONLY)
@@ -57,6 +60,8 @@ jobs:
   create-github-release:
     if: ${{ inputs.is_release }}
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write # create the GitHub release
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
         with:

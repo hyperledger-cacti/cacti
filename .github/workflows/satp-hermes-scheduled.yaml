@@ -21,6 +21,8 @@ on:
   # Keep manual dispatch so you can trigger an ad-hoc run without waiting
   # for Sunday (useful when debugging a flaky test outside normal PR flow).
   workflow_dispatch:
+permissions:
+  contents: read
 
 jobs:
   satp-hermes:

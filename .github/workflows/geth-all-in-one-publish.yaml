@@ -12,6 +12,8 @@ concurrency:
 
 env:
   IMAGE_NAME: cactus-geth-all-in-one
+permissions:
+  contents: read
 
 jobs:
   # Push image to GitHub Packages.

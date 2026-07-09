@@ -22,6 +22,8 @@ env:
   NODEJS_VERSION: v20.20.0
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+permissions:
+  contents: read
 
 jobs:
   deploy-docs:

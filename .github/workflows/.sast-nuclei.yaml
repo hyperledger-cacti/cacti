@@ -28,6 +28,8 @@ on:
           nuclei-templates release tag to clone (e.g. v10.1.4).
           Leave empty to use the latest commit on the default branch.
           Verify available tags at github.com/projectdiscovery/nuclei-templates/releases
+permissions:
+  contents: read
 
 jobs:
   nuclei-scan:

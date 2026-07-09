@@ -12,6 +12,8 @@ concurrency:
 
 env:
   IMAGE_NAME: cactus-connector-fabric-cli
+permissions:
+  contents: read
 
 jobs:
   # Push image to GitHub Packages.
