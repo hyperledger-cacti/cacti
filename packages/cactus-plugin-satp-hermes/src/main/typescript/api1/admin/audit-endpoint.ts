@@ -44,6 +44,7 @@ import {
   type IAsyncProvider,
 } from "@hyperledger-cacti/cactus-common";
 
+import createHttpError from "http-errors";
 import {
   handleRestEndpointException,
   registerWebServiceEndpoint,
@@ -214,17 +215,13 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
    */
   private parseRequiredIso(value: unknown, name: string): Date {
     if (typeof value !== "string") {
-      const err = new Error(`${name} must be an ISO-8601 string`);
-      (err as any).statusCode = 400;
-      throw err;
+      throw createHttpError(400, `${name} must be an ISO-8601 string`);
     }
 
     const date = new Date(value);
 
     if (isNaN(date.getTime())) {
-      const err = new Error(`${name} must be a valid ISO-8601 timestamp`);
-      (err as any).statusCode = 400;
-      throw err;
+      throw createHttpError(400, `${name} must be a valid ISO-8601 timestamp`);
     }
 
     return date;
@@ -259,11 +256,10 @@ export class AuditEndpointV1 implements IWebServiceEndpoint {
           : new Date();
 
       if (startDate.getTime() > endDate.getTime()) {
-        const err = new Error(
+        throw createHttpError(
+          400,
           "startTimestamp must be less than or equal to endTimestamp",
         );
-        (err as any).statusCode = 400;
-        throw err;
       }
 
       const auditRequest: AuditRequest = {
