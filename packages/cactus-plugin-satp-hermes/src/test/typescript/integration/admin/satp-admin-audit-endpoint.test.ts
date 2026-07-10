@@ -216,21 +216,42 @@ describe("Audit Endpoint Integration Tests", () => {
     expect(response.data.auditEntries.entries.length).toBe(1);
   });
 
-  it("Given invalid timestamp format, When calling audit endpoint, Then return 400 Bad Request", async () => {
+  it("Given malformed startTimestamp, When calling audit endpoint, Then return 400 Bad Request", async () => {
     // Given
-    const SATPGatewayAdminApi: AdminApi = new AdminApi(
+    const api: AdminApi = new AdminApi(
       new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
     const invalidStartTimestamp = "INVALID_TIMESTAMP";
-    const invalidEndTimestamp = "ANOTHER_INVALID_TIMESTAMP";
+    const validEndTimestamp = new Date().toISOString();
 
     // When / Then
     await expect(
-      SATPGatewayAdminApi.performAudit(
-        invalidStartTimestamp,
-        invalidEndTimestamp,
-      ),
+      api.performAudit(invalidStartTimestamp, validEndTimestamp),
+    ).rejects.toMatchObject({
+      response: {
+        status: 400,
+        data: expect.arrayContaining([
+          expect.objectContaining({
+            errorCode: "format.openapi.validation",
+          }),
+        ]),
+      },
+    });
+  });
+
+  it("Given malformed endTimestamp, When calling audit endpoint, Then return 400 Bad Request", async () => {
+    // Given
+    const api: AdminApi = new AdminApi(
+      new Configuration({ basePath: gateway.getAddressOApiAddress() }),
+    );
+
+    const validStartTimestamp = new Date(Date.now() - 1000).toISOString();
+    const invalidEndTimestamp = "NOT_A_DATE";
+
+    // When / Then
+    await expect(
+      api.performAudit(validStartTimestamp, invalidEndTimestamp),
     ).rejects.toMatchObject({
       response: {
         status: 400,
@@ -258,7 +279,9 @@ describe("Audit Endpoint Integration Tests", () => {
     ).rejects.toMatchObject({
       response: {
         status: 400,
-        data: { error: "InvalidParameter" },
+        data: expect.objectContaining({
+          message: "BadRequest",
+        }),
       },
     });
   });
