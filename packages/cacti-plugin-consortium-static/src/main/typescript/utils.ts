@@ -28,30 +28,48 @@ export async function verifyOrganization(
   token: string,
   jwk: JWK,
   expectedOrganization: string,
-): Promise<string | boolean> {
+  seenJtis?: Map<string, number>,
+): Promise<boolean> {
   try {
-    // Import the JWK as a public key
     const publicKey: Uint8Array | KeyLike = await importJWK(jwk, "ES256K");
 
-    // Verify the JWT using the public key
+    // jwtVerify throws JWTExpired / JWTInvalid on bad tokens, so no manual expiry check needed
     const { payload } = await jwtVerify(token, publicKey);
 
-    // Check if the organization name matches
     if (payload.iss !== expectedOrganization) {
       return false;
     }
 
-    //TODO: verify payload.jti against remote log of the organization.
-    if (!payload.exp) {
-      return "Your token does not have an expiration date.";
+    // jwtVerify does not require exp to be present; reject tokens that omit it
+    if (payload.exp === undefined) {
+      return false;
     }
-    if (payload.exp < Date.now()) {
-      return "The token has expired";
+
+    if (seenJtis !== undefined) {
+      const { jti } = payload;
+      if (!jti) {
+        return false;
+      }
+
+      // Prune expired entries on each call to prevent unbounded memory growth
+      const nowSecs = Math.floor(Date.now() / 1000);
+      for (const [key, expiry] of seenJtis) {
+        if (expiry <= nowSecs) {
+          seenJtis.delete(key);
+        }
+      }
+
+      // Namespace by issuer: jti uniqueness is only guaranteed within an issuer
+      // payload.iss and payload.exp are guaranteed non-undefined at this point
+      const cacheKey = `${payload.iss}:${jti}`;
+      if (seenJtis.has(cacheKey)) {
+        return false;
+      }
+      seenJtis.set(cacheKey, payload.exp as number);
     }
 
     return true;
-  } catch (err) {
-    console.error(err);
+  } catch (_err) {
     return false;
   }
 }
