@@ -89,7 +89,7 @@
     "socket.io-client-fixed-types": "4.5.4",
     "tape": "5.6.1",
     "tape-promise": "4.0.0",
-    "tar-fs": "3.0.10",
+    "tar-fs": "3.1.1",
     "tar-stream": "2.2.0",
     "temp": "0.9.4",
     "typescript-optional": "2.0.1",
@@ -118,7 +118,7 @@
     "@types/tar-stream": "2.2.1",
     "@types/temp": "0.9.1",
     "esm": "3.2.25",
-    "tar-fs": "3.0.10",
+    "tar-fs": "3.1.1",
     "temp": "0.9.4"
   },
   "engines": {

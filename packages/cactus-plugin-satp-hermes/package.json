@@ -215,7 +215,7 @@
     "axios": "1.16.0",
     "bignumber.js": "9.1.2",
     "bn.js": "5.2.3",
-    "body-parser": "1.20.2",
+    "body-parser": "1.20.3",
     "class-transformer": "0.5.1",
     "class-validator": "0.14.1",
     "cors": "2.8.5",
