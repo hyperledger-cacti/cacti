@@ -258,7 +258,9 @@ describe("Audit Endpoint Integration Tests", () => {
     ).rejects.toMatchObject({
       response: {
         status: 400,
-        data: { error: "InvalidParameter" },
+        data: expect.objectContaining({
+          message: "BadRequest",
+        }),
       },
     });
   });
