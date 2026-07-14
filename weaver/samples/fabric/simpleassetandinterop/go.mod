@@ -9,7 +9,7 @@ require (
 	github.com/hyperledger/fabric-contract-api-go v1.2.2
 	github.com/hyperledger/fabric-protos-go v0.3.7
 	github.com/sirupsen/logrus v1.9.4
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require golang.org/x/mod v0.35.0 // indirect
