@@ -47,7 +47,6 @@ export async function getAllTgzPath(): Promise<IGetAllTgzPathResponse> {
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3628
       "packages/cacti-plugin-weaver-driver-fabric/src/main/typescript/hyperledger-cacti-cacti-weaver-driver-fabric-*.tgz",
       // link for issue ticket relating to this package: https://github.com/hyperledger-cacti/cacti/issues/3632
-      "examples/cactus-common-example-server/hyperledger-cacti-cactus-common-example-server-*.tgz",
     ],
   };
 
