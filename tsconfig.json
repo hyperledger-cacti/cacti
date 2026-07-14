@@ -100,9 +100,6 @@
       "path": "./packages/cactus-test-tooling/tsconfig.json"
     },
     {
-      "path": "./examples/cactus-common-example-server/tsconfig.json"
-    },
-    {
       "path": "./extensions/cactus-plugin-object-store-ipfs/tsconfig.json"
     },
     {
