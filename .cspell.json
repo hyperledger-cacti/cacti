@@ -272,7 +272,6 @@
   "ignorePaths": [
     "**/node_modules/**",
     "**/build/**",
-    "**/src/main/typescript/generated/**",
-    "examples/cactus-common-example-server/**"
+    "**/src/main/typescript/generated/**"
   ]
 }
