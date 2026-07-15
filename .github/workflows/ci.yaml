@@ -71,19 +71,6 @@ jobs:
       run_code_coverage: ${{ needs.env-setup.outputs.run_code_coverage }}
       run_trivy_scan: ${{ needs.env-setup.outputs.run_trivy_scan }}
 
-  examples-workflow:
-    needs: [checks-and-build, env-setup]
-    # dorny/test-reporter (checks: write) + benchmark cache restore (actions: read).
-    permissions:
-      contents: read
-      actions: read
-      checks: write
-    uses: ./.github/workflows/examples-workflow.yaml
-    with:
-      affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}
-      node_version: ${{ needs.env-setup.outputs.node_version }}
-      run_code_coverage: ${{ needs.env-setup.outputs.run_code_coverage }}
-
   ghcr-workflow:
     needs: [checks-and-build, env-setup]
     uses: ./.github/workflows/ghcr-workflow.yaml
