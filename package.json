@@ -8,8 +8,6 @@
       "packages/cactus-*",
       "extensions/cactus-*",
       "packages/cacti-*",
-      "examples/cactus-*",
-      "examples/cacti-*",
       "extensions/cacti-*",
       "weaver/common/protos-js",
       "weaver/sdks/fabric/interoperation-node-sdk",

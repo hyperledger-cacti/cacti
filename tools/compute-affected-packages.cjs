@@ -36,7 +36,7 @@ const path = require("path");
 
 const { execSync } = require("child_process");
 
-const WORKSPACE_DIR = ["packages", "examples", "extensions"]; // change if needed
+const WORKSPACE_DIR = ["packages", "extensions"]; // change if needed
 
 // --- 1. Collect all workspace package.json files ---
 function getAllPackages() {
