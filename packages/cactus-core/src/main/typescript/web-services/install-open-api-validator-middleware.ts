@@ -40,7 +40,7 @@ export async function installOpenapiValidationMiddleware(
 
   app.use(
     OpenApiValidator.middleware({
-      apiSpec: apiSpec as OpenAPIV3.Document,
+      apiSpec: apiSpec as OpenAPIV3.DocumentV3,
       validateApiSpec: false,
       $refParser: {
         mode: "dereference",

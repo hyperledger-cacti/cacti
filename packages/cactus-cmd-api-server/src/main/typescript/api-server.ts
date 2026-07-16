@@ -968,7 +968,7 @@ export class ApiServer {
       .map(async (plugin: ICactusPlugin) => {
         const p = plugin as IPluginWebService;
         await p.getOrCreateWebServices();
-        const apiSpec = p.getOpenApiSpec() as OpenAPIV3.Document;
+        const apiSpec = p.getOpenApiSpec() as OpenAPIV3.DocumentV3;
         const pkgName = p.getPackageName();
         const oApiValidationOn = !openApiValidationOffPkgs.includes(pkgName);
 

@@ -55,7 +55,7 @@
     "body-parser": "1.20.3",
     "express": "5.1.0",
     "express-jwt-authz": "2.4.1",
-    "express-openapi-validator": "5.2.0",
+    "express-openapi-validator": "5.6.2",
     "http-errors": "2.0.0",
     "http-errors-enhanced-cjs": "2.0.1",
     "run-time-error-cjs": "1.4.0",
