@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784192104959,
+  "lastUpdate": 1784192310093,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -491,6 +491,35 @@ window.BENCHMARK_DATA = {
             "range": "±2.10%",
             "unit": "ops/sec",
             "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Bhavyam Sharma",
+            "username": "bhavyamsharmaa",
+            "email": "positionbhavyamsharma@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "4c227ff24d46587871322eddae19249c12f05de8",
+          "message": "refactor(cactus-plugin-satp-hermes): add dead code detection rules\n\n- Add no-unreachable (error), no-unused-private-class-members (warn),\n  and @typescript-eslint/no-unused-expressions (warn) rules to\n  eslint.config.mjs for dead code detection\n- Add Node.js globals override for *.mjs files\n- Add lint:ci npm script for CI linting without auto-fix, sorted\n  alphabetically in package.json\n- Add SATP lint stage to satp-hermes-build.yaml CI workflow\n- Restore deleted catch block as commented-out code in\n  stage1-client-service.ts (will be uncommented when logic is added)\n\nSigned-off-by: Bhavyam Sharma <positionbhavyamsharma@gmail.com>",
+          "timestamp": "2026-06-16T14:53:47Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/4c227ff24d46587871322eddae19249c12f05de8"
+        },
+        "date": 1784192307561,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 1973,
+            "range": "±3.16%",
+            "unit": "ops/sec",
+            "extra": "184 samples"
           }
         ]
       }
