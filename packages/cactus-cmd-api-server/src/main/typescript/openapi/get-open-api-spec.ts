@@ -14,7 +14,7 @@ import type { OpenAPIV3 } from "express-openapi-validator/dist/framework/types";
 export async function getOpenApiSpecV1(req: {
   readonly pluginRegistry: PluginRegistry;
   readonly logLevel?: LogLevelDesc;
-}): Promise<OpenAPIV3.Document[]> {
+}): Promise<OpenAPIV3.DocumentV3[]> {
   const fnTag = `cactus-cmd-api-server/openapi/get-open-api-spec.ts#getOpenApiSpecV1()`;
   Checks.truthy(req, `${fnTag} req`);
   Checks.truthy(req.pluginRegistry, `${fnTag} req.pluginRegistry`);
@@ -39,7 +39,7 @@ export async function getOpenApiSpecV1(req: {
       log.debug("Getting OpenAPI spec for %s", pkgName);
       const webPlugin = plugin as IPluginWebService;
       const openApiSpec = await webPlugin.getOpenApiSpec();
-      return openApiSpec as OpenAPIV3.Document;
+      return openApiSpec as OpenAPIV3.DocumentV3;
     },
   );
 

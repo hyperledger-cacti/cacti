@@ -84,7 +84,7 @@
     "express": "5.1.0",
     "express-http-proxy": "1.6.2",
     "express-jwt": "8.4.1",
-    "express-openapi-validator": "5.2.0",
+    "express-openapi-validator": "5.6.2",
     "express-rate-limit": "6.7.0",
     "fastify": "5.8.5",
     "fs-extra": "11.2.0",
