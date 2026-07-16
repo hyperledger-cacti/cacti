@@ -29,7 +29,6 @@ const PACKAGES_TO_BE_IGNORED_FOR_DEP_CONSISTENCY_CHECK: string[] = [
   "@hyperledger-cacti/cactus-plugin-object-store-ipfs",
   "@hyperledger-cacti/cactus-common-example-server",
   "@hyperledger-cacti/cactus-example-cbdc-bridging-backend",
-  "@hyperledger-cacti/cacti-example-cbdc-bridging-frontend",
   "@hyperledger-cacti/cacti-weaver-protos-js",
   "@hyperledger-cacti/cacti-weaver-besu-cli",
   "@hyperledger-cacti/cacti-weaver-driver-fabric",
