@@ -63,7 +63,7 @@ export class PluginRegistry {
    * when the plugin does not exist in the registry.
    *
    * @param instanceId The `instanceId` of the plugin that you are looking to obtain an instance of from the registry.
-   * @throws If there is no plugin in the registry by the `instanceId` specificed.
+   * @throws If there is no plugin in the registry by the `instanceId` specified.
    */
   public getOneById<T extends ICactusPlugin>(instanceId: string): T {
     Checks.nonBlankString(instanceId, "instanceId");
@@ -86,7 +86,7 @@ export class PluginRegistry {
    * plugin being loaded for your code.
    *
    * @param packageName The package name of the plugin that you are looking to obtain an instance of from the registry.
-   * @throws If there is no plugin in the registry by the package name specificed.
+   * @throws If there is no plugin in the registry by the package name specified.
    */
   public getOneByPackageName<T extends ICactusPlugin>(packageName: string): T {
     return this.findOneByPackageName(packageName).orElseThrow(
