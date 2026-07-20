@@ -52,7 +52,6 @@
     "generate-api-server-config": "yarn node ./tools/generate-api-server-config.js",
     "sync-ts-config": "TS_NODE_PROJECT=tools/tsconfig.json node --experimental-json-modules --loader ts-node/esm ./tools/sync-npm-deps-to-tsc-projects.ts",
     "start:api-server": "yarn node ./packages/cactus-cmd-api-server/dist/lib/main/typescript/cmd/cactus-api.js --config-file=.config.json",
-    "start:example-cbdc-bridging-app": "node -r ts-node/register examples/cactus-example-cbdc-bridging-backend/dist/lib/main/typescript/cbdc-bridging-app-cli.js dotenv_config_path=examples/cactus-example-cbdc-bridging-backend/process.env",
     "purge-build-cache": "del-cli .build-cache/*",
     "clean": "yarn purge-build-cache && del-cli \"./{packages,examples,extensions}/cactus-*/{dist,.nyc_output,src/main/kotlin/generated/openapi/kotlin-client/*,src/main/proto/generated/*,src/main/typescript/generated/openapi/typescript-axios/*,src/main-server/kotlin/gen/kotlin-spring/src/**/{model,api}/*}\" \"!**/.openapi-generator-ignore\"",
     "lint": "run-s format:eslint format:prettier spellcheck",
