@@ -1267,12 +1267,22 @@ export class PluginLedgerConnectorFabric
    * @returns correct TransientMap
    */
   private toTransientMap(transientData?: unknown): TransientMap {
-    const transientMap = transientData as TransientMap;
+    const source = (transientData ?? {}) as Record<string, unknown>;
+
+    // Transient-data keys are caller-supplied and cannot be allow-listed (they
+    // ARE the payload forwarded to chaincode), so writing them into a normal
+    // object would let a key such as "__proto__" pollute Object.prototype or a
+    // key such as "toString" overwrite an inherited built-in. Copying into a
+    // prototype-less object removes the prototype chain and every inherited
+    // property, so arbitrary keys cannot inject into or pollute anything — the
+    // same guarantee as the marker-prefix pattern, but without renaming the
+    // keys the chaincode expects. Only the caller's own keys are copied.
+    const transientMap: TransientMap = Object.create(null);
 
     try {
       //Obtains and parses each component of transient data
-      for (const key in transientMap) {
-        transientMap[key] = Buffer.from(JSON.stringify(transientMap[key]));
+      for (const key of Object.keys(source)) {
+        transientMap[key] = Buffer.from(JSON.stringify(source[key]));
       }
     } catch (ex) {
       this.log.error(`Building transient map crashed: `, ex);

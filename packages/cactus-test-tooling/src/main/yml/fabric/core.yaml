@@ -662,11 +662,10 @@ ledger:
        couchDBAddress: 127.0.0.1:5984
        # This username must have read and write authority on CouchDB
        username:
-       # The password is recommended to pass as an environment variable
-       # during start up (eg CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD).
-       # If it is stored here, the file must be access control protected
-       # to prevent unintended users from discovering the password.
-       password:
+       # The password is passed as an environment variable during start up
+       # (eg CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD) rather than stored here.
+       # If it must be stored in this file, the file has to be access control
+       # protected to prevent unintended users from discovering the password.
        # Number of retries for CouchDB errors
        maxRetries: 3
        # Number of retries for CouchDB errors during peer startup.
