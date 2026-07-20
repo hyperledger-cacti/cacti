@@ -7084,22 +7084,6 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@hyperledger-cacti/cactus-workshop-examples-2022-11-14@workspace:examples/cactus-workshop-examples-2022-11-14":
-  version: 0.0.0-use.local
-  resolution: "@hyperledger-cacti/cactus-workshop-examples-2022-11-14@workspace:examples/cactus-workshop-examples-2022-11-14"
-  dependencies:
-    "@hyperledger-cacti/cactus-cmd-api-server": "npm:3.0.0-beta.1"
-    "@hyperledger-cacti/cactus-common": "npm:3.0.0-beta.1"
-    "@hyperledger-cacti/cactus-core": "npm:3.0.0-beta.1"
-    "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-beta.1"
-    "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-beta.1"
-    "@types/uuid": "npm:10.0.0"
-    kubo-rpc-client: "npm:3.0.1"
-    typescript-optional: "npm:2.0.1"
-    uuid: "npm:11.1.1"
-  languageName: unknown
-  linkType: soft
-
 "@hyperledger-cacti/cactus@workspace:.":
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus@workspace:."
