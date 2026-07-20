@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784192310093,
+  "lastUpdate": 1784538715204,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -520,6 +520,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.16%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "id": "c5a584191c4a4f683d2897f81cb095dd58bd2383",
+          "message": "build(deps): bump serde_with from 3.12.0 to 3.21.0 in /packages/cacti-plugin-ledger-connector-stellar/src/test/rust/demo-contract in the cargo-security\n\nBumps the cargo-security group with 1 update in the /packages/cacti-plugin-ledger-connector-stellar/src/test/rust/demo-contract directory: [serde_with](https://github.com/jonasbb/serde_with).\n\nUpdates `serde_with` from 3.12.0 to 3.21.0\n- [Release notes](https://github.com/jonasbb/serde_with/releases)\n- [Commits](https://github.com/jonasbb/serde_with/compare/v3.12.0...v3.21.0)\n\n---\nupdated-dependencies:\n- dependency-name: serde_with\n  dependency-version: 3.21.0\n  dependency-type: indirect\n  dependency-group: cargo-security\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2026-07-17T22:31:01Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/c5a584191c4a4f683d2897f81cb095dd58bd2383"
+        },
+        "date": 1784538712724,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 602,
+            "range": "±3.26%",
+            "unit": "ops/sec",
+            "extra": "175 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 622,
+            "range": "±2.13%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
