@@ -30,7 +30,7 @@ jobs:
     name: Validate Gradle Wrappers
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: Validate Gradle wrappers against Gradle's published checksums
         uses: gradle/actions/wrapper-validation@3f131e8634966bd73d06cc69884922b02e6faf92 #v6.2.0
@@ -73,7 +73,7 @@ jobs:
       run-coverage: ${{ steps.set-output.outputs.run-coverage }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
       - name: Set output
         id: set-output
         run: echo "run-coverage=${{ env.RUN_CODE_COVERAGE }}" >> "$GITHUB_OUTPUT"
@@ -81,7 +81,7 @@ jobs:
   build-dev:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
       - name: build
         uses:  ./.github/actions/configure-repo/
         with:
@@ -92,7 +92,7 @@ jobs:
     outputs:
       affected_packages: ${{ steps.compute-affected-packages.outputs.affected_packages }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         with:
           fetch-depth: 0
       - name: Set up Node.js

@@ -36,7 +36,7 @@ jobs:
       simpleassettransfer_changed: ${{ steps.changes.outputs.simpleassettransfer_changed }}
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 #v4.0.2
         id: changes
@@ -73,10 +73,10 @@ jobs:
     if:   inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -97,10 +97,10 @@ jobs:
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -121,10 +121,10 @@ jobs:
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -141,10 +141,10 @@ jobs:
     if:  inputs.run_all == 'true' ||  needs.check_code_changed.outputs.interopcc_changed == 'true'
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -161,10 +161,10 @@ jobs:
     if: ${{ inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -185,10 +185,10 @@ jobs:
     if: ${{   inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gocli_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -205,10 +205,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simplestate_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -229,10 +229,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' ||  needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.satpsimpleasset_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -253,10 +253,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleasset_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -277,10 +277,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassetandinterop_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -301,10 +301,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.simpleassettransfer_changed == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
 
@@ -325,10 +325,10 @@ jobs:
     if: ${{  inputs.run_all == 'true' || needs.check_code_changed.outputs.interopcc_changed == 'true' || needs.check_code_changed.outputs.gosdk_changed   == 'true' }}
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
     - name: Set up Go
-      uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 #v6.5.0
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e #v7.0.0
       with:
         go-version: '1.26.4'
         
