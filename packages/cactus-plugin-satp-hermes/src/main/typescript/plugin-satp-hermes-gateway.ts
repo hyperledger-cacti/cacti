@@ -1258,19 +1258,24 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.info(
           `${fnTag}: Created migration source: ${JSON.stringify(migrationSource)}`,
         );
-        const database = knex({
-          ...this.config.localRepository,
-          migrations: {
-            // This removes the problem with the migration source being in the file system
-            migrationSource: migrationSource,
-          },
-        });
+        let database: Knex | undefined;
+        try {
+          database = knex({
+            ...this.config.localRepository,
+            migrations: {
+              // This removes the problem with the migration source being in the file system
+              migrationSource: migrationSource,
+            },
+          });
 
-        await database.migrate.latest();
-        await this.oracleLogRepository.database.migrate.latest();
-        await (
-          this.auditRepository as AuditEntryRepository
-        ).database.migrate.latest();
+          await database.migrate.latest();
+          await this.oracleLogRepository.database.migrate.latest();
+          await (
+            this.auditRepository as AuditEntryRepository
+          ).database.migrate.latest();
+        } finally {
+          await database?.destroy();
+        }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
@@ -1501,6 +1506,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           this.logger.debug("Shutting down OpenAPI server");
           await this.OApiServer?.shutdown();
           this.logger.debug("OpenAPI server shut down");
+          await this.destroyRepositories();
           return;
         }
 
@@ -1522,8 +1528,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.info(`Closed ${connectionsClosed} connections`);
         this.logger.info("Gateway Coordinator shut down");
 
-        this.logger.debug("Shutting down audit repository");
-        await this.auditRepository?.destroy();
+        await this.destroyRepositories();
 
         if (this.monitorService) {
           this.logger.debug("Shutting down monitor service");
@@ -1539,6 +1544,32 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         span.end();
       }
     });
+  }
+
+  private async destroyRepositories(): Promise<void> {
+    const fnTag = `${this.className}#destroyRepositories()`;
+    if (this.localRepository) {
+      this.logger.debug("Destroying local repository");
+      try {
+        await this.localRepository.destroy();
+      } catch (err) {
+        this.logger.error(
+          `${fnTag}: Error destroying local repository: ${err}`,
+        );
+      }
+      this.localRepository = undefined;
+    }
+    if (this.remoteRepository) {
+      this.logger.debug("Destroying remote repository");
+      try {
+        await this.remoteRepository.destroy();
+      } catch (err) {
+        this.logger.error(
+          `${fnTag}: Error destroying remote repository: ${err}`,
+        );
+      }
+      this.remoteRepository = undefined;
+    }
   }
 
   private async shutdownGOLServer(): Promise<void> {
@@ -1585,6 +1616,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           this.logger.debug("Shutting down OpenAPI server");
           await this.OApiServer?.shutdown();
           this.logger.debug("OpenAPI server shut down");
+          await this.destroyRepositories();
           return;
         }
 
@@ -1610,6 +1642,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         this.logger.info(`Closed ${connectionsClosed} connections`);
         this.logger.info("Gateway Coordinator shut down");
+
+        await this.destroyRepositories();
         return;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
