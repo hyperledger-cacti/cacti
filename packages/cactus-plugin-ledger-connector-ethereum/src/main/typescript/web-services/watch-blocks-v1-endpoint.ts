@@ -254,7 +254,8 @@ export abstract class WatchBlocksV1Endpoint {
  * async subscriptions.
  */
 export class WatchBlocksV1HttpPollEndpoint extends WatchBlocksV1Endpoint {
-  private monitoringInterval: NodeJS.Timer | undefined;
+  private pollTimeout: NodeJS.Timeout | undefined;
+  private pollGeneration = 0;
   private httpPollInterval: number;
 
   public get className(): string {
@@ -279,32 +280,41 @@ export class WatchBlocksV1HttpPollEndpoint extends WatchBlocksV1Endpoint {
     }
     this.isSubscribed = true;
 
-    socket.on("disconnect", async () => this.unsubscribe());
-    socket.on(WatchBlocksV1.Unsubscribe, async () => this.unsubscribe());
+    log.debug("Starting new HTTP polling loop...");
+    const currentGen = ++this.pollGeneration;
 
-    log.debug("Starting new HTTP polling interval...");
-    this.monitoringInterval = setInterval(async () => {
+    const tick = async () => {
+      if (this.pollGeneration !== currentGen) return;
+
       try {
         await this.emitAllSinceLastSeenBlock();
       } catch (error) {
         log.warn(`${this.className} - polling thread exception:`, error);
       }
-    }, this.httpPollInterval);
+
+      // Check generation again before scheduling next tick
+      if (this.pollGeneration === currentGen) {
+        this.pollTimeout = setTimeout(tick, this.httpPollInterval);
+      }
+    };
+
+    this.pollTimeout = setTimeout(tick, this.httpPollInterval);
 
     return this;
   }
 
   public async unsubscribe(): Promise<void> {
     this.log.debug("Unsubscribing HTTP polling monitor...");
+    this.pollGeneration++;
     try {
-      clearInterval(this.monitoringInterval);
+      if (this.pollTimeout) clearTimeout(this.pollTimeout);
     } catch (error) {
       this.log.info(
-        `Could not clear polling interval id ${this.monitoringInterval}, error:`,
+        `Could not clear polling timeout id ${this.pollTimeout}, error:`,
         error,
       );
     }
-    this.monitoringInterval = undefined;
+    this.pollTimeout = undefined;
     this.isSubscribed = false;
   }
 }
