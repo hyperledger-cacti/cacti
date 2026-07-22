@@ -253,24 +253,27 @@ describe("Ethereum contract deploy and invoke using keychain tests", () => {
   });
 
   test("deployContract with additional parameters should fail", async () => {
-    try {
-      await apiClient.deployContract({
-        contract: {
-          contractName: HelloWorldContractJson.contractName,
-          keychainId: keychainPlugin.getKeychainId(),
-        },
-        web3SigningCredential: {
-          ethAccount: WHALE_ACCOUNT_ADDRESS,
-          secret: "",
-          type: Web3SigningCredentialType.GethKeychainPassword,
-        },
-        gas: 1000000,
-        fake: 4,
-      } as DeployContractV1Request);
-      fail("Expected deployContract call to fail but it succeeded.");
-    } catch (error) {
-      console.log("deployContract failed as expected");
-    }
+    const deployWithUnexpectedFields = apiClient.deployContract({
+      contract: {
+        contractName: HelloWorldContractJson.contractName,
+        keychainId: keychainPlugin.getKeychainId(),
+      },
+      web3SigningCredential: {
+        ethAccount: WHALE_ACCOUNT_ADDRESS,
+        secret: "",
+        type: Web3SigningCredentialType.GethKeychainPassword,
+      },
+      gas: 1000000,
+      fake: 4,
+    } as DeployContractV1Request);
+
+    await expect(deployWithUnexpectedFields).rejects.toMatchObject({
+      response: expect.objectContaining({
+        data: expect.objectContaining({
+          error: expect.stringContaining("fake"),
+        }),
+      }),
+    });
   });
 
   //////////////////////////////////
