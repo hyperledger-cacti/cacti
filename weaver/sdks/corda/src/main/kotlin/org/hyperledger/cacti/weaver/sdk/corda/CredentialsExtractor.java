@@ -6,13 +6,11 @@
  
 package org.hyperledger.cacti.weaver.sdk.corda;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -22,6 +20,7 @@ import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.Vector;
@@ -96,31 +95,19 @@ public class CredentialsExtractor {
 		return false;
 	}
 
-	private static String readFile(String path) {
-		try {
-			FileReader fr = new FileReader(path);
-			BufferedReader br = new BufferedReader(fr);
-			StringBuffer pem = new StringBuffer();
-			while(true) {
-				String line = br.readLine();
-				if (line == null) {
-					break;
-				}
-				if (pem.length() > 0) {
-					pem.append("\n");
-				}
-				pem.append(line.trim());
-			}
-			br.close();
-			fr.close();
-			return Base64.getEncoder().encodeToString(pem.toString().getBytes());
+	private static String encodeCertificatePem(X509Certificate xcert) {
+		try (StringWriter sw = new StringWriter();
+				JcaPEMWriter xwriter = new JcaPEMWriter(sw)) {
+			xwriter.writeObject(xcert);
+			xwriter.flush();
+			return Base64.getEncoder().encodeToString(sw.toString().getBytes(StandardCharsets.UTF_8));
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
-		return null;
 	}
 
-	private static String getRootCertPEM(KeyStore ks, String trustStore, String tempStore) {
+	private static String getRootCertPEM(KeyStore ks, String trustStore) {
 		if (!loadKeyStore(ks, trustStore)) {
 			return null;
 		}
@@ -147,27 +134,7 @@ public class CredentialsExtractor {
 						else {
 							return null;
 						}
-						try {
-							File outputDir = new File(tempStore + "root/");
-							if (!outputDir.exists()) {
-								outputDir.mkdirs();
-								// remove all privilege from all previous users
-								outputDir.setReadable(false, false);
-								outputDir.setWritable(false, false);
-								outputDir.setExecutable(false, false);
-								// add all privilege to owner
-								outputDir.setReadable(true, true); 
-								outputDir.setWritable(true, true);
-								outputDir.setExecutable(true, true);
-							}
-							JcaPEMWriter xwriter = new JcaPEMWriter(new FileWriter(tempStore + "root/rootcert.pem"));
-							xwriter.writeObject(xcert);
-							xwriter.close();
-							return readFile(tempStore + "root/rootcert.pem");
-						} catch (IOException e) {
-							e.printStackTrace();
-							break;
-						}
+						return encodeCertificatePem(xcert);
 					}
 				}
 			}
@@ -178,7 +145,7 @@ public class CredentialsExtractor {
 	}
 
 	// Return sequence: <node org id> <root CA cert>, <doorman CA cert>, <node CA cert>, <id cert 1>, <id cert 2>,....
-	private static Vector<String> getCertChain(KeyStore ks, String nodeKeyStorePath, String tmpStore, String[] tmpCertfiles) {
+	private static Vector<String> getCertChain(KeyStore ks, String nodeKeyStorePath) {
 		Vector<String> chainCerts = new Vector<String>();
 		if (!loadKeyStore(ks, nodeKeyStorePath)) {
 			return null;
@@ -205,51 +172,34 @@ public class CredentialsExtractor {
 						certExtractCount = 4;
 					}
 					for (int i = 0 ; i < certExtractCount ; i++) {
-						try {
-							File outputDir = new File(tmpStore);
-							if (!outputDir.exists()) {
-								outputDir.mkdirs();
-								// remove all permissions from all users (including owner)
-								outputDir.setReadable(false, false);
-								outputDir.setWritable(false, false);
-								outputDir.setExecutable(false, false);
-								// grant full permissions to owner only
-								outputDir.setReadable(true, true); 
-								outputDir.setWritable(true, true);  
-								outputDir.setExecutable(true, true);
-							}
-							String filePath = tmpStore + tmpCertfiles[i] + ".pem";
-							JcaPEMWriter xwriter = new JcaPEMWriter(new FileWriter(filePath));
-							xwriter.writeObject(xcerts[i]);
-							xwriter.close();
-							if (i == 0) {
-								chainCerts.add(readFile(filePath));
-							} else if (i == 1) {
-								String xcertOrg = null;
-								try {
-									LdapName identity = new LdapName(xcerts[0].getSubjectX500Principal().getName());
-									for (Rdn rdn: identity.getRdns()) {
-										if (rdn.getType().equals("O")) {
-											xcertOrg = rdn.getValue().toString();
-										}
-									}
-								} catch (InvalidNameException e) {
-									e.printStackTrace();
-									return null;
-								}
-								if (xcertOrg == null) {
-									return null;
-								}
-								chainCerts.add(0, xcertOrg);
-								chainCerts.add(1, readFile(filePath));
-							} else if (i == 2) {
-								chainCerts.add(1, readFile(filePath));
-							} else if (i == 3) {
-								chainCerts.add(1, readFile(filePath));
-							}
-						} catch (IOException e) {
-							e.printStackTrace();
+						String encodedCert = encodeCertificatePem(xcerts[i]);
+						if (encodedCert == null) {
 							return null;
+						}
+						if (i == 0) {
+							chainCerts.add(encodedCert);
+						} else if (i == 1) {
+							String xcertOrg = null;
+							try {
+								LdapName identity = new LdapName(xcerts[0].getSubjectX500Principal().getName());
+								for (Rdn rdn: identity.getRdns()) {
+									if (rdn.getType().equals("O")) {
+										xcertOrg = rdn.getValue().toString();
+									}
+								}
+							} catch (InvalidNameException e) {
+								e.printStackTrace();
+								return null;
+							}
+							if (xcertOrg == null) {
+								return null;
+							}
+							chainCerts.add(0, xcertOrg);
+							chainCerts.add(1, encodedCert);
+						} else if (i == 2) {
+							chainCerts.add(1, encodedCert);
+						} else if (i == 3) {
+							chainCerts.add(1, encodedCert);
 						}
 					}
 				}
@@ -261,10 +211,8 @@ public class CredentialsExtractor {
 		return chainCerts;
 	}
 
-	private static JsonObject getNodeIdCertChain(KeyStore ks, JsonObject configObj, String nodeKeyStorePath, String tempStore) {
-		String tmpStore = tempStore + "node/";
-		String[] tmpCertfiles = new String[] { "nodeIdentity", "nodeCA", "doormanCA", "rootCA" };
-		Vector<String> certs = getCertChain(ks, nodeKeyStorePath, tmpStore, tmpCertfiles);
+	private static JsonObject getNodeIdCertChain(KeyStore ks, JsonObject configObj, String nodeKeyStorePath) {
+		Vector<String> certs = getCertChain(ks, nodeKeyStorePath);
 		if (certs == null || certs.size() <= 3) {
 			return null;
 		}
@@ -289,10 +237,8 @@ public class CredentialsExtractor {
 		return configObj;
 	}
 
-	private static JsonObject getNodeTlsCertChain(KeyStore ks, JsonObject configObj, String nodeKeyStorePath, String tempStore) {
-		String tmpStore = tempStore + "ssl/";
-		String[] tmpCertfiles = new String[] { "nodeTlsCert", "nodeTlsCA", "doormanTlsCA", "rootTlsCA" };
-		Vector<String> certs = getCertChain(ks, nodeKeyStorePath, tmpStore, tmpCertfiles);
+	private static JsonObject getNodeTlsCertChain(KeyStore ks, JsonObject configObj, String nodeKeyStorePath) {
+		Vector<String> certs = getCertChain(ks, nodeKeyStorePath);
 		if (certs == null || certs.size() <= 3) {
 			return null;
 		}
@@ -306,21 +252,6 @@ public class CredentialsExtractor {
 		return configObj;
 	}
 
-	private static void deleteFolder(File folder) throws Exception {
-		if (folder.isDirectory()) {
-			for (File subf : folder.listFiles()) {
-				try {
-					deleteFolder(subf);
-				} catch (Exception e) {
-					String errorMessage = "An error occurred while deleting : " + subf.getPath();
-					throw new Exception(errorMessage);
-				}
-			}
-		}
-		folder.delete();
-		System.out.println((folder.exists() ? "Failed to delete : " : "Deleted successfully : ") + folder.getPath());
-	}
-
 	public static String getConfig(String baseNodesPath, String[] nodes) {
 		KeyStore ks = null;
 		try {
@@ -332,14 +263,13 @@ public class CredentialsExtractor {
 		JsonObject configObj = new JsonObject();
 		for (String node: nodes) {
 			String nodePath = baseNodesPath + node + "/certificates";
-			String tempStore = nodePath + "/tmp/";
 			JsonObject nodeConfigObj = new JsonObject();
-			nodeConfigObj = getNodeIdCertChain(ks, nodeConfigObj, nodePath + "/nodekeystore.jks", tempStore);
+			nodeConfigObj = getNodeIdCertChain(ks, nodeConfigObj, nodePath + "/nodekeystore.jks");
 			if (configObj == null) {
 				System.out.println("Unable to extract node certificate chain");
 				break;
 			} else {
-				//nodeConfigObj = getNodeTlsCertChain(ks, nodeConfigObj, nodePath + "/sslkeystore.jks", tempStore);
+				//nodeConfigObj = getNodeTlsCertChain(ks, nodeConfigObj, nodePath + "/sslkeystore.jks");
 				//if (nodeConfigObj == null) {
 				//	System.out.println("Unable to extract TLS certificate chain");
 				//	break;
@@ -347,11 +277,6 @@ public class CredentialsExtractor {
 				//	configObj.add(node, nodeConfigObj);
 				//}
 				configObj.add(node, nodeConfigObj);
-			}
-			try {
-				deleteFolder(new File(tempStore));
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
 			System.out.println("Extracted configuration for " + node);
 		}
