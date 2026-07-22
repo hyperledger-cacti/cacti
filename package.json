@@ -252,7 +252,7 @@
     "@types/yargs": "17.0.24",
     "@typescript-eslint/eslint-plugin": "7.1.0",
     "@typescript-eslint/parser": "7.1.0",
-    "adm-zip": "0.5.10",
+    "adm-zip": "0.6.0",
     "benchmark": "2.1.4",
     "browserify-zlib": "0.2.0",
     "buffer": "6.0.3",
