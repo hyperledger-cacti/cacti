@@ -54,7 +54,7 @@ const walletSetup = async (
     );
   } else {
     // Enroll the admin user, and import the new identity into the wallet.
-    console.log("Enrolling Admin...", adminName, adminSecret);
+    console.log(`Enrolling admin identity "${adminName}"`);
     const enrollment = await ca.enroll({
       enrollmentID: adminName,
       enrollmentSecret: adminSecret,
