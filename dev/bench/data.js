@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784538715204,
+  "lastUpdate": 1784797284837,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -554,6 +554,42 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 622,
             "range": "±2.13%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Parth Singh",
+            "username": "ParthSinghPS",
+            "email": "posiedon.1721@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "bc860e9982d122f1a2b319b44660ead2fe5c062b",
+          "message": "refactor: remove cactus-workshop-examples package\n\nSigned-off-by: Parth Singh <posiedon.1721@gmail.com>",
+          "timestamp": "2026-07-20T07:20:38Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/bc860e9982d122f1a2b319b44660ead2fe5c062b"
+        },
+        "date": 1784797281952,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 575,
+            "range": "±3.37%",
+            "unit": "ops/sec",
+            "extra": "174 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 590,
+            "range": "±2.34%",
             "unit": "ops/sec",
             "extra": "182 samples"
           }
