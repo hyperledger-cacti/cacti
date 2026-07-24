@@ -13,6 +13,7 @@ import {
   OracleTaskTypeEnum,
   OracleTaskModeEnum,
   OracleTaskStatusEnum,
+  OracleRegisterRequestTaskModeEnum,
   type OracleTask,
 } from "../../../main/typescript/generated/gateway-client/typescript-axios/api";
 
@@ -413,6 +414,58 @@ describe("Oracle Logging", () => {
         expect(log.taskId).toBe("mgr-test-1");
         expect(log.timestamp).toBeDefined();
       }
+    });
+
+    it("logs and persists poll-task/fail but keeps task Active when polling callback throws", async () => {
+      const task: OracleTask = {
+        taskID: "mgr-poll-fail-1",
+        type: OracleTaskTypeEnum.Read,
+        srcContract: {
+          contractAddress: "0x0",
+          contractAbi: [],
+          contractName: "Test",
+        },
+        dstContract: {
+          contractAddress: "0x0",
+          contractAbi: [],
+          contractName: "Test",
+        },
+        timestamp: Date.now(),
+        operations: [],
+        status: OracleTaskStatusEnum.Active,
+        mode: OracleRegisterRequestTaskModeEnum.Polling,
+        pollingInterval: 50,
+      };
+
+      // Force processTask to always fail
+      jest
+        .spyOn(oracleManager as any, "processTask")
+        .mockRejectedValue(new Error("simulated poll failure"));
+
+      await oracleManager.registerTask(task);
+
+      // Wait long enough for at least one poll cycle to fire and writes to flush
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Cleanup: stop the poller before assertions
+      await oracleManager.unregisterTask(task.taskID);
+      jest.restoreAllMocks();
+
+      const logs = await managerRepo.readByTaskId("mgr-poll-fail-1");
+
+      // There must be at least one poll-task fail entry
+      const pollFailLogs = logs.filter(
+        (l) => l.type === "poll-task" && l.operation === "fail",
+      );
+      expect(pollFailLogs.length).toBeGreaterThanOrEqual(1);
+
+      // The persisted data must contain the error message
+      const parsedData = JSON.parse(pollFailLogs[0].data);
+      expect(parsedData.error.message).toBe("simulated poll failure");
+
+      // The task must still be Active (not shut down after a single failure)
+      const taskState = oracleManager.getTask("mgr-poll-fail-1");
+      expect(taskState.status).toBe(OracleTaskStatusEnum.Active);
     });
   });
 });
