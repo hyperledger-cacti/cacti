@@ -57,6 +57,8 @@ export interface IRepository<T, K> {
   readById(id: K): Promise<T>;
   /** Create new entity in storage */
   create(entity: T): any;
+  /** Run pending database migrations */
+  migrate(): Promise<void>;
   /** Clean up repository resources and connections */
   destroy(): any;
   /** Reset repository to initial state */

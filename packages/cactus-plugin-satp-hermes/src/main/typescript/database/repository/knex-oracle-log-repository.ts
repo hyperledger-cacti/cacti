@@ -75,6 +75,16 @@ export class KnexOracleLogRepository implements IOracleLogRepository {
     throw lastError;
   }
 
+  /**
+   * Run pending database migrations to bring the schema up to date.
+   *
+   * @returns Promise resolving when all pending migrations have been applied
+   * @since 0.0.3-beta
+   */
+  async migrate(): Promise<void> {
+    await this.database.migrate.latest();
+  }
+
   async reset() {
     await this.database.migrate.rollback();
     await this.database.migrate.latest();

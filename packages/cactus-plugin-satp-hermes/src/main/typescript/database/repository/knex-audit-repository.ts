@@ -187,6 +187,16 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
   }
 
   /**
+   * Run pending database migrations to bring the schema up to date.
+   *
+   * @returns Promise resolving when all pending migrations have been applied
+   * @since 0.0.3-beta
+   */
+  async migrate(): Promise<void> {
+    await this.database.migrate.latest();
+  }
+
+  /**
    * Reset the database to initial state by rolling back and reapplying migrations.
    *
    * This operation is destructive and will delete all existing data.
