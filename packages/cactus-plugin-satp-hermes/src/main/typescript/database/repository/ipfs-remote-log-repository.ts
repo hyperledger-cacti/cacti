@@ -158,6 +158,17 @@ export class IPFSRemoteLogRepository implements IRemoteLogRepository {
   async reset() {}
 
   /**
+   * Migration (no-op for IPFS).
+   *
+   * IPFS is schema-less, so no migrations are required.
+   * This method exists to satisfy the interface contract.
+   *
+   * @returns Promise resolving immediately
+   * @since 0.0.3-beta
+   */
+  async migrate(): Promise<void> {}
+
+  /**
    * Destroy operation (no-op for IPFS).
    *
    * IPFS connections are stateless, so no cleanup is required.
