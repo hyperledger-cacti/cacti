@@ -12,7 +12,9 @@
     "./src",
     "src/**/*.json"
   ],
-  "exclude": ["./vendor"],
+  "exclude": [
+    "./vendor"
+  ],
   "references": [
     {
       "path": "../cactus-common/tsconfig.json"
@@ -28,9 +30,6 @@
     },
     {
       "path": "../cactus-plugin-ledger-connector-besu/tsconfig.json"
-    },
-    {
-      "path": "../cactus-test-tooling/tsconfig.json"
     }
   ]
 }

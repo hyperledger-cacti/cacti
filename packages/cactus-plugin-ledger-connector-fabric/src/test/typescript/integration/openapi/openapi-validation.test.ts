@@ -37,7 +37,7 @@ import { Configuration } from "@hyperledger-cacti/cactus-core-api";
 
 import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../../../main/json/openapi.json";
-import { PeerCerts } from "@hyperledger-cacti/cactus-test-tooling/src/main/typescript/fabric/fabric-test-ledger-v1";
+import { PeerCerts } from "@hyperledger-cacti/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
 
 const testCase = "deploys Fabric V2.5.6 contract from typescript source";
 const logLevel: LogLevelDesc = "INFO";

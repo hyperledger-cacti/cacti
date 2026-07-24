@@ -97,9 +97,6 @@
       "path": "./packages/cacti-copm-test/tsconfig.json"
     },
     {
-      "path": "./packages/cactus-test-tooling/tsconfig.json"
-    },
-    {
       "path": "./examples/cactus-common-example-server/tsconfig.json"
     },
     {

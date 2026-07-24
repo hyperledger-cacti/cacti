@@ -57,7 +57,7 @@ import {
 
 import { sendTransactionOnFabric } from "../../common/send-transaction-on-fabric";
 import { getBlock } from "../../common/get-block";
-import { PeerCerts } from "@hyperledger-cacti/cactus-test-tooling/src/main/typescript/fabric/fabric-test-ledger-v1";
+import { PeerCerts } from "@hyperledger-cacti/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
 
 // For development on local fabric network
 // 1. leaveLedgerRunning = true, useRunningLedger = false to run ledger and leave it running after test finishes.

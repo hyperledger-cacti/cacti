@@ -8,7 +8,11 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-persistence-fabric.tsbuildinfo"
   },
-  "include": ["./src", "./src/**/*.json", "./src/**/*.sql"],
+  "include": [
+    "./src",
+    "./src/**/*.json",
+    "./src/**/*.sql"
+  ],
   "references": [
     {
       "path": "../cactus-core/tsconfig.json"
@@ -18,9 +22,6 @@
     },
     {
       "path": "../cactus-core-api/tsconfig.json"
-    },
-    {
-      "path": "../cactus-test-tooling/tsconfig.json"
     },
     {
       "path": "../cactus-plugin-ledger-connector-fabric/tsconfig.json"

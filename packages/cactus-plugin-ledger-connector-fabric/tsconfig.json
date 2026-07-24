@@ -28,9 +28,6 @@
     },
     {
       "path": "../cactus-plugin-keychain-memory/tsconfig.json"
-    },
-    {
-      "path": "../cactus-test-tooling/tsconfig.json"
     }
   ]
 }

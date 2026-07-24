@@ -22,9 +22,6 @@
     },
     {
       "path": "../cacti-plugin-consortium-static/tsconfig.json"
-    },
-    {
-      "path": "../cactus-test-tooling/tsconfig.json"
     }
   ]
 }

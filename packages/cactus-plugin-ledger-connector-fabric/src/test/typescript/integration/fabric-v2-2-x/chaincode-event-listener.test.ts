@@ -45,7 +45,7 @@ import {
 import { IPluginLedgerConnectorFabricOptions } from "../../../../main/typescript/plugin-ledger-connector-fabric";
 import { GatewayOptions } from "../../../../main/typescript/generated/openapi/typescript-axios/api";
 import { CreateListenerRequest } from "../../../../main/typescript/common/utils";
-import { PeerCerts } from "@hyperledger-cacti/cactus-test-tooling/src/main/typescript/fabric/fabric-test-ledger-v1";
+import { PeerCerts } from "@hyperledger-cacti/cactus-test-tooling/dist/lib/main/typescript/fabric/fabric-test-ledger-v1";
 
 // For development on local fabric network
 // 1. leaveLedgerRunning = true, useRunningLedger = false to run ledger and leave it running after test finishes.

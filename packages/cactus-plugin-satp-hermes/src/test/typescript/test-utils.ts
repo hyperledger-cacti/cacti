@@ -22,7 +22,7 @@ import { FabricTestEnvironment } from "./environments/fabric-test-environment";
 import knex, { Knex } from "knex";
 import net from "net";
 import Docker, { Container, ContainerInfo } from "dockerode";
-import { Containers } from "@hyperledger-cacti/cactus-test-tooling/src/main/typescript/common/containers";
+import { Containers } from "@hyperledger-cacti/cactus-test-tooling/dist/lib/main/typescript/common/containers";
 import { EventEmitter } from "events";
 import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { createMigrationSource } from "../../main/typescript/database/knex-migration-source";

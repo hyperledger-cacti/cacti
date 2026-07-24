@@ -329,48 +329,4 @@ jobs:
           name: coverage-reports-38
           path: ./code-coverage-ts/**/
 
-  cactus-test-tooling:
-    if: contains(fromJson(inputs.affected-packages), 'packages/cactus-test-tooling')
-    continue-on-error: false
-    env:
-      JEST_TEST_PATTERN: packages/cactus-test-tooling/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
-      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-test-tooling
-      TAPE_TEST_PATTERN: >-
-        --files={./packages/cactus-test-tooling/src/test/typescript/integration/besu/besu-test-ledger/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/fabric/fabric-test-ledger-v1/constructor-validates-options.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-constructor.test.ts,./packages/cactus-test-tooling/src/test/typescript/integration/substrate/substrate-test-ledger-multiple-concurrent.test.ts}
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
 
-      - name: CI environment clean-up
-        run: ./tools/ci-env-clean-up.sh
-
-      - uses: ./.github/actions/docker-pull/
-        with:
-          image: stellar/quickstart:v425-latest
-
-      - name: build
-        with:
-          node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'         
-        uses: ./.github/actions/configure-repo/
-
-      - name: Run Jest Tests
-        uses: ./.github/actions/jest-runner/
-        with:
-          run_code_coverage: ${{ inputs.run_code_coverage }}
-          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
-          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
-          github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: cactus-test-tooling-report
-      
-      - name: Run Tape Tests
-        uses: ./.github/actions/tape-runner/
-        with:
-          tape_test_pattern: ${{ env.TAPE_TEST_PATTERN }}
-        
-      - name: Upload coverage reports as artifacts
-        if: ${{ inputs.run_code_coverage == 'true' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
-        with:
-          name: coverage-reports-45
-          path: ./code-coverage-ts/**/

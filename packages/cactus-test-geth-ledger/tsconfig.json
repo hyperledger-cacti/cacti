@@ -7,13 +7,13 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-test-geth-ledger.tsbuildinfo"
   },
-  "include": ["./src", "src/**/*.json"],
+  "include": [
+    "./src",
+    "src/**/*.json"
+  ],
   "references": [
     {
       "path": "../cactus-common/tsconfig.json"
-    },
-    {
-      "path": "../cactus-test-tooling/tsconfig.json"
     }
   ]
 }

@@ -20,7 +20,7 @@ import { DefaultApi } from "../../../../main/typescript/generated/openapi/typesc
 const logLevel: LogLevelDesc = "TRACE";
 
 import http from "http";
-import { extractShortHash } from "./../../../../../../cactus-test-tooling/src/main/typescript/corda/corda-v5-test-ledger";
+import { extractShortHash } from "@hyperledger-cacti/cactus-test-tooling/dist/lib/main/typescript/corda/corda-v5-test-ledger";
 import express from "express";
 import bodyParser from "body-parser";
 import { AddressInfo } from "net";

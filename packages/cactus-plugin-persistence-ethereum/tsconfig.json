@@ -8,7 +8,11 @@
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cactus-plugin-persistence-ethereum.tsbuildinfo"
   },
-  "include": ["./src", "./src/**/*.json", "./src/**/*.sql"],
+  "include": [
+    "./src",
+    "./src/**/*.json",
+    "./src/**/*.sql"
+  ],
   "references": [
     {
       "path": "../cactus-core/tsconfig.json"
@@ -21,9 +25,6 @@
     },
     {
       "path": "../cactus-cmd-api-server/tsconfig.json"
-    },
-    {
-      "path": "../cactus-test-tooling/tsconfig.json"
     },
     {
       "path": "../cactus-plugin-ledger-connector-ethereum/tsconfig.json"

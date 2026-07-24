@@ -32,9 +32,6 @@
     },
     {
       "path": "../cactus-plugin-ledger-connector-besu/tsconfig.json"
-    },
-    {
-      "path": "../cactus-test-tooling/tsconfig.json"
     }
   ]
 }

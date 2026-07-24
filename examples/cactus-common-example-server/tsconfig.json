@@ -21,9 +21,6 @@
     },
     {
       "path": "../../packages/cactus-core-api/tsconfig.json"
-    },
-    {
-      "path": "../../packages/cactus-test-tooling/tsconfig.json"
     }
   ]
 }
