@@ -10,6 +10,7 @@ import {
 } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
+import { InvokeContractV1Request } from "@hyperledger-cacti/cactus-plugin-ledger-connector-besu";
 import { BesuTestEnvironment } from "../../test-utils";
 import {
   EvmFungibleAsset,
@@ -183,10 +184,26 @@ describe("Besu Leaf Test with Fungible Tokens", () => {
   });
 
   it("Should Lock a token", async () => {
+    const invokeContractSpy = jest.spyOn(
+      (besuLeaf as any).connector,
+      "invokeContract",
+    );
+
     const response = await besuLeaf.lockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
+
+    expect(invokeContractSpy).toHaveBeenCalled();
+    const invokeContractRequest = invokeContractSpy.mock
+      .calls[0][0] as InvokeContractV1Request;
+    expect(invokeContractRequest.contractName).toBe(
+      (besuLeaf as any).wrapperContractName,
+    );
+    expect(invokeContractRequest.contractName).not.toBe(
+      besuLeaf.getWrapperContract(TokenType.NONSTANDARD_FUNGIBLE),
+    );
+    invokeContractSpy.mockRestore();
 
     const response2 = (await besuLeaf.getAsset(asset.id)) as EvmFungibleAsset;
     expect(response2).toBeDefined();
@@ -220,10 +237,26 @@ describe("Besu Leaf Test with Fungible Tokens", () => {
   });
 
   it("Should Unlock a token", async () => {
+    const invokeContractSpy = jest.spyOn(
+      (besuLeaf as any).connector,
+      "invokeContract",
+    );
+
     const response = await besuLeaf.unlockAsset(asset.id, 100 as Amount);
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
+
+    expect(invokeContractSpy).toHaveBeenCalled();
+    const invokeContractRequest = invokeContractSpy.mock
+      .calls[0][0] as InvokeContractV1Request;
+    expect(invokeContractRequest.contractName).toBe(
+      (besuLeaf as any).wrapperContractName,
+    );
+    expect(invokeContractRequest.contractName).not.toBe(
+      besuLeaf.getWrapperContract(TokenType.NONSTANDARD_FUNGIBLE),
+    );
+    invokeContractSpy.mockRestore();
 
     const response2 = (await besuLeaf.getAsset(asset.id)) as EvmFungibleAsset;
     expect(response2).toBeDefined();
@@ -477,6 +510,11 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
   });
 
   it("Should Lock a token", async () => {
+    const invokeContractSpy = jest.spyOn(
+      (besuLeaf as any).connector,
+      "invokeContract",
+    );
+
     const response = await besuLeaf.lockAsset(
       nonFungibleAsset.id,
       Number(uniqueTokenId1) as UniqueTokenID,
@@ -484,6 +522,17 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
+
+    expect(invokeContractSpy).toHaveBeenCalled();
+    const invokeContractRequest = invokeContractSpy.mock
+      .calls[0][0] as InvokeContractV1Request;
+    expect(invokeContractRequest.contractName).toBe(
+      (besuLeaf as any).wrapperContractName,
+    );
+    expect(invokeContractRequest.contractName).not.toBe(
+      besuLeaf.getWrapperContract(TokenType.NONSTANDARD_NONFUNGIBLE),
+    );
+    invokeContractSpy.mockRestore();
 
     const response2 = (await besuLeaf.getAsset(
       nonFungibleAsset.id,
@@ -528,6 +577,11 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
   });
 
   it("Should Unlock a token", async () => {
+    const invokeContractSpy = jest.spyOn(
+      (besuLeaf as any).connector,
+      "invokeContract",
+    );
+
     const response = await besuLeaf.unlockAsset(
       nonFungibleAsset.id,
       Number(uniqueTokenId1) as UniqueTokenID,
@@ -535,6 +589,17 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
     expect(response.transactionReceipt).toBeDefined();
+
+    expect(invokeContractSpy).toHaveBeenCalled();
+    const invokeContractRequest = invokeContractSpy.mock
+      .calls[0][0] as InvokeContractV1Request;
+    expect(invokeContractRequest.contractName).toBe(
+      (besuLeaf as any).wrapperContractName,
+    );
+    expect(invokeContractRequest.contractName).not.toBe(
+      besuLeaf.getWrapperContract(TokenType.NONSTANDARD_NONFUNGIBLE),
+    );
+    invokeContractSpy.mockRestore();
 
     const response2 = (await besuLeaf.getAsset(
       nonFungibleAsset.id,
