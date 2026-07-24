@@ -1,4 +1,7 @@
 import "jest-extended";
+import { mkdtempSync, rmSync } from "fs";
+import * as os from "os";
+import * as path from "path";
 import {
   Containers,
   pruneDockerContainersIfGithubAction,
@@ -9,6 +12,7 @@ import {
 } from "@hyperledger-cacti/cactus-common";
 import { ApiServer } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { ApiClient } from "@hyperledger-cacti/cactus-api-client";
+import knex from "knex";
 
 import {
   SATPGateway,
@@ -351,7 +355,143 @@ describe("SATPGateway startup", () => {
       // todo error in the test, something was not properly shutdown
       await gateway.shutdown();
     }
+
+    // Regression check: shutdown() must release the GOL server port too, not
+    // just the OApiServer — otherwise a new gateway can't rebind the same port.
+    const gateway2 = await factory.create({
+      instanceId: "gateway-orchestrator-instance-id-2",
+      pluginRegistry: new PluginRegistry(),
+      gid: {
+        id: "mockID2",
+        name: "CustomGateway2",
+        version: [
+          {
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
+          },
+        ],
+        proofID: "mockProofID11",
+        gatewayServerPort: serverPort,
+        gatewayClientPort: clientPort,
+        address: "http://localhost",
+      },
+      monitorService: monitorService,
+    });
+    await expect(gateway2.startup()).resolves.toBeUndefined();
+    await gateway2.shutdown();
   });
+
+  test("createDBRepository migrates all four databases", async () => {
+    const tmpDir = mkdtempSync(path.join(os.tmpdir(), "satp-db-test-"));
+    const dbPaths = {
+      local: path.join(tmpDir, "local.sqlite3"),
+      remote: path.join(tmpDir, "remote.sqlite3"),
+      audit: path.join(tmpDir, "audit.sqlite3"),
+      oracle: path.join(tmpDir, "oracle.sqlite3"),
+    };
+
+    const sqliteConfig = (filename: string) => ({
+      client: "sqlite3",
+      connection: { filename },
+      useNullAsDefault: true,
+    });
+
+    const options: SATPGatewayConfig = {
+      instanceId: "gateway-db-migration-test",
+      pluginRegistry: new PluginRegistry(),
+      logLevel: logLevel,
+      gid: {
+        id: "mockID",
+        name: "DBMigrationGateway",
+        version: [
+          {
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
+          },
+        ],
+        gatewayServerPort: 13020,
+        gatewayClientPort: 13021,
+        address: "http://localhost",
+      },
+      localRepository: sqliteConfig(dbPaths.local),
+      remoteRepository: sqliteConfig(dbPaths.remote),
+      auditRepository: sqliteConfig(dbPaths.audit),
+      oracleLogRepository: sqliteConfig(dbPaths.oracle),
+      monitorService: monitorService,
+    };
+
+    const gateway = await factory.create(options);
+    await gateway.startup();
+    await gateway.shutdown();
+
+    const expectedTables: Record<string, string> = {
+      [dbPaths.local]: "logs",
+      [dbPaths.remote]: "remote-logs",
+      [dbPaths.audit]: "audit_entries",
+      [dbPaths.oracle]: "oracle_logs",
+    };
+
+    for (const [filename, expectedTable] of Object.entries(expectedTables)) {
+      const db = knex({
+        client: "sqlite3",
+        connection: { filename },
+        useNullAsDefault: true,
+      });
+      try {
+        const hasTable = await db.schema.hasTable(expectedTable);
+        expect(hasTable).toBeTrue();
+      } finally {
+        await db.destroy();
+      }
+    }
+
+    rmSync(tmpDir, { recursive: true });
+  });
+
+  test("shutdown destroys all repositories even without startup", async () => {
+    const sqliteConfig = (filename: string) => ({
+      client: "sqlite3",
+      connection: { filename },
+      useNullAsDefault: true,
+    });
+
+    const options: SATPGatewayConfig = {
+      instanceId: "gateway-db-shutdown-test",
+      pluginRegistry: new PluginRegistry(),
+      logLevel: logLevel,
+      gid: {
+        id: "mockID",
+        name: "DBShutdownGateway",
+        version: [
+          {
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
+          },
+        ],
+        gatewayServerPort: 13030,
+        gatewayClientPort: 13031,
+        address: "http://localhost",
+      },
+      localRepository: sqliteConfig(":memory:"),
+      remoteRepository: sqliteConfig(":memory:"),
+      auditRepository: sqliteConfig(":memory:"),
+      oracleLogRepository: sqliteConfig(":memory:"),
+      monitorService: monitorService,
+    };
+
+    const gateway = await factory.create(options);
+
+    await gateway.shutdown();
+
+    await expect(gateway.localRepository!.migrate()).rejects.toThrow();
+    await expect(gateway.remoteRepository!.migrate()).rejects.toThrow();
+    await expect(gateway.auditRepository.migrate()).rejects.toThrow();
+    await expect(gateway.oracleLogRepository.migrate()).rejects.toThrow();
+  });
+
   test("Gateway launches without database config", async () => {
     const [serverPort, clientPort] = await getFreePorts(2);
     const options: SATPGatewayConfig = {

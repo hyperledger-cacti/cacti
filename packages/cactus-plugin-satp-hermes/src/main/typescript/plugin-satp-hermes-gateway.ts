@@ -96,7 +96,7 @@ import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
 import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
 import { IPrivacyPolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
 import { IMergePolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-merging/merge-policies";
-import knex, { Knex } from "knex";
+import { Knex } from "knex";
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { NetworkId } from "./public-api";
 import {
@@ -105,7 +105,6 @@ import {
   ConfigService,
 } from "@hyperledger-cacti/cactus-cmd-api-server";
 import { AddressInfo } from "node:net";
-import { createMigrationSource } from "./database/knex-migration-source";
 import { ExtensionsManager } from "./extensions/extensions-manager";
 import { MonitorService } from "./services/monitoring/monitor";
 import { Context, context, Span, SpanStatusCode } from "@opentelemetry/api";
@@ -529,7 +528,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private signer: JsObjectSigner;
   private _pubKey: string;
 
-  private isShutdown: boolean = false;
+  private ownApiServerPluginRegistry?: PluginRegistry;
 
   public claimFormat?: ClaimFormat;
   public localRepository?: ILocalLogRepository;
@@ -673,6 +672,27 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         createOracleLogKnexConfig(this.instanceId),
       );
     }
+
+    this.onShutdown({
+      name: "destroy-db-repositories",
+      hook: async () => {
+        const repositories = {
+          localRepository: this.localRepository,
+          remoteRepository: this.remoteRepository,
+          auditRepository: this.auditRepository,
+          oracleLogRepository: this.oracleLogRepository,
+        };
+        for (const [name, repo] of Object.entries(repositories)) {
+          if (repo != null) {
+            await repo.destroy();
+          } else {
+            this.logger.warn(
+              `Skipping repository destroy on shutdown: ${name} is not defined`,
+            );
+          }
+        }
+      },
+    });
 
     if (this.config.keyPair === undefined) {
       throw new Error("Key pair is undefined");
@@ -1168,6 +1188,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         const pluginRegistry = new PluginRegistry({
           plugins: [this, ...extensions],
         });
+        this.ownApiServerPluginRegistry = pluginRegistry;
 
         if (!this.config.gid) {
           throw new Error("GatewayIdentity is not defined");
@@ -1248,33 +1269,17 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
     await context.with(ctx, async () => {
       try {
-        if (!this.config.localRepository) {
-          this.logger.info(`${fnTag}: Local repository is not defined`);
-          this.logger.info(`${fnTag}: Using default local repository`);
-          this.config.localRepository = knexLocalInstance.default;
-        }
-        this.logger.info(`${fnTag}: Creating migration source`);
-        const migrationSource = await createMigrationSource();
-        this.logger.info(
-          `${fnTag}: Created migration source: ${JSON.stringify(migrationSource)}`,
-        );
-        let database: Knex | undefined;
-        try {
-          database = knex({
-            ...this.config.localRepository,
-            migrations: {
-              // This removes the problem with the migration source being in the file system
-              migrationSource: migrationSource,
-            },
-          });
+        const repositories = [
+          this.localRepository,
+          this.remoteRepository,
+          this.auditRepository,
+          this.oracleLogRepository,
+        ];
 
-          await database.migrate.latest();
-          await this.oracleLogRepository.database.migrate.latest();
-          await (
-            this.auditRepository as AuditEntryRepository
-          ).database.migrate.latest();
-        } finally {
-          await database?.destroy();
+        for (const repo of repositories) {
+          if (repo != null) {
+            await repo.migrate();
+          }
         }
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
@@ -1487,11 +1492,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.debug(`Entering ${fnTag}`);
 
         this.logger.debug("Shutting down Gateway Application");
-        if (this.isShutdown) {
-          this.OApiServer = undefined; // without this, this will be a recursive loop, OAPI server will call shutdown on the gateway
-        }
-
-        this.isShutdown = true;
 
         try {
           this.logger.debug("Shutting down BLO");
@@ -1504,19 +1504,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         if (this.OApiServer) {
           this.logger.debug("Shutting down OpenAPI server");
-          await this.OApiServer?.shutdown();
+          this.deregisterSelfFromOwnApiServer();
+          await this.OApiServer.shutdown();
           this.logger.debug("OpenAPI server shut down");
-          await this.destroyRepositories();
-          return;
         }
 
         this.logger.debug("Shutting down Gateway Coordinator");
         await this.shutdownGOLServer();
-        this.logger.debug("Running shutdown hooks");
-        for (const hook of this.shutdownHooks) {
-          this.logger.debug(`Running shutdown hook: ${hook.name}`);
-          await hook.hook();
-        }
+        await this.runShutdownHooks();
 
         this.logger.debug("Oracle Manager shut down");
         await this.SATPCCManager?.getOracleManager().shutdown();
@@ -1527,8 +1522,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         this.logger.info(`Closed ${connectionsClosed} connections`);
         this.logger.info("Gateway Coordinator shut down");
-
-        await this.destroyRepositories();
 
         if (this.monitorService) {
           this.logger.debug("Shutting down monitor service");
@@ -1546,30 +1539,22 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     });
   }
 
-  private async destroyRepositories(): Promise<void> {
-    const fnTag = `${this.className}#destroyRepositories()`;
-    if (this.localRepository) {
-      this.logger.debug("Destroying local repository");
-      try {
-        await this.localRepository.destroy();
-      } catch (err) {
-        this.logger.error(
-          `${fnTag}: Error destroying local repository: ${err}`,
-        );
-      }
-      this.localRepository = undefined;
+  private async runShutdownHooks(): Promise<void> {
+    this.logger.debug("Running shutdown hooks");
+    for (const hook of this.shutdownHooks) {
+      this.logger.debug(`Running shutdown hook: ${hook.name}`);
+      await hook.hook();
     }
-    if (this.remoteRepository) {
-      this.logger.debug("Destroying remote repository");
-      try {
-        await this.remoteRepository.destroy();
-      } catch (err) {
-        this.logger.error(
-          `${fnTag}: Error destroying remote repository: ${err}`,
-        );
-      }
-      this.remoteRepository = undefined;
-    }
+  }
+
+  /**
+   * Prevents ApiServer#shutdown() from recursing back into this.shutdown():
+   * the gateway registers itself as a plugin of its own ApiServer (see
+   * getOrCreateHttpServer()) to install its endpoints, which would otherwise
+   * get its shutdown() called again by the ApiServer's plugin-shutdown loop.
+   */
+  private deregisterSelfFromOwnApiServer(): void {
+    this.ownApiServerPluginRegistry?.deleteByPackageName(this.getPackageName());
   }
 
   private async shutdownGOLServer(): Promise<void> {
@@ -1610,14 +1595,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.debug(`Entering ${fnTag}`);
         this.logger.debug("Killing Gateway Application");
 
-        this.isShutdown = true;
-
         if (this.OApiServer) {
           this.logger.debug("Shutting down OpenAPI server");
-          await this.OApiServer?.shutdown();
+          this.deregisterSelfFromOwnApiServer();
+          await this.OApiServer.shutdown();
           this.logger.debug("OpenAPI server shut down");
-          await this.destroyRepositories();
-          return;
         }
 
         if (this.monitorService) {
@@ -1627,11 +1609,8 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         }
 
         this.logger.debug("Shutting down Gateway Coordinator");
-        this.logger.debug("Running shutdown hooks");
-        for (const hook of this.shutdownHooks) {
-          this.logger.debug(`Running shutdown hook: ${hook.name}`);
-          await hook.hook();
-        }
+        await this.shutdownGOLServer();
+        await this.runShutdownHooks();
 
         this.logger.debug("Oracle Manager shut down");
         await this.SATPCCManager?.getOracleManager().shutdown();
@@ -1643,7 +1622,6 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.logger.info(`Closed ${connectionsClosed} connections`);
         this.logger.info("Gateway Coordinator shut down");
 
-        await this.destroyRepositories();
         return;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
