@@ -58,7 +58,7 @@
     "@hyperledger-cacti/cactus-plugin-keychain-memory": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-test-tooling": "3.0.0-beta.1",
-    "axios": "1.16.0",
+    "axios": "1.18.0",
     "express": "5.1.0",
     "web3-eth-abi": "4.0.3",
     "web3-utils": "4.2.1"
@@ -67,7 +67,7 @@
     "@types/body-parser": "1.19.4",
     "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",
-    "body-parser": "1.20.3",
+    "body-parser": "1.20.6",
     "jest-extended": "7.0.0",
     "uuid": "11.1.1"
   },
