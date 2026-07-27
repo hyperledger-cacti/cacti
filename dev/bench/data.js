@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784797284837,
+  "lastUpdate": 1785143664114,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -592,6 +592,42 @@ window.BENCHMARK_DATA = {
             "range": "±2.34%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "84d5f102429bb31336eb91dd196bc859570785f3",
+          "message": "build(deps): bump the npm-security group across 1 directory with 3 updates\n\nBumps the npm-security group with 3 updates in the / directory: [brace-expansion](https://github.com/juliangruber/brace-expansion), [dompurify](https://github.com/cure53/DOMPurify) and [fast-uri](https://github.com/fastify/fast-uri).\n\n\nUpdates `brace-expansion` from 1.1.15 to 1.1.16\n- [Release notes](https://github.com/juliangruber/brace-expansion/releases)\n- [Commits](https://github.com/juliangruber/brace-expansion/compare/v1.1.15...v1.1.16)\n\nUpdates `dompurify` from 3.4.11 to 3.4.12\n- [Release notes](https://github.com/cure53/DOMPurify/releases)\n- [Commits](https://github.com/cure53/DOMPurify/compare/3.4.11...3.4.12)\n\nUpdates `fast-uri` from 3.1.3 to 3.1.4\n- [Release notes](https://github.com/fastify/fast-uri/releases)\n- [Commits](https://github.com/fastify/fast-uri/compare/v3.1.3...v3.1.4)\n\n---\nupdated-dependencies:\n- dependency-name: brace-expansion\n  dependency-version: 1.1.16\n  dependency-type: indirect\n  dependency-group: npm-security\n- dependency-name: dompurify\n  dependency-version: 3.4.12\n  dependency-type: indirect\n  dependency-group: npm-security\n- dependency-name: fast-uri\n  dependency-version: 3.1.4\n  dependency-type: indirect\n  dependency-group: npm-security\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2026-07-24T09:45:17Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/84d5f102429bb31336eb91dd196bc859570785f3"
+        },
+        "date": 1785143661717,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 643,
+            "range": "±3.10%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 684,
+            "range": "±2.00%",
+            "unit": "ops/sec",
+            "extra": "184 samples"
           }
         ]
       }
