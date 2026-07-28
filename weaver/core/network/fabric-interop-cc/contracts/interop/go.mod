@@ -3,7 +3,7 @@ module github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/
 go 1.26
 
 require (
-	github.com/ethereum/go-ethereum v1.17.4
+	github.com/ethereum/go-ethereum v1.17.5
 	github.com/golang/protobuf v1.5.4
 	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250315024943-6d1e72e951ad
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230731094759-d626e9ab09b9

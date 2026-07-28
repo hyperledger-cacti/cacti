@@ -6,7 +6,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/google/uuid v1.6.0
 	github.com/hyperledger/fabric-admin-sdk v0.2.0
-	github.com/hyperledger/fabric-gateway v1.11.0
+	github.com/hyperledger/fabric-gateway v1.12.0
 	github.com/hyperledger/fabric-protos-go v0.3.7
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
