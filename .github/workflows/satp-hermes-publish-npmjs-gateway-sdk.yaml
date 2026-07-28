@@ -116,7 +116,7 @@ jobs:
       npm_package_name: ${{ steps.set_tags.outputs.npm_package_name }}
       is_release: ${{ steps.set_tags.outputs.is_release }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
       - name: Set package tags
         id: set_tags
         run: |
@@ -177,7 +177,7 @@ jobs:
     if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/satp-dev' || github.ref == 'refs/heads/satp-stg' || startsWith(github.ref, 'refs/tags/'))) || (github.event_name == 'pull_request' && (github.base_ref == 'main' || github.base_ref == 'satp-dev' || github.base_ref == 'satp-stg')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 #v7.0.0
@@ -256,7 +256,7 @@ jobs:
     # Production publishes run under the `prod` environment; dev builds use none.
     environment: ${{ needs.set-npm-tags.outputs.is_release == 'true' && 'prod' || '' }}
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: Setup Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 #v7.0.0
