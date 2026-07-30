@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785143664114,
+  "lastUpdate": 1785402188896,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -628,6 +628,42 @@ window.BENCHMARK_DATA = {
             "range": "±2.00%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "ParthSinghPS",
+            "username": "ParthSinghPS",
+            "email": "posiedon.1721@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "67a9dda931780940edd6d2de86094447989fd74f",
+          "message": "refactor: remove cactus-common-example-server\n\nRemove package from workspace and CI to migrate it to the\n\ncacti-demos repository.\n\nRefs: hyperledger-cacti/cacti#4543\nSigned-off-by: Parth Singh <posiedon.1721@gmail.com>",
+          "timestamp": "2026-07-14T10:37:55Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/67a9dda931780940edd6d2de86094447989fd74f"
+        },
+        "date": 1785402186460,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 634,
+            "range": "±3.13%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 646,
+            "range": "±1.97%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
