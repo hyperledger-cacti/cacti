@@ -1,0 +1,59 @@
+# Whitepaper-only MkDocs build — renders just docs/docs/whitepaper/whitepaper.md
+# so the paper can be previewed on its own, without building the full docs site.
+#
+# See docs/docs/whitepaper/build-whitepaper.md for full build instructions.
+#
+# Usage (from the docs/ directory, or via the yarn scripts):
+#   mkdocs serve -f mkdocs.whitepaper.yml     # live preview at http://127.0.0.1:8000
+#   mkdocs build -f mkdocs.whitepaper.yml     # static build into docs/site-whitepaper/
+site_name: "Hyperledger Cacti — Whitepaper v2"
+site_url: https://hyperledger-cacti.github.io/cacti/
+repo_name: hyperledger-cacti/cacti
+repo_url: https://github.com/hyperledger-cacti/cacti
+docs_dir: docs
+site_dir: site-whitepaper
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - navigation.top
+    - toc.follow
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Whitepaper: whitepaper/whitepaper.md
+
+# Build only the whitepaper: exclude every other Markdown file in docs_dir,
+# keeping non-Markdown assets (the whitepaper images and stylesheets).
+# The negation re-includes whitepaper.md after the broad exclusion.
+exclude_docs: |
+  **/*.md
+  !whitepaper/whitepaper.md
