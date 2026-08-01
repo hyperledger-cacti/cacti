@@ -4446,7 +4446,7 @@ __metadata:
     "@hyperledger-cacti/cacti-weaver-sdk-fabric": "npm:3.0.0-beta.1"
     "@types/express": "npm:5.0.1"
     "@types/node": "npm:18.11.9"
-    body-parser: "npm:1.20.3"
+    body-parser: "npm:1.20.6"
     dotenv: "npm:8.6.0"
     express: "npm:5.1.0"
     fabric-ca-client: "npm:2.2.20"
@@ -4631,10 +4631,10 @@ __metadata:
     "@types/xml2js": "npm:0.4.9"
     "@vercel/ncc": "npm:0.38.1"
     async-exit-hook: "npm:2.0.1"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     benchmark: "npm:2.1.4"
     bluebird: "npm:3.7.2"
-    body-parser: "npm:1.20.3"
+    body-parser: "npm:1.20.6"
     compression: "npm:1.7.4"
     convict: "npm:6.2.5"
     convict-format-with-validator: "npm:6.2.0"
@@ -4687,7 +4687,7 @@ __metadata:
     loglevel: "npm:1.8.1"
     loglevel-plugin-prefix: "npm:0.8.4"
     run-time-error-cjs: "npm:1.4.0"
-    sanitize-html: "npm:2.12.1"
+    sanitize-html: "npm:2.17.5"
     secp256k1: "npm:5.0.1"
     sha3: "npm:2.1.4"
     uuid: "npm:11.1.1"
@@ -4709,7 +4709,7 @@ __metadata:
     ajv: "npm:8.18.0"
     ajv-draft-04: "npm:1.0.0"
     ajv-formats: "npm:3.0.1"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     express: "npm:5.1.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -4732,7 +4732,7 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/http-errors": "npm:2.0.2"
-    body-parser: "npm:1.20.3"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     express-jwt-authz: "npm:2.4.1"
     express-openapi-validator: "npm:5.6.2"
@@ -4854,8 +4854,8 @@ __metadata:
     "@types/fs-extra": "npm:11.0.4"
     "@types/tape": "npm:4.13.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     dockerode: "npm:3.3.0"
     express: "npm:5.1.0"
     fabric-network: "npm:2.2.20"
@@ -4916,7 +4916,7 @@ __metadata:
     "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-beta.1"
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "npm:3.0.0-beta.1"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     express: "npm:5.1.0"
     joi: "npm:17.13.4"
     openapi-types: "npm:12.1.3"
@@ -4936,7 +4936,7 @@ __metadata:
     "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-beta.1"
     "@types/bn.js": "npm:5.2.0"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     bn.js: "npm:5.2.3"
     dotenv: "npm:16.3.1"
     ds-test: "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
@@ -4965,8 +4965,8 @@ __metadata:
     "@hyperledger-cacti/cactus-core-api": "npm:3.0.0-beta.1"
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     npm-run-all2: "npm:6.1.2"
@@ -4994,9 +4994,9 @@ __metadata:
     "@types/google-protobuf": "npm:3.15.5"
     "@types/http-errors": "npm:2.0.4"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     benchmark: "npm:2.1.4"
-    body-parser: "npm:1.20.3"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     fs-extra: "npm:11.2.0"
     google-protobuf: "npm:3.21.4"
@@ -5042,8 +5042,8 @@ __metadata:
     "@types/multer": "npm:1.4.7"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     express-openapi-validator: "npm:5.6.2"
     http-errors-enhanced-cjs: "npm:2.0.1"
@@ -5081,19 +5081,19 @@ __metadata:
     "@types/minimist": "npm:1.2.2"
     "@types/sanitize-html": "npm:2.9.5"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     chalk: "npm:4.1.2"
     ethers: "npm:6.8.1"
     express: "npm:5.1.0"
     http-proxy-middleware: "npm:3.0.7"
     jest-extended: "npm:7.0.0"
-    js-yaml: "npm:3.15.0"
+    js-yaml: "npm:5.2.2"
     minimist: "npm:1.2.8"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
-    sanitize-html: "npm:2.12.1"
+    sanitize-html: "npm:2.17.5"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
@@ -5133,7 +5133,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/temp": "npm:0.9.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     bl: "npm:6.1.0"
     bn.js: "npm:4.12.3"
     body-parser: "npm:2.3.0"
@@ -5152,7 +5152,7 @@ __metadata:
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
     joi: "npm:17.13.4"
-    js-yaml: "npm:3.15.0"
+    js-yaml: "npm:5.2.2"
     json5: "npm:2.2.3"
     jsrsasign: "npm:11.1.3"
     lodash: "npm:4.18.1"
@@ -5167,7 +5167,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     sanitize-filename: "npm:1.6.3"
-    sanitize-html: "npm:2.12.1"
+    sanitize-html: "npm:2.17.5"
     secp256k1: "npm:5.0.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
@@ -5225,8 +5225,8 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     jest-extended: "npm:4.0.1"
     npm-run-all: "npm:4.1.5"
@@ -5258,8 +5258,8 @@ __metadata:
     "@types/express": "npm:5.0.1"
     "@types/pg": "npm:8.6.5"
     async-mutex: "npm:0.4.0"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     fabric-network: "npm:2.5.0-snapshot.23"
     jest-extended: "npm:4.0.1"
@@ -5335,10 +5335,10 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
     "@vercel/ncc": "npm:0.38.1"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     bignumber.js: "npm:9.1.2"
     bn.js: "npm:5.2.3"
-    body-parser: "npm:1.20.3"
+    body-parser: "npm:1.20.6"
     class-transformer: "npm:0.5.1"
     class-validator: "npm:0.14.1"
     cors: "npm:2.8.5"
@@ -5368,7 +5368,7 @@ __metadata:
     jest: "npm:29.5.0"
     jest-extended: "npm:7.0.0"
     jest-junit: "npm:16.0.0"
-    js-yaml: "npm:3.15.0"
+    js-yaml: "npm:5.2.2"
     jsonc: "npm:2.0.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.4"
@@ -5470,8 +5470,8 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     uuid: "npm:11.1.1"
@@ -5495,8 +5495,8 @@ __metadata:
     "@types/body-parser": "npm:1.19.4"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
-    body-parser: "npm:1.20.3"
+    axios: "npm:1.18.0"
+    body-parser: "npm:1.20.6"
     express: "npm:5.1.0"
     jest-extended: "npm:7.0.0"
     key-encoder: "npm:2.0.3"
@@ -5522,7 +5522,7 @@ __metadata:
     "@hyperledger-cacti/cactus-test-tooling": "npm:3.0.0-beta.1"
     "@types/express": "npm:5.0.1"
     "@types/uuid": "npm:10.0.0"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     express: "npm:5.1.0"
     http-status-codes: "npm:2.3.0"
     jest-extended: "npm:7.0.0"
@@ -5581,7 +5581,7 @@ __metadata:
     "@types/tar-fs": "npm:2.0.4"
     "@types/tar-stream": "npm:2.2.1"
     "@types/temp": "npm:0.9.1"
-    axios: "npm:1.16.0"
+    axios: "npm:1.18.0"
     compare-versions: "npm:3.6.0"
     dockerode: "npm:3.3.0"
     elliptic: "npm:6.6.1"
@@ -5594,7 +5594,7 @@ __metadata:
     is-port-reachable: "npm:3.0.0"
     jest-extended: "npm:7.0.0"
     joi: "npm:17.13.4"
-    js-yaml: "npm:3.15.0"
+    js-yaml: "npm:5.2.2"
     keycloak-admin: "npm:1.14.22"
     lodash: "npm:4.18.1"
     node-forge: "npm:1.4.0"
@@ -19359,7 +19359,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.11.20":
+"dayjs@npm:^1.11.20, dayjs@npm:^1.11.7":
   version: 1.11.21
   resolution: "dayjs@npm:1.11.21"
   checksum: 10/dd16f9f2706b61b90e3c346a3211ac3afd9e26193136ce0e87f70bf74d1c17a447bceb230a88b175467fc9f5e3243d8c1544b9897092a12d9c80ee44d338dcb6
@@ -28340,6 +28340,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"js-yaml@npm:5.2.2":
+  version: 5.2.2
+  resolution: "js-yaml@npm:5.2.2"
+  dependencies:
+    argparse: "npm:^2.0.1"
+  bin:
+    js-yaml: bin/js-yaml.mjs
+  checksum: 10/2b4c2933af12c97e1c4894a4f27fe9b06dab70a64a96bb50624b4429bef6bf11008bde20d868bce52a36784473314efc30078ba6025b58cf7537961e23b1ae9c
+  languageName: node
+  linkType: hard
+
 "js-yaml@npm:^3.13.1":
   version: 3.14.2
   resolution: "js-yaml@npm:3.14.2"
@@ -29119,6 +29130,15 @@ __metadata:
   version: 1.14.3
   resolution: "ky@npm:1.14.3"
   checksum: 10/afd6a6ff10e33138d5338c014a051ca920c6ced7f8452748dfe960c26fb5456f36e103cd8b5868ebf2a38bf13c2b3f53b74cbea44a1b53923e1921bb9a6447b1
+  languageName: node
+  linkType: hard
+
+"launder@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "launder@npm:1.7.1"
+  dependencies:
+    dayjs: "npm:^1.11.7"
+  checksum: 10/e0fbf7934728c9dd82eea3ccbebc31c021c9ffee225861cf6e2f219bdeb2be0d8585748eb700ec58a41a7dff5529e50ac84500657a7a927305685ec9f1cb3ab3
   languageName: node
   linkType: hard
 
@@ -37367,17 +37387,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sanitize-html@npm:2.12.1":
-  version: 2.12.1
-  resolution: "sanitize-html@npm:2.12.1"
+"sanitize-html@npm:2.17.5":
+  version: 2.17.5
+  resolution: "sanitize-html@npm:2.17.5"
   dependencies:
     deepmerge: "npm:^4.2.2"
     escape-string-regexp: "npm:^4.0.0"
-    htmlparser2: "npm:^8.0.0"
+    htmlparser2: "npm:^10.1.0"
     is-plain-object: "npm:^5.0.0"
+    launder: "npm:^1.7.1"
     parse-srcset: "npm:^1.0.2"
     postcss: "npm:^8.3.11"
-  checksum: 10/0aef3e56a7fe30983921e070d432167df1aabd9e6e4a78b5de127af275c38b41f8e97f0440b6970cee1875dc003bc5e3c3a588ec7d2c242fca6d8f3327ea8efb
+  checksum: 10/93c7ae236faa9bf281533394caebd5cbbc3e52349c1d82c32fb921826b65fcdab435238eee2931d70e9781f46be47c9e530909d258e239fa230f12496bfdc4f6
   languageName: node
   linkType: hard
 

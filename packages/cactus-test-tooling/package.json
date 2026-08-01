@@ -66,7 +66,7 @@
   },
   "dependencies": {
     "@hyperledger-cacti/cactus-common": "3.0.0-beta.1",
-    "axios": "1.16.0",
+    "axios": "1.18.0",
     "compare-versions": "3.6.0",
     "dockerode": "3.3.0",
     "elliptic": "6.6.1",
@@ -78,7 +78,7 @@
     "is-port-reachable": "3.0.0",
     "jest-extended": "7.0.0",
     "joi": "17.13.4",
-    "js-yaml": "3.15.0",
+    "js-yaml": "5.2.2",
     "keycloak-admin": "1.14.22",
     "lodash": "4.18.1",
     "node-forge": "1.4.0",
