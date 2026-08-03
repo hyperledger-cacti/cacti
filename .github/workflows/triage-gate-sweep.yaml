@@ -1,0 +1,236 @@
+# Triage gate — sweep phase.
+#
+# Runs daily. For each open PR carrying the `Triage_Warning` label:
+#   * If the author is now exempt (hyperledger-cacti org member or
+#     Dependabot), remove the label silently.
+#   * If the PR now references a `Triage_Ready` issue, remove the label
+#     and mark the sticky comment resolved (self-heal).
+#   * If neither and the label has been on the PR for at least 7 days,
+#     close the PR with a comment linking PULL.md §9. The PR
+#     remains reopenable.
+#
+# Companion to triage-gate-warn.yaml — see the security notes there.
+# This workflow is `schedule`/`workflow_dispatch` only, so it never
+# touches PR-provided code and does not need the same set of hard rules,
+# but we still avoid `actions/checkout` and shell-interpolating any
+# PR-controlled data.
+
+name: "Triage Gate — Sweep"
+
+on:
+  schedule:
+    # Daily at 00:00 UTC.
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'When true, log actions but do not modify PRs. Default false.'
+        required: false
+        default: 'false'
+        type: string
+
+concurrency:
+  group: triage-gate-sweep-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Single source of truth for the label names, sticky-comment marker,
+# grace period, and internal tuning knobs. Keep in sync with
+# triage-gate-warn.yaml.
+env:
+  TRIAGE_WARN_LABEL: Triage_Warning
+  TRIAGE_READY_LABEL: Triage_Ready
+  TRIAGE_MARKER: '<!-- triage-bot -->'
+  TRIAGE_CLOSE_AFTER_DAYS: '7'
+  TRIAGE_MAX_PAGES: '5'
+  TRIAGE_BODY_MAX_BYTES: '16384'
+  TRIAGE_PULL_MD_URL: 'https://github.com/hyperledger-cacti/cacti/blob/main/PULL.md#9-linked-issue-and-traceability'
+
+permissions:
+  contents: read
+
+jobs:
+  triage-gate-sweep:
+    name: Close warned PRs after grace period
+    runs-on: ubuntu-22.04
+    permissions:
+      pull-requests: write
+      issues: write
+      contents: read
+    steps:
+      - name: Sweep PRs carrying Triage_Warning
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
+        env:
+          # `github.event.inputs.*` is `null` on schedule runs, which
+          # evaluates to 'false' via the `||` fallback below.
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        with:
+          script: |
+            const WARN_LABEL = process.env.TRIAGE_WARN_LABEL;
+            const READY_LABEL = process.env.TRIAGE_READY_LABEL;
+            const MARKER = process.env.TRIAGE_MARKER;
+            const CLOSE_AFTER_DAYS = Number(process.env.TRIAGE_CLOSE_AFTER_DAYS);
+            const MAX_PAGES = Number(process.env.TRIAGE_MAX_PAGES);
+            const BODY_MAX_BYTES = Number(process.env.TRIAGE_BODY_MAX_BYTES);
+            const dryRun = (process.env.DRY_RUN || 'false').toLowerCase() === 'true';
+            const { owner, repo } = context.repo;
+            const pullMdUrl = process.env.TRIAGE_PULL_MD_URL;
+
+            core.info(`Sweep starting (dryRun=${dryRun}).`);
+
+            // Search query uses only workflow constants — no PR-controlled
+            // data is interpolated. Safe against injection.
+            const query = `repo:${owner}/${repo} is:pr is:open label:"${WARN_LABEL}"`;
+            let searchPages = 0;
+            const results = await github.paginate(
+              github.rest.search.issuesAndPullRequests,
+              { q: query, per_page: 100 },
+              (response, done) => {
+                searchPages++;
+                if (searchPages >= MAX_PAGES) done();
+                // search endpoint wraps hits in { items: [...] }
+                return response.data.items;
+              },
+            );
+            core.info(`Found ${results.length} open PR(s) with ${WARN_LABEL} (capped at ${MAX_PAGES} pages).`);
+            
+            // Match warn workflow: only org owners/members and Dependabot
+            // are exempt. Outside collaborators still need Triage_Ready.
+            const exemptAssoc = new Set(['OWNER', 'MEMBER']);
+            const exemptBots = new Set(['dependabot[bot]']);
+            const now = Date.now();
+
+            const kwPattern = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?|address(?:e[sd])?|refs?)\s+#(\d+)/gi;
+
+            for (const item of results) {
+              const num = item.number;
+
+              // Refresh authoritative PR state — search results can be stale.
+              const { data: pr } = await github.rest.pulls.get({
+                owner, repo, pull_number: num,
+              });
+
+              if (pr.draft) {
+                core.info(`#${num}: draft, skipping.`);
+                continue;
+              }
+
+              const login = (pr.user && pr.user.login) || '';
+              if (exemptAssoc.has(pr.author_association) || exemptBots.has(login)) {
+                core.info(`#${num}: exempt (${login}, ${pr.author_association}); clearing label.`);
+                if (!dryRun) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner, repo, issue_number: num, name: WARN_LABEL,
+                    });
+                  } catch (err) {
+                    core.info(`#${num}: removeLabel: ${err.message}`);
+                  }
+                }
+                continue;
+              }
+
+              // Re-check conformance against current body (capped for safety).
+              const body = (pr.body || '').slice(0, BODY_MAX_BYTES);
+              const kw = new RegExp(kwPattern.source, kwPattern.flags);
+              const issueNumbers = new Set();
+              let m;
+              while ((m = kw.exec(body)) !== null) {
+                issueNumbers.add(Number(m[1]));
+              }
+
+              let conforming = false;
+              for (const n of issueNumbers) {
+                try {
+                  const { data: issue } = await github.rest.issues.get({
+                    owner, repo, issue_number: n,
+                  });
+                  if (issue.pull_request) continue;
+                  const labels = (issue.labels || []).map(l => (typeof l === 'string' ? l : l.name));
+                  if (labels.includes(READY_LABEL)) {
+                    conforming = true;
+                    break;
+                  }
+                } catch (err) {
+                  core.info(`#${num}: could not fetch #${n}: ${err.message}`);
+                }
+              }
+
+              // Fetch the sticky bot comment once, before branching on conformance.
+              // It serves two purposes:
+              //   1. Self-heal (conforming path): update the comment to resolved.
+              //   2. Age source (non-conforming path): use created_at as the
+              //      label-age proxy instead of listEvents pagination.
+              let commentPages = 0;
+              const comments = await github.paginate(github.rest.issues.listComments, {
+                owner, repo, issue_number: num, per_page: 100,
+              }, (response, done) => {
+                commentPages++;
+                if (commentPages >= MAX_PAGES) done();
+                return response.data;
+              });
+              const sticky = comments.find(c =>
+                (c.body || '').includes(MARKER)
+                && c.user
+                && c.user.type === 'Bot'
+                && c.user.login === 'github-actions[bot]'
+              );
+
+              if (conforming) {
+                core.info(`#${num}: now conforming; clearing label + resolving comment.`);
+                if (!dryRun) {
+                  try {
+                    await github.rest.issues.removeLabel({
+                      owner, repo, issue_number: num, name: WARN_LABEL,
+                    });
+                  } catch (err) {
+                    core.info(`#${num}: removeLabel: ${err.message}`);
+                  }
+                  if (sticky) {
+                    const resolved = [
+                      MARKER,
+                      '',
+                      ':white_check_mark: This PR now references a `Triage_Ready` issue. Triage gate cleared.',
+                    ].join('\n');
+                    await github.rest.issues.updateComment({
+                      owner, repo, comment_id: sticky.id, body: resolved,
+                    });
+                  }
+                }
+                continue;
+              }
+
+              if (!sticky) {
+                core.info(`#${num}: Triage_Warning label present but sticky comment not found; skipping.`);
+                continue;
+              }
+
+              const ageDays = (now - new Date(sticky.created_at).getTime()) / (1000 * 60 * 60 * 24);
+              if (ageDays < CLOSE_AFTER_DAYS) {
+                core.info(`#${num}: warning issued ${ageDays.toFixed(1)}d ago (< ${CLOSE_AFTER_DAYS}d); leaving open.`);
+                continue;
+              }
+
+              core.info(`#${num}: warning issued ${ageDays.toFixed(1)}d ago; closing.`);
+              if (dryRun) continue;
+
+              const closeMsg = [
+                MARKER,
+                '',
+                ':x: **Closing per triage gate.**',
+                '',
+                `This PR has carried the \`${WARN_LABEL}\` label for more than ${CLOSE_AFTER_DAYS} days without being linked to a \`${READY_LABEL}\` issue.`,
+                '',
+                `See [PULL.md §9 — Linked Issue and Traceability](${pullMdUrl}).`,
+                '',
+                'You are welcome to reopen this PR once you have added a closing keyword (for example `Closes #1234`) pointing to a triaged issue.',
+              ].join('\n');
+
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: num, body: closeMsg,
+              });
+              await github.rest.pulls.update({
+                owner, repo, pull_number: num, state: 'closed',
+              });
+            }
+
+            core.info('Sweep complete.');
