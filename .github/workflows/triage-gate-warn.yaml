@@ -1,0 +1,243 @@
+# Triage gate — warn phase.
+#
+# Enforces PULL.md §9 (Linked Issue and Traceability) and
+# AI_GUIDELINES.md §2.6 (Triage Gate for Agents): every PR must reference
+# an issue that carries the `Triage_Ready` label. If it does not, this
+# workflow adds the `Triage_Warning` label and posts (or edits) a single
+# sticky comment explaining the rule and the 7-day grace period. The
+# scheduled sweep workflow (triage-gate-sweep.yaml) later closes PRs that
+# remain non-conforming past the grace period.
+#
+# ============================================================
+# SECURITY — READ BEFORE MODIFYING
+# ============================================================
+# This workflow runs on `pull_request_target`, which is required so that
+# the GITHUB_TOKEN has write access when the PR comes from a fork; a
+# plain `pull_request` trigger would receive a read-only token and could
+# not comment/label. `pull_request_target` executes in the base repo
+# context and therefore has access to secrets and a writable token.
+# If PR-provided code were ever executed here, a malicious fork could
+# hijack the runner (the "pwn request" attack pattern).
+#
+# RULES for this workflow:
+#   1. NEVER `actions/checkout` the PR head. This job needs zero source
+#      files from the PR; it operates purely on the event payload and
+#      the REST API.
+#   2. NEVER run package managers, builds, tests, or any script that
+#      lives inside the PR (no `yarn`, `npm`, `pnpm`, `make`, `bash
+#      scripts/*`, etc.).
+#   3. The only step is `actions/github-script` to get PR context. All
+#      untrusted PR-controlled data (title, body, labels, author) is
+#      read via the JS `context` object; it is never interpolated into
+#      a shell `run:` block.
+#   4. `permissions:` are declared at the job level with the minimum
+#      scopes needed: comment/label/close on PRs, read issue labels.
+#   5. All third-party actions pinned to a full commit SHA.
+#
+#
+# See:
+#   - https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+#   - https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+# ============================================================
+
+name: "Triage Gate — Warn"
+
+on:
+  pull_request_target:
+    types: [opened, edited, reopened, ready_for_review]
+
+concurrency:
+  group: triage-gate-warn-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# Single source of truth for the label names, sticky-comment marker,
+# grace period, and internal tuning knobs. Change here and both the warn
+# and sweep workflows stay in sync (keep values identical to
+# triage-gate-sweep.yaml).
+env:
+  TRIAGE_WARN_LABEL: Triage_Warning
+  TRIAGE_READY_LABEL: Triage_Ready
+  TRIAGE_WARN_LABEL_COLOR: d93b67
+  TRIAGE_MARKER: '<!-- triage-bot -->'
+  TRIAGE_CLOSE_AFTER_DAYS: '7'
+  # Cap pagination on comments/events so a maliciously noisy PR cannot
+  # force the workflow to walk unbounded API history.
+  TRIAGE_MAX_PAGES: '5'
+  # Slice PR body before regex work; defense-in-depth vs. large inputs.
+  TRIAGE_BODY_MAX_BYTES: '16384'
+  TRIAGE_PULL_MD_URL: 'https://github.com/hyperledger-cacti/cacti/blob/main/PULL.md#9-linked-issue-and-traceability'
+
+# Top-level default is read-only; the job below elevates to the minimum
+# scopes it needs. See the security notes at the top of this file.
+permissions:
+  contents: read
+
+jobs:
+  triage-gate-warn:
+    name: Enforce Triage_Ready link
+    runs-on: ubuntu-22.04
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - name: Check triage-ready linkage and warn if missing
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 #v9.0.0
+        with:
+          script: |
+            const WARN_LABEL = process.env.TRIAGE_WARN_LABEL;
+            const READY_LABEL = process.env.TRIAGE_READY_LABEL;
+            const WARN_LABEL_COLOR = process.env.TRIAGE_WARN_LABEL_COLOR;
+            const MARKER = process.env.TRIAGE_MARKER;
+            const CLOSE_AFTER_DAYS = Number(process.env.TRIAGE_CLOSE_AFTER_DAYS);
+            const MAX_PAGES = Number(process.env.TRIAGE_MAX_PAGES);
+            const BODY_MAX_BYTES = Number(process.env.TRIAGE_BODY_MAX_BYTES);
+
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              core.info('No pull_request payload; nothing to do.');
+              return;
+            }
+
+            if (pr.draft) {
+              core.info(`PR #${pr.number} is a draft; skipping.`);
+              return;
+            }
+
+            // Exemptions: hyperledger-cacti org members (author_association
+            // === 'MEMBER'; the org owner surfaces as 'OWNER') and
+            // Dependabot. Maintainers and code owners are covered in
+            // practice because they are org members. Outside collaborators
+            // (author_association === 'COLLABORATOR') and everyone else
+            // must still link a Triage_Ready issue.
+            const exemptAssoc = new Set(['OWNER', 'MEMBER']);
+            const exemptBots = new Set(['dependabot[bot]']);
+            const login = (pr.user && pr.user.login) || '';
+            if (exemptAssoc.has(pr.author_association) || exemptBots.has(login)) {
+              core.info(`Exempt author (${login}, ${pr.author_association}); skipping.`);
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const pullMdUrl = process.env.TRIAGE_PULL_MD_URL;
+
+            // Cap untrusted PR body before regex/scan work (BODY_MAX_BYTES
+            // is far more than any legitimate closing-keyword usage needs
+            // and removes any ReDoS/large-input concern).
+            const body = (pr.body || '').slice(0, BODY_MAX_BYTES);
+            const kw = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?|address(?:e[sd])?|refs?)\s+#(\d+)/gi;
+            const issueNumbers = new Set();
+            let m;
+            while ((m = kw.exec(body)) !== null) {
+              issueNumbers.add(Number(m[1]));
+            }
+
+            let conforming = false;
+            for (const num of issueNumbers) {
+              try {
+                const { data: issue } = await github.rest.issues.get({
+                  owner, repo, issue_number: num,
+                });
+                // Skip if the reference is actually a PR, not an issue.
+                if (issue.pull_request) continue;
+                const labels = (issue.labels || []).map(l => (typeof l === 'string' ? l : l.name));
+                if (labels.includes(READY_LABEL)) {
+                  conforming = true;
+                  break;
+                }
+              } catch (err) {
+                core.info(`Could not fetch #${num}: ${err.message}`);
+              }
+            }
+
+            // Locate an existing sticky bot comment. The marker alone is not
+            // enough: an untrusted PR author could post a decoy comment with
+            // the marker in an attempt to make the bot overwrite/edit that
+            // comment. We additionally require the comment to have been
+            // authored by `github-actions[bot]`
+            let pageCount = 0;
+            const allComments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: pr.number, per_page: 100,
+            }, (response, done) => {
+              pageCount++;
+              if (pageCount >= MAX_PAGES) done();
+              return response.data;
+            });
+            const sticky = allComments.find(c =>
+              (c.body || '').includes(MARKER)
+              && c.user
+              && c.user.type === 'Bot'
+              && c.user.login === 'github-actions[bot]'
+            );
+
+            if (conforming) {
+              // Self-heal: clear the warning label and resolve the comment.
+              const hasLabel = (pr.labels || []).some(l => l.name === WARN_LABEL);
+              if (hasLabel) {
+                try {
+                  await github.rest.issues.removeLabel({
+                    owner, repo, issue_number: pr.number, name: WARN_LABEL,
+                  });
+                } catch (err) {
+                  core.info(`removeLabel: ${err.message}`);
+                }
+              }
+              if (sticky) {
+                const resolved = [
+                  MARKER,
+                  '',
+                  ':white_check_mark: This PR now references a `Triage_Ready` issue. Triage gate cleared.',
+                ].join('\n');
+                await github.rest.issues.updateComment({
+                  owner, repo, comment_id: sticky.id, body: resolved,
+                });
+              }
+              return;
+            }
+
+            // Non-conforming: ensure the warning label exists (idempotent) and apply it.
+            try {
+              await github.rest.issues.createLabel({
+                owner, repo,
+                name: WARN_LABEL,
+                color: WARN_LABEL_COLOR,
+                description: `PR does not link a ${READY_LABEL} issue; auto-close after ${CLOSE_AFTER_DAYS} days.`,
+              });
+            } catch (err) {
+              // 422 = already exists; that is the expected steady state.
+              core.info(`createLabel: ${err.message}`);
+            }
+            try {
+              await github.rest.issues.addLabels({
+                owner, repo, issue_number: pr.number, labels: [WARN_LABEL],
+              });
+            } catch (err) {
+              core.info(`addLabels: ${err.message}`);
+            }
+
+            const warning = [
+              MARKER,
+              '',
+              ':warning: **Triage gate:** this PR does not reference a triaged issue.',
+              '',
+              `Every PR must be linked to an issue carrying the \`${READY_LABEL}\` label. See [PULL.md §9 — Linked Issue and Traceability](${pullMdUrl}).`,
+              '',
+              'Please edit the PR description to include a closing keyword and an issue number, for example:',
+              '',
+              '> `Closes #1234`',
+              '',
+              `The referenced issue must already carry \`${READY_LABEL}\` (assigned by a maintainer during triage).`,
+              '',
+              `:hourglass: If this is not resolved within **${CLOSE_AFTER_DAYS} days** of the \`${WARN_LABEL}\` label being applied, the PR will be closed automatically. You will be able to reopen it once the linkage is in place.`,
+              '',
+              'Members of the hyperledger-cacti GitHub organization and Dependabot are exempt from this check.',
+            ].join('\n');
+
+            if (sticky) {
+              await github.rest.issues.updateComment({
+                owner, repo, comment_id: sticky.id, body: warning,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: pr.number, body: warning,
+              });
+            }
