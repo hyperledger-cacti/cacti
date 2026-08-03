@@ -45,6 +45,10 @@ See the official [Confluence high-level project overview](https://lf-hyperledger
 
 For project vision and goals, technical details, and more, see the official [Hyperledger Cacti documentation](https://hyperledger-cacti.github.io/cacti/) to get all your questions answered about the project, to get started with setup, testing, and evaluation, and to get hands-on with code and configurations. Here, you can find separate (and specific) instructions for getting started with running and experimenting with [Cactus modules](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver modules](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) respectively.
 
+> **New contributors:** A [Nix flake](./BUILD.md#nix-flake-quickstart) is
+> available for one-command setup of the entire development toolchain. See
+> [BUILD.md](./BUILD.md) for all setup options.
+
 ## Roadmap
 
 See [ROADMAP.md](./ROADMAP.md) for details on the envisioned integration.
