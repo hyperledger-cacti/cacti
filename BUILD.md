@@ -1,7 +1,8 @@
 - [Hyperledger Cacti Build Instructions](#hyperledger-cacti-build-instructions)
 - [Fast Developer Flow / Code Iterations](#fast-developer-flow--code-iterations)
 - [Getting Started](#getting-started)
-  - [VSCode Dev Container](#vscode-dev-container)
+  - [Dev Container Quickstart](#dev-container-quickstart-recommended)
+  - [Nix Flake Quickstart](#nix-flake-quickstart)
   - [MacOS](#macos)
   - [Linux](#linux)
   - [Windows](#windows)
@@ -103,8 +104,48 @@ yarn install
 ```
 
 **Tip:** If you're new to open source, running locally is often faster and simpler than debugging container issues.
-    
-### MacOS 
+
+### Nix Flake Quickstart
+
+If you have [Nix](https://nixos.org/) installed with flakes enabled, you can
+set up a complete, reproducible development environment with a single command.
+Nix provides the exact versions of Node.js, Go, Rust, JDK, Protobuf, and all
+other required toolchains, no manual installation necessary.
+
+#### Prerequisites
+
+* [Nix](https://nixos.org/) with [flakes](https://wiki.nixos.org/wiki/Flakes) enabled
+* [Docker](https://www.docker.com/) (daemon must be running on the host for integration tests)
+
+> **Note:** If you are new to Nix, see the detailed
+> [Nix Setup Guide](./docs/docs/guides/nix-setup.md) for installation and
+> configuration instructions.
+
+#### Step-by-Step Setup
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/hyperledger-cacti/cacti.git
+cd cacti
+```
+
+**2. Enter the development shell**
+```bash
+nix develop
+```
+
+The first run downloads and caches all dependencies (a few minutes). Subsequent
+runs are near-instantaneous.
+
+**3. Build the project**
+```bash
+yarn run configure
+```
+
+> **Tip:** If you only work on TypeScript packages and do not need Go, Rust, or
+> Java, use the lighter Node-only shell instead: `nix develop .#node`
+
+### MacOS
 
 _Unless explicitly stated otherwise, each bullet will apply to both Intel and ARM Macs. In bullets where there is a difference in the installation process it will be noted._
 * Git
