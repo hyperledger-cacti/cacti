@@ -60,7 +60,7 @@
     "@hyperledger-cacti/cactus-common": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-core": "3.0.0-beta.1",
     "@hyperledger-cacti/cactus-core-api": "3.0.0-beta.1",
-    "axios": "1.16.0",
+    "axios": "1.18.0",
     "bl": "6.1.0",
     "bn.js": "4.12.3",
     "dockerode": "3.3.0",
