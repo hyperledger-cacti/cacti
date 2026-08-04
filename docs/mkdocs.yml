@@ -62,6 +62,8 @@ markdown_extensions:
       repo: mkdocs-material
   - pymdownx.mark
   - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      base_path: [".."]
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -84,6 +86,7 @@ extra:
     provider: mike
 nav:
   - Introduction: index.md
+  - Start Here: start-here.md
   - Vision: vision.md
   - Architecture: architecture.md
   - Key Concepts:

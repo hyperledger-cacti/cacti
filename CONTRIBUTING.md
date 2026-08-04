@@ -26,6 +26,8 @@
 
 Thank you for your interest to contribute to Hyperledger Cacti! :tada:
 
+> **First time here?** See [START_HERE.md](./START_HERE.md) for an
+> overview of all documentation paths (contributor, developer, operator).
 
 First things first, please review the [LF Decentralized Trust Code of Conduct](https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct) before participating.
 If you use AI or LLM tooling in your contributions, please also review our [AI Guidelines](./AI_GUIDELINES.md).
