@@ -198,6 +198,15 @@ nav:
     - Operations: guides/operations.md
     - Developers: guides/developers.md
     - Upgrading: guides/upgrading.md
+  - Recipes:
+    - Overview: recipes/index.md
+    - Git Branch Setup: recipes/git-branch-setup.md
+    - Create a New Package: recipes/create-new-package.md
+    - Testing Guide: recipes/testing-guide.md
+    - Ledger Plugin Testing: recipes/ledger-plugin-testing.md
+    - Building API Clients: recipes/building-api-clients.md
+    - Managing Dependencies: recipes/managing-dependencies.md
+    - VS Code Setup: recipes/vscode-setup.md
   - References:
     - Technical Specifications: references/specs.md
     - Publications: references/publications.md
