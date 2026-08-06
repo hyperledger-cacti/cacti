@@ -207,7 +207,8 @@
     "supports-color": "7.2.0",
     "supports-hyperlinks": "2.3.0",
     "request-promise-native": "1.0.9",
-    "@angular/*": "19.2.20"
+    "@angular/*": "19.2.20",
+    "decompress": "npm:@xhmikosr/decompress@11.1.3"
   },
   "devDependencies": {
     "@angular/common": "20.3.25",
