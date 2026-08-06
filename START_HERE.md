@@ -16,14 +16,14 @@ follow the corresponding section to get started.
 |------|-------------|---------|
 | **Contributor** | You want to modify, extend, or fix the Cacti codebase itself. | [For Contributors][contributors] |
 | **Developer** | You want to use Cacti packages as dependencies in your own application. | [For Developers][developers] |
-| **Operator** | You want to deploy and run Cacti components in a production or staging environment. | [For Operators][operators] |
+| **Operator** | You want to deploy and run Cacti components | [For Operators][operators] |
 
 The following diagram illustrates how each role interacts with the Cacti
 ecosystem:
 
 ```mermaid
 flowchart LR
-    A["You"] --> B{"What do you<br/>want to do?"}
+    B{"Goal"}
     B -->|"Modify the<br/>Cacti codebase"| C["Contributor"]
     B -->|"Use Cacti as<br/>a dependency"| D["Developer"]
     B -->|"Deploy and<br/>run Cacti"| E["Operator"]
@@ -53,13 +53,13 @@ code and documentation to the Cacti repository.
 Before you begin, ensure you have the following installed:
 
 - [Git][git_install]
-- [Docker Desktop][docker_desktop] (must be running)
+- [Docker Desktop][docker_desktop]
 
-### Quick Start
+### Installation
 
 The fastest way to set up a working development environment is with the
 Nix flake. This provisions the full polyglot toolchain (Node.js, Go,
-Rust, JDK, Protobuf, Foundry) in a single command.
+Rust, JDK, Protobuf, Foundry) in a single command. See the [Nix Setup Guide][nix_setup].
 
 ```bash
 # 1. Clone the repository
@@ -73,12 +73,8 @@ nix develop
 yarn run configure
 ```
 
-> **Note:** The Nix flake requires the Nix package manager with flakes
-> enabled. See the [Nix Setup Guide][nix_setup]
-> for installation and troubleshooting.
-
 Alternative setup methods are available if Nix is not suitable for your
-environment:
+environment. The different setup methods are:
 
 | Method | Description | Guide |
 |--------|-------------|-------|
@@ -86,43 +82,13 @@ environment:
 | **Dev Container** | Docker-based VS Code development environment | [BUILD.md - Dev Container Quickstart][build_dev_container] |
 | **Manual Setup** | Platform-specific installation (macOS, Linux, Windows/WSL) | [BUILD.md - Getting Started][build_getting_started] |
 
-### Making Your First Contribution
-
-Once your environment is set up, follow this workflow to submit your
-first pull request:
-
-1. **Fork** the repository on GitHub.
-2. **Create a branch** from `main` with a descriptive name.
-3. **Make your changes** in small, focused commits.
-4. **Run the local CI checks** before pushing:
-   ```bash
-   yarn run configure
-   yarn run lint
-   yarn run test:jest:all
-   ```
-5. **Push and open a pull request** against `upstream/main`.
-
-### Contributor Documentation
-
-The following documents govern the contribution process, coding
-standards, and review expectations:
-
-| Document | Purpose |
-|----------|---------|
-| [BUILD.md][build_doc] | Development environment setup and build instructions |
-| [CONTRIBUTING.md][contributing_doc] | Contribution workflow, PR process, and review guidelines |
-| [CONVENTIONS.md][conventions_doc] | Coding standards, package structure, and repository conventions |
-| [PULL.md][pull_doc] | Pull request quality standards and review criteria |
-| [AI_GUIDELINES.md][ai_guidelines_doc] | Guidelines for AI-assisted contributions |
-
 ---
 
 ## For Developers
 
-This section is for programmers and AI/LLM agents who want to use Cacti
+This section is for anyone who want to use Cacti
 packages as dependencies in their own applications. You do not need to
-clone or build the Cacti repository; instead, you install individual
-packages from npm.
+clone or build the Cacti repository; instead, you can leverage the project artifacts (npm packages, docker images), or compile them from source.
 
 ### What Cacti Provides
 
@@ -271,6 +237,38 @@ endpoint at the API server's base URL.
 | [Weaver Getting Started][weaver_getting_started] | End-to-end setup for cross-network interoperability |
 
 ---
+
+## For Contributors 
+
+### Making Your First Contribution
+
+Once your environment is set up, follow this workflow to submit your
+first pull request:
+
+1. **Fork** the repository on GitHub.
+2. **Create a branch** from `main` with a descriptive name.
+3. **Make your changes** in small, focused commits.
+4. **Run the local CI checks** before pushing:
+   ```bash
+   yarn run configure
+   yarn run lint
+   yarn run test:jest:all
+   ```
+5. **Push and open a pull request** against `upstream/main`.
+
+### Contributor Documentation
+
+The following documents govern the contribution process, coding
+standards, and review expectations:
+
+| Document | Purpose |
+|----------|---------|
+| [BUILD.md][build_doc] | Development environment setup and build instructions |
+| [CONTRIBUTING.md][contributing_doc] | Contribution workflow, PR process, and review guidelines |
+| [CONVENTIONS.md][conventions_doc] | Coding standards, package structure, and repository conventions |
+| [PULL.md][pull_doc] | Pull request quality standards and review criteria |
+| [AI_GUIDELINES.md][ai_guidelines_doc] | Guidelines for AI-assisted contributions |
+
 
 ## Additional Resources
 
