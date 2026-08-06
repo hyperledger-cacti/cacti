@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1785748494799,
+  "lastUpdate": 1786007052191,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -700,6 +700,42 @@ window.BENCHMARK_DATA = {
             "range": "±2.01%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Parth Singh",
+            "username": "ParthSinghPS",
+            "email": "posiedon.1721@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "7eb4b28c9e0ea4d748fb322e20814911f1733270",
+          "message": "refactor: remove cactus-example-cbdc-bridging-backend\n\nRemove package from workspace and CI to migrate it to the\ncacti-demos repository.\nRefs: hyperledger-cacti/cacti#4543\n\nSigned-off-by: Parth Singh <posiedon.1721@gmail.com>",
+          "timestamp": "2026-07-15T08:34:10Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/7eb4b28c9e0ea4d748fb322e20814911f1733270"
+        },
+        "date": 1786007049566,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 706,
+            "range": "±3.36%",
+            "unit": "ops/sec",
+            "extra": "177 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 822,
+            "range": "±2.91%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
