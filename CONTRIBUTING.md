@@ -1,52 +1,67 @@
-- [Git Know How / Reading List](#git-know-how--reading-list)
-- [Small, Focused Pull Requests](#small-focused-pull-requests)
-- [PR Checklist - Contributor/Developer](#pr-checklist---contributordeveloper)
-- [PR Checklist - Maintainer/Reviewer](#pr-checklist---maintainerreviewer)
-- [Create local branch](#create-local-branch)
-  - [Directory structure](#directory-structure)
-- [Create a new package](#create-a-new-package)
-- [Test Automation](#test-automation)
-  - [Summary](#summary)
-  - [Test Case Core Principles](#test-case-core-principles)
-- [Working with the Code](#working-with-the-code)
-  - [Running/Debugging the tests](#runningdebugging-the-tests)
-    - [Running a single test case](#running-a-single-test-case)
-    - [Running all test cases (unit+integration)](#running-all-test-cases-unitintegration)
-    - [Running unit tests only](#running-unit-tests-only)
-    - [Running integration tests only](#running-integration-tests-only)
-    - [What is npx used for?](#what-is-npx-used-for)
-    - [What's the equivalent of npx for Yarn?](#whats-the-equivalent-of-npx-for-yarn)
-    - [Debugging a test case](#debugging-a-test-case)
-  - [All-In-One Docker Images for Ledger Connector Plugins](#all-in-one-docker-images-for-ledger-connector-plugins)
-    - [Test Automation of Ledger Plugins](#test-automation-of-ledger-plugins)
-  - [Building the API Client(S)](#building-the-api-clients)
-  - [Adding new dependencies:](#adding-new-dependencies)
-  - [Reload VSCode Window After Adding Dependencies](#reload-vscode-window-after-adding-dependencies)
-  - [On Reproducible Builds](#on-reproducible-builds)
+<!-- --8<-- [start:content] -->
+# Contributing to Hyperledger Cacti
 
-Thank you for your interest to contribute to Hyperledger Cacti! :tada:
+- [Ways to Contribute](#ways-to-contribute)
+- [Code of Conduct](#code-of-conduct)
+- [AI Guidelines](#ai-guidelines)
+- [Contribution Workflow](#contribution-workflow)
+  - [Git Know How / Reading List](#git-know-how--reading-list)
+  - [Small, Focused Pull Requests](#small-focused-pull-requests)
+- [Pull Request Principles](#pull-request-principles)
+  - [PR Checklist - Contributor / Developer](#pr-checklist---contributor--developer)
+- [Commit Messages](#commit-messages)
+  - [Commit Email Address](#commit-email-address)
+- [DCO - Signed-off-by](#dco---signed-off-by)
+  - [Important GitHub Requirements](#important-github-requirements)
+- [Inclusive Language](#inclusive-language)
+- [Review Process](#review-process)
+  - [PR Checklist - Maintainer / Reviewer](#pr-checklist---maintainer--reviewer)
+- [Technical Recipes](#technical-recipes)
 
-> **First time here?** See [START_HERE.md](./START_HERE.md) for an
+Thank you for your interest in contributing to Hyperledger Cacti! :tada:
+
+> **First time here?** See [START_HERE.md][start_here] for an
 > overview of all documentation paths (contributor, developer, operator).
 
-First things first, please review the [LF Decentralized Trust Code of Conduct](https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct) before participating.
-If you use AI or LLM tooling in your contributions, please also review our [AI Guidelines](./AI_GUIDELINES.md).
+## Ways to Contribute
 
-There are many ways to contribute to Hyperledger Cacti, both as a user and as a developer.
+Contributions from the development community help improve the capabilities of
+Hyperledger Cacti. These contributions are the most effective way to
+make a positive impact on the project.
 
-As a user, this can include:
-* [Making Feature/Enhancement Proposals](https://github.com/hyperledger-cacti/cacti/issues/new?template=feature_request.yml)
-* [Reporting bugs](https://github.com/hyperledger-cacti/cacti/issues/new?template=bug_report.yml)
+**As a user**, this can include:
 
-As a developer:
-* if you only have a little time, consider picking up a [“help-wanted”](https://github.com/hyperledger-cacti/cacti/labels/help%20wanted) or ["good-first-issue"](https://github.com/hyperledger-cacti/cacti/labels/good%20first%20issue) task
-* If you can commit to full-time development, then please contact us on our [Discord channel](https://discord.com/channels/905194001349627914/908379338716631050) to work through logistics!
+* [Reporting bugs][report_bug]
+* [Making feature / enhancement proposals][feature_request]
 
-We welcome contributions to this project in many forms, whether it is to fix a bug, improve the documentation, add a new feature, or add support for any new DLT platform.
+**As a developer:**
 
-Please familiarize yourself with the [documentation](https://hyperledger-cacti.github.io/cacti/). In particular, review the [vision and design methodology](https://hyperledger-cacti.github.io/cacti/vision/) and [system architecture](https://hyperledger-cacti.github.io/cacti/architecture/). Follow the tutorial instructions to test the [Cactus](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) features respectively. (For a deeper understanding of the Weaver design and specifications, also check out the [Weaver RFCs](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/rfcs).)
+* If you only have a little time, consider picking up a ["help-wanted"][help_wanted] or ["good-first-issue"][good_first_issue] task.
+* If you can commit to full-time development, please contact us on our [Discord channel][discord] to work through logistics!
 
-## Git Know How / Reading List
+We welcome contributions in many forms, whether it is fixing a bug, improving
+the documentation, adding a new feature, or adding support for a new DLT
+platform.
+
+Please familiarize yourself with the [documentation][docs_site]. In particular,
+review the [vision and design methodology][vision] and
+[system architecture][architecture]. Follow the tutorial instructions to test the
+[Cactus][cactus_intro] and [Weaver][weaver_intro] features respectively.
+
+## Code of Conduct
+
+First things first, please review the
+[LF Decentralized Trust Code of Conduct][lf_coc]
+before participating and abide by these community standards.
+
+## AI Guidelines
+
+If you use AI or LLM tooling in your contributions, please also review our
+[AI Guidelines][ai_guidelines].
+
+## Contribution Workflow
+
+### Git Know How / Reading List
 
 This section is for you if you do not know your way around advanced git concepts such as
 - rebasing (interactive or otherwise)
@@ -79,11 +94,10 @@ Further reading:
 - https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-collaborative-development-models
 - https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests
 
-
-## Small, Focused Pull Requests
+### Small, Focused Pull Requests
 
 Pull requests **must** be small, self-contained chunks of work that
-address a single concern — one bug fix, one feature, or one
+address a single concern - one bug fix, one feature, or one
 refactoring. This is a core contribution principle, not a suggestion.
 
 - **One logical change per PR.** Do not bundle unrelated fixes,
@@ -98,16 +112,19 @@ refactoring. This is a core contribution principle, not a suggestion.
 - **AI-generated PRs are not exempt.** AI tooling can easily produce
   large, sprawling changes. Contributors using AI assistants must
   still break work into focused, reviewable units — see
-  [AI Guidelines §2.4](./AI_GUIDELINES.md#24-compliance-with-project-standards).
+  [AI Guidelines §2.4][ai_guidelines_compliance].
 
 Small, focused PRs significantly reduce the cognitive load on
 reviewers, speed up the review cycle, and keep the git history clean
 and bisectable.
 
-See [PULL.md](./PULL.md) for the full Pull Request Guidelines,
+See [PULL.md][pull_doc] for the full Pull Request Guidelines,
 including concrete examples.
 
-## PR Checklist - Contributor/Developer
+## Pull Request Principles
+
+### PR Checklist - Contributor / Developer
+
 **To avoid issues in the future, do not install dependencies globally. Ensure all dependencies are kept self-contained.**
 
 1. Fork [hyperledger-cacti/cacti](https://github.com/hyperledger-cacti/cacti) via Github UI
@@ -120,13 +137,13 @@ including concrete examples.
      ```
 
 2. Clone the fork to your local machine
-3. (Optional) [Create local branch](#create-local-branch) for minimizing code conflicts when you want to contribute multiple changes regarding different issues in parallel.
+3. (Optional) Create a local branch for minimizing code conflicts when you want to contribute multiple changes regarding different issues in parallel. See the [Git Branch Setup][recipe_git_branch] recipe for details.
 4. Complete the desired changes and where possible test locally
 5. Make sure you have set up your git signatures
    1. Note: Always sign your commits using the `git commit -S`
    2. For more information see [here](https://gist.github.com/tkuhrt/10211ae0a26a91a8c030d00344f7d11b)
 6. Think about/decide on what your commit message will be.
-   1. The commit message syntax might be hard to remember at first so you we invite you to use the `npm run commit` command which upon execution presents you with a series of prompts that you can fill out and have your input validated in realtime, making it impossible (or at least much harder) to produce an invalid commit message that the commit lint bot on Github will flag with an error.
+   1. The commit message syntax might be hard to remember at first so we invite you to use the `npm run commit` command which upon execution presents you with a series of prompts that you can fill out and have your input validated in realtime, making it impossible (or at least much harder) to produce an invalid commit message that the commit lint bot on Github will flag with an error.
 7. Commit your changes
     1. Make sure your commit message follows the formatting requirements (details above) and here: [Conventional Commits syntax](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification); this aids in release notes generation which we intend to automate
     2. Be aware that we are using git commit hooks for the automation of certain mundane tasks such as applying the required code style and formatting so your code will be wrapped at 80 characters each line automatically. If you wish to see how your changes will be altered by the formatter you can run the `npm run prettier` command from a terminal or install an IDE extension for the `Prettier` tool that can do the same (VSCode has one that is known to work).
@@ -149,7 +166,46 @@ including concrete examples.
    9.  try to add the change in a way that does not produce additional commits on the PR but instead do an `git commit --amend --signoff` on your local branch and then a force push to the remote branch of yours (the PR essentially). Again, if the change you are doing does not fit within any one of the existing commits of your PR, then it is justified to add a new commit and this is up to your discretion (maintainers may respectfully ask you to squash if they see otherwise)
    10. The rule of thumb for any and all things in git/Cacti is to maintain a clean, tidy commit log/history that enables everyone to easily look up changes and find accurate answers to the basic questions of `Who? / What? / When / Why?`. If you have ever been in a situation when you tried to figure out the original point a bug was introduced (and tried to figure out why the offending change was made in the first place) and the git blame just lead you to a 10 megabyte large patch with the message 'merge xyz', then you know exactly what it is we are trying to avoid here. :-)
 
-## PR Checklist - Maintainer/Reviewer
+## Commit Messages
+
+Commit messages should follow common Git conventions, such as using the
+imperative mood, separate subject lines, and a line length of 72 characters.
+These rules are well documented in
+[Chris Beam's blog post](https://chris.beams.io/posts/git-commit/#seven-rules).
+
+We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification)
+syntax. You can use the interactive `npm run commit` command to help format your
+commit message correctly.
+
+### Commit Email Address
+
+Your commit email address must match your GitHub email address. For more
+information, see https://help.github.com/articles/setting-your-commit-email-address-in-git/
+
+## DCO - Signed-off-by
+
+Each commit must include a "Signed-off-by" line in the commit message
+(`git commit -s`). This sign-off indicates that you agree the commit satisfies
+the [Developer Certificate of Origin (DCO)](http://developercertificate.org/).
+
+### Important GitHub Requirements
+
+A pull request cannot be merged until it has passed these status checks:
+
+* The build must pass all checks
+* The PR must be approved by at least two reviewers without any
+  outstanding requests for changes
+
+## Inclusive Language
+
+- Consider that users who will read the source code and documentation are from different backgrounds and cultures and that they have different preferences.
+- Avoid potential offensive terms and, for instance, prefer "allow list and deny list" to "white list and black list".
+- We believe that we all have a role to play to improve our world, and even if writing inclusive code and documentation might not look like a huge improvement, it's a first step in the right direction.
+- We suggest to refer to [Microsoft bias free writing guidelines](https://learn.microsoft.com/en-us/style-guide/bias-free-communication) and [Google inclusive doc writing guide](https://developers.google.com/style/inclusive-documentation) as starting points.
+
+## Review Process
+
+### PR Checklist - Maintainer / Reviewer
 
 Ensure all the following conditions are met (on top of you agreeing with the change itself)
 
@@ -165,18 +221,49 @@ Ensure all the following conditions are met (on top of you agreeing with the cha
 
 To protect the Hyperledger Cacti source code, GitHub pull requests are accepted from forked repositories only. There are also quality standards identified and documented here that will be enhanced over time.
 
-
 ## Technical Recipes
 
 The technical instructions for working with the Cacti codebase have been moved to dedicated recipes in our `docs/recipes` directory to keep this contributing guide focused on process and governance.
 
 | Recipe | Description |
 |---|---|
-| [Git Branch Setup](./docs/recipes/git-branch-setup.md) | How to fork, branch, rebase, and set up your git hooks. |
-| [Create a New Package](./docs/recipes/create-new-package.md) | Structure and scaffolding for creating a new Cacti package. |
-| [Testing Guide](./docs/recipes/testing-guide.md) | Test principles, tap compatibility, parallelism, and test commands. |
-| [Ledger Plugin Testing](./docs/recipes/ledger-plugin-testing.md) | Writing and running integration tests for ledger connectors with all-in-one docker images. |
-| [Building API Clients](./docs/recipes/building-api-clients.md) | How OpenAPI definitions automatically generate API clients. |
-| [Managing Dependencies](./docs/recipes/managing-dependencies.md) | Adding and locking npm dependencies with Yarn Workspaces. |
-| [VS Code Setup](./docs/recipes/vscode-setup.md) | Refreshing types and configuring the launch.json debugger. |
+| [Git Branch Setup][recipe_git_branch] | How to fork, branch, rebase, and set up your git hooks. |
+| [Create a New Package][recipe_new_package] | Structure and scaffolding for creating a new Cacti package. |
+| [Testing Guide][recipe_testing] | Test principles, tap compatibility, parallelism, and test commands. |
+| [Ledger Plugin Testing][recipe_ledger_testing] | Writing and running integration tests for ledger connectors with all-in-one docker images. |
+| [Building API Clients][recipe_api_clients] | How OpenAPI definitions automatically generate API clients. |
+| [Managing Dependencies][recipe_dependencies] | Adding and locking npm dependencies with Yarn Workspaces. |
+| [VS Code Setup][recipe_vscode] | Refreshing types and configuring the launch.json debugger. |
+<!-- --8<-- [end:content] -->
 
+<!--
+=============================================================================
+GITHUB REFERENCE LINKS
+These links are used when viewing this file directly on GitHub.
+When this file is rendered via MkDocs (through a snippet wrapper), the
+wrapper file provides its own set of reference links that override these.
+=============================================================================
+-->
+
+[start_here]: ./START_HERE.md
+[report_bug]: https://github.com/hyperledger-cacti/cacti/issues/new?template=bug_report.yml
+[feature_request]: https://github.com/hyperledger-cacti/cacti/issues/new?template=feature_request.yml
+[help_wanted]: https://github.com/hyperledger-cacti/cacti/labels/help%20wanted
+[good_first_issue]: https://github.com/hyperledger-cacti/cacti/labels/good%20first%20issue
+[discord]: https://discord.com/channels/905194001349627914/908379338716631050
+[docs_site]: https://hyperledger-cacti.github.io/cacti/
+[vision]: https://hyperledger-cacti.github.io/cacti/vision/
+[architecture]: https://hyperledger-cacti.github.io/cacti/architecture/
+[cactus_intro]: https://hyperledger-cacti.github.io/cacti/cactus/introduction/
+[weaver_intro]: https://hyperledger-cacti.github.io/cacti/weaver/introduction/
+[lf_coc]: https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct
+[ai_guidelines]: ./AI_GUIDELINES.md
+[ai_guidelines_compliance]: ./AI_GUIDELINES.md#24-compliance-with-project-standards
+[pull_doc]: ./PULL.md
+[recipe_git_branch]: ./docs/recipes/git-branch-setup.md
+[recipe_new_package]: ./docs/recipes/create-new-package.md
+[recipe_testing]: ./docs/recipes/testing-guide.md
+[recipe_ledger_testing]: ./docs/recipes/ledger-plugin-testing.md
+[recipe_api_clients]: ./docs/recipes/building-api-clients.md
+[recipe_dependencies]: ./docs/recipes/managing-dependencies.md
+[recipe_vscode]: ./docs/recipes/vscode-setup.md
