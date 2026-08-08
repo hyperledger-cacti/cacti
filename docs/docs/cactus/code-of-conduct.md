@@ -1,7 +1,4 @@
-Code of Conduct Guidelines
-======================================================================================
-
-Please review the [LF Decentralized Trust Code of Conduct](https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct) before participating and abide by these community standards.
+--8<-- "CODE_OF_CONDUCT.md:content"
 
 [Previous](governance.md "Governance") [Next](contributing.md "Contributing")
 
