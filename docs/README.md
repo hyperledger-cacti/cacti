@@ -27,6 +27,19 @@ are needed:
 ### Python 3
 `Python 3` can be installed locally, as described in the [Python Getting Started guide](https://www.python.org/about/gettingstarted/).
 
+### Create a local Python environment with pyenv
+
+If you use `pyenv`, create an isolated environment before installing the docs
+dependencies:
+
+```bash
+pyenv install 3.12.0
+pyenv local 3.12.0
+python -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+```
+
 ### MkDocs
 
 The MkDocs-related items can be installed locally, as described in the

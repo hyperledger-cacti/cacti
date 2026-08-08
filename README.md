@@ -41,6 +41,10 @@ For legacy users: Cactus source code is in the repository root (excluding the `w
 
 ## Documentation
 
+**New to Cacti?** See [START_HERE.md](./START_HERE.md) to find the right
+documentation path based on your role (contributor, developer, or
+operator).
+
 See the official [Confluence high-level project overview](https://lf-hyperledger.atlassian.net/wiki/spaces/cactus/overview?homepageId=20414469).
 
 For project vision and goals, technical details, and more, see the official [Hyperledger Cacti documentation](https://hyperledger-cacti.github.io/cacti/) to get all your questions answered about the project, to get started with setup, testing, and evaluation, and to get hands-on with code and configurations. Here, you can find separate (and specific) instructions for getting started with running and experimenting with [Cactus modules](https://hyperledger-cacti.github.io/cacti/cactus/introduction/) and [Weaver modules](https://hyperledger-cacti.github.io/cacti/weaver/introduction/) respectively.
@@ -76,7 +80,7 @@ as starting points.
 * discord channel: [https://discord.com/invite/hyperledger](https://discord.com/invite/hyperledger)
 
 ## Contributing
-We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
+We welcome contributions to Hyperledger Cacti in many forms, and there's always plenty to do!
 
 Please review [contributing](/CONTRIBUTING.md) guidelines to get started.
 

@@ -1,3 +1,4 @@
+<!-- --8<-- [start:content] -->
 - [Hyperledger Cacti Build Instructions](#hyperledger-cacti-build-instructions)
 - [Fast Developer Flow / Code Iterations](#fast-developer-flow--code-iterations)
 - [Getting Started](#getting-started)
@@ -443,3 +444,4 @@ By creating a PR for the edited `ci.yml` file, this will allow the CI to run the
   2) Go to the `Actions` tab within the main Hyperledger Cactus Repository
 
 Click on the `CI Cactus workflow`. There should be a new job you've created be listed underneath the `build (ubuntu-22.04)` jobs. Click on the the new job (what's you've named your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that start with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your OS and paste the SSH command script in order to begin an upterm session.
+<!-- --8<-- [end:content] -->

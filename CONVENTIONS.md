@@ -275,7 +275,7 @@ Helper: `npm run commit` (interactive Commitizen prompt)
 
 ### Signing
 
-All commits must be signed: `git commit -S`
+All commits must be signed: `git commit -s`
 DCO (Developer Certificate of Origin) is enforced.
 
 ### PR Workflow

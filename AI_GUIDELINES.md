@@ -383,7 +383,7 @@ any other project documentation.
 - [Cacti GOVERNANCE.md](./GOVERNANCE.md)
 - [Cacti CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
 - [Cacti PULL.md §9 — Linked Issue and Traceability](./PULL.md#9-linked-issue-and-traceability)
-- [Cacti PULL.md §10 — Automated Linked-Issue Check (Planned)](./PULL.md#10-automated-linked-issue-check-planned)
+
 - [Cacti Copilot Instructions](.github/copilot-instructions.md)
 - [Cacti Repository Instruction Files](.github/instructions/)
 
