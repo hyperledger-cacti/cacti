@@ -1,20 +1,24 @@
-# @hyperledger/cactus-besu-multi-party-all-in-one<!-- omit in toc -->
+# @hyperledger-cacti/cactus-besu-multi-party-all-in-one<!-- omit in toc -->
 
 ## Table of Contents<!-- omit in toc -->
 
-- [Summary](#summary)
-- [Usage via Public Container Registry](#usage-via-public-container-registry)
+- [Overview](#overview)
+- [How to Run via Public Container Registry](#how-to-run-via-public-container-registry)
 - [List endpoints and services](#list-endpoints-and-services)
 - [2021-06-16 22:23:46,653 DEBG 'besu-network' stdout output:](#2021-06-16-222346653-debg-besu-network-stdout-output)
 - [List endpoints and services](#list-endpoints-and-services-1)
 
-## Summary
+## Overview
 
 A container image that hosts a Besu network which is
 - Has multiple nodes and validators
 - Supports transaction privacy (`privateFrom` and `privateFor`)
 
-## Usage via Public Container Registry
+**Target Audience:**
+- [x] Developers
+- [x] Operators
+
+## How to Run via Public Container Registry
 
 ```sh
 docker run \

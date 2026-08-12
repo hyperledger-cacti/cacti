@@ -1,16 +1,22 @@
-# @hyperledger/cactus-substrate-all-in-one<!-- omit in toc -->
+# @hyperledger-cacti/cactus-substrate-all-in-one<!-- omit in toc -->
+
+## Overview
 
 A container image that can holds the default Substrate test ledger (and the corresponding front-end).
 This image can be used for development of Substrate-based chains (including but not limited to pallets, smart contracts) and connectors.
 
 This is the test ledger used by the `polkadot-connector` package.
 
+**Target Audience:**
+- [x] Developers
+- [x] Operators
+
 ## Table of Contents<!-- omit in toc -->
 
-- [Usage](#usage)
+- [How to Run](#how-to-run)
 - [Build](#build)
 
-## Usage
+## How to Run
 To run the test ledger, use:
 
 ```sh
