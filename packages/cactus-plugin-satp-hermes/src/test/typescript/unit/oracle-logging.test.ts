@@ -1,4 +1,6 @@
 import "jest-extended";
+import fs from "fs";
+import path from "path";
 import { Knex } from "knex";
 import { KnexOracleLogRepository } from "../../../main/typescript/database/repository/knex-oracle-log-repository";
 import {
@@ -13,6 +15,7 @@ import {
   OracleTaskTypeEnum,
   OracleTaskModeEnum,
   OracleTaskStatusEnum,
+  OracleRegisterRequestTaskModeEnum,
   type OracleTask,
 } from "../../../main/typescript/generated/gateway-client/typescript-axios/api";
 
@@ -414,14 +417,94 @@ describe("Oracle Logging", () => {
         expect(log.timestamp).toBeDefined();
       }
     });
+
+    it("logs and persists poll-task/fail but keeps task Active when polling callback throws", async () => {
+      const task: OracleTask = {
+        taskID: "mgr-poll-fail-1",
+        type: OracleTaskTypeEnum.Read,
+        srcContract: {
+          contractAddress: "0x0",
+          contractAbi: [],
+          contractName: "Test",
+        },
+        dstContract: {
+          contractAddress: "0x0",
+          contractAbi: [],
+          contractName: "Test",
+        },
+        timestamp: Date.now(),
+        operations: [],
+        status: OracleTaskStatusEnum.Active,
+        mode: OracleRegisterRequestTaskModeEnum.Polling,
+        pollingInterval: 50,
+      };
+
+      // Force processTask to always fail
+      jest
+        .spyOn(oracleManager as any, "processTask")
+        .mockRejectedValue(new Error("simulated poll failure"));
+
+      await oracleManager.registerTask(task);
+
+      // Wait long enough for at least one poll cycle to fire and writes to flush
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
+      // Assert task is still Active BEFORE cleanup (unregisterTask sets it Inactive)
+      const taskState = oracleManager.getTask("mgr-poll-fail-1");
+      expect(taskState.status).toBe(OracleTaskStatusEnum.Active);
+
+      // Cleanup: stop the poller
+      await oracleManager.unregisterTask(task.taskID);
+      jest.restoreAllMocks();
+
+      const logs = await managerRepo.readByTaskId("mgr-poll-fail-1");
+
+      // There must be at least one poll-task fail entry
+      const pollFailLogs = logs.filter(
+        (l) => l.type === "poll-task" && l.operation === "fail",
+      );
+      expect(pollFailLogs.length).toBeGreaterThanOrEqual(1);
+
+      // The persisted data must contain the error message
+      const parsedData = JSON.parse(pollFailLogs[0].data);
+      expect(parsedData.error.message).toBe("simulated poll failure");
+    });
   });
 });
 
+/**
+ * Derive the same DATA_DIR that createOracleLogKnexConfig uses.
+ * Mirrors the logic in knexfile.ts so we can delete on-disk files.
+ */
+const ORACLE_DATA_DIR = path.resolve(
+  __dirname,
+  "../../../main/typescript/database/data",
+);
+
+function oracleDbPath(instanceId: string): string {
+  return path.join(ORACLE_DATA_DIR, `.oracle-logs-${instanceId}.sqlite3`);
+}
+
+function removeOracleDbFiles(...instanceIds: string[]): void {
+  for (const id of instanceIds) {
+    const p = oracleDbPath(id);
+    if (fs.existsSync(p)) {
+      fs.rmSync(p, { force: true });
+    }
+  }
+}
+
 describe("SQLite oracle log database isolation", () => {
+  afterAll(() => {
+    // Clean up all on-disk SQLite files created by tests in this suite
+    removeOracleDbFiles("same-db-test", "alpha", "beta", "migrate-then-insert");
+  });
   it("two repos with the same instanceId share the same file database", async () => {
     // Two KnexOracleLogRepository instances backed by the same file path
     // behave as connections to the same database.
     const instanceId = "same-db-test";
+    // Delete any stale file left by a previous CI run before opening
+    removeOracleDbFiles(instanceId);
     const repoA = new KnexOracleLogRepository(
       createOracleLogKnexConfig(instanceId),
     );
@@ -454,6 +537,8 @@ describe("SQLite oracle log database isolation", () => {
   });
 
   it("two file-based databases with different instanceIds are isolated", async () => {
+    // Delete any stale files left by a previous CI run
+    removeOracleDbFiles("alpha", "beta");
     const repoAlpha = new KnexOracleLogRepository(
       createOracleLogKnexConfig("alpha"),
     );
@@ -487,6 +572,8 @@ describe("SQLite oracle log database isolation", () => {
 
   it("migrate.latest() then insert does not produce 'no such table' error", async () => {
     const instanceId = "migrate-then-insert";
+    // Delete any stale file left by a previous CI run
+    removeOracleDbFiles(instanceId);
     const repo = new KnexOracleLogRepository(
       createOracleLogKnexConfig(instanceId),
     );
