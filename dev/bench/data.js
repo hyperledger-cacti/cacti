@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786351232513,
+  "lastUpdate": 1786544821347,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -772,6 +772,42 @@ window.BENCHMARK_DATA = {
             "range": "±2.19%",
             "unit": "ops/sec",
             "extra": "183 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "VRamakrishna",
+            "username": "VRamakrishna",
+            "email": "vramakr2@in.ibm.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "id": "499d4067db6b94f45d61c1960db65dd565c6026b",
+          "message": "build(deps): updated vulnerable node-tar and axios packages\n\nAddresses critical dependabot alert #3831.\nUpdated \"tar\" npm package version to at least \"7.5.22\".\n\nAddresses high dependabot alerts #3905-3928.\nUpdated \"axios\" package version to at least \"1.18.0\".\n\nSigned-off-by: VRamakrishna <vramakr2@in.ibm.com>",
+          "timestamp": "2026-08-10T06:50:39Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/499d4067db6b94f45d61c1960db65dd565c6026b"
+        },
+        "date": 1786544818761,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 596,
+            "range": "±3.69%",
+            "unit": "ops/sec",
+            "extra": "175 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 618,
+            "range": "±1.97%",
+            "unit": "ops/sec",
+            "extra": "181 samples"
           }
         ]
       }
