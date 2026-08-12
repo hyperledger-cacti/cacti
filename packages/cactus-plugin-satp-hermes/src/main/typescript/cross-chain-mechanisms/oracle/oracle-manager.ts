@@ -548,16 +548,46 @@ export class OracleManager {
 
           // set up polling or event listener
           if (task.mode === OracleRegisterRequestTaskModeEnum.Polling) {
+            let pollSeq = 0;
             this.schedulerManager.addPoller(
               task.taskID,
               async () => {
+                const currentSeq = pollSeq++;
                 try {
                   await this.processTask(task as OracleTask);
                   this.logger.info(
                     `${fnTag}: Task ${task.taskID} executed successfully`,
                   );
+                  await this.logAndPersist(
+                    task.taskID,
+                    "poll-task",
+                    "exec",
+                    safeStableStringify({ task }) ?? "",
+                    currentSeq,
+                  );
                   // TODO: Dispatch a success notification.
                 } catch (error) {
+                  this.logger.error(
+                    `${fnTag}: Task ${task.taskID} failed`,
+                    error,
+                  );
+                  await this.logAndPersist(
+                    task.taskID,
+                    "poll-task",
+                    "fail",
+                    safeStableStringify({
+                      task,
+                      error:
+                        error instanceof Error
+                          ? {
+                              name: error.name,
+                              message: error.message,
+                              stack: error.stack,
+                            }
+                          : { message: String(error) },
+                    }) ?? "",
+                    currentSeq,
+                  );
                   // TODO: Dispatch a failure notification.
                 }
               },
