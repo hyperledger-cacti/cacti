@@ -1,4 +1,6 @@
-# @hyperledger/cactus-core-api
+# @hyperledger-cacti/cactus-core-api
+
+## Overview
 
 This package is meant to be depended on by most of the other packages for interface
 definitions, abstract classes and generated code. All of which is to be kept with
@@ -7,26 +9,37 @@ dependencies.
 
 From the above it also comes that the `core-api` package is rarely used by developers who are implementing projects with Hyperledger Cactus and instead it is mostly consumed by the framework's other packages internally (e.g. the Hyperledger Cactus contributors).
 
-# Usage
+**Target Audience:**
+- [x] Developers
+- [ ] Operators
 
-## Installation
+## Install
 
 You can install the package via your favorite package manager.
 
 Yarn: 
 
-    yarn add --exact @hyperledger/cactus-core-api
+    yarn add --exact @hyperledger-cacti/cactus-core-api
 
 npm: 
 
-    npm install --save-exact=true @hyperledger/cactus-core-api
+    npm install --save-exact=true @hyperledger-cacti/cactus-core-api
 
 > We highly recommend using exact versions in general when managing your dependencies
 > in order to achieve (or get closer to) [reproducible builds](https://reproducible-builds.org/) and to enhance your
 > security posture against malicious package versions that might get pushed to the
 > registries without the knowledge or consent or well intentioned maintainers.
 
-## Import
+## API Summary
+
+- **Plugin Interfaces**: `ICactusPlugin`, `IPluginLedgerConnector`, `IPluginKeychain`, `IPluginWebService`, `IPluginObjectStore`
+- **Plugin Factories**: `PluginFactory`, `PluginFactoryFactory`
+- **gRPC/cRPC Services**: `IPluginGrpcService`, `IPluginCrpcService`
+- **Validation**: `createAjvTypeGuard`
+
+## Usage
+
+### Import
 
 ```typescript
 import {
@@ -38,7 +51,7 @@ import {
 } from "@hyperledger-cacti/cactus-core-api";
 ```
 
-## Check If POJO is a Cactus Plugin
+### Check If POJO is a Cactus Plugin
 
 ```typescript
 if (!isICactusPlugin(plugin)) {
@@ -46,9 +59,17 @@ if (!isICactusPlugin(plugin)) {
 }
 ```
 
-# Development
+## Testing
 
-## Weaver Protocol Buffers
+To run tests for this package:
+
+```sh
+yarn jest
+```
+
+## Development
+
+### Weaver Protocol Buffers
 
 To test the Rust build, you need to run either one of the following:
 

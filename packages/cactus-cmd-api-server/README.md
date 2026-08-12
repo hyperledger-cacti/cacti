@@ -1,6 +1,7 @@
-# `@hyperledger/cactus-cmd-api-server` <!-- omit in toc -->
+# `@hyperledger-cacti/cactus-cmd-api-server` <!-- omit in toc -->
 
-- [Summary](#summary)
+- [Overview](#overview)
+- [Configuration](#configuration)
 - [Usage](#usage)
   - [Basic Example](#basic-example)
   - [Remote Plugin Imports at Runtime Example](#remote-plugin-imports-at-runtime-example)
@@ -10,7 +11,7 @@
 - [Containerization](#containerization)
   - [Building the container image locally](#building-the-container-image-locally)
   - [Running the container image locally](#running-the-container-image-locally)
-  - [Running Locally Built Image with Locally Modified Plugins Without npm/ghcr Publishishing](#running-locally-built-image-with-locally-modified-plugins-without-npmghcr-publishishing)
+  - [Running Locally Built Image with Locally Modified Plugins Without npm/ghcr Publishing](#running-locally-built-image-with-locally-modified-plugins-without-npmghcr-publishing)
   - [Testing API calls with the container](#testing-api-calls-with-the-container)
   - [Running a Security Scan on the Built Container Image](#running-a-security-scan-on-the-built-container-image)
 - [Prometheus Exporter](#prometheus-exporter)
@@ -21,13 +22,14 @@
         - [response.type.ts](#responsetypets)
         - [data-fetcher.ts](#data-fetcherts)
         - [metrics.ts](#metricsts)
+- [Testing](#testing)
 - [FAQ](#faq)
   - [What is the difference between a Cactus Node and a Cactus API Server?](#what-is-the-difference-between-a-cactus-node-and-a-cactus-api-server)
   - [Is the API server horizontally scalable?](#is-the-api-server-horizontally-scalable)
   - [Does the API server automatically protect me from malicious plugins?](#does-the-api-server-automatically-protect-me-from-malicious-plugins)
   - [Can I use the API server with plugins deployed as a service?](#can-i-use-the-api-server-with-plugins-deployed-as-a-service)
 
-## Summary
+## Overview
 
 This package is part of the Hyperledger Cactus blockchain integration framework
 and is used as a shell/container of sort for housing different Cactus plugins
@@ -37,6 +39,51 @@ The API server gives you for free the following benefits, should you choose to
 use it:
 1. Automatic wiring of API endpoints for Cactus plugins which implement the `IPluginWebService` Typescript interface
 2. Lightweight inversion of control container provided to plugins in the form of the `PluginRegistry` so that plugins can depend on each other in a way that each plugin instance can be uniquely identified and obtained by other plugins. A great example of this in action is ledger connector plugins frequently using the `PluginRegistry` to look up instances of keychain plugins to get access to secrets that are needed for the connector plugins to accomplish certain tasks such as cryptographically signing some information or SSH-ing into a server instance in order to upload and deploy binary (or otherwise) artifacts of smart contracts.
+
+**Target Audience:**
+- [x] Developers
+- [x] Operators
+
+## Configuration
+
+The following configuration options are available for the API server:
+
+| Option | Environment Variable | Default | Description |
+|---|---|---|---|
+| `openApiValidationOffPkgs` | `OPEN_API_VALIDATION_OFF_PKGS` | `[]` | The list of package names for which OpenAPI validation should be disabled. This is useful when dealing with plugins that have incorrect or incomplete OpenAPI specifications or when there is a bug in the OpenAPI validator middleware that cause it to have false negatives during validation. |
+| `crpcHost` | `CRPC_HOST` | `127.0.0.1` | The host to bind the CRPC fastify instance to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host. |
+| `crpcPort` | `CRPC_PORT` | `6000` | The HTTP port to bind the CRPC fastify server endpoints to. |
+| `pluginManagerOptionsJson` | `PLUGIN_MANAGER_OPTIONS_JSON` | `{}` | Can be used to override npm registry and authentication details for example. |
+| `authorizationProtocol` | `AUTHORIZATION_PROTOCOL` | `null` | The name of the authorization protocol to use. Accepted values are: JSON_WEB_TOKEN, NONE |
+| `authorizationConfigJson` | `AUTHORIZATION_CONFIG_JSON` | `null` | The JSON string to deserialize when configuring authorization. |
+| `plugins` | `PLUGINS` | `[]` | A collection of plugins to load at runtime. |
+| `configFile` | `CONFIG_FILE` | `""` | The path to a config file that holds the configuration itself which will be parsed and validated. |
+| `logLevel` | `LOG_LEVEL` | `"warn"` | The level at which loggers should be configured. Supported values include the following: error, warn, info, debug, trace |
+| `minNodeVersion` | `MIN_NODE_VERSION` | `"12.0.0"` | Determines the lower bound of NodeJS version that the API server will be willing to start on. |
+| `tlsDefaultMaxVersion` | `TLS_DEFAULT_MAX_VERSION` | `"TLSv1.3"` | Sets the DEFAULT_MAX_VERSION property of the built-in tls module of NodeJS. |
+| `cockpitEnabled` | `COCKPIT_ENABLED` | `false` | Enable Cockpit server. |
+| `cockpitHost` | `COCKPIT_HOST` | `"127.0.0.1"` | The host to bind the Cockpit webserver to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host. |
+| `cockpitPort` | `COCKPIT_PORT` | `3000` | The HTTP port to bind the Cockpit webserver to. |
+| `cockpitWwwRoot` | `COCKPIT_WWW_ROOT` | `""` | The file-system path pointing to the static files of web application served as the cockpit by the API server. |
+| `cockpitCorsDomainCsv` | `COCKPIT_CORS_DOMAIN_CSV` | `""` | The Comma seperated list of domains to allow Cross Origin Resource Sharing from when serving static file requests. The wildcard (*) character is supported to allow CORS for any and all domains |
+| `cockpitTlsEnabled` | `COCKPIT_TLS_ENABLED` | `true` | Enable TLS termination on the server. Useful if you do not have/want to have a reverse proxy or load balancer doing the SSL/TLS termination in your environment. |
+| `cockpitApiProxyRejectUnauthorized` | `COCKPIT_API_PROXY_REJECT_UNAUTHORIZED` | `true` | When false: accept self signed certificates while proxying from the cockpit host to the API host. Acceptable for development environments, never use it in production. |
+| `cockpitMtlsEnabled` | `COCKPIT_MTLS_ENABLED` | `true` | Enable mTLS so that only clients presenting valid TLS certificate of their own will be able to connect to the cockpit |
+| `cockpitTlsCertPem` | `COCKPIT_TLS_CERT_PEM` | `null` | Either the file path to the cert file or the contents of it. Value is checked for existence on the file system as a path. |
+| `cockpitTlsKeyPem` | `COCKPIT_TLS_KEY_PEM` | `null` | Either the file path to the key file or the contents of it. Value is checked for existence on the file system as a path. |
+| `cockpitTlsClientCaPem` | `COCKPIT_TLS_CLIENT_CA_PEM` | `null` | Either the client cert file pat or the contents of it. Value is checked for existence on the file system as a path. |
+| `apiHost` | `API_HOST` | `"127.0.0.1"` | The host to bind the API to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host. |
+| `apiPort` | `API_PORT` | `4000` | The HTTP port to bind the API server endpoints to. |
+| `apiCorsDomainCsv` | `API_CORS_DOMAIN_CSV` | `""` | The Comma seperated list of domains to allow Cross Origin Resource Sharing from when serving API requests. The wildcard (*) character is supported to allow CORS for any and all domains, however using it is not recommended unless you are developing or demonstrating something with Cactus. |
+| `apiTlsEnabled` | `API_TLS_ENABLED` | `true` | Enable TLS termination on the server. Useful if you do not have/want to have a reverse proxy or load balancer doing the SSL/TLS termination in your environment. |
+| `apiMtlsEnabled` | `API_MTLS_ENABLED` | `true` | Enable mTLS so that only clients presenting valid TLS certificate of their own will be able to connect to the web APIs |
+| `apiTlsCertPem` | `API_TLS_CERT_PEM` | `null` | Either the file path to the cert file or the contents of it. Value is checked for existence on the file system as a path. |
+| `apiTlsClientCaPem` | `API_TLS_CLIENT_CA_PEM` | `null` | Either the client cert file pat or the contents of it. Value is checked for existence on the file system as a path. |
+| `apiTlsKeyPem` | `API_TLS_KEY_PEM` | `null` | Either the file path to the key file or the contents of it. Value is checked for existence on the file system as a path. |
+| `grpcHost` | `GRPC_HOST` | `"127.0.0.1"` | The host to bind the gRPC server to. Secure default is: 127.0.0.1. Use 0.0.0.0 to bind for any host. |
+| `grpcPort` | `GRPC_PORT` | `5000` | The gRPC port to serve web services on. |
+| `grpcMtlsEnabled` | `GRPC_TLS_ENABLED` | `true` | Enable TLS termination on the grpc server. Useful if you do not have/want to have a reverse proxy or load balancer doing the SSL/TLS termination in your environment. |
+| `enableShutdownHook` | `ENABLE_SHUTDOWN_HOOK` | `true` | It will cause the API server to listen to OS process signals and will attempt to gracefully shut itself down in response to these when the flag is enabled (which is the default behavior). |
 
 ## Usage
 
@@ -206,6 +253,8 @@ of the machine they are hosted on:
 
 ![deployment-low-resource-example.png](https://github.com/hyperledger/cactus/raw/4a337be719a9d2e2ccb877edccd7849f4be477ec/whitepaper/deployment-low-resource-example.png)
 
+
+
 ## Containerization
 
 ### Building the container image locally
@@ -214,7 +263,7 @@ In the project root directory run these commands on the terminal:
 
 ```sh
 yarn configure
-yarn lerna run build:bundle --scope=@hyperledger/cactus-cmd-api-server
+yarn lerna run build:bundle --scope=@hyperledger-cacti/cactus-cmd-api-server
 
 ```
 
@@ -341,7 +390,7 @@ Once you've built the container, the following commands should work:
       --config-file=/.cacti-config.json
   ```
 
-### Running Locally Built Image with Locally Modified Plugins Without npm/ghcr Publishishing
+### Running Locally Built Image with Locally Modified Plugins Without npm/ghcr Publishing
 
 It can be very inconvenient to have to publish npm packages just for testing. If you'd like to
 evaluate some changes you've made in a plugin, but need to have the plugin installed in the API 
@@ -407,7 +456,7 @@ Don't have a Besu network on hand to test with? Test or develop against our Besu
 
 3. Terminal Window 3 (curl - replace eth accounts as needed)
     ```sh
-    curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction' \
+    curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/run-transaction' \
     --header 'Content-Type: application/json' \
     --data-raw '{
         "web3SigningCredential": {
@@ -518,6 +567,14 @@ This file lists all the prometheus metrics and what they are used for.
 
 
 
+
+## Testing
+
+To run the tests for this package, execute the following command:
+
+```sh
+yarn test
+```
 
 ## FAQ
 
