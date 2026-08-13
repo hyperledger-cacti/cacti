@@ -28,15 +28,15 @@ GOMODULE_PATHS=("weaver/common/protos-go"
 VERSION=${1:-"2.1.0"}
 OLD_VERSION=$(cat weaver/common/protos-go/VERSION)
 
-echo "REPO: $REPO"
-echo "OLD_VERSION: $OLD_VERSION"
-echo "VERSION: $VERSION"
-
 # Strip leading 'v' if present to normalize version
 NORMALIZED_VERSION=$VERSION
 if [ "${VERSION:0:1}" = "v" ]; then
   NORMALIZED_VERSION=${VERSION:1}
 fi
+
+echo "REPO: $REPO"
+echo "OLD_VERSION: $OLD_VERSION"
+echo "VERSION: $NORMALIZED_VERSION"
 
 # Extract major version from normalized VERSION
 MAJOR_VERSION=$(echo $NORMALIZED_VERSION | cut -d '.' -f 1)
@@ -225,33 +225,33 @@ update_import_paths() {
   done
 }
 
-# # First pass: Update testutils dependency if present
-# echo "========== PHASE 1: Updating testutils dependency =========="
-# TESTUTILS_MODULE="github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
-# for GOMODULE in ${GOMODULE_PATHS[@]}; do
-#   if [ -f "$ROOT_DIR/$GOMODULE/go.mod" ]; then
-#     pushd "$ROOT_DIR/$GOMODULE" > /dev/null
+# First pass: Update testutils dependency if present
+echo "========== PHASE 1: Updating testutils dependency =========="
+TESTUTILS_MODULE="github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils"
+for GOMODULE in ${GOMODULE_PATHS[@]}; do
+  if [ -f "$ROOT_DIR/$GOMODULE/go.mod" ]; then
+    pushd "$ROOT_DIR/$GOMODULE" > /dev/null
     
-#     # Check if testutils is a dependency
-#     if grep -q $TESTUTILS_MODULE go.mod; then
-#       echo "Updating testutils in $GOMODULE..."
+    # Check if testutils is a dependency
+    if grep -q $TESTUTILS_MODULE go.mod; then
+      echo "Updating testutils in $GOMODULE..."
 
-#       CURRENT_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE)
-#       COMMIT_HASH=$(git rev-parse main)
-#       LATEST_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE@$COMMIT_HASH)
+      CURRENT_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE)
+      COMMIT_HASH=$(git rev-parse main)
+      LATEST_TESTUTILS_VERSION=$(go list -m -f '{{.Version}}' $TESTUTILS_MODULE@$COMMIT_HASH)
       
-#       if [ "$CURRENT_TESTUTILS_VERSION" != "$LATEST_TESTUTILS_VERSION" ]; then
-#         # Get latest testutils
-#         go mod edit -require=$TESTUTILS_MODULE@$LATEST_TESTUTILS_VERSION
-#         go mod tidy
-#       else
-#         echo "Skipping: testutils is already up to date in $GOMODULE"
-#       fi
-#     fi
+      if [ "$CURRENT_TESTUTILS_VERSION" != "$LATEST_TESTUTILS_VERSION" ]; then
+        # Get latest testutils
+        go mod edit -require=$TESTUTILS_MODULE@$LATEST_TESTUTILS_VERSION
+        go mod tidy
+      else
+        echo "Skipping: testutils is already up to date in $GOMODULE"
+      fi
+    fi
     
-#     popd > /dev/null
-#   fi
-# done
+    popd > /dev/null
+  fi
+done
 
 # Second pass: Update import paths in source files
 echo "========== PHASE 2: Updating import paths in source files =========="
@@ -311,9 +311,11 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
     echo "--------- START DEP -----------"
     GOMOD_DEP_VERSION=$(echo $GOMOD_DEP | awk -F "@" '{print $2}')
     GOMOD_DEP_MAJOR_VERSION=""
-    if [ "${GOMOD_DEP_VERSION:1:1}" -gt "1" ]; then
-      GOMOD_DEP_MAJOR_VERSION="/${GOMOD_DEP_VERSION:0:2}"
+    tmp=$(echo ${GOMOD_DEP_VERSION#v} | cut -d '.' -f 1)
+    if [ "$tmp" -gt "1" ]; then
+      GOMOD_DEP_MAJOR_VERSION="/v${tmp}"
     fi
+
     GOMOD_PATH=$(echo $GOMOD_DEP | awk -F "$GOMOD_DEP_MAJOR_VERSION@" '{print $1}' | awk -F "$REPO/" '{print $2}')
     echo DEP: $GOMOD_DEP
     echo DEP: $GOMOD_PATH
@@ -334,14 +336,29 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
     echo "  Verifying dependencies in go.mod are updated..."
     if [ -f go.mod ]; then
       # Check if any old version references exist in go.mod
-      if grep -q "$REPO.*$OLD_MAJOR_VER v" go.mod 2>/dev/null; then
-        echo "  WARNING: Found old version references in $GOMOD_PATH/go.mod:"
-        grep "$REPO.*$OLD_MAJOR_VER v" go.mod
+      if [ "$OLD_MODULE_MAJOR_VER" != "$NEW_MAJOR_VER" ]; then
+        if grep -q "$REPO.*$OLD_MODULE_MAJOR_VER v" go.mod 2>/dev/null; then
+          echo "  WARNING: Found old version references in $GOMOD_PATH/go.mod:"
+          grep "$REPO.*$OLD_MODULE_MAJOR_VER v" go.mod
+          echo "  ERROR: Dependencies must be updated before calculating checksum"
+          popd > /dev/null
+          echo "------------ END --------------"
+          exit 1
+        fi
+      fi
+      # Now we are sure that any cacti dependency has the new major version.
+      # Also ensure those dependencies are pinned to the full new version
+      # (v$NORMALIZED_VERSION). testutils has no major suffix and uses a
+      # pseudo-version, so it is not matched here and is intentionally skipped.
+      if grep -E "$REPO.*$NEW_MAJOR_VER v" go.mod | grep -vqE " v$NORMALIZED_VERSION([[:space:]]|$)"; then
+        echo "  WARNING: Found cacti dependencies not at v$NORMALIZED_VERSION in $GOMOD_PATH/go.mod:"
+        grep -E "$REPO.*$NEW_MAJOR_VER v" go.mod | grep -vE " v$NORMALIZED_VERSION([[:space:]]|$)"
         echo "  ERROR: Dependencies must be updated before calculating checksum"
         popd > /dev/null
         echo "------------ END --------------"
         exit 1
       fi
+
       echo "  Verification passed: All dependencies updated to new version"
     fi
     
@@ -358,7 +375,7 @@ for GOMODULE in ${GOMODULE_PATHS[@]}; do
     
     pushd "$ROOT_DIR/$GOMODULE" > /dev/null
     UPDATE="false"
-    (cat go.mod | grep -q "$GOMOD_NAME $GOMOD_VERSION") || UPDATE="true"
+    (cat go.mod | grep -qE "$GOMOD_NAME $GOMOD_VERSION([[:space:]]|$)") || UPDATE="true"
     if [ "$UPDATE" = "true" ]; then
       # Remove old version entries using OLD_MAJOR_VER
       grep -v "$OLD_GOMOD_NAME v" go.mod > go.mod.tmp
