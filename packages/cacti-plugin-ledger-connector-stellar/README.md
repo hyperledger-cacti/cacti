@@ -1,4 +1,6 @@
-# `@hyperledger/cacti-plugin-ledger-connector-stellar`
+# `@hyperledger-cacti/cacti-plugin-ledger-connector-stellar`
+
+## Overview
 
 This plugin provides `Cacti` a way to interact with Stellar networks. Using this we can perform:
 
@@ -6,7 +8,9 @@ This plugin provides `Cacti` a way to interact with Stellar networks. Using this
 - Build and sign transactions.
 - Invoke smart-contract functions that we have deployed on the network.
 
-## Summary
+**Target Audience:**
+- [x] Developers
+- [x] Operators
 
 - [Getting Started](#getting-started)
 - [Architecture](#architecture)
@@ -39,6 +43,28 @@ In the project root folder, run this command to compile the plugin and create th
 ```sh
 yarn tsc
 ```
+
+### Installing
+
+To install this package as a dependency:
+
+```sh
+npm install @hyperledger-cacti/cacti-plugin-ledger-connector-stellar
+```
+
+## Configuration
+
+The configuration options for this plugin are defined in the `IPluginLedgerConnectorStellarOptions` interface:
+
+| Option | Required | Description |
+|---|---|---|
+| `instanceId` | Yes | Unique ID for the plugin instance. |
+| `networkConfig` | Yes | Configuration for connecting to the Stellar network (Horizon/RPC URL). |
+| `pluginRegistry` | Yes | A reference to the Cacti `PluginRegistry` instance. |
+| `prometheusExporter` | No | Optional Prometheus exporter instance for metrics. |
+| `logLevel` | No | The log level for the plugin (e.g., 'INFO', 'DEBUG'). |
+
+The API surface is documented in the [OpenAPI specification](./src/main/json/openapi.json). A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/](./src/main/typescript/generated/openapi/typescript-axios/).
 
 ### Architecture
 
@@ -274,14 +300,14 @@ Once Prometheus is setup, the corresponding scrape_config needs to be added to t
 
 ```(yaml)
 - job_name: 'stellar_ledger_connector_exporter'
-  metrics_path: api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics
+  metrics_path: api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics
   scrape_interval: 5s
   static_configs:
     - targets: ['{host}:{port}']
 ```
 
 Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, `packages/cacti-plugin-ledger-connector-stellar/src/test/typescript/unit/get-open-api-spec-v1-connector-stellar.test.ts`) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
-`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics`
+`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
 On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cacti_stellar_total_tx_count** and click **execute**

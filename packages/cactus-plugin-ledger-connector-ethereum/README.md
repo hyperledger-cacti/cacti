@@ -1,4 +1,6 @@
-# `@hyperledger/cactus-plugin-ledger-connector-ethereum`
+# `@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum`
+
+## Overview
 
 This plugin provides `Cactus` a way to interact with Ethereum networks. Using this we can perform:
 
@@ -6,7 +8,11 @@ This plugin provides `Cactus` a way to interact with Ethereum networks. Using th
 - Build and sign transactions using different keystores.
 - Invoke smart-contract functions that we have deployed on the network.
 
-## Summary
+**Target Audience:**
+- [x] Developers
+- [x] Operators
+
+## Table of Contents <!-- omit in toc -->
 
 - [Getting Started](#getting-started)
 - [Usage](#usage)
@@ -29,6 +35,30 @@ In the root of the project to install the dependencies execute the command:
 ```sh
 npm run configure
 ```
+
+### Installing
+
+To install this package as a dependency:
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-ledger-connector-ethereum
+```
+
+### Configuration
+
+The configuration options for this plugin are defined in the `IPluginLedgerConnectorEthereumOptions` interface:
+
+| Option | Required | Description |
+|---|---|---|
+| `instanceId` | Yes | Unique ID for the plugin instance. |
+| `pluginRegistry` | Yes | A reference to the Cacti `PluginRegistry` instance. |
+| `rpcApiHttpHost` | No | The HTTP URL of the Ethereum JSON-RPC endpoint. |
+| `rpcApiHttpOptions` | No | HTTP provider options (authentication, headers, etc.). |
+| `rpcApiWsHost` | No | The WebSocket URL of the Ethereum JSON-RPC endpoint. |
+| `rpcApiWsSocketOptions` | No | WebSocket provider socket options (client config, headers). |
+| `rpcApiWsReconnectOptions` | No | WebSocket provider reconnect behavior options. |
+| `logLevel` | No | The log level for the plugin (e.g., 'INFO', 'DEBUG'). |
+| `prometheusExporter` | No | Optional Prometheus exporter instance for metrics. |
 
 ## Usage
 
@@ -84,7 +114,7 @@ enum Web3SigningCredentialType {
 }
 ```
 
-> Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP)
+> Extensive documentation and examples in the [Cacti documentation](https://hyperledger.github.io/cacti/) (WIP)
 
 ## EthereumApiClient
 
@@ -212,7 +242,7 @@ const subscription = watchObservable.subscribe({
 ### Example
 ``` typescript
   const proxyUrl = new URL(
-    "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc",
+    "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/json-rpc",
     apiHost,
   );
   const web3ProxyClient = new Web3(proxyUrl.toString());
@@ -229,7 +259,7 @@ To check that all has been installed correctly and that the pugin has no errors 
 npx jest cactus-plugin-ledger-connector-ethereum
 ```
 
-### Stess test
+### Stress test
 - Use CLI for manual setup of test environment and geneartion of artillery config.
 - `artillery` must be installed separately (we do not recommend running it if they are any known open vulnerabilities)
 
@@ -365,7 +395,7 @@ docker run \
 
 **Terminal Window 3 (curl - replace eth accounts as needed)**
 ```sh
-curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction' \
+curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/run-transaction' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "web3SigningCredential": {
@@ -426,14 +456,14 @@ Once Prometheus is setup, the corresponding scrape_config needs to be added to t
 
 ```(yaml)
 - job_name: 'ethereum_ledger_connector_exporter'
-  metrics_path: api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics
+  metrics_path: api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics
   scrape_interval: 5s
   static_configs:
     - targets: ['{host}:{port}']
 ```
 
 Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/integration/plugin-ledger-connector-ethereum/deploy-contract/deploy-contract-from-json.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
-`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics`
+`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
 On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_ethereum_total_tx_count** and click **execute**
