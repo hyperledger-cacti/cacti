@@ -1,12 +1,25 @@
-# `@hyperledger/cactus-plugin-ledger-connector-fabric` <!-- omit in toc -->
+# `@hyperledger-cacti/cactus-plugin-ledger-connector-fabric` <!-- omit in toc -->
+
+## Overview
+
+This plugin provides a way to interact with Fabric networks.
+Using this one can perform:
+* Deploy smart contracts (chaincode).
+* Execute transactions on the ledger.
+* Invoke chaincode functions.
+
+**Target Audience:**
+- [x] Developers
+- [x] Operators
 
 ## Table of Contents <!-- omit in toc -->
 
 - [1. Usage](#1-usage)
   - [1.1. Installation](#11-installation)
-  - [1.2. Using as a Library](#12-using-as-a-library)
-  - [1.3. Using Via The API Client](#13-using-via-the-api-client)
-  - [1.4. Signing Credentials with Hashicorp Vault](#14-signing-credentials-with-hashicorp-vault)
+  - [1.2. Configuration](#12-configuration)
+  - [1.3. Using as a Library](#13-using-as-a-library)
+  - [1.4. Using Via The API Client](#14-using-via-the-api-client)
+  - [1.5. Signing Credentials with Hashicorp Vault](#15-signing-credentials-with-hashicorp-vault)
     - [1.4.1. Identity Providers](#141-identity-providers)
     - [1.4.2. Setting up a WS-X.509 provider](#142-setting-up-a-ws-x509-provider)
     - [1.4.3. Building the ws-identity docker image](#143-building-the-ws-identity-docker-image)
@@ -21,7 +34,7 @@
   - [2.1. run-transaction-endpoint](#21-run-transaction-endpoint)
 - [3. Containerization](#3-containerization)
   - [3.1. Running the container](#31-running-the-container)
-  - [3.3. Testing API calls with the container](#33-testing-api-calls-with-the-container)
+  - [3.2. Testing API calls with the container](#32-testing-api-calls-with-the-container)
 - [4. Prometheus Exporter](#4-prometheus-exporter)
   - [4.1. Usage Prometheus](#41-usage-prometheus)
   - [4.2. Prometheus Integration](#42-prometheus-integration)
@@ -29,39 +42,60 @@
     - [4.3.1. response.type.ts](#431-responsetypets)
     - [4.3.2. data-fetcher.ts](#432-data-fetcherts)
     - [4.3.3. metrics.ts](#433-metricsts)
-- [5. Contributing](#5-contributing)
-- [6. License](#6-license)
-- [7. Acknowledgments](#7-acknowledgments)
+- [5. Testing](#5-testing)
+- [6. Contributing](#6-contributing)
+- [7. License](#7-license)
+- [8. Acknowledgments](#8-acknowledgments)
 
 
 ## 1. Usage
 
-This plugin provides a way to interact with Fabric networks.
-Using this one can perform:
-* Deploy smart contracts (chaincode).
-* Execute transactions on the ledger.
-* Invoke chaincode functions.
+The above functionality can either be accessed by importing the plugin directly as a library (embedding) or by hosting it as a REST API through the [Cactus API server](https://www.npmjs.com/package/@hyperledger-cacti/cactus-cmd-api-server)
 
-The above functionality can either be accessed by importing the plugin directly as a library (embedding) or by hosting it as a REST API through the [Cactus API server](https://www.npmjs.com/package/@hyperledger/cactus-cmd-api-server)
-
-We also publish the [Cactus API server as a container image](https://github.com/hyperledger/cactus/pkgs/container/cactus-cmd-api-server) to the GitHub Container Registry that you can run easily with a one liner.
+We also publish the [Cactus API server as a container image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cactus-cmd-api-server) to the GitHub Container Registry that you can run easily with a one liner.
 The API server is also embeddable in your own NodeJS project if you choose to do so.
+
+The API surface is documented in the [OpenAPI specification](./src/main/json/openapi.json). A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/](./src/main/typescript/generated/openapi/typescript-axios/).
 
 ### 1.1. Installation
 
 **npm**
 
 ```sh
-npm install @hyperledger/cactus-plugin-ledger-connector-fabric
+npm install @hyperledger-cacti/cactus-plugin-ledger-connector-fabric
 ```
 
 **yarn**
 
 ```sh
-yarn add @hyperledger/cactus-plugin-ledger-connector-fabric
+yarn add @hyperledger-cacti/cactus-plugin-ledger-connector-fabric
 ```
 
-### 1.2. Using as a Library
+### 1.2. Configuration
+
+The configuration options for this plugin are defined in the `IPluginLedgerConnectorFabricOptions` interface:
+
+| Option | Required | Description |
+|---|---|---|
+| `instanceId` | Yes | Unique ID for the plugin instance. |
+| `pluginRegistry` | Yes | A reference to the Cacti `PluginRegistry` instance. |
+| `logLevel` | No | The log level for the plugin (e.g., 'INFO', 'DEBUG'). |
+| `connectionProfile` | No | A parsed Fabric connection profile object. |
+| `connectionProfileB64` | No | Base64-encoded Fabric connection profile JSON. |
+| `prometheusExporter` | No | Optional Prometheus exporter instance for metrics. |
+| `discoveryOptions` | No | Fabric Gateway discovery options. |
+| `eventHandlerOptions` | No | Fabric Gateway event handler options. |
+| `supportedIdentity` | No | Array of supported `FabricSigningCredentialType`s. |
+| `vaultConfig` | No | Configuration for HashiCorp Vault integration. |
+| `webSocketConfig` | No | Configuration for WebSocket communication. |
+| `signCallback` | No | Custom callback for signing payloads. |
+| `dockerNetworkName` | No | Docker network name used by the CLI container to communicate with the ledger. |
+| `collectTransactionReceipts` | No | CC-TX-VIZ: Flag to collect transaction receipts. |
+| `persistMessages` | No | CC-TX-VIZ: Flag to persist messages. |
+| `queueId` | No | CC-TX-VIZ: Queue ID for processing. |
+| `eventProvider` | No | CC-TX-VIZ: Event provider identifier. |
+
+### 1.3. Using as a Library
 
 ```typescript
 import {
@@ -250,7 +284,7 @@ await connector.rotateKey(
 )
 ```
 
-> Extensive documentation and examples in the [readthedocs](https://readthedocs.org/projects/hyperledger-cactus/) (WIP)
+
 
 #### 1.4.1. Identity Providers
 
@@ -553,7 +587,7 @@ docker run \
     --config-file=/.cacti-config.json
 ```
 
-### 3.3. Testing API calls with the container
+### 3.2. Testing API calls with the container
 
 Don't have a fabric network on hand to test with? Test or develop against our fabric All-In-One container!
 
@@ -625,7 +659,7 @@ FIXME: This does not work. We need to (at the very least)
 
 **Terminal Window 3 (cURL)**
 ```sh
-curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/run-transaction' \
+curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction' \
 --header 'Content-Type: application/json' \
 --data-raw '{
   "channelName": "mychannel",
@@ -665,14 +699,14 @@ Once Prometheus is setup, the corresponding scrape_config needs to be added to t
 
 ```(yaml)
 - job_name: 'fabric_ledger_connector_exporter'
-  metrics_path: api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
+  metrics_path: api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
   scrape_interval: 5s
   static_configs:
     - targets: ['{host}:{port}']
 ```
 
 Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, `packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/run-transaction-endpoint-v1.test.ts`) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
-`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`
+`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
 On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_fabric_total_tx_count** and click **execute**
@@ -688,14 +722,22 @@ This file contains functions encasing the logic to process the data points
 #### 4.3.3. metrics.ts
 This file lists all the prometheus metrics and what they are used for.
 
-## 5. Contributing
+## 5. Testing
+
+To run the tests for this package, execute the following command from the package root:
+
+```sh
+npm run test
+```
+
+## 6. Contributing
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
 Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 6. License
+## 7. License
 
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
-## 7. Acknowledgments
+## 8. Acknowledgments

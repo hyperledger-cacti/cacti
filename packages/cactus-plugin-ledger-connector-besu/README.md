@@ -1,17 +1,23 @@
-# `@hyperledger/cactus-plugin-ledger-connector-besu`
+# `@hyperledger-cacti/cactus-plugin-ledger-connector-besu`
+
+## Overview
 
 This plugin provides `Cactus` a way to interact with Besu networks. Using this we can perform:
 * Deploy Smart-contracts through bytecode.
 * Build and sign transactions using different keystores.
-* Invoke smart-contract functions that we have deployed on the network.
-## Summary
+* Invoke chaincode functions.
+
+**Target Audience:**
+- [x] Developers
+- [x] Operators
+
+## Table of Contents <!-- omit in toc -->
 
   - [Getting Started](#getting-started)
   - [Architecture](#architecture)
   - [Usage](#usage)
   - [Prometheus Exporter](#prometheus-exporter)
-  - [Runing the tests](#running-the-tests)
-  - [Built With](#built-with)
+  - [Running the tests](#running-the-tests)
   - [Contributing](#contributing)
   - [License](#license)
   - [Acknowledgments](#acknowledgments)
@@ -35,6 +41,27 @@ In the project root folder, run this command to compile the plugin and create th
 npm run tsc
 ```
 
+### Installing
+
+To install this package as a dependency:
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-ledger-connector-besu
+```
+
+### Configuration
+
+The configuration options for this plugin are defined in the `IPluginLedgerConnectorBesuOptions` interface:
+
+| Option | Required | Description |
+|---|---|---|
+| `instanceId` | Yes | Unique ID for the plugin instance. |
+| `rpcApiHttpHost` | Yes | The HTTP URL of the Besu JSON-RPC endpoint. |
+| `rpcApiWsHost` | Yes | The WebSocket URL of the Besu JSON-RPC endpoint. |
+| `pluginRegistry` | Yes | A reference to the Cacti `PluginRegistry` instance. |
+| `prometheusExporter` | No | Optional Prometheus exporter instance for metrics. |
+| `logLevel` | No | The log level for the plugin (e.g., 'INFO', 'DEBUG'). |
+
 ### Architecture
 The sequence diagrams for various endpoints are mentioned below
 
@@ -42,9 +69,9 @@ The sequence diagrams for various endpoints are mentioned below
 ![run-transaction-endpoint sequence diagram](docs/architecture/images/run-transaction-endpoint.png)
 The above diagram shows the sequence diagram of run-transaction-endpoint. User A (One of the many Users) interacts with the API Client which in turn, calls the API server. API server then executes transact() method which is explained in detailed in the subsequent diagrams.
 ![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
-The above diagram shows the sequence diagram of transact() method of the PluginLedgerConnectorBesu class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the type of Web3SigningCredentialType, corresponsing responses are sent back to the caller.  
+The above diagram shows the sequence diagram of transact() method of the PluginLedgerConnectorBesu class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the type of Web3SigningCredentialType, corresponding responses are sent back to the caller.  
 ![run-transaction-endpoint transactCactusKeychainRef() method](docs/architecture/images/run-transaction-endpoint-transact-cactuskeychainref.png)
-The above diagram shows transactCactusKeychainReference() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is CACTUSKEYCHAINREF. This method inturn calls transactPrivateKey() which calls the signTransaction() method of web3 library. 
+The above diagram shows transactCactusKeychainReference() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is CACTUSKEYCHAINREF. This method in turn calls transactPrivateKey() which calls the signTransaction() method of web3 library. 
 ![runtransaction-endpoint transactPrivateKey() method](docs/architecture/images/run-transaction-endpoint-transact-privatekey.png)
 The above diagram shows transactPrivateKey() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is PRIVATEKEYHEX. This method then calls the signTransaction() method of the web3 library.
 ![run-transaction-endpoint transactSigned() method](docs/architecture/images/run-transaction-endpoint-transact-signed.png)
@@ -53,6 +80,8 @@ The above diagram shows transactSigned() method being called by the transact() m
 The above diagram shows pollForTxReceipt() method which is called by the transactSigned() method as described in the previous sequence diagram. This method waits for the block confirmation in a loop and then sends the corresponding response back to the caller.
 
 ### Usage
+
+The API surface is documented in the [OpenAPI specification](./src/main/json/openapi.json). A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/](./src/main/typescript/generated/openapi/typescript-axios/).
 
 To use this import public-api and create new **PluginFactoryLedgerConnector**. Then use it to create a connector.
 ```typescript
@@ -237,7 +266,7 @@ docker run \
 
 **Terminal Window 3 (curl - replace eth accounts as needed)**
 ```sh
-curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/run-transaction' \
+curl --location --request POST 'http://127.0.0.1:4000/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/run-transaction' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "web3SigningCredential": {
@@ -288,7 +317,7 @@ This class creates a prometheus exporter, which scrapes the transactions (total 
 
 ### Prometheus Exporter Usage
 The prometheus exporter object is initialized in the `PluginLedgerConnectorBesu` class constructor itself, so instantiating the object of the `PluginLedgerConnectorBesu` class, gives access to the exporter object.
-You can also initialize the prometheus exporter object seperately and then pass it to the `IPluginLedgerConnectorBesuOptions` interface for `PluginLedgerConnectoBesu` constructor.
+You can also initialize the prometheus exporter object separately and then pass it to the `IPluginLedgerConnectorBesuOptions` interface for `PluginLedgerConnectorBesu` constructor.
 
 `getPrometheusMetricsV1` function returns the prometheus exporter metrics, currently displaying the total transaction count, which currently increments everytime the `transact()` method of the `PluginLedgerConnectorBesu` class is called.
 
@@ -298,14 +327,14 @@ Once Prometheus is setup, the corresponding scrape_config needs to be added to t
 
 ```(yaml)
 - job_name: 'besu_ledger_connector_exporter'
-  metrics_path: api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
+  metrics_path: api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
   scrape_interval: 5s
   static_configs:
     - targets: ['{host}:{port}']
 ```
 
 Here the `host:port` is where the prometheus exporter metrics are exposed. The test cases (For example, packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/deploy-contract-from-json.test.ts) exposes it over `0.0.0.0` and a random port(). The random port can be found in the running logs of the test case and looks like (42379 in the below mentioned URL)
-`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`
+`Metrics URL: http://0.0.0.0:42379/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics`
 
 Once edited, you can start the prometheus service by referencing the above edited prometheus.yml file.
 On the prometheus graphical interface (defaulted to http://localhost:9090), choose **Graph** from the menu bar, then select the **Console** tab. From the **Insert metric at cursor** drop down, select **cactus_besu_total_tx_count** and click **execute**
@@ -323,7 +352,7 @@ This file lists all the prometheus metrics and what they are used for.
 
 ## Running the tests
 
-To check that all has been installed correctly and that the pugin has no errors run the tests:
+To check that all has been installed correctly and that the plugin has no errors run the tests:
 
 * Run this command at the project's root:
 ```sh
