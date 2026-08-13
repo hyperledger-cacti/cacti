@@ -377,7 +377,8 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -407,7 +408,8 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     );
 
     const reqApproveFabricAddress = await approveAddressApi2.getApproveAddress(
-      fabricEnv.network,
+      fabricEnv.network.id,
+      fabricEnv.network.ledgerType,
       TokenType.Fungible,
     );
     expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
@@ -629,7 +631,8 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
     );
 
     const reqApproveFabricAddress = await approveAddressApi1.getApproveAddress(
-      fabricEnv.network,
+      fabricEnv.network.id,
+      fabricEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -657,7 +660,8 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -877,7 +881,8 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -908,7 +913,8 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     const reqApproveEthereumAddress =
       await approveAddressApi2.getApproveAddress(
-        ethereumEnv.network,
+        ethereumEnv.network.id,
+        ethereumEnv.network.ledgerType,
         TokenType.Fungible,
       );
 

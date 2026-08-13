@@ -42,6 +42,12 @@ export async function installOpenapiValidationMiddleware(
     OpenApiValidator.middleware({
       apiSpec: apiSpec as OpenAPIV3.DocumentV3,
       validateApiSpec: false,
+      // Up to v5.2.0 the validator hard-coded allErrors=true internally. Since
+      // v5.3.0 it reads the flag from here instead, defaulting to Ajv's own
+      // default of false which makes validation stop at the first error. We
+      // report every violation of a request so that callers can fix them all
+      // in one go rather than one round-trip per offending property.
+      validateRequests: { allErrors: true },
       $refParser: {
         mode: "dereference",
       },

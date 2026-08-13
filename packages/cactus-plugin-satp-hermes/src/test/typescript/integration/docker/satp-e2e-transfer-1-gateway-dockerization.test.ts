@@ -262,7 +262,8 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -286,7 +287,8 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
-      fabricEnv.network,
+      fabricEnv.network.id,
+      fabricEnv.network.ledgerType,
       TokenType.Fungible,
     );
     expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
@@ -422,7 +424,8 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
     );
 
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
-      fabricEnv.network,
+      fabricEnv.network.id,
+      fabricEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -444,7 +447,8 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
     log.debug("Approved 100 amount to the Fabric Bridge Address");
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -582,7 +586,8 @@ describe.skip("SATPGateway sending a token from Besu to Ethereum", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -606,7 +611,8 @@ describe.skip("SATPGateway sending a token from Besu to Ethereum", () => {
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
-      ethereumEnv.network,
+      ethereumEnv.network.id,
+      ethereumEnv.network.ledgerType,
       TokenType.Fungible,
     );
 

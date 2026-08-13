@@ -264,7 +264,8 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -287,8 +288,16 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     }
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
+    if (!fabricEnv?.network?.id || !fabricEnv?.network?.ledgerType) {
+      throw new Error("Fabric network information is undefined");
+    }
+
+    const fabricNetworkId = fabricEnv.network.id;
+    const fabricLedgerType = fabricEnv.network.ledgerType;
+
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
-      fabricEnv.network,
+      fabricNetworkId,
+      fabricLedgerType,
       TokenType.Fungible,
     );
     expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
@@ -424,8 +433,15 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
       new Configuration({ basePath: gateway.getAddressOApiAddress() }),
     );
 
+    if (!fabricEnv?.network) {
+      throw new Error("Fabric test environment network is undefined");
+    }
+
+    const fabricNetwork = fabricEnv.network;
+
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
-      fabricEnv.network,
+      fabricNetwork.id,
+      fabricNetwork.ledgerType,
       TokenType.Fungible,
     );
 
@@ -447,7 +463,8 @@ describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
     log.debug("Approved 100 amount to the Fabric Bridge Address");
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -599,7 +616,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -622,7 +640,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
-      ethereumEnv.network,
+      ethereumEnv.network.id,
+      ethereumEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -790,7 +809,8 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Nonfungible,
     );
 
@@ -815,7 +835,8 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
     );
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
-      ethereumEnv.network,
+      ethereumEnv.network.id,
+      ethereumEnv.network.ledgerType,
       TokenType.Nonfungible,
     );
 

@@ -5705,14 +5705,17 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+         * @param {string} networkIdId The id of the DLT network being interacted with.
+         * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
          * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getApproveAddress: async (networkId: TransactRequestSourceAssetNetworkId, tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'networkId' is not null or undefined
-            assertParamExists('getApproveAddress', 'networkId', networkId)
+        getApproveAddress: async (networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'networkIdId' is not null or undefined
+            assertParamExists('getApproveAddress', 'networkIdId', networkIdId)
+            // verify required parameter 'networkIdLedgerType' is not null or undefined
+            assertParamExists('getApproveAddress', 'networkIdLedgerType', networkIdLedgerType)
             // verify required parameter 'tokenType' is not null or undefined
             assertParamExists('getApproveAddress', 'tokenType', tokenType)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address`;
@@ -5727,8 +5730,12 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-            if (networkId !== undefined) {
-                localVarQueryParameter['networkId'] = networkId;
+            if (networkIdId !== undefined) {
+                localVarQueryParameter['networkId.id'] = networkIdId;
+            }
+
+            if (networkIdLedgerType !== undefined) {
+                localVarQueryParameter['networkId.ledgerType'] = networkIdLedgerType;
             }
 
             if (tokenType !== undefined) {
@@ -5759,13 +5766,14 @@ export const GetApproveAddressApiFp = function(configuration?: Configuration) {
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+         * @param {string} networkIdId The id of the DLT network being interacted with.
+         * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
          * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getApproveAddress(networkId: TransactRequestSourceAssetNetworkId, tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetApproveAddress200Response>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getApproveAddress(networkId, tokenType, options);
+        async getApproveAddress(networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetApproveAddress200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getApproveAddress(networkIdId, networkIdLedgerType, tokenType, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -5781,13 +5789,14 @@ export const GetApproveAddressApiFactory = function (configuration?: Configurati
         /**
          * Get approve address for the token transfer
          * @summary Get approve address
-         * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+         * @param {string} networkIdId The id of the DLT network being interacted with.
+         * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
          * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getApproveAddress(networkId: TransactRequestSourceAssetNetworkId, tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: any): AxiosPromise<GetApproveAddress200Response> {
-            return localVarFp.getApproveAddress(networkId, tokenType, options).then((request) => request(axios, basePath));
+        getApproveAddress(networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: any): AxiosPromise<GetApproveAddress200Response> {
+            return localVarFp.getApproveAddress(networkIdId, networkIdLedgerType, tokenType, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -5802,14 +5811,15 @@ export class GetApproveAddressApi extends BaseAPI {
     /**
      * Get approve address for the token transfer
      * @summary Get approve address
-     * @param {TransactRequestSourceAssetNetworkId} networkId The network of the DLT being interacted with.
+     * @param {string} networkIdId The id of the DLT network being interacted with.
+     * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
      * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof GetApproveAddressApi
      */
-    public getApproveAddress(networkId: TransactRequestSourceAssetNetworkId, tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig) {
-        return GetApproveAddressApiFp(this.configuration).getApproveAddress(networkId, tokenType, options).then((request) => request(this.axios, this.basePath));
+    public getApproveAddress(networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig) {
+        return GetApproveAddressApiFp(this.configuration).getApproveAddress(networkIdId, networkIdLedgerType, tokenType, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
