@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-13)
+
+### Bug Fixes
+
+* **cacti-plugin-consortium-static:** add jti replay protection ([1c1a069](https://github.com/hyperledger-cacti/cacti/commit/1c1a069a616e426b52814a4cd88791747a47b5ee)), closes [#4372](https://github.com/hyperledger-cacti/cacti/issues/4372)
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes
