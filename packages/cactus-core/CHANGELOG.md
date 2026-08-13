@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-13)
+
+### Bug Fixes
+
+* **ci:** repair besu openapi validation and satp approve-address ([b15e264](https://github.com/hyperledger-cacti/cacti/commit/b15e26498d2482f1bd233448130923fc2b7888fe)), closes [#4670](https://github.com/hyperledger-cacti/cacti/issues/4670)
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes

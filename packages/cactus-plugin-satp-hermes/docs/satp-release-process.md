@@ -21,7 +21,7 @@ account), not by this pipeline.
 **Dev builds — on SATP Hermes changes.** A push to `main`, `satp-dev`, or
 `satp-stg` that touches `packages/cactus-plugin-satp-hermes/**` or
 `.github/workflows/satp-hermes-*.yaml` publishes a `dev` build, versioned
-`{base-version}-dev.{short-sha}` (e.g. `3.0.0-beta.1-dev.abc1234`). Dev Docker
+`{base-version}-dev.{short-sha}` (e.g. `3.0.0-dev.abc1234`). Dev Docker
 images are pushed to **GHCR only**; Docker Hub receives release builds only.
 
 **Production releases — on tag push.** Pushing a `v{X.Y.Z}` version tag (the
@@ -30,18 +30,18 @@ and publishes the exact version to every registry (GHCR + Docker Hub), moving
 `latest` (or, for `-rc` tags, the `rc` channel). The tag-push path runs the
 full test suite first and publishes under the `prod` GitHub Environment.
 
-Examples below assume  version `3.0.0-beta.1` and commit `abc1234`.
+Examples below assume  version `3.0.0` and commit `abc1234`.
 The `dev`/`latest`/`rc` names are npm **dist-tags** (and Docker moving
 tags) that always point at the newest matching build.
 
 For dev:
 
 ```bash
-# Dev (main / satp-dev / satp-stg) → 3.0.0-beta.1-dev.abc1234, npm dist-tag `dev`
+# Dev (main / satp-dev / satp-stg) → 3.0.0-dev.abc1234, npm dist-tag `dev`
 npm install @hyperledger-cacti/cactus-plugin-satp-hermes@dev                      # newest dev build
-npm install @hyperledger-cacti/cactus-plugin-satp-hermes@3.0.0-beta.1-dev.abc1234 # pin exact version
-docker pull ghcr.io/hyperledger-cacti/cacti-satp-hermes-gateway:3.0.0-beta.1-dev.abc1234
-docker pull hyperledger/cacti-satp-hermes-gateway:3.0.0-beta.1-dev.abc1234
+npm install @hyperledger-cacti/cactus-plugin-satp-hermes@3.0.0-dev.abc1234 # pin exact version
+docker pull ghcr.io/hyperledger-cacti/cacti-satp-hermes-gateway:3.0.0-dev.abc1234
+docker pull hyperledger/cacti-satp-hermes-gateway:3.0.0-dev.abc1234
 ```
 
 For prod:

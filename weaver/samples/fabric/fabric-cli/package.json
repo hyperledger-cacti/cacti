@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cacti-weaver-fabric-cli",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0",
   "description": "fabric-cli CLI",
   "keywords": [
     "Hyperledger",
@@ -56,8 +56,8 @@
   },
   "dependencies": {
     "@fidm/x509": "1.2.1",
-    "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0-beta.1",
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "3.0.0-beta.1",
+    "@hyperledger-cacti/cacti-weaver-protos-js": "3.0.0",
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "3.0.0",
     "body-parser": "1.20.6",
     "dotenv": "8.6.0",
     "express": "5.1.0",

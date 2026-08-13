@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-13)
+
+**Note:** Version bump only for package @hyperledger-cacti/cactus-test-geth-ledger
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes

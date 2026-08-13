@@ -23,7 +23,7 @@ require (
 	github.com/gobuffalo/envy v1.10.2 // indirect
 	github.com/gobuffalo/packd v1.0.2 // indirect
 	github.com/gobuffalo/packr v1.30.1 // indirect
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0
 	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
