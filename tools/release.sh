@@ -32,7 +32,8 @@ function release() {
     if [ $? -ne 0 ]; then return 1; fi
     ./tools/weaver-update-version.sh $VERSION .
     if [ $? -ne 0 ]; then return 1; fi
-    git add . && git commit -s -m "chore(release): publish v$VERSION"
+    git add . && SKIP_FORBIDDEN_PATHS=1 git commit -s -m "chore(release): publish v$VERSION"
+    if [ $? -ne 0 ]; then return 1; fi
     return 0
 }
 
