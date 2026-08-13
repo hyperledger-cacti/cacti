@@ -94,7 +94,7 @@ describe("GetStatus Endpoint and Functionality testing", () => {
       ).rejects.toMatchObject({
         response: {
           data: expect.objectContaining({
-            message: expect.stringContaining("Internal Server Error"),
+            message: expect.stringContaining("InternalServerError"),
             error: expect.stringContaining("Session not found"),
           }),
         },

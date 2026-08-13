@@ -440,11 +440,24 @@ paths:
           verbLowerCase: get
           path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address
       parameters:
-        - name: networkId
-          description: The network of the DLT being interacted with.
+        # The two properties of NetworkId are declared as separate, flat query
+        # parameters on purpose: an object typed query parameter would be
+        # serialized by the OpenAPI spec as `id=...&ledgerType=...` but the
+        # typescript-axios client generator flattens objects with dots instead,
+        # sending `networkId.id=...`. Spelling the wire format out here is what
+        # keeps the generated client, this spec and the request validator in
+        # agreement.
+        - name: networkId.id
+          description: The id of the DLT network being interacted with.
           in: query
           schema:
-            $ref: '#/components/schemas/NetworkId'
+            type: string
+          required: true
+        - name: networkId.ledgerType
+          description: The ledger type of the DLT network being interacted with.
+          in: query
+          schema:
+            $ref: ../../../../../cactus-core-api/src/main/json/openapi.json#/components/schemas/LedgerType
           required: true
         - name: tokenType
           description: The type of token being transferred.

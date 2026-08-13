@@ -282,7 +282,8 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -306,7 +307,8 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
-      ethereumEnv.network,
+      ethereumEnv.network.id,
+      ethereumEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -528,7 +530,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
@@ -559,7 +562,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     const reqApproveEthereumAddress =
       await approveAddressApi2.getApproveAddress(
-        ethereumEnv.network,
+        ethereumEnv.network.id,
+        ethereumEnv.network.ledgerType,
         TokenType.Fungible,
       );
 
@@ -795,7 +799,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
 
     const reqApproveEthereumAddress =
       await approveAddressApi1.getApproveAddress(
-        ethereumEnv.network,
+        ethereumEnv.network.id,
+        ethereumEnv.network.ledgerType,
         TokenType.Fungible,
       );
 
@@ -827,7 +832,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
     );
 
     const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress(
-      besuEnv.network,
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
       TokenType.Fungible,
     );
 
