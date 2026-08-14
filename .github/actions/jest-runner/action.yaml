@@ -15,6 +15,21 @@ inputs:
     description: "The name of the report"
     required: false
     default: "jest-tests-report"
+  jest_test_ignore:
+    description: >-
+      Regex of test paths to skip, passed through as --testPathIgnorePatterns.
+      NOTE: this REPLACES the list in jest.config.js rather than adding to it,
+      so only use it for patterns under the caller's own jest_test_pattern.
+    required: false
+    default: ""
+  jest_test_timeout:
+    description: >-
+      Per-test timeout in milliseconds, passed through as --testTimeout.
+      Leave empty to use the repo-wide jest.config.js value (1 hour).
+      NOTE: jest applies this to hooks as well, so it must stay above the
+      time a suite's beforeAll needs (a Fabric AIO ledger takes ~4 minutes).
+    required: false
+    default: ""
   github_secret:
     description: "GitHub secret for authentication"
     required: false
@@ -29,6 +44,8 @@ runs:
         mkdir -p reports
         export JEST_JUNIT_OUTPUT_FILE="reports/${{ inputs.report_name }}.xml"
         yarn jest "${{ inputs.jest_test_pattern }}" \
+          ${{ inputs.jest_test_timeout && format('--testTimeout={0}', inputs.jest_test_timeout) || '' }} \
+          ${{ inputs.jest_test_ignore && format('--testPathIgnorePatterns={0}', inputs.jest_test_ignore) || '' }} \
           --coverage \
           --coverageDirectory="${{ inputs.jest_test_coverage_path }}" \
           --reporters=default \
@@ -43,6 +60,8 @@ runs:
         mkdir -p reports
         export JEST_JUNIT_OUTPUT_FILE="reports/${{ inputs.report_name }}.xml"
         yarn jest "${{ inputs.jest_test_pattern }}" \
+          ${{ inputs.jest_test_timeout && format('--testTimeout={0}', inputs.jest_test_timeout) || '' }} \
+          ${{ inputs.jest_test_ignore && format('--testPathIgnorePatterns={0}', inputs.jest_test_ignore) || '' }} \
           --reporters=default \
           --reporters=jest-junit \
           --passWithNoTests \
