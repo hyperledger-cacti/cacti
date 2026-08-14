@@ -308,14 +308,6 @@ jobs:
           # slowest healthy suite, while still failing a hung test inside the
           # job's 30 minute budget instead of silently eating it.
           jest_test_timeout: "600000"
-          # TEMPORARY: the two fabric-watch-blocks-* suites never terminate on
-          # their own - the connector emits the block but the client never
-          # receives it, so the subscription retries until the peer's Deliver
-          # stream limit is hit. Quarantined here so the rest of the directory
-          # can run green; removed in the follow-up commit that fixes the
-          # connector. Safe as a CLI override because jest.config.js's own
-          # testPathIgnorePatterns list contains nothing under fabric-v2-2-x.
-          jest_test_ignore: "/node_modules/|fabric-v2-2-x/fabric-watch-blocks-(delegated-sign-)?v1-endpoint\\.test\\.ts"
 
       - name: Upload coverage reports as artifacts
         if: ${{ inputs.run_code_coverage == 'true' }}
