@@ -57,6 +57,12 @@ concurrency:
 env:
   TRIAGE_WARN_LABEL: Triage_Warning
   TRIAGE_READY_LABEL: Triage_Ready
+  # Release PRs cut by the automated release job are exempt when the title
+  # starts with this prefix AND the PR carries this label. The label is the
+  # real guard: only maintainers/bots can apply labels, so a fork cannot
+  # self-exempt by naming its PR alone.
+  TRIAGE_RELEASE_LABEL: release
+  TRIAGE_RELEASE_TITLE_PREFIX: 'chore(release)'
   TRIAGE_WARN_LABEL_COLOR: d93b67
   TRIAGE_MARKER: '<!-- triage-bot -->'
   TRIAGE_CLOSE_AFTER_DAYS: '7'
@@ -78,6 +84,7 @@ jobs:
     runs-on: ubuntu-22.04
     permissions:
       issues: write
+      pull-requests: write
       contents: read
     steps:
       - name: Check triage-ready linkage and warn if missing
@@ -91,6 +98,8 @@ jobs:
             const CLOSE_AFTER_DAYS = Number(process.env.TRIAGE_CLOSE_AFTER_DAYS);
             const MAX_PAGES = Number(process.env.TRIAGE_MAX_PAGES);
             const BODY_MAX_BYTES = Number(process.env.TRIAGE_BODY_MAX_BYTES);
+            const RELEASE_LABEL = process.env.TRIAGE_RELEASE_LABEL;
+            const RELEASE_TITLE_PREFIX = process.env.TRIAGE_RELEASE_TITLE_PREFIX;
 
             const pr = context.payload.pull_request;
             if (!pr) {
@@ -114,6 +123,20 @@ jobs:
             const login = (pr.user && pr.user.login) || '';
             if (exemptAssoc.has(pr.author_association) || exemptBots.has(login)) {
               core.info(`Exempt author (${login}, ${pr.author_association}); skipping.`);
+              return;
+            }
+
+            // Release PRs cut by the automated release job are exempt: the
+            // title starts with the release prefix (e.g. `chore(release):
+            // publish vX.Y.Z`) AND the PR carries the release label.
+            // Requiring the label is the real guard — only maintainers/bots
+            // can apply labels, so an untrusted fork cannot self-exempt by
+            // just naming its PR `chore(release)`.
+            const isReleasePr =
+              (pr.title || '').startsWith(RELEASE_TITLE_PREFIX)
+              && (pr.labels || []).some(l => l.name === RELEASE_LABEL);
+            if (isReleasePr) {
+              core.info(`Release PR #${pr.number} (title + ${RELEASE_LABEL} label); skipping.`);
               return;
             }
 
