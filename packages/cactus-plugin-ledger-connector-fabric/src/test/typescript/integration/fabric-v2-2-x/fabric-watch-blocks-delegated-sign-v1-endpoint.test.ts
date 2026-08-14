@@ -15,6 +15,11 @@ const fabricEnvCAVersion = "1.4.9";
 const ledgerChannelName = "mychannel";
 const ledgerContractName = "basic";
 
+// How long a single watchBlocks subscription may go without delivering an
+// event before the test gives up. Well above the few seconds a healthy
+// subscription needs, far below jest.config.js's 1 hour testTimeout.
+const WATCH_BLOCK_EVENT_TIMEOUT_MS = 60_000;
+
 // Log settings
 const testLogLevel: LogLevelDesc = "info"; // default: info
 const sutLogLevel: LogLevelDesc = "info"; // default: info
@@ -242,7 +247,24 @@ describe("watchBlocksDelegatedSignV1 of fabric connector tests", () => {
     triggerTransactionCreation = true,
   ) {
     // Start monitoring
+    // Bound the wait explicitly. Without this the only thing that can end a
+    // subscription that never delivers is jest's testTimeout, which this repo
+    // sets to an hour - so a broken emitter shows up as a silent hang that
+    // consumes the whole CI job instead of a failure naming the block type.
     const monitorPromise = new Promise<void>((resolve, reject) => {
+      const eventDeadline = setTimeout(() => {
+        reject(
+          new Error(
+            `Timed out after ${WATCH_BLOCK_EVENT_TIMEOUT_MS} ms waiting for a '${type}' block event ` +
+              `(monitor '${monitorName}'). The connector accepted the subscription but never ` +
+              `delivered a block to the client.`,
+          ),
+        );
+      }, WATCH_BLOCK_EVENT_TIMEOUT_MS);
+      const settle = (fn: () => void) => {
+        clearTimeout(eventDeadline);
+        fn();
+      };
       const watchObservable = apiClient.watchBlocksDelegatedSignV1({
         channelName: ledgerChannelName,
         signerCertificate: adminIdentity.credentials.certificate,
@@ -256,17 +278,17 @@ describe("watchBlocksDelegatedSignV1 of fabric connector tests", () => {
           try {
             checkEventCallback(event);
             subscription.unsubscribe();
-            resolve();
+            settle(resolve);
           } catch (err) {
             log.error("watchBlocksDelegatedSignV1() event check error:", err);
             subscription.unsubscribe();
-            reject(err);
+            settle(() => reject(err));
           }
         },
         error(err) {
           log.error("watchBlocksDelegatedSignV1() error:", err);
           subscription.unsubscribe();
-          reject(err);
+          settle(() => reject(err));
         },
       });
     });

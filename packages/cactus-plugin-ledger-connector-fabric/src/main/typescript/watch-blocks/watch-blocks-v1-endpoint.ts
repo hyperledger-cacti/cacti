@@ -54,6 +54,31 @@ export interface IWatchBlocksV1EndpointConfiguration {
 }
 
 /**
+ * Convert a value into one that socket.io will send as a single JSON packet.
+ *
+ * socket.io inspects every outgoing payload for Buffer instances. If it finds
+ * any, it sends a *binary* packet: the JSON is emitted with each Buffer
+ * replaced by a `{_placeholder: true}` marker, followed by one attachment
+ * frame per Buffer, and the client only surfaces the event once it has
+ * reassembled all of them.
+ *
+ * A full or private Fabric BlockEvent carries ~27 Buffers (block header
+ * hashes, signatures, envelope payloads). Emitting one directly produced a
+ * packet the client never reassembled, so `WatchBlocksV1.Next` never fired,
+ * the subscription looked idle, and the client re-subscribed indefinitely -
+ * eventually exhausting the peer's `/protos.Deliver` concurrency limit.
+ * Filtered and the Cacti* block types were unaffected only because their
+ * payloads happen to contain no Buffers.
+ *
+ * Round-tripping through JSON replaces each Buffer with its plain
+ * `{type: "Buffer", data: [...]}` representation, which is what an HTTP client
+ * of this API would receive anyway, so the payload goes out as one JSON packet.
+ */
+function toSocketIoJsonSafe<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T;
+}
+
+/**
  * Endpoint to watch for new blocks on fabric ledger and report them
  * to client using socketio.
  */
@@ -154,9 +179,12 @@ export class WatchBlocksV1Endpoint {
       return;
     }
 
-    socket.emit(WatchBlocksV1.Next, {
-      fullBlock: blockEvent,
-    });
+    socket.emit(
+      WatchBlocksV1.Next,
+      toSocketIoJsonSafe({
+        fullBlock: blockEvent,
+      }),
+    );
   }
 
   /**
@@ -179,9 +207,12 @@ export class WatchBlocksV1Endpoint {
       return;
     }
 
-    socket.emit(WatchBlocksV1.Next, {
-      filteredBlock: blockEvent,
-    });
+    socket.emit(
+      WatchBlocksV1.Next,
+      toSocketIoJsonSafe({
+        filteredBlock: blockEvent,
+      }),
+    );
   }
 
   /**
@@ -204,9 +235,12 @@ export class WatchBlocksV1Endpoint {
       return;
     }
 
-    socket.emit(WatchBlocksV1.Next, {
-      privateBlock: blockEvent,
-    });
+    socket.emit(
+      WatchBlocksV1.Next,
+      toSocketIoJsonSafe({
+        privateBlock: blockEvent,
+      }),
+    );
   }
 
   /**
