@@ -18,8 +18,6 @@ github.com/google/pprof v0.0.0-20260402051712-545e8a4df936 h1:EwtI+Al+DeppwYX2oX
 github.com/google/pprof v0.0.0-20260402051712-545e8a4df936/go.mod h1:MxpfABSjhmINe3F1It9d+8exIHFvUqtLIRCdOGNXqiI=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1 h1:V8uHcUOLCdmSus18nAra6TqzCwCFfi5O2JRmXLxXmIw=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1/go.mod h1:/lseTq2zQDQEi6RyVWQCGSsmkiaL3F5bLz5ke/2BoG4=
 github.com/hyperledger/fabric-admin-sdk v0.2.0 h1:PVRDP5OuTwelfV38szFWwj6zU6aXzu8J2zXHThSGYOg=
 github.com/hyperledger/fabric-admin-sdk v0.2.0/go.mod h1:Eu8X6HDuQGXN+3eyzzQBLKoIhlkUeDyhKGdKeOwdGVM=
 github.com/hyperledger/fabric-gateway v1.12.0 h1:l73n0932yj+eifJBr5c3/cNjwORHAj3OCVcvD2pR+WE=
@@ -80,3 +78,5 @@ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0 h1:XcXMgOhXndZqmwhCImO9Yh4wGc98D4D7WnrCMdSkxwM=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0/go.mod h1:ZBs3JeqVDGnHS57rbe2A5RlCHHiz4VCUgFBz8VD9ehQ=

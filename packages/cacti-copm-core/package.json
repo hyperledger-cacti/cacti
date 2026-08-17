@@ -1,6 +1,6 @@
 {
   "name": "@hyperledger-cacti/cacti-copm-core",
-  "version": "3.0.0-beta.1",
+  "version": "3.0.0",
   "description": "Cacti Common Operators",
   "keywords": [
     "Hyperledger",
@@ -51,8 +51,8 @@
     "@bufbuild/buf": "1.30.0",
     "@bufbuild/protobuf": "1.10.0",
     "@connectrpc/connect": "1.4.0",
-    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "3.0.0-beta.1",
-    "@hyperledger-cacti/cactus-common": "3.0.0-beta.1"
+    "@hyperledger-cacti/cacti-weaver-sdk-fabric": "3.0.0",
+    "@hyperledger-cacti/cactus-common": "3.0.0"
   },
   "devDependencies": {
     "@bufbuild/protoc-gen-es": "1.8.0",

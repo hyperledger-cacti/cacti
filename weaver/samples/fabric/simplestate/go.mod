@@ -3,7 +3,7 @@ module github.com/hyperledger-cacti/cacti/weaver/samples/fabric/simplestate
 go 1.26
 
 require (
-	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20250322060009-aad136a8bda9
+	github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20260817182945-a8c093474763
 	github.com/hyperledger/fabric-chaincode-go v0.0.0-20230731094759-d626e9ab09b9
 	github.com/hyperledger/fabric-contract-api-go v1.2.2
 	github.com/stretchr/testify v1.11.1

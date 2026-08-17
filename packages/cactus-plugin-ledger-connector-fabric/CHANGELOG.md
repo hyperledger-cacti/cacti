@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-17)
+
+### Bug Fixes
+
+* **security:** resolve high-severity CodeQL code-scanning findings ([8898cd1](https://github.com/hyperledger-cacti/cacti/commit/8898cd1e66ac0f45872fc39ba0cc5c7695b19dce))
+
+### Features
+
+* **connector-fabric:** add CertDatastore.has() and .delete() methods ([fc575cc](https://github.com/hyperledger-cacti/cacti/commit/fc575cc6ec2ba34c55424920728cad888d01e3ca))
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes

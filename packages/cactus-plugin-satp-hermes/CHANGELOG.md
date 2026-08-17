@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-17)
+
+### Bug Fixes
+
+* **ci:** repair besu openapi validation and satp approve-address ([b15e264](https://github.com/hyperledger-cacti/cacti/commit/b15e26498d2482f1bd233448130923fc2b7888fe)), closes [#4670](https://github.com/hyperledger-cacti/cacti/issues/4670)
+* **satp-hermes:** add input validation to transact-handler-service ([3e6e2c2](https://github.com/hyperledger-cacti/cacti/commit/3e6e2c2e84ddbd0c9bdef34aeddbae737e875e6b))
+* **satp-hermes:** correct add-counterparty-gateway operationId ([78fd4f1](https://github.com/hyperledger-cacti/cacti/commit/78fd4f1e515fd98b258819aafb14623c8e3618be))
+* **satp-hermes:** destroy knex connection pools on shutdown ([43d93d8](https://github.com/hyperledger-cacti/cacti/commit/43d93d823ecbe0084b11c56bac3a8a5653860a42)), closes [#4185](https://github.com/hyperledger-cacti/cacti/issues/4185) [#4184](https://github.com/hyperledger-cacti/cacti/issues/4184)
+* **satp-hermes:** run DB migrations on startup for all repositories ([f479836](https://github.com/hyperledger-cacti/cacti/commit/f479836f17d3f9891680bd17ba370bd49b50ceab))
+* **satp-hermes:** stop leaking stack traces from admin endpoints ([fe3fa5f](https://github.com/hyperledger-cacti/cacti/commit/fe3fa5f2788e95654eb5f24bc075ffa181e70c7b))
+* **satp-hermes:** use createHttpError for audit 400 responses ([b3f3d71](https://github.com/hyperledger-cacti/cacti/commit/b3f3d71e05c2d8462e8f9a6d1917c84923296dd0)), closes [#4608](https://github.com/hyperledger-cacti/cacti/issues/4608)
+
+### Features
+
+* **satp-hermes:** add ERC6909 support ([07adf47](https://github.com/hyperledger-cacti/cacti/commit/07adf473edbf2e419133d8fbd1d5e9bfb51a2ded))
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes

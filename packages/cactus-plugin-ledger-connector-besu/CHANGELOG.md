@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-17)
+
+### Bug Fixes
+
+* **besu:** close WebSocket provider and complete txSubject on shutdown ([f8a4a98](https://github.com/hyperledger-cacti/cacti/commit/f8a4a989ecdb25f425afa4f895f6b8b8bceac65b)), closes [#4226](https://github.com/hyperledger-cacti/cacti/issues/4226) [#4238](https://github.com/hyperledger-cacti/cacti/issues/4238)
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes
