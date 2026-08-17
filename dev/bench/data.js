@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1786954937404,
+  "lastUpdate": 1786955225700,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -878,6 +878,35 @@ window.BENCHMARK_DATA = {
             "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
             "value": 578,
             "range": "±3.43%",
+            "unit": "ops/sec",
+            "extra": "181 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]",
+            "email": "49699333+dependabot[bot]@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "02beef640099bd22f0a357ccc165505d5c12d4a6",
+          "message": "build(deps): bump the gomod group across 3 directories with 3 updates\n\nBumps the gomod group with 1 update in the /weaver/common/protos-go directory: [google.golang.org/grpc](https://github.com/grpc/grpc-go).\nBumps the gomod group with 1 update in the /weaver/core/network/fabric-interop-cc/contracts/interop directory: [github.com/ethereum/go-ethereum](https://github.com/ethereum/go-ethereum).\nBumps the gomod group with 2 updates in the /weaver/sdks/fabric/go-sdk directory: [google.golang.org/grpc](https://github.com/grpc/grpc-go) and [github.com/hyperledger/fabric-gateway](https://github.com/hyperledger/fabric-gateway).\n\n\nUpdates `google.golang.org/grpc` from 1.82.1 to 1.83.0\n- [Release notes](https://github.com/grpc/grpc-go/releases)\n- [Commits](https://github.com/grpc/grpc-go/compare/v1.82.1...v1.83.0)\n\nUpdates `github.com/ethereum/go-ethereum` from 1.17.4 to 1.17.5\n- [Release notes](https://github.com/ethereum/go-ethereum/releases)\n- [Commits](https://github.com/ethereum/go-ethereum/compare/v1.17.4...v1.17.5)\n\nUpdates `google.golang.org/grpc` from 1.82.1 to 1.83.0\n- [Release notes](https://github.com/grpc/grpc-go/releases)\n- [Commits](https://github.com/grpc/grpc-go/compare/v1.82.1...v1.83.0)\n\nUpdates `github.com/hyperledger/fabric-gateway` from 1.11.0 to 1.12.0\n- [Release notes](https://github.com/hyperledger/fabric-gateway/releases)\n- [Changelog](https://github.com/hyperledger/fabric-gateway/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/hyperledger/fabric-gateway/compare/v1.11.0...v1.12.0)\n\n---\nupdated-dependencies:\n- dependency-name: google.golang.org/grpc\n  dependency-version: 1.83.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: gomod\n- dependency-name: github.com/ethereum/go-ethereum\n  dependency-version: 1.17.5\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n  dependency-group: gomod\n- dependency-name: google.golang.org/grpc\n  dependency-version: 1.83.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: gomod\n- dependency-name: github.com/hyperledger/fabric-gateway\n  dependency-version: 1.12.0\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n  dependency-group: gomod\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>",
+          "timestamp": "2026-08-11T08:51:16Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/02beef640099bd22f0a357ccc165505d5c12d4a6"
+        },
+        "date": 1786955223339,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 891,
+            "range": "±4.30%",
             "unit": "ops/sec",
             "extra": "181 samples"
           }
