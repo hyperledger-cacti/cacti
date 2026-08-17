@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-17)
+
+### Bug Fixes
+
+* **connector-ethereum:** prevent re-entrant HTTP polling ([10660e9](https://github.com/hyperledger-cacti/cacti/commit/10660e98874dc933ceab598aa2be494202fce7e5)), closes [#4198](https://github.com/hyperledger-cacti/cacti/issues/4198) [#4199](https://github.com/hyperledger-cacti/cacti/issues/4199)
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-17)
+
+### Bug Fixes
+
+* **api-server:** await all gRPC plugin registrations before bindAsync ([e5478e3](https://github.com/hyperledger-cacti/cacti/commit/e5478e3d18c91e43a48b67a6f7be1924f6776153)), closes [#4163](https://github.com/hyperledger-cacti/cacti/issues/4163) [#4162](https://github.com/hyperledger-cacti/cacti/issues/4162)
+* **cmd-api-server:** deprecate cockpitWwwRoot default path ([861cda8](https://github.com/hyperledger-cacti/cacti/commit/861cda845a6c51aa1b19250b17c89e11bf5f13b6)), closes [#4108](https://github.com/hyperledger-cacti/cacti/issues/4108)
+* **cmd-api-server:** make gRPC bind host configurable ([#4311](https://github.com/hyperledger-cacti/cacti/issues/4311)) ([42a45fe](https://github.com/hyperledger-cacti/cacti/commit/42a45fe4e1ba3c85715624bd350b94eddd81d91f))
+
 # [3.0.0-beta.1](https://github.com/hyperledger-cacti/cacti/compare/v2.1.0-alpha.1...v3.0.0-beta.1) (2026-06-22)
 
 ### Bug Fixes

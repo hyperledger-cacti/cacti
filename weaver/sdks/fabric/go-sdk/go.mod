@@ -16,7 +16,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0-beta.1
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0
 	github.com/hyperledger/fabric-protos-go-apiv2 v0.3.7 // indirect
 	github.com/miekg/pkcs11 v1.1.2 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
