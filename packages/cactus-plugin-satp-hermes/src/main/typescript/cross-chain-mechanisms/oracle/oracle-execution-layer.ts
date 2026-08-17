@@ -42,7 +42,7 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
    *
    * @param options - The options for configuring the OracleExecutionLayer instance.
    *
-   * @throws {ClaimFormatError} If the provided claim type is not supported by the bridge.
+   * @throws {ClaimFormatError} If the provided claim type is not supported by the oracle.
    */
   constructor(public readonly options: IOracleExecutionLayerOptions) {
     const label = OracleExecutionLayer.CLASS_NAME;
@@ -55,8 +55,10 @@ export class OracleExecutionLayer implements OracleExecutionLayer {
 
     this.claimType = options.claimType || ClaimFormat.DEFAULT;
 
-    if (!(this.claimType in options.oracleImpl.getSupportedClaimFormats())) {
-      throw new ClaimFormatError("Claim not supported by the bridge");
+    if (
+      !options.oracleImpl.getSupportedClaimFormats().includes(this.claimType)
+    ) {
+      throw new ClaimFormatError("Claim not supported by the oracle");
     }
     this.oracleImpl = options.oracleImpl;
   }
