@@ -178,5 +178,5 @@ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0 h1:XcXMgOhXndZqmwhCImO9Yh4wGc98D4D7WnrCMdSkxwM=
 github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0/go.mod h1:ZBs3JeqVDGnHS57rbe2A5RlCHHiz4VCUgFBz8VD9ehQ=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.0 h1:T5o01hMJDbc7ZluLQmBoIqLSj/3wkmaSf+bKT+yvCnQ=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.0 h1:0NMDfVixLK6+7WuuHc6vGMyM5lH2a1afKZBNTjQmyPc=
 github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.0/go.mod h1:PkkdLRPTOhnY3ubZ0OHLfjc3wwzqx4ZeC+rAMkmkEXc=
