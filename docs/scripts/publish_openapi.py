@@ -56,7 +56,18 @@ def get_openapi_files(root_dir):
 if not os.path.exists(json_dir):
     os.makedirs(json_dir)
 
-package_list_str = subprocess.run(["npx lerna ls --json"], shell=True, capture_output=True, text=True)
+# Use `yarn lerna` (not `npx lerna`): this repo uses Yarn Berry with
+# nodeLinker: pnpm, so npm's `npx` cannot resolve the workspace-managed
+# lerna-lite binary and returns empty output. `yarn lerna list --json`
+# is the same invocation the publish-npm workflow relies on.
+package_list_str = subprocess.run(
+    ["yarn", "lerna", "list", "--json"], capture_output=True, text=True
+)
+if package_list_str.returncode != 0 or not package_list_str.stdout.strip():
+    raise SystemExit(
+        f"'yarn lerna list --json' failed (exit {package_list_str.returncode}).\n"
+        f"stderr:\n{package_list_str.stderr}"
+    )
 package_list = json.loads(package_list_str.stdout)
 
 for package in package_list:

@@ -182,8 +182,10 @@ update_import_paths() {
     local base_import="$REPO/$dep_module"
     local old_import="${base_import}${old_dep_major_ver}"
     local new_import="${base_import}${NEW_MAJOR_VER}"
-    
-    # Only update if there's a change
+
+    # Update Go import paths only when the major version changed (.go files
+    # contain import paths but no version strings). Markdown is updated
+    # unconditionally below, so versions are normalized on same-major bumps too.
     if [ "$old_import" != "$new_import" ]; then
       echo "  Updating references: $old_import -> $new_import (version: $old_version -> $NORMALIZED_VERSION)"
       
@@ -202,26 +204,30 @@ update_import_paths() {
           rm -f "${file}.bak"
         fi
       done
-      
-      # Update markdown files (import paths AND version numbers)
-      for file in $md_files; do
-        if [ -f "$file" ]; then
-          sed -i.bak -E \
-            -e "s|${old_import} v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?|${new_import} v${NORMALIZED_VERSION}|g" \
-            -e "s|${old_import}/|${new_import}/|g" \
-            -e "s|${old_import}\"|${new_import}\"|g" \
-            -e "s|${old_import}\)|${new_import})|g" \
-            -e "s|${old_import}$|${new_import}|g" \
-            "$file"
-          
-          # Check if file was modified by comparing with backup
-          if ! cmp -s "$file" "${file}.bak" 2>/dev/null; then
-            echo "    Updated: $file"
-          fi
-          rm -f "${file}.bak"
-        fi
-      done
     fi
+
+    # Update markdown files ALWAYS (import paths AND version numbers). The
+    # version sed matches "$old_import v<ver>", which equals "$new_import
+    # v<ver>" on a same-major bump (e.g. v3.0.0-beta.1 -> v3.0.0), so it
+    # normalizes the version in both cases; README is part of the module zip
+    # hash. The path seds are no-ops when the major version is unchanged.
+    for file in $md_files; do
+      if [ -f "$file" ]; then
+        sed -i.bak -E \
+          -e "s|${old_import} v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?|${new_import} v${NORMALIZED_VERSION}|g" \
+          -e "s|${old_import}/|${new_import}/|g" \
+          -e "s|${old_import}\"|${new_import}\"|g" \
+          -e "s|${old_import}\)|${new_import})|g" \
+          -e "s|${old_import}$|${new_import}|g" \
+          "$file"
+
+        # Check if file was modified by comparing with backup
+        if ! cmp -s "$file" "${file}.bak" 2>/dev/null; then
+          echo "    Updated: $file"
+        fi
+        rm -f "${file}.bak"
+      fi
+    done
   done
 }
 

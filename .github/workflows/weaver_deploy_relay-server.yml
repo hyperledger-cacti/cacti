@@ -113,5 +113,5 @@ jobs:
         
       - name: Push latest tag
         if: ${{ env.RELAY_PUSH == 'true' }}
-        run: (cat out | grep "exists") || make push-server-latest DOCKER_REGISTRY=${DOCKER_REGISTRY}
+        run: make push-server-latest DOCKER_REGISTRY=${DOCKER_REGISTRY}
         working-directory: weaver/core/relay
