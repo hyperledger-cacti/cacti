@@ -1,0 +1,28 @@
+---
+title: Level 2 - API Server with Plugins
+---
+sequenceDiagram
+    participant App as Your App<br/>(Python/Java/Go)
+    participant API as Cacti API Server<br/>(Docker Container)
+    participant Conn as Connector Plugin
+    participant KC as Keychain Plugin
+    participant BC as Blockchain Network
+
+    App->>API: REST POST /invoke-contract
+    activate API
+    API->>KC: Get signing credentials
+    activate KC
+    KC-->>API: Credentials
+    deactivate KC
+    API->>Conn: invokeContract(request)
+    activate Conn
+    Conn->>BC: JSON-RPC Call
+    activate BC
+    BC-->>Conn: Transaction Result
+    deactivate BC
+    Conn-->>API: Response
+    deactivate Conn
+    API-->>App: HTTP 200 + JSON
+    deactivate API
+
+    Note over App,BC: Your app uses REST API.<br/>Cacti runs as a containerized service.
