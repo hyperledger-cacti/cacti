@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.1](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0...v3.0.1) (2026-08-20)
+
+### Bug Fixes
+
+* **connector-fabric:** send full/private blocks as JSON not binary ([ff89c40](https://github.com/hyperledger-cacti/cacti/commit/ff89c40e9637d590830f56bc800fadf6489e519c)), closes [#4472](https://github.com/hyperledger-cacti/cacti/issues/4472)
+
 # [3.0.0](https://github.com/hyperledger-cacti/cacti/compare/v3.0.0-beta.1...v3.0.0) (2026-08-17)
 
 ### Bug Fixes

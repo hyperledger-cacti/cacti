@@ -83,8 +83,8 @@ Below, we list the template functions with sample code that you, as a developer,
   ```go
   require(
       ...
-      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0
-      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.0
+      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.1
+      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/assetexchange/v3 v3.0.1
       ...
   )
   ```
@@ -176,8 +176,8 @@ Below, we list the template functions with sample code that you, as a developer,
   ```go
   require(
       ...
-      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0
-      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0
+      github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.1
+      github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.1
       ...
   )
   ```
@@ -536,7 +536,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   RELAY_PORT=<relay-server-port/"port" in config.toml>
   EXTERNAL_NETWORK=<docker-bridge-network>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-relay-server
-  DOCKER_TAG=3.0.0
+  DOCKER_TAG=3.0.1
   ```
     - The `PATH_TO_CONFIG` variable should point to the properties file typically named `config.toml` (you can name this whatever you wish). See further below for instructions to write this file.
     - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
@@ -630,7 +630,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   EXTERNAL_NETWORK=<docker-bridge-network>
   TLS_CREDENTIALS_DIR=<dir-with-tls-cert-and-key>
   DOCKER_IMAGE_NAME=ghcr.io/hyperledger-cacti/cacti-weaver-driver-fabric
-  DOCKER_TAG=3.0.0
+  DOCKER_TAG=3.0.1
   DRIVER_TLS=<true|false>
   DRIVER_TLS_CERT_PATH=path_to_tls_cert_pem_for_driver
   DRIVER_TLS_KEY_PATH=path_to_tls_key_pem_for_driver

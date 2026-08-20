@@ -34,8 +34,8 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/certificate-transparency-go v1.1.7 // indirect
 	github.com/google/uuid v1.6.0 // indirect
-	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0
-	github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v3 v3.0.0
+	github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.1
+	github.com/hyperledger-cacti/cacti/weaver/sdks/fabric/go-sdk/v3 v3.0.1
 	github.com/hyperledger/fabric-config v0.0.5 // indirect
 	github.com/hyperledger/fabric-lib-go v1.0.0 // indirect
 	github.com/hyperledger/fabric-protos-go v0.3.7 // indirect
