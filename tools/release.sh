@@ -20,7 +20,7 @@ function release() {
     if [ $? -ne 0 ]; then return 1; fi
     yarn run configure
     if [ $? -ne 0 ]; then return 1; fi
-    yarn lerna version $VERSION --ignore-scripts --conventional-commits --exact --git-remote upstream --message="chore(release): publish %s" --no-push --no-git-tag-version --no-ignore-changes
+    yarn lerna version $VERSION --ignore-scripts --conventional-commits --exact --git-remote upstream --message="chore(release): publish %s" --no-push --no-git-tag-version --force-publish
     if [ $? -ne 0 ]; then return 1; fi
     yarn tools:bump-openapi-spec-dep-versions --target-version=$VERSION
     if [ $? -ne 0 ]; then return 1; fi

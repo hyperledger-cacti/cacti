@@ -47,8 +47,8 @@ github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/hashicorp/hcl v1.0.0/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20260817182945-a8c093474763 h1:NK+vp0sgq2muFCXhYCDchjuMmZBuMmZxylBGCVDz3AM=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20260817182945-a8c093474763/go.mod h1:kxQfH8cva+B1FOBxM8eEW0S8mzV/3D91svgceB38BQc=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20260820100610-dd06c2f6b968 h1:53LEIrUiDPNLVqEQM3eDL9XKm6nf34p6hyFOa4+EgRE=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/libs/testutils v0.0.0-20260820100610-dd06c2f6b968/go.mod h1:kxQfH8cva+B1FOBxM8eEW0S8mzV/3D91svgceB38BQc=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230731094759-d626e9ab09b9 h1:XV1mxAmExeWraP5AmBSB1v415jMCSFJ087dRUiI6f6o=
 github.com/hyperledger/fabric-chaincode-go v0.0.0-20230731094759-d626e9ab09b9/go.mod h1:WEd2Rlyj47/8b0VvH/zYPKamLdU3hg7jWqV8XEBTLOk=
 github.com/hyperledger/fabric-contract-api-go v1.2.2 h1:zun9/BmaIWFSSOkfQXikdepK0XDb7MkJfc/lb5j3ku8=
@@ -176,7 +176,7 @@ gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C
 gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
 gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0 h1:XcXMgOhXndZqmwhCImO9Yh4wGc98D4D7WnrCMdSkxwM=
-github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.0/go.mod h1:ZBs3JeqVDGnHS57rbe2A5RlCHHiz4VCUgFBz8VD9ehQ=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0 h1:wJxGH/+Twzam7aaUlTWKn2Kv4hrUR7OHLVq8NvZO4oY=
-github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.0/go.mod h1:aoklkGQ4Ng465l4a4JIm9WhpS65qh5kJ+3a9CH85eLQ=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.1 h1:FjgSANtIjOL+p/PZEHCSuiQmU+VQznwJ2pvk5QdUb1A=
+github.com/hyperledger-cacti/cacti/weaver/common/protos-go/v3 v3.0.1/go.mod h1:ZBs3JeqVDGnHS57rbe2A5RlCHHiz4VCUgFBz8VD9ehQ=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.1 h1:FLFNydGn6AbfYY3kx49IBer8uciu5yr2YRYfmt+0XME=
+github.com/hyperledger-cacti/cacti/weaver/core/network/fabric-interop-cc/interfaces/asset-mgmt/v3 v3.0.1/go.mod h1:FDKbpON31bdpultERgu9uuNJZH0cn5At0klK7hg7jA4=

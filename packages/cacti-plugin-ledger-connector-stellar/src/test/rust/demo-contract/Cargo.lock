@@ -641,7 +641,7 @@ checksum = "bf151400ff0baff5465007dd2f3e717f3fe502074ca563069ce3a6629d07b289"
 
 [[package]]
 name = "hello-world"
-version = "3.0.0"
+version = "3.0.1"
 dependencies = [
  "soroban-sdk",
 ]
