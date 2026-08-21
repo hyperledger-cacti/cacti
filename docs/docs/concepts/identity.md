@@ -1,6 +1,6 @@
 ---
-id: decentralized-identity
-title: Decentralized Identity
+id: identity
+title: Identity
 ---
 
 <!--

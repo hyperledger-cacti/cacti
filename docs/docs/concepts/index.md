@@ -11,4 +11,4 @@ and executed.
 | **Data Sharing** | Querying and verifying ledger state across networks without asset movement. | [Data Sharing](./data-sharing.md) |
 | **Connector (or Driver)** | Plugin that abstract interaction for specific network. | [Connector](./connector.md) |
 | **Relay Architecture** | A protocol-neutral message routing layer that connects heterogeneous networks without shared middleware. | [Relay](./relay.md) |
-| **Identity Management** | Establishing trust and verifying membership across independently governed networks. | [Decentralized Identity](./identity.md) |
+| **Identity Management** | Establishing trust and verifying membership across independently governed networks. | [Identity](./identity.md) |
