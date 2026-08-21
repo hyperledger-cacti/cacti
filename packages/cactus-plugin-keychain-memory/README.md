@@ -1,4 +1,75 @@
-# `@hyperledger/cactus-plugin-keychain-memory`
+# `@hyperledger-cacti/cactus-plugin-keychain-memory`
+
+> In-memory keychain plugin for development and testing.
+
+## Overview
+
+This package implements the Cacti keychain plugin interfaces with a `Map`-backed
+store. It supports direct plugin calls, OpenAPI web services, and ConnectRPC
+services for setting, retrieving, checking, and deleting keychain entries.
+
+The plugin stores values as plain text and provides no encryption or persistent
+storage. Do not use it to hold production secrets.
+
+**Target Audience:**
+
+- [x] Developers
+- [ ] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-keychain-memory
+```
+
+## Configuration
+
+The `IPluginKeychainMemoryOptions` interface accepts the following options:
+
+| Option | Required | Default | Description |
+| --- | --- | --- | --- |
+| `instanceId` | Yes | None | Unique identifier for this plugin instance. |
+| `keychainId` | Yes | None | Logical identifier for the keychain. |
+| `logLevel` | No | `"INFO"` | Plugin log level. |
+| `backend` | No | New empty `Map` | Initial in-memory key-value store. |
+| `prometheusExporter` | No | New exporter instance | Prometheus exporter used by the plugin. |
+| `observabilityBufferSize` | No | `1` | Replay buffer size for keychain operation events. |
+| `observabilityTtlSeconds` | No | `1` | Replay window for keychain operation events. |
+
+## API Summary
+
+The plugin implements `IPluginKeychain`, `IPluginWebService`, and
+`IPluginCrpcService`. Its primary operations are:
+
+- `set()` to store a value under a key
+- `get()` to retrieve a value
+- `has()` to check whether a key exists
+- `delete()` to remove a key
+- `getPrometheusMetricsV1()` to retrieve Prometheus metrics
+
+The HTTP API is defined in the
+[OpenAPI specification](./src/main/json/openapi.json). Generated TypeScript
+Axios client code is available under
+[`src/main/typescript/generated/openapi/typescript-axios/`](./src/main/typescript/generated/openapi/typescript-axios/).
+
+## Usage
+
+```typescript
+import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-memory";
+
+const keychain = new PluginKeychainMemory({
+  instanceId: "keychain-memory-instance",
+  keychainId: "development-keychain",
+  logLevel: "INFO",
+});
+
+await keychain.set("example-key", "example-value");
+
+const value = await keychain.get("example-key");
+const isPresent = await keychain.has("example-key");
+
+await keychain.delete("example-key");
+```
 
 ## Prometheus Exporter
 
@@ -39,3 +110,23 @@ This file contains functions encasing the logic to process the data points
 
 ###### metrics.ts
 This file lists all the prometheus metrics and what they are used for.
+
+## Testing
+
+From the repository root, run the package tests with:
+
+```sh
+yarn test:jest:all packages/cactus-plugin-keychain-memory/src/test/typescript
+```
+
+The test suite covers the direct plugin API, generated API client, API surface,
+and observability behavior.
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+
+## License
+
+This distribution is published under the Apache License Version 2.0 found in
+the [LICENSE](../../LICENSE) file.

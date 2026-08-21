@@ -7,8 +7,8 @@
 
 <div align="center">
 
-[![Data Sharing Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_data-sharing.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_data-sharing.yml) [![Asset Transfer Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-transfer.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-transfer.yml)  
-[![Fabric Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-fabric.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-fabric.yml) [![Corda Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-corda.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-corda.yml) [![Besu Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-besu.yml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_asset-exchange-besu.yml)
+[![Data Sharing Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-data-sharing.yaml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-data-sharing.yaml) [![Asset Transfer Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-transfer.yaml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-transfer.yaml)
+[![Fabric Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-exchange-fabric.yaml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-exchange-fabric.yaml) [![Corda Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-exchange-corda.yaml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-exchange-corda.yaml) [![Besu Asset Exchange Status](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-exchange-besu.yaml/badge.svg?event=push)](https://github.com/hyperledger-cacti/cacti/actions/workflows/test_weaver-asset-exchange-besu.yaml)
 
 </div>
 
@@ -22,19 +22,19 @@ Weaver is a framework, with a family of protocols, to enable interoperation for 
 ## Weaver Use Cases
 The framework allows two independent networks built on the same or different DLTs to interoperate on a need basis. Though presently, Weaver supports only permissioned DLTs (Hyperledger Fabric, Corda, and to some extent Hyperledger Besu), the design encompasses both permissioned and open DLTs. We expect to add support to the latter (e.g., Ethereum, Bitcoin) in due course.
 
-Weaver, in effect, allows smart contracts managing data and assets on their respective ledgers to interlink and thereby produce an augnmented business workflow that can span multiple shared ledgers and networks. The core capabilities (or use cases) in Weaver that are the building blocks for cross-network operations are:
+Weaver, in effect, allows smart contracts managing data and assets on their respective ledgers to interlink and thereby produce an augmented business workflow that can span multiple shared ledgers and networks. The core capabilities (or use cases) in Weaver that are the building blocks for cross-network operations are:
 - Data sharing across ledgers with proof of authenticity and provenance
 - Atomic asset transfers between networks
 - Atomic asset exchanges in multiple networks
 
 Each capability is implemented as a protocol with the endpoints being the respective peer networks that arrive at ledger state update decisions through consensus. See the [project overview](./OVERVIEW.md) for more information and references.
 
-With Weaver, limited-scope blockchain networks can be scaled up to a _network-of-networks_ where different DLT networks can interoperate using Weaver's protocols ad hoc, thereby creating an illusion of a worldwide distributed ledger (or blockchain) without requiring netowrks to sacrifice their independence. This is illustrated in the figure below.
+With Weaver, limited-scope blockchain networks can be scaled up to a _network-of-networks_ where different DLT networks can interoperate using Weaver's protocols ad hoc, thereby creating an illusion of a worldwide distributed ledger (or blockchain) without requiring networks to sacrifice their independence. This is illustrated in the figure below.
 
 <img src="./resources/images/weaver-vision.png">
 
 ## Weaver Components
-The framework offers common components that can be reused in networks built on any arbitrary DLT as well as design templates for components that must be built on DLT-specific tech stacks. We will strive to provide acclerators that minimize the effort involved in building DLT-specific components. Presently, we support Hyperledger Fabric and Corda, and to some extent Hyperledger Besu.
+The framework offers common components that can be reused in networks built on any arbitrary DLT as well as design templates for components that must be built on DLT-specific tech stacks. We will strive to provide accelerators that minimize the effort involved in building DLT-specific components. Presently, we support Hyperledger Fabric and Corda, and to some extent Hyperledger Besu.
 - The key platform elements are:
   * Protocol units, namely request access control, generation and verification of ledger state authenticity proofs, hash- and time-locking of assets, and claiming and unlocking of assets. These units leverage the networks' native smart contract frameworks.
   * Generic and extensible patterns for _ledger views_ and _view addresses_ for seamless inter-network communication. Our goal is to provide a basis for an eventual standard that is not tied to a particular DLT implementation.

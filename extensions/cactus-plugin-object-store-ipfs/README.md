@@ -1,9 +1,27 @@
-# `@hyperledger/cactus-plugin-object-store-ipfs`
+# `@hyperledger-cacti/cactus-plugin-object-store-ipfs`
 
-This plugin provides `Cactus` a way to interact with IPFS networks. Using this we can perform:
+## Overview
+
+This plugin provides Cacti with an IPFS-backed implementation of the object
+store plugin interface. It can:
+
 - Insert objects in the IPFS network.
 - Retrieve objects from the IPFS network.
 - Check existence of an object in the IPFS network.
+
+The plugin namespaces stored objects under a configured parent directory and
+accepts either Kubo RPC client options or an initialized compatible client.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-object-store-ipfs
+```
 
 ## Summary
 
@@ -21,23 +39,44 @@ your local machine for development and testing purposes.
 
 ### Prerequisites
 
-In the root of the project to install the dependencies execute the command:
+From the repository root, install dependencies and build the project:
+
 ```sh
-npm run configure
+yarn run configure
 ```
 
 ### Compiling
 
-In the project root folder, run this command to compile the plugin and create the dist directory:
+Compile the TypeScript project from the repository root:
+
 ```sh
-npm run tsc
+yarn run tsc
 ```
 
 ## Architecture
 
->TODO
+The plugin implements `IPluginObjectStore` and uses `kubo-rpc-client` to
+communicate with an IPFS node. The `parentDir` option provides a namespace for
+all keys handled by a plugin instance. Web service endpoints delegate to the
+same `get`, `has`, and `set` operations exposed by the plugin class.
+
+## Configuration
+
+| Option | Required | Default | Description |
+| --- | --- | --- | --- |
+| `instanceId` | Yes | None | Unique identifier for the plugin instance. |
+| `parentDir` | Yes | None | IPFS directory used to namespace object keys. |
+| `ipfsClientOrOptions` | Yes | None | Kubo RPC client options or a compatible initialized client. |
+| `logLevel` | No | `"INFO"` | Plugin log level. |
+
+## API Summary
+
 ### API Endpoints
-This plugin uses OpenAPI to generate the API paths. There are three endpoints defined for each operation supported (get, set, has).
+
+The plugin defines OpenAPI endpoints for the three supported object-store
+operations: `get`, `has`, and `set`. See the
+[OpenAPI specification](./src/main/json/openapi.json) for request and response
+schemas.
 
 ## Usage
 
@@ -96,12 +135,21 @@ const isPresent = response.data.isPresent;
 const timestamp = response.data.checkedAt;
 ```
 
-## Contributing
-We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
+## Testing
 
-Please review [CONTRIBUTING.md](https://github.com/hyperledger/cactus/blob/main/CONTRIBUTING.md "CONTRIBUTING.md") to get started.
+From the repository root, run the tracked package tests with:
+
+```sh
+yarn test:jest:all extensions/cactus-plugin-object-store-ipfs/src/test/typescript
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
 
 ## License
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.
+
+This distribution is published under the Apache License Version 2.0 found in
+the [LICENSE](../../LICENSE) file.
 
 ## Acknowledgments

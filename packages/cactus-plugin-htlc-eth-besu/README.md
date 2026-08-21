@@ -1,4 +1,23 @@
-# @hyperledger/cactus-plugin-htlc-eth-besu
+# `@hyperledger-cacti/cactus-plugin-htlc-eth-besu`
+
+## Overview
+
+This plugin deploys and operates hash time-locked contracts on Besu through a registered Cacti Besu ledger connector.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-htlc-eth-besu
+```
+
+## API Summary
+
+The public API exports the HTLC plugin, its factory and options, generated OpenAPI client types, and contract artifacts. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
 
 Allows `Cacti` to interact with HTLC contract manager. 
 
@@ -12,7 +31,7 @@ Allows `Cacti` to interact with HTLC contract manager.
   - [License](#license)
 
 
-## Getting Started
+## Usage
 The smart contracts and rationalle ane explained in detail in <a href=https://medium.com/@rafaelbelchior/dlt-interoperability-and-more-%EF%B8%8F-24-privacy-preserving-cross-chain-atomic-swaps-bonus-lets-ff99a90714de> this Medium article </a>.
 
 These instructions will get you a copy of the project up and running on
@@ -26,7 +45,7 @@ Steps to compile the project: `forge build`.
 
 
 
-## Running the tests
+## Testing
 
 The tests can be found in @hyperledger/cactus-test-htlc-eth-besu. To run this, in the root project execute:
 

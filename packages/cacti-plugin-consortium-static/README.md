@@ -1,5 +1,32 @@
 # `@hyperledger-cacti/cacti-plugin-consortium-static`
 
+## Overview
+
+This plugin provides a static consortium repository with authenticated node enrollment, shared consortium metadata, and an experimental policy model. It does not implement consensus or reliable broadcast between consortium nodes.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cacti-plugin-consortium-static
+```
+
+## Configuration
+
+Configure the local node, member identity, ledgers, plugin instances, organization public keys, consortium nodes, shared package configuration, and optional root policy group through `IPluginConsortiumStaticOptions`.
+
+## API Summary
+
+The public API exports `PluginConsortiumStatic`, its factory and options, `StaticConsortiumProvider`, generated OpenAPI client types, consortium endpoints, policy-model types, token utilities, and Prometheus metric names. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
+
+## Usage
+
+The integration tests under [`src/test/typescript/integration/`](./src/test/typescript/integration/) demonstrate plugin construction, authenticated node enrollment, and repository updates.
+
 ## Cacti Consortium Static
 
 This plugin is an improvement of the package /cactus-plugin-consortium-manual ,bringing some new features to the table while conserving the possibility to be used as the old one (not allowing runtime changes)
@@ -52,3 +79,20 @@ The model is in an early stage, and serves only as a POC for now. The goal is to
 ## Notes
 
 For usage, check the tests in the /integration folder
+
+## Testing
+
+From the repository root, run:
+
+```sh
+yarn test:jest:all packages/cacti-plugin-consortium-static/src/test/typescript
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+
+## License
+
+This distribution is published under the Apache License Version 2.0 found in
+the [LICENSE](../../LICENSE) file.
