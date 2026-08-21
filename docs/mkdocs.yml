@@ -89,12 +89,18 @@ extra:
 nav:
   - Overview:
     - Introduction: index.md
+    - Start Here: start-here.md
     - Vision: vision.md
     - Architecture: architecture.md
     - Key Concepts:
       - Overview: concepts/index.md
+      - Asset Exchange: concepts/asset-exchange.md
+      - Asset Transfer: concepts/asset-transfer.md
       - Data Sharing: concepts/data-sharing.md
-    - Start Here: start-here.md
+      - Relay: concepts/relay.md
+      - Connector: concepts/connector.md
+      - Identity: concepts/identity.md
+    - Use Cases: use-cases.md
   - Platforms:
     - Cactus:
       - Introduction: cactus/introduction.md
