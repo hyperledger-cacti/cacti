@@ -86,5 +86,10 @@ jobs:
         run: 'python3 docs/scripts/publish_openapi.py'
         
       - name: Build and publish
-        run: git pull && mkdocs gh-deploy
+        # NOTE: no `git pull` here. This workflow is triggered by tag pushes, so
+        # actions/checkout leaves us in detached-HEAD state; `git pull` would fail
+        # with "You are not currently on a branch". `mkdocs gh-deploy` manages the
+        # gh-pages branch on its own (force-pushes via ghp-import), so it needs no
+        # pull of the source ref.
+        run: mkdocs gh-deploy
         working-directory: docs
