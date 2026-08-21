@@ -85,108 +85,126 @@ extra:
   version:
     provider: mike
 nav:
-  - Introduction: index.md
-  - Vision: vision.md
-  - Architecture: architecture.md
-  - Key Concepts:
-    - Data Sharing: concepts/data-sharing.md
-  - Use Cases: use-cases.md
-  - Cactus:
-    - Introduction: cactus/introduction.md
-    - Building: cactus/build.md
-    - Examples:
-      - Overview: cactus/examples.md
-      - Supply Chain Application: cactus/examples/supply-chain-app.md
-    - Governance: cactus/governance.md
-    - Code of Conduct: cactus/code-of-conduct.md
-    - Contributing: cactus/contributing.md
-    - Whitepaper: cactus/whitepaper.md
-    - Regulatory and Industry Initiatives: cactus/regulatory-and-industry-initiatives-reading-list.md
-    - Packages: cactus/packages.md
-    - Ledger Browser:
-      - Overview:  cactus/ledger-browser/overview.md
-      - Setup:  cactus/ledger-browser/setup.md
-      - Plugin Apps:
-        - App Patterns:  cactus/ledger-browser/plugin-apps/app-patterns.md
-        - Ethereum Browser:  cactus/ledger-browser/plugin-apps/ethereum-browser.md
-        - Hyperledger Fabric Browser:  cactus/ledger-browser/plugin-apps/fabric-browser.md
-      - Developer Guide:
-        - Overview:  cactus/ledger-browser/developer-guide/overview.md
-        - Architecture:  cactus/ledger-browser/developer-guide/architecture.md
-        - Tutorial:  cactus/ledger-browser/developer-guide/tutorial.md
-    - Ledger Support:
-      - Overview: cactus/support.md
-      - Hyperledger Besu: cactus/support/besu.md
-      - R3 Corda: cactus/support/corda.md
-      - Hyperledger Fabric: cactus/support/fabric.md
-      - Hyperledger Iroha: cactus/support/iroha.md
-  - Weaver:
-    - Framework: weaver/introduction.md
-    - Getting Started:
-      - Using Weaver: weaver/getting-started/guide.md
-      - Launching a Test Network:
-        - Component Overview: weaver/getting-started/test-network/overview.md
-        - Setup with Locally Built Weaver Components: weaver/getting-started/test-network/setup-local.md
-        - Setup with Locally Built Dockerized Weaver Components: weaver/getting-started/test-network/setup-local-docker.md
-        - Setup with Imported Weaver Components: weaver/getting-started/test-network/setup-packages.md
-        - Setup with Imported Dockerized Weaver Components: weaver/getting-started/test-network/setup-packages-docker.md
-        - Ledger Initialization: weaver/getting-started/test-network/ledger-initialization.md
-        - Advanced Configuration: weaver/getting-started/test-network/advanced-configuration.md
-      - Testing Interoperation Modes:
-        - Overview: weaver/getting-started/interop/overview.md
-        - Data Sharing: weaver/getting-started/interop/data-sharing.md
-        - Asset Exchange:
-          - Overview: weaver/getting-started/interop/asset-exchange/overview.md
-          - Fabric with Fabric: weaver/getting-started/interop/asset-exchange/fabric-fabric.md
-          - Fabric with Corda: weaver/getting-started/interop/asset-exchange/fabric-corda.md
-          - Fabric with Besu: weaver/getting-started/interop/asset-exchange/fabric-besu.md
-          - Corda with Corda: weaver/getting-started/interop/asset-exchange/corda-corda.md
-          - Corda with Besu: weaver/getting-started/interop/asset-exchange/corda-besu.md
-          - Besu with Besu: weaver/getting-started/interop/asset-exchange/besu-besu.md
-        - Asset Transfer: weaver/getting-started/interop/asset-transfer.md
-      - Enabling Weaver in your Network and Application:
-        - Overview: weaver/getting-started/enabling-weaver-network/overview.md
-        - Hyperledger Fabric: weaver/getting-started/enabling-weaver-network/fabric.md
-        - R3 Corda: weaver/getting-started/enabling-weaver-network/corda.md
-        - Hyperledger Besu: weaver/getting-started/enabling-weaver-network/besu.md
-    - What is Interoperability?:
-      - Understanding Interoperability: weaver/what-is-interoperability/understanding-interoperability.md
-      - Levels of Interoperability: weaver/what-is-interoperability/levels-of-interoperability.md
-      - Integration Patterns: weaver/what-is-interoperability/integration-patterns.md
-    - Interoperability Modes: weaver/interoperability-modes.md
-    - Design Principles: weaver/design-principles.md
-    - User Stories:
-      - Overview: weaver/user-stories/overview.md
-      - Global Trade: weaver/user-stories/global-trade.md
-      - DvP in Financial Markets: weaver/user-stories/financial-markets.md
-      - Legacy Integration: weaver/user-stories/legacy-integration.md
-    - Architecture and Design:
-      - Overview: weaver/architecture-and-design/overview.md
-      - Relay: weaver/architecture-and-design/relay.md
-      - Drivers: weaver/architecture-and-design/drivers.md
-      - Weaver DApps: weaver/architecture-and-design/weaver-dapps.md
-      - Decentralized Identity: weaver/architecture-and-design/decentralized-identity.md
-    - Security Model:
-      - Authentication: weaver/security-model/authentication.md
-      - Access Control: weaver/security-model/access-control.md
-      - Proofs and Verification: weaver/security-model/proofs-and-verification.md
-      - End-to-End Security: weaver/security-model/end-to-end-security.md
-    - Deployment Considerations:
-      - Deployment Patterns: weaver/deployment-considerations/deployment-patterns.md
-      - Governance and Policies: weaver/deployment-considerations/governance-and-policies.md
-      - Legal and Regulation: weaver/deployment-considerations/legal-and-regulation.md
-    - Specifications: weaver/specifications.md
-    - Roadmap: weaver/roadmap.md
-    - Publications: weaver/publications.md
-  - SATP Hermes:
-    - Architecture: satp-hermes/architecture/satp-hermes.md
-  - Guides:
-    - Getting Started: guides/getting-started.md
-    - Nix Setup: guides/nix-setup.md
-    - Operations: guides/operations.md
-    - Developers: guides/developers.md
-    - Upgrading: guides/upgrading.md
-  - References:
+  - Overview:
+    - Introduction: index.md
+    - Start Here: start-here.md
+    - Vision: vision.md
+    - Architecture: architecture.md
+    - Key Concepts:
+      - Overview: concepts/index.md
+      - Data Sharing: concepts/data-sharing.md
+    - Use Cases: use-cases.md
+  - Platforms:
+    - Cactus:
+      - Introduction: cactus/introduction.md
+      - Building: cactus/build.md
+      - Examples:
+        - Overview: cactus/examples.md
+        - Supply Chain Application: cactus/examples/supply-chain-app.md
+      - Governance: cactus/governance.md
+      - Code of Conduct: cactus/code-of-conduct.md
+      - Contributing: cactus/contributing.md
+      - Whitepaper: cactus/whitepaper.md
+      - Regulatory and Industry Initiatives: cactus/regulatory-and-industry-initiatives-reading-list.md
+      - Packages: cactus/packages.md
+      - Ledger Browser:
+        - Overview: cactus/ledger-browser/overview.md
+        - Setup: cactus/ledger-browser/setup.md
+        - Plugin Apps:
+          - App Patterns: cactus/ledger-browser/plugin-apps/app-patterns.md
+          - Ethereum Browser: cactus/ledger-browser/plugin-apps/ethereum-browser.md
+          - Hyperledger Fabric Browser: cactus/ledger-browser/plugin-apps/fabric-browser.md
+        - Developer Guide:
+          - Overview: cactus/ledger-browser/developer-guide/overview.md
+          - Architecture: cactus/ledger-browser/developer-guide/architecture.md
+          - Tutorial: cactus/ledger-browser/developer-guide/tutorial.md
+      - Ledger Support:
+        - Overview: cactus/support.md
+        - Hyperledger Besu: cactus/support/besu.md
+        - R3 Corda: cactus/support/corda.md
+        - Hyperledger Fabric: cactus/support/fabric.md
+        - Hyperledger Iroha: cactus/support/iroha.md
+    - Weaver:
+      - Framework: weaver/introduction.md
+      - Getting Started:
+        - Using Weaver: weaver/getting-started/guide.md
+        - Launching a Test Network:
+          - Component Overview: weaver/getting-started/test-network/overview.md
+          - Setup with Locally Built Weaver Components: weaver/getting-started/test-network/setup-local.md
+          - Setup with Locally Built Dockerized Weaver Components: weaver/getting-started/test-network/setup-local-docker.md
+          - Setup with Imported Weaver Components: weaver/getting-started/test-network/setup-packages.md
+          - Setup with Imported Dockerized Weaver Components: weaver/getting-started/test-network/setup-packages-docker.md
+          - Ledger Initialization: weaver/getting-started/test-network/ledger-initialization.md
+          - Advanced Configuration: weaver/getting-started/test-network/advanced-configuration.md
+        - Testing Interoperation Modes:
+          - Overview: weaver/getting-started/interop/overview.md
+          - Data Sharing: weaver/getting-started/interop/data-sharing.md
+          - Asset Exchange:
+            - Overview: weaver/getting-started/interop/asset-exchange/overview.md
+            - Fabric with Fabric: weaver/getting-started/interop/asset-exchange/fabric-fabric.md
+            - Fabric with Corda: weaver/getting-started/interop/asset-exchange/fabric-corda.md
+            - Fabric with Besu: weaver/getting-started/interop/asset-exchange/fabric-besu.md
+            - Corda with Corda: weaver/getting-started/interop/asset-exchange/corda-corda.md
+            - Corda with Besu: weaver/getting-started/interop/asset-exchange/corda-besu.md
+            - Besu with Besu: weaver/getting-started/interop/asset-exchange/besu-besu.md
+          - Asset Transfer: weaver/getting-started/interop/asset-transfer.md
+        - Enabling Weaver in your Network and Application:
+          - Overview: weaver/getting-started/enabling-weaver-network/overview.md
+          - Hyperledger Fabric: weaver/getting-started/enabling-weaver-network/fabric.md
+          - R3 Corda: weaver/getting-started/enabling-weaver-network/corda.md
+          - Hyperledger Besu: weaver/getting-started/enabling-weaver-network/besu.md
+      - What is Interoperability?:
+        - Understanding Interoperability: weaver/what-is-interoperability/understanding-interoperability.md
+        - Levels of Interoperability: weaver/what-is-interoperability/levels-of-interoperability.md
+        - Integration Patterns: weaver/what-is-interoperability/integration-patterns.md
+      - Interoperability Modes: weaver/interoperability-modes.md
+      - Design Principles: weaver/design-principles.md
+      - User Stories:
+        - Overview: weaver/user-stories/overview.md
+        - Global Trade: weaver/user-stories/global-trade.md
+        - DvP in Financial Markets: weaver/user-stories/financial-markets.md
+        - Legacy Integration: weaver/user-stories/legacy-integration.md
+      - Architecture and Design:
+        - Overview: weaver/architecture-and-design/overview.md
+        - Relay: weaver/architecture-and-design/relay.md
+        - Drivers: weaver/architecture-and-design/drivers.md
+        - Weaver DApps: weaver/architecture-and-design/weaver-dapps.md
+        - Decentralized Identity: weaver/architecture-and-design/decentralized-identity.md
+      - Security Model:
+        - Authentication: weaver/security-model/authentication.md
+        - Access Control: weaver/security-model/access-control.md
+        - Proofs and Verification: weaver/security-model/proofs-and-verification.md
+        - End-to-End Security: weaver/security-model/end-to-end-security.md
+      - Deployment Considerations:
+        - Deployment Patterns: weaver/deployment-considerations/deployment-patterns.md
+        - Governance and Policies: weaver/deployment-considerations/governance-and-policies.md
+        - Legal and Regulation: weaver/deployment-considerations/legal-and-regulation.md
+      - Specifications: weaver/specifications.md
+      - Roadmap: weaver/roadmap.md
+      - Publications: weaver/publications.md
+    - SATP Hermes:
+      - Architecture: satp-hermes/architecture/satp-hermes.md
+      - Gateway Configuration: satp-hermes/configuration.md
+      - API Type 3 Adapter Specification: satp-hermes/api3-adapter-spec.md
+      - Database and Migrations: satp-hermes/database.md
+      - Operations: satp-hermes/operations.md
+  - Build and Operate:
+    - Guides:
+      - Getting Started: guides/getting-started.md
+      - Nix Setup: guides/nix-setup.md
+      - Operations: guides/operations.md
+      - Developers: guides/developers.md
+      - Upgrading: guides/upgrading.md
+    - Recipes:
+      - Overview: recipes/index.md
+      - Git Branch Setup: recipes/git-branch-setup.md
+      - Create a New Package: recipes/create-new-package.md
+      - Testing Guide: recipes/testing-guide.md
+      - Ledger Plugin Testing: recipes/ledger-plugin-testing.md
+      - Building API Clients: recipes/building-api-clients.md
+      - Managing Dependencies: recipes/managing-dependencies.md
+      - VS Code Setup: recipes/vscode-setup.md
+  - Reference:
     - Technical Specifications: references/specs.md
     - Publications: references/publications.md
     - Events and Podcasts: references/events.md

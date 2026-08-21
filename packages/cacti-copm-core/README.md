@@ -1,3 +1,4 @@
+# `@hyperledger-cacti/cacti-copm-core`
 
 - [Overview](#overview)
 - [Usage](#usage)
@@ -13,27 +14,37 @@
     - [Figure: Asset Exchange with Lock and ClaimLock](#figure-asset-exchange-with-lock-and-claimlock)
 - [Development](#development)
 
-# Overview
+## Overview
 
 This package defines the common types, interfaces, and endpoints for the
-COPM module to be used by Digital Ledger-specific implementations.
+COPM module to be used by distributed-ledger-specific implementations.
+
+**Target Audience:**
+
+- [x] Developers
+- [ ] Operators
 
 These endpoints require specific chaincode and weaver relays to be deployed on the network.
 Please refer to [the Weaver documentation](https://hyperledger-cacti.github.io/cacti/weaver/introduction/).
 
+## Install
 
-# Usage
+```sh
+npm install @hyperledger-cacti/cacti-copm-core
+```
+
+## API Summary
+
+The package exports the ConnectRPC `DefaultService`, generated request and
+response types, common ledger and relay types, COPM interfaces, validators,
+`ViewAddress`, and `TransferrableAsset`. For the complete RPC contract, see
+the [COPM OpenAPI reference](https://hyperledger-cacti.github.io/cacti/references/openapi/cacti-copm-core_openapi/).
+
+## Usage
 
 For a detailed command specification, please refer to the [OpenAPI Endpoint Documentation](https://hyperledger-cacti.github.io/cacti/references/openapi/cacti-copm-core_openapi/)
 
-## Installation
-
-Yarn: 
-
-    yarn add --exact @hyperledger-cacti/cacti-copm-core
-
-
-## Data Sharing
+### Data Sharing
  - ability to read data on another network
  - the other network must first give you permission
   
@@ -75,7 +86,7 @@ sequenceDiagram
     deactivate COPM gRPC A
 ```
 
-## Asset Transfer
+### Asset Transfer
 
  - Asset changes networks
  - Asset burnt on Ledger A, minted on Ledger B
@@ -125,7 +136,7 @@ sequenceDiagram
     deactivate System B
 ```
 
-## Asset Exchange
+### Asset Exchange
 
  - Assets stay where they are
  - Two parties swap asset ownership of two assets
@@ -175,10 +186,26 @@ sequenceDiagram
 ```
 
 
-# Development
+## Development
 
 When implementing a new distributed ledger, the following interfaces must be implemented:
 
 - DLTransactionContext:  Implements running a transaction on the local network
 - DLRemoteTransactionContext: Uses the weaver relays to run a transaction on another network
 - DLTransactionContextFactory: Factory to return either local or remote context for the specific DLT.
+
+## Testing
+
+This package does not define a package-local test script. Its generated service
+contract and shared abstractions are exercised by the ledger-specific COPM
+plugins and the integration tests in
+[`cacti-copm-test`](../cacti-copm-test/README.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+
+## License
+
+This distribution is published under the Apache License Version 2.0 found in
+the [LICENSE](../../LICENSE) file.

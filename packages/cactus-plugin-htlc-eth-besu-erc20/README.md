@@ -1,4 +1,23 @@
-# `@hyperledger/cactus-plugin-htlc-eth-besu-erc20`
+# `@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20`
+
+## Overview
+
+This plugin deploys and operates ERC-20 hash time-locked contracts on Besu through a registered Cacti Besu ledger connector.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20
+```
+
+## API Summary
+
+The public API exports the ERC-20 HTLC plugin, its factory and options, generated OpenAPI client types, and contract artifacts. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
 
 Allows Cactus nodes to interact with HTLC contracts with ERC-20 Tokens
 
@@ -11,7 +30,7 @@ Allows Cactus nodes to interact with HTLC contracts with ERC-20 Tokens
   - [Contributing](#contributing)
   - [License](#license)
 
-## Getting Started
+## Usage
 
 ### Installing
 
@@ -21,7 +40,7 @@ In a Cactus root directory, need execute:
 ```
 This command compile and build the project.
 
-## Running the tests
+## Testing
 
 For test all the plugin we have @hyperledger/cactus-test-plugin-htlc-eth-besu-erc20
 For execute the test plugin, can execute in root directory: 
