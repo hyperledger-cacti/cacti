@@ -1,0 +1,1 @@
+--8<-- "packages/cactus-plugin-satp-hermes/docs/operations.md:content"

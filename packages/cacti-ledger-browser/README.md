@@ -1,4 +1,23 @@
-# `@hyperledger/cacti-ledger-browser`
+# `@hyperledger-cacti/cacti-ledger-browser`
+
+## Overview
+
+This package provides the React-based Cacti Ledger Browser for visualizing ledger data exposed through Cacti services.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cacti-ledger-browser
+```
+
+## API Summary
+
+The package is a browser application rather than a reusable plugin API. Its source is organized under [`src/`](./src/), with runtime configuration supplied when the application is built and deployed.
 
 This component allows viewing ledger data in Supabase or other PostgreSQL compatible database. The data is fed to supabase by persistence plugins for each ledgers.
 
@@ -34,3 +53,15 @@ Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
 
 ## Acknowledgments
+
+## Usage
+
+Configure the application for the target Cacti API and run it through the monorepo development workflow described below.
+
+## Testing
+
+From the repository root, run:
+
+```sh
+yarn test:jest:all packages/cacti-ledger-browser/src/test
+```

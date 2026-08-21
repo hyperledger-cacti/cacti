@@ -1,4 +1,23 @@
-# `@hyperledger/cactus-test-geth-ledger`
+# `@hyperledger-cacti/cactus-test-geth-ledger`
+
+## Overview
+
+This package provides helpers for starting and controlling ephemeral go-ethereum ledgers in Cacti integration tests.
+
+**Target Audience:**
+
+- [x] Developers
+- [ ] Operators
+
+## Install
+
+```sh
+npm install --save-dev @hyperledger-cacti/cactus-test-geth-ledger
+```
+
+## API Summary
+
+The public API exports the Geth test-ledger helpers and related options used by Cacti test suites. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
 
 Helpers for running test `go-ethereum` ledger in test scripts.
 
@@ -11,7 +30,7 @@ Helpers for running test `go-ethereum` ledger in test scripts.
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
 
-## Getting Started
+## Usage
 
 Clone the git repository on your local machine. Follow these instructions that will get you a copy of the project up and running on
 your local machine for development and testing purposes.
@@ -51,7 +70,7 @@ await ledger.start();
 const rpcApiHttpHost = await ledger.getRpcApiHttpHost();
 ```
 
-## Running the tests
+## Testing
 
 To check that all has been installed correctly and that the test class has no errors:
 

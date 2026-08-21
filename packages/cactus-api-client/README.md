@@ -1,4 +1,23 @@
-# `@hyperledger/cactus-api-client` <!-- omit in toc -->
+# `@hyperledger-cacti/cactus-api-client` <!-- omit in toc -->
+
+## Overview
+
+This package provides the universal Cacti API client used by browser and server applications to communicate with Cacti nodes and consortium services.
+
+**Target Audience:**
+
+- [x] Developers
+- [ ] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-api-client
+```
+
+## API Summary
+
+The public API exports the Cacti API client, consortium providers, generated API types, and supporting client utilities. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
 
 - [Summary](#summary)
 - [Usage](#usage)
@@ -147,3 +166,11 @@ One such common trait is the client side component of the routing that decides w
 @see — https ://github.com/OpenAPITools/openapi-generator/blob/v5.0.0-beta2/modules/openapi-generator/src/main/resources/typescript-axios/apiInner.mustache#L337
 
 @see — https ://github.com/OpenAPITools/openapi-generator/blob/v5.0.0/docs/generators/typescript-axios.md
+
+## Testing
+
+From the repository root, run:
+
+```sh
+yarn test:jest:all packages/cactus-api-client/src/test/typescript
+```

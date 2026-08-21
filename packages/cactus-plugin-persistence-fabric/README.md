@@ -1,4 +1,27 @@
-# `@hyperledger/cactus-plugin-persistence-fabric`
+# `@hyperledger-cacti/cactus-plugin-persistence-fabric`
+
+## Overview
+
+This plugin observes a Fabric ledger through a Cacti connector and persists normalized ledger data in a relational database.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-persistence-fabric
+```
+
+## Configuration
+
+The plugin requires a Fabric connector instance and database connection settings. Use the setup and usage sections below for the tracked schema and synchronization workflow.
+
+## API Summary
+
+The plugin exposes status and synchronization operations through its TypeScript and OpenAPI interfaces. See [`public-api.ts`](./src/main/typescript/public-api.ts) and the endpoint section below.
 
 This plugin allows `Cacti` to persist Hyperledger Fabric data into some storage (currently to a `PostgreSQL` database, but this concept can be extended further).
 Data in the database can later be analyzed and viewed in a GUI tool.
@@ -19,7 +42,7 @@ Data in the database can later be analyzed and viewed in a GUI tool.
 - For now, the database schema is not considered public and can change over time (i.e., writing own application that reads data directly from the database is discouraged).
 - Only `status` endpoint is available, all the methods must be called directly on the plugin instance for now.
 
-## Getting Started
+## Usage
 
 Clone the git repository on your local machine. Follow these instructions that will get you a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -52,7 +75,7 @@ npm install
 CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME=fabric_all_in_one_testnet_2x  ./setup.sh
 ```
 
-Once you have an Fabric ledger ready, you need to start the [Ethereum Cacti Connector](../cactus-plugin-ledger-connector-fabric/README.md). We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts](./src/test/typescript/manual).
+Once you have an Fabric ledger ready, you need to start the [Fabric Cacti Connector](../cactus-plugin-ledger-connector-fabric/README.md). We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts](./src/test/typescript/manual).
 
 #### Supabase Instance
 
@@ -85,7 +108,7 @@ node ./dist/lib/test/typescript/manual/sample-setup.js
 
 #### Complete Sample Scenario
 
-Location: [./src/test/typescript/manual/common-setup-methods](./src/test/typescript/manual/common-setup-methods)
+Location: [./src/test/typescript/manual/complete-sample-scenario.ts](./src/test/typescript/manual/complete-sample-scenario.ts)
 
 This script starts the test Hyperledger Fabric ledger for you and executes few transactions on a `basic` chaincode. Then, it synchronizes everything to a database and monitors for all new blocks. This script can also be used for manual, end-to-end tests of a plugin.
 
@@ -101,7 +124,7 @@ Custom supabase can be set with environment variable `SUPABASE_CONNECTION_STRING
 SUPABASE_CONNECTION_STRING=postgresql://postgres:your-super-secret-and-long-postgres-password@127.0.0.1:5432/postgres npm run complete-sample-scenario
 ```
 
-### Usage
+### Quick Start
 
 Instantiate a new `PluginPersistenceFabric` instance:
 
@@ -113,7 +136,7 @@ const persistencePlugin = new PluginPersistenceFabric({
   apiClient: new FabricApiClient(apiConfigOptions),
   logLevel: "info",
   instanceId: "my-instance",
-  connectionString: "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",,
+  connectionString: "postgresql://postgres:your-super-secret-and-long-postgres-password@localhost:5432/postgres",
   channelName: "mychannel",
   gatewayOptions: {
     identity: signingCredential.keychainRef,
@@ -152,7 +175,7 @@ DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-persistence-fabric/ -f .
 
 ## Endpoints
 
-### StatusV1 (`/api/v1/plugins/@hyperledger/cactus-plugin-persistence-fabric/status`)
+### StatusV1 (`/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/status`)
 
 - Returns status of the plugin (latest block read, failed blocks, is monitor running, etc...)
 
@@ -188,7 +211,7 @@ DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-persistence-fabric/ -f .
 
 - Synchronize entire ledger state with the database.
 
-## Running the tests
+## Testing
 
 To run all the tests for this persistence plugin to ensure it's working correctly execute the following from the root of the `cactus` project:
 

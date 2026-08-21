@@ -1,4 +1,23 @@
-# `@hyperledger/cactus-plugin-bungee-hermes`
+# `@hyperledger-cacti/cactus-plugin-bungee-hermes`
+
+## Overview
+
+This plugin creates and combines distributed-ledger views through configured Cacti ledger connectors. It implements the BUNGEE data-sharing model used by Cacti interoperability flows.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-bungee-hermes
+```
+
+## API Summary
+
+The public API exports the plugin, factory, generated OpenAPI client, privacy and merge policy types, and view creation utilities. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
 
 The package provides `Hyperledger Cacti` a way to create blockchain snapshots and views for different distributed ledgers currently supported by Cacti. The implementation follows the paper [BUNGEE](https://dl.acm.org/doi/pdf/10.1145/3643689) (Blockchain UNifier view GEnErator).
 
@@ -76,7 +95,7 @@ Endpoints exposed:
   - ProcessViewV1
 
 
-## Running the tests
+## Testing
   - **besu-test-basic.test.ts**: A test using strategy-besu and a besu connector, testing creating views for different timeframes and states.
   - **ethereum-test-basic.test.ts**: A test using strategy-ethereum and a ethereum connector, testing creating views for different timeframes and states.
   - **fabric-test-basic.test.ts**: A test using strategy-fabric and a fabric connector, testing creating views for different timeframes and states.
