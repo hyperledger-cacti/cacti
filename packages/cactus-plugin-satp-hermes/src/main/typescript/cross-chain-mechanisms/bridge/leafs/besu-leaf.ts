@@ -736,7 +736,7 @@ export class BesuLeaf
         }
 
         const response = (await this.connector.invokeContract({
-          contractName: this.wrapperContractAddress,
+          contractName: this.wrapperContractName,
           contractAbi: SATPWrapperContract.abi,
           contractAddress: this.wrapperContractAddress,
           invocationType: EthContractInvocationType.Send,
@@ -796,7 +796,7 @@ export class BesuLeaf
         }
 
         const response = (await this.connector.invokeContract({
-          contractName: this.wrapperContractAddress,
+          contractName: this.wrapperContractName,
           contractAbi: SATPWrapperContract.abi,
           contractAddress: this.wrapperContractAddress,
           invocationType: EthContractInvocationType.Send,
@@ -1165,7 +1165,7 @@ export class BesuLeaf
         }
 
         const response = (await this.connector.invokeContract({
-          contractName: this.wrapperContractAddress,
+          contractName: this.wrapperContractName,
           contractAbi: SATPWrapperContract.abi,
           contractAddress: this.wrapperContractAddress,
           invocationType: invocationType,

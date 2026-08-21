@@ -542,7 +542,7 @@ export class EthereumLeaf
 
     if (!this.isFullPluginOptions(options.connectorOptions)) {
       throw new ConnectorOptionsError(
-        "Invalid options provided to the FabricLeaf constructor. Please provide a valid IPluginLedgerConnectorEthereumOptions object.",
+        "Invalid options provided to the EthereumLeaf constructor. Please provide a valid IPluginLedgerConnectorEthereumOptions object.",
       );
     }
 
