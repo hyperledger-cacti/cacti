@@ -1,8 +1,40 @@
-# `@hyperledger/cactus-plugin-htlc-coordinator-besu`
+# `@hyperledger-cacti/cactus-plugin-htlc-coordinator-besu`
 
-Allows Cactus nodes to interact beetwen diferent networks. Using this we can perform:
-* Instantiate an existing HTLC plugin, also the own HTLC and the counterparty HTLC.
-* Interact with the HTLC, deploying, checking and withdrawing the funds.
+## Overview
+
+This extension coordinates hash time-locked contract (HTLC) operations through
+the Besu and Besu ERC-20 HTLC plugins. It locates the required connector and
+HTLC plugins in a Cacti `PluginRegistry`, then exposes operations for creating
+the initiating and counterparty contracts and withdrawing counterparty funds.
+
+**Target Audience:**
+
+- [x] Developers
+- [x] Operators
+
+## Install
+
+```sh
+npm install @hyperledger-cacti/cactus-plugin-htlc-coordinator-besu
+```
+
+## Configuration
+
+The `IPluginHTLCCoordinatorBesuOptions` interface accepts:
+
+| Option | Required | Default | Description |
+| --- | --- | --- | --- |
+| `instanceId` | Yes | None | Unique identifier for the coordinator instance. |
+| `pluginRegistry` | Yes | None | Registry containing the Besu connector and HTLC plugins used by requests. |
+| `logLevel` | No | `"INFO"` | Coordinator log level. |
+
+## API Summary
+
+The coordinator exposes `ownHTLC`, `counterpartyHTLC`, and
+`withdrawCounterparty` operations through both its TypeScript API and OpenAPI
+web services. Request and response schemas are defined in the
+[OpenAPI specification](./src/main/json/openapi.json).
+
 ## Summary
 
   - [Usage](#usage)
@@ -15,7 +47,9 @@ Allows Cactus nodes to interact beetwen diferent networks. Using this we can per
 
 ## Usage
 
-To use this import public-api and create new **PluginFactoryHTLCCoordinatorBesu*. Then use it to create a HTLC Coordinator.
+Import the public API and use `PluginFactoryHTLCCoordinatorBesu` to create a
+coordinator:
+
 ```typescript
     const factoryHTLC = new PluginFactoryHTLCCoordinatorBesu({
         pluginImportType: PluginImportType.Local,
@@ -48,7 +82,7 @@ Call example to create an ownHTLC and instantiate a HTLC contract:
         outputAddress: "1AcVYm7M3kkJQH28FXAvyBFQzFRL6xPKu8",
         gas: estimatedGas,
     };
-    const response = await coordinator.ownCoordinator(ownHTLCRequest);
+    const response = await pluginHTLCCoordinatorBesu.ownHTLC(ownHTLCRequest);
 });
 ```
 The field "htlcPackage" can have the following values:
@@ -84,19 +118,26 @@ yarn run watch
 
 #### Alice flow
 
-The [Alice diagram](docs/flow/htlc-coordinator-alice-flow.md, "Alice Flow") shows the sequence diagram of a complete flow for a participant who wants exchange funds with another participant. She doesn't start the withdraw flow becuase she doesn't know the secret to withdraw them.
+The [Alice diagram](./docs/flow/htlc-coordinator-alice-flow.md) shows the
+sequence for a participant who initiates an exchange but does not know the
+secret required to withdraw the counterparty funds.
 
 #### Bob flow
 
-The next [Bob diagram](docs/flow/htlc-coordinator-bob-flow.md, "Bob Flow") 
-shows the sequence diagram of a complete flow for a participant who wants exchange funds with another participant, but he knows the secret and starts the flow to withdraw the funds.
+The [Bob diagram](./docs/flow/htlc-coordinator-bob-flow.md) shows the sequence
+for a participant who knows the secret and initiates withdrawal.
 
+## Testing
+
+From the repository root, run:
+
+```sh
+yarn test:jest:all extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript
+```
 
 ## Contributing
 
-We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
-
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
 
 ## License
 

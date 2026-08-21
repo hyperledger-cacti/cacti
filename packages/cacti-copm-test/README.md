@@ -1,6 +1,35 @@
-# @hyperledger-cacti/cacti-copm-test
+# `@hyperledger-cacti/cacti-copm-test`
+
+## Overview
 
 Test framework for testing the COPM distributed ledger-specific plugins.
+
+**Target Audience:**
+
+- [x] Developers
+- [ ] Operators
+
+## Install
+
+```sh
+npm install --save-dev @hyperledger-cacti/cacti-copm-test
+```
+
+## Configuration
+
+Ledger-specific test support implements the `TestAssets` and `CopmTester`
+interfaces exported by this package. The tester factory selects the
+implementation for each supported network type.
+
+## API Summary
+
+The package exports:
+
+- `WeaverInteropConfiguration` for Weaver interoperability settings
+- `TestAssets` for issuing and inspecting test assets
+- `CopmTester` for creating a ledger-specific COPM test environment and client
+
+## Usage
 
 ## Development
 
@@ -35,4 +64,25 @@ Makefile_\<ledger_type\> will build a docker weaver network of the given network
   
 The asset exchanges and asset transfer network modes are currently mutually exclusive.
 
+## Testing
+
+The package defines separate integration-test commands for each COPM operation:
+
+```sh
+yarn workspace @hyperledger-cacti/cacti-copm-test test:view
+yarn workspace @hyperledger-cacti/cacti-copm-test test:pledge
+yarn workspace @hyperledger-cacti/cacti-copm-test test:lock
+```
+
+These tests require their corresponding ledger and Weaver test-network
+components.
+
+## Contributing
+
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+
+## License
+
+This distribution is published under the Apache License Version 2.0 found in
+the [LICENSE](../../LICENSE) file.
 

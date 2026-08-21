@@ -180,6 +180,10 @@ nav:
     - Publications: weaver/publications.md
   - SATP Hermes:
     - Architecture: satp-hermes/architecture/satp-hermes.md
+    - Gateway Configuration: satp-hermes/configuration.md
+    - API Type 3 Adapter Specification: satp-hermes/api3-adapter-spec.md
+    - Database and Migrations: satp-hermes/database.md
+    - Operations: satp-hermes/operations.md
   - Guides:
     - Getting Started: guides/getting-started.md
     - Nix Setup: guides/nix-setup.md
