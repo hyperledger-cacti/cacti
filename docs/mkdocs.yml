@@ -92,7 +92,12 @@ nav:
     - Architecture: architecture.md
     - Key Concepts:
       - Overview: concepts/index.md
+      - Asset Exchange: concepts/asset-exchange.md
+      - Asset Transfer: concepts/asset-transfer.md
       - Data Sharing: concepts/data-sharing.md
+      - Relay: concepts/relay.md
+      - Connector: concepts/connector.md
+      - Identity: concepts/identity.md
     - Use Cases: use-cases.md
   - Platforms:
     - Cactus:
