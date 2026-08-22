@@ -6,6 +6,13 @@
 # PR per ecosystem (security updates are otherwise opened individually and
 # ungrouped by default). Every grouped PR lands on its own Dependabot branch.
 #
+# Every ecosystem also sets a 30-day `cooldown`: a newly published version is not
+# proposed until it has been on the registry for 30 days, which is the window in
+# which a compromised or typosquatted release is usually yanked. `cooldown`
+# applies to version updates ONLY -- security updates driven by a published
+# advisory are never delayed by it. A dependency still inside its cooldown is
+# simply left out of that run's group PR and picked up once it becomes eligible.
+#
 # NOTE: Dependabot does not support wildcards in `target-branch` (it accepts
 # exactly one branch name, and the default branch when omitted). To run on the
 # release/* branches, every release branch needs its own duplicated set of
@@ -24,6 +31,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 30
+      semver-major-days: 30
+      semver-minor-days: 30
+      semver-patch-days: 30
     groups:
       npm:
         applies-to: version-updates
@@ -40,6 +52,8 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 30
     groups:
       github-actions:
         applies-to: version-updates
@@ -54,6 +68,8 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 30
     groups:
       docker:
         applies-to: version-updates
@@ -68,6 +84,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 30
+      semver-major-days: 30
+      semver-minor-days: 30
+      semver-patch-days: 30
     groups:
       gomod:
         applies-to: version-updates
@@ -82,6 +103,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 1
+    cooldown:
+      default-days: 30
+      semver-major-days: 30
+      semver-minor-days: 30
+      semver-patch-days: 30
     groups:
       cargo:
         applies-to: version-updates
