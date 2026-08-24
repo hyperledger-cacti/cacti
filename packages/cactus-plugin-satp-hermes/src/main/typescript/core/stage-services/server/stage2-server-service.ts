@@ -32,7 +32,7 @@ import {
   LockAssertionExpirationError,
   SessionError,
 } from "../../errors/satp-service-errors";
-import { SATPInternalError } from "../../errors/satp-errors";
+import { SATPError, SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
 import { create } from "@bufbuild/protobuf";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -186,10 +186,11 @@ export class Stage2ServerService extends SATPService {
     return context.with(ctx, () => {
       try {
         const errorResponse = create(LockAssertionResponseSchema, {});
+        const clientError = SATPError.fromInternalError(error);
         const commonBody = create(CommonSatpSchema, {
           messageType: MessageType.ASSERTION_RECEIPT,
           error: true,
-          errorCode: error.getSATPErrorType(),
+          errorCode: clientError.errorType,
         });
 
         if (!(error instanceof SessionNotFoundError) && session != undefined) {
@@ -254,11 +255,24 @@ export class Stage2ServerService extends SATPService {
 
         sessionData.lockAssertionClaimFormat = request.lockAssertionClaimFormat; //todo check if valid
 
-        if (request.lockAssertionExpiration == BigInt(0)) {
-          throw new LockAssertionExpirationError(fnTag);
+        const currentTime = BigInt(Date.now());
+        const maximumExpiration = currentTime + sessionData.lockExpirationTime;
+
+        if (request.lockAssertionExpiration <= currentTime) {
+          throw new LockAssertionExpirationError(
+            fnTag,
+            "lock assertion already expired",
+          );
         }
 
-        sessionData.lockAssertionExpiration = request.lockAssertionExpiration; //todo check if expired
+        if (request.lockAssertionExpiration > maximumExpiration) {
+          throw new LockAssertionExpirationError(
+            fnTag,
+            "lock assertion exceeds the negotiated expiration time",
+          );
+        }
+
+        sessionData.lockAssertionExpiration = request.lockAssertionExpiration;
 
         if (
           sessionData.clientTransferNumber != "" &&
