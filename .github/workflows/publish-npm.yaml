@@ -42,7 +42,7 @@ jobs:
         run: |
           echo "inputs.GIT_TAG_TO_PUBLISH=${{ inputs.GIT_TAG_TO_PUBLISH }}"
 
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         with:
           ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
 
@@ -97,7 +97,7 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         with:
           ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
 
@@ -164,7 +164,7 @@ jobs:
       packages: write
       contents: read
     steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         with:
           ref: ${{ inputs.GIT_TAG_TO_PUBLISH }}
 
