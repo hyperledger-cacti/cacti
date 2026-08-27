@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1787560149169,
+  "lastUpdate": 1787830106326,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -65,6 +65,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.16%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Maciej Skrzypkowski",
+            "username": "mskrzypkows",
+            "email": "mskr@gmx.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "56ee7616bfe111c1d849ea07c20868fe46a4a359",
+          "message": "fix(satp-hermes): fix caching, ClaimFormat check, network config\n\n    BesuLeaf passed wrapperContractAddress as contractName in lockAsset(),\n    unlockAsset(), and runTransaction(), causing an ABI cache miss on every\n    call. Fixed to use wrapperContractName, and added a regression test\n    covering this case.\n\n    ConnectorOptionsError in EthereumLeaf's constructor said \"FabricLeaf\" —\n    corrected to \"EthereumLeaf\".\n\n    OracleEVM used EthereumLeaf.CLASS_NAME for its `this.id` assignment and\n    in a NoSigningCredentialError message. Both replaced with\n    OracleEVM.CLASS_NAME, and the now-unused EthereumLeaf import was removed.\n\n    SATPBridgeExecutionLayerImpl and OracleExecutionLayer used the `in`\n    operator to check supported claim formats, which checks array indices\n    (0, 1, 2...) rather than values. Since ClaimFormat.DEFAULT=1, `1 in [1]`\n    evaluated to false, causing every transfer to throw ClaimFormatError.\n    Both now use Array.prototype.includes(). Added unit tests covering:\n    supported format accepts, DEFAULT fallback, unsupported format throws,\n    and empty supported list throws. Also corrected the oracle's error\n    message to reference \"the oracle\" instead of \"the bridge\".\n\n    Exported IEthereumNetworkConfig, the configuration interface consumers\n    need to connect gateways to Ethereum networks.\n\n    Assisted-by: anthropic:claude-sonnet-4.6\n\nSigned-off-by: Maciej Skrzypkowski <mskr@gmx.com>",
+          "timestamp": "2026-08-17T07:06:07Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/56ee7616bfe111c1d849ea07c20868fe46a4a359"
+        },
+        "date": 1787830103756,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 641,
+            "range": "±3.01%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 663,
+            "range": "±1.98%",
+            "unit": "ops/sec",
+            "extra": "184 samples"
           }
         ]
       }
