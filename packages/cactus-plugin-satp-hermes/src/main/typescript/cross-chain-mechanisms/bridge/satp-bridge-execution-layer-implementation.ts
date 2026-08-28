@@ -330,9 +330,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (bridgeEndPoint as BridgeLeafNonFungible).lockAsset(
             asset.id,
-            Number(
-              (asset as NonFungibleAsset).uniqueDescriptor,
-            ) as UniqueTokenID,
+            (asset as NonFungibleAsset).uniqueDescriptor,
           );
         }
         break;
@@ -352,12 +350,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
         } else if (instanceOfNonFungibleAsset(asset)) {
           response = await (
             bridgeEndPoint as BridgeLeafNonFungible
-          ).unlockAsset(
-            asset.id,
-            Number(
-              (asset as NonFungibleAsset).uniqueDescriptor,
-            ) as UniqueTokenID,
-          );
+          ).unlockAsset(asset.id, (asset as NonFungibleAsset).uniqueDescriptor);
         }
         break;
       case SATPStageOperations.MINT:

@@ -645,7 +645,7 @@ export class BesuTestEnvironment {
       keychainId: inUseContractKeyChainId,
       invocationType: BesuContractInvocationType.Send,
       methodName: "approve",
-      params: [wrapperAddress, Number(assetAttribute)],
+      params: [wrapperAddress, BigInt(assetAttribute)],
       signingCredential: {
         ethAccount: this.firstHighNetWorthAccount,
         secret: this.besuKeyPair.privateKey,
@@ -753,7 +753,7 @@ export class BesuTestEnvironment {
    */
   public async mintMultiTokens(
     amount: string,
-    tokenTypeId: number,
+    tokenTypeId: bigint | string,
   ): Promise<void> {
     const responseMint = await this.connector.invokeContract({
       contractName:
@@ -783,7 +783,7 @@ export class BesuTestEnvironment {
   public async checkMultiTokenBalance(
     contractAddress: string,
     account: string,
-    tokenTypeId: number,
+    tokenTypeId: bigint | string,
     expectedAmount: string,
     signingCredential: Web3SigningCredential,
   ): Promise<void> {

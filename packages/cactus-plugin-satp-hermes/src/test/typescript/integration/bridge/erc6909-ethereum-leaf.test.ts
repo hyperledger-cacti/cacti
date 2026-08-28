@@ -22,9 +22,12 @@ import {
 } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/asset";
 import { SupportedContractTypes } from "../../environments/ethereum-test-environment";
 
-// ERC-6909 token type IDs used across all tests in this suite
-const TOKEN_TYPE_A = 42 as UniqueTokenID;
-const TOKEN_TYPE_B = 99 as UniqueTokenID;
+// ERC-6909 token type IDs used across all tests in this suite.
+// TOKEN_TYPE_A exceeds Number.MAX_SAFE_INTEGER (2^53 - 1) to exercise the
+// bigint path end-to-end and catch any regression to a lossy Number()
+// conversion.
+const TOKEN_TYPE_A = 9007199254740993n as UniqueTokenID;
+const TOKEN_TYPE_B = 99n as UniqueTokenID;
 
 let ontologyManager: OntologyManager;
 let multiTokenAsset: EvmMultiTokenAsset;
@@ -80,7 +83,7 @@ beforeAll(async () => {
     // Mint 200 tokens of TOKEN_TYPE_A to the whale account.
     // The deployer automatically holds BRIDGE_ROLE on SATMultiTokenContract
     // so the mint call goes through without an explicit role grant.
-    await ethereumEnv.mintMultiTokens("200", Number(TOKEN_TYPE_A));
+    await ethereumEnv.mintMultiTokens("200", TOKEN_TYPE_A);
   }
 }, TIMEOUT);
 
@@ -182,14 +185,14 @@ describe("ERC6909 Multi-Token Ethereum Leaf Test", () => {
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       wrapperAddress,
-      Number(TOKEN_TYPE_A),
+      TOKEN_TYPE_A,
       "100",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       WHALE_ACCOUNT_ADDRESS,
-      Number(TOKEN_TYPE_A),
+      TOKEN_TYPE_A,
       "100",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
@@ -213,14 +216,14 @@ describe("ERC6909 Multi-Token Ethereum Leaf Test", () => {
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       wrapperAddress,
-      Number(TOKEN_TYPE_A),
+      TOKEN_TYPE_A,
       "0",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       WHALE_ACCOUNT_ADDRESS,
-      Number(TOKEN_TYPE_A),
+      TOKEN_TYPE_A,
       "200",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
@@ -252,7 +255,7 @@ describe("ERC6909 Multi-Token Ethereum Leaf Test", () => {
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       wrapperAddress,
-      Number(TOKEN_TYPE_A),
+      TOKEN_TYPE_A,
       "0",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
@@ -276,7 +279,7 @@ describe("ERC6909 Multi-Token Ethereum Leaf Test", () => {
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       wrapperAddress,
-      Number(TOKEN_TYPE_B),
+      TOKEN_TYPE_B,
       "50",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
@@ -300,14 +303,14 @@ describe("ERC6909 Multi-Token Ethereum Leaf Test", () => {
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       wrapperAddress,
-      Number(TOKEN_TYPE_B),
+      TOKEN_TYPE_B,
       "0",
       ethereumEnv.getTestOwnerSigningCredential(),
     );
     await ethereumEnv.checkMultiTokenBalance(
       ethereumEnv.getTestMultiTokenContractAddress(),
       WHALE_ACCOUNT_ADDRESS,
-      Number(TOKEN_TYPE_B),
+      TOKEN_TYPE_B,
       "50",
       ethereumEnv.getTestOwnerSigningCredential(),
     );

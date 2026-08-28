@@ -114,7 +114,7 @@ export interface Asset {
 
 export type Brand<K, T> = K & { __brand: T };
 export type Amount = Brand<number, "Amount">;
-export type UniqueTokenID = Brand<number, "UniqueTokenID">;
+export type UniqueTokenID = Brand<bigint, "UniqueTokenID">;
 
 export interface FungibleAsset extends Asset {
   amount: Amount;
@@ -128,7 +128,7 @@ export interface FungibleAsset extends Asset {
  * MultiTokenAsset always carries the chain-native token type ID so the bridge
  * can dispatch the correct uniqueDescriptor overload on lock/mint/burn/assign.
  * The uniqueDescriptor here is the uint256 token type ID from the on-chain
- * contract, carried as a branded number (not the SATP-internal token_id).
+ * contract, carried as a branded bigint (not the SATP-internal token_id).
  */
 export interface MultiTokenAsset extends FungibleAsset {
   uniqueDescriptor: UniqueTokenID;
