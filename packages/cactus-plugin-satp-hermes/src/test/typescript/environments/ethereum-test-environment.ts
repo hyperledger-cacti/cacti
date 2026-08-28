@@ -557,7 +557,7 @@ export class EthereumTestEnvironment {
    */
   public async mintMultiTokens(
     amount: string,
-    tokenTypeId: number,
+    tokenTypeId: bigint | string,
   ): Promise<void> {
     const responseMint = await this.connector.invokeContract({
       contract: {
@@ -588,7 +588,7 @@ export class EthereumTestEnvironment {
   public async checkMultiTokenBalance(
     contractAddress: string,
     account: string,
-    tokenTypeId: number,
+    tokenTypeId: bigint | string,
     expectedAmount: string,
     signingCredential: Web3SigningCredential,
   ): Promise<void> {
@@ -714,7 +714,7 @@ export class EthereumTestEnvironment {
       },
       invocationType: EthContractInvocationType.Send,
       methodName: "approve",
-      params: [wrapperAddress, Number(assetAttribute)],
+      params: [wrapperAddress, BigInt(assetAttribute)],
       web3SigningCredential: {
         ethAccount: WHALE_ACCOUNT_ADDRESS,
         secret: "",

@@ -121,7 +121,7 @@ beforeEach(() => {
     });
 }, TIMEOUT);
 
-const ERC6909_TOKEN_TYPE_ID = 42;
+const ERC6909_TOKEN_TYPE_ID = 42n;
 
 beforeAll(async () => {
   // Fabric setup skipped — all Fabric describe blocks are describe.skip

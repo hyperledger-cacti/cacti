@@ -30,7 +30,7 @@ let ontologyManager: OntologyManager;
 let asset: EvmFungibleAsset;
 let nonFungibleAsset: EvmNonFungibleAsset;
 
-const uniqueTokenId1: string = "1001";
+const uniqueTokenId1: string = "9007199254740993";
 const uniqueTokenId2: string = "1002";
 
 const monitorService = MonitorService.createOrGetMonitorService({
@@ -88,7 +88,10 @@ beforeAll(async () => {
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
 
     await ethereumEnv.mintTokens("100", TokenType.NONSTANDARD_FUNGIBLE);
-    await ethereumEnv.mintTokens("1001", TokenType.NONSTANDARD_NONFUNGIBLE);
+    await ethereumEnv.mintTokens(
+      uniqueTokenId1,
+      TokenType.NONSTANDARD_NONFUNGIBLE,
+    );
   }
 }, TIMEOUT);
 
@@ -485,7 +488,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
       owner: WHALE_ACCOUNT_ADDRESS,
       contractName: ethereumEnv.nonFungibleDefaultAsset.contractName,
       contractAddress: ethereumEnv.nonFungibleDefaultAsset.contractAddress!,
-      uniqueDescriptor: Number(uniqueTokenId1) as UniqueTokenID,
+      uniqueDescriptor: BigInt(uniqueTokenId1) as UniqueTokenID,
       network: {
         id: EthereumTestEnvironment.ETH_NETWORK_ID,
         ledgerType: LedgerType.Ethereum,
@@ -523,7 +526,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
   it("Should Approve a token", async () => {
     await ethereumEnv.approveAssets(
       ethereumLeaf.getWrapperContract(TokenType.NONSTANDARD_NONFUNGIBLE),
-      "1001",
+      uniqueTokenId1,
       TokenType.NONSTANDARD_NONFUNGIBLE,
     );
   });
@@ -531,7 +534,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
   it("Should Lock a token", async () => {
     const response = await ethereumLeaf.lockAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -539,7 +542,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
 
     const response2 = (await ethereumLeaf.getAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     )) as EvmNonFungibleAsset;
     expect(response2).toBeDefined();
     expect(response2.id).toBe(nonFungibleAsset.id);
@@ -552,7 +555,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
       ethereumEnv.getTestNonFungibleContractName(),
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     log.info(`Locked token${uniqueTokenId1} successfully`);
 
@@ -584,7 +587,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
   it("Should Unlock a token", async () => {
     const response = await ethereumLeaf.unlockAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -604,7 +607,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
       ethereumEnv.getTestNonFungibleContractName(),
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      0 as UniqueTokenID,
+      0n as UniqueTokenID,
     );
     log.info(`Unlocked token ${uniqueTokenId1} successfully`);
 
@@ -641,7 +644,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
     );
     const response = await ethereumLeaf.lockAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -650,7 +653,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
 
     const response2 = await ethereumLeaf.burnAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response2).toBeDefined();
     expect(response2.transactionId).toBeDefined();
@@ -671,7 +674,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
       ethereumEnv.nonFungibleDefaultAsset.contractName,
     );
     expect(response3.uniqueDescriptor as UniqueTokenID).toBe(
-      0 as UniqueTokenID,
+      0n as UniqueTokenID,
     );
 
     await ethereumEnv.checkBalance(
@@ -700,7 +703,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
   it("Should Mint a token", async () => {
     const response = await ethereumLeaf.mintAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -709,7 +712,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
 
     const response2 = (await ethereumLeaf.getAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     )) as EvmNonFungibleAsset;
     expect(response2).toBeDefined();
     expect(response2.id).toBe(nonFungibleAsset.id);
@@ -719,7 +722,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
       ethereumEnv.getTestNonFungibleContractAddress().toLowerCase(),
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     );
     log.info(`Minted token ${uniqueTokenId2} successfully`);
 
@@ -740,7 +743,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
     const response = await ethereumLeaf.assignAsset(
       nonFungibleAsset.id,
       nonFungibleAsset.owner,
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -758,7 +761,7 @@ describe("Ethereum Leaf Non Fungible Test", () => {
       ethereumEnv.getTestNonFungibleContractAddress(),
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      0 as UniqueTokenID,
+      0n as UniqueTokenID,
     );
     log.info(
       `Assigned token ${uniqueTokenId2} successfully from wrapper account`,

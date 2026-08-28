@@ -1118,7 +1118,7 @@ export class BesuLeaf
               contractAddress: token.contractAddress,
               type: Number(token.tokenType),
               owner: token.owner,
-              uniqueDescriptor: Number(token.amount) as UniqueTokenID,
+              uniqueDescriptor: BigInt(token.amount) as UniqueTokenID,
               network: this.networkIdentification,
               ercTokenStandard: Number(token.ercTokenStandard),
             } as EvmNonFungibleAsset;
