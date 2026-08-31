@@ -87,12 +87,12 @@ extra:
 nav:
   - Overview:
     - Introduction: index.md
-    - Start Here: start-here.md
     - Vision: vision.md
     - Architecture: architecture.md
     - Key Concepts:
       - Overview: concepts/index.md
       - Data Sharing: concepts/data-sharing.md
+    - Start Here: start-here.md
     - Use Cases: use-cases.md
   - Platforms:
     - Cactus:
@@ -182,12 +182,12 @@ nav:
       - Specifications: weaver/specifications.md
       - Roadmap: weaver/roadmap.md
       - Publications: weaver/publications.md
-    - SATP Hermes:
-      - Architecture: satp-hermes/architecture/satp-hermes.md
-      - Gateway Configuration: satp-hermes/configuration.md
-      - API Type 3 Adapter Specification: satp-hermes/api3-adapter-spec.md
-      - Database and Migrations: satp-hermes/database.md
-      - Operations: satp-hermes/operations.md
+  - SATP Hermes:
+    - Overview: satp-hermes/index.md
+    - Gateway Configuration: satp-hermes/configuration.md
+    - API Type 3 Adapter Specification: satp-hermes/api3-adapter-spec.md
+    - Database and Migrations: satp-hermes/database.md
+    - Operations: satp-hermes/operations.md
   - Build and Operate:
     - Guides:
       - Getting Started: guides/getting-started.md
@@ -205,6 +205,7 @@ nav:
       - Managing Dependencies: recipes/managing-dependencies.md
       - VS Code Setup: recipes/vscode-setup.md
   - Reference:
+    - Overview: references/index.md
     - Technical Specifications: references/specs.md
     - Publications: references/publications.md
     - Events and Podcasts: references/events.md

@@ -20,6 +20,7 @@ set of reference links defined at the bottom of that file.
 [build_getting_started]: https://github.com/hyperledger-cacti/cacti/blob/main/BUILD.md#getting-started
 [build_doc]: https://github.com/hyperledger-cacti/cacti/blob/main/BUILD.md
 [contributing_doc]: https://github.com/hyperledger-cacti/cacti/blob/main/CONTRIBUTING.md
+[how_to_contribute]: ./contributing/how-to-contribute.md
 [conventions_doc]: https://github.com/hyperledger-cacti/cacti/blob/main/CONVENTIONS.md
 [pull_doc]: https://github.com/hyperledger-cacti/cacti/blob/main/PULL.md
 [ai_guidelines_doc]: https://github.com/hyperledger-cacti/cacti/blob/main/AI_GUIDELINES.md
@@ -27,7 +28,7 @@ set of reference links defined at the bottom of that file.
 [architecture_overview]: ./architecture.md
 [openapi_specs]: https://hyperledger-cacti.github.io/cacti/references/openapi/index.html
 [weaver_doc]: ./weaver/introduction.md
-[satp_hermes]: ./satp-hermes/architecture/satp-hermes.md
+[satp_hermes]: ./satp-hermes/index.md
 [build_configure_cacti]: https://github.com/hyperledger-cacti/cacti/blob/main/BUILD.md#configure-cacti
 [weaver_getting_started]: ./weaver/introduction.md
 [roadmap_doc]: https://github.com/hyperledger-cacti/cacti/blob/main/ROADMAP.md
