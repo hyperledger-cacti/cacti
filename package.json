@@ -163,7 +163,7 @@
     "sigstore@npm:^2.2.0": "4.1.1",
     "@opentelemetry/propagator-jaeger": ">=2.9.0",
     "adm-zip": ">=0.6.0",
-    "react-router": ">=6.30.4 <7",
+    "react-router": ">=6.30.6 <7",
     "sanitize-html": ">=2.17.5",
     "htmlparser2": ">=9.1.0 <10",
     "@opentelemetry/core": ">=2.8.0",
