@@ -1,3 +1,7 @@
 # Use Cases and Applications for Cacti
 
-This page is under construction. While we are working on it, you can find compelling examples and sample code [here](https://github.com/hyperledger-cacti/cacti/blob/main/whitepaper/whitepaper.md), [here](./weaver/user-stories/), [here](https://github.com/hyperledger-cacti/cacti/tree/main/examples), and [here](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/samples).
+Explore Cacti use cases and sample implementations through the following resources:
+
+- [Cacti Demos](https://github.com/hyperledger-cacti/cacti-demos) provides runnable examples and demonstration applications.
+- The [Cacti whitepaper](https://github.com/hyperledger-cacti/cacti/blob/main/whitepaper/whitepaper.md) describes the project's architecture and representative use cases.
+- [Weaver samples](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/samples) provide sample applications and network configurations.
