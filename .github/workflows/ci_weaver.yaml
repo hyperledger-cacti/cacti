@@ -35,10 +35,10 @@ jobs:
     with: 
       run_all: $RUN_ALL
     uses: ./.github/workflows/test_weaver-relay.yaml
-  corda-interop-app:
-    with: 
-      run_all: $RUN_ALL 
-    uses: ./.github/workflows/test_weaver-corda-interop-app.yaml
+  corda-pkgs:
+    with:
+      run_all: $RUN_ALL
+    uses: ./.github/workflows/test_weaver-corda-pkgs.yaml
   pre-release:
     with: 
       run_all: $RUN_ALL 

@@ -31,6 +31,7 @@ plugins {
     id "java-library"
     id 'org.jetbrains.dokka' version '0.10.1'
     id "maven-publish"
+    id "jacoco"
 }
 
 apply plugin: "kotlin"
@@ -99,6 +100,12 @@ dependencies {
     implementation "org.slf4j:jul-to-slf4j:$slf4j_version"
     implementation "org.slf4j:slf4j-simple:$slf4j_version"
 
+    // Unit test dependencies (JUnit 5 / Jupiter). gson and bouncycastle are already on the
+    // main classpath and are inherited by the test source set.
+    testImplementation "org.junit.jupiter:junit-jupiter-api:5.10.2"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.10.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
+
 }
 
 
@@ -161,7 +168,59 @@ publishing {
 
 tasks.test {
     useJUnitPlatform()
+    // Always re-run so results are logged every time, instead of Gradle reporting the
+    // task UP-TO-DATE and printing nothing.
+    outputs.upToDateWhen { false }
     testLogging {
+        // One line per test: name + passed/skipped/failed.
         events("passed", "skipped", "failed")
+        // No stdout noise for passing tests; only failures print debugging detail
+        // (assertion message + full stack trace).
+        showStandardStreams = false
+        exceptionFormat = "full"
+        showCauses = true
+        showStackTraces = true
+    }
+    // Log everything to the console; drop the HTML report.
+    reports {
+        html.required = false
+    }
+    // Generate the coverage report right after the tests run.
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    // No HTML/XML on disk; we only need the CSV to parse and print a summary to the log.
+    reports {
+        html.required = false
+        xml.required = false
+        csv.required = true
+    }
+    doLast {
+        def csv = reports.csv.outputLocation.get().asFile
+        if (!csv.exists()) {
+            println "\n[coverage] no report generated (${csv})"
+            return
+        }
+        def pct = { covered, missed ->
+            def total = covered + missed
+            total == 0 ? "n/a" : String.format("%.1f%% (%d/%d)", 100.0 * covered / total, covered, total)
+        }
+        int insMissed = 0, insCovered = 0, brMissed = 0, brCovered = 0, lnMissed = 0, lnCovered = 0
+        // JaCoCo CSV columns: GROUP,PACKAGE,CLASS,
+        //   INSTRUCTION_MISSED(3),INSTRUCTION_COVERED(4),BRANCH_MISSED(5),BRANCH_COVERED(6),
+        //   LINE_MISSED(7),LINE_COVERED(8),...
+        csv.readLines().drop(1).each { row ->
+            def c = row.split(',')
+            insMissed += c[3] as int; insCovered += c[4] as int
+            brMissed  += c[5] as int; brCovered  += c[6] as int
+            lnMissed  += c[7] as int; lnCovered  += c[8] as int
+            if (c[2] == "CredentialsExtractor") {
+                println "\n[coverage] CredentialsExtractor -> lines ${pct(c[8] as int, c[7] as int)}, " +
+                        "branches ${pct(c[6] as int, c[5] as int)}, instructions ${pct(c[4] as int, c[3] as int)}"
+            }
+        }
+        println "[coverage] TOTAL -> lines ${pct(lnCovered, lnMissed)}, " +
+                "branches ${pct(brCovered, brMissed)}, instructions ${pct(insCovered, insMissed)}\n"
     }
 }
