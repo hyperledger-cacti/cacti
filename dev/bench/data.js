@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1787830577420,
+  "lastUpdate": 1788164235331,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -130,6 +130,42 @@ window.BENCHMARK_DATA = {
             "range": "±4.28%",
             "unit": "ops/sec",
             "extra": "184 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Parth Singh",
+            "username": "ParthSinghPS",
+            "email": "posiedon.1721@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "2ebe62180e4425dbd028cc2f62c4b4aa44595355",
+          "message": "docs(packages): standardize remaining package documentation\n\nAddresses #4595\n\nApply the package documentation template to the remaining in-scope\npackages and active extensions. Align README package names with their\nmanifests, add focused installation, API, usage, and testing guidance,\nand update the package index.\n\nConsolidate SATP Hermes configuration, database, operations,\narchitecture, and API Type 3 documentation through MkDocs wrappers.\n\nVerify Weaver documentation navigation, correct stale workflow badges,\nand document active Fabric Go sample modules.\n\nAssisted-by: openai:gpt-5\nSigned-off-by: Parth Singh <posiedon.1721@gmail.com>",
+          "timestamp": "2026-08-21T18:36:02Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/2ebe62180e4425dbd028cc2f62c4b4aa44595355"
+        },
+        "date": 1788164232387,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 643,
+            "range": "±3.14%",
+            "unit": "ops/sec",
+            "extra": "174 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 632,
+            "range": "±2.00%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
