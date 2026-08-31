@@ -9,7 +9,6 @@ package org.hyperledger.cacti.weaver.sdk.corda;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -79,21 +78,16 @@ public class CredentialsExtractor {
 		return true;
 	}
 
-	private static boolean loadKeyStore(KeyStore ks, String path) {
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(new File(path));	// Trust store file path
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+	private static void loadKeyStore(KeyStore ks, String path) {
+		File keyStoreFile = new File(path);
+		if (!keyStoreFile.exists()) {
+			throw new IllegalArgumentException("CredentialsExtractor: keystore file not found: " + path);
 		}
-		try {
+		try (FileInputStream fis = new FileInputStream(keyStoreFile)) {
 			ks.load(fis, null);
-			fis.close();
-			return true;
 		} catch (NoSuchAlgorithmException | CertificateException | IOException e) {
-			e.printStackTrace();
+			throw new IllegalStateException("CredentialsExtractor: failed to load keystore '" + path + "': " + e.getMessage(), e);
 		}
-		return false;
 	}
 
 	private static String readFile(String path) {
@@ -120,75 +114,16 @@ public class CredentialsExtractor {
 		return null;
 	}
 
-	private static String getRootCertPEM(KeyStore ks, String trustStore, String tempStore) {
-		if (!loadKeyStore(ks, trustStore)) {
-			return null;
-		}
-		try {
-			Enumeration<String> aliases = ks.aliases();
-			while (aliases.hasMoreElements()) {
-				String alias = aliases.nextElement();
-				System.out.println("Trust store alias:" + alias);
-				if (ks.isCertificateEntry(alias)) {
-					System.out.println("This is a certificate alias");
-				} else {
-					continue;
-				}
-				Certificate cert = ks.getCertificate(alias);
-				if (cert != null) {
-					if (cert.getType().equals("X.509")) {
-						X509Certificate xcert = (X509Certificate) cert;
-						System.out.println(xcert.getIssuerX500Principal().getName());
-						System.out.println(xcert.getSubjectX500Principal().getName());
-						System.out.println(xcert.getCriticalExtensionOIDs());
-						if (isSelfSignedCertificate(xcert)) {
-							System.out.println("This is a Self-signed certificate");
-						}
-						else {
-							return null;
-						}
-						try {
-							File outputDir = new File(tempStore + "root/");
-							if (!outputDir.exists()) {
-								outputDir.mkdirs();
-								// remove all privilege from all previous users
-								outputDir.setReadable(false, false);
-								outputDir.setWritable(false, false);
-								outputDir.setExecutable(false, false);
-								// add all privilege to owner
-								outputDir.setReadable(true, true); 
-								outputDir.setWritable(true, true);
-								outputDir.setExecutable(true, true);
-							}
-							JcaPEMWriter xwriter = new JcaPEMWriter(new FileWriter(tempStore + "root/rootcert.pem"));
-							xwriter.writeObject(xcert);
-							xwriter.close();
-							return readFile(tempStore + "root/rootcert.pem");
-						} catch (IOException e) {
-							e.printStackTrace();
-							break;
-						}
-					}
-				}
-			}
-		} catch (KeyStoreException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	// Return sequence: <node org id> <root CA cert>, <doorman CA cert>, <node CA cert>, <id cert 1>, <id cert 2>,....
 	private static Vector<String> getCertChain(KeyStore ks, String nodeKeyStorePath, String tmpStore, String[] tmpCertfiles) {
 		Vector<String> chainCerts = new Vector<String>();
-		if (!loadKeyStore(ks, nodeKeyStorePath)) {
-			return null;
-		}
+		loadKeyStore(ks, nodeKeyStorePath);
 		try {
 			Enumeration<String> aliases = ks.aliases();
 			while (aliases.hasMoreElements()) {
 				String alias = aliases.nextElement();
 				Certificate[] certs = ks.getCertificateChain(alias);
-				if (certs.length == 4) {
+				if (certs != null && certs.length == 4) {
 					X509Certificate xcerts[] = new X509Certificate[certs.length];
 					for (int i = 0 ; i < certs.length ; i++) {
 						if (!certs[i].getType().equals("X.509")) {
@@ -281,11 +216,6 @@ public class CredentialsExtractor {
 		JsonArray nodeIdCert = new JsonArray();
 		nodeIdCert.add(certs.elementAt(4));
 		configObj.add("nodeid_cert", nodeIdCert);
-		/*JsonArray idArr = new JsonArray();
-		for (int i = 3 ; i < certs.size() ; i++) {
-			idArr.add(certs.elementAt(i));
-		}
-		obj.add("admins", idArr);*/
 		return configObj;
 	}
 
@@ -334,20 +264,15 @@ public class CredentialsExtractor {
 			String nodePath = baseNodesPath + node + "/certificates";
 			String tempStore = nodePath + "/tmp/";
 			JsonObject nodeConfigObj = new JsonObject();
-			nodeConfigObj = getNodeIdCertChain(ks, nodeConfigObj, nodePath + "/nodekeystore.jks", tempStore);
-			if (configObj == null) {
-				System.out.println("Unable to extract node certificate chain");
-				break;
-			} else {
-				//nodeConfigObj = getNodeTlsCertChain(ks, nodeConfigObj, nodePath + "/sslkeystore.jks", tempStore);
-				//if (nodeConfigObj == null) {
-				//	System.out.println("Unable to extract TLS certificate chain");
-				//	break;
-				//} else {
-				//	configObj.add(node, nodeConfigObj);
-				//}
-				configObj.add(node, nodeConfigObj);
+			String nodeKeyStorePath = nodePath + "/nodekeystore.jks";
+			nodeConfigObj = getNodeIdCertChain(ks, nodeConfigObj, nodeKeyStorePath, tempStore);
+			if (nodeConfigObj == null) {
+				throw new IllegalStateException("CredentialsExtractor: unable to extract identity certificate chain for node '"
+						+ node + "'; expected a 4-certificate chain (node identity, node CA, doorman CA, root CA) in keystore: "
+						+ nodeKeyStorePath);
 			}
+			//nodeConfigObj = getNodeTlsCertChain(ks, nodeConfigObj, nodePath + "/sslkeystore.jks", tempStore);
+			configObj.add(node, nodeConfigObj);
 			try {
 				deleteFolder(new File(tempStore));
 			} catch (Exception e) {
@@ -359,22 +284,5 @@ public class CredentialsExtractor {
 		Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 		return gson.toJson(configObj);
 	}
-
-	/*public static void main(String[] args) {
-		String baseNodesPath = "store/certs/";
-		String config = getConfig(baseNodesPath);
-		if (config == null) {
-			System.out.println("Unable to get config");
-		} else {
-			try {
-				FileWriter fw = new FileWriter(baseNodesPath + "config.json");
-				fw.write(config);
-				fw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			System.out.println("Written configuration JSON to file");
-		}
-	}*/
 
 }
