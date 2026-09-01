@@ -27,7 +27,7 @@ jobs:
       contents: read
     steps:
       - name: Check Version Format in Tag
-        uses: nowsprinting/check-version-format-action@485fbf1df432e42859933ebaf16f27f7cdb7bde7 #v5.0.2
+        uses: nowsprinting/check-version-format-action@ee32a64fe737aeac52fe802f1bf8c3454f93a86c #v5.0.3
         id: version
         with:
           prefix: 'v'
