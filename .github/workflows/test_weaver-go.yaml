@@ -18,12 +18,6 @@ permissions:
   contents: read
 
 jobs:
-
-  debug_event_type:
-    runs-on: ubuntu-22.04
-    steps:
-      - run: echo "${{ github.event_name }}"
-     
   check_code_changed:
     outputs:
       interopcc_changed: ${{ steps.changes.outputs.interopcc_changed }}
@@ -349,3 +343,50 @@ jobs:
     - name: Test
       run: GOLANG_PROTOBUF_REGISTRATION_CONFLICT=warn CACTI_ROOT=$GITHUB_WORKSPACE go test -v .
       working-directory: weaver/sdks/fabric/go-sdk/membershipmanager
+
+  # Single rollup gate for all jobs above. Branch protection requires ONLY this
+  # context instead of the individual job contexts, so a job that legitimately
+  # skips (paths-filter found no relevant change) does not leave a required
+  # check pending forever. `if: always()` makes it always report a status; a
+  # `skipped` dependency is treated as passing, only `failure`/`cancelled` fail.
+  go-success:
+    needs:
+      - check_code_changed
+      - unit_test_interopcc
+      - unit_test_assetmgmt
+      - build_test_libs_utils
+      - build_test_libs_assetexchange
+      - unit_test_sdk
+      - build_test_cli
+      - unit_test_simplestate
+      - unit_test_satpsimpleasset
+      - unit_test_simpleasset
+      - unit_test_simpleassetandinterop
+      - unit_test_simpleassettransfer
+      - unit_test_sdk_membership
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Report status of all jobs
+        run: |
+          echo "Status of upstream jobs:"
+          echo "  check_code_changed              = ${{ needs.check_code_changed.result }}"
+          echo "  unit_test_interopcc             = ${{ needs.unit_test_interopcc.result }}"
+          echo "  unit_test_assetmgmt             = ${{ needs.unit_test_assetmgmt.result }}"
+          echo "  build_test_libs_utils           = ${{ needs.build_test_libs_utils.result }}"
+          echo "  build_test_libs_assetexchange   = ${{ needs.build_test_libs_assetexchange.result }}"
+          echo "  unit_test_sdk                   = ${{ needs.unit_test_sdk.result }}"
+          echo "  build_test_cli                  = ${{ needs.build_test_cli.result }}"
+          echo "  unit_test_simplestate           = ${{ needs.unit_test_simplestate.result }}"
+          echo "  unit_test_satpsimpleasset       = ${{ needs.unit_test_satpsimpleasset.result }}"
+          echo "  unit_test_simpleasset           = ${{ needs.unit_test_simpleasset.result }}"
+          echo "  unit_test_simpleassetandinterop = ${{ needs.unit_test_simpleassetandinterop.result }}"
+          echo "  unit_test_simpleassettransfer   = ${{ needs.unit_test_simpleassettransfer.result }}"
+          echo "  unit_test_sdk_membership        = ${{ needs.unit_test_sdk_membership.result }}"
+      - name: Fail if any job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::One or more jobs failed or were cancelled."
+          exit 1
+      - name: All jobs passed
+        run: echo "All jobs succeeded or were skipped."
