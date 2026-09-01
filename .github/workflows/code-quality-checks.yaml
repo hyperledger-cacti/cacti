@@ -83,7 +83,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@908c540300062bd5a7e473851cdb4282204cee09 #v1.9.1
         with:
-          version: stable
+          version: "1.5.1"
 
       - name: build
         with:
