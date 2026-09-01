@@ -19,9 +19,10 @@ additionally implements `IPluginGrpcService` for gRPC streaming.
 
 ## Supported Connectors
 
-Aries, Besu, CDL, Corda, Ethereum, Fabric, Polkadot, Sawtooth,
-Xdai. Each has ledger-specific APIs — Ethereum and Besu share the most
-overlap; Fabric uses `ConnectionProfile` and identity wallets.
+The active production connectors support Hyperledger Besu, R3 Corda,
+Ethereum, Hyperledger Fabric, and Stellar. Each connector has ledger-specific
+APIs. Ethereum and Besu share the most overlap, while Fabric uses connection
+profiles and identity wallets.
 
 ## Common File Structure
 

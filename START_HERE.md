@@ -242,19 +242,9 @@ endpoint at the API server's base URL.
 
 ### Making Your First Contribution
 
-Once your environment is set up, follow this workflow to submit your
-first pull request:
-
-1. **Fork** the repository on GitHub.
-2. **Create a branch** from `main` with a descriptive name.
-3. **Make your changes** in small, focused commits.
-4. **Run the local CI checks** before pushing:
-   ```bash
-   yarn run configure
-   yarn run lint
-   yarn run test:jest:all
-   ```
-5. **Push and open a pull request** against `upstream/main`.
+Follow the [How to Contribute][how_to_contribute] guide for the
+authoritative contribution workflow, pull request requirements, commit
+conventions, and validation guidance.
 
 ### Contributor Documentation
 
@@ -294,6 +284,7 @@ standards, and review expectations:
 [build_getting_started]: ./BUILD.md#getting-started
 [build_doc]: ./BUILD.md
 [contributing_doc]: ./CONTRIBUTING.md
+[how_to_contribute]: ./docs/docs/contributing/how-to-contribute.md
 [conventions_doc]: ./CONVENTIONS.md
 [pull_doc]: ./PULL.md
 [ai_guidelines_doc]: ./AI_GUIDELINES.md
