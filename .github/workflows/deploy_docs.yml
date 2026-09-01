@@ -6,13 +6,14 @@ name: Deploy Docs (Github Pages)
 
 on:
   push:
+    branches:
+      # pushes to main refresh the 'dev' docs version (only when docs paths change,
+      # gated by the check_docs_changed job below)
+      - main
     tags:
-      # only tags with stable versions a.b.c i.e. without -alpha or -dev or -beta etc
+      # only tags with stable versions a.b.c i.e. without -alpha or -dev or -beta etc.
+      # Tagged releases always publish, regardless of which paths changed.
       - v[0-9]+.[0-9]+.[0-9]+
-
-    paths:
-      - 'docs/**'
-      - 'packages/cactus-plugin-satp-hermes/docs/**'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,7 +27,31 @@ permissions:
   contents: read
 
 jobs:
+  # Detects whether documentation-relevant files changed. Only meaningful for
+  # main pushes (dev docs); tagged releases and manual dispatches ignore its
+  # result and always publish (see deploy-docs `if` below).
+  check_docs_changed:
+    runs-on: ubuntu-22.04
+    outputs:
+      docs_changed: ${{ steps.changes.outputs.docs_changed }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 #v7.0.0
+
+      - uses: dorny/paths-filter@7b450fff21473bca461d4b92ce414b9d0420d706 #v4.0.2
+        id: changes
+        with:
+          filters: |
+            docs_changed:
+              - '*.md'
+              - 'docs/**'
+              - 'packages/**/*.md'
+              - 'weaver/**/*.md'
+
   deploy-docs:
+    needs: check_docs_changed
+    # Tagged releases and manual dispatches always publish; main pushes publish
+    # only when docs-relevant paths changed.
+    if: ${{ github.ref_type == 'tag' || github.event_name == 'workflow_dispatch' || needs.check_docs_changed.outputs.docs_changed == 'true' }}
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -85,11 +110,33 @@ jobs:
       - name: Build markdown for openapi specs
         run: 'python3 docs/scripts/publish_openapi.py'
         
-      - name: Build and publish
-        # NOTE: no `git pull` here. This workflow is triggered by tag pushes, so
-        # actions/checkout leaves us in detached-HEAD state; `git pull` would fail
-        # with "You are not currently on a branch". `mkdocs gh-deploy` manages the
-        # gh-pages branch on its own (force-pushes via ghp-import), so it needs no
-        # pull of the source ref.
-        run: mkdocs gh-deploy
+      - name: Configure git identity for mike
+        # mike commits the built site to the gh-pages branch, so it needs an author.
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Build and publish (versioned)
+        # `mike` publishes versioned docs to the gh-pages branch (each version in its
+        # own subdir, with a versions.json + root redirect). No `git pull` here: tag
+        # pushes leave actions/checkout in detached-HEAD state and mike manages
+        # gh-pages on its own via --push.
+        #
+        #   - tag push (v1.2.3)  -> deploy version 1.2.3 + moving `latest` alias,
+        #                           and make `latest` the default the root redirects to
+        #   - main push/dispatch -> refresh the `dev` version
+        run: |
+          # mike commits to the gh-pages branch, but the CI checkout only fetched the
+          # triggering ref — not gh-pages. Without that branch locally, mike creates a
+          # divergent one and its push is rejected ("fetch first"). Fetch it so mike
+          # appends and fast-forwards; ignore failure on the first-ever deploy when
+          # gh-pages does not yet exist.
+          git fetch origin gh-pages --depth=1 || echo "no existing gh-pages branch yet"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VERSION="${GITHUB_REF_NAME#v}"        # v1.2.3 -> 1.2.3
+            mike deploy --push --update-aliases "$VERSION" latest
+            mike set-default --push latest
+          else
+            mike deploy --push dev
+          fi
         working-directory: docs
