@@ -208,3 +208,30 @@ jobs:
               exit 1
           fi
         working-directory: weaver/samples/fabric/fabric-cli
+
+  # Single rollup gate for all jobs above. Branch protection requires ONLY this
+  # context instead of the individual job contexts, so a job that legitimately
+  # skips (paths-filter found no relevant change) does not leave a required
+  # check pending forever. `if: always()` makes it always report a status; a
+  # `skipped` dependency is treated as passing, only `failure`/`cancelled` fail.
+  asset-exchange-fabric-success:
+    needs:
+      - check_code_changed
+      - asset-exchange-fabric
+      - asset-exchange-fabric-local
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Report status of all jobs
+        run: |
+          echo "Status of upstream jobs:"
+          echo "  check_code_changed          = ${{ needs.check_code_changed.result }}"
+          echo "  asset-exchange-fabric       = ${{ needs.asset-exchange-fabric.result }}"
+          echo "  asset-exchange-fabric-local = ${{ needs.asset-exchange-fabric-local.result }}"
+      - name: Fail if any job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::One or more jobs failed or were cancelled."
+          exit 1
+      - name: All jobs passed
+        run: echo "All jobs succeeded or were skipped."

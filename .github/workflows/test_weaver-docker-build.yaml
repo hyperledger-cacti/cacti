@@ -220,3 +220,38 @@ jobs:
       - name: Build Image
         run: make build-image-local
         working-directory: weaver/core/identity-management/iin-agent
+
+  # Single rollup gate for all jobs above. Branch protection requires ONLY this
+  # context instead of the individual job contexts, so a job that legitimately
+  # skips (paths-filter found no relevant change) does not leave a required
+  # check pending forever. `if: always()` makes it always report a status; a
+  # `skipped` dependency is treated as passing, only `failure`/`cancelled` fail.
+  docker-build-success:
+    needs:
+      - check_code_changed
+      - build_docker_relay
+      - build_docker_fabric_driver_local
+      - build_docker_fabric_driver_packages
+      - build_docker_corda_driver_local
+      - build_docker_corda_driver_packages
+      - build_docker_iin_agent_local
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Report status of all jobs
+        run: |
+          echo "Status of upstream jobs:"
+          echo "  check_code_changed                  = ${{ needs.check_code_changed.result }}"
+          echo "  build_docker_relay                  = ${{ needs.build_docker_relay.result }}"
+          echo "  build_docker_fabric_driver_local    = ${{ needs.build_docker_fabric_driver_local.result }}"
+          echo "  build_docker_fabric_driver_packages = ${{ needs.build_docker_fabric_driver_packages.result }}"
+          echo "  build_docker_corda_driver_local     = ${{ needs.build_docker_corda_driver_local.result }}"
+          echo "  build_docker_corda_driver_packages  = ${{ needs.build_docker_corda_driver_packages.result }}"
+          echo "  build_docker_iin_agent_local        = ${{ needs.build_docker_iin_agent_local.result }}"
+      - name: Fail if any job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::One or more jobs failed or were cancelled."
+          exit 1
+      - name: All jobs passed
+        run: echo "All jobs succeeded or were skipped."

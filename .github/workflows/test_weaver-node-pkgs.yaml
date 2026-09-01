@@ -157,3 +157,35 @@ jobs:
       - name: Build
         run: mkdocs build
         working-directory: docs
+
+  # Single rollup gate for all Weaver node-package jobs above. Branch protection
+  # requires ONLY this context (node-pkgs / node-pkgs-success) instead of the
+  # per-matrix-leg contexts. Because the matrix jobs skip at the job level when
+  # paths-filter finds no relevant change, their per-leg contexts are never
+  # emitted and would otherwise leave a required check pending forever. This job
+  # runs with `if: always()` so it always reports a status; a `skipped`
+  # dependency (including a matrix job that never spawned any legs) is treated as
+  # passing, and only `failure`/`cancelled` fail the gate.
+  node-pkgs-success:
+    needs:
+      - check_code_changed
+      - unit_test_weaver_node_sdk_local
+      - unit_test_iin_agent_local
+      - build-docs
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Report status of all node-pkgs jobs
+        run: |
+          echo "Status of upstream jobs:"
+          echo "  check_code_changed              = ${{ needs.check_code_changed.result }}"
+          echo "  unit_test_weaver_node_sdk_local = ${{ needs.unit_test_weaver_node_sdk_local.result }}"
+          echo "  unit_test_iin_agent_local       = ${{ needs.unit_test_iin_agent_local.result }}"
+          echo "  build-docs                      = ${{ needs.build-docs.result }}"
+      - name: Fail if any job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::One or more Weaver node-package jobs failed or were cancelled."
+          exit 1
+      - name: All jobs passed
+        run: echo "All Weaver node-package jobs succeeded or were skipped."

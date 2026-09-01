@@ -197,3 +197,28 @@ jobs:
       - name: DEBUG Logs - fabric n1 and n2 driver
         if: failure()
         run: cat weaver/core/drivers/fabric-driver/fdriver.out
+
+  # Single rollup gate for all jobs above. Branch protection requires ONLY this
+  # context instead of the individual job contexts, so a job that legitimately
+  # skips (paths-filter found no relevant change) does not leave a required
+  # check pending forever. `if: always()` makes it always report a status; a
+  # `skipped` dependency is treated as passing, only `failure`/`cancelled` fail.
+  fabric-fabric-satp-success:
+    needs:
+      - check_code_changed
+      - fabric-fabric-satp-local
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Report status of all jobs
+        run: |
+          echo "Status of upstream jobs:"
+          echo "  check_code_changed       = ${{ needs.check_code_changed.result }}"
+          echo "  fabric-fabric-satp-local = ${{ needs.fabric-fabric-satp-local.result }}"
+      - name: Fail if any job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::One or more jobs failed or were cancelled."
+          exit 1
+      - name: All jobs passed
+        run: echo "All jobs succeeded or were skipped."

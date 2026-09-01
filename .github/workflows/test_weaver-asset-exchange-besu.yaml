@@ -403,3 +403,33 @@ jobs:
           fi
         working-directory: weaver/samples/besu/besu-cli
 
+
+  # Single rollup gate for all Besu asset-exchange jobs above. Branch protection
+  # requires ONLY this context (asset-exchange-besu / asset-exchange-besu-success)
+  # instead of the per-matrix-leg contexts. Because the matrix jobs skip at the
+  # job level when paths-filter finds no relevant change, their per-leg contexts
+  # are never emitted and would otherwise leave a required check pending forever.
+  # This job runs with `if: always()` so it always reports a status; a `skipped`
+  # dependency (including a matrix job that never spawned any legs) is treated as
+  # passing, and only `failure`/`cancelled` fail the gate.
+  asset-exchange-besu-success:
+    needs:
+      - check_code_changed
+      - asset-exchange-besu
+      - asset-exchange-besu-local
+    if: ${{ always() }}
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Report status of all besu asset-exchange jobs
+        run: |
+          echo "Status of upstream jobs:"
+          echo "  check_code_changed        = ${{ needs.check_code_changed.result }}"
+          echo "  asset-exchange-besu       = ${{ needs.asset-exchange-besu.result }}"
+          echo "  asset-exchange-besu-local = ${{ needs.asset-exchange-besu-local.result }}"
+      - name: Fail if any job failed or was cancelled
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "::error::One or more Besu asset-exchange jobs failed or were cancelled."
+          exit 1
+      - name: All jobs passed
+        run: echo "All Besu asset-exchange jobs succeeded or were skipped."
