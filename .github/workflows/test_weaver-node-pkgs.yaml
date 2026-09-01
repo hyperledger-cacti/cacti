@@ -57,13 +57,12 @@ jobs:
 
   unit_test_weaver_node_sdk_local:
     needs: check_code_changed
+    if: inputs.run_all == 'true' || needs.check_code_changed.outputs.fabric_sdk_changed == 'true'
     runs-on: ubuntu-22.04
 
     strategy:
       matrix:
         node-version: [v20.20.2, v22.18.0]
-        exclude:
-          - node-version: ${{ needs.check_code_changed.outputs.fabric_sdk_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -98,13 +97,12 @@ jobs:
 
   unit_test_iin_agent_local:
     needs: check_code_changed
+    if: inputs.run_all == 'true' || needs.check_code_changed.outputs.iin_agent_changed == 'true'
     runs-on: ubuntu-22.04
 
     strategy:
       matrix:
         node-version: [v20.20.2, v22.18.0]
-        exclude:
-          - node-version: ${{ needs.check_code_changed.outputs.iin_agent_changed != 'true' }}
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
