@@ -93,7 +93,6 @@ nav:
       - Overview: concepts/index.md
       - Data Sharing: concepts/data-sharing.md
     - Start Here: start-here.md
-    - Use Cases: use-cases.md
   - Platforms:
     - Cactus:
       - Introduction: cactus/introduction.md
@@ -118,12 +117,7 @@ nav:
           - Overview: cactus/ledger-browser/developer-guide/overview.md
           - Architecture: cactus/ledger-browser/developer-guide/architecture.md
           - Tutorial: cactus/ledger-browser/developer-guide/tutorial.md
-      - Ledger Support:
-        - Overview: cactus/support.md
-        - Hyperledger Besu: cactus/support/besu.md
-        - R3 Corda: cactus/support/corda.md
-        - Hyperledger Fabric: cactus/support/fabric.md
-        - Hyperledger Iroha: cactus/support/iroha.md
+      - Ledger Support: cactus/support.md
     - Weaver:
       - Framework: weaver/introduction.md
       - Getting Started:
@@ -182,12 +176,14 @@ nav:
       - Specifications: weaver/specifications.md
       - Roadmap: weaver/roadmap.md
       - Publications: weaver/publications.md
-  - SATP Hermes:
-    - Overview: satp-hermes/index.md
-    - Gateway Configuration: satp-hermes/configuration.md
-    - API Type 3 Adapter Specification: satp-hermes/api3-adapter-spec.md
-    - Database and Migrations: satp-hermes/database.md
-    - Operations: satp-hermes/operations.md
+  - SATP:
+    - SATP Hermes:
+      - Overview: satp-hermes/index.md
+      - Gateway Configuration: satp-hermes/configuration.md
+      - API Type 3 Adapter Specification: satp-hermes/api3-adapter-spec.md
+      - Database and Migrations: satp-hermes/database.md
+      - Operations: satp-hermes/operations.md
+    - SATP Weaver: satp-weaver.md
   - Build and Operate:
     - Guides:
       - Getting Started: guides/getting-started.md
@@ -206,6 +202,7 @@ nav:
       - VS Code Setup: recipes/vscode-setup.md
   - Reference:
     - Overview: references/index.md
+    - Use Cases and Applications for Cacti: use-cases.md
     - Technical Specifications: references/specs.md
     - Publications: references/publications.md
     - Events and Podcasts: references/events.md
