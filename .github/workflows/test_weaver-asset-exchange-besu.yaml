@@ -39,7 +39,7 @@ jobs:
 
   asset-exchange-besu:
     needs: check_code_changed
-    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' }}
+    if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && (inputs.run_all == 'true' || needs.check_code_changed.outputs.status == 'true') }}
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
@@ -47,8 +47,6 @@ jobs:
       fail-fast: false
       matrix:
         app_contract: ["AliceERC1155", "AliceERC20", "AliceERC721"]
-        exclude:
-          - app_contract: ${{ needs.check_code_changed.outputs.status != 'true' }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -221,6 +219,7 @@ jobs:
 
   asset-exchange-besu-local:
     needs: check_code_changed
+    if: inputs.run_all == 'true' || needs.check_code_changed.outputs.status == 'true'
     # The type of runner that the job will run on
     runs-on: ubuntu-22.04
 
@@ -228,17 +227,9 @@ jobs:
       fail-fast: false
       matrix:
         app_contract: ["AliceERC1155", "AliceERC20", "AliceERC721"]
-        exclude:
-          - app_contract: ${{ needs.check_code_changed.outputs.status != 'true' }}
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Print  needs.check_code_changed.outputs.status
-        run: echo needs.check_code_changed.outputs.status => ${{ needs.check_code_changed.outputs.status }}
-
-      - name: Print  needs.check_code_changed.outputs.status != true
-        run: echo needs.check_code_changed.outputs.status != true => ${{ needs.check_code_changed.outputs.status != 'true' }}
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
