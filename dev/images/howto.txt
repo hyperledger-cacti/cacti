@@ -1,0 +1,1 @@
+rsvg-convert -w 1280 -o hyperledgercactus.png -f png -a hyperledgercactus_color.svg

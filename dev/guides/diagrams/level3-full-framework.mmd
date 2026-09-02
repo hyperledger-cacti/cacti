@@ -1,0 +1,41 @@
+---
+title: Level 3 - Full Framework Integration
+---
+flowchart TB
+    subgraph CLIENT["Client Layer"]
+        FE["Your Frontend<br/>(React/Angular/Vue)"]
+    end
+
+    subgraph APISERVER["Cacti API Server"]
+        direction TB
+        
+        subgraph YOURPLUGIN["Your Business Logic Plugin"]
+            EP["Your REST Endpoints"]
+            SVC["Your Services"]
+            EP --> SVC
+        end
+        
+        subgraph CACTIPLUGINS["Cacti Plugins"]
+            direction LR
+            CONN["Ledger Connectors"]
+            KC["Keychain"]
+            CONS["Consortium"]
+        end
+        
+        YOURPLUGIN --> CACTIPLUGINS
+    end
+
+    subgraph LEDGERS["Blockchain Networks"]
+        direction LR
+        L1["Fabric"]
+        L2["Besu"]
+        L3["Ethereum"]
+    end
+
+    CLIENT --> APISERVER
+    CACTIPLUGINS --> LEDGERS
+
+    style CLIENT fill:#e3f2fd,stroke:#1565c0
+    style YOURPLUGIN fill:#fff8e1,stroke:#ff8f00
+    style CACTIPLUGINS fill:#e8f5e9,stroke:#2e7d32
+    style LEDGERS fill:#fce4ec,stroke:#c2185b
