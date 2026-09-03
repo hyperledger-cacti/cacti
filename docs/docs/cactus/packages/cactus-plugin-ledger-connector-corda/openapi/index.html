@@ -1,0 +1,1904 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cacti Plugin - Connector Corda</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cacti Plugin - Connector Corda</h1>
+    <div class="app-desc">Can perform basic tasks on a Corda ledger</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#clearMonitorTransactionsV1"><code><span class="http-method">delete</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions</code></a></li>
+  <li><a href="#deployContractJarsV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars</code></a></li>
+  <li><a href="#diagnoseNodeV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node</code></a></li>
+  <li><a href="#getFlowV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid</code></a></li>
+  <li><a href="#getMonitorTransactionsV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions</code></a></li>
+  <li><a href="#getPrometheusMetricsV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics</code></a></li>
+  <li><a href="#invokeContractV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract</code></a></li>
+  <li><a href="#listCpiV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi</code></a></li>
+  <li><a href="#listFlowV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow</code></a></li>
+  <li><a href="#listFlowsV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows</code></a></li>
+  <li><a href="#networkMapV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map</code></a></li>
+  <li><a href="#startFlowV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow</code></a></li>
+  <li><a href="#startMonitorV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor</code></a></li>
+  <li><a href="#stopMonitorV1"><code><span class="http-method">delete</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor</code></a></li>
+  <li><a href="#vaultQueryV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="clearMonitorTransactionsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions</code></pre></div>
+    <div class="method-summary">Clear transactions from internal store so they'll not be available by GetMonitorTransactionsV1 anymore. (<span class="nickname">clearMonitorTransactionsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">ClearMonitorTransactionsV1Request <a href="#ClearMonitorTransactionsV1Request">ClearMonitorTransactionsV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ClearMonitorTransactionsV1Response">ClearMonitorTransactionsV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "msg" : "msg",
+  "success" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#ClearMonitorTransactionsV1Response">ClearMonitorTransactionsV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="deployContractJarsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars</code></pre></div>
+    <div class="method-summary">Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak). (<span class="nickname">deployContractJarsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">DeployContractJarsV1Request <a href="#DeployContractJarsV1Request">DeployContractJarsV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#DeployContractJarsSuccessV1Response">DeployContractJarsSuccessV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "deployedJarFiles" : [ "deployedJarFiles", "deployedJarFiles" ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#DeployContractJarsSuccessV1Response">DeployContractJarsSuccessV1Response</a>
+    <h4 class="field-label">400</h4>
+    Bad Request
+        <a href="#DeployContractJarsBadRequestV1Response">DeployContractJarsBadRequestV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="diagnoseNodeV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">diagnoseNodeV1</span>)</div>
+    <div class="method-notes">Responds with diagnostic information about the Corda node</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">DiagnoseNodeV1Request <a href="#DiagnoseNodeV1Request">DiagnoseNodeV1Request</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#DiagnoseNodeV1Response">DiagnoseNodeV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "nodeDiagnosticInfo" : {
+    "vendor" : "vendor",
+    "platformVersion" : 1,
+    "version" : "version",
+    "cordapps" : [ {
+      "licence" : "licence",
+      "targetPlatformVersion" : 6,
+      "vendor" : "vendor",
+      "name" : "name",
+      "jarHash" : {
+        "offset" : 0,
+        "size" : 32,
+        "bytes" : "Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc="
+      },
+      "shortName" : "shortName",
+      "type" : "type",
+      "version" : "version",
+      "minimumPlatformVersion" : 0
+    }, {
+      "licence" : "licence",
+      "targetPlatformVersion" : 6,
+      "vendor" : "vendor",
+      "name" : "name",
+      "jarHash" : {
+        "offset" : 0,
+        "size" : 32,
+        "bytes" : "Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc="
+      },
+      "shortName" : "shortName",
+      "type" : "type",
+      "version" : "version",
+      "minimumPlatformVersion" : 0
+    }, {
+      "licence" : "licence",
+      "targetPlatformVersion" : 6,
+      "vendor" : "vendor",
+      "name" : "name",
+      "jarHash" : {
+        "offset" : 0,
+        "size" : 32,
+        "bytes" : "Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc="
+      },
+      "shortName" : "shortName",
+      "type" : "type",
+      "version" : "version",
+      "minimumPlatformVersion" : 0
+    }, {
+      "licence" : "licence",
+      "targetPlatformVersion" : 6,
+      "vendor" : "vendor",
+      "name" : "name",
+      "jarHash" : {
+        "offset" : 0,
+        "size" : 32,
+        "bytes" : "Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc="
+      },
+      "shortName" : "shortName",
+      "type" : "type",
+      "version" : "version",
+      "minimumPlatformVersion" : 0
+    }, {
+      "licence" : "licence",
+      "targetPlatformVersion" : 6,
+      "vendor" : "vendor",
+      "name" : "name",
+      "jarHash" : {
+        "offset" : 0,
+        "size" : 32,
+        "bytes" : "Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc="
+      },
+      "shortName" : "shortName",
+      "type" : "type",
+      "version" : "version",
+      "minimumPlatformVersion" : 0
+    } ],
+    "revision" : "revision"
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#DiagnoseNodeV1Response">DiagnoseNodeV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getFlowV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid</code></pre></div>
+    <div class="method-summary">This method gets the current status of the specified flow instance. (<span class="nickname">getFlowV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetFlowCidV1Request <a href="#GetFlowCidV1Request">GetFlowCidV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetFlowCidV1Response">GetFlowCidV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: text/plain</div>
+    <pre class="example"><code>Custom MIME type example not yet supported: text/plain</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetFlowCidV1Response">GetFlowCidV1Response</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Forbidden
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getMonitorTransactionsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions</code></pre></div>
+    <div class="method-summary">Get transactions for monitored state classes. (<span class="nickname">getMonitorTransactionsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetMonitorTransactionsV1Request <a href="#GetMonitorTransactionsV1Request">GetMonitorTransactionsV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetMonitorTransactionsV1Response">GetMonitorTransactionsV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "msg" : "msg",
+  "tx" : [ {
+    "data" : "data",
+    "index" : "index"
+  }, {
+    "data" : "data",
+    "index" : "index"
+  } ],
+  "success" : true,
+  "stateFullClassName" : "net.corda.samples.example.states.IOUState"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetMonitorTransactionsV1Response">GetMonitorTransactionsV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getPrometheusMetricsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics</code></pre></div>
+    <div class="method-summary">Get the Prometheus Metrics (<span class="nickname">getPrometheusMetricsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      String
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#String">String</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="invokeContractV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract</code></pre></div>
+    <div class="method-summary">Invokes a contract on a Corda ledger (e.g. a flow) (<span class="nickname">invokeContractV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">InvokeContractV1Request <a href="#InvokeContractV1Request">InvokeContractV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "callOutput" : "{}",
+  "success" : true,
+  "progress" : [ "progress", "progress" ],
+  "flowId" : "flowId",
+  "transactionId" : "transactionId"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="listCpiV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi</code></pre></div>
+    <div class="method-summary">List all CPIs uploaded to the cluster (<span class="nickname">listCpiV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">ListCpiV1Request <a href="#ListCpiV1Request">ListCpiV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ListCpiV1Response">ListCpiV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "cpis" : [ {
+    "cpiFileFullChecksum" : "string",
+    "cpiFileChecksum" : "string",
+    "cpks" : [ {
+      "libraries" : [ "string", "string" ],
+      "id" : {
+        "signerSummaryHash" : "string",
+        "name" : "string",
+        "version" : "string"
+      },
+      "mainBundle" : "string",
+      "type" : "string",
+      "hash" : "string",
+      "timestamp" : "2022-06-24T10:15:30Z"
+    }, {
+      "libraries" : [ "string", "string" ],
+      "id" : {
+        "signerSummaryHash" : "string",
+        "name" : "string",
+        "version" : "string"
+      },
+      "mainBundle" : "string",
+      "type" : "string",
+      "hash" : "string",
+      "timestamp" : "2022-06-24T10:15:30Z"
+    } ],
+    "groupPolicy" : "string",
+    "id" : {
+      "signerSummaryHash" : "string",
+      "name" : "string",
+      "version" : "string"
+    },
+    "timestamp" : "2022-06-24T10:15:30Z"
+  }, {
+    "cpiFileFullChecksum" : "string",
+    "cpiFileChecksum" : "string",
+    "cpks" : [ {
+      "libraries" : [ "string", "string" ],
+      "id" : {
+        "signerSummaryHash" : "string",
+        "name" : "string",
+        "version" : "string"
+      },
+      "mainBundle" : "string",
+      "type" : "string",
+      "hash" : "string",
+      "timestamp" : "2022-06-24T10:15:30Z"
+    }, {
+      "libraries" : [ "string", "string" ],
+      "id" : {
+        "signerSummaryHash" : "string",
+        "name" : "string",
+        "version" : "string"
+      },
+      "mainBundle" : "string",
+      "type" : "string",
+      "hash" : "string",
+      "timestamp" : "2022-06-24T10:15:30Z"
+    } ],
+    "groupPolicy" : "string",
+    "id" : {
+      "signerSummaryHash" : "string",
+      "name" : "string",
+      "version" : "string"
+    },
+    "timestamp" : "2022-06-24T10:15:30Z"
+  } ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#ListCpiV1Response">ListCpiV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="listFlowV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow</code></pre></div>
+    <div class="method-summary">This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running. (<span class="nickname">listFlowV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetFlowCidV1Request <a href="#GetFlowCidV1Request">GetFlowCidV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#FlowStatusV1Responses">FlowStatusV1Responses</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: text/plain</div>
+    <pre class="example"><code>Custom MIME type example not yet supported: text/plain</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#FlowStatusV1Responses">FlowStatusV1Responses</a>
+    <h4 class="field-label">401</h4>
+    Unauthorized
+        <a href="#"></a>
+    <h4 class="field-label">403</h4>
+    Forbidden
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="listFlowsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">listFlowsV1</span>)</div>
+    <div class="method-notes">Responds with a list of the flows on the Corda node.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">ListFlowsV1Request <a href="#ListFlowsV1Request">ListFlowsV1Request</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ListFlowsV1Response">ListFlowsV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "flowNames" : [ "net.corda.finance.flows.CashExitFlow", "net.corda.finance.flows.CashIssueAndPaymentFlow", "net.corda.finance.flows.CashIssueFlow", "net.corda.finance.flows.CashPaymentFlow", "net.corda.finance.internal.CashConfigDataFlow", "net.corda.samples.obligation.flows.IOUIssueFlow", "net.corda.samples.obligation.flows.IOUSettleFlow", "net.corda.samples.obligation.flows.IOUTransferFlow", "net.corda.samples.obligation.flows.SelfIssueCashFlow" ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#ListFlowsV1Response">ListFlowsV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="networkMapV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">networkMapV1</span>)</div>
+    <div class="method-notes">Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List<NodeInfo></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#object">object</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      array[<a href="#NodeInfo">NodeInfo</a>]
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ {
+  "legalIdentities" : [ {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  }, {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  } ],
+  "addresses" : [ {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  }, {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  } ],
+  "serial" : 1.4658129805029452,
+  "platformVersion" : 6,
+  "legalIdentitiesAndCerts" : [ null, null ]
+}, {
+  "legalIdentities" : [ {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  }, {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  } ],
+  "addresses" : [ {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  }, {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  } ],
+  "serial" : 1.4658129805029452,
+  "platformVersion" : 6,
+  "legalIdentitiesAndCerts" : [ null, null ]
+}, {
+  "legalIdentities" : [ {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  }, {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  } ],
+  "addresses" : [ {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  }, {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  } ],
+  "serial" : 1.4658129805029452,
+  "platformVersion" : 6,
+  "legalIdentitiesAndCerts" : [ null, null ]
+}, {
+  "legalIdentities" : [ {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  }, {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  } ],
+  "addresses" : [ {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  }, {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  } ],
+  "serial" : 1.4658129805029452,
+  "platformVersion" : 6,
+  "legalIdentitiesAndCerts" : [ null, null ]
+}, {
+  "legalIdentities" : [ {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  }, {
+    "owningKey" : {
+      "format" : "X.509",
+      "algorithm" : "EdDSA",
+      "encoded" : "MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54="
+    },
+    "name" : {
+      "commonName" : "commonName",
+      "country" : "GB",
+      "organisationUnit" : "organisationUnit",
+      "locality" : "London",
+      "x500Principal" : {
+        "name" : "O=PartyA,L=London,C=GB",
+        "encoded" : "MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ=="
+      },
+      "organisation" : "PartyA",
+      "state" : "state"
+    }
+  } ],
+  "addresses" : [ {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  }, {
+    "port" : 0.8008281904610115,
+    "host" : "host"
+  } ],
+  "serial" : 1.4658129805029452,
+  "platformVersion" : 6,
+  "legalIdentitiesAndCerts" : [ null, null ]
+} ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="startFlowV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow</code></pre></div>
+    <div class="method-summary">This method starts a new instance for the specified flow for the specified holding identity. (<span class="nickname">startFlowV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">StartFlowV1Request <a href="#StartFlowV1Request">StartFlowV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#StartFlowV1Response">StartFlowV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "holdingIDShortHash" : "string",
+  "flowError" : {
+    "message" : "string",
+    "type" : "string"
+  },
+  "clientRequestId" : "string",
+  "flowResult" : "string",
+  "flowStatus" : "string",
+  "flowId" : "string",
+  "timestamp" : "2022-06-24T10:15:30Z"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#StartFlowV1Response">StartFlowV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="startMonitorV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor</code></pre></div>
+    <div class="method-summary">Start monitoring corda changes (transactions) of given state class (<span class="nickname">startMonitorV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">StartMonitorV1Request <a href="#StartMonitorV1Request">StartMonitorV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#StartMonitorV1Response">StartMonitorV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "msg" : "msg",
+  "success" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#StartMonitorV1Response">StartMonitorV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="stopMonitorV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="delete"><code class="huge"><span class="http-method">delete</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor</code></pre></div>
+    <div class="method-summary">Stop monitoring corda changes (transactions) of given state class (<span class="nickname">stopMonitorV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">StopMonitorV1Request <a href="#StopMonitorV1Request">StopMonitorV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#StopMonitorV1Response">StopMonitorV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "msg" : "msg",
+  "success" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#StopMonitorV1Response">StopMonitorV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="vaultQueryV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">vaultQueryV1</span>)</div>
+    <div class="method-notes">Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">VaultQueryV1Request <a href="#VaultQueryV1Request">VaultQueryV1Request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      Object
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#Object">Object</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#CPIIDV1"><code>CPIIDV1</code> - </a></li>
+    <li><a href="#ClearMonitorTransactionsV1Request"><code>ClearMonitorTransactionsV1Request</code> - </a></li>
+    <li><a href="#ClearMonitorTransactionsV1Response"><code>ClearMonitorTransactionsV1Response</code> - </a></li>
+    <li><a href="#CordaNodeSshCredentials"><code>CordaNodeSshCredentials</code> - </a></li>
+    <li><a href="#CordaRpcCredentials"><code>CordaRpcCredentials</code> - </a></li>
+    <li><a href="#CordaX500Name"><code>CordaX500Name</code> - </a></li>
+    <li><a href="#CordappDeploymentConfig"><code>CordappDeploymentConfig</code> - </a></li>
+    <li><a href="#CordappInfo"><code>CordappInfo</code> - </a></li>
+    <li><a href="#DeployContractJarsBadRequestV1Response"><code>DeployContractJarsBadRequestV1Response</code> - </a></li>
+    <li><a href="#DeployContractJarsSuccessV1Response"><code>DeployContractJarsSuccessV1Response</code> - </a></li>
+    <li><a href="#DeployContractJarsV1Request"><code>DeployContractJarsV1Request</code> - </a></li>
+    <li><a href="#DiagnoseNodeV1Request"><code>DiagnoseNodeV1Request</code> - </a></li>
+    <li><a href="#DiagnoseNodeV1Response"><code>DiagnoseNodeV1Response</code> - </a></li>
+    <li><a href="#FlowInvocationType"><code>FlowInvocationType</code> - </a></li>
+    <li><a href="#FlowStatusV1Responses"><code>FlowStatusV1Responses</code> - </a></li>
+    <li><a href="#FlowStatusV1Responses_flowStatusResponses_inner"><code>FlowStatusV1Responses_flowStatusResponses_inner</code> - </a></li>
+    <li><a href="#FlowV1Error"><code>FlowV1Error</code> - </a></li>
+    <li><a href="#GetFlowCidV1Request"><code>GetFlowCidV1Request</code> - </a></li>
+    <li><a href="#GetFlowCidV1Response"><code>GetFlowCidV1Response</code> - </a></li>
+    <li><a href="#GetMonitorTransactionsV1Request"><code>GetMonitorTransactionsV1Request</code> - </a></li>
+    <li><a href="#GetMonitorTransactionsV1Response"><code>GetMonitorTransactionsV1Response</code> - </a></li>
+    <li><a href="#GetMonitorTransactionsV1Response_tx_inner"><code>GetMonitorTransactionsV1Response_tx_inner</code> - </a></li>
+    <li><a href="#InvokeContractV1Request"><code>InvokeContractV1Request</code> - </a></li>
+    <li><a href="#InvokeContractV1Response"><code>InvokeContractV1Response</code> - </a></li>
+    <li><a href="#JarFile"><code>JarFile</code> - </a></li>
+    <li><a href="#JvmObject"><code>JvmObject</code> - </a></li>
+    <li><a href="#JvmType"><code>JvmType</code> - </a></li>
+    <li><a href="#JvmTypeKind"><code>JvmTypeKind</code> - </a></li>
+    <li><a href="#ListCpiV1Request"><code>ListCpiV1Request</code> - </a></li>
+    <li><a href="#ListCpiV1Response"><code>ListCpiV1Response</code> - </a></li>
+    <li><a href="#ListCpiV1Response_cpis_inner"><code>ListCpiV1Response_cpis_inner</code> - </a></li>
+    <li><a href="#ListCpiV1Response_cpis_inner_cpks_inner"><code>ListCpiV1Response_cpis_inner_cpks_inner</code> - </a></li>
+    <li><a href="#ListFlowsV1Request"><code>ListFlowsV1Request</code> - </a></li>
+    <li><a href="#ListFlowsV1Response"><code>ListFlowsV1Response</code> - </a></li>
+    <li><a href="#NetworkHostAndPort"><code>NetworkHostAndPort</code> - </a></li>
+    <li><a href="#NodeDiagnosticInfo"><code>NodeDiagnosticInfo</code> - </a></li>
+    <li><a href="#NodeInfo"><code>NodeInfo</code> - </a></li>
+    <li><a href="#Party"><code>Party</code> - </a></li>
+    <li><a href="#PublicKey"><code>PublicKey</code> - </a></li>
+    <li><a href="#SHA256"><code>SHA256</code> - </a></li>
+    <li><a href="#StartFlowV1Request"><code>StartFlowV1Request</code> - </a></li>
+    <li><a href="#StartFlowV1Request_requestBody"><code>StartFlowV1Request_requestBody</code> - </a></li>
+    <li><a href="#StartFlowV1Response"><code>StartFlowV1Response</code> - </a></li>
+    <li><a href="#StartMonitorV1Request"><code>StartMonitorV1Request</code> - </a></li>
+    <li><a href="#StartMonitorV1Response"><code>StartMonitorV1Response</code> - </a></li>
+    <li><a href="#StopMonitorV1Request"><code>StopMonitorV1Request</code> - </a></li>
+    <li><a href="#StopMonitorV1Response"><code>StopMonitorV1Response</code> - </a></li>
+    <li><a href="#VaultQueryV1Request"><code>VaultQueryV1Request</code> - </a></li>
+    <li><a href="#X500Principal"><code>X500Principal</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="CPIIDV1"><code>CPIIDV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signerSummaryHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">version </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ClearMonitorTransactionsV1Request"><code>ClearMonitorTransactionsV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">clientAppId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ID of a client application that wants to monitor the state changes </div>
+<div class="param">stateFullClassName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The fully qualified name of the Corda state to monitor </div>
+<div class="param">txIndexes </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ClearMonitorTransactionsV1Response"><code>ClearMonitorTransactionsV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Flag set to true if operation completed correctly. </div>
+<div class="param">msg </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Message describing operation status or any errors that occurred. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CordaNodeSshCredentials"><code>CordaNodeSshCredentials</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">hostKeyEntry </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">username </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">password </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">hostname </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">port </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CordaRpcCredentials"><code>CordaRpcCredentials</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">hostname </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">port </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">username </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">password </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CordaX500Name"><code>CordaX500Name</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">commonName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">organisationUnit (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">organisation </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">locality </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">state (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">country </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">x500Principal </div><div class="param-desc"><span class="param-type"><a href="#X500Principal">X500Principal</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CordappDeploymentConfig"><code>CordappDeploymentConfig</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">sshCredentials </div><div class="param-desc"><span class="param-type"><a href="#CordaNodeSshCredentials">CordaNodeSshCredentials</a></span>  </div>
+<div class="param">rpcCredentials </div><div class="param-desc"><span class="param-type"><a href="#CordaRpcCredentials">CordaRpcCredentials</a></span>  </div>
+<div class="param">cordaNodeStartCmd </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The shell command to execute in order to start back up a Corda node after having placed new jars in the cordapp directory of said node. </div>
+<div class="param">cordappDir </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The absolute file system path where the Corda Node is expecting deployed Cordapp jar files to be placed. </div>
+<div class="param">cordaJarPath </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The absolute file system path where the corda.jar file of the node can be found. This is used to execute database schema migrations where applicable (H2 database in use in development environments). </div>
+<div class="param">nodeBaseDirPath </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The absolute file system path where the base directory of the Corda node can be found. This is used to pass in to corda.jar when being invoked for certain tasks such as executing database schema migrations for a deployed contract. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CordappInfo"><code>CordappInfo</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A CordappInfo describes a single CorDapp currently installed on the node</div>
+    <div class="field-items">
+      <div class="param">jarHash </div><div class="param-desc"><span class="param-type"><a href="#">SHA256</a></span>  </div>
+<div class="param">licence </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The name of the licence this CorDapp is released under </div>
+<div class="param">minimumPlatformVersion </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The minimum platform version the node must be at for the CorDapp to run </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The name of the JAR file that defines the CorDapp </div>
+<div class="param">shortName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The name of the CorDapp </div>
+<div class="param">targetPlatformVersion </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The target platform version this CorDapp has been tested against </div>
+<div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A description of what sort of CorDapp this is - either a contract, workflow, or a combination. </div>
+<div class="param">vendor </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The vendor of this CorDapp </div>
+<div class="param">version </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The version of this CorDapp </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractJarsBadRequestV1Response"><code>DeployContractJarsBadRequestV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">errors </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractJarsSuccessV1Response"><code>DeployContractJarsSuccessV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">deployedJarFiles </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractJarsV1Request"><code>DeployContractJarsV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">cordappDeploymentConfigs </div><div class="param-desc"><span class="param-type"><a href="#CordappDeploymentConfig">array[CordappDeploymentConfig]</a></span> The list of deployment configurations pointing to the nodes where the provided cordapp jar files are to be deployed . </div>
+<div class="param">jarFiles </div><div class="param-desc"><span class="param-type"><a href="#JarFile">array[JarFile]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DiagnoseNodeV1Request"><code>DiagnoseNodeV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">nodeIds (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Optional property specifying which Corda Node should be the one being diagnosed in case the Connector has multiple connections established for different nodes (which is not yet a supported feature, but we want to keep this possibility open for the future). </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DiagnoseNodeV1Response"><code>DiagnoseNodeV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">nodeDiagnosticInfo </div><div class="param-desc"><span class="param-type"><a href="#NodeDiagnosticInfo">NodeDiagnosticInfo</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FlowInvocationType"><code>FlowInvocationType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Determines which flow starting method will be used on the back-end when invoking the flow. Based on the value here the plugin back-end might invoke the rpc.startFlowDynamic() method or the rpc.startTrackedFlowDynamic() method. Streamed responses are aggregated and returned in a single response to HTTP callers who are not equipped to handle streams like WebSocket/gRPC/etc. do.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FlowStatusV1Responses"><code>FlowStatusV1Responses</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">flowStatusResponses (optional)</div><div class="param-desc"><span class="param-type"><a href="#FlowStatusV1Responses_flowStatusResponses_inner">array[FlowStatusV1Responses_flowStatusResponses_inner]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FlowStatusV1Responses_flowStatusResponses_inner"><code>FlowStatusV1Responses_flowStatusResponses_inner</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">clientRequestId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowError (optional)</div><div class="param-desc"><span class="param-type"><a href="#FlowV1Error">FlowV1Error</a></span>  </div>
+<div class="param">flowId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowResult (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowStatus (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">holdingIDShortHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timestamp (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span>  format: date-time</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FlowV1Error"><code>FlowV1Error</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetFlowCidV1Request"><code>GetFlowCidV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>This method gets the current status of the specified flow instance.</div>
+    <div class="field-items">
+      <div class="param">username </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">password </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">rejectUnauthorized </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">holdingIDShortHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">clientRequestId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetFlowCidV1Response"><code>GetFlowCidV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">clientRequestId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowError (optional)</div><div class="param-desc"><span class="param-type"><a href="#FlowV1Error">FlowV1Error</a></span>  </div>
+<div class="param">flowId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowResult (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowStatus </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">holdingIDShortHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timestamp </div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span>  format: date-time</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetMonitorTransactionsV1Request"><code>GetMonitorTransactionsV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">clientAppId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ID of a client application that wants to monitor the state changes </div>
+<div class="param">stateFullClassName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The fully qualified name of the Corda state to monitor </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetMonitorTransactionsV1Response"><code>GetMonitorTransactionsV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Flag set to true if operation completed correctly. </div>
+<div class="param">msg </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Message describing operation status or any errors that occurred. </div>
+<div class="param">stateFullClassName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The fully qualified name of the Corda state to monitor </div>
+<div class="param">tx (optional)</div><div class="param-desc"><span class="param-type"><a href="#GetMonitorTransactionsV1Response_tx_inner">array[GetMonitorTransactionsV1Response_tx_inner]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetMonitorTransactionsV1Response_tx_inner"><code>GetMonitorTransactionsV1Response_tx_inner</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">index (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">data (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeContractV1Request"><code>InvokeContractV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">flowFullClassName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The fully qualified name of the Corda flow to invoke </div>
+<div class="param">flowInvocationType </div><div class="param-desc"><span class="param-type"><a href="#FlowInvocationType">FlowInvocationType</a></span>  </div>
+<div class="param">params </div><div class="param-desc"><span class="param-type"><a href="#JvmObject">array[JvmObject]</a></span> The list of arguments to pass in to the contract method being invoked. </div>
+<div class="param">timeoutMs (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeContractV1Response"><code>InvokeContractV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">callOutput </div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span> Data returned from the JVM when no transaction is running </div>
+<div class="param">transactionId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The net.corda.core.flows.StateMachineRunId value returned by the flow execution. </div>
+<div class="param">progress (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> An array of strings representing the aggregated stream of progress updates provided by a <em>tracked</em> flow invocation. If the flow invocation was not tracked, this array is still returned, but as empty. </div>
+<div class="param">flowId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The id for the flow handle </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JarFile"><code>JarFile</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">filename </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">hasDbMigrations </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Indicates whether the cordapp jar in question contains any embedded migrations that Cactus can/should execute between copying the jar into the cordapp directory and starting the node back up. </div>
+<div class="param">contentBase64 </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  format: base64</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JvmObject"><code>JvmObject</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Can represent JVM primitive and reference types as well. The jvmTypeKind field indicates which one is being stored. If the jvmTypeKind field is set to REFERENCE then the jvmCtorArgs array is expected to be filled, otherwise (e.g. PRIMITIVE jvmTypeKind) it is expected that the primitiveValue property is filled with a primitive data type supported by the JSON standard such as strings, booleans, numbers, etc.</div>
+    <div class="field-items">
+      <div class="param">jvmTypeKind </div><div class="param-desc"><span class="param-type"><a href="#JvmTypeKind">JvmTypeKind</a></span>  </div>
+<div class="param">primitiveValue (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span>  </div>
+<div class="param">jvmCtorArgs (optional)</div><div class="param-desc"><span class="param-type"><a href="#JvmObject">array[JvmObject]</a></span>  </div>
+<div class="param">jvmType </div><div class="param-desc"><span class="param-type"><a href="#JvmType">JvmType</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JvmType"><code>JvmType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Represents a reference to a JVM type (such as a Java class)</div>
+    <div class="field-items">
+      <div class="param">fqClassName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">constructorName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> This parameter is used to specify that the function used to construct this JvmType is not a constructor function but instead is a factory function. Setting this parameter will cause the plugin to look up methods of the class denoted by fqClassName instead of its constructors. </div>
+<div class="param">invocationTarget (optional)</div><div class="param-desc"><span class="param-type"><a href="#JvmObject">JvmObject</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JvmTypeKind"><code>JvmTypeKind</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ListCpiV1Request"><code>ListCpiV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">username </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">password </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">rejectUnauthorized </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ListCpiV1Response"><code>ListCpiV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">cpis (optional)</div><div class="param-desc"><span class="param-type"><a href="#ListCpiV1Response_cpis_inner">array[ListCpiV1Response_cpis_inner]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ListCpiV1Response_cpis_inner"><code>ListCpiV1Response_cpis_inner</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">cpiFileChecksum (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">cpiFileFullChecksum (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">cpks (optional)</div><div class="param-desc"><span class="param-type"><a href="#ListCpiV1Response_cpis_inner_cpks_inner">array[ListCpiV1Response_cpis_inner_cpks_inner]</a></span>  </div>
+<div class="param">groupPolicy (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#CPIIDV1">CPIIDV1</a></span>  </div>
+<div class="param">timestamp (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span>  format: date-time</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ListCpiV1Response_cpis_inner_cpks_inner"><code>ListCpiV1Response_cpis_inner_cpks_inner</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">hash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">id (optional)</div><div class="param-desc"><span class="param-type"><a href="#CPIIDV1">CPIIDV1</a></span>  </div>
+<div class="param">libraries (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">mainBundle (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timestamp (optional)</div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span>  format: date-time</div>
+<div class="param">type (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ListFlowsV1Request"><code>ListFlowsV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">filter (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ListFlowsV1Response"><code>ListFlowsV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">flowNames </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> An array of strings storing the names of the flows as returned by the flowList Corda RPC. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NetworkHostAndPort"><code>NetworkHostAndPort</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">host </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">port </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NodeDiagnosticInfo"><code>NodeDiagnosticInfo</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A NodeDiagnosticInfo holds information about the current node version.</div>
+    <div class="field-items">
+      <div class="param">cordapps </div><div class="param-desc"><span class="param-type"><a href="#CordappInfo">array[CordappInfo]</a></span> A list of CorDapps currently installed on this node </div>
+<div class="param">platformVersion </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> The platform version of this node. This number represents a released API version, and should be used to make functionality decisions (e.g. enabling an app feature only if an underlying platform feature exists) </div>
+<div class="param">revision </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The git commit hash this node was built from </div>
+<div class="param">vendor </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The vendor of this node </div>
+<div class="param">version </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The current node version string, e.g. 4.3, 4.4-SNAPSHOT. Note that this string is effectively freeform, and so should only be used for providing diagnostic information. It should not be used to make functionality decisions (the platformVersion is a better fit for this). </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NodeInfo"><code>NodeInfo</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">addresses </div><div class="param-desc"><span class="param-type"><a href="#NetworkHostAndPort">array[NetworkHostAndPort]</a></span>  </div>
+<div class="param">platformVersion </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">serial </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">legalIdentities </div><div class="param-desc"><span class="param-type"><a href="#Party">array[Party]</a></span>  </div>
+<div class="param">legalIdentitiesAndCerts </div><div class="param-desc"><span class="param-type"><a href="#object">array[Object]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Party"><code>Party</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#CordaX500Name">CordaX500Name</a></span>  </div>
+<div class="param">owningKey </div><div class="param-desc"><span class="param-type"><a href="#PublicKey">PublicKey</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PublicKey"><code>PublicKey</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>An instance of a java.security.PublicKey (which is an interface) implementation such as org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl</div>
+    <div class="field-items">
+      <div class="param">algorithm </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">format </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">encoded </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SHA256"><code>SHA256</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>SHA-256 is part of the SHA-2 hash function family. Generated hash is fixed size, 256-bits (32-bytes).</div>
+    <div class="field-items">
+      <div class="param">bytes </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">offset </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">size </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StartFlowV1Request"><code>StartFlowV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>This method starts a new instance for the specified flow for the specified holding identity.</div>
+    <div class="field-items">
+      <div class="param">username </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">password </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">rejectUnauthorized </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">holdingIDShortHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">clientRequestId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowClassName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">requestBody </div><div class="param-desc"><span class="param-type"><a href="#StartFlowV1Request_requestBody">StartFlowV1Request_requestBody</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StartFlowV1Request_requestBody"><code>StartFlowV1Request_requestBody</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">chatName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">otherMember (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">message (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">numberOfRecords (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StartFlowV1Response"><code>StartFlowV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">clientRequestId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowError (optional)</div><div class="param-desc"><span class="param-type"><a href="#FlowV1Error">FlowV1Error</a></span>  </div>
+<div class="param">flowId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowResult (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">flowStatus </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">holdingIDShortHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timestamp </div><div class="param-desc"><span class="param-type"><a href="#DateTime">Date</a></span>  format: date-time</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StartMonitorV1Request"><code>StartMonitorV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">clientAppId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ID of a client application that wants to monitor the state changes </div>
+<div class="param">stateFullClassName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The fully qualified name of the Corda state to monitor </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StartMonitorV1Response"><code>StartMonitorV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Flag set to true if monitoring started correctly. </div>
+<div class="param">msg </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Message describing operation status or any errors that occurred. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StopMonitorV1Request"><code>StopMonitorV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">clientAppId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ID of a client application that wants to monitor the state changes </div>
+<div class="param">stateFullClassName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The fully qualified name of the Corda state to monitor </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StopMonitorV1Response"><code>StopMonitorV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Flag set to true if operation completed correctly. </div>
+<div class="param">msg </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Message describing operation status or any errors that occurred. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="VaultQueryV1Request"><code>VaultQueryV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractStateType (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Valid, fully qualified JVM class name which will be fed into Class.forName(...) </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="X500Principal"><code>X500Principal</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">encoded </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Base64 encoded public key </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

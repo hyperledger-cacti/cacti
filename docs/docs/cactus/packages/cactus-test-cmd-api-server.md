@@ -1,20 +1,5 @@
-`@hyperledger/cactus-test-cmd-api-server`
-=================================================================================================================
+--8<-- "packages/cactus-test-cmd-api-server/README.md"
 
-This is the test package for the package that’s called `cactus-cmd-api-server`
-
-Usage
---------------------------------------------
-
-// TODO: DEMONSTRATE API
-
-FAQ
-----------------------------------------
-
-### **What is a dedicated test package for?**
-
-This is a dedicated test package meaning that it verifies the integration between two packages that are somehow dependent on each other and therefore these tests cannot be added properly in the child package due to circular dependency issues and it would not be fitting to add it in the parent because the child package’s tests should not be held by the parent as a matter of principle.
-
-[Previous](cactus-test-api-client.md "@hyperledger-cacti/cactus-test-api-client") [Next](cactus-test-tooling.md "@hyperledger-cacti/cactus-test-tooling")
-
-* * *
+[package-doc-src-main-typescript-public-api-ts]: https://github.com/hyperledger-cacti/cacti/blob/main/packages/cactus-test-cmd-api-server/src/main/typescript/public-api.ts
+[package-doc-contributing-md]: ../contributing.md
+[package-doc-license]: https://github.com/hyperledger-cacti/cacti/blob/main/LICENSE

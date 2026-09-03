@@ -215,6 +215,12 @@ if (require.main === module) {
 
 ```
 
+### Historical Complete Example
+
+The former supply-chain backend demonstrates how the API server was used in a
+complete application. Its [source is preserved in repository history](https://github.com/hyperledger-cacti/cacti/tree/d0b8b4330572de0beafc2f48ada9d191a1c57dc8/examples/cactus-example-supply-chain-backend/src/main/typescript).
+This example is no longer part of the current checkout.
+
 ## Deployment Scenarios
 
 There's a set of building blocks (members, nodes, API server processes, plugin instances) that you can use when defining (founding) a consortium and these building blocks relate to each other in a way that can be expressed with an entity relationship diagram which can be seen below.
@@ -527,7 +533,7 @@ You can also initialize the prometheus exporter object seperately and then pass 
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
 Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
 
-```(yaml)
+```yaml
 - job_name: 'consortium_manual_exporter'
   metrics_path: /api/v1/api-server/get-prometheus-exporter-metrics
   scrape_interval: 5s

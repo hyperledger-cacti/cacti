@@ -17,7 +17,7 @@ npm install @hyperledger-cacti/cacti-ledger-browser
 
 ## API Summary
 
-The package is a browser application rather than a reusable plugin API. Its source is organized under [`src/`](./src/), with runtime configuration supplied when the application is built and deployed.
+The package is a browser application rather than a reusable plugin API. Its source is organized under [`src/`][package-doc-src], with runtime configuration supplied when the application is built and deployed.
 
 This component allows viewing ledger data in Supabase or other PostgreSQL compatible database. The data is fed to supabase by persistence plugins for each ledgers.
 
@@ -40,17 +40,17 @@ This component allows viewing ledger data in Supabase or other PostgreSQL compat
 
 Clone the git repository on your local machine.
 
-See [docs/docs/cactus/ledger-browser/setup.md](../../docs/docs/cactus/ledger-browser/setup.md) for detailed information on how to setup and use this package.
+See [docs/docs/cactus/ledger-browser/setup.md][package-doc-docs-docs-cactus-ledger-browser-setup-md] for detailed information on how to setup and use this package.
 
 ## Contributing
 
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 ## Acknowledgments
 
@@ -65,3 +65,8 @@ From the repository root, run:
 ```sh
 yarn test:jest:all packages/cacti-ledger-browser/src/test
 ```
+
+[package-doc-src]: ./src/
+[package-doc-docs-docs-cactus-ledger-browser-setup-md]: ../../docs/docs/cactus/ledger-browser/setup.md
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

@@ -19,7 +19,7 @@ yarn configure
 
 ## API Summary
 
-The package public API is limited to utilities required by its integration tests. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
+The package public API is limited to utilities required by its integration tests. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] for the maintained export surface.
 
 This is the test package for the package that's called `cactus-cmd-api-server`
 
@@ -45,8 +45,12 @@ yarn test:jest:all packages/cactus-test-cmd-api-server/src/test/typescript
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

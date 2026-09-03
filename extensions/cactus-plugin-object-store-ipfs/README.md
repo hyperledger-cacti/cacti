@@ -75,7 +75,7 @@ same `get`, `has`, and `set` operations exposed by the plugin class.
 
 The plugin defines OpenAPI endpoints for the three supported object-store
 operations: `get`, `has`, and `set`. See the
-[OpenAPI specification](./src/main/json/openapi.json) for request and response
+[OpenAPI specification][package-doc-src-main-json-openapi-json] for request and response
 schemas.
 
 ## Usage
@@ -145,11 +145,15 @@ yarn test:jest:all extensions/cactus-plugin-object-store-ipfs/src/test/typescrip
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
 This distribution is published under the Apache License Version 2.0 found in
-the [LICENSE](../../LICENSE) file.
+the [LICENSE][package-doc-license] file.
 
 ## Acknowledgments
+
+[package-doc-src-main-json-openapi-json]: ./src/main/json/openapi.json
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

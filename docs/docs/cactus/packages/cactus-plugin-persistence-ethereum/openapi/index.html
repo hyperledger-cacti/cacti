@@ -1,0 +1,320 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cactus Plugin - Persistence Ethereum</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cactus Plugin - Persistence Ethereum</h1>
+    <div class="app-desc">Synchronizes state of an ethereum ledger into a DB that can later be viewed in GUI</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#getStatusV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="getStatusV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-ethereum/status</code></pre></div>
+    <div class="method-summary">Get the status of persistence plugin for ethereum (<span class="nickname">getStatusV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#StatusResponseV1">StatusResponseV1</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "connected" : true,
+  "monitoredTokensCount" : 0.8008281904610115,
+  "instanceId" : "instanceId",
+  "lastSeenBlock" : 6.027456183070403,
+  "monitorRunning" : true,
+  "webServicesRegistered" : true,
+  "operationsRunning" : [ {
+    "operation" : "operation",
+    "startAt" : "startAt"
+  }, {
+    "operation" : "operation",
+    "startAt" : "startAt"
+  } ]
+}</code></pre>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: text/plain</div>
+    <pre class="example"><code>Custom MIME type example not yet supported: text/plain</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#StatusResponseV1">StatusResponseV1</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#ErrorExceptionResponseV1"><code>ErrorExceptionResponseV1</code> - </a></li>
+    <li><a href="#MonitoredToken"><code>MonitoredToken</code> - </a></li>
+    <li><a href="#StatusResponseV1"><code>StatusResponseV1</code> - </a></li>
+    <li><a href="#TokenTypeV1"><code>TokenTypeV1</code> - </a></li>
+    <li><a href="#TrackedOperationV1"><code>TrackedOperationV1</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="ErrorExceptionResponseV1"><code>ErrorExceptionResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">error </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="MonitoredToken"><code>MonitoredToken</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Ethereum tokens that are being monitored by the persistence plugin.</div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#TokenTypeV1">TokenTypeV1</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Token name </div>
+<div class="param">symbol </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Token symbol </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="StatusResponseV1"><code>StatusResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response with plugin status report.</div>
+    <div class="field-items">
+      <div class="param">instanceId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Plugin instance id. </div>
+<div class="param">connected </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> True if successfully connected to the database, false otherwise. </div>
+<div class="param">webServicesRegistered </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> True if web services were correctly exported. </div>
+<div class="param">monitoredTokensCount </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Total number of tokens being monitored by the plugin. </div>
+<div class="param">operationsRunning </div><div class="param-desc"><span class="param-type"><a href="#TrackedOperationV1">array[TrackedOperationV1]</a></span>  </div>
+<div class="param">monitorRunning </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> True if block monitoring is running, false otherwise. </div>
+<div class="param">lastSeenBlock </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Number of the last block seen by the block monitor. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TokenTypeV1"><code>TokenTypeV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TrackedOperationV1"><code>TrackedOperationV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Persistence plugin operation that is tracked and returned in status report.</div>
+    <div class="field-items">
+      <div class="param">startAt </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Start time of the operation. </div>
+<div class="param">operation </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Operation name. </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

@@ -45,6 +45,15 @@ jobs:
               - '*.md'
               - 'docs/**'
               - 'packages/**/*.md'
+              - 'extensions/**/*.md'
+              - 'packages/*/docs/**'
+              - 'extensions/*/docs/**'
+              - 'packages/*/assets/**'
+              - 'extensions/*/assets/**'
+              - 'packages/*/images/**'
+              - 'extensions/*/images/**'
+              - 'packages/*/src/main/json/**'
+              - 'extensions/*/src/main/json/**'
               - 'weaver/**/*.md'
 
   deploy-docs:
@@ -98,18 +107,14 @@ jobs:
         working-directory: packages/cactus-plugin-satp-hermes
 
       - name: Build SATP Hermes diagrams
-        run: yarn docs:diagrams
+        run: yarn run docs:diagrams
         working-directory: packages/cactus-plugin-satp-hermes
 
       - name: Copy SATP Hermes docs to mkdocs
         run: |
           mkdir -p docs/docs/satp-hermes/assets
-          cp -r packages/cactus-plugin-satp-hermes/docs/architecture docs/docs/satp-hermes/
           cp -r packages/cactus-plugin-satp-hermes/assets/diagrams docs/docs/satp-hermes/assets/
 
-      - name: Build markdown for openapi specs
-        run: 'python3 docs/scripts/publish_openapi.py'
-        
       - name: Configure git identity for mike
         # mike commits the built site to the gh-pages branch, so it needs an author.
         run: |

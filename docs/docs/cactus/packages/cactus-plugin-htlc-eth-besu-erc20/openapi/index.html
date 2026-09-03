@@ -1,0 +1,736 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cactus Plugin - HTLC ETH BESU ERC20</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cactus Plugin - HTLC ETH BESU ERC20</h1>
+    <div class="app-desc">Allows Cactus nodes to interact with HTLC contracts with ERC-20 Tokens</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#getSingleStatusV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status</code></a></li>
+  <li><a href="#getStatusV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status</code></a></li>
+  <li><a href="#initializeV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize</code></a></li>
+  <li><a href="#newContractV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract</code></a></li>
+  <li><a href="#refundV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund</code></a></li>
+  <li><a href="#withdrawV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="getSingleStatusV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">getSingleStatusV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetSingleStatusRequest <a href="#GetSingleStatusRequest">GetSingleStatusRequest</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      Integer
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Status
+        <a href="#Integer">Integer</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getStatusV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status</code></pre></div>
+    <div class="method-summary"> (<span class="nickname">getStatusV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetStatusRequest <a href="#GetStatusRequest">GetStatusRequest</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      array[Integer]
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ 0, 0 ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Array of status
+        
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="initializeV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize</code></pre></div>
+    <div class="method-summary">Initialize contract (<span class="nickname">initializeV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">InitializeRequest <a href="#InitializeRequest">InitializeRequest</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#RunTransactionResponse">RunTransactionResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "transactionReceipt" : {
+    "blockHash" : "blockHash",
+    "gasUsed" : 1.4658129805029452,
+    "blockNumber" : 6.027456183070403,
+    "contractAddress" : "contractAddress",
+    "transactionIndex" : 0.8008281904610115,
+    "from" : "from",
+    "to" : "to",
+    "transactionHash" : "transactionHash",
+    "status" : true
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#RunTransactionResponse">RunTransactionResponse</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="newContractV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract</code></pre></div>
+    <div class="method-summary">Create a new hashtimelock contract (<span class="nickname">newContractV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">NewContractRequest <a href="#NewContractRequest">NewContractRequest</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "transactionReceipt" : {
+    "blockHash" : "blockHash",
+    "gasUsed" : 1.4658129805029452,
+    "blockNumber" : 6.027456183070403,
+    "contractAddress" : "contractAddress",
+    "transactionIndex" : 0.8008281904610115,
+    "from" : "from",
+    "to" : "to",
+    "transactionHash" : "transactionHash",
+    "status" : true
+  },
+  "callOutput" : "",
+  "success" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="refundV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund</code></pre></div>
+    <div class="method-summary">Refund a hashtimelock contract (<span class="nickname">refundV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">RefundRequest <a href="#RefundRequest">RefundRequest</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "transactionReceipt" : {
+    "blockHash" : "blockHash",
+    "gasUsed" : 1.4658129805029452,
+    "blockNumber" : 6.027456183070403,
+    "contractAddress" : "contractAddress",
+    "transactionIndex" : 0.8008281904610115,
+    "from" : "from",
+    "to" : "to",
+    "transactionHash" : "transactionHash",
+    "status" : true
+  },
+  "callOutput" : "",
+  "success" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="withdrawV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw</code></pre></div>
+    <div class="method-summary">Withdraw a hashtimelock contract (<span class="nickname">withdrawV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">WithdrawRequest <a href="#WithdrawRequest">WithdrawRequest</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "transactionReceipt" : {
+    "blockHash" : "blockHash",
+    "gasUsed" : 1.4658129805029452,
+    "blockNumber" : 6.027456183070403,
+    "contractAddress" : "contractAddress",
+    "transactionIndex" : 0.8008281904610115,
+    "from" : "from",
+    "to" : "to",
+    "transactionHash" : "transactionHash",
+    "status" : true
+  },
+  "callOutput" : "",
+  "success" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#GetSingleStatusRequest"><code>GetSingleStatusRequest</code> - </a></li>
+    <li><a href="#GetStatusRequest"><code>GetStatusRequest</code> - </a></li>
+    <li><a href="#InitializeRequest"><code>InitializeRequest</code> - </a></li>
+    <li><a href="#InvokeContractV1Response"><code>InvokeContractV1Response</code> - </a></li>
+    <li><a href="#NewContractRequest"><code>NewContractRequest</code> - </a></li>
+    <li><a href="#NewContractRequest_gas"><code>NewContractRequest_gas</code> - </a></li>
+    <li><a href="#RefundRequest"><code>RefundRequest</code> - </a></li>
+    <li><a href="#RunTransactionResponse"><code>RunTransactionResponse</code> - </a></li>
+    <li><a href="#Web3SigningCredential"><code>Web3SigningCredential</code> - </a></li>
+    <li><a href="#Web3SigningCredentialCactusKeychainRef"><code>Web3SigningCredentialCactusKeychainRef</code> - </a></li>
+    <li><a href="#Web3SigningCredentialNone"><code>Web3SigningCredentialNone</code> - </a></li>
+    <li><a href="#Web3SigningCredentialPrivateKeyHex"><code>Web3SigningCredentialPrivateKeyHex</code> - </a></li>
+    <li><a href="#Web3SigningCredentialType"><code>Web3SigningCredentialType</code> - </a></li>
+    <li><a href="#Web3TransactionReceipt"><code>Web3TransactionReceipt</code> - </a></li>
+    <li><a href="#WithdrawRequest"><code>WithdrawRequest</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="GetSingleStatusRequest"><code>GetSingleStatusRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Defines the parameters for retrieving the single status of the HTLC swap.</div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">connectorId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetStatusRequest"><code>GetStatusRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Defines the parameters for retrieving the status of the HTLC swap.</div>
+    <div class="field-items">
+      <div class="param">ids </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">connectorId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InitializeRequest"><code>InitializeRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">connectorId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> connectorId for the connector besu plugin </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> keychainId for the keychain plugin </div>
+<div class="param">constructorArgs </div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span>  </div>
+<div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">gas (optional)</div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeContractV1Response"><code>InvokeContractV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">transactionReceipt (optional)</div><div class="param-desc"><span class="param-type"><a href="#Web3TransactionReceipt">Web3TransactionReceipt</a></span>  </div>
+<div class="param">callOutput (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span>  </div>
+<div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NewContractRequest"><code>NewContractRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractAddress </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Contract address </div>
+<div class="param">inputAmount </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Input amount to lock </div>
+<div class="param">outputAmount </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Output amount to lock </div>
+<div class="param">expiration </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Timestamp to expire the contract </div>
+<div class="param">hashLock </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Hashlock needed to refund the amount </div>
+<div class="param">tokenAddress </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The token address </div>
+<div class="param">receiver </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The receiver address </div>
+<div class="param">outputNetwork </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The output network id </div>
+<div class="param">outputAddress </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The output address to receive the tokens </div>
+<div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">connectorId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> connectorId for the connector besu plugin </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> keychainId for the keychian plugin </div>
+<div class="param">gas (optional)</div><div class="param-desc"><span class="param-type"><a href="#NewContractRequest_gas">NewContractRequest_gas</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NewContractRequest_gas"><code>NewContractRequest_gas</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RefundRequest"><code>RefundRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Contract htlc id for refund </div>
+<div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">connectorId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> connectorId for the connector besu plugin </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> keychainId for the keychain plugin </div>
+<div class="param">gas (optional)</div><div class="param-desc"><span class="param-type"><a href="#NewContractRequest_gas">NewContractRequest_gas</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionResponse"><code>RunTransactionResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">transactionReceipt </div><div class="param-desc"><span class="param-type"><a href="#Web3TransactionReceipt">Web3TransactionReceipt</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredential"><code>Web3SigningCredential</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+<div class="param">ethAccount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication. </div>
+<div class="param">keychainEntryKey </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter. </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter. </div>
+<div class="param">secret </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The HEX encoded private key of an eth account. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialCactusKeychainRef"><code>Web3SigningCredentialCactusKeychainRef</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+<div class="param">ethAccount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication. </div>
+<div class="param">keychainEntryKey </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter. </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialNone"><code>Web3SigningCredentialNone</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Using this denotes that there is no signing required because the transaction is pre-signed.</div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialPrivateKeyHex"><code>Web3SigningCredentialPrivateKeyHex</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+<div class="param">ethAccount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication. </div>
+<div class="param">secret </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The HEX encoded private key of an eth account. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialType"><code>Web3SigningCredentialType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3TransactionReceipt"><code>Web3TransactionReceipt</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">transactionHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionIndex </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">blockHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">blockNumber </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">gasUsed </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">contractAddress (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">from </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">to </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WithdrawRequest"><code>WithdrawRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Contract locked id </div>
+<div class="param">secret </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Secret need to unlock the contract </div>
+<div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">connectorId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> connectorId for the connector besu plugin </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> keychainId for the keychain plugin </div>
+<div class="param">gas (optional)</div><div class="param-desc"><span class="param-type"><a href="#NewContractRequest_gas">NewContractRequest_gas</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

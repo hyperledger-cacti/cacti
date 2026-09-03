@@ -1,0 +1,623 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cactus Plugin - BUNGEE-Hermes</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cactus Plugin - BUNGEE-Hermes</h1>
+    <div class="app-desc">Can create blockchain views of different networks</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#createViewV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/create-view</code></a></li>
+  <li><a href="#getAvailableStrategies"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-available-strategies</code></a></li>
+  <li><a href="#getPublicKey"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key</code></a></li>
+  <li><a href="#mergeViewsV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/merge-views</code></a></li>
+  <li><a href="#processViewV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/process-view</code></a></li>
+  <li><a href="#verifyMerkleRoot"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/verify-merkle-root</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="createViewV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/create-view</code></pre></div>
+    <div class="method-summary">Creates a Blockchain View. (<span class="nickname">createViewV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">CreateViewRequest <a href="#CreateViewRequest">CreateViewRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#CreateViewResponse">CreateViewResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "view" : "Object",
+  "signature" : "signature of Object"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#CreateViewResponse">CreateViewResponse</a>
+    <h4 class="field-label">404</h4>
+    Could not complete request.
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getAvailableStrategies"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-available-strategies</code></pre></div>
+    <div class="method-summary">Queries plugin's available strategies for ledger capture (<span class="nickname">getAvailableStrategies</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      array[String]
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>[ "strategy-fabric", "strategy-fabric" ]</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        
+    <h4 class="field-label">404</h4>
+    Could not complete request.
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getPublicKey"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key</code></pre></div>
+    <div class="method-summary">Queries plugin's public key (<span class="nickname">getPublicKey</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetPublicKeyResponse">GetPublicKeyResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "pubKey" : "----BEGIN CERTIFICATE----random content...."
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetPublicKeyResponse">GetPublicKeyResponse</a>
+    <h4 class="field-label">404</h4>
+    Could not complete request.
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="mergeViewsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/merge-views</code></pre></div>
+    <div class="method-summary">Merges multiple views according to a privacy policy (<span class="nickname">mergeViewsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">MergeViewsRequest <a href="#MergeViewsRequest">MergeViewsRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#MergeViewsResponse">MergeViewsResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "integratedView" : "Object",
+  "signature" : "signature of Object"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#MergeViewsResponse">MergeViewsResponse</a>
+    <h4 class="field-label">404</h4>
+    Could not complete request.
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="processViewV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/process-view</code></pre></div>
+    <div class="method-summary">Creates a Blockchain View. (<span class="nickname">processViewV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">ProcessViewRequest <a href="#ProcessViewRequest">ProcessViewRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#CreateViewResponse">CreateViewResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "view" : "Object",
+  "signature" : "signature of Object"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#CreateViewResponse">CreateViewResponse</a>
+    <h4 class="field-label">404</h4>
+    Could not complete request.
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="verifyMerkleRoot"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/verify-merkle-root</code></pre></div>
+    <div class="method-summary">Checks validity of merkle tree root given an input (<span class="nickname">verifyMerkleRoot</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">VerifyMerkleRootRequest <a href="#VerifyMerkleRootRequest">VerifyMerkleRootRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#VerifyMerkleRootResponse">VerifyMerkleRootResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "result" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#VerifyMerkleRootResponse">VerifyMerkleRootResponse</a>
+    <h4 class="field-label">404</h4>
+    Could not complete request.
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#CreateViewRequest"><code>CreateViewRequest</code> - </a></li>
+    <li><a href="#CreateViewRequest_networkDetails"><code>CreateViewRequest_networkDetails</code> - </a></li>
+    <li><a href="#CreateViewResponse"><code>CreateViewResponse</code> - </a></li>
+    <li><a href="#GetPublicKeyResponse"><code>GetPublicKeyResponse</code> - </a></li>
+    <li><a href="#MergePolicyOpts"><code>MergePolicyOpts</code> - </a></li>
+    <li><a href="#MergeViewsRequest"><code>MergeViewsRequest</code> - </a></li>
+    <li><a href="#MergeViewsResponse"><code>MergeViewsResponse</code> - </a></li>
+    <li><a href="#PrivacyPolicyOpts"><code>PrivacyPolicyOpts</code> - </a></li>
+    <li><a href="#ProcessViewRequest"><code>ProcessViewRequest</code> - </a></li>
+    <li><a href="#VerifyMerkleRootRequest"><code>VerifyMerkleRootRequest</code> - </a></li>
+    <li><a href="#VerifyMerkleRootResponse"><code>VerifyMerkleRootResponse</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="CreateViewRequest"><code>CreateViewRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Request object for createViewV1 endpoint</div>
+    <div class="field-items">
+      <div class="param">stateIds (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">tI (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">tF (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">viewID (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">strategyId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">networkDetails </div><div class="param-desc"><span class="param-type"><a href="#CreateViewRequest_networkDetails">CreateViewRequest_networkDetails</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CreateViewRequest_networkDetails"><code>CreateViewRequest_networkDetails</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">connectorApiPath </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">participant </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CreateViewResponse"><code>CreateViewResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>This is the response for a CreateViewRequest or ProcessViewRequest</div>
+    <div class="field-items">
+      <div class="param">view (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signature (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetPublicKeyResponse"><code>GetPublicKeyResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>public key from bungee-hermes plugin instance</div>
+    <div class="field-items">
+      <div class="param">pubKey (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="MergePolicyOpts"><code>MergePolicyOpts</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>identifier of the policy used to merge views (can be none)</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="MergeViewsRequest"><code>MergeViewsRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>This is the input for a mergeViewRequest</div>
+    <div class="field-items">
+      <div class="param">serializedViews </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Array of serialized views </div>
+<div class="param">mergePolicy </div><div class="param-desc"><span class="param-type"><a href="#MergePolicyOpts">MergePolicyOpts</a></span>  </div>
+<div class="param">policyArguments (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Arguments for the privacy policy function. Order is important </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="MergeViewsResponse"><code>MergeViewsResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>This is the response of a mergeViewRequest</div>
+    <div class="field-items">
+      <div class="param">integratedView (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signature (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PrivacyPolicyOpts"><code>PrivacyPolicyOpts</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>identifier of the policy used to process a view</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ProcessViewRequest"><code>ProcessViewRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>This is the input for a mergeViewRequest</div>
+    <div class="field-items">
+      <div class="param">serializedView </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">policyId </div><div class="param-desc"><span class="param-type"><a href="#PrivacyPolicyOpts">PrivacyPolicyOpts</a></span>  </div>
+<div class="param">policyArguments </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Arguments for the privacy policy function. Order is important </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="VerifyMerkleRootRequest"><code>VerifyMerkleRootRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Set of transaction or state proofs and merkle tree root for verification</div>
+    <div class="field-items">
+      <div class="param">input (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">root (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="VerifyMerkleRootResponse"><code>VerifyMerkleRootResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>true or false, wether input matched provided root</div>
+    <div class="field-items">
+      <div class="param">result (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

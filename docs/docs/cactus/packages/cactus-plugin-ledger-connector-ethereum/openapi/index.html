@@ -1,0 +1,1015 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cacti Plugin - Connector Ethereum</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cacti Plugin - Connector Ethereum</h1>
+    <div class="app-desc">Can perform basic tasks on a Ethereum ledger</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#deployContract"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/deploy-contract</code></a></li>
+  <li><a href="#getPrometheusMetricsV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics</code></a></li>
+  <li><a href="#invokeContractV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-contract</code></a></li>
+  <li><a href="#invokeRawWeb3EthContractV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract</code></a></li>
+  <li><a href="#invokeWeb3EthMethodV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method</code></a></li>
+  <li><a href="#runTransactionV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/run-transaction</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="deployContract"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/deploy-contract</code></pre></div>
+    <div class="method-summary">Deploys the contract to ethereum ledger. (<span class="nickname">deployContract</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">DeployContractV1Request <a href="#DeployContractV1Request">DeployContractV1Request</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#RunTransactionResponse">RunTransactionResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "transactionReceipt" : {
+    "blockHash" : "blockHash",
+    "logsBloom" : "logsBloom",
+    "contractAddress" : "contractAddress",
+    "transactionIndex" : "transactionIndex",
+    "commitmentHash" : "commitmentHash",
+    "type" : "type",
+    "transactionHash" : "transactionHash",
+    "output" : "output",
+    "gasUsed" : "gasUsed",
+    "blockNumber" : "blockNumber",
+    "cumulativeGasUsed" : "cumulativeGasUsed",
+    "from" : "from",
+    "to" : "to",
+    "revertReason" : "revertReason",
+    "effectiveGasPrice" : "effectiveGasPrice",
+    "logs" : [ "", "" ],
+    "status" : true
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#RunTransactionResponse">RunTransactionResponse</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getPrometheusMetricsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics</code></pre></div>
+    <div class="method-summary">Get the Prometheus Metrics (<span class="nickname">getPrometheusMetricsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      String
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#String">String</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="invokeContractV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-contract</code></pre></div>
+    <div class="method-summary">Invokes a contract on an ethereum ledger (<span class="nickname">invokeContractV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">InvokeContractV1Request <a href="#InvokeContractV1Request">InvokeContractV1Request</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "transactionReceipt" : {
+    "blockHash" : "blockHash",
+    "logsBloom" : "logsBloom",
+    "contractAddress" : "contractAddress",
+    "transactionIndex" : "transactionIndex",
+    "commitmentHash" : "commitmentHash",
+    "type" : "type",
+    "transactionHash" : "transactionHash",
+    "output" : "output",
+    "gasUsed" : "gasUsed",
+    "blockNumber" : "blockNumber",
+    "cumulativeGasUsed" : "cumulativeGasUsed",
+    "from" : "from",
+    "to" : "to",
+    "revertReason" : "revertReason",
+    "effectiveGasPrice" : "effectiveGasPrice",
+    "logs" : [ "", "" ],
+    "status" : true
+  },
+  "callOutput" : "",
+  "success" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#InvokeContractV1Response">InvokeContractV1Response</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="invokeRawWeb3EthContractV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract</code></pre></div>
+    <div class="method-summary">Low-level endpoint to invoke a method on deployed contract. (<span class="nickname">invokeRawWeb3EthContractV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">InvokeRawWeb3EthContractV1Request <a href="#InvokeRawWeb3EthContractV1Request">InvokeRawWeb3EthContractV1Request</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#InvokeRawWeb3EthContractV1Response">InvokeRawWeb3EthContractV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "data" : "",
+  "errorDetail" : "errorDetail",
+  "status" : 0.8008281904610115
+}</code></pre>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: text/plain</div>
+    <pre class="example"><code>Custom MIME type example not yet supported: text/plain</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#InvokeRawWeb3EthContractV1Response">InvokeRawWeb3EthContractV1Response</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="invokeWeb3EthMethodV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method</code></pre></div>
+    <div class="method-summary">Invoke any method from web3.eth (low-level) (<span class="nickname">invokeWeb3EthMethodV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">InvokeRawWeb3EthMethodV1Request <a href="#InvokeRawWeb3EthMethodV1Request">InvokeRawWeb3EthMethodV1Request</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#InvokeRawWeb3EthMethodV1Response">InvokeRawWeb3EthMethodV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "data" : "",
+  "errorDetail" : "errorDetail",
+  "status" : 0.8008281904610115
+}</code></pre>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: text/plain</div>
+    <pre class="example"><code>Custom MIME type example not yet supported: text/plain</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#InvokeRawWeb3EthMethodV1Response">InvokeRawWeb3EthMethodV1Response</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="runTransactionV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/run-transaction</code></pre></div>
+    <div class="method-summary">Executes a transaction on a ethereum ledger (<span class="nickname">runTransactionV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">RunTransactionRequest <a href="#RunTransactionRequest">RunTransactionRequest</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#RunTransactionResponse">RunTransactionResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "transactionReceipt" : {
+    "blockHash" : "blockHash",
+    "logsBloom" : "logsBloom",
+    "contractAddress" : "contractAddress",
+    "transactionIndex" : "transactionIndex",
+    "commitmentHash" : "commitmentHash",
+    "type" : "type",
+    "transactionHash" : "transactionHash",
+    "output" : "output",
+    "gasUsed" : "gasUsed",
+    "blockNumber" : "blockNumber",
+    "cumulativeGasUsed" : "cumulativeGasUsed",
+    "from" : "from",
+    "to" : "to",
+    "revertReason" : "revertReason",
+    "effectiveGasPrice" : "effectiveGasPrice",
+    "logs" : [ "", "" ],
+    "status" : true
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#RunTransactionResponse">RunTransactionResponse</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#ContractJSON"><code>ContractJSON</code> - </a></li>
+    <li><a href="#ContractJsonDefinition"><code>ContractJsonDefinition</code> - </a></li>
+    <li><a href="#ContractKeychainDefinition"><code>ContractKeychainDefinition</code> - </a></li>
+    <li><a href="#DeployContractV1Request"><code>DeployContractV1Request</code> - </a></li>
+    <li><a href="#DeployContractV1Request_contract"><code>DeployContractV1Request_contract</code> - </a></li>
+    <li><a href="#DeployedContractJsonDefinition"><code>DeployedContractJsonDefinition</code> - </a></li>
+    <li><a href="#ErrorExceptionResponseV1"><code>ErrorExceptionResponseV1</code> - </a></li>
+    <li><a href="#EthContractInvocationType"><code>EthContractInvocationType</code> - </a></li>
+    <li><a href="#EthContractInvocationWeb3Method"><code>EthContractInvocationWeb3Method</code> - </a></li>
+    <li><a href="#EthereumTransactionConfig"><code>EthereumTransactionConfig</code> - </a></li>
+    <li><a href="#GasTransactionConfig"><code>GasTransactionConfig</code> - </a></li>
+    <li><a href="#GasTransactionConfigEIP1559"><code>GasTransactionConfigEIP1559</code> - </a></li>
+    <li><a href="#GasTransactionConfigLegacy"><code>GasTransactionConfigLegacy</code> - </a></li>
+    <li><a href="#InvokeContractV1Request"><code>InvokeContractV1Request</code> - </a></li>
+    <li><a href="#InvokeContractV1Request_contract"><code>InvokeContractV1Request_contract</code> - </a></li>
+    <li><a href="#InvokeContractV1Response"><code>InvokeContractV1Response</code> - </a></li>
+    <li><a href="#InvokeRawWeb3EthContractV1Request"><code>InvokeRawWeb3EthContractV1Request</code> - </a></li>
+    <li><a href="#InvokeRawWeb3EthContractV1Response"><code>InvokeRawWeb3EthContractV1Response</code> - </a></li>
+    <li><a href="#InvokeRawWeb3EthMethodV1Request"><code>InvokeRawWeb3EthMethodV1Request</code> - </a></li>
+    <li><a href="#InvokeRawWeb3EthMethodV1Response"><code>InvokeRawWeb3EthMethodV1Response</code> - </a></li>
+    <li><a href="#RunTransactionRequest"><code>RunTransactionRequest</code> - </a></li>
+    <li><a href="#RunTransactionResponse"><code>RunTransactionResponse</code> - </a></li>
+    <li><a href="#WatchBlocksV1"><code>WatchBlocksV1</code> - </a></li>
+    <li><a href="#WatchBlocksV1BlockData"><code>WatchBlocksV1BlockData</code> - </a></li>
+    <li><a href="#WatchBlocksV1BlockData_timestamp"><code>WatchBlocksV1BlockData_timestamp</code> - </a></li>
+    <li><a href="#WatchBlocksV1Options"><code>WatchBlocksV1Options</code> - </a></li>
+    <li><a href="#WatchBlocksV1Progress"><code>WatchBlocksV1Progress</code> - </a></li>
+    <li><a href="#Web3BlockHeader"><code>Web3BlockHeader</code> - </a></li>
+    <li><a href="#Web3SigningCredential"><code>Web3SigningCredential</code> - </a></li>
+    <li><a href="#Web3SigningCredentialCactiKeychainRef"><code>Web3SigningCredentialCactiKeychainRef</code> - </a></li>
+    <li><a href="#Web3SigningCredentialGethKeychainPassword"><code>Web3SigningCredentialGethKeychainPassword</code> - </a></li>
+    <li><a href="#Web3SigningCredentialNone"><code>Web3SigningCredentialNone</code> - </a></li>
+    <li><a href="#Web3SigningCredentialPrivateKeyHex"><code>Web3SigningCredentialPrivateKeyHex</code> - </a></li>
+    <li><a href="#Web3SigningCredentialType"><code>Web3SigningCredentialType</code> - </a></li>
+    <li><a href="#Web3Transaction"><code>Web3Transaction</code> - </a></li>
+    <li><a href="#Web3TransactionReceipt"><code>Web3TransactionReceipt</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="ContractJSON"><code>ContractJSON</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">bytecode </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode </div>
+<div class="param">abi </div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span> The application binary interface of the solidity contract, optional parameter </div>
+<div class="param">metadata (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">deployedBytecode (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">sourceMap (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">deployedSourceMap (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">sourcePath (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">compiler (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span>  </div>
+<div class="param">networks (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span>  </div>
+<div class="param">ast (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span>  </div>
+<div class="param">functionHashes (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span>  </div>
+<div class="param">gasEstimates (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ContractJsonDefinition"><code>ContractJsonDefinition</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractJSON </div><div class="param-desc"><span class="param-type"><a href="#ContractJSON">ContractJSON</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ContractKeychainDefinition"><code>ContractKeychainDefinition</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The contract name for retrieve the contracts json on the keychain. </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The keychainId for retrieve the contracts json. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractV1Request"><code>DeployContractV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">contract </div><div class="param-desc"><span class="param-type"><a href="#DeployContractV1Request_contract">DeployContractV1Request_contract</a></span>  </div>
+<div class="param">constructorArgs (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span> The list of arguments to pass in to the constructor of the contract being deployed. </div>
+<div class="param">gasConfig (optional)</div><div class="param-desc"><span class="param-type"><a href="#GasTransactionConfig">GasTransactionConfig</a></span>  </div>
+<div class="param">value (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Ether balance to send on deployment. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractV1Request_contract"><code>DeployContractV1Request_contract</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractJSON </div><div class="param-desc"><span class="param-type"><a href="#ContractJSON">ContractJSON</a></span>  </div>
+<div class="param">contractName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The contract name for retrieve the contracts json on the keychain. </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The keychainId for retrieve the contracts json. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployedContractJsonDefinition"><code>DeployedContractJsonDefinition</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractJSON </div><div class="param-desc"><span class="param-type"><a href="#ContractJSON">ContractJSON</a></span>  </div>
+<div class="param">contractAddress </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorExceptionResponseV1"><code>ErrorExceptionResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Error response from the connector.</div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Short error description message. </div>
+<div class="param">error </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Detailed error information. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="EthContractInvocationType"><code>EthContractInvocationType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="EthContractInvocationWeb3Method"><code>EthContractInvocationWeb3Method</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="EthereumTransactionConfig"><code>EthereumTransactionConfig</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">rawTransaction (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">from (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">to (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">value (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">nonce (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">data (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gasConfig (optional)</div><div class="param-desc"><span class="param-type"><a href="#GasTransactionConfig">GasTransactionConfig</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GasTransactionConfig"><code>GasTransactionConfig</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction gas settings.</div>
+    <div class="field-items">
+      <div class="param">gas (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum amount of gas a user is willing to provide for the execution of the transaction. (gasLimit) </div>
+<div class="param">gasPrice (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A price (in Wei) a user is willing to pay for each unit of gas used during the execution of the transaction. In EIP-1559 (London fork) networks, it will be set as both maxFeePerGas and maxPriorityFeePerGas. </div>
+<div class="param">gasLimit (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum amount of gas a user is willing to provide for the execution of the transaction. </div>
+<div class="param">maxFeePerGas (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum fee (including the base fee and the tip) a user is willing to pay per unit of gas. </div>
+<div class="param">maxPriorityFeePerGas (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum tip amount a user is willing to pay per unit of gas. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GasTransactionConfigEIP1559"><code>GasTransactionConfigEIP1559</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction gas settings in networks after EIP-1559 (London fork).</div>
+    <div class="field-items">
+      <div class="param">gasLimit (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum amount of gas a user is willing to provide for the execution of the transaction. </div>
+<div class="param">maxFeePerGas (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum fee (including the base fee and the tip) a user is willing to pay per unit of gas. </div>
+<div class="param">maxPriorityFeePerGas (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum tip amount a user is willing to pay per unit of gas. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GasTransactionConfigLegacy"><code>GasTransactionConfigLegacy</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction gas settings in networks before EIP-1559 (London fork).</div>
+    <div class="field-items">
+      <div class="param">gas (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A maximum amount of gas a user is willing to provide for the execution of the transaction. (gasLimit) </div>
+<div class="param">gasPrice (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A price (in Wei) a user is willing to pay for each unit of gas used during the execution of the transaction. In EIP-1559 (London fork) networks, it will be set as both maxFeePerGas and maxPriorityFeePerGas. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeContractV1Request"><code>InvokeContractV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contract </div><div class="param-desc"><span class="param-type"><a href="#InvokeContractV1Request_contract">InvokeContractV1Request_contract</a></span>  </div>
+<div class="param">methodName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The name of the contract method to invoke. </div>
+<div class="param">params </div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span> The list of arguments to pass in to the contract method being invoked. </div>
+<div class="param">invocationType </div><div class="param-desc"><span class="param-type"><a href="#EthContractInvocationType">EthContractInvocationType</a></span>  </div>
+<div class="param">web3SigningCredential (optional)</div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">gasConfig (optional)</div><div class="param-desc"><span class="param-type"><a href="#GasTransactionConfig">GasTransactionConfig</a></span>  </div>
+<div class="param">value (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timeoutMs (optional)</div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> The amount of milliseconds to wait for a transaction receipt before returning an error. Only has any effect if the invocation type is SEND </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeContractV1Request_contract"><code>InvokeContractV1Request_contract</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractJSON </div><div class="param-desc"><span class="param-type"><a href="#ContractJSON">ContractJSON</a></span>  </div>
+<div class="param">contractAddress </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">contractName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The contract name for retrieve the contracts json on the keychain. </div>
+<div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The keychainId for retrieve the contracts json. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeContractV1Response"><code>InvokeContractV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">transactionReceipt (optional)</div><div class="param-desc"><span class="param-type"><a href="#Web3TransactionReceipt">Web3TransactionReceipt</a></span>  </div>
+<div class="param">callOutput (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span>  </div>
+<div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeRawWeb3EthContractV1Request"><code>InvokeRawWeb3EthContractV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">abi </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> The application binary interface of the solidity contract </div>
+<div class="param">address </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Deployed solidity contract address </div>
+<div class="param">invocationType </div><div class="param-desc"><span class="param-type"><a href="#EthContractInvocationWeb3Method">EthContractInvocationWeb3Method</a></span>  </div>
+<div class="param">invocationParams (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span> The list of arguments for contract invocation method (send, call, etc...) </div>
+<div class="param">contractMethod </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Method of deployed solidity contract to execute </div>
+<div class="param">contractMethodArgs (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span> The list of arguments for deployed solidity contract method </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeRawWeb3EthContractV1Response"><code>InvokeRawWeb3EthContractV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Status code of the operation </div>
+<div class="param">data (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Output of contract invocation method </div>
+<div class="param">errorDetail (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Error details </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeRawWeb3EthMethodV1Request"><code>InvokeRawWeb3EthMethodV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">methodName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The name of the web3.eth method to invoke </div>
+<div class="param">params (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span> The list of arguments to pass to web3.eth method specified in methodName </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="InvokeRawWeb3EthMethodV1Response"><code>InvokeRawWeb3EthMethodV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Status code of the operation </div>
+<div class="param">data (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Output of requested web3.eth method </div>
+<div class="param">errorDetail (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Error details </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionRequest"><code>RunTransactionRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">web3SigningCredential </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredential">Web3SigningCredential</a></span>  </div>
+<div class="param">transactionConfig </div><div class="param-desc"><span class="param-type"><a href="#EthereumTransactionConfig">EthereumTransactionConfig</a></span>  </div>
+<div class="param">timeoutMs (optional)</div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionResponse"><code>RunTransactionResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">transactionReceipt </div><div class="param-desc"><span class="param-type"><a href="#Web3TransactionReceipt">Web3TransactionReceipt</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksV1"><code>WatchBlocksV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksV1BlockData"><code>WatchBlocksV1BlockData</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">number </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">hash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">parentHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">nonce </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">sha3Uncles </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">logsBloom (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionsRoot (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">stateRoot </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">receiptsRoot (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">difficulty (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">mixHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">miner </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">extraData </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gasLimit </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gasUsed </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timestamp </div><div class="param-desc"><span class="param-type"><a href="#WatchBlocksV1BlockData_timestamp">WatchBlocksV1BlockData_timestamp</a></span>  </div>
+<div class="param">size </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">totalDifficulty </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">uncles </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">baseFeePerGas (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactions </div><div class="param-desc"><span class="param-type"><a href="#Web3Transaction">array[Web3Transaction]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksV1BlockData_timestamp"><code>WatchBlocksV1BlockData_timestamp</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksV1Options"><code>WatchBlocksV1Options</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">getBlockData (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> Include entire block data if flag is true, otherwise just a header is returned (default) </div>
+<div class="param">lastSeenBlock (optional)</div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Block from which we want to start the monitoring process. </div>
+<div class="param">httpPollInterval (optional)</div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> How often to poll ethereum node for new blocks. Not used if the node supports subscription based monitoring (i.e. WebSocket). </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksV1Progress"><code>WatchBlocksV1Progress</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">blockHeader (optional)</div><div class="param-desc"><span class="param-type"><a href="#Web3BlockHeader">Web3BlockHeader</a></span>  </div>
+<div class="param">blockData (optional)</div><div class="param-desc"><span class="param-type"><a href="#WatchBlocksV1BlockData">WatchBlocksV1BlockData</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3BlockHeader"><code>Web3BlockHeader</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">number (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">parentHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">sha3Uncles </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionsRoot (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">receiptsRoot (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">difficulty (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">mixHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">miner (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gasLimit </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gasUsed </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">stateRoot (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">logsBloom (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">extraData (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">nonce (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timestamp (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredential"><code>Web3SigningCredential</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+<div class="param">ethAccount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication. </div>
+<div class="param">secret </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The HEX encoded private key of an eth account. </div>
+<div class="param">keychainEntryKey </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter. </div>
+<div class="param">keychainId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialCactiKeychainRef"><code>Web3SigningCredentialCactiKeychainRef</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+<div class="param">ethAccount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication. </div>
+<div class="param">keychainEntryKey </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter. </div>
+<div class="param">keychainId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialGethKeychainPassword"><code>Web3SigningCredentialGethKeychainPassword</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+<div class="param">ethAccount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional terminology of authentication. </div>
+<div class="param">secret </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> A geth keychain unlock password. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialNone"><code>Web3SigningCredentialNone</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Using this denotes that there is no signing required because the transaction is pre-signed.</div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialPrivateKeyHex"><code>Web3SigningCredentialPrivateKeyHex</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#Web3SigningCredentialType">Web3SigningCredentialType</a></span>  </div>
+<div class="param">ethAccount </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication. </div>
+<div class="param">secret </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The HEX encoded private key of an eth account. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3SigningCredentialType"><code>Web3SigningCredentialType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3Transaction"><code>Web3Transaction</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">hash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">nonce </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">blockHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">blockNumber </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionIndex </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">from </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">to </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gasPrice </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gas </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">input </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">chainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">v (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">r (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">s (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Web3TransactionReceipt"><code>Web3TransactionReceipt</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">status </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">transactionHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionIndex </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">blockHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">blockNumber </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">gasUsed </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">effectiveGasPrice (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">contractAddress (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">from </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">to </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">logs (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span>  </div>
+<div class="param">logsBloom (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">revertReason (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">output (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">commitmentHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">cumulativeGasUsed (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">type (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>
