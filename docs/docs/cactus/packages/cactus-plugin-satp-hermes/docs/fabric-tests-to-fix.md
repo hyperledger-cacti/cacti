@@ -1,0 +1,1 @@
+--8<-- "packages/cactus-plugin-satp-hermes/docs/fabric-tests-to-fix.md"

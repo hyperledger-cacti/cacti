@@ -21,11 +21,11 @@ Configure the local node, member identity, ledgers, plugin instances, organizati
 
 ## API Summary
 
-The public API exports `PluginConsortiumStatic`, its factory and options, `StaticConsortiumProvider`, generated OpenAPI client types, consortium endpoints, policy-model types, token utilities, and Prometheus metric names. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
+The public API exports `PluginConsortiumStatic`, its factory and options, `StaticConsortiumProvider`, generated OpenAPI client types, consortium endpoints, policy-model types, token utilities, and Prometheus metric names. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] for the maintained export surface.
 
 ## Usage
 
-The integration tests under [`src/test/typescript/integration/`](./src/test/typescript/integration/) demonstrate plugin construction, authenticated node enrollment, and repository updates.
+The integration tests under [`src/test/typescript/integration/`][package-doc-src-test-typescript-integration] demonstrate plugin construction, authenticated node enrollment, and repository updates.
 
 ## Cacti Consortium Static
 
@@ -90,9 +90,14 @@ yarn test:jest:all packages/cacti-plugin-consortium-static/src/test/typescript
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
 This distribution is published under the Apache License Version 2.0 found in
-the [LICENSE](../../LICENSE) file.
+the [LICENSE][package-doc-license] file.
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-src-test-typescript-integration]: ./src/test/typescript/integration/
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

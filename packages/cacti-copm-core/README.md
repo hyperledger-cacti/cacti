@@ -199,13 +199,17 @@ When implementing a new distributed ledger, the following interfaces must be imp
 This package does not define a package-local test script. Its generated service
 contract and shared abstractions are exercised by the ledger-specific COPM
 plugins and the integration tests in
-[`cacti-copm-test`](../cacti-copm-test/README.md).
+[`cacti-copm-test`][package-doc-cacti-copm-test-readme-md].
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
 This distribution is published under the Apache License Version 2.0 found in
-the [LICENSE](../../LICENSE) file.
+the [LICENSE][package-doc-license] file.
+
+[package-doc-cacti-copm-test-readme-md]: ../cacti-copm-test/README.md
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

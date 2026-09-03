@@ -66,22 +66,22 @@ The configuration options for this plugin are defined in the `IPluginLedgerConne
 The sequence diagrams for various endpoints are mentioned below
 
 #### run-transaction-endpoint
-![run-transaction-endpoint sequence diagram](docs/architecture/images/run-transaction-endpoint.png)
+![run-transaction-endpoint sequence diagram][package-doc-docs-architecture-images-run-transaction-endpoint-png]
 The above diagram shows the sequence diagram of run-transaction-endpoint. User A (One of the many Users) interacts with the API Client which in turn, calls the API server. API server then executes transact() method which is explained in detailed in the subsequent diagrams.
-![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
+![run-transaction-endpoint transact() method][package-doc-docs-architecture-images-run-transaction-endpoint-transact-png]
 The above diagram shows the sequence diagram of transact() method of the PluginLedgerConnectorBesu class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the type of Web3SigningCredentialType, corresponding responses are sent back to the caller.  
-![run-transaction-endpoint transactCactusKeychainRef() method](docs/architecture/images/run-transaction-endpoint-transact-cactuskeychainref.png)
+![run-transaction-endpoint transactCactusKeychainRef() method][package-doc-docs-architecture-images-run-transaction-endpoint-transact-cactuskeychainref-png]
 The above diagram shows transactCactusKeychainReference() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is CACTUSKEYCHAINREF. This method in turn calls transactPrivateKey() which calls the signTransaction() method of web3 library. 
-![runtransaction-endpoint transactPrivateKey() method](docs/architecture/images/run-transaction-endpoint-transact-privatekey.png)
+![runtransaction-endpoint transactPrivateKey() method][package-doc-docs-architecture-images-run-transaction-endpoint-transact-privatekey-png]
 The above diagram shows transactPrivateKey() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is PRIVATEKEYHEX. This method then calls the signTransaction() method of the web3 library.
-![run-transaction-endpoint transactSigned() method](docs/architecture/images/run-transaction-endpoint-transact-signed.png)
+![run-transaction-endpoint transactSigned() method][package-doc-docs-architecture-images-run-transaction-endpoint-transact-signed-png]
 The above diagram shows transactSigned() method being called by the transact() method of the PluginLedgerConnector class when the Web3SigningCredentialType is NONE. This method calls the sendSignedTransaction() of the web3 library and then calls pollForTxReceipt() method.
-![run-transaction-endpoint pollForTxReceipt() method](docs/architecture/images/run-transaction-endpoint-transact-pollfortxreceipt.png)
+![run-transaction-endpoint pollForTxReceipt() method][package-doc-docs-architecture-images-run-transaction-endpoint-transact-pollfortxreceipt-png]
 The above diagram shows pollForTxReceipt() method which is called by the transactSigned() method as described in the previous sequence diagram. This method waits for the block confirmation in a loop and then sends the corresponding response back to the caller.
 
 ### Usage
 
-The API surface is documented in the [OpenAPI specification](./src/main/json/openapi.json). A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/](./src/main/typescript/generated/openapi/typescript-axios/).
+The API surface is documented in the [OpenAPI specification][package-doc-src-main-json-openapi-json]. A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/][package-doc-src-main-typescript-generated-openapi-typescript-axios].
 
 To use this import public-api and create new **PluginFactoryLedgerConnector**. Then use it to create a connector.
 ```typescript
@@ -325,7 +325,7 @@ You can also initialize the prometheus exporter object separately and then pass 
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
 Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
 
-```(yaml)
+```yaml
 - job_name: 'besu_ledger_connector_exporter'
   metrics_path: api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-besu/get-prometheus-exporter-metrics
   scrape_interval: 5s
@@ -363,10 +363,21 @@ npm run test:plugin-ledger-connector-besu
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
-## Acknowledgments 
+## Acknowledgments
+
+[package-doc-docs-architecture-images-run-transaction-endpoint-png]: docs/architecture/images/run-transaction-endpoint.png
+[package-doc-docs-architecture-images-run-transaction-endpoint-transact-png]: docs/architecture/images/run-transaction-endpoint-transact.png
+[package-doc-docs-architecture-images-run-transaction-endpoint-transact-cactuskeychainref-png]: docs/architecture/images/run-transaction-endpoint-transact-cactuskeychainref.png
+[package-doc-docs-architecture-images-run-transaction-endpoint-transact-privatekey-png]: docs/architecture/images/run-transaction-endpoint-transact-privatekey.png
+[package-doc-docs-architecture-images-run-transaction-endpoint-transact-signed-png]: docs/architecture/images/run-transaction-endpoint-transact-signed.png
+[package-doc-docs-architecture-images-run-transaction-endpoint-transact-pollfortxreceipt-png]: docs/architecture/images/run-transaction-endpoint-transact-pollfortxreceipt.png
+[package-doc-src-main-json-openapi-json]: ./src/main/json/openapi.json
+[package-doc-src-main-typescript-generated-openapi-typescript-axios]: ./src/main/typescript/generated/openapi/typescript-axios/
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

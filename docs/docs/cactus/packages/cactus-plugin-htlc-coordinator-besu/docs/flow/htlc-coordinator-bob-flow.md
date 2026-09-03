@@ -1,0 +1,1 @@
+--8<-- "extensions/cactus-plugin-htlc-coordinator-besu/docs/flow/htlc-coordinator-bob-flow.md"

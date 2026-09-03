@@ -21,7 +21,7 @@ The plugin requires an Ethereum connector instance and database connection setti
 
 ## API Summary
 
-The plugin exposes status and synchronization operations through its TypeScript and OpenAPI interfaces. See [`public-api.ts`](./src/main/typescript/public-api.ts) and the endpoint section below.
+The plugin exposes status and synchronization operations through its TypeScript and OpenAPI interfaces. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] and the endpoint section below.
 
 This plugin allows `Cactus` to persist Ethereum data into some storage (currently to a `PostgreSQL` database, but this concept can be extended further).
 Data in the database can later be analyzed and viewed in a GUI tool.
@@ -59,9 +59,9 @@ yarn run configure
 
 #### Ethereum Ledger and Connector
 
-This plugin requires a running Ethereum ledger that you want to persist to a database. For testing purposes, you can use our [test geth-all-in-one Docker image](../../tools/docker/geth-all-in-one/README.md). Make sure you have the JSON-RPC WS address ready.
+This plugin requires a running Ethereum ledger that you want to persist to a database. For testing purposes, you can use our [test geth-all-in-one Docker image][package-doc-tools-docker-geth-all-in-one-readme-md]. Make sure you have the JSON-RPC WS address ready.
 
-Once you have an Ethereum ledger ready, you need to start the [Ethereum Cacti Connector](../cactus-plugin-ledger-connector-ethereum/README.md). We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts](./src/test/typescript/manual).
+Once you have an Ethereum ledger ready, you need to start the [Ethereum Cacti Connector][package-doc-cactus-plugin-ledger-connector-ethereum-readme-md]. We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts][package-doc-src-test-typescript-manual].
 
 #### Supabase Instance
 
@@ -73,7 +73,7 @@ We've created some sample scripts to help you get started quickly. All the steps
 
 #### Sample Setup
 
-Location: [./src/test/typescript/manual/sample-setup.ts](./src/test/typescript/manual/sample-setup.ts)
+Location: [./src/test/typescript/manual/sample-setup.ts][package-doc-src-test-typescript-manual-sample-setup-ts]
 
 This sample script can be used to set up `ApiServer` with the Ethereum connector and persistence plugins to monitor and store ledger data in a database. You need to have a ledger running before executing this script. You can add custom code (e.g., to specify tokens to be monitored) after the comment `CUSTOM CODE GOES HERE !!!!` in the script file.
 
@@ -91,7 +91,7 @@ ETHEREUM_RPC_WS_HOST=ws://127.0.0.1:8546 SUPABASE_CONNECTION_STRING=postgresql:/
 
 #### Complete Sample Scenario
 
-Location: [./src/test/typescript/manual/complete-sample-scenario.ts](./src/test/typescript/manual/complete-sample-scenario.ts)
+Location: [./src/test/typescript/manual/complete-sample-scenario.ts][package-doc-src-test-typescript-manual-complete-sample-scenario-ts]
 
 This script starts the test Ethereum ledger for you, deploys a sample ERC721 contract, and mints some tokens. Then it synchronizes everything to a database and monitors for all new blocks. This script can also be used for manual, end-to-end tests of a plugin.
 
@@ -151,7 +151,7 @@ persistencePlugin.startMonitor((err) => {
 persistencePlugin.getStatus();
 ```
 
-> See [plugin integration tests](./src/test/typescript/integration) for complete usage examples.
+> See [plugin integration tests][package-doc-src-test-typescript-integration] for complete usage examples.
 
 ### Building/running the container image locally
 
@@ -227,7 +227,7 @@ npx jest cactus-plugin-persistence-ethereum
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ### Quick plugin project walkthrough
 
@@ -284,6 +284,16 @@ Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 ## Acknowledgments
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-tools-docker-geth-all-in-one-readme-md]: ../../tools/docker/geth-all-in-one/README.md
+[package-doc-cactus-plugin-ledger-connector-ethereum-readme-md]: ../cactus-plugin-ledger-connector-ethereum/README.md
+[package-doc-src-test-typescript-manual]: ./src/test/typescript/manual
+[package-doc-src-test-typescript-manual-sample-setup-ts]: ./src/test/typescript/manual/sample-setup.ts
+[package-doc-src-test-typescript-manual-complete-sample-scenario-ts]: ./src/test/typescript/manual/complete-sample-scenario.ts
+[package-doc-src-test-typescript-integration]: ./src/test/typescript/integration
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

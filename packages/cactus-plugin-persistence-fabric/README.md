@@ -21,7 +21,7 @@ The plugin requires a Fabric connector instance and database connection settings
 
 ## API Summary
 
-The plugin exposes status and synchronization operations through its TypeScript and OpenAPI interfaces. See [`public-api.ts`](./src/main/typescript/public-api.ts) and the endpoint section below.
+The plugin exposes status and synchronization operations through its TypeScript and OpenAPI interfaces. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] and the endpoint section below.
 
 This plugin allows `Cacti` to persist Hyperledger Fabric data into some storage (currently to a `PostgreSQL` database, but this concept can be extended further).
 Data in the database can later be analyzed and viewed in a GUI tool.
@@ -58,7 +58,7 @@ yarn run configure
 
 #### Hyperledger Fabric Ledger and Connector
 
-This plugin requires a running Hyperledger Fabric ledger that you want to persist to a database. For testing purposes, you can use our [test fabric-all-in-one Docker image](../../tools/docker/fabric-all-in-one/README.md). To access the ledger you'll need your organization connection profile JSON and a wallet containing registered identity. If you are using our `fabric-all-in-one` image, you can run our [asset-transfer-basic-utils scripts](../../tools/docker/fabric-all-in-one/asset-transfer-basic-utils/README.md) to fetch Org1 connection profile from a docker and register new user to a localhost wallet.
+This plugin requires a running Hyperledger Fabric ledger that you want to persist to a database. For testing purposes, you can use our [test fabric-all-in-one Docker image][package-doc-tools-docker-fabric-all-in-one-readme-md]. To access the ledger you'll need your organization connection profile JSON and a wallet containing registered identity. If you are using our `fabric-all-in-one` image, you can run our [asset-transfer-basic-utils scripts][package-doc-tools-docker-fabric-all-in-one-asset-transfer-basic-utils-readme-md] to fetch Org1 connection profile from a docker and register new user to a localhost wallet.
 
 ```shell
 # Start the test ledger
@@ -75,7 +75,7 @@ npm install
 CACTUS_FABRIC_ALL_IN_ONE_CONTAINER_NAME=fabric_all_in_one_testnet_2x  ./setup.sh
 ```
 
-Once you have an Fabric ledger ready, you need to start the [Fabric Cacti Connector](../cactus-plugin-ledger-connector-fabric/README.md). We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts](./src/test/typescript/manual).
+Once you have an Fabric ledger ready, you need to start the [Fabric Cacti Connector][package-doc-cactus-plugin-ledger-connector-fabric-readme-md]. We recommend running the connector on the same ApiServer instance as the persistence plugin for better performance and reduced network overhead. See the connector package README for more instructions, or check out the [setup sample scripts][package-doc-src-test-typescript-manual].
 
 #### Supabase Instance
 
@@ -87,7 +87,7 @@ We've created some sample scripts to help you get started quickly. All the steps
 
 #### Sample Setup
 
-Location: [./src/test/typescript/manual/sample-setup.ts](./src/test/typescript/manual/sample-setup.ts)
+Location: [./src/test/typescript/manual/sample-setup.ts][package-doc-src-test-typescript-manual-sample-setup-ts]
 
 This sample script can be used to set up `ApiServer` with the Fabric connector and persistence plugins to monitor and store ledger data in a database. You need to have a ledger running before executing this script.
 
@@ -108,7 +108,7 @@ node ./dist/lib/test/typescript/manual/sample-setup.js
 
 #### Complete Sample Scenario
 
-Location: [./src/test/typescript/manual/complete-sample-scenario.ts](./src/test/typescript/manual/complete-sample-scenario.ts)
+Location: [./src/test/typescript/manual/complete-sample-scenario.ts][package-doc-src-test-typescript-manual-complete-sample-scenario-ts]
 
 This script starts the test Hyperledger Fabric ledger for you and executes few transactions on a `basic` chaincode. Then, it synchronizes everything to a database and monitors for all new blocks. This script can also be used for manual, end-to-end tests of a plugin.
 
@@ -163,7 +163,7 @@ persistencePlugin.startMonitor((err) => {
 persistencePlugin.getStatus();
 ```
 
-> See [plugin integration tests](./src/test/typescript/integration) for complete usage examples.
+> See [plugin integration tests][package-doc-src-test-typescript-integration] for complete usage examples.
 
 ### Building/running the container image locally
 
@@ -223,7 +223,7 @@ npx jest cactus-plugin-persistence-fabric
 
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ### Quick plugin project walkthrough
 
@@ -272,6 +272,17 @@ Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 ## Acknowledgments
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-tools-docker-fabric-all-in-one-readme-md]: ../../tools/docker/fabric-all-in-one/README.md
+[package-doc-tools-docker-fabric-all-in-one-asset-transfer-basic-utils-readme-md]: ../../tools/docker/fabric-all-in-one/asset-transfer-basic-utils/README.md
+[package-doc-cactus-plugin-ledger-connector-fabric-readme-md]: ../cactus-plugin-ledger-connector-fabric/README.md
+[package-doc-src-test-typescript-manual]: ./src/test/typescript/manual
+[package-doc-src-test-typescript-manual-sample-setup-ts]: ./src/test/typescript/manual/sample-setup.ts
+[package-doc-src-test-typescript-manual-complete-sample-scenario-ts]: ./src/test/typescript/manual/complete-sample-scenario.ts
+[package-doc-src-test-typescript-integration]: ./src/test/typescript/integration
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

@@ -17,7 +17,7 @@ npm install @hyperledger-cacti/cactus-api-client
 
 ## API Summary
 
-The public API exports the Cacti API client, consortium providers, generated API types, and supporting client utilities. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
+The public API exports the Cacti API client, consortium providers, generated API types, and supporting client utilities. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] for the maintained export surface.
 
 - [Summary](#summary)
 - [Usage](#usage)
@@ -174,3 +174,5 @@ From the repository root, run:
 ```sh
 yarn test:jest:all packages/cactus-api-client/src/test/typescript
 ```
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts

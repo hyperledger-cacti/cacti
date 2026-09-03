@@ -17,7 +17,7 @@ npm install @hyperledger-cacti/cactus-plugin-htlc-eth-besu
 
 ## API Summary
 
-The public API exports the HTLC plugin, its factory and options, generated OpenAPI client types, and contract artifacts. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
+The public API exports the HTLC plugin, its factory and options, generated OpenAPI client types, and contract artifacts. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] for the maintained export surface.
 
 Allows `Cacti` to interact with HTLC contract manager. 
 
@@ -66,7 +66,7 @@ Run ALL the solidity tests: `forge test -vvvv`
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ## Nohoist configuration
 Foundry uses ``forge-std``and ``ds-test``modules for testing purposes. Given that Foundry cannot access files outside of the project, we use nohoist to force lerna to download the packages within the Forge project directory:
@@ -84,4 +84,8 @@ If in the future Forge supports importing Solidity files from outside the projec
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

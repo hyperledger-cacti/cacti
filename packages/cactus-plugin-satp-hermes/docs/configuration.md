@@ -37,5 +37,7 @@ See [`SATPGatewayConfig`](https://github.com/hyperledger-cacti/cacti/blob/main/p
 
 The CLI requires `/opt/cacti/satp-hermes/config/config.json` by default and optionally loads `/opt/cacti/satp-hermes/config/adapter-config.yml`. Programmatic callers can override `workDir`, `configPath`, and `adapterConfigPath` through `launchGateway()`.
 
-The CLI validates the identity, counterparties, key pair, environment, policies, repositories, cross-chain configuration, extensions, and optional adapter configuration before constructing the gateway. For adapter fields and execution-point semantics, see the [API Type 3 adapter specification](/cacti/satp-hermes/api3-adapter-spec/).
+The CLI validates the identity, counterparties, key pair, environment, policies, repositories, cross-chain configuration, extensions, and optional adapter configuration before constructing the gateway. For adapter fields and execution-point semantics, see the [API Type 3 adapter specification][package-doc-api3-adapter-spec-md].
 <!-- --8<-- [end:content] -->
+
+[package-doc-api3-adapter-spec-md]: ./api3-adapter-spec.md

@@ -64,7 +64,7 @@ The configuration options for this plugin are defined in the `IPluginLedgerConne
 | `prometheusExporter` | No | Optional Prometheus exporter instance for metrics. |
 | `logLevel` | No | The log level for the plugin (e.g., 'INFO', 'DEBUG'). |
 
-The API surface is documented in the [OpenAPI specification](./src/main/json/openapi.json). A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/](./src/main/typescript/generated/openapi/typescript-axios/).
+The API surface is documented in the [OpenAPI specification][package-doc-src-main-json-openapi-json]. A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/][package-doc-src-main-typescript-generated-openapi-typescript-axios].
 
 ### Architecture
 
@@ -298,7 +298,7 @@ You can also initialize the prometheus exporter object seperately and then pass 
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
 Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
 
-```(yaml)
+```yaml
 - job_name: 'stellar_ledger_connector_exporter'
   metrics_path: api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-stellar/get-prometheus-exporter-metrics
   scrape_interval: 5s
@@ -340,10 +340,15 @@ yarn jest packages/cacti-plugin-ledger-connector-stellar/
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 ## Acknowledgments
+
+[package-doc-src-main-json-openapi-json]: ./src/main/json/openapi.json
+[package-doc-src-main-typescript-generated-openapi-typescript-axios]: ./src/main/typescript/generated/openapi/typescript-axios/
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

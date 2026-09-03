@@ -1,0 +1,493 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Core API</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Core API</h1>
+    <div class="app-desc">Contains/describes the core API types for Cactus. Does not describe actual endpoints on its own as this is left to the implementing plugins who can import and re-use commonly needed type definitions from this specification. One example of said commonly used type definitions would be the types related to consortium management, cactus nodes, ledgers, etc..</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#CactusNode"><code>CactusNode</code> - </a></li>
+    <li><a href="#CactusNodeMeta"><code>CactusNodeMeta</code> - </a></li>
+    <li><a href="#CactusNode_allOf"><code>CactusNode_allOf</code> - </a></li>
+    <li><a href="#ConsensusAlgorithmFamiliesWithOutTxFinality"><code>ConsensusAlgorithmFamiliesWithOutTxFinality</code> - </a></li>
+    <li><a href="#ConsensusAlgorithmFamiliesWithTxFinality"><code>ConsensusAlgorithmFamiliesWithTxFinality</code> - </a></li>
+    <li><a href="#ConsensusAlgorithmFamily"><code>ConsensusAlgorithmFamily</code> - </a></li>
+    <li><a href="#Consortium"><code>Consortium</code> - </a></li>
+    <li><a href="#ConsortiumDatabase"><code>ConsortiumDatabase</code> - </a></li>
+    <li><a href="#ConsortiumMember"><code>ConsortiumMember</code> - </a></li>
+    <li><a href="#Constants"><code>Constants</code> - </a></li>
+    <li><a href="#DeleteKeychainEntryRequestV1"><code>DeleteKeychainEntryRequestV1</code> - </a></li>
+    <li><a href="#DeleteKeychainEntryResponseV1"><code>DeleteKeychainEntryResponseV1</code> - </a></li>
+    <li><a href="#GetKeychainEntryRequestV1"><code>GetKeychainEntryRequestV1</code> - </a></li>
+    <li><a href="#GetKeychainEntryResponseV1"><code>GetKeychainEntryResponseV1</code> - </a></li>
+    <li><a href="#GetObjectRequestV1"><code>GetObjectRequestV1</code> - </a></li>
+    <li><a href="#GetObjectResponseV1"><code>GetObjectResponseV1</code> - </a></li>
+    <li><a href="#HasKeychainEntryRequestV1"><code>HasKeychainEntryRequestV1</code> - </a></li>
+    <li><a href="#HasKeychainEntryResponseV1"><code>HasKeychainEntryResponseV1</code> - </a></li>
+    <li><a href="#HasObjectRequestV1"><code>HasObjectRequestV1</code> - </a></li>
+    <li><a href="#HasObjectResponseV1"><code>HasObjectResponseV1</code> - </a></li>
+    <li><a href="#JWSGeneral"><code>JWSGeneral</code> - </a></li>
+    <li><a href="#JWSRecipient"><code>JWSRecipient</code> - </a></li>
+    <li><a href="#Ledger"><code>Ledger</code> - </a></li>
+    <li><a href="#LedgerType"><code>LedgerType</code> - </a></li>
+    <li><a href="#PluginImport"><code>PluginImport</code> - </a></li>
+    <li><a href="#PluginImportAction"><code>PluginImportAction</code> - </a></li>
+    <li><a href="#PluginImportType"><code>PluginImportType</code> - </a></li>
+    <li><a href="#PluginInstance"><code>PluginInstance</code> - </a></li>
+    <li><a href="#SetKeychainEntryRequestV1"><code>SetKeychainEntryRequestV1</code> - </a></li>
+    <li><a href="#SetKeychainEntryResponseV1"><code>SetKeychainEntryResponseV1</code> - </a></li>
+    <li><a href="#SetObjectRequestV1"><code>SetObjectRequestV1</code> - </a></li>
+    <li><a href="#SetObjectResponseV1"><code>SetObjectResponseV1</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="CactusNode"><code>CactusNode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A Cactus node can be a single server, or a set of servers behind a load balancer acting as one.</div>
+    <div class="field-items">
+      <div class="param">nodeApiHost </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">publicKeyPem </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The PEM encoded public key that was used to generate the JWS included in the response (the jws property) format: Must only contain the public key, never include here  the PEM that also contains a private key. See PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail</div>
+<div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">consortiumId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">memberId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ledgerIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Stores an array of Ledger entity IDs that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions. </div>
+<div class="param">pluginInstanceIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactusNodeMeta"><code>CactusNodeMeta</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A Cactus node meta information</div>
+    <div class="field-items">
+      <div class="param">nodeApiHost </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">publicKeyPem </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The PEM encoded public key that was used to generate the JWS included in the response (the jws property) format: Must only contain the public key, never include here  the PEM that also contains a private key. See PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactusNode_allOf"><code>CactusNode_allOf</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">consortiumId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">memberId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ledgerIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Stores an array of Ledger entity IDs that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions. </div>
+<div class="param">pluginInstanceIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConsensusAlgorithmFamiliesWithOutTxFinality"><code>ConsensusAlgorithmFamiliesWithOutTxFinality</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Enumerates a list of consensus algorithm families that do not provide immediate finality</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConsensusAlgorithmFamiliesWithTxFinality"><code>ConsensusAlgorithmFamiliesWithTxFinality</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Enumerates a list of consensus algorithm families that provide immediate finality</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConsensusAlgorithmFamily"><code>ConsensusAlgorithmFamily</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremost a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Consortium"><code>Consortium</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">mainApiHost </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">memberIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> The collection (array) of primary keys of consortium member entities that belong to this Consortium. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConsortiumDatabase"><code>ConsortiumDatabase</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">consortium </div><div class="param-desc"><span class="param-type"><a href="#Consortium">array[Consortium]</a></span> A collection of Consortium entities. In practice this should only ever contain a single consortium, but we defined it as an array to keep the convention up with the rest of the collections defined in the Consortium data in general. Also, if we ever decide to somehow have some sort of consortium to consortium integration (which does not make much sense in the current frame of mind of the author in the year 2020) then having this as an array will have proven itself to be an excellent long term compatibility/extensibility decision indeed. </div>
+<div class="param">ledger </div><div class="param-desc"><span class="param-type"><a href="#Ledger">array[Ledger]</a></span> The complete collection of all ledger entities in existence within the consortium. </div>
+<div class="param">consortiumMember </div><div class="param-desc"><span class="param-type"><a href="#ConsortiumMember">array[ConsortiumMember]</a></span> The complete collection of all consortium member entities in existence within the consortium. </div>
+<div class="param">cactusNode </div><div class="param-desc"><span class="param-type"><a href="#CactusNode">array[CactusNode]</a></span> The complete collection of all cactus nodes entities in existence within the consortium. </div>
+<div class="param">pluginInstance </div><div class="param-desc"><span class="param-type"><a href="#PluginInstance">array[PluginInstance]</a></span> The complete collection of all plugin instance entities in existence within the consortium. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConsortiumMember"><code>ConsortiumMember</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The human readable name a Consortium member can be referred to while making it easy for humans to distinguish this particular consortium member entity from any other ones. </div>
+<div class="param">nodeIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Constants"><code>Constants</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeleteKeychainEntryRequestV1"><code>DeleteKeychainEntryRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key for the entry to check the presence of on the keychain. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeleteKeychainEntryResponseV1"><code>DeleteKeychainEntryResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key that was deleted from the keychain. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetKeychainEntryRequestV1"><code>GetKeychainEntryRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key for the entry to get from the keychain. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetKeychainEntryResponseV1"><code>GetKeychainEntryResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key that was used to retrieve the value from the keychain. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The value associated with the requested key on the keychain. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetObjectRequestV1"><code>GetObjectRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key for the entry to get from the object store. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetObjectResponseV1"><code>GetObjectResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key that was used to retrieve the value from the object store. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The value associated with the requested key in the object store as a string. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HasKeychainEntryRequestV1"><code>HasKeychainEntryRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key to check for presence in the keychain. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HasKeychainEntryResponseV1"><code>HasKeychainEntryResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key that was used to check the presence of the value in the entry store. </div>
+<div class="param">checkedAt </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Date and time encoded as JSON when the presence check was performed by the plugin backend. </div>
+<div class="param">isPresent </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> The boolean true or false indicating the presence or absence of an entry under 'key'. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HasObjectRequestV1"><code>HasObjectRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key to check for presence in the object store. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HasObjectResponseV1"><code>HasObjectResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key that was used to check the presence of the value in the object store. </div>
+<div class="param">checkedAt </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Date and time encoded as JSON when the presence check was performed by the plugin backend. </div>
+<div class="param">isPresent </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> The boolean true or false indicating the presence or absence of an object under 'key'. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JWSGeneral"><code>JWSGeneral</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signatures </div><div class="param-desc"><span class="param-type"><a href="#JWSRecipient">array[JWSRecipient]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JWSRecipient"><code>JWSRecipient</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515 for info about standard.</div>
+    <div class="field-items">
+      <div class="param">signature </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">protected (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">header (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Ledger"><code>Ledger</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ledgerType </div><div class="param-desc"><span class="param-type"><a href="#LedgerType">LedgerType</a></span>  </div>
+<div class="param">consortiumMemberId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="LedgerType"><code>LedgerType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example &quot;BESU_1X&quot; involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PluginImport"><code>PluginImport</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">packageName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#PluginImportType">PluginImportType</a></span>  </div>
+<div class="param">action </div><div class="param-desc"><span class="param-type"><a href="#PluginImportAction">PluginImportAction</a></span>  </div>
+<div class="param">options (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PluginImportAction"><code>PluginImportAction</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PluginImportType"><code>PluginImportType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PluginInstance"><code>PluginInstance</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">packageName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SetKeychainEntryRequestV1"><code>SetKeychainEntryRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key for the entry to set on the keychain. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The value that will be associated with the key on the keychain. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SetKeychainEntryResponseV1"><code>SetKeychainEntryResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key that was used to set the value on the keychain. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SetObjectRequestV1"><code>SetObjectRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key for the entry to set in the object store. </div>
+<div class="param">value </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The value that will be associated with the key in the object store. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SetObjectResponseV1"><code>SetObjectResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">key </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The key that was used to set the value in the object store. </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

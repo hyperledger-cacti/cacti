@@ -118,11 +118,11 @@ enum Web3SigningCredentialType {
 
 ## EthereumApiClient
 
-All connector API endpoints are defined in [open-api specification](./src/main/json/openapi.json). You can use [EthereumApiClient](./src/main/typescript/api-client) to call remote ethereum connector functions. It also contain additional utility functions to ease integration.
+All connector API endpoints are defined in [open-api specification][package-doc-src-main-json-openapi-json]. You can use [EthereumApiClient][package-doc-src-main-typescript-api-client] to call remote ethereum connector functions. It also contain additional utility functions to ease integration.
 
 ### REST Functions
 
-See [DefaultApi](./src/main/typescript/generated/openapi/typescript-axios/api.ts) for up-to-date listing of supported endpoints.
+See [DefaultApi][package-doc-src-main-typescript-generated-openapi-typescript-axios-api-ts] for up-to-date listing of supported endpoints.
 
 - deployContractSolBytecodeJsonObjectV1
 - deployContractSolBytecodeV1
@@ -454,7 +454,7 @@ You can also initialize the prometheus exporter object seperately and then pass 
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
 Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
 
-```(yaml)
+```yaml
 - job_name: 'ethereum_ledger_connector_exporter'
   metrics_path: api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics
   scrape_interval: 5s
@@ -493,14 +493,20 @@ There's a simple script for checking integration with [alchemy platform](https:/
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 ## Acknowledgments
 
 ```
 
 ```
+
+[package-doc-src-main-json-openapi-json]: ./src/main/json/openapi.json
+[package-doc-src-main-typescript-api-client]: ./src/main/typescript/api-client
+[package-doc-src-main-typescript-generated-openapi-typescript-axios-api-ts]: ./src/main/typescript/generated/openapi/typescript-axios/api.ts
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

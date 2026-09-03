@@ -8,7 +8,7 @@ The SATP Hermes Plugin implements the IETF Secure Asset Transfer Protocol (SATP)
 
 ### Complete System Architecture
 
-![Architecture Overview](../assets/diagrams/architecture-overview.svg)
+![Architecture Overview][package-doc-assets-diagrams-architecture-overview-svg]
 
 The diagram above shows the complete SATP Hermes architecture including:
 
@@ -39,7 +39,7 @@ The diagram above shows the complete SATP Hermes architecture including:
 
 ### Entry Point Initialization
 
-![Entry Point Flow](../assets/diagrams/entrypoint-flow.svg)
+![Entry Point Flow][package-doc-assets-diagrams-entrypoint-flow-svg]
 
 This sequence diagram illustrates the complete initialization process when launching a gateway through the CLI:
 
@@ -52,7 +52,7 @@ This sequence diagram illustrates the complete initialization process when launc
 
 ### Use Case Scenarios
 
-![Entry Point Use Cases](../assets/diagrams/entrypoint-use-cases.svg)
+![Entry Point Use Cases][package-doc-assets-diagrams-entrypoint-use-cases-svg]
 
 Three deployment models leverage the same core:
 
@@ -64,7 +64,7 @@ Three deployment models leverage the same core:
 
 ### Core Module
 
-![Core Module](../assets/diagrams/module-core.svg)
+![Core Module][package-doc-assets-diagrams-module-core-svg]
 
 The **Core Module** implements the SATP protocol state machine:
 
@@ -77,7 +77,7 @@ The **Core Module** implements the SATP protocol state machine:
 
 ### API Module
 
-![API Module](../assets/diagrams/module-api.svg)
+![API Module][package-doc-assets-diagrams-module-api-svg]
 
 The **API Module** provides REST endpoints for external access:
 
@@ -88,7 +88,7 @@ The **API Module** provides REST endpoints for external access:
 
 ### Cross-Chain Module
 
-![Cross-Chain Module](../assets/diagrams/module-cross-chain.svg)
+![Cross-Chain Module][package-doc-assets-diagrams-module-cross-chain-svg]
 
 The **Cross-Chain Module** handles blockchain interactions:
 
@@ -101,7 +101,7 @@ The **Cross-Chain Module** handles blockchain interactions:
 
 ### Database Module
 
-![Database Module](../assets/diagrams/module-database.svg)
+![Database Module][package-doc-assets-diagrams-module-database-svg]
 
 The **Database Module** manages persistence:
 
@@ -113,7 +113,7 @@ The **Database Module** manages persistence:
 
 ### Services Module
 
-![Services Module](../assets/diagrams/module-services.svg)
+![Services Module][package-doc-assets-diagrams-module-services-svg]
 
 The **Services Module** provides gateway orchestration:
 
@@ -126,7 +126,7 @@ The **Services Module** provides gateway orchestration:
 
 ### Factory Module
 
-![Factory Module](../assets/diagrams/module-factory.svg)
+![Factory Module][package-doc-assets-diagrams-module-factory-svg]
 
 The **Factory Module** handles component creation:
 
@@ -138,7 +138,7 @@ The **Factory Module** handles component creation:
 
 ### API1 - BLO REST Endpoints
 
-![API1 Endpoints](../assets/diagrams/api1-endpoints.svg)
+![API1 Endpoints][package-doc-assets-diagrams-api1-endpoints-svg]
 
 The **API1 Module** provides RESTful HTTP endpoints for external access:
 
@@ -162,7 +162,7 @@ The **API1 Module** provides RESTful HTTP endpoints for external access:
 
 ### API3 - SATP Protocol gRPC/ConnectRPC
 
-![API3 SATP Protocol](../assets/diagrams/api3-satp-protocol.svg)
+![API3 SATP Protocol][package-doc-assets-diagrams-api3-satp-protocol-svg]
 
 The **API3 Module** implements gateway-to-gateway SATP protocol communication:
 
@@ -345,7 +345,7 @@ yarn docs:validate
 
 For detailed implementation guides, configuration examples, and troubleshooting:
 
-- **[Documentation README](../README.md)** - Diagram generation, build instructions, and documentation maintenance
+- **[Documentation README][package-doc-readme-md]** - Diagram generation, build instructions, and documentation maintenance
 - **Individual module documentation** - Refer to API specifics for each component
 - **[GitHub Examples](https://github.com/hyperledger-cacti/cacti/tree/main/examples)** - Use cases and sample implementations
 
@@ -362,3 +362,16 @@ All documentation files from the `docs/` folder are available in the generated T
 **Version**: 0.0.3-beta  
 **SATP Draft**: core-02, architecture-02, crash-02  
 **License**: Apache-2.0
+
+[package-doc-assets-diagrams-architecture-overview-svg]: ../../assets/diagrams/architecture-overview.svg
+[package-doc-assets-diagrams-entrypoint-flow-svg]: ../../assets/diagrams/entrypoint-flow.svg
+[package-doc-assets-diagrams-entrypoint-use-cases-svg]: ../../assets/diagrams/entrypoint-use-cases.svg
+[package-doc-assets-diagrams-module-core-svg]: ../../assets/diagrams/module-core.svg
+[package-doc-assets-diagrams-module-api-svg]: ../../assets/diagrams/module-api.svg
+[package-doc-assets-diagrams-module-cross-chain-svg]: ../../assets/diagrams/module-cross-chain.svg
+[package-doc-assets-diagrams-module-database-svg]: ../../assets/diagrams/module-database.svg
+[package-doc-assets-diagrams-module-services-svg]: ../../assets/diagrams/module-services.svg
+[package-doc-assets-diagrams-module-factory-svg]: ../../assets/diagrams/module-factory.svg
+[package-doc-assets-diagrams-api1-endpoints-svg]: ../../assets/diagrams/api1-endpoints.svg
+[package-doc-assets-diagrams-api3-satp-protocol-svg]: ../../assets/diagrams/api3-satp-protocol.svg
+[package-doc-readme-md]: ../../README.md

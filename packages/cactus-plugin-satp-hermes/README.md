@@ -21,8 +21,8 @@ npm install @hyperledger-cacti/cactus-plugin-satp-hermes
 The package exports `SATPGateway`, `SATPGatewayConfig`, the gateway factory,
 generated API clients, protocol types, cross-chain bridge types, adapter APIs,
 and gateway configuration-loading utilities. See
-[`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export
-surface and [the bundled OpenAPI document](./src/main/json/oapi-api1-bundled.json)
+[`public-api.ts`][package-doc-src-main-typescript-public-api-ts] for the maintained export
+surface and [the bundled OpenAPI document][package-doc-src-main-json-oapi-api1-bundled-json]
 for application-to-gateway request and response schemas.
 
 ## Key Features
@@ -215,16 +215,16 @@ the configuration sources of truth. The standalone CLI loads
 `config/config.json` and optionally `config/adapter-config.yml` from its
 working directory.
 
-- [Gateway configuration](./docs/configuration.md)
-- [Database and migrations](./docs/database.md)
-- [Operator deployment and health checks](./docs/operations.md)
+- [Gateway configuration][package-doc-docs-configuration-md]
+- [Database and migrations][package-doc-docs-database-md]
+- [Operator deployment and health checks][package-doc-docs-operations-md]
 
 ## Adapter Layer (API Type 3)
 
 The adapter layer connects SATP protocol execution points to outbound webhooks
 and optional inbound approval workflows. Its configuration schema, ordering,
 timeouts, decision endpoint, and execution points are maintained in the
-[API Type 3 adapter specification](./docs/api3-adapter-spec.md).
+[API Type 3 adapter specification][package-doc-docs-api3-adapter-spec-md].
 
 ## Containerization
 
@@ -327,8 +327,16 @@ Please review [CONTRIBUTING.md](https://github.com/hyperledger-cacti/cacti/blob/
 
 ## Release Process
 
-See [docs/satp-release-process.md](docs/satp-release-process.md) for the full release process, including the dev and production build types and the release checklist.
+See [docs/satp-release-process.md][package-doc-docs-satp-release-process-md] for the full release process, including the dev and production build types and the release checklist.
 
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-src-main-json-oapi-api1-bundled-json]: ./src/main/json/oapi-api1-bundled.json
+[package-doc-docs-configuration-md]: ./docs/configuration.md
+[package-doc-docs-database-md]: ./docs/database.md
+[package-doc-docs-operations-md]: ./docs/operations.md
+[package-doc-docs-api3-adapter-spec-md]: ./docs/api3-adapter-spec.md
+[package-doc-docs-satp-release-process-md]: docs/satp-release-process.md

@@ -17,7 +17,7 @@ npm install @hyperledger-cacti/cactus-plugin-bungee-hermes
 
 ## API Summary
 
-The public API exports the plugin, factory, generated OpenAPI client, privacy and merge policy types, and view creation utilities. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
+The public API exports the plugin, factory, generated OpenAPI client, privacy and merge policy types, and view creation utilities. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] for the maintained export surface.
 
 The package provides `Hyperledger Cacti` a way to create blockchain snapshots and views for different distributed ledgers currently supported by Cacti. The implementation follows the paper [BUNGEE](https://dl.acm.org/doi/pdf/10.1145/3643689) (Blockchain UNifier view GEnErator).
 
@@ -246,3 +246,5 @@ Please review [CONTRIBUTING.md](https://github.com/hyperledger/cactus/blob/main/
 
 ## License
 This distribution is published under the Apache License Version 2.0 found in the [LICENSE ](https://github.com/hyperledger/cactus/blob/main/LICENSE "LICENSE ")file.
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
