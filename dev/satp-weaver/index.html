@@ -8,27 +8,31 @@
       
       
       
-        <link rel="canonical" href="https://hyperledger-cacti.github.io/cacti/dev/cactus/support/substrate/">
+        <link rel="canonical" href="https://hyperledger-cacti.github.io/cacti/dev/satp-weaver/">
       
       
+        <link rel="prev" href="../satp-hermes/operations/">
+      
+      
+        <link rel="next" href="../guides/getting-started/">
       
       
         
       
       
-      <link rel="icon" href="../../../images/HL_Cacti_Logo_Colorreverse.svg">
+      <link rel="icon" href="../images/HL_Cacti_Logo_Colorreverse.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Substrate Support - Hyperledger Cacti documentation</title>
+        <title>SATP Weaver - Hyperledger Cacti documentation</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -47,7 +51,7 @@
       
     
     
-    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -82,7 +86,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#substrate-support" class="md-skip">
+        <a href="#satp-weaver" class="md-skip">
           Skip to content
         </a>
       
@@ -97,12 +101,12 @@
             <div class="md-banner__inner md-grid md-typeset">
               
   You're not viewing the latest version.
-  <a href="../../../.."> 
+  <a href="../.."> 
     <strong>Click here to go to latest.</strong>
   </a>
 
             </div>
-            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL("../../.."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
+            <script>var el=document.querySelector("[data-md-component=outdated]"),base=new URL(".."),outdated=__md_get("__outdated",sessionStorage,base);!0===outdated&&el&&(el.hidden=!1)</script>
           </aside>
         
       </div>
@@ -114,9 +118,9 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="Hyperledger Cacti documentation" class="md-header__button md-logo" aria-label="Hyperledger Cacti documentation" data-md-component="logo">
+    <a href=".." title="Hyperledger Cacti documentation" class="md-header__button md-logo" aria-label="Hyperledger Cacti documentation" data-md-component="logo">
       
-  <img src="../../../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
+  <img src="../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -133,7 +137,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Substrate Support
+              SATP Weaver
             
           </span>
         </div>
@@ -240,7 +244,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../.." class="md-tabs__link">
+        <a href=".." class="md-tabs__link">
           
   
   
@@ -267,7 +271,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../introduction/" class="md-tabs__link">
+        <a href="../cactus/introduction/" class="md-tabs__link">
           
   
   
@@ -286,18 +290,32 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../../satp-hermes/" class="md-tabs__link">
+      
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../satp-hermes/" class="md-tabs__link">
           
   
   
-  SATP Hermes
+  SATP
 
         </a>
       </li>
+    
+  
+
     
   
 
@@ -317,7 +335,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../guides/getting-started/" class="md-tabs__link">
+        <a href="../guides/getting-started/" class="md-tabs__link">
           
   
   
@@ -340,7 +358,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../references/" class="md-tabs__link">
+        <a href="../references/" class="md-tabs__link">
           
   
   
@@ -360,7 +378,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../contributing/how-to-contribute/" class="md-tabs__link">
+        <a href="../contributing/how-to-contribute/" class="md-tabs__link">
           
   
   
@@ -387,7 +405,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../blog/2021-01-21-cross-chain-asset/" class="md-tabs__link">
+        <a href="../blog/2021-01-21-cross-chain-asset/" class="md-tabs__link">
           
   
   
@@ -432,9 +450,9 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="Hyperledger Cacti documentation" class="md-nav__button md-logo" aria-label="Hyperledger Cacti documentation" data-md-component="logo">
+    <a href=".." title="Hyperledger Cacti documentation" class="md-nav__button md-logo" aria-label="Hyperledger Cacti documentation" data-md-component="logo">
       
-  <img src="../../../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
+  <img src="../images/HL_Cacti_Logo_Colorreverse.svg" alt="logo">
 
     </a>
     Hyperledger Cacti documentation
@@ -513,7 +531,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../.." class="md-nav__link">
+      <a href=".." class="md-nav__link">
         
   
   
@@ -541,7 +559,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../vision/" class="md-nav__link">
+      <a href="../vision/" class="md-nav__link">
         
   
   
@@ -569,7 +587,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../architecture/" class="md-nav__link">
+      <a href="../architecture/" class="md-nav__link">
         
   
   
@@ -649,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../concepts/" class="md-nav__link">
+      <a href="../concepts/" class="md-nav__link">
         
   
   
@@ -677,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../concepts/data-sharing/" class="md-nav__link">
+      <a href="../concepts/data-sharing/" class="md-nav__link">
         
   
   
@@ -713,7 +731,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../start-here/" class="md-nav__link">
+      <a href="../start-here/" class="md-nav__link">
         
   
   
@@ -721,34 +739,6 @@
     
   
     Start Here
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../use-cases/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Use Cases
   
 
     
@@ -880,7 +870,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../introduction/" class="md-nav__link">
+      <a href="../cactus/introduction/" class="md-nav__link">
         
   
   
@@ -908,7 +898,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../build/" class="md-nav__link">
+      <a href="../cactus/build/" class="md-nav__link">
         
   
   
@@ -988,7 +978,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/" class="md-nav__link">
+      <a href="../cactus/examples/" class="md-nav__link">
         
   
   
@@ -1016,7 +1006,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../examples/supply-chain-app.md" class="md-nav__link">
+      <a href="../cactus/examples/supply-chain-app.md" class="md-nav__link">
         
   
   
@@ -1052,7 +1042,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../governance/" class="md-nav__link">
+      <a href="../cactus/governance/" class="md-nav__link">
         
   
   
@@ -1080,7 +1070,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../code-of-conduct/" class="md-nav__link">
+      <a href="../cactus/code-of-conduct/" class="md-nav__link">
         
   
   
@@ -1108,7 +1098,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/" class="md-nav__link">
+      <a href="../cactus/contributing/" class="md-nav__link">
         
   
   
@@ -1136,7 +1126,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../whitepaper/" class="md-nav__link">
+      <a href="../cactus/whitepaper/" class="md-nav__link">
         
   
   
@@ -1164,7 +1154,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../regulatory-and-industry-initiatives-reading-list/" class="md-nav__link">
+      <a href="../cactus/regulatory-and-industry-initiatives-reading-list/" class="md-nav__link">
         
   
   
@@ -1192,7 +1182,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../packages/" class="md-nav__link">
+      <a href="../cactus/packages/" class="md-nav__link">
         
   
   
@@ -1272,7 +1262,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/overview/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/overview/" class="md-nav__link">
         
   
   
@@ -1300,7 +1290,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/setup/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/setup/" class="md-nav__link">
         
   
   
@@ -1380,7 +1370,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/plugin-apps/app-patterns/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/plugin-apps/app-patterns/" class="md-nav__link">
         
   
   
@@ -1408,7 +1398,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/plugin-apps/ethereum-browser/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/plugin-apps/ethereum-browser/" class="md-nav__link">
         
   
   
@@ -1436,7 +1426,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/plugin-apps/fabric-browser/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/plugin-apps/fabric-browser/" class="md-nav__link">
         
   
   
@@ -1524,7 +1514,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/developer-guide/overview/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/developer-guide/overview/" class="md-nav__link">
         
   
   
@@ -1552,7 +1542,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/developer-guide/architecture/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/developer-guide/architecture/" class="md-nav__link">
         
   
   
@@ -1580,7 +1570,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../ledger-browser/developer-guide/tutorial/" class="md-nav__link">
+      <a href="../cactus/ledger-browser/developer-guide/tutorial/" class="md-nav__link">
         
   
   
@@ -1623,25 +1613,9 @@
   
   
   
-    
-    
-    
-    
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
-      
+    <li class="md-nav__item">
+      <a href="../cactus/support/" class="md-nav__link">
         
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_1_11" >
-        
-          
-          <label class="md-nav__link" for="__nav_2_1_11" id="__nav_2_1_11_label" tabindex="0">
-            
   
   
   <span class="md-ellipsis">
@@ -1655,163 +1629,7 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_1_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_1_11">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Ledger Support
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../besu/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Hyperledger Besu
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../corda/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    R3 Corda
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../fabric/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Hyperledger Fabric
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../iroha.md" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Hyperledger Iroha
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
     </li>
   
 
@@ -1884,7 +1702,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/introduction/" class="md-nav__link">
+      <a href="../weaver/introduction/" class="md-nav__link">
         
   
   
@@ -1964,7 +1782,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/guide/" class="md-nav__link">
+      <a href="../weaver/getting-started/guide/" class="md-nav__link">
         
   
   
@@ -2044,7 +1862,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/test-network/overview/" class="md-nav__link">
+      <a href="../weaver/getting-started/test-network/overview/" class="md-nav__link">
         
   
   
@@ -2072,7 +1890,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/test-network/setup-local/" class="md-nav__link">
+      <a href="../weaver/getting-started/test-network/setup-local/" class="md-nav__link">
         
   
   
@@ -2100,7 +1918,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/test-network/setup-local-docker/" class="md-nav__link">
+      <a href="../weaver/getting-started/test-network/setup-local-docker/" class="md-nav__link">
         
   
   
@@ -2128,7 +1946,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/test-network/setup-packages/" class="md-nav__link">
+      <a href="../weaver/getting-started/test-network/setup-packages/" class="md-nav__link">
         
   
   
@@ -2156,7 +1974,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/test-network/setup-packages-docker/" class="md-nav__link">
+      <a href="../weaver/getting-started/test-network/setup-packages-docker/" class="md-nav__link">
         
   
   
@@ -2184,7 +2002,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/test-network/ledger-initialization/" class="md-nav__link">
+      <a href="../weaver/getting-started/test-network/ledger-initialization/" class="md-nav__link">
         
   
   
@@ -2212,7 +2030,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/test-network/advanced-configuration/" class="md-nav__link">
+      <a href="../weaver/getting-started/test-network/advanced-configuration/" class="md-nav__link">
         
   
   
@@ -2300,7 +2118,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/overview/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/overview/" class="md-nav__link">
         
   
   
@@ -2328,7 +2146,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/data-sharing/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/data-sharing/" class="md-nav__link">
         
   
   
@@ -2408,7 +2226,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-exchange/overview/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-exchange/overview/" class="md-nav__link">
         
   
   
@@ -2436,7 +2254,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-exchange/fabric-fabric/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-exchange/fabric-fabric/" class="md-nav__link">
         
   
   
@@ -2464,7 +2282,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-exchange/fabric-corda/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-exchange/fabric-corda/" class="md-nav__link">
         
   
   
@@ -2492,7 +2310,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-exchange/fabric-besu/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-exchange/fabric-besu/" class="md-nav__link">
         
   
   
@@ -2520,7 +2338,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-exchange/corda-corda/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-exchange/corda-corda/" class="md-nav__link">
         
   
   
@@ -2548,7 +2366,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-exchange/corda-besu/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-exchange/corda-besu/" class="md-nav__link">
         
   
   
@@ -2576,7 +2394,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-exchange/besu-besu/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-exchange/besu-besu/" class="md-nav__link">
         
   
   
@@ -2612,7 +2430,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/interop/asset-transfer/" class="md-nav__link">
+      <a href="../weaver/getting-started/interop/asset-transfer/" class="md-nav__link">
         
   
   
@@ -2700,7 +2518,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/enabling-weaver-network/overview/" class="md-nav__link">
+      <a href="../weaver/getting-started/enabling-weaver-network/overview/" class="md-nav__link">
         
   
   
@@ -2728,7 +2546,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/enabling-weaver-network/fabric/" class="md-nav__link">
+      <a href="../weaver/getting-started/enabling-weaver-network/fabric/" class="md-nav__link">
         
   
   
@@ -2756,7 +2574,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/enabling-weaver-network/corda/" class="md-nav__link">
+      <a href="../weaver/getting-started/enabling-weaver-network/corda/" class="md-nav__link">
         
   
   
@@ -2784,7 +2602,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/getting-started/enabling-weaver-network/besu/" class="md-nav__link">
+      <a href="../weaver/getting-started/enabling-weaver-network/besu/" class="md-nav__link">
         
   
   
@@ -2880,7 +2698,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/what-is-interoperability/understanding-interoperability/" class="md-nav__link">
+      <a href="../weaver/what-is-interoperability/understanding-interoperability/" class="md-nav__link">
         
   
   
@@ -2908,7 +2726,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/what-is-interoperability/levels-of-interoperability/" class="md-nav__link">
+      <a href="../weaver/what-is-interoperability/levels-of-interoperability/" class="md-nav__link">
         
   
   
@@ -2936,7 +2754,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/what-is-interoperability/integration-patterns/" class="md-nav__link">
+      <a href="../weaver/what-is-interoperability/integration-patterns/" class="md-nav__link">
         
   
   
@@ -2972,7 +2790,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/interoperability-modes/" class="md-nav__link">
+      <a href="../weaver/interoperability-modes/" class="md-nav__link">
         
   
   
@@ -3000,7 +2818,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/design-principles/" class="md-nav__link">
+      <a href="../weaver/design-principles/" class="md-nav__link">
         
   
   
@@ -3080,7 +2898,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/user-stories/overview/" class="md-nav__link">
+      <a href="../weaver/user-stories/overview/" class="md-nav__link">
         
   
   
@@ -3108,7 +2926,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/user-stories/global-trade/" class="md-nav__link">
+      <a href="../weaver/user-stories/global-trade/" class="md-nav__link">
         
   
   
@@ -3136,7 +2954,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/user-stories/financial-markets/" class="md-nav__link">
+      <a href="../weaver/user-stories/financial-markets/" class="md-nav__link">
         
   
   
@@ -3164,7 +2982,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/user-stories/legacy-integration/" class="md-nav__link">
+      <a href="../weaver/user-stories/legacy-integration/" class="md-nav__link">
         
   
   
@@ -3252,7 +3070,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/architecture-and-design/overview/" class="md-nav__link">
+      <a href="../weaver/architecture-and-design/overview/" class="md-nav__link">
         
   
   
@@ -3280,7 +3098,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/architecture-and-design/relay/" class="md-nav__link">
+      <a href="../weaver/architecture-and-design/relay/" class="md-nav__link">
         
   
   
@@ -3308,7 +3126,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/architecture-and-design/drivers/" class="md-nav__link">
+      <a href="../weaver/architecture-and-design/drivers/" class="md-nav__link">
         
   
   
@@ -3336,7 +3154,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/architecture-and-design/weaver-dapps/" class="md-nav__link">
+      <a href="../weaver/architecture-and-design/weaver-dapps/" class="md-nav__link">
         
   
   
@@ -3364,7 +3182,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/architecture-and-design/decentralized-identity/" class="md-nav__link">
+      <a href="../weaver/architecture-and-design/decentralized-identity/" class="md-nav__link">
         
   
   
@@ -3452,7 +3270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/security-model/authentication/" class="md-nav__link">
+      <a href="../weaver/security-model/authentication/" class="md-nav__link">
         
   
   
@@ -3480,7 +3298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/security-model/access-control/" class="md-nav__link">
+      <a href="../weaver/security-model/access-control/" class="md-nav__link">
         
   
   
@@ -3508,7 +3326,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/security-model/proofs-and-verification/" class="md-nav__link">
+      <a href="../weaver/security-model/proofs-and-verification/" class="md-nav__link">
         
   
   
@@ -3536,7 +3354,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/security-model/end-to-end-security/" class="md-nav__link">
+      <a href="../weaver/security-model/end-to-end-security/" class="md-nav__link">
         
   
   
@@ -3624,7 +3442,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/deployment-considerations/deployment-patterns/" class="md-nav__link">
+      <a href="../weaver/deployment-considerations/deployment-patterns/" class="md-nav__link">
         
   
   
@@ -3652,7 +3470,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/deployment-considerations/governance-and-policies/" class="md-nav__link">
+      <a href="../weaver/deployment-considerations/governance-and-policies/" class="md-nav__link">
         
   
   
@@ -3680,7 +3498,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/deployment-considerations/legal-and-regulation/" class="md-nav__link">
+      <a href="../weaver/deployment-considerations/legal-and-regulation/" class="md-nav__link">
         
   
   
@@ -3716,7 +3534,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/specifications/" class="md-nav__link">
+      <a href="../weaver/specifications/" class="md-nav__link">
         
   
   
@@ -3744,7 +3562,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/roadmap/" class="md-nav__link">
+      <a href="../weaver/roadmap/" class="md-nav__link">
         
   
   
@@ -3772,7 +3590,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../weaver/publications/" class="md-nav__link">
+      <a href="../weaver/publications/" class="md-nav__link">
         
   
   
@@ -3812,6 +3630,61 @@
       
   
   
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SATP
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    SATP
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
   
   
     
@@ -3828,10 +3701,10 @@
         
           
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_1" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
             
   
   
@@ -3849,8 +3722,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_1">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -3867,7 +3740,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../satp-hermes/" class="md-nav__link">
+      <a href="../satp-hermes/" class="md-nav__link">
         
   
   
@@ -3895,7 +3768,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../satp-hermes/configuration/" class="md-nav__link">
+      <a href="../satp-hermes/configuration/" class="md-nav__link">
         
   
   
@@ -3923,7 +3796,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../satp-hermes/api3-adapter-spec/" class="md-nav__link">
+      <a href="../satp-hermes/api3-adapter-spec/" class="md-nav__link">
         
   
   
@@ -3951,7 +3824,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../satp-hermes/database/" class="md-nav__link">
+      <a href="../satp-hermes/database/" class="md-nav__link">
         
   
   
@@ -3979,7 +3852,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../satp-hermes/operations/" class="md-nav__link">
+      <a href="../satp-hermes/operations/" class="md-nav__link">
         
   
   
@@ -3995,6 +3868,52 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SATP Weaver
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
     </li>
   
 
@@ -4118,7 +4037,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/getting-started/" class="md-nav__link">
+      <a href="../guides/getting-started/" class="md-nav__link">
         
   
   
@@ -4146,7 +4065,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/nix-setup/" class="md-nav__link">
+      <a href="../guides/nix-setup/" class="md-nav__link">
         
   
   
@@ -4174,7 +4093,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/operations/" class="md-nav__link">
+      <a href="../guides/operations/" class="md-nav__link">
         
   
   
@@ -4202,7 +4121,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/developers/" class="md-nav__link">
+      <a href="../guides/developers/" class="md-nav__link">
         
   
   
@@ -4230,7 +4149,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../guides/upgrading/" class="md-nav__link">
+      <a href="../guides/upgrading/" class="md-nav__link">
         
   
   
@@ -4318,7 +4237,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/" class="md-nav__link">
+      <a href="../recipes/" class="md-nav__link">
         
   
   
@@ -4346,7 +4265,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/git-branch-setup/" class="md-nav__link">
+      <a href="../recipes/git-branch-setup/" class="md-nav__link">
         
   
   
@@ -4374,7 +4293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/create-new-package/" class="md-nav__link">
+      <a href="../recipes/create-new-package/" class="md-nav__link">
         
   
   
@@ -4402,7 +4321,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/testing-guide/" class="md-nav__link">
+      <a href="../recipes/testing-guide/" class="md-nav__link">
         
   
   
@@ -4430,7 +4349,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/ledger-plugin-testing/" class="md-nav__link">
+      <a href="../recipes/ledger-plugin-testing/" class="md-nav__link">
         
   
   
@@ -4458,7 +4377,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/building-api-clients/" class="md-nav__link">
+      <a href="../recipes/building-api-clients/" class="md-nav__link">
         
   
   
@@ -4486,7 +4405,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/managing-dependencies/" class="md-nav__link">
+      <a href="../recipes/managing-dependencies/" class="md-nav__link">
         
   
   
@@ -4514,7 +4433,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../recipes/vscode-setup/" class="md-nav__link">
+      <a href="../recipes/vscode-setup/" class="md-nav__link">
         
   
   
@@ -4609,7 +4528,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/" class="md-nav__link">
+      <a href="../references/" class="md-nav__link">
         
   
   
@@ -4637,7 +4556,35 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/specs/" class="md-nav__link">
+      <a href="../use-cases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use Cases and Applications for Cacti
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../references/specs/" class="md-nav__link">
         
   
   
@@ -4665,7 +4612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/publications/" class="md-nav__link">
+      <a href="../references/publications/" class="md-nav__link">
         
   
   
@@ -4693,7 +4640,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/events/" class="md-nav__link">
+      <a href="../references/events/" class="md-nav__link">
         
   
   
@@ -4721,7 +4668,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/business/" class="md-nav__link">
+      <a href="../references/business/" class="md-nav__link">
         
   
   
@@ -4749,7 +4696,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/best-practices/" class="md-nav__link">
+      <a href="../references/best-practices/" class="md-nav__link">
         
   
   
@@ -4777,7 +4724,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/github/" class="md-nav__link">
+      <a href="../references/github/" class="md-nav__link">
         
   
   
@@ -4805,7 +4752,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../references/openapi/" class="md-nav__link">
+      <a href="../references/openapi/" class="md-nav__link">
         
   
   
@@ -4833,7 +4780,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../glossary/" class="md-nav__link">
+      <a href="../glossary/" class="md-nav__link">
         
   
   
@@ -4920,7 +4867,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../contributing/how-to-contribute/" class="md-nav__link">
+      <a href="../contributing/how-to-contribute/" class="md-nav__link">
         
   
   
@@ -4948,7 +4895,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../contributing/reporting-a-bug/" class="md-nav__link">
+      <a href="../contributing/reporting-a-bug/" class="md-nav__link">
         
   
   
@@ -4976,7 +4923,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../contributing/requesting-a-change/" class="md-nav__link">
+      <a href="../contributing/requesting-a-change/" class="md-nav__link">
         
   
   
@@ -5004,7 +4951,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../contributing/asking-a-question/" class="md-nav__link">
+      <a href="../contributing/asking-a-question/" class="md-nav__link">
         
   
   
@@ -5032,7 +4979,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../faqs/" class="md-nav__link">
+      <a href="../faqs/" class="md-nav__link">
         
   
   
@@ -5060,7 +5007,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../contact-us/" class="md-nav__link">
+      <a href="../contact-us/" class="md-nav__link">
         
   
   
@@ -5199,7 +5146,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/2021-01-21-cross-chain-asset/" class="md-nav__link">
+      <a href="../blog/2021-01-21-cross-chain-asset/" class="md-nav__link">
         
   
   
@@ -5227,7 +5174,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/2021-01-21-emergence-enterprise-interoperability/" class="md-nav__link">
+      <a href="../blog/2021-01-21-emergence-enterprise-interoperability/" class="md-nav__link">
         
   
   
@@ -5315,7 +5262,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/2022-11-07-introducing-hyperledger-cacti/" class="md-nav__link">
+      <a href="../blog/2022-11-07-introducing-hyperledger-cacti/" class="md-nav__link">
         
   
   
@@ -5403,7 +5350,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../blog/2023-10-03-hyperledger-cacti-graduation/" class="md-nav__link">
+      <a href="../blog/2023-10-03-hyperledger-cacti-graduation/" class="md-nav__link">
         
   
   
@@ -5459,20 +5406,8 @@
   
 
 
-<h1 id="substrate-support">Substrate Support<a class="headerlink" href="#substrate-support" title="Permanent link">&para;</a></h1>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Substrate chains include Polkadot, Kusama, Rococco, etc. The deployContract feature is for development and test case authoring only, not recommended to be used in production environments for managing smart contracts.
-</code></pre></div>
-<details>
-  <summary>Hyperledger Cacti v1.0.0-rc3</summary>
-
-  | Substrate API version | deployContract* | invokeContract | runTransaction |
-  | --- | :---: | :---: | :---: |
-  | @polkadot/api 10.9.1 | ✅ [test]() | ✅ [test]() | ✅ [test]() |
-
-</details>
-
-<p><a href="../fabric/" title="Fabric Support">Previous</a></p>
-<hr />
+<h1 id="satp-weaver">SATP Weaver<a class="headerlink" href="#satp-weaver" title="Permanent link">&para;</a></h1>
+<p>See the <a href="https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/protocols/satp/asset-transfer/generic.md">SATP asset transfer protocol documentation</a> for information about the SATP implementation provided by Hyperledger Cacti Weaver.</p>
 
 
 
@@ -5506,6 +5441,44 @@
         <footer class="md-footer">
   
     
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../satp-hermes/operations/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Operations">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Operations
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../guides/getting-started/" class="md-footer__link md-footer__link--next" aria-label="Next: Getting Started">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Getting Started
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
   
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
@@ -5536,10 +5509,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "navigation.expand", "navigation.footer", "navigation.instant", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "toc.follow", "toc.integrate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>
