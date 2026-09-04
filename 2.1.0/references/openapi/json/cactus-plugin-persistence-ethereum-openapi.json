@@ -1,0 +1,164 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Persistence Ethereum",
+        "description": "Synchronizes state of an ethereum ledger into a DB that can later be viewed in GUI",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "TokenTypeV1": {
+                "type": "string",
+                "enum": ["erc20", "erc721"],
+                "x-enum-descriptions": [
+                    "EIP-20: Token Standard",
+                    "EIP-721: Non-Fungible Token Standard"
+                ],
+                "x-enum-varnames": ["ERC20", "ERC721"]
+            },
+            "MonitoredToken": {
+                "description": "Ethereum tokens that are being monitored by the persistence plugin.",
+                "type": "object",
+                "required": ["type", "name", "symbol"],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/TokenTypeV1"
+                    },
+                    "name": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Token name"
+                    },
+                    "symbol": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Token symbol"
+                    }
+                }
+            },
+            "TrackedOperationV1": {
+                "description": "Persistence plugin operation that is tracked and returned in status report.",
+                "type": "object",
+                "required": ["startAt", "operation"],
+                "properties": {
+                    "startAt": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Start time of the operation."
+                    },
+                    "operation": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Operation name."
+                    }
+                }
+            },
+            "StatusResponseV1": {
+                "description": "Response with plugin status report.",
+                "type": "object",
+                "required": [
+                    "instanceId",
+                    "connected",
+                    "webServicesRegistered",
+                    "monitoredTokensCount",
+                    "operationsRunning",
+                    "monitorRunning",
+                    "lastSeenBlock"
+                ],
+                "properties": {
+                    "instanceId": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Plugin instance id."
+                    },
+                    "connected": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "True if successfully connected to the database, false otherwise."
+                    },
+                    "webServicesRegistered": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "True if web services were correctly exported."
+                    },
+                    "monitoredTokensCount": {
+                        "type": "number",
+                        "nullable": false,
+                        "description": "Total number of tokens being monitored by the plugin."
+                    },
+                    "operationsRunning": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TrackedOperationV1"
+                        }
+                    },
+                    "monitorRunning": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "True if block monitoring is running, false otherwise."
+                    },
+                    "lastSeenBlock": {
+                        "type": "number",
+                        "nullable": false,
+                        "description": "Number of the last block seen by the block monitor."
+                    }
+                }
+            },
+            "ErrorExceptionResponseV1": {
+                "type": "object",
+                "required": ["message", "error"],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-persistence-ethereum/status"
+                    }
+                },
+                "operationId": "getStatusV1",
+                "summary": "Get the status of persistence plugin for ethereum",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusResponseV1"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

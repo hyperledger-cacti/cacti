@@ -1,0 +1,363 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cacti Plugin - Connector Sawtooth",
+        "description": "Can perform basic tasks on a Sawtooth ledger",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "SawtoothTransactionHeaderV1": {
+                "required": [
+                    "batcher_public_key",
+                    "dependencies",
+                    "family_name",
+                    "family_version",
+                    "inputs",
+                    "nonce",
+                    "outputs",
+                    "payload_sha512",
+                    "signer_public_key"
+                ],
+                "properties": {
+                    "batcher_public_key": {
+                        "type": "string",
+                        "example": "02d260a46457a064733153e09840c322bee1dff34445d7d49e19e60abd18fd0758"
+                    },
+                    "dependencies": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "1baee350bdb60bcee60e3d325d43283cf830b4c23b2cb17d3bb43935bd7af3761c2bee79847c72a9e396a9ae58f48add4e43f94eb83f84442c6085c1dd5d4dbe"
+                        }
+                    },
+                    "family_name": {
+                        "type": "string",
+                        "example": "intkey"
+                    },
+                    "family_version": {
+                        "type": "string",
+                        "example": "1.0"
+                    },
+                    "inputs": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+                        }
+                    },
+                    "nonce": {
+                        "type": "string",
+                        "example": "QAApS4L"
+                    },
+                    "outputs": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "1cf12650d858e0985ecc7f60418aaf0cc5ab587f42c2570a884095a9e8ccacd0f6545c"
+                        }
+                    },
+                    "payload_sha512": {
+                        "type": "string",
+                        "example": "fb6135ef73f4fe77367f9384b3bbbb158f4b8603c9d612157108e5c271868fce2242ee4abd7a29397ba63780c3ccab13783dfd4d9f0167beda03cdb0e37b87f4"
+                    },
+                    "signer_public_key": {
+                        "type": "string",
+                        "example": "038bba5708acc262464c9fe30d3de9e905a9a5fa30cedd151dd9cd09ea26d46d00"
+                    }
+                }
+            },
+            "SawtoothTransactionV1": {
+                "required": ["header", "header_signature", "payload"],
+                "properties": {
+                    "header": {
+                        "$ref": "#/components/schemas/SawtoothTransactionHeaderV1"
+                    },
+                    "header_signature": {
+                        "type": "string",
+                        "example": "540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a"
+                    },
+                    "payload": {
+                        "type": "string"
+                    }
+                }
+            },
+            "SawtoothBatchHeaderV1": {
+                "required": ["signer_public_key", "transaction_ids"],
+                "properties": {
+                    "signer_public_key": {
+                        "type": "string",
+                        "example": "038bba5708acc262464c9fe30d3de9e905a9a5fa30cedd151dd9cd09ea26d46d00"
+                    },
+                    "transaction_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "540a6803971d1880ec73a96cb97815a95d374cbad5d865925e5aa0432fcf1931539afe10310c122c5eaae15df61236079abbf4f258889359c4d175516934484a"
+                        }
+                    }
+                }
+            },
+            "SawtoothBatchV1": {
+                "required": ["header", "header_signature", "transactions"],
+                "properties": {
+                    "header": {
+                        "$ref": "#/components/schemas/SawtoothBatchHeaderV1"
+                    },
+                    "header_signature": {
+                        "type": "string",
+                        "example": "89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c"
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SawtoothTransactionV1"
+                        }
+                    }
+                }
+            },
+            "SawtoothBlockHeaderV1": {
+                "required": [
+                    "batch_ids",
+                    "block_num",
+                    "consensus",
+                    "previous_block_id",
+                    "signer_public_key",
+                    "state_root_hash"
+                ],
+                "properties": {
+                    "block_num": {
+                        "type": "integer",
+                        "example": 12345
+                    },
+                    "previous_block_id": {
+                        "type": "string",
+                        "example": "65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+                    },
+                    "signer_public_key": {
+                        "type": "string",
+                        "example": "02d260a46457a064733153e09840c322bee1dff34445d7d49e19e60abd18fd0758"
+                    },
+                    "batch_ids": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "89807bfc9089e37e00d87d97357de14cfbc455cd608438d426a625a30a0da9a31c406983803c4aa27e1f32a3ff61709e8ec4b56abbc553d7d330635b5d27029c"
+                        }
+                    },
+                    "consensus": {
+                        "type": "string"
+                    },
+                    "state_root_hash": {
+                        "type": "string",
+                        "example": "708ca7fbb701799bb387f2e50deaca402e8502abe229f705693d2d4f350e1ad6"
+                    }
+                }
+            },
+            "SawtoothBlockV1": {
+                "required": ["header", "header_signature", "batches"],
+                "properties": {
+                    "header": {
+                        "$ref": "#/components/schemas/SawtoothBlockHeaderV1"
+                    },
+                    "header_signature": {
+                        "type": "string",
+                        "example": "65cd3a3ce088b265b626f704b7f3db97b6f12e848dccb35d7806f3d0324c71b709ed360d602b8b658b94695374717e3bdb4b76f77886953777d5d008558247dd"
+                    },
+                    "batches": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/SawtoothBatchV1"
+                        }
+                    }
+                }
+            },
+            "CactiTransactionV1": {
+                "description": "Sawtooth transaction with additional fields filled by Cacti connector.",
+                "type": "object",
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/SawtoothTransactionV1"
+                    },
+                    {
+                        "type": "object",
+                        "required": ["payload_decoded"],
+                        "properties": {
+                            "payload_decoded": {
+                                "description": "Decoded payload of sawtooth transaction.",
+                                "example": "[{'Verb':'inc','Name':'monitorTest3','Value':11}]}]"
+                            }
+                        }
+                    }
+                ]
+            },
+            "WatchBlocksV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Next",
+                    "org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Error",
+                    "org.hyperledger.cacti.api.async.sawtooth.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "WatchBlocksV1ListenerType": {
+                "type": "string",
+                "description": "Response type from WatchBlocks. 'Cacti*' are custom views, others correspond to plain sawtooth data.",
+                "enum": ["full", "cacti:transactions"],
+                "x-enum-varnames": ["Full", "CactiTransactions"]
+            },
+            "WatchBlocksV1TransactionFilter": {
+                "type": "object",
+                "properties": {
+                    "family_name": {
+                        "type": "string"
+                    }
+                }
+            },
+            "WatchBlocksV1Options": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/WatchBlocksV1ListenerType",
+                        "description": "Type of response block to return.",
+                        "nullable": false
+                    },
+                    "txFilterBy": {
+                        "$ref": "#/components/schemas/WatchBlocksV1TransactionFilter",
+                        "description": "Filter specification for transactions (only used when selected CactiTransactions response type).",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksV1CactiTransactionsResponse": {
+                "type": "object",
+                "description": "Custom response containing block transactions summary.",
+                "required": ["cactiTransactionsEvents"],
+                "properties": {
+                    "cactiTransactionsEvents": {
+                        "description": "List of sawtooth transactions matching specifid (optional) filter",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CactiTransactionV1",
+                            "nullable": false
+                        }
+                    }
+                }
+            },
+            "WatchBlocksV1FullResponse": {
+                "type": "object",
+                "description": "Response that returns entire sawtooth block.",
+                "required": ["fullBlock"],
+                "properties": {
+                    "fullBlock": {
+                        "description": "Full commited block.",
+                        "$ref": "#/components/schemas/SawtoothBlockV1",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksV1Progress": {
+                "description": "Response block from WatchBlocks endpoint. Depends on 'type' passed in subscription options.",
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksV1CactiTransactionsResponse",
+                        "nullable": false
+                    },
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksV1FullResponse",
+                        "nullable": false
+                    }
+                ]
+            },
+            "StatusResponseV1": {
+                "description": "Response with plugin and validator status report.",
+                "type": "object",
+                "required": ["instanceId"],
+                "properties": {
+                    "instanceId": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Plugin instance id."
+                    },
+                    "openApiSpecVersion": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Version of connectors Open API Spec."
+                    },
+                    "initialized": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "True if endpoints were created, false otherwise"
+                    },
+                    "sawtoothStatus": {
+                        "nullable": false,
+                        "description": "Response from sawtooth Rest API status endpoint"
+                    }
+                }
+            },
+            "ErrorExceptionResponseV1": {
+                "type": "object",
+                "required": ["message", "error"],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-sawtooth/status"
+                    }
+                },
+                "operationId": "getStatusV1",
+                "summary": "Get the status of the connector and the sawtooth validator",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusResponseV1"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

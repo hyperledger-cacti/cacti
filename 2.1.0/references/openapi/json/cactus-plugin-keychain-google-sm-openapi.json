@@ -1,0 +1,382 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus - Keychain API",
+        "description": "Contains/describes the Keychain API types/paths for Hyperledger Cactus.",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "GetKeychainEntryRequestV1": {
+                "type": "object",
+                "required": ["key"],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to get from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "GetKeychainEntryResponseV1": {
+                "type": "object",
+                "required": ["key", "value"],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to retrieve the value from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value associated with the requested key on the keychain.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "SetKeychainEntryRequestV1": {
+                "type": "object",
+                "required": ["key", "value"],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to set on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "The value that will be associated with the key on the keychain.",
+                        "minLength": 0,
+                        "maxLength": 10485760,
+                        "nullable": false
+                    }
+                }
+            },
+            "SetKeychainEntryResponseV1": {
+                "type": "object",
+                "required": ["key"],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to set the value on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeleteKeychainEntryRequestV1": {
+                "type": "object",
+                "required": ["key"],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key for the entry to check the presence of on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "DeleteKeychainEntryResponseV1": {
+                "type": "object",
+                "required": ["key"],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was deleted from the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasKeychainEntryRequestV1": {
+                "type": "object",
+                "required": ["key"],
+                "additionalProperties": false,
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key to check for presence in the keychain.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    }
+                }
+            },
+            "HasKeychainEntryResponseV1": {
+                "type": "object",
+                "required": ["key", "isPresent", "checkedAt"],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "description": "The key that was used to check the presence of the value in the entry store.",
+                        "minLength": 1,
+                        "maxLength": 1024,
+                        "nullable": false
+                    },
+                    "checkedAt": {
+                        "type": "string",
+                        "description": "Date and time encoded as JSON when the presence check was performed by the plugin backend.",
+                        "nullable": false
+                    },
+                    "isPresent": {
+                        "type": "boolean",
+                        "description": "The boolean true or false indicating the presence or absence of an entry under 'key'.",
+                        "nullable": false
+                    }
+                }
+            }
+        },
+        "requestBodies": {
+            "keychain_get_entry_request_body": {
+                "description": "Request body to obtain a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_set_entry_request_body": {
+                "description": "Request body to write/update a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SetKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_delete_entry_request_body": {
+                "description": "Request body to delete a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/DeleteKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            },
+            "keychain_has_entry_request_body": {
+                "description": "Request body for checking a keychain entry via its key",
+                "required": true,
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasKeychainEntryRequestV1"
+                        }
+                    }
+                }
+            }
+        },
+        "responses": {
+            "keychain_get_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/GetKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_get_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_get_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_get_entry_404": {
+                "description": "A keychain item with the specified key was not found."
+            },
+            "keychain_get_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_set_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/SetKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_set_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_set_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_set_entry_500": {
+                "description": "Unexpected error."
+            },
+            "keychain_delete_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/DeleteKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_has_entry_200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/HasKeychainEntryResponseV1"
+                        }
+                    }
+                }
+            },
+            "keychain_has_entry_400": {
+                "description": "Bad request. Key must be a string and longer than 0, shorter than 1024 characters."
+            },
+            "keychain_has_entry_401": {
+                "description": "Authorization information is missing or invalid."
+            },
+            "keychain_has_entry_500": {
+                "description": "Unexpected error."
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/get-keychain-entry": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/get-keychain-entry",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "operationId": "getKeychainEntryV1",
+                "summary": "Retrieves the contents of a keychain entry from the backend.",
+                "parameters": [],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/keychain_get_entry_request_body"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/keychain_get_entry_200"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/keychain_get_entry_400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/keychain_get_entry_401"
+                    },
+                    "404": {
+                        "$ref": "#/components/responses/keychain_get_entry_404"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/keychain_get_entry_500"
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/set-keychain-entry": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/set-keychain-entry",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "operationId": "setKeychainEntryV1",
+                "summary": "Sets a value under a key on the keychain backend.",
+                "parameters": [],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/keychain_set_entry_request_body"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/keychain_set_entry_200"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/keychain_set_entry_400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/keychain_set_entry_401"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/keychain_set_entry_500"
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/delete-keychain-entry": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/delete-keychain-entry",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "operationId": "deleteKeychainEntryV1",
+                "summary": "Deletes an entry under a key on the keychain backend.",
+                "parameters": [],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/keychain_delete_entry_request_body"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/keychain_delete_entry_200"
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/has-keychain-entry": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-keychain-google-sm/has-keychain-entry",
+                        "verbLowerCase": "post"
+                    }
+                },
+                "operationId": "hasKeychainEntryV1",
+                "summary": "Checks that an entry exists under a key on the keychain backend.",
+                "parameters": [],
+                "requestBody": {
+                    "$ref": "#/components/requestBodies/keychain_has_entry_request_body"
+                },
+                "responses": {
+                    "200": {
+                        "$ref": "#/components/responses/keychain_has_entry_200"
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/keychain_has_entry_400"
+                    },
+                    "401": {
+                        "$ref": "#/components/responses/keychain_has_entry_401"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/keychain_has_entry_500"
+                    }
+                }
+            }
+        }
+    }
+}

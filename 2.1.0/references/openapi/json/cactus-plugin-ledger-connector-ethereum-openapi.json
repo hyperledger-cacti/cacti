@@ -1,0 +1,1162 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cacti Plugin - Connector Ethereum",
+        "description": "Can perform basic tasks on a Ethereum ledger",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "Web3SigningCredential": {
+                "type": "object",
+                "required": ["type"],
+                "discriminator": {
+                    "propertyName": "type"
+                },
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialGethKeychainPassword"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialCactiKeychainRef"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialNone"
+                    }
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialGethKeychainPassword": {
+                "type": "object",
+                "required": ["type", "ethAccount", "secret"],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "ethAccount": {
+                        "type": "string",
+                        "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional terminology of authentication.",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "nullable": false
+                    },
+                    "secret": {
+                        "type": "string",
+                        "description": "A geth keychain unlock password.",
+                        "minLength": 0,
+                        "maxLength": 65535
+                    }
+                }
+            },
+            "Web3SigningCredentialCactiKeychainRef": {
+                "type": "object",
+                "required": ["type", "ethAccount", "keychainEntryKey"],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "ethAccount": {
+                        "type": "string",
+                        "description": "The ethereum account (public key) that the credential  belongs to. Basically the username in the traditional  terminology of authentication.",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "nullable": false
+                    },
+                    "keychainEntryKey": {
+                        "type": "string",
+                        "description": "The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    }
+                }
+            },
+            "Web3SigningCredentialPrivateKeyHex": {
+                "type": "object",
+                "required": ["type", "ethAccount", "secret"],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "ethAccount": {
+                        "type": "string",
+                        "description": "The ethereum account (public key) that the credential belongs to. Basically the username in the traditional terminology of authentication.",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "nullable": false
+                    },
+                    "secret": {
+                        "type": "string",
+                        "description": "The HEX encoded private key of an eth account.",
+                        "minLength": 0,
+                        "maxLength": 65535
+                    }
+                }
+            },
+            "Web3SigningCredentialNone": {
+                "type": "object",
+                "required": ["type"],
+                "description": "Using this denotes that there is no signing required because the transaction is pre-signed.",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialType": {
+                "type": "string",
+                "enum": [
+                    "CACTI_KEYCHAIN_REF",
+                    "GETH_KEYCHAIN_PASSWORD",
+                    "PRIVATE_KEY_HEX",
+                    "NONE"
+                ]
+            },
+            "EthContractInvocationType": {
+                "type": "string",
+                "enum": ["SEND", "CALL"]
+            },
+            "EthContractInvocationWeb3Method": {
+                "type": "string",
+                "enum": ["send", "call", "encodeABI", "estimateGas"]
+            },
+            "GasTransactionConfigLegacy": {
+                "type": "object",
+                "description": "Transaction gas settings in networks before EIP-1559 (London fork).",
+                "required": [],
+                "properties": {
+                    "gas": {
+                        "type": "string",
+                        "description": "A maximum amount of gas a user is willing to provide for the execution of the transaction. (gasLimit)"
+                    },
+                    "gasPrice": {
+                        "type": "string",
+                        "description": "A price (in Wei) a user is willing to pay for each unit of gas used during the execution of the transaction. In EIP-1559 (London fork) networks, it will be set as both maxFeePerGas and maxPriorityFeePerGas."
+                    }
+                }
+            },
+            "GasTransactionConfigEIP1559": {
+                "type": "object",
+                "description": "Transaction gas settings in networks after EIP-1559 (London fork).",
+                "required": [],
+                "properties": {
+                    "gasLimit": {
+                        "type": "string",
+                        "description": "A maximum amount of gas a user is willing to provide for the execution of the transaction.",
+                        "nullable": false
+                    },
+                    "maxFeePerGas": {
+                        "type": "string",
+                        "description": "A maximum fee (including the base fee and the tip) a user is willing to pay per unit of gas.",
+                        "nullable": false
+                    },
+                    "maxPriorityFeePerGas": {
+                        "type": "string",
+                        "description": "A maximum tip amount a user is willing to pay per unit of gas.",
+                        "nullable": false
+                    }
+                }
+            },
+            "GasTransactionConfig": {
+                "type": "object",
+                "description": "Transaction gas settings.",
+                "required": [],
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/GasTransactionConfigLegacy"
+                    },
+                    {
+                        "$ref": "#/components/schemas/GasTransactionConfigEIP1559"
+                    }
+                ]
+            },
+            "EthereumTransactionConfig": {
+                "type": "object",
+                "required": [],
+                "properties": {
+                    "rawTransaction": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "from": {
+                        "type": "string"
+                    },
+                    "to": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "type": "string"
+                    },
+                    "gasConfig": {
+                        "$ref": "#/components/schemas/GasTransactionConfig"
+                    }
+                }
+            },
+            "Web3TransactionReceipt": {
+                "type": "object",
+                "required": [
+                    "blockHash",
+                    "blockNumber",
+                    "transactionHash",
+                    "transactionIndex",
+                    "status",
+                    "from",
+                    "to",
+                    "gasUsed"
+                ],
+                "additionalProperties": true,
+                "properties": {
+                    "status": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "transactionHash": {
+                        "type": "string",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
+                    },
+                    "transactionIndex": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "blockHash": {
+                        "type": "string",
+                        "minLength": 66,
+                        "maxLength": 66,
+                        "pattern": "^0x([A-Fa-f0-9]{64})$"
+                    },
+                    "blockNumber": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "gasUsed": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "effectiveGasPrice": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "type": "string",
+                        "nullable": true
+                    },
+                    "from": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "to": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "logs": {
+                        "type": "array",
+                        "default": [],
+                        "items": {},
+                        "nullable": false
+                    },
+                    "logsBloom": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "revertReason": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "output": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "commitmentHash": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "cumulativeGasUsed": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "type": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "ContractJSON": {
+                "type": "object",
+                "required": ["contractName", "bytecode", "abi"],
+                "additionalProperties": true,
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "bytecode": {
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 24576,
+                        "description": "See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode"
+                    },
+                    "abi": {
+                        "description": "The application binary interface of the solidity contract, optional parameter",
+                        "type": "array",
+                        "items": {},
+                        "nullable": false
+                    },
+                    "metadata": {
+                        "type": "string"
+                    },
+                    "deployedBytecode": {
+                        "type": "string"
+                    },
+                    "sourceMap": {
+                        "type": "string"
+                    },
+                    "deployedSourceMap": {
+                        "type": "string"
+                    },
+                    "sourcePath": {
+                        "type": "string"
+                    },
+                    "compiler": {
+                        "type": "object"
+                    },
+                    "networks": {
+                        "type": "object"
+                    },
+                    "ast": {
+                        "type": "object"
+                    },
+                    "functionHashes": {
+                        "type": "object"
+                    },
+                    "gasEstimates": {
+                        "type": "object"
+                    }
+                }
+            },
+            "ContractJsonDefinition": {
+                "type": "object",
+                "required": ["contractJSON"],
+                "additionalProperties": false,
+                "properties": {
+                    "contractJSON": {
+                        "$ref": "#/components/schemas/ContractJSON"
+                    }
+                }
+            },
+            "DeployedContractJsonDefinition": {
+                "type": "object",
+                "required": ["contractJSON", "contractAddress"],
+                "additionalProperties": false,
+                "properties": {
+                    "contractJSON": {
+                        "$ref": "#/components/schemas/ContractJSON"
+                    },
+                    "contractAddress": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "ContractKeychainDefinition": {
+                "type": "object",
+                "required": ["contractName", "keychainId"],
+                "additionalProperties": false,
+                "properties": {
+                    "contractName": {
+                        "type": "string",
+                        "description": "The contract name for retrieve the contracts json on the keychain.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychainId for retrieve the contracts json.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionRequest": {
+                "type": "object",
+                "required": ["web3SigningCredential", "transactionConfig"],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential"
+                    },
+                    "transactionConfig": {
+                        "$ref": "#/components/schemas/EthereumTransactionConfig"
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt with thehash of the transaction(which indicates successful execution) beforegiving up and crashing.",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionResponse": {
+                "type": "object",
+                "required": ["transactionReceipt"],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    }
+                }
+            },
+            "DeployContractV1Request": {
+                "type": "object",
+                "required": ["web3SigningCredential", "contract"],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential"
+                    },
+                    "contract": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/ContractJsonDefinition"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ContractKeychainDefinition"
+                            }
+                        ],
+                        "nullable": false
+                    },
+                    "constructorArgs": {
+                        "description": "The list of arguments to pass in to the constructor of the contract being deployed.",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    },
+                    "gasConfig": {
+                        "$ref": "#/components/schemas/GasTransactionConfig"
+                    },
+                    "value": {
+                        "type": "string",
+                        "description": "Ether balance to send on deployment.",
+                        "nullable": false
+                    }
+                }
+            },
+            "InvokeContractV1Request": {
+                "type": "object",
+                "required": ["contract", "methodName", "params", "invocationType"],
+                "additionalProperties": false,
+                "properties": {
+                    "contract": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/DeployedContractJsonDefinition"
+                            },
+                            {
+                                "$ref": "#/components/schemas/ContractKeychainDefinition"
+                            }
+                        ]
+                    },
+                    "methodName": {
+                        "description": "The name of the contract method to invoke.",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass in to the contract method being invoked.",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    },
+                    "invocationType": {
+                        "$ref": "#/components/schemas/EthContractInvocationType"
+                    },
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/Web3SigningCredential"
+                    },
+                    "gasConfig": {
+                        "$ref": "#/components/schemas/GasTransactionConfig"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "timeoutMs": {
+                        "type": "number",
+                        "description": "The amount of milliseconds to wait for a transaction receipt before returning an error. Only has any effect if the invocation type is SEND",
+                        "minimum": 0,
+                        "default": 60000,
+                        "nullable": false
+                    }
+                }
+            },
+            "InvokeContractV1Response": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "transactionReceipt": {
+                        "$ref": "#/components/schemas/Web3TransactionReceipt"
+                    },
+                    "callOutput": {},
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    }
+                }
+            },
+            "InvokeRawWeb3EthMethodV1Request": {
+                "type": "object",
+                "required": ["methodName"],
+                "additionalProperties": false,
+                "properties": {
+                    "methodName": {
+                        "description": "The name of the web3.eth method to invoke",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass to web3.eth method specified in methodName",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    }
+                }
+            },
+            "InvokeRawWeb3EthMethodV1Response": {
+                "type": "object",
+                "required": ["status"],
+                "additionalProperties": false,
+                "properties": {
+                    "status": {
+                        "type": "number",
+                        "nullable": false,
+                        "description": "Status code of the operation"
+                    },
+                    "data": {
+                        "description": "Output of requested web3.eth method"
+                    },
+                    "errorDetail": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Error details"
+                    }
+                }
+            },
+            "InvokeRawWeb3EthContractV1Request": {
+                "type": "object",
+                "required": ["abi", "address", "invocationType", "contractMethod"],
+                "additionalProperties": false,
+                "properties": {
+                    "abi": {
+                        "description": "The application binary interface of the solidity contract"
+                    },
+                    "address": {
+                        "description": "Deployed solidity contract address",
+                        "type": "string"
+                    },
+                    "invocationType": {
+                        "$ref": "#/components/schemas/EthContractInvocationWeb3Method"
+                    },
+                    "invocationParams": {
+                        "description": "The list of arguments for contract invocation method (send, call, etc...)",
+                        "type": "object",
+                        "default": {}
+                    },
+                    "contractMethod": {
+                        "description": "Method of deployed solidity contract to execute",
+                        "type": "string"
+                    },
+                    "contractMethodArgs": {
+                        "description": "The list of arguments for deployed solidity contract method",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    }
+                }
+            },
+            "InvokeRawWeb3EthContractV1Response": {
+                "type": "object",
+                "required": ["status"],
+                "additionalProperties": false,
+                "properties": {
+                    "status": {
+                        "description": "Status code of the operation",
+                        "type": "number"
+                    },
+                    "data": {
+                        "description": "Output of contract invocation method"
+                    },
+                    "errorDetail": {
+                        "description": "Error details",
+                        "type": "string"
+                    }
+                }
+            },
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            },
+            "WatchBlocksV1": {
+                "type": "string",
+                "enum": [
+                    "org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Next",
+                    "org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Error",
+                    "org.hyperledger.cacti.api.async.ethereum.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "WatchBlocksV1Options": {
+                "type": "object",
+                "properties": {
+                    "getBlockData": {
+                        "type": "boolean",
+                        "description": "Include entire block data if flag is true, otherwise just a header is returned (default)",
+                        "default": "false"
+                    },
+                    "lastSeenBlock": {
+                        "type": "number",
+                        "description": "Block from which we want to start the monitoring process.",
+                        "default": "latest"
+                    },
+                    "httpPollInterval": {
+                        "type": "number",
+                        "description": "How often to poll ethereum node for new blocks. Not used if the node supports subscription based monitoring (i.e. WebSocket).",
+                        "default": "5 seconds"
+                    }
+                }
+            },
+            "Web3BlockHeader": {
+                "type": "object",
+                "required": ["sha3Uncles", "transactionRoot", "gasLimit", "gasUsed"],
+                "properties": {
+                    "number": {
+                        "type": "string"
+                    },
+                    "parentHash": {
+                        "type": "string"
+                    },
+                    "sha3Uncles": {
+                        "type": "string"
+                    },
+                    "transactionsRoot": {
+                        "type": "string"
+                    },
+                    "receiptsRoot": {
+                        "type": "string"
+                    },
+                    "difficulty": {
+                        "type": "string"
+                    },
+                    "mixHash": {
+                        "type": "string"
+                    },
+                    "miner": {
+                        "type": "string"
+                    },
+                    "gasLimit": {
+                        "type": "string"
+                    },
+                    "gasUsed": {
+                        "type": "string"
+                    },
+                    "stateRoot": {
+                        "type": "string"
+                    },
+                    "logsBloom": {
+                        "type": "string"
+                    },
+                    "extraData": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "type": "string"
+                    }
+                }
+            },
+            "Web3Transaction": {
+                "type": "object",
+                "required": [
+                    "hash",
+                    "nonce",
+                    "blockHash",
+                    "blockNumber",
+                    "transactionIndex",
+                    "from",
+                    "to",
+                    "value",
+                    "gasPrice",
+                    "gas",
+                    "input",
+                    "type",
+                    "chainId"
+                ],
+                "properties": {
+                    "hash": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "blockHash": {
+                        "type": "string"
+                    },
+                    "blockNumber": {
+                        "type": "string"
+                    },
+                    "transactionIndex": {
+                        "type": "string"
+                    },
+                    "from": {
+                        "type": "string"
+                    },
+                    "to": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "gasPrice": {
+                        "type": "string"
+                    },
+                    "gas": {
+                        "type": "string"
+                    },
+                    "input": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "chainId": {
+                        "type": "string"
+                    },
+                    "v": {
+                        "type": "string"
+                    },
+                    "r": {
+                        "type": "string"
+                    },
+                    "s": {
+                        "type": "string"
+                    }
+                }
+            },
+            "WatchBlocksV1BlockData": {
+                "type": "object",
+                "required": [
+                    "number",
+                    "parentHash",
+                    "nonce",
+                    "sha3Uncles",
+                    "transactionRoot",
+                    "stateRoot",
+                    "receiptRoot",
+                    "miner",
+                    "extraData",
+                    "gasLimit",
+                    "gasUsed",
+                    "timestamp",
+                    "size",
+                    "totalDifficulty",
+                    "uncles",
+                    "transactions"
+                ],
+                "properties": {
+                    "number": {
+                        "type": "string"
+                    },
+                    "hash": {
+                        "type": "string"
+                    },
+                    "parentHash": {
+                        "type": "string"
+                    },
+                    "nonce": {
+                        "type": "string"
+                    },
+                    "sha3Uncles": {
+                        "type": "string"
+                    },
+                    "logsBloom": {
+                        "type": "string"
+                    },
+                    "transactionsRoot": {
+                        "type": "string"
+                    },
+                    "stateRoot": {
+                        "type": "string"
+                    },
+                    "receiptsRoot": {
+                        "type": "string"
+                    },
+                    "difficulty": {
+                        "type": "string"
+                    },
+                    "mixHash": {
+                        "type": "string"
+                    },
+                    "miner": {
+                        "type": "string"
+                    },
+                    "extraData": {
+                        "type": "string"
+                    },
+                    "gasLimit": {
+                        "type": "string"
+                    },
+                    "gasUsed": {
+                        "type": "string"
+                    },
+                    "timestamp": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    },
+                    "size": {
+                        "type": "string"
+                    },
+                    "totalDifficulty": {
+                        "type": "string"
+                    },
+                    "uncles": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "baseFeePerGas": {
+                        "type": "string"
+                    },
+                    "transactions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Web3Transaction"
+                        }
+                    }
+                }
+            },
+            "WatchBlocksV1Progress": {
+                "type": "object",
+                "properties": {
+                    "blockHeader": {
+                        "$ref": "#/components/schemas/Web3BlockHeader"
+                    },
+                    "blockData": {
+                        "$ref": "#/components/schemas/WatchBlocksV1BlockData"
+                    }
+                }
+            },
+            "ErrorExceptionResponseV1": {
+                "type": "object",
+                "description": "Error response from the connector.",
+                "required": ["message", "error"],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Short error description message.",
+                        "nullable": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "description": "Detailed error information.",
+                        "nullable": false
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/deploy-contract"
+                    }
+                },
+                "operationId": "deployContract",
+                "summary": "Deploys the contract to ethereum ledger.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/run-transaction"
+                    }
+                },
+                "operationId": "runTransactionV1",
+                "summary": "Executes a transaction on a ethereum ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-contract"
+                    }
+                },
+                "operationId": "invokeContractV1",
+                "summary": "Invokes a contract on an ethereum ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeContractV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetricsV1",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-method"
+                    }
+                },
+                "operationId": "invokeWeb3EthMethodV1",
+                "summary": "Invoke any method from web3.eth (low-level)",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeRawWeb3EthMethodV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeRawWeb3EthMethodV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/invoke-raw-web3eth-contract"
+                    }
+                },
+                "operationId": "invokeRawWeb3EthContractV1",
+                "summary": "Low-level endpoint to invoke a method on deployed contract.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeRawWeb3EthContractV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeRawWeb3EthContractV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-ethereum/json-rpc": {
+            "summary": "Proxy endpoint to pass JSON-RPC requests to remote ethereum node."
+        }
+    }
+}

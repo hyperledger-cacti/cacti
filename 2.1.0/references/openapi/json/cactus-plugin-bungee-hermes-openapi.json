@@ -1,0 +1,477 @@
+{
+    "openapi": "3.0.3",
+    "servers": [
+        {
+            "url": "http://{host}:{port}/api/v1/@hyperledger/cactus-plugin-satp-hermes",
+            "description": "Development server",
+            "variables": {
+                "host": {
+                    "default": "localhost"
+                },
+                "port": {
+                    "default": "3000"
+                }
+            }
+        }
+    ],
+    "info": {
+        "title": "Hyperledger Cactus Plugin - BUNGEE-Hermes",
+        "description": "Can create blockchain views of different networks",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "PrivacyPolicyOpts": {
+                "description": "identifier of the policy used to process a view",
+                "type": "string",
+                "enum": ["pruneState"],
+                "x-enum-varnames": ["PruneState"]
+            },
+            "MergePolicyOpts": {
+                "description": "identifier of the policy used to merge views (can be none)",
+                "type": "string",
+                "enum": ["pruneState", "pruneStateFromView", "NONE"],
+                "x-enum-varnames": ["PruneState", "PruneStateFromView", "NONE"]
+            },
+            "CreateViewRequest": {
+                "type": "object",
+                "description": "Request object for createViewV1 endpoint",
+                "required": ["strategyId", "networkDetails"],
+                "properties": {
+                    "stateIds": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "id-of-asset-1"
+                        },
+                        "example": ["id-of-asset-1", "id-of-asset-2"]
+                    },
+                    "tI": {
+                        "type": "string",
+                        "example": "0"
+                    },
+                    "tF": {
+                        "type": "string",
+                        "example": "999999999999"
+                    },
+                    "viewID": {
+                        "type": "string",
+                        "example": "view-1"
+                    },
+                    "strategyId": {
+                        "type": "string",
+                        "example": "fabric-strategy",
+                        "nullable": false
+                    },
+                    "networkDetails": {
+                        "type": "object",
+                        "nullable": false,
+                        "required": ["connectorApiPath", "participant"],
+                        "properties": {
+                            "connectorApiPath": {
+                                "type": "string",
+                                "nullable": false,
+                                "example": "http://localhost:3000"
+                            },
+                            "participant": {
+                                "type": "string",
+                                "nullable": false,
+                                "example": "participant-1"
+                            }
+                        },
+                        "example": {
+                            "connectorApiPath": "http://localhost:3000",
+                            "participant": "participant-1"
+                        }
+                    }
+                },
+                "example": {
+                    "strategyId": "fabric-strategy",
+                    "networkDetails": {
+                        "connectorApiPath": "http://localhost:3000",
+                        "participant": "participant-1"
+                    }
+                }
+            },
+            "CreateViewResponse": {
+                "type": "object",
+                "description": "This is the response for a CreateViewRequest or ProcessViewRequest",
+                "properties": {
+                    "view": {
+                        "type": "string",
+                        "example": "Object"
+                    },
+                    "signature": {
+                        "type": "string",
+                        "example": "signature of Object"
+                    }
+                },
+                "example": {
+                    "view": "Object",
+                    "signature": "signature of Object"
+                }
+            },
+            "GetPublicKeyResponse": {
+                "type": "object",
+                "description": "public key from bungee-hermes plugin instance",
+                "properties": {
+                    "pubKey": {
+                        "type": "string",
+                        "example": "----BEGIN CERTIFICATE----random content...."
+                    }
+                }
+            },
+            "AvailableStrategiesResponse": {
+                "type": "array",
+                "description": "Array with available strategy ids",
+                "items": {
+                    "type": "string",
+                    "example": "strategy-fabric"
+                }
+            },
+            "VerifyMerkleRootRequest": {
+                "type": "object",
+                "description": "Set of transaction or state proofs and merkle tree root for verification",
+                "properties": {
+                    "input": {
+                        "nullable": false,
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "example": "transactionProof stringified"
+                        }
+                    },
+                    "root": {
+                        "nullable": false,
+                        "type": "string"
+                    }
+                }
+            },
+            "VerifyMerkleRootResponse": {
+                "type": "object",
+                "description": "true or false, wether input matched provided root",
+                "properties": {
+                    "result": {
+                        "type": "boolean",
+                        "example": "true"
+                    }
+                }
+            },
+            "MergeViewsResponse": {
+                "type": "object",
+                "description": "This is the response of a mergeViewRequest",
+                "properties": {
+                    "integratedView": {
+                        "type": "string",
+                        "example": "Object"
+                    },
+                    "signature": {
+                        "type": "string",
+                        "example": "signature of Object"
+                    }
+                },
+                "example": {
+                    "integratedView": "Object",
+                    "signature": "signature of Object"
+                }
+            },
+            "MergeViewsRequest": {
+                "type": "object",
+                "description": "This is the input for a mergeViewRequest",
+                "required": ["serializedViews", "mergePolicy"],
+                "properties": {
+                    "serializedViews": {
+                        "nullable": false,
+                        "type": "array",
+                        "description": "Array of serialized views",
+                        "items": {
+                            "type": "string",
+                            "nullable": false,
+                            "example": "View object stringified"
+                        }
+                    },
+                    "mergePolicy": {
+                        "$ref": "#/components/schemas/MergePolicyOpts"
+                    },
+                    "policyArguments": {
+                        "type": "array",
+                        "description": "Arguments for the privacy policy function. Order is important",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "example": {
+                    "serializedViews": ["View 1", "View2"],
+                    "mergePolicy": "undefined"
+                }
+            },
+            "ProcessViewRequest": {
+                "type": "object",
+                "description": "This is the input for a mergeViewRequest",
+                "required": ["serializedView", "policyId", "policyArguments"],
+                "properties": {
+                    "serializedView": {
+                        "type": "string",
+                        "nullable": false,
+                        "example": "View object stringified"
+                    },
+                    "policyId": {
+                        "$ref": "#/components/schemas/PrivacyPolicyOpts"
+                    },
+                    "policyArguments": {
+                        "type": "array",
+                        "description": "Arguments for the privacy policy function. Order is important",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "example": {
+                    "serializedView": "View 1",
+                    "policyId": "policy 1",
+                    "policyArguments": ["stateId"]
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/create-view": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/create-view"
+                    }
+                },
+                "operationId": "createViewV1",
+                "summary": "Creates a Blockchain View.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateViewRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateViewResponse"
+                                },
+                                "example": {
+                                    "view": "Object",
+                                    "signature": "signature of Object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-public-key"
+                    }
+                },
+                "operationId": "GetPublicKey",
+                "summary": "Queries plugin's public key",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetPublicKeyResponse"
+                                },
+                                "example": {
+                                    "pubKey": "----BEGIN CERTIFICATE----random content...."
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-available-strategies": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/get-available-strategies"
+                    }
+                },
+                "operationId": "GetAvailableStrategies",
+                "summary": "Queries plugin's available strategies for ledger capture",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AvailableStrategiesResponse"
+                                },
+                                "example": ["strategy-fabric"]
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/verify-merkle-root"
+                    }
+                },
+                "operationId": "verifyMerkleRoot",
+                "summary": "Checks validity of merkle tree root given an input",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyMerkleRootRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerifyMerkleRootResponse"
+                                },
+                                "example": {
+                                    "result": true
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/merge-views"
+                    }
+                },
+                "operationId": "mergeViewsV1",
+                "summary": "Merges multiple views according to a privacy policy",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MergeViewsRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MergeViewsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-bungee-hermes/process-view"
+                    }
+                },
+                "operationId": "processViewV1",
+                "summary": "Creates a Blockchain View.",
+                "description": "",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "description": "",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ProcessViewRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateViewResponse"
+                                },
+                                "example": {
+                                    "view": "Object",
+                                    "signature": "signature of Object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Could not complete request."
+                    }
+                }
+            }
+        }
+    }
+}

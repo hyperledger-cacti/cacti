@@ -1,0 +1,745 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cacti Plugin - Connector Aries",
+        "description": "Can communicate with other Aries agents and Cacti Aries connectors",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "WatchConnectionStateV1": {
+                "type": "string",
+                "description": "Websocket requests for monitoring connection change events.",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Next",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Error",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchConnectionStateV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "WatchConnectionStateOptionsV1": {
+                "type": "object",
+                "description": "Options passed when monitoring connection change events.",
+                "required": ["agentName"],
+                "properties": {
+                    "agentName": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Aries agent label that will also be used as wallet id."
+                    }
+                }
+            },
+            "WatchConnectionStateProgressV1": {
+                "type": "object",
+                "description": "Values pushed on each connection state change.",
+                "required": ["connectionRecord", "previousState"],
+                "properties": {
+                    "connectionRecord": {
+                        "$ref": "#/components/schemas/AgentConnectionRecordV1",
+                        "nullable": false
+                    },
+                    "previousState": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
+            "WatchProofStateV1": {
+                "type": "string",
+                "description": "Websocket requests for monitoring proof state change events.",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Next",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Error",
+                    "org.hyperledger.cactus.api.async.hlaries.WatchProofStateV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "WatchProofStateOptionsV1": {
+                "type": "object",
+                "description": "Options passed when monitoring proof state change events.",
+                "required": ["agentName"],
+                "properties": {
+                    "agentName": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Aries agent label that will also be used as wallet id."
+                    }
+                }
+            },
+            "WatchProofStateProgressV1": {
+                "type": "object",
+                "description": "Values pushed on each proof state change.",
+                "required": ["proofRecord", "previousState"],
+                "properties": {
+                    "proofRecord": {
+                        "$ref": "#/components/schemas/AriesProofExchangeRecordV1",
+                        "nullable": false
+                    },
+                    "previousState": {
+                        "type": "string",
+                        "nullable": true
+                    }
+                }
+            },
+            "CactiAcceptPolicyV1": {
+                "type": "string",
+                "description": "Credential / Proof requests acceptance policies for Aries agent",
+                "enum": ["always", "contentApproved", "never"],
+                "x-enum-varnames": ["Always", "ContentApproved", "Never"]
+            },
+            "CactiProofRequestAttributeV1": {
+                "type": "object",
+                "description": "Credential attribute checks to be performed by a proof request.",
+                "required": ["name"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Attribute name."
+                    },
+                    "isValueEqual": {
+                        "nullable": false,
+                        "description": "Check if attribute has specified value"
+                    },
+                    "isCredentialDefinitionIdEqual": {
+                        "nullable": false,
+                        "description": "Check if credentialDefinitionId has specified value"
+                    }
+                }
+            },
+            "AriesProofExchangeRecordV1": {
+                "type": "object",
+                "description": "Proof exchange record from Aries framework (simplified)",
+                "additionalProperties": true,
+                "required": ["id", "threadId", "state", "protocolVersion"],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "connectionId": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "threadId": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "state": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "protocolVersion": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "isVerified": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "errorMessage": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "AriesIndyVdrPoolConfigV1": {
+                "type": "object",
+                "description": "Indy VDR network configuration",
+                "required": ["genesisTransactions", "isProduction", "indyNamespace"],
+                "properties": {
+                    "genesisTransactions": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Indy genesis transactions."
+                    },
+                    "isProduction": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "Flag to specify whether this is production or development ledger."
+                    },
+                    "indyNamespace": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Indy namespace"
+                    },
+                    "connectOnStartup": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "Connect to the ledger on startup flag"
+                    }
+                }
+            },
+            "AriesAgentConfigV1": {
+                "type": "object",
+                "description": "Aries agent configuration to be setup and used by the connector.",
+                "required": ["name", "walletKey", "indyNetworks"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Aries agent label that will also be used as wallet id."
+                    },
+                    "walletKey": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Wallet private key - do not share with anyone."
+                    },
+                    "walletPath": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Path to wallet sqlite database to use. If not provided, the connector default path and agent name will be used."
+                    },
+                    "indyNetworks": {
+                        "type": "array",
+                        "nullable": false,
+                        "items": {
+                            "$ref": "#/components/schemas/AriesIndyVdrPoolConfigV1",
+                            "minItems": 1
+                        }
+                    },
+                    "inboundUrl": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Inbound endpoint URL for this agent. Must be unique for this connector. Must contain port.",
+                        "example": "http://127.0.0.1:1234",
+                        "default": "undefined"
+                    },
+                    "autoAcceptConnections": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "Flag to accept new connection by default",
+                        "default": "false"
+                    },
+                    "autoAcceptCredentials": {
+                        "$ref": "#/components/schemas/CactiAcceptPolicyV1",
+                        "nullable": false,
+                        "description": "Policy for accepting new credentials by this agent",
+                        "default": "never"
+                    },
+                    "autoAcceptProofs": {
+                        "$ref": "#/components/schemas/CactiAcceptPolicyV1",
+                        "nullable": false,
+                        "description": "Policy for accepting new proof requests by this agent",
+                        "default": "never"
+                    }
+                }
+            },
+            "AriesAgentSummaryV1": {
+                "type": "object",
+                "description": "Summary of an Aries Agent configured in the connector.",
+                "required": [
+                    "name",
+                    "isAgentInitialized",
+                    "isWalletInitialized",
+                    "isWalletProvisioned",
+                    "walletConfig",
+                    "endpoints"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": false,
+                        "description": "Aries label of an agent"
+                    },
+                    "isAgentInitialized": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "True when Aries agent has been initialized properly."
+                    },
+                    "isWalletInitialized": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "True when this agents wallet has been initialized properly."
+                    },
+                    "isWalletProvisioned": {
+                        "type": "boolean",
+                        "nullable": false,
+                        "description": "True when this agents wallet has been provisioned properly."
+                    },
+                    "walletConfig": {
+                        "type": "object",
+                        "nullable": false,
+                        "required": ["id", "type"],
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "nullable": false,
+                                "description": "Wallet entry ID"
+                            },
+                            "type": {
+                                "type": "string",
+                                "nullable": false,
+                                "description": "Wallet storage type"
+                            }
+                        }
+                    },
+                    "endpoints": {
+                        "type": "array",
+                        "nullable": false,
+                        "description": "Aries agent endpoints configured",
+                        "items": {
+                            "type": "string",
+                            "nullable": false
+                        }
+                    }
+                }
+            },
+            "AgentConnectionsFilterV1": {
+                "type": "object",
+                "description": "Fields that can be used to filter agent connection list.",
+                "properties": {
+                    "did": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "invitationDid": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "outOfBandId": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "role": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "state": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "theirDid": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "threadId": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "AgentConnectionRecordV1": {
+                "type": "object",
+                "description": "Aries agent connection information.",
+                "additionalProperties": true,
+                "required": ["state", "role", "isReady"],
+                "properties": {
+                    "state": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "role": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "isReady": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "did": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "theirDid": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "theirLabel": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "alias": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "threadId": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "errorMessage": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "outOfBandId": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "invitationDid": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "GetConnectionsV1Request": {
+                "type": "object",
+                "description": "Request for GetConnections endpoint.",
+                "required": ["agentName"],
+                "properties": {
+                    "agentName": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "filter": {
+                        "$ref": "#/components/schemas/AgentConnectionsFilterV1",
+                        "nullable": false
+                    }
+                }
+            },
+            "GetConnectionsV1Response": {
+                "type": "array",
+                "description": "Response for GetConnections endpoint.",
+                "default": [],
+                "items": {
+                    "$ref": "#/components/schemas/AgentConnectionRecordV1"
+                }
+            },
+            "GetAgentsV1Response": {
+                "type": "array",
+                "description": "Response for GetAgents endpoint.",
+                "default": [],
+                "items": {
+                    "$ref": "#/components/schemas/AriesAgentSummaryV1"
+                }
+            },
+            "CreateNewConnectionInvitationV1Request": {
+                "type": "object",
+                "description": "Request for CreateNewConnectionInvitation endpoint.",
+                "required": ["agentName"],
+                "properties": {
+                    "agentName": {
+                        "type": "string",
+                        "description": "Aries label of an agent to use to generate an invitation",
+                        "nullable": false
+                    },
+                    "invitationDomain": {
+                        "type": "string",
+                        "description": "Invitation URL domain to use. If not specified, then connector default domain will be used",
+                        "nullable": false
+                    }
+                }
+            },
+            "CreateNewConnectionInvitationV1Response": {
+                "type": "object",
+                "description": "Response for CreateNewConnectionInvitation endpoint.",
+                "required": ["invitationUrl", "outOfBandId"],
+                "properties": {
+                    "invitationUrl": {
+                        "type": "string",
+                        "description": "Invitation URL that can be used by another aries agent to connect to us.",
+                        "nullable": false
+                    },
+                    "outOfBandId": {
+                        "type": "string",
+                        "description": "ID that can be used to track status of the connection",
+                        "nullable": false
+                    }
+                }
+            },
+            "AcceptInvitationV1Request": {
+                "type": "object",
+                "description": "Request for AcceptInvitation endpoint.",
+                "required": ["agentName", "invitationUrl"],
+                "properties": {
+                    "agentName": {
+                        "type": "string",
+                        "description": "Aries label of an agent to be used to connect using URL",
+                        "nullable": false
+                    },
+                    "invitationUrl": {
+                        "type": "string",
+                        "description": "Invitation URL generated by another aries agent.",
+                        "nullable": false
+                    }
+                }
+            },
+            "AcceptInvitationV1Response": {
+                "type": "object",
+                "description": "Response for AcceptInvitation endpoint.",
+                "required": ["outOfBandId"],
+                "properties": {
+                    "outOfBandId": {
+                        "type": "string",
+                        "description": "ID that can be used to track status of the connection",
+                        "nullable": false
+                    }
+                }
+            },
+            "RequestProofV1Request": {
+                "type": "object",
+                "description": "Request for RequestProof endpoint.",
+                "required": ["agentName", "connectionId", "proofAttributes"],
+                "properties": {
+                    "agentName": {
+                        "type": "string",
+                        "description": "Aries label of an agent to be used to connect using URL",
+                        "nullable": false
+                    },
+                    "connectionId": {
+                        "type": "string",
+                        "description": "Peer connection ID from which we want to request a proof.",
+                        "nullable": false
+                    },
+                    "proofAttributes": {
+                        "type": "array",
+                        "nullable": false,
+                        "items": {
+                            "$ref": "#/components/schemas/CactiProofRequestAttributeV1",
+                            "minItems": 1
+                        }
+                    }
+                }
+            },
+            "ErrorExceptionV1Response": {
+                "type": "object",
+                "description": "Error response from the connector.",
+                "required": ["message", "error"],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Short error description message.",
+                        "nullable": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "description": "Detailed error information.",
+                        "nullable": false
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-agents": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-agents"
+                    }
+                },
+                "operationId": "getAgentsV1",
+                "summary": "Get all Aries agents configured in this connector plugin.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetAgentsV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/get-connections"
+                    }
+                },
+                "operationId": "getConnectionsV1",
+                "summary": "Get all connections of given aries agent.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GetConnectionsV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GetConnectionsV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/create-new-connection-invitation": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/create-new-connection-invitation"
+                    }
+                },
+                "operationId": "createNewConnectionInvitationV1",
+                "summary": "Create new aries agent invitation that other agents can use to connect.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateNewConnectionInvitationV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CreateNewConnectionInvitationV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/accept-invitation": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/accept-invitation"
+                    }
+                },
+                "operationId": "acceptInvitationV1",
+                "summary": "Connect to another agent using it's invitation URL",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AcceptInvitationV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AcceptInvitationV1Response"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/request-proof": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-aries/request-proof"
+                    }
+                },
+                "operationId": "requestProofV1",
+                "summary": "Request proof matching provided requriements from connected peer agent.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RequestProofV1Request"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AriesProofExchangeRecordV1"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionV1Response"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

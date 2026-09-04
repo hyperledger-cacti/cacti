@@ -1,0 +1,671 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector Iroha V2",
+        "description": "Can perform basic tasks on a Iroha V2 ledger",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "IrohaInstruction": {
+                "type": "string",
+                "description": "Command names that correspond to Iroha Special Instructions (https://hyperledger.github.io/iroha-2-docs/guide/advanced/isi.html)",
+                "enum": [
+                    "registerDomain",
+                    "registerAssetDefinition",
+                    "registerAsset",
+                    "mintAsset",
+                    "burnAsset",
+                    "transferAsset",
+                    "registerAccount"
+                ],
+                "x-enum-descriptions": [
+                    "Register new domain",
+                    "Register new asset definition",
+                    "Register new asset",
+                    "Mint asset value",
+                    "Burn asset value",
+                    "Transfer asset between accounts",
+                    "Register new account"
+                ],
+                "x-enum-varnames": [
+                    "RegisterDomain",
+                    "RegisterAssetDefinition",
+                    "RegisterAsset",
+                    "MintAsset",
+                    "BurnAsset",
+                    "TransferAsset",
+                    "RegisterAccount"
+                ]
+            },
+            "IrohaQuery": {
+                "type": "string",
+                "description": "Command names that correspond to Iroha queries (https://hyperledger.github.io/iroha-2-docs/guide/advanced/queries.html)",
+                "enum": [
+                    "findAllDomains",
+                    "findDomainById",
+                    "findAssetDefinitionById",
+                    "findAllAssetsDefinitions",
+                    "findAssetById",
+                    "findAllAssets",
+                    "findAllPeers",
+                    "findAllBlocks",
+                    "findAccountById",
+                    "findAllAccounts",
+                    "findAllTransactions",
+                    "findTransactionByHash"
+                ],
+                "x-enum-descriptions": [
+                    "Get list of all registered domains",
+                    "Get domain with specified ID",
+                    "Get asset definition with specified ID",
+                    "Get list of all registered asset definition",
+                    "Get asset with specified ID",
+                    "Get list of all registered assets",
+                    "Get list of all ledger peers",
+                    "Get list of all ledger blocks",
+                    "Get account with specified ID",
+                    "Get list of all registered accounts",
+                    "Get list of all transactions",
+                    "Get transaction with specified hash"
+                ],
+                "x-enum-varnames": [
+                    "FindAllDomains",
+                    "FindDomainById",
+                    "FindAssetDefinitionById",
+                    "FindAllAssetsDefinitions",
+                    "FindAssetById",
+                    "FindAllAssets",
+                    "FindAllPeers",
+                    "FindAllBlocks",
+                    "FindAccountById",
+                    "FindAllAccounts",
+                    "FindAllTransactions",
+                    "FindTransactionByHash"
+                ]
+            },
+            "WatchBlocksV1": {
+                "type": "string",
+                "description": "Websocket requests for monitoring new blocks.",
+                "enum": [
+                    "org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Subscribe",
+                    "org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Next",
+                    "org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Unsubscribe",
+                    "org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Error",
+                    "org.hyperledger.cactus.api.async.hliroha2.WatchBlocksV1.Complete"
+                ],
+                "x-enum-varnames": [
+                    "Subscribe",
+                    "Next",
+                    "Unsubscribe",
+                    "Error",
+                    "Complete"
+                ]
+            },
+            "BlockTypeV1": {
+                "type": "string",
+                "description": "Iroha V2 block response type.",
+                "enum": ["raw", "binary"],
+                "x-enum-descriptions": [
+                    "Default JSON-encoded string full block data.",
+                    "Encoded format that must be decoded with Iroha SDK on client side before use"
+                ],
+                "x-enum-varnames": ["Raw", "Binary"]
+            },
+            "TransactionStatusV1": {
+                "type": "string",
+                "description": "Status of Iroha V2 transaction.",
+                "enum": ["submitted", "committed", "rejected"],
+                "x-enum-descriptions": [
+                    "Transaction was submitted to the ledger - use other tools to check if it was accepted and committed.",
+                    "Transaction was committed to the ledger.",
+                    "Transaction was rejected."
+                ],
+                "x-enum-varnames": ["Submitted", "Committed", "Rejected"]
+            },
+            "WatchBlocksOptionsV1": {
+                "type": "object",
+                "description": "Options passed when subscribing to block monitoring.",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/BlockTypeV1",
+                        "description": "Type of response block to return.",
+                        "default": "BlockTypeV1.Binary",
+                        "nullable": false
+                    },
+                    "startBlock": {
+                        "type": "string",
+                        "description": "Number of block to start monitoring from.",
+                        "minLength": 1,
+                        "nullable": false
+                    },
+                    "baseConfig": {
+                        "$ref": "#/components/schemas/Iroha2BaseConfig",
+                        "description": "Iroha V2 connection configuration.",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksRawResponseV1": {
+                "type": "object",
+                "description": "Default JSON-encoded string full block data.",
+                "required": ["blockData"],
+                "properties": {
+                    "blockData": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksBinaryResponseV1": {
+                "type": "object",
+                "description": "Binary encoded response of block data.",
+                "required": ["binaryBlock"],
+                "properties": {
+                    "binaryBlock": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "WatchBlocksResponseV1": {
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksRawResponseV1",
+                        "nullable": false
+                    },
+                    {
+                        "$ref": "#/components/schemas/WatchBlocksBinaryResponseV1",
+                        "nullable": false
+                    },
+                    {
+                        "$ref": "#/components/schemas/ErrorExceptionResponseV1",
+                        "nullable": false
+                    }
+                ]
+            },
+            "Iroha2AccountId": {
+                "type": "object",
+                "description": "Iroha V2 account ID.",
+                "additionalProperties": false,
+                "nullable": false,
+                "required": ["name", "domainId"],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "domainId": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "Iroha2KeyJson": {
+                "type": "object",
+                "description": "Private/Public key JSON containing payload and digest function.",
+                "additionalProperties": false,
+                "nullable": false,
+                "required": ["digestFunction", "payload"],
+                "properties": {
+                    "digestFunction": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "payload": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "KeychainReference": {
+                "type": "object",
+                "description": "Reference to entry stored in Cactus keychain plugin.",
+                "required": ["keychainId", "keychainRef"],
+                "properties": {
+                    "keychainId": {
+                        "type": "string",
+                        "description": "Keychain plugin ID.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    },
+                    "keychainRef": {
+                        "type": "string",
+                        "description": "Key reference name.",
+                        "minLength": 1,
+                        "maxLength": 100,
+                        "nullable": false
+                    }
+                }
+            },
+            "Iroha2KeyPair": {
+                "type": "object",
+                "description": "Pair of Iroha account private and public keys.",
+                "required": ["privateKey", "publicKey"],
+                "properties": {
+                    "privateKey": {
+                        "$ref": "#/components/schemas/Iroha2KeyJson",
+                        "nullable": false
+                    },
+                    "publicKey": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "Iroha2BaseConfigTorii": {
+                "type": "object",
+                "description": "Iroha V2 peer connection information.",
+                "additionalProperties": false,
+                "nullable": false,
+                "properties": {
+                    "apiURL": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "telemetryURL": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "Iroha2BaseConfig": {
+                "type": "object",
+                "description": "Iroha V2 connection configuration.",
+                "additionalProperties": false,
+                "required": ["torii"],
+                "properties": {
+                    "torii": {
+                        "$ref": "#/components/schemas/Iroha2BaseConfigTorii",
+                        "nullable": false
+                    },
+                    "accountId": {
+                        "$ref": "#/components/schemas/Iroha2AccountId",
+                        "nullable": false
+                    },
+                    "signingCredential": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Iroha2KeyPair",
+                                "nullable": false
+                            },
+                            {
+                                "$ref": "#/components/schemas/KeychainReference",
+                                "nullable": false
+                            }
+                        ]
+                    }
+                }
+            },
+            "IrohaInstructionRequestV1": {
+                "type": "object",
+                "description": "Single Iroha V2 instruction to be executed request.",
+                "required": ["name", "params"],
+                "additionalProperties": false,
+                "properties": {
+                    "name": {
+                        "type": "IrohaInstruction",
+                        "description": "Iroha V2 instruction name.",
+                        "nullable": false
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass with specified instruction.",
+                        "type": "array",
+                        "items": {}
+                    }
+                }
+            },
+            "IrohaTransactionParametersV1": {
+                "type": "object",
+                "description": "Iroha V2 transaction payload parameters",
+                "additionalProperties": true,
+                "properties": {
+                    "ttl": {
+                        "type": "string",
+                        "description": "BigInt time to live.",
+                        "nullable": false
+                    },
+                    "creationTime": {
+                        "type": "string",
+                        "description": "BigInt creation time",
+                        "nullable": false
+                    },
+                    "nonce": {
+                        "type": "number",
+                        "description": "Transaction nonce",
+                        "nullable": false
+                    }
+                }
+            },
+            "IrohaTransactionDefinitionV1": {
+                "type": "object",
+                "description": "Iroha V2 transaction definition",
+                "required": ["instruction"],
+                "additionalProperties": false,
+                "properties": {
+                    "instruction": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/IrohaInstructionRequestV1",
+                                "nullable": false
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/IrohaInstructionRequestV1"
+                                }
+                            }
+                        ]
+                    },
+                    "params": {
+                        "$ref": "#/components/schemas/IrohaTransactionParametersV1",
+                        "description": "Transaction parameters",
+                        "nullable": false
+                    }
+                }
+            },
+            "IrohaQueryDefinitionV1": {
+                "type": "object",
+                "description": "Iroha V2 query definition.",
+                "required": ["query"],
+                "additionalProperties": false,
+                "properties": {
+                    "query": {
+                        "type": "IrohaQuery",
+                        "description": "Name of the query to be executed.",
+                        "nullable": false
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass with the query.",
+                        "type": "array",
+                        "items": {}
+                    }
+                }
+            },
+            "IrohaSignedQueryDefinitionV1": {
+                "type": "object",
+                "description": "Iroha V2 signed query definition",
+                "required": ["query", "payload"],
+                "additionalProperties": false,
+                "properties": {
+                    "query": {
+                        "type": "IrohaQuery",
+                        "description": "Name of the query to be executed.",
+                        "nullable": false
+                    },
+                    "payload": {
+                        "description": "Signed query transaction binary data received from generate-transaction endpoint.",
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "TransactRequestV1": {
+                "type": "object",
+                "description": "Request to transact endpoint.",
+                "additionalProperties": false,
+                "properties": {
+                    "signedTransaction": {
+                        "description": "Signed transaction binary data received from generate-transaction endpoint.",
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "transaction": {
+                        "$ref": "#/components/schemas/IrohaTransactionDefinitionV1",
+                        "description": "New transaction definition. Caller must provide signing credential in `baseConfig`.",
+                        "nullable": false
+                    },
+                    "waitForCommit": {
+                        "description": "Wait unitl transaction is sent and return the final status (committed / rejected)",
+                        "type": "boolean",
+                        "default": false,
+                        "nullable": false
+                    },
+                    "baseConfig": {
+                        "$ref": "#/components/schemas/Iroha2BaseConfig",
+                        "description": "Iroha V2 connection configuration.",
+                        "nullable": false
+                    }
+                }
+            },
+            "TransactResponseV1": {
+                "type": "object",
+                "description": "Response from transaction endpoint with operation status.",
+                "required": ["hash", "status"],
+                "properties": {
+                    "hash": {
+                        "type": "string",
+                        "description": "Hexadecimal hash of the transaction sent to the ledger.",
+                        "nullable": false
+                    },
+                    "status": {
+                        "$ref": "#/components/schemas/TransactionStatusV1",
+                        "description": "Status of the sent transaction.",
+                        "nullable": false
+                    },
+                    "rejectReason": {
+                        "description": "When waitForCommit was suplied and the transaction was rejected, contains the reason of the rejection.",
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "QueryRequestV1": {
+                "type": "object",
+                "description": "Request to query endpoint.",
+                "additionalProperties": false,
+                "properties": {
+                    "query": {
+                        "$ref": "#/components/schemas/IrohaQueryDefinitionV1",
+                        "description": "Query definition. Caller must provide signing credential in `baseConfig`",
+                        "nullable": false
+                    },
+                    "signedQuery": {
+                        "$ref": "#/components/schemas/IrohaSignedQueryDefinitionV1",
+                        "description": "Query payload signed on the client side.",
+                        "nullable": false
+                    },
+                    "baseConfig": {
+                        "$ref": "#/components/schemas/Iroha2BaseConfig",
+                        "description": "Iroha V2 connection configuration.",
+                        "nullable": false
+                    }
+                }
+            },
+            "QueryResponseV1": {
+                "type": "object",
+                "description": "Response with the query results.",
+                "required": ["response"],
+                "properties": {
+                    "response": {
+                        "description": "Query response data that varies between different queries.",
+                        "nullable": false
+                    }
+                }
+            },
+            "GenerateTransactionRequestV1": {
+                "type": "object",
+                "description": "Request for generating transaction or query payload that can be signed on the client side.",
+                "additionalProperties": false,
+                "required": ["request"],
+                "properties": {
+                    "request": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/IrohaTransactionDefinitionV1",
+                                "description": "New transaction definition. Caller must provide signing credential in `baseConfig`.",
+                                "nullable": false
+                            },
+                            {
+                                "$ref": "#/components/schemas/IrohaQueryDefinitionV1",
+                                "description": "Query definition. Caller must provide signing credential in `baseConfig`.",
+                                "nullable": false
+                            }
+                        ]
+                    },
+                    "baseConfig": {
+                        "$ref": "#/components/schemas/Iroha2BaseConfig",
+                        "description": "Iroha V2 connection configuration.",
+                        "nullable": false
+                    }
+                }
+            },
+            "ErrorExceptionResponseV1": {
+                "type": "object",
+                "description": "Error response from the connector.",
+                "required": ["message", "error"],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Short error description message.",
+                        "nullable": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "description": "Detailed error information.",
+                        "nullable": false
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/transact"
+                    }
+                },
+                "operationId": "TransactV1",
+                "summary": "Executes a transaction on a Iroha V2 ledger (by sending some instructions)",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransactRequestV1"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransactResponseV1"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/generate-transaction"
+                    }
+                },
+                "operationId": "generateTransactionV1",
+                "summary": "Generate transaction that can be signed locally.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GenerateTransactionRequestV1"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-iroha2/query"
+                    }
+                },
+                "operationId": "QueryV1",
+                "summary": "Executes a query on a Iroha V2 ledger and returns it's results.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/QueryRequestV1"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QueryResponseV1"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponseV1"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

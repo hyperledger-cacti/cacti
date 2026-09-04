@@ -1,0 +1,834 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Hyperledger Cactus Plugin - Connector Polkadot",
+        "description": "Can perform basic tasks on a Polkadot parachain",
+        "version": "2.1.0",
+        "license": {
+            "name": "Apache-2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+        }
+    },
+    "components": {
+        "schemas": {
+            "PrometheusExporterMetricsResponse": {
+                "type": "string",
+                "nullable": false
+            },
+            "TransactionInfoRequest": {
+                "type": "object",
+                "required": ["accountAddress", "transactionExpiration"],
+                "additionalProperties": false,
+                "properties": {
+                    "accountAddress": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "transactionExpiration": {
+                        "type": "number",
+                        "nullable": true
+                    }
+                }
+            },
+            "TransactionInfoResponseData": {
+                "type": "object",
+                "required": ["nonce", "blockHash", "era"],
+                "additionalProperties": false,
+                "properties": {
+                    "nonce": {
+                        "type": "object",
+                        "nullable": false
+                    },
+                    "blockHash": {
+                        "type": "object",
+                        "nullable": false
+                    },
+                    "era": {
+                        "type": "object",
+                        "nullable": true
+                    }
+                }
+            },
+            "TransactionInfoResponse": {
+                "type": "object",
+                "required": ["responseContainer"],
+                "additionalProperties": false,
+                "properties": {
+                    "responseContainer": {
+                        "type": "object",
+                        "required": ["response_data", "succeeded", "message", "error"],
+                        "additionalProperties": false,
+                        "properties": {
+                            "response_data": {
+                                "$ref": "#/components/schemas/TransactionInfoResponseData",
+                                "nullable": false
+                            },
+                            "succeeded": {
+                                "type": "boolean",
+                                "nullable": false
+                            },
+                            "message": {
+                                "type": "string",
+                                "nullable": false
+                            },
+                            "error": {
+                                "type": "string",
+                                "nullable": true
+                            }
+                        }
+                    }
+                }
+            },
+            "RawTransactionRequest": {
+                "type": "object",
+                "required": ["to", "value"],
+                "additionalProperties": false,
+                "properties": {
+                    "to": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "value": {
+                        "type": "number",
+                        "nullable": false
+                    }
+                }
+            },
+            "RawTransactionResponseData": {
+                "type": "object",
+                "required": ["rawTransaction"],
+                "additionalProperties": false,
+                "properties": {
+                    "rawTransaction": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "RawTransactionResponse": {
+                "type": "object",
+                "required": ["responseContainer"],
+                "additionalProperties": false,
+                "properties": {
+                    "responseContainer": {
+                        "type": "object",
+                        "required": ["response_data", "succeeded", "message", "error"],
+                        "additionalProperties": false,
+                        "properties": {
+                            "response_data": {
+                                "$ref": "#/components/schemas/RawTransactionResponseData",
+                                "nullable": false
+                            },
+                            "succeeded": {
+                                "type": "boolean",
+                                "nullable": false
+                            },
+                            "message": {
+                                "type": "string",
+                                "nullable": false
+                            },
+                            "error": {
+                                "type": "string",
+                                "nullable": true
+                            }
+                        }
+                    }
+                }
+            },
+            "SignRawTransactionRequest": {
+                "type": "object",
+                "required": ["rawTransaction", "mnemonic"],
+                "additionalProperties": false,
+                "properties": {
+                    "rawTransaction": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "mnemonic": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "signingOptions": {
+                        "type": "object",
+                        "nullable": false
+                    }
+                }
+            },
+            "SignRawTransactionResponse": {
+                "type": "object",
+                "required": ["success", "signedTransaction"],
+                "additionalProperties": false,
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "signedTransaction": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "web3SigningCredential": {
+                "type": "object",
+                "required": ["type"],
+                "discriminator": {
+                    "propertyName": "type"
+                },
+                "oneOf": [
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialMnemonicString"
+                    },
+                    {
+                        "$ref": "#/components/schemas/Web3SigningCredentialNone"
+                    }
+                ],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialCactusKeychainRef": {
+                "type": "object",
+                "required": ["type", "ethAccount", "keychainId", "keychainEntryKey"],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "keychainEntryKey": {
+                        "type": "string",
+                        "description": "The key to use when looking up the the keychain entry holding the secret pointed to by the  keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    },
+                    "keychainId": {
+                        "type": "string",
+                        "description": "The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.",
+                        "minLength": 0,
+                        "maxLength": 1024
+                    }
+                }
+            },
+            "Web3SigningCredentialMnemonicString": {
+                "type": "object",
+                "required": ["type", "mnemonic"],
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    },
+                    "mnemonic": {
+                        "type": "string",
+                        "description": "The Polkadot account's seed phrase for signing transaction",
+                        "nullable": false
+                    }
+                }
+            },
+            "Web3SigningCredentialNone": {
+                "type": "object",
+                "required": ["type"],
+                "description": "Using this denotes that there is no signing required because the transaction is pre-signed.",
+                "properties": {
+                    "type": {
+                        "$ref": "#/components/schemas/Web3SigningCredentialType"
+                    }
+                }
+            },
+            "Web3SigningCredentialType": {
+                "type": "string",
+                "enum": ["CACTUS_KEYCHAIN_REF", "MNEMONIC_STRING", "NONE"]
+            },
+            "PolkadotTransactionConfig": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                    "transferSubmittable": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "to": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "value": {
+                        "oneOf": [
+                            {
+                                "type": "number"
+                            }
+                        ]
+                    }
+                }
+            },
+            "RunTransactionRequest": {
+                "type": "object",
+                "required": ["web3SigningCredential", "transactionConfig"],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/web3SigningCredential",
+                        "nullable": false
+                    },
+                    "transactionConfig": {
+                        "$ref": "#/components/schemas/PolkadotTransactionConfig",
+                        "nullable": false
+                    }
+                }
+            },
+            "RunTransactionResponse": {
+                "type": "object",
+                "required": ["success"],
+                "additionalProperties": false,
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "txHash": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "blockHash": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "DeployContractInkRequest": {
+                "type": "object",
+                "required": ["web3SigningCredential", "wasm", "metadata", "gasLimit"],
+                "additionalProperties": false,
+                "properties": {
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/web3SigningCredential",
+                        "nullable": false
+                    },
+                    "wasm": {
+                        "description": "raw wasm for the compiled contract in base64 format",
+                        "type": "string",
+                        "format": "byte",
+                        "nullable": false
+                    },
+                    "constructorMethod": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "metadata": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "gasLimit": {
+                        "type": "object",
+                        "required": ["refTime", "proofSize"],
+                        "properties": {
+                            "refTime": {
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "proofSize": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    },
+                    "storageDepositLimit": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass in to the contract method being deployed",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    },
+                    "balance": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        ]
+                    },
+                    "salt": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ],
+                        "nullable": true
+                    }
+                }
+            },
+            "DeployContractInkResponse": {
+                "type": "object",
+                "required": ["success"],
+                "additionalProperties": false,
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "contractAddress": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "PolkadotContractInvocationType": {
+                "type": "string",
+                "enum": ["SEND", "QUERY"]
+            },
+            "InvokeContractRequest": {
+                "type": "object",
+                "required": [
+                    "invocationType",
+                    "metadata",
+                    "contractAddress",
+                    "methodName",
+                    "gasLimit",
+                    "accountAddress",
+                    "web3SigningCredential"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "invocationType": {
+                        "$ref": "#/components/schemas/PolkadotContractInvocationType",
+                        "nullable": false,
+                        "description": "Indicates whether it is a QUERY or a SEND type of  invocation where only SEND ends up creating an actual transaction on the ledger."
+                    },
+                    "accountAddress": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "web3SigningCredential": {
+                        "$ref": "#/components/schemas/web3SigningCredential",
+                        "nullable": false
+                    },
+                    "metadata": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            }
+                        ]
+                    },
+                    "contractAddress": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "methodName": {
+                        "description": "The name of the contract method to invoke.",
+                        "type": "string",
+                        "nullable": false,
+                        "minLength": 1,
+                        "maxLength": 2048
+                    },
+                    "gasLimit": {
+                        "type": "object",
+                        "required": ["refTime", "proofSize"],
+                        "properties": {
+                            "refTime": {
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "proofSize": {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        }
+                    },
+                    "storageDepositLimit": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        ],
+                        "nullable": true
+                    },
+                    "balance": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "integer",
+                                "minimum": 0
+                            }
+                        ]
+                    },
+                    "params": {
+                        "description": "The list of arguments to pass in to the contract method being invoked",
+                        "type": "array",
+                        "default": [],
+                        "items": {}
+                    }
+                }
+            },
+            "InvokeContractResponse": {
+                "type": "object",
+                "required": ["success"],
+                "properties": {
+                    "callOutput": {},
+                    "success": {
+                        "type": "boolean",
+                        "nullable": false
+                    },
+                    "txHash": {
+                        "type": "string",
+                        "nullable": false
+                    },
+                    "blockHash": {
+                        "type": "string",
+                        "nullable": false
+                    }
+                }
+            },
+            "ErrorExceptionResponse": {
+                "type": "object",
+                "description": "Error response from the connector.",
+                "required": ["message", "error"],
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "description": "Short error description message.",
+                        "nullable": false
+                    },
+                    "error": {
+                        "type": "string",
+                        "description": "Detailed error information.",
+                        "nullable": false
+                    }
+                }
+            }
+        }
+    },
+    "paths": {
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics": {
+            "get": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "get",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-prometheus-exporter-metrics"
+                    }
+                },
+                "operationId": "getPrometheusMetrics",
+                "summary": "Get the Prometheus Metrics",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PrometheusExporterMetricsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-transaction-info"
+                    }
+                },
+                "operationId": "getTransactionInfo",
+                "summary": "Get the necessary Transaction Info for a account",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TransactionInfoRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TransactionInfoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/get-raw-transaction"
+                    }
+                },
+                "operationId": "getRawTransaction",
+                "summary": "Get raw unsigned transaction",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RawTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RawTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/sign-raw-transaction"
+                    }
+                },
+                "operationId": "signRawTransaction",
+                "summary": "sign the raw transaction",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SignRawTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SignRawTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/run-transaction"
+                    }
+                },
+                "operationId": "runTransaction",
+                "summary": "Executes a transaction on a Polkadot ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunTransactionRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunTransactionResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/deploy-contract-ink"
+                    }
+                },
+                "operationId": "deployContractInk",
+                "summary": "Deploys the ink! contract",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeployContractInkRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/DeployContractInkResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract": {
+            "post": {
+                "x-hyperledger-cacti": {
+                    "http": {
+                        "verbLowerCase": "post",
+                        "path": "/api/v1/plugins/@hyperledger/cactus-plugin-ledger-connector-polkadot/invoke-contract"
+                    }
+                },
+                "operationId": "invokeContract",
+                "summary": "Invokes a contract on a polkadot ledger",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/InvokeContractRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InvokeContractResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorExceptionResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
