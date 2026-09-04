@@ -50,8 +50,8 @@ markdown_extensions:
   - pymdownx.caret
   - pymdownx.details
   - pymdownx.emoji:
-      emoji_generator: !!python/name:materialx.emoji.to_svg
-      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
@@ -202,6 +202,111 @@ nav:
       - Building API Clients: recipes/building-api-clients.md
       - Managing Dependencies: recipes/managing-dependencies.md
       - VS Code Setup: recipes/vscode-setup.md
+  - Technical reference:
+    - Packages:
+      - Overview: cactus/packages.md
+      - Core and SDK Packages:
+        - cactus-common:
+          - README: cactus/packages/cactus-common.md
+        - cactus-core:
+          - README: cactus/packages/cactus-core.md
+        - cactus-core-api:
+          - README: cactus/packages/cactus-core-api.md
+          - OAPI spec: cactus/packages/cactus-core-api/oapi.md
+        - cactus-api-client:
+          - README: cactus/packages/cactus-api-client.md
+        - cacti-ledger-browser:
+          - README: cactus/packages/cacti-ledger-browser.md
+      - Connectors, Plugins, and Infrastructure:
+        - cactus-plugin-satp-hermes:
+          - README: cactus/packages/cactus-plugin-satp-hermes.md
+          - Documentation:
+            - Documentation overview: cactus/packages/cactus-plugin-satp-hermes/docs/README.md
+            - API Type 3 adapter specification: cactus/packages/cactus-plugin-satp-hermes/docs/api3-adapter-spec.md
+            - Architecture: cactus/packages/cactus-plugin-satp-hermes/docs/architecture/satp-hermes.md
+            - Gateway configuration: cactus/packages/cactus-plugin-satp-hermes/docs/configuration.md
+            - Database and migrations: cactus/packages/cactus-plugin-satp-hermes/docs/database.md
+            - Fabric test limitation: cactus/packages/cactus-plugin-satp-hermes/docs/fabric-tests-to-fix.md
+            - Operations: cactus/packages/cactus-plugin-satp-hermes/docs/operations.md
+            - Release process: cactus/packages/cactus-plugin-satp-hermes/docs/satp-release-process.md
+          - OAPI spec: cactus/packages/cactus-plugin-satp-hermes/oapi.md
+        - cactus-plugin-bungee-hermes:
+          - README: cactus/packages/cactus-plugin-bungee-hermes.md
+          - OAPI spec: cactus/packages/cactus-plugin-bungee-hermes/oapi.md
+        - cactus-cmd-api-server:
+          - README: cactus/packages/cactus-cmd-api-server.md
+          - OAPI spec: cactus/packages/cactus-cmd-api-server/oapi.md
+        - cacti-copm-core:
+          - README: cactus/packages/cacti-copm-core.md
+          - OAPI spec: cactus/packages/cacti-copm-core/oapi.md
+        - cacti-plugin-copm-corda:
+          - README: cactus/packages/cacti-plugin-copm-corda.md
+        - cacti-plugin-copm-fabric:
+          - README: cactus/packages/cacti-plugin-copm-fabric.md
+        - cacti-plugin-consortium-static:
+          - README: cactus/packages/cacti-plugin-consortium-static.md
+          - OAPI spec: cactus/packages/cacti-plugin-consortium-static/oapi.md
+        - cacti-plugin-weaver-driver-fabric:
+          - README: cactus/packages/cacti-plugin-weaver-driver-fabric.md
+        - cactus-plugin-ledger-connector-besu:
+          - README: cactus/packages/cactus-plugin-ledger-connector-besu.md
+          - OAPI spec: cactus/packages/cactus-plugin-ledger-connector-besu/oapi.md
+        - cactus-plugin-ledger-connector-corda:
+          - README: cactus/packages/cactus-plugin-ledger-connector-corda.md
+          - OAPI spec: cactus/packages/cactus-plugin-ledger-connector-corda/oapi.md
+        - cactus-plugin-ledger-connector-ethereum:
+          - README: cactus/packages/cactus-plugin-ledger-connector-ethereum.md
+          - OAPI spec: cactus/packages/cactus-plugin-ledger-connector-ethereum/oapi.md
+        - cactus-plugin-ledger-connector-fabric:
+          - README: cactus/packages/cactus-plugin-ledger-connector-fabric.md
+          - OAPI spec: cactus/packages/cactus-plugin-ledger-connector-fabric/oapi.md
+        - cacti-plugin-ledger-connector-stellar:
+          - README: cactus/packages/cacti-plugin-ledger-connector-stellar.md
+          - OAPI spec: cactus/packages/cacti-plugin-ledger-connector-stellar/oapi.md
+        - cactus-plugin-keychain-memory:
+          - README: cactus/packages/cactus-plugin-keychain-memory.md
+          - OAPI spec: cactus/packages/cactus-plugin-keychain-memory/oapi.md
+        - cactus-plugin-htlc-eth-besu:
+          - README: cactus/packages/cactus-plugin-htlc-eth-besu.md
+          - OAPI spec: cactus/packages/cactus-plugin-htlc-eth-besu/oapi.md
+        - cactus-plugin-htlc-eth-besu-erc20:
+          - README: cactus/packages/cactus-plugin-htlc-eth-besu-erc20.md
+          - OAPI spec: cactus/packages/cactus-plugin-htlc-eth-besu-erc20/oapi.md
+        - cactus-plugin-persistence-ethereum:
+          - README: cactus/packages/cactus-plugin-persistence-ethereum.md
+          - OAPI spec: cactus/packages/cactus-plugin-persistence-ethereum/oapi.md
+        - cactus-plugin-persistence-fabric:
+          - README: cactus/packages/cactus-plugin-persistence-fabric.md
+          - OAPI spec: cactus/packages/cactus-plugin-persistence-fabric/oapi.md
+      - Extensions:
+        - cactus-plugin-object-store-ipfs:
+          - README: cactus/packages/cactus-plugin-object-store-ipfs.md
+          - OAPI spec: cactus/packages/cactus-plugin-object-store-ipfs/oapi.md
+        - cactus-plugin-htlc-coordinator-besu:
+          - README: cactus/packages/cactus-plugin-htlc-coordinator-besu.md
+          - Documentation:
+            - Alice flow: cactus/packages/cactus-plugin-htlc-coordinator-besu/docs/flow/htlc-coordinator-alice-flow.md
+            - Bob flow: cactus/packages/cactus-plugin-htlc-coordinator-besu/docs/flow/htlc-coordinator-bob-flow.md
+          - OAPI spec: cactus/packages/cactus-plugin-htlc-coordinator-besu/oapi.md
+      - Test and Tooling Packages:
+        - cactus-test-tooling:
+          - README: cactus/packages/cactus-test-tooling.md
+        - cactus-test-api-client:
+          - README: cactus/packages/cactus-test-api-client.md
+        - cactus-test-cmd-api-server:
+          - README: cactus/packages/cactus-test-cmd-api-server.md
+        - cacti-copm-test:
+          - README: cactus/packages/cacti-copm-test.md
+        - cactus-test-geth-ledger:
+          - README: cactus/packages/cactus-test-geth-ledger.md
+        - cactus-test-plugin-htlc-eth-besu:
+          - README: cactus/packages/cactus-test-plugin-htlc-eth-besu.md
+        - cactus-test-plugin-htlc-eth-besu-erc20:
+          - README: cactus/packages/cactus-test-plugin-htlc-eth-besu-erc20.md
+        - cactus-test-plugin-ledger-connector-besu:
+          - README: cactus/packages/cactus-test-plugin-ledger-connector-besu.md
+        - cactus-test-plugin-ledger-connector-ethereum:
+          - README: cactus/packages/cactus-test-plugin-ledger-connector-ethereum.md
   - Reference:
     - Overview: references/index.md
     - Use Cases and Applications for Cacti: use-cases.md

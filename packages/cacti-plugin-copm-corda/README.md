@@ -65,21 +65,25 @@ These implementations should be marked as Spring components, as shown in the exa
 
 ## Development
 
-See the [cacti-copm-test README](../cacti-copm-test/README.md) for details on
+See the [cacti-copm-test README][package-doc-cacti-copm-test-readme-md] for details on
 building a Corda test network.
 
 ## Testing
 
 The package does not define a standalone test command. Its sample Kotlin server
 and Corda integration are exercised through the
-[`cacti-copm-test`](../cacti-copm-test/README.md) network and integration
+[`cacti-copm-test`][package-doc-cacti-copm-test-readme-md] network and integration
 suite.
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
 This distribution is published under the Apache License Version 2.0 found in
-the [LICENSE](../../LICENSE) file.
+the [LICENSE][package-doc-license] file.
+
+[package-doc-cacti-copm-test-readme-md]: ../cacti-copm-test/README.md
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

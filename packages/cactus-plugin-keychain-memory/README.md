@@ -48,9 +48,9 @@ The plugin implements `IPluginKeychain`, `IPluginWebService`, and
 - `getPrometheusMetricsV1()` to retrieve Prometheus metrics
 
 The HTTP API is defined in the
-[OpenAPI specification](./src/main/json/openapi.json). Generated TypeScript
+[OpenAPI specification][package-doc-src-main-json-openapi-json]. Generated TypeScript
 Axios client code is available under
-[`src/main/typescript/generated/openapi/typescript-axios/`](./src/main/typescript/generated/openapi/typescript-axios/).
+[`src/main/typescript/generated/openapi/typescript-axios/`][package-doc-src-main-typescript-generated-openapi-typescript-axios].
 
 ## Usage
 
@@ -86,7 +86,7 @@ You can also initialize the prometheus exporter object seperately and then pass 
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
 Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
 
-```(yaml)
+```yaml
 - job_name: 'keychain_memory_exporter'
   metrics_path: api/v1/plugins/@hyperledger/cactus-plugin-keychain-memory/get-prometheus-exporter-metrics
   scrape_interval: 5s
@@ -124,9 +124,14 @@ and observability behavior.
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
 This distribution is published under the Apache License Version 2.0 found in
-the [LICENSE](../../LICENSE) file.
+the [LICENSE][package-doc-license] file.
+
+[package-doc-src-main-json-openapi-json]: ./src/main/json/openapi.json
+[package-doc-src-main-typescript-generated-openapi-typescript-axios]: ./src/main/typescript/generated/openapi/typescript-axios/
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

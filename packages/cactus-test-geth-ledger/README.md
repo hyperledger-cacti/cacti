@@ -17,7 +17,7 @@ npm install --save-dev @hyperledger-cacti/cactus-test-geth-ledger
 
 ## API Summary
 
-The public API exports the Geth test-ledger helpers and related options used by Cacti test suites. See [`public-api.ts`](./src/main/typescript/public-api.ts) for the maintained export surface.
+The public API exports the Geth test-ledger helpers and related options used by Cacti test suites. See [`public-api.ts`][package-doc-src-main-typescript-public-api-ts] for the maintained export surface.
 
 Helpers for running test `go-ethereum` ledger in test scripts.
 
@@ -84,10 +84,14 @@ npx jest cactus-test-geth-ledger
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 ## Acknowledgments
+
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

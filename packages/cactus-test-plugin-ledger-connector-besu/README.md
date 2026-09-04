@@ -19,7 +19,7 @@ yarn configure
 
 ## API Summary
 
-The package public API is limited to test support. Its maintained functionality is the integration-test suite under [`src/test/typescript/`](./src/test/typescript/).
+The package public API is limited to test support. Its maintained functionality is the integration-test suite under [`src/test/typescript/`][package-doc-src-test-typescript].
 
 ## Usage
 
@@ -35,13 +35,17 @@ yarn test:jest:all packages/cactus-test-plugin-ledger-connector-besu/src/test/ty
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 This package is designed to hold test cases verifying the correct operation of
 the code in the package of similar name: `@hyperledger/cactus-plugin-ledger-connector-besu`.
 
 It contains no code that you would find useful in a production deployment.
+
+[package-doc-src-test-typescript]: ./src/test/typescript/
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

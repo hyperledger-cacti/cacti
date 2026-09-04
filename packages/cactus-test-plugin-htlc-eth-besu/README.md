@@ -5,7 +5,7 @@
 ## Overview
 
 This package contains the integration and API-surface tests for
-[`@hyperledger-cacti/cactus-plugin-htlc-eth-besu`](../cactus-plugin-htlc-eth-besu/README.md).
+[`@hyperledger-cacti/cactus-plugin-htlc-eth-besu`][package-doc-cactus-plugin-htlc-eth-besu-readme-md].
 The suite validates the plugin's OpenAPI contract and the initialize, contract,
 status, refund, and withdrawal endpoints.
 
@@ -31,7 +31,7 @@ No separate runtime configuration API is exported by this package.
 ## API Summary
 
 The package does not export a public API. Its
-[`public-api.ts`](./src/main/typescript/public-api.ts) file is intentionally
+[`public-api.ts`][package-doc-src-main-typescript-public-api-ts] file is intentionally
 empty, and the package is used to group integration tests.
 
 ## Usage
@@ -52,9 +52,14 @@ executing the same pattern locally.
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
 This distribution is published under the Apache License Version 2.0 found in
-the [LICENSE](../../LICENSE) file.
+the [LICENSE][package-doc-license] file.
+
+[package-doc-cactus-plugin-htlc-eth-besu-readme-md]: ../cactus-plugin-htlc-eth-besu/README.md
+[package-doc-src-main-typescript-public-api-ts]: ./src/main/typescript/public-api.ts
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

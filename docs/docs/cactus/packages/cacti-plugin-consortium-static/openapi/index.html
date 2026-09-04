@@ -1,0 +1,649 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cactus Plugin - Consortium Web Service</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cactus Plugin - Consortium Web Service</h1>
+    <div class="app-desc">Manage a Cactus consortium through the APIs. Needs administrative privileges.</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#addNodeToConsortiumV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/add-node</code></a></li>
+  <li><a href="#getConsortiumJwsV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/consortium/jws</code></a></li>
+  <li><a href="#getNodeJwsV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/node/jws</code></a></li>
+  <li><a href="#getPrometheusMetricsV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/get-prometheus-exporter-metrics</code></a></li>
+  <li><a href="#receiveBroadcastV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/receive-broadcast</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="addNodeToConsortiumV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/add-node</code></pre></div>
+    <div class="method-summary">Adds a node to consortium JWS (<span class="nickname">addNodeToConsortiumV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">NewNodeRequestV1 <a href="#NewNodeRequestV1">NewNodeRequestV1</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetConsortiumJwsResponse">GetConsortiumJwsResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "jws" : {
+    "payload" : "payload",
+    "signatures" : [ {
+      "protected" : "protected",
+      "signature" : "signature",
+      "header" : {
+        "key" : ""
+      }
+    }, {
+      "protected" : "protected",
+      "signature" : "signature",
+      "header" : {
+        "key" : ""
+      }
+    } ]
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetConsortiumJwsResponse">GetConsortiumJwsResponse</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getConsortiumJwsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/consortium/jws</code></pre></div>
+    <div class="method-summary">Retrieves a consortium JWS (<span class="nickname">getConsortiumJwsV1</span>)</div>
+    <div class="method-notes">The JWS asserting the consortium metadata (pub keys and hosts of nodes)</div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#object">object</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetConsortiumJwsResponse">GetConsortiumJwsResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "jws" : {
+    "payload" : "payload",
+    "signatures" : [ {
+      "protected" : "protected",
+      "signature" : "signature",
+      "header" : {
+        "key" : ""
+      }
+    }, {
+      "protected" : "protected",
+      "signature" : "signature",
+      "header" : {
+        "key" : ""
+      }
+    } ]
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetConsortiumJwsResponse">GetConsortiumJwsResponse</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getNodeJwsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/node/jws</code></pre></div>
+    <div class="method-summary">Retrieves the JWT of a Cactus Node (<span class="nickname">getNodeJwsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">body <a href="#object">object</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetNodeJwsResponse">GetNodeJwsResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "jws" : {
+    "payload" : "payload",
+    "signatures" : [ {
+      "protected" : "protected",
+      "signature" : "signature",
+      "header" : {
+        "key" : ""
+      }
+    }, {
+      "protected" : "protected",
+      "signature" : "signature",
+      "header" : {
+        "key" : ""
+      }
+    } ]
+  }
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetNodeJwsResponse">GetNodeJwsResponse</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getPrometheusMetricsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/get-prometheus-exporter-metrics</code></pre></div>
+    <div class="method-summary">Get the Prometheus Metrics (<span class="nickname">getPrometheusMetricsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      String
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#String">String</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="receiveBroadcastV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-consortium-static/receive-broadcast</code></pre></div>
+    <div class="method-summary">Adds a node to consortium JWS (<span class="nickname">receiveBroadcastV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">BroadcastRequestV1 <a href="#BroadcastRequestV1">BroadcastRequestV1</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#BroadcastResponseV1">BroadcastResponseV1</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "result" : true
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#BroadcastResponseV1">BroadcastResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#BroadcastRequestV1"><code>BroadcastRequestV1</code> - </a></li>
+    <li><a href="#BroadcastRequestV1_message"><code>BroadcastRequestV1_message</code> - </a></li>
+    <li><a href="#BroadcastResponseV1"><code>BroadcastResponseV1</code> - </a></li>
+    <li><a href="#CactusNode"><code>CactusNode</code> - </a></li>
+    <li><a href="#CactusNodeMeta"><code>CactusNodeMeta</code> - </a></li>
+    <li><a href="#CactusNode_allOf"><code>CactusNode_allOf</code> - </a></li>
+    <li><a href="#GetConsortiumJwsResponse"><code>GetConsortiumJwsResponse</code> - </a></li>
+    <li><a href="#GetNodeJwsResponse"><code>GetNodeJwsResponse</code> - </a></li>
+    <li><a href="#Identity"><code>Identity</code> - </a></li>
+    <li><a href="#JWSGeneral"><code>JWSGeneral</code> - </a></li>
+    <li><a href="#JWSRecipient"><code>JWSRecipient</code> - </a></li>
+    <li><a href="#Ledger"><code>Ledger</code> - </a></li>
+    <li><a href="#LedgerType"><code>LedgerType</code> - </a></li>
+    <li><a href="#NewNodeRequestV1"><code>NewNodeRequestV1</code> - </a></li>
+    <li><a href="#PluginInstance"><code>PluginInstance</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="BroadcastRequestV1"><code>BroadcastRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#BroadcastRequestV1_message">BroadcastRequestV1_message</a></span>  </div>
+<div class="param">signature </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BroadcastRequestV1_message"><code>BroadcastRequestV1_message</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#NewNodeRequestV1">NewNodeRequestV1</a></span>  </div>
+<div class="param">pubKey </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BroadcastResponseV1"><code>BroadcastResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">result </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactusNode"><code>CactusNode</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A Cactus node can be a single server, or a set of servers behind a load balancer acting as one.</div>
+    <div class="field-items">
+      <div class="param">nodeApiHost </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">publicKeyPem </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The PEM encoded public key that was used to generate the JWS included in the response (the jws property) format: Must only contain the public key, never include here  the PEM that also contains a private key. See PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail</div>
+<div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">consortiumId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">memberId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ledgerIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Stores an array of Ledger entity IDs that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions. </div>
+<div class="param">pluginInstanceIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactusNodeMeta"><code>CactusNodeMeta</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A Cactus node meta information</div>
+    <div class="field-items">
+      <div class="param">nodeApiHost </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">publicKeyPem </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The PEM encoded public key that was used to generate the JWS included in the response (the jws property) format: Must only contain the public key, never include here  the PEM that also contains a private key. See PEM format: https://en.wikipedia.org/wiki/Privacy-Enhanced_Mail</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactusNode_allOf"><code>CactusNode_allOf</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">consortiumId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">memberId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ledgerIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> Stores an array of Ledger entity IDs that are reachable (routable) via this Cactus Node. This information is used by the client side SDK API client to figure out at runtime where to send API requests that are specific to a certain ledger such as requests to execute transactions. </div>
+<div class="param">pluginInstanceIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetConsortiumJwsResponse"><code>GetConsortiumJwsResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">jws </div><div class="param-desc"><span class="param-type"><a href="#JWSGeneral">JWSGeneral</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetNodeJwsResponse"><code>GetNodeJwsResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">jws </div><div class="param-desc"><span class="param-type"><a href="#JWSGeneral">JWSGeneral</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Identity"><code>Identity</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Identity object of a Cacti Node</div>
+    <div class="field-items">
+      <div class="param">pubKey </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Public key of the Node </div>
+<div class="param">memberId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> memberId of the organization the node belongs to </div>
+<div class="param">proof </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> JWT generated by the organization the node belongs to </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JWSGeneral"><code>JWSGeneral</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">payload </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signatures </div><div class="param-desc"><span class="param-type"><a href="#JWSRecipient">array[JWSRecipient]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="JWSRecipient"><code>JWSRecipient</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A JSON Web Signature. See: https://tools.ietf.org/html/rfc7515 for info about standard.</div>
+    <div class="field-items">
+      <div class="param">signature </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">protected (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">header (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="Ledger"><code>Ledger</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ledgerType </div><div class="param-desc"><span class="param-type"><a href="#LedgerType">LedgerType</a></span>  </div>
+<div class="param">consortiumMemberId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="LedgerType"><code>LedgerType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example &quot;BESU_1X&quot; involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="NewNodeRequestV1"><code>NewNodeRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">identity </div><div class="param-desc"><span class="param-type"><a href="#Identity">Identity</a></span>  </div>
+<div class="param">treeHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> proof of common configs and policies defined by the consortium </div>
+<div class="param">node </div><div class="param-desc"><span class="param-type"><a href="#CactusNode">CactusNode</a></span>  </div>
+<div class="param">ledger </div><div class="param-desc"><span class="param-type"><a href="#Ledger">array[Ledger]</a></span> Ledger metadata </div>
+<div class="param">pluginInstance </div><div class="param-desc"><span class="param-type"><a href="#PluginInstance">array[PluginInstance]</a></span> Plugin Instance metadata </div>
+<div class="param">signature </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> signature of the message </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="PluginInstance"><code>PluginInstance</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">packageName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

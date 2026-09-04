@@ -98,6 +98,24 @@ await stellarTestLedger.stop();
 await stellarTestLedger.destroy();
 ```
 
+### WS-identity Server Image
+
+`WsTestServer` manages a WS-identity server used to test the Fabric connector's
+WS-X.509 credentials. Its default image is `ghcr.io/brioux/ws-identity:0.0.1`.
+This image is for testing, not production.
+
+To build an image locally, clone [ws-identity](https://github.com/brioux/ws-identity)
+and run these commands from that repository:
+
+```sh
+npm install
+npm run build
+docker build . -t ws-identity-local
+```
+
+The `imageName` and `imageVersion` options select the image used by
+[`WsTestServer`][package-doc-src-main-typescript-ws-test-server-ws-test-server-ts].
+
 ## Testing
 
 To run tests for this package, use the `jest` command:
@@ -105,3 +123,5 @@ To run tests for this package, use the `jest` command:
 ```bash
 npx jest
 ```
+
+[package-doc-src-main-typescript-ws-test-server-ws-test-server-ts]: ./src/main/typescript/ws-test-server/ws-test-server.ts

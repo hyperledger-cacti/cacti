@@ -55,7 +55,7 @@ The above functionality can either be accessed by importing the plugin directly 
 We also publish the [Cactus API server as a container image](https://github.com/hyperledger-cacti/cacti/pkgs/container/cactus-cmd-api-server) to the GitHub Container Registry that you can run easily with a one liner.
 The API server is also embeddable in your own NodeJS project if you choose to do so.
 
-The API surface is documented in the [OpenAPI specification](./src/main/json/openapi.json). A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/](./src/main/typescript/generated/openapi/typescript-axios/).
+The API surface is documented in the [OpenAPI specification][package-doc-src-main-json-openapi-json]. A generated TypeScript Axios client is available at [src/main/typescript/generated/openapi/typescript-axios/][package-doc-src-main-typescript-generated-openapi-typescript-axios].
 
 ### 1.1. Installation
 
@@ -316,7 +316,8 @@ The following packages are used to access private keys (via web-socket)  stored 
 
 #### 1.4.3. Building the ws-identity docker image
 
-TBD
+See the [WS-identity image build instructions][package-doc-cactus-test-tooling-readme-md-ws-identity-server-image]
+in the test-tooling package.
 
 ### 1.5 Monitoring new blocks (WatchBlocks)
 - Use `ApiClient` to receive new blocks from a fabric ledger.
@@ -324,7 +325,7 @@ TBD
 - Credentials must be configured using `gatewayOptions` argument (you can either send them directly in request or use wallet stored in keychain).
 
 #### 1.5.1 Example
-For more detailed example check [fabric-watch-blocks-v1-endpoint.test.ts](./src/test/typescript/integration/fabric-v2-2-x/fabric-watch-blocks-v1-endpoint.test.ts)
+For more detailed example check [fabric-watch-blocks-v1-endpoint.test.ts][package-doc-src-test-typescript-integration-fabric-v2-2-x-fabric-watch-blocks-v1-endpoint-test-ts]
 
 ``` typescript
 // Setup
@@ -417,15 +418,15 @@ The sequence diagrams for various endpoints are mentioned below
 
 ### 2.1. run-transaction-endpoint
 
-![run-transaction-endpoint sequence diagram](docs/architecture/images/run-transaction-endpoint.png)
+![run-transaction-endpoint sequence diagram][package-doc-docs-architecture-images-run-transaction-endpoint-png]
 
 The above diagram shows the sequence diagram of run-transaction-endpoint. User A (One of the many Users) interacts with the API Client which in turn, calls the API server. API server then executes transact() method which is explained in detailed in the subsequent diagram.
 
-![run-transaction-endpoint transact() method](docs/architecture/images/run-transaction-endpoint-transact.png)
+![run-transaction-endpoint transact() method][package-doc-docs-architecture-images-run-transaction-endpoint-transact-png]
 
 The above diagram shows the sequence diagram of transact() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends RunTransactionRequest object as an argument to the transact() method. Based on the invocationType (FabricContractInvocationType.CALL, FabricCOntractInvocationType.SEND), corresponding responses are send back to the caller.
 
-![run-transaction-endpoint-enroll](docs/architecture/images/run-transaction-endpoint-enroll.png)
+![run-transaction-endpoint-enroll][package-doc-docs-architecture-images-run-transaction-endpoint-enroll-png]
 
 The above diagram shows the sequence diagram of enroll() method of the PluginLedgerConnectorFabric class. The caller to this function, which in reference to the above sequence diagram is API server, sends Signer object along with EnrollmentRequest as an argument to the enroll() method. Based on the singerType (FabricSigningCredentialType.X509, FabricSigningCredentialType.VaultX509, FabricSigningCredentialType.WsX509), corresponding identity is enrolled and stored inside keychain.
 
@@ -697,7 +698,7 @@ You can also initialize the prometheus exporter object seperately and then pass 
 To use Prometheus with this exporter make sure to install [Prometheus main component](https://prometheus.io/download/).
 Once Prometheus is setup, the corresponding scrape_config needs to be added to the prometheus.yml
 
-```(yaml)
+```yaml
 - job_name: 'fabric_ledger_connector_exporter'
   metrics_path: api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
   scrape_interval: 5s
@@ -734,10 +735,20 @@ npm run test
 
 We welcome contributions to Hyperledger Cactus in many forms, and there’s always plenty to do!
 
-Please review [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
+Please review [CONTRIBUTING.md][package-doc-contributing-md] to get started.
 
 ## 7. License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
 ## 8. Acknowledgments
+
+[package-doc-src-main-json-openapi-json]: ./src/main/json/openapi.json
+[package-doc-src-main-typescript-generated-openapi-typescript-axios]: ./src/main/typescript/generated/openapi/typescript-axios/
+[package-doc-cactus-test-tooling-readme-md-ws-identity-server-image]: ../cactus-test-tooling/README.md#ws-identity-server-image
+[package-doc-src-test-typescript-integration-fabric-v2-2-x-fabric-watch-blocks-v1-endpoint-test-ts]: ./src/test/typescript/integration/fabric-v2-2-x/fabric-watch-blocks-v1-endpoint.test.ts
+[package-doc-docs-architecture-images-run-transaction-endpoint-png]: docs/architecture/images/run-transaction-endpoint.png
+[package-doc-docs-architecture-images-run-transaction-endpoint-transact-png]: docs/architecture/images/run-transaction-endpoint-transact.png
+[package-doc-docs-architecture-images-run-transaction-endpoint-enroll-png]: docs/architecture/images/run-transaction-endpoint-enroll.png
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE

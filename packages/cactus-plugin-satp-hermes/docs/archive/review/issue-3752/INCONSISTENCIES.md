@@ -21,11 +21,11 @@ The goals of this report are to:
 
 **Requirements - Stage 0:**
 
-![Stage 0 requirements](2025-03-STAGE-0-Requirements.png)
+![Stage 0 requirements][package-doc-2025-03-stage-0-requirements-png]
 
 **Requirements - Stage 1:**
 
-![Stage 1 requirements](2025-03-STAGE-1-Requirements.png)
+![Stage 1 requirements][package-doc-2025-03-stage-1-requirements-png]
 
 **Inconsistencies - Stage 0:**
 
@@ -171,3 +171,6 @@ Solving the resulting sub-issues in order to reduce inconsistency between the sp
 **Published in:**
 
 18th of March 2025 by Rodolfo Carapau
+
+[package-doc-2025-03-stage-0-requirements-png]: 2025-03-STAGE-0-Requirements.png
+[package-doc-2025-03-stage-1-requirements-png]: 2025-03-STAGE-1-Requirements.png

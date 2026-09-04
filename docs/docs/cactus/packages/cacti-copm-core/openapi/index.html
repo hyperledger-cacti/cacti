@@ -1,0 +1,641 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cacti Plugin - Common Operator Primitives</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cacti Plugin - Common Operator Primitives</h1>
+    <div class="app-desc">Contains/describes the Hyperledger Cacti Common Operator Primitives plugin.  These primitives require specific chaincode and Weaver relays to be deployed on the network as described at https://hyperledger-cacti.github.io/cacti/weaver/introduction/.</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#claimLockedAssetV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-locked-asset</code></a></li>
+  <li><a href="#claimPledgedAssetV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-pledged-asset</code></a></li>
+  <li><a href="#getVerifiedViewV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/get-verified-view</code></a></li>
+  <li><a href="#lockAssetV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/lock-asset</code></a></li>
+  <li><a href="#noopV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/no-op</code></a></li>
+  <li><a href="#pledgeAssetV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/pledge-asset</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="claimLockedAssetV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-locked-asset</code></pre></div>
+    <div class="method-summary">Claim an asset that has been locked. (<span class="nickname">claimLockedAssetV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">AssetLockClaimV1 <a href="#AssetLockClaimV1">AssetLockClaimV1</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#claimPledgedAssetV1_200_response">claimPledgedAssetV1_200_response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "claim_id" : "claim-550e8400-e29b-41d4-a716-446655440000"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#claimPledgedAssetV1_200_response">claimPledgedAssetV1_200_response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="claimPledgedAssetV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/claim-pledged-asset</code></pre></div>
+    <div class="method-summary">Claim an asset that has been pledged. (<span class="nickname">claimPledgedAssetV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">AssetPledgeClaimV1 <a href="#AssetPledgeClaimV1">AssetPledgeClaimV1</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#claimPledgedAssetV1_200_response">claimPledgedAssetV1_200_response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "claim_id" : "claim-550e8400-e29b-41d4-a716-446655440000"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#claimPledgedAssetV1_200_response">claimPledgedAssetV1_200_response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getVerifiedViewV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/get-verified-view</code></pre></div>
+    <div class="method-summary">Runs a transaction on the remote network and returns the result.  Result is verified according to rules pre-populated in the chaincode. (<span class="nickname">getVerifiedViewV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">get_verified_viewV1_request <a href="#get_verified_viewV1_request">get_verified_viewV1_request</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#get_verified_viewV1_200_response">get_verified_viewV1_200_response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "data" : "bill:invoice-2033"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#get_verified_viewV1_200_response">get_verified_viewV1_200_response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="lockAssetV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/lock-asset</code></pre></div>
+    <div class="method-summary">Lock an asset. (<span class="nickname">lockAssetV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">AssetLockV1 <a href="#AssetLockV1">AssetLockV1</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#lockAssetV1_200_response">lockAssetV1_200_response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "lock_id" : "lock-550e8400-e29b-41d4-a716-446655440000"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#lockAssetV1_200_response">lockAssetV1_200_response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="noopV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/no-op</code></pre></div>
+    <div class="method-summary">A no-op operation.  May be used as a health check. (<span class="nickname">noopV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="pledgeAssetV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-copm/pledge-asset</code></pre></div>
+    <div class="method-summary">Pledge an asset. (<span class="nickname">pledgeAssetV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">AssetPledgeV1 <a href="#AssetPledgeV1">AssetPledgeV1</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#pledgeAssetV1_200_response">pledgeAssetV1_200_response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "pledge_id" : "pledge-550e8400-e29b-41d4-a716-446655440000"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#pledgeAssetV1_200_response">pledgeAssetV1_200_response</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#AssetAccountV1"><code>AssetAccountV1</code> - </a></li>
+    <li><a href="#AssetLockClaimV1"><code>AssetLockClaimV1</code> - </a></li>
+    <li><a href="#AssetLockV1"><code>AssetLockV1</code> - </a></li>
+    <li><a href="#AssetPledgeClaimV1"><code>AssetPledgeClaimV1</code> - </a></li>
+    <li><a href="#AssetPledgeV1"><code>AssetPledgeV1</code> - </a></li>
+    <li><a href="#HashInfoV1"><code>HashInfoV1</code> - </a></li>
+    <li><a href="#TransferrableAssetV1"><code>TransferrableAssetV1</code> - </a></li>
+    <li><a href="#ViewAddressV1"><code>ViewAddressV1</code> - </a></li>
+    <li><a href="#ViewV1"><code>ViewV1</code> - </a></li>
+    <li><a href="#claimPledgedAssetV1_200_response"><code>claimPledgedAssetV1_200_response</code> - </a></li>
+    <li><a href="#get_verified_viewV1_200_response"><code>get_verified_viewV1_200_response</code> - </a></li>
+    <li><a href="#get_verified_viewV1_request"><code>get_verified_viewV1_request</code> - </a></li>
+    <li><a href="#lockAssetV1_200_response"><code>lockAssetV1_200_response</code> - </a></li>
+    <li><a href="#pledgeAssetV1_200_response"><code>pledgeAssetV1_200_response</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="AssetAccountV1"><code>AssetAccountV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>An account used in exchanging or transferring assets.</div>
+    <div class="field-items">
+      <div class="param">organization </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">user_id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AssetLockClaimV1"><code>AssetLockClaimV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Claim a previously locked asset on the same network.
+&quot;lock_id&quot; is required for fungible assets, &quot;asset&quot; is required for non-fungible assets.
+https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/protocols/asset-exchange/generic-htlc.md</div>
+    <div class="field-items">
+      <div class="param">lock_id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">destination </div><div class="param-desc"><span class="param-type"><a href="#">AssetAccountV1</a></span>  </div>
+<div class="param">asset </div><div class="param-desc"><span class="param-type"><a href="#">TransferrableAssetV1</a></span>  </div>
+<div class="param">hash_info </div><div class="param-desc"><span class="param-type"><a href="#">HashInfoV1</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AssetLockV1"><code>AssetLockV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>lock an asset by HTLC so it can be claimed by a user on the same network.  https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/protocols/asset-exchange/generic-htlc.md</div>
+    <div class="field-items">
+      <div class="param">asset </div><div class="param-desc"><span class="param-type"><a href="#">TransferrableAssetV1</a></span>  </div>
+<div class="param">source (optional)</div><div class="param-desc"><span class="param-type"><a href="#">AssetAccountV1</a></span>  </div>
+<div class="param">dest (optional)</div><div class="param-desc"><span class="param-type"><a href="#">AssetAccountV1</a></span>  </div>
+<div class="param">hash_info </div><div class="param-desc"><span class="param-type"><a href="#">HashInfoV1</a></span>  </div>
+<div class="param">destination_certificate (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">source_certificate (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">expiry_secs </div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AssetPledgeClaimV1"><code>AssetPledgeClaimV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Asset Claim per https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/protocols/asset-transfer/generic.md#protocol-units-or-building-blocks</div>
+    <div class="field-items">
+      <div class="param">pledge_id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">source </div><div class="param-desc"><span class="param-type"><a href="#">AssetAccountV1</a></span>  </div>
+<div class="param">destination </div><div class="param-desc"><span class="param-type"><a href="#">AssetAccountV1</a></span>  </div>
+<div class="param">asset </div><div class="param-desc"><span class="param-type"><a href="#">TransferrableAssetV1</a></span>  </div>
+<div class="param">source_certificate </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">dest_certificate (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="AssetPledgeV1"><code>AssetPledgeV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Asset Pledge per https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/protocols/asset-transfer/generic.md#protocol-units-or-building-blocks</div>
+    <div class="field-items">
+      <div class="param">source </div><div class="param-desc"><span class="param-type"><a href="#">AssetAccountV1</a></span>  </div>
+<div class="param">destination </div><div class="param-desc"><span class="param-type"><a href="#">AssetAccountV1</a></span>  </div>
+<div class="param">asset </div><div class="param-desc"><span class="param-type"><a href="#">TransferrableAssetV1</a></span>  </div>
+<div class="param">expiry_secs (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
+<div class="param">destination_certificate </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="HashInfoV1"><code>HashInfoV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>hash used to lock asset in HTLC when claiming</div>
+    <div class="field-items">
+      <div class="param">hash_fcn </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">secret </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TransferrableAssetV1"><code>TransferrableAssetV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>An asset.  One of 'asset_id' or 'asset_quantity' is required.  Please see https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/protocols/asset-transfer/generic.md</div>
+    <div class="field-items">
+      <div class="param">asset_type (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">asset_id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> encoded description of NFT </div>
+<div class="param">asset_quantity (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ViewAddressV1"><code>ViewAddressV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>View addressing per https://github.com/hyperledger-cacti/cacti/blob/main/weaver/rfcs/formats/views/addressing.md#views</div>
+    <div class="field-items">
+      <div class="param">contract_id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">function (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">input (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ViewV1"><code>ViewV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The address of a view on a given remote organizations' chaincode</div>
+    <div class="field-items">
+      <div class="param">organization (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">view_address (optional)</div><div class="param-desc"><span class="param-type"><a href="#">ViewAddressV1</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="claimPledgedAssetV1_200_response"><code>claimPledgedAssetV1_200_response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">claim_id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="get_verified_viewV1_200_response"><code>get_verified_viewV1_200_response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">data (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="get_verified_viewV1_request"><code>get_verified_viewV1_request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">account (optional)</div><div class="param-desc"><span class="param-type"><a href="#AssetAccountV1">AssetAccountV1</a></span>  </div>
+<div class="param">view (optional)</div><div class="param-desc"><span class="param-type"><a href="#ViewV1">ViewV1</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="lockAssetV1_200_response"><code>lockAssetV1_200_response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">lock_id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="pledgeAssetV1_200_response"><code>pledgeAssetV1_200_response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">pledge_id (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

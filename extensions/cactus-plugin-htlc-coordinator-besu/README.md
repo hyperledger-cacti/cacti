@@ -33,7 +33,7 @@ The `IPluginHTLCCoordinatorBesuOptions` interface accepts:
 The coordinator exposes `ownHTLC`, `counterpartyHTLC`, and
 `withdrawCounterparty` operations through both its TypeScript API and OpenAPI
 web services. Request and response schemas are defined in the
-[OpenAPI specification](./src/main/json/openapi.json).
+[OpenAPI specification][package-doc-src-main-json-openapi-json].
 
 ## Summary
 
@@ -118,13 +118,13 @@ yarn run watch
 
 #### Alice flow
 
-The [Alice diagram](./docs/flow/htlc-coordinator-alice-flow.md) shows the
+The [Alice diagram][package-doc-docs-flow-htlc-coordinator-alice-flow-md] shows the
 sequence for a participant who initiates an exchange but does not know the
 secret required to withdraw the counterparty funds.
 
 #### Bob flow
 
-The [Bob diagram](./docs/flow/htlc-coordinator-bob-flow.md) shows the sequence
+The [Bob diagram][package-doc-docs-flow-htlc-coordinator-bob-flow-md] shows the sequence
 for a participant who knows the secret and initiates withdrawal.
 
 ## Testing
@@ -137,9 +137,14 @@ yarn test:jest:all extensions/cactus-plugin-htlc-coordinator-besu/src/test/types
 
 ## Contributing
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for contribution requirements.
+See [CONTRIBUTING.md][package-doc-contributing-md] for contribution requirements.
 
 ## License
 
-This distribution is published under the Apache License Version 2.0 found in the [LICENSE](../../LICENSE) file.
+This distribution is published under the Apache License Version 2.0 found in the [LICENSE][package-doc-license] file.
 
+[package-doc-src-main-json-openapi-json]: ./src/main/json/openapi.json
+[package-doc-docs-flow-htlc-coordinator-alice-flow-md]: ./docs/flow/htlc-coordinator-alice-flow.md
+[package-doc-docs-flow-htlc-coordinator-bob-flow-md]: ./docs/flow/htlc-coordinator-bob-flow.md
+[package-doc-contributing-md]: ../../CONTRIBUTING.md
+[package-doc-license]: ../../LICENSE
