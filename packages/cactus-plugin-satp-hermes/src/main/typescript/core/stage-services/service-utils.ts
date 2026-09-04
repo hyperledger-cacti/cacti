@@ -81,6 +81,20 @@ function toSafeNumber(value: bigint | string, fieldName: string): number {
 }
 
 /**
+ * Converts a bigint or numeric string to a bigint, rethrowing with the field
+ * name and value if it is not a valid integer representation.
+ */
+function toSafeBigInt(value: bigint | string, fieldName: string): bigint {
+  try {
+    return BigInt(value);
+  } catch (err) {
+    throw new Error(
+      `Cannot convert ${fieldName} "${value}" to a BigInt: ${(err as Error).message}`,
+    );
+  }
+}
+
+/**
  * Converts internal fungible asset representation to Protocol Buffer format.
  *
  * @description
@@ -304,13 +318,13 @@ export function protoToAsset(asset: ProtoAsset, networkId: NetworkId): Asset {
       "amount",
     ) as Amount;
     if (asset.uniqueDescriptor) {
-      (assetObj as FungibleAsset).uniqueDescriptor = toSafeNumber(
+      (assetObj as FungibleAsset).uniqueDescriptor = toSafeBigInt(
         asset.uniqueDescriptor,
         "uniqueDescriptor",
       ) as UniqueTokenID;
     }
   } else if (asset.tokenType == TokenType.NONSTANDARD_NONFUNGIBLE) {
-    (assetObj as NonFungibleAsset).uniqueDescriptor = toSafeNumber(
+    (assetObj as NonFungibleAsset).uniqueDescriptor = toSafeBigInt(
       asset.amount,
       "amount",
     ) as UniqueTokenID;
