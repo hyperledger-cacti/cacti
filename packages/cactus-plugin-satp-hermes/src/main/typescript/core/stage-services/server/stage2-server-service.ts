@@ -201,6 +201,18 @@ export class Stage2ServerService extends SATPService {
 
         verifyLockAssertionRequestMessage(fnTag, this.Signer, request, session);
 
+        const sessionData = session.getServerSessionData();
+        sessionData.lockAssertionClaim = request.lockAssertionClaim!;
+        sessionData.lockAssertionClaimFormat =
+          request.lockAssertionClaimFormat!;
+        sessionData.lockAssertionExpiration = request.lockAssertionExpiration;
+        saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
+        saveTimestamp(
+          sessionData,
+          MessageType.LOCK_ASSERT,
+          TimestampType.RECEIVED,
+        );
+
         this.Log.info(`${fnTag}, LockAssertionRequest passed all checks.`);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });

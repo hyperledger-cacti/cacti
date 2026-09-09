@@ -36,6 +36,7 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { SATPSession } from "../../../core/satp-session";
+import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import {
   verifyCommitFinalAssertionRequestMessage,
   verifyCommitPreparationRequestMessage,
@@ -411,6 +412,14 @@ export class Stage3ServerService extends SATPService {
           session,
         );
 
+        const sessionData = session.getServerSessionData();
+        saveHash(sessionData, MessageType.COMMIT_PREPARE, getHash(request));
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_PREPARE,
+          TimestampType.RECEIVED,
+        );
+
         this.Log.info(`${fnTag}, CommitPreparationRequest passed all checks.`);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
@@ -439,6 +448,19 @@ export class Stage3ServerService extends SATPService {
           request,
           session,
           this.Log,
+        );
+
+        const sessionData = session.getServerSessionData();
+        sessionData.burnAssertionClaim = request.burnAssertionClaim!;
+        if (request.burnAssertionClaimFormat != undefined) {
+          sessionData.burnAssertionClaimFormat =
+            request.burnAssertionClaimFormat;
+        }
+        saveHash(sessionData, MessageType.COMMIT_FINAL, getHash(request));
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_FINAL,
+          TimestampType.RECEIVED,
         );
 
         this.Log.info(
@@ -470,6 +492,19 @@ export class Stage3ServerService extends SATPService {
           this.Signer,
           request,
           session,
+        );
+
+        const sessionData = session.getServerSessionData();
+        sessionData.state = State.COMPLETED;
+        saveHash(
+          sessionData,
+          MessageType.COMMIT_TRANSFER_COMPLETE,
+          getHash(request),
+        );
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_TRANSFER_COMPLETE,
+          TimestampType.RECEIVED,
         );
 
         this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);

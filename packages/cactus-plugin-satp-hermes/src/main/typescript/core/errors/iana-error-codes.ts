@@ -379,6 +379,9 @@ import { SATPErrorType } from "./satp-error-type";
 export const SATP_ERROR_TYPE_TO_V13: Partial<Record<SATPErrorType, ErrorCode>> =
   {
     [SATPErrorType.BADLY_FORMATED_MESSAGE]: ERR_1_1_1,
+    [SATPErrorType.UNSPECIFIED]: ERR_1_1_1,
+    [SATPErrorType.DLT_NOT_SUPPORTED]: ERR_1_1_1,
+    [SATPErrorType.BRIDGE_PROBLEM]: ERR_1_1_1,
     [SATPErrorType.INCORRECT_PARAMETER]: ERR_1_1_2,
     [SATPErrorType.BADLY_FORMATED_MESSAGE_CLAIM]: ERR_1_1_19,
     [SATPErrorType.BADLY_FORMATED_MESSAGE_BAD_SIGNATURE]: ERR_1_1_1,

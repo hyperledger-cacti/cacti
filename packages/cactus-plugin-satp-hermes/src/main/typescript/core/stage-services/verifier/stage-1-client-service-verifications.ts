@@ -13,22 +13,14 @@
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
-import { getHash } from "../../../utils/gateway-utils";
 import { MessageType } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import type { TransferProposalResponse } from "../../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import type { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v13/service/stage_0_pb";
-import {
-  State,
-  type SessionData,
-} from "../../../generated/proto/cacti/satp/v13/session/session_pb";
+import { type SessionData } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import type { SATPSession } from "../../satp-session";
 import type { SATPLogger as Logger } from "../../satp-logger";
-import {
-  SessionType,
-  TimestampType,
-  saveHash,
-  saveTimestamp,
-} from "../../session-utils";
+import type { NetworkId } from "../../../public-api";
+import { SessionType } from "../../session-utils";
 import {
   MessageTypeError,
   SessionError,
@@ -41,6 +33,42 @@ import {
   signatureVerifier,
   verifyMessage,
 } from "./data-verifier";
+
+export function verifyTransferProposalRequest(
+  tag: string,
+  sessionData: SessionData,
+  connectedDLTs: NetworkId[],
+): void {
+  if (sessionData.senderAsset == undefined) {
+    throw new Error(`${tag}, receiverAsset is missing`);
+  }
+
+  if (sessionData.senderAsset.networkId == undefined) {
+    throw new Error(`${tag}, senderAsset.networkId is missing`);
+  }
+
+  if (
+    !connectedDLTs.some(
+      (connectedDLT) =>
+        connectedDLT.id === sessionData.senderAsset!.networkId!.id,
+    )
+  ) {
+    throw new Error(
+      `${tag}, sender gateway dlt system: ${sessionData.senderAsset.networkId.id} is not supported by this gateway`,
+    );
+  }
+}
+
+export function verifyTransferCommenceRequest(
+  tag: string,
+  session: SATPSession | undefined,
+): void {
+  if (session == undefined) {
+    throw new SessionError(tag);
+  }
+
+  session.verify(tag, SessionType.CLIENT);
+}
 
 /**
  * Full Stage 1 client verification of an incoming `TransferProposalResponse`.
@@ -60,7 +88,7 @@ export function verifyTransferProposalResponse(
   logger: Logger,
 ): boolean {
   // INIT_RECEIPT has no hash-chain predecessor to validate here.
-  const sessionData = verifyMessage(
+  verifyMessage(
     tag,
     signer,
     response,
@@ -73,20 +101,12 @@ export function verifyTransferProposalResponse(
     },
   );
 
-  // Assume INIT_REJECT; overridden with INIT_RECEIPT below when accepted.
-  saveTimestamp(sessionData, MessageType.INIT_REJECT, TimestampType.RECEIVED);
-
   if (response.common!.messageType == MessageType.INIT_REJECT) {
     logger.info(
       `${tag}, TransferProposalReceipt proposedTransferClaims were rejected`,
     );
-    sessionData.state = State.REJECTED;
-    saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
     return false;
   }
-
-  saveHash(sessionData, MessageType.INIT_RECEIPT, getHash(response));
-  saveTimestamp(sessionData, MessageType.INIT_RECEIPT, TimestampType.RECEIVED);
 
   return true;
 }
@@ -99,7 +119,6 @@ export function verifyTransferProposalResponse(
  * {@link verifyMessage}, while the hash-chain check reuses
  * {@link hashPrevMessageVerifier}.
  *
- * @returns The resolved client session data.
  * @throws {SessionError} When the session is undefined
  * @throws {TransferContextIdError} When the transfer context id is missing or mismatched
  * @throws {WrapAssertionClaimError} When the wrap assertion claim is missing
@@ -112,7 +131,7 @@ export function verifyPreSATPTransferResponse(
   signer: JsObjectSigner,
   response: PreSATPTransferResponse,
   session: SATPSession | undefined,
-): SessionData {
+): void {
   if (session == undefined) {
     throw new SessionError(tag);
   }
@@ -122,8 +141,6 @@ export function verifyPreSATPTransferResponse(
   }
 
   const sessionData = session.getClientSessionData();
-
-  sessionData.recipientGatewayNetworkId = response.recipientGatewayNetworkId;
 
   session.verify(tag, SessionType.CLIENT);
 
@@ -162,20 +179,4 @@ export function verifyPreSATPTransferResponse(
   );
 
   signatureVerifier(tag, signer, response, sessionData);
-
-  sessionData.receiverAsset!.tokenId = response.recipientTokenId;
-
-  saveHash(
-    sessionData,
-    MessageType.PRE_SATP_TRANSFER_RESPONSE,
-    getHash(response),
-  );
-
-  saveTimestamp(
-    sessionData,
-    MessageType.PRE_SATP_TRANSFER_RESPONSE,
-    TimestampType.RECEIVED,
-  );
-
-  return sessionData;
 }

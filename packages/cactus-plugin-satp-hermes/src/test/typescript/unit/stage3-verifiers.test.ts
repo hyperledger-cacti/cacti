@@ -32,7 +32,6 @@ import {
   Stage2TimestampsSchema,
   Stage3HashesSchema,
   Stage3TimestampsSchema,
-  State,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
 import {
   CommitFinalAssertionRequest,
@@ -53,7 +52,6 @@ import {
   LockAssertionResponseSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_2_pb";
 import { SATP_VERSION } from "../../../main/typescript/core/constants";
-import { getMessageHash } from "../../../main/typescript/core/session-utils";
 import {
   verifyCommitFinalAssertionRequestMessage,
   verifyCommitPreparationRequestMessage,
@@ -178,20 +176,14 @@ describe("verifyCommitPreparationRequestMessage", () => {
     ).toThrow(SessionError);
   });
 
-  it("passes and records the message for a valid request", () => {
+  it("passes for a valid request", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const request = makeCommitPreparationRequest();
 
-    const result = verifyCommitPreparationRequestMessage(
-      TAG,
-      signer,
-      request,
-      session,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(getMessageHash(result, MessageType.COMMIT_PREPARE)).not.toBe("");
+    expect(() =>
+      verifyCommitPreparationRequestMessage(TAG, signer, request, session),
+    ).not.toThrow();
   });
 });
 
@@ -211,43 +203,32 @@ describe("verifyCommitFinalAssertionRequestMessage", () => {
     ).toThrow(BurnAssertionClaimError);
   });
 
-  it("passes and records the message for a valid request", () => {
+  it("passes for a valid request", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const request = makeCommitFinalAssertionRequest();
 
-    const result = verifyCommitFinalAssertionRequestMessage(
-      TAG,
-      signer,
-      request,
-      session,
-      logger,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(result.burnAssertionClaim).toBeDefined();
-    expect(getMessageHash(result, MessageType.COMMIT_FINAL)).not.toBe("");
+    expect(() =>
+      verifyCommitFinalAssertionRequestMessage(
+        TAG,
+        signer,
+        request,
+        session,
+        logger,
+      ),
+    ).not.toThrow();
   });
 });
 
 describe("verifyTransferCompleteRequestMessage", () => {
-  it("passes, marks the session completed and records the message", () => {
+  it("passes for a valid request", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const request = makeTransferCompleteRequest();
 
-    const result = verifyTransferCompleteRequestMessage(
-      TAG,
-      signer,
-      request,
-      session,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(result.state).toBe(State.COMPLETED);
-    expect(
-      getMessageHash(result, MessageType.COMMIT_TRANSFER_COMPLETE),
-    ).not.toBe("");
+    expect(() =>
+      verifyTransferCompleteRequestMessage(TAG, signer, request, session),
+    ).not.toThrow();
   });
 });
 
@@ -259,20 +240,14 @@ describe("verifyLockAssertionResponseMessage", () => {
     ).toThrow(SessionError);
   });
 
-  it("passes and records the message for a valid response", () => {
+  it("passes for a valid response", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const response = makeLockAssertionResponse();
 
-    const result = verifyLockAssertionResponseMessage(
-      TAG,
-      signer,
-      response,
-      session,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(getMessageHash(result, MessageType.ASSERTION_RECEIPT)).not.toBe("");
+    expect(() =>
+      verifyLockAssertionResponseMessage(TAG, signer, response, session),
+    ).not.toThrow();
   });
 });
 
@@ -292,22 +267,20 @@ describe("verifyCommitPreparationResponseMessage", () => {
     ).toThrow(MintAssertionClaimError);
   });
 
-  it("passes and records the message for a valid response", () => {
+  it("passes for a valid response", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const response = makeCommitPreparationResponse();
 
-    const result = verifyCommitPreparationResponseMessage(
-      TAG,
-      signer,
-      response,
-      session,
-      logger,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(result.mintAssertionClaim).toBeDefined();
-    expect(getMessageHash(result, MessageType.COMMIT_READY)).not.toBe("");
+    expect(() =>
+      verifyCommitPreparationResponseMessage(
+        TAG,
+        signer,
+        response,
+        session,
+        logger,
+      ),
+    ).not.toThrow();
   });
 });
 
@@ -327,22 +300,20 @@ describe("verifyCommitFinalAssertionResponseMessage", () => {
     ).toThrow(AssignmentAssertionClaimError);
   });
 
-  it("passes and records the message for a valid response", () => {
+  it("passes for a valid response", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const response = makeCommitFinalAssertionResponse();
 
-    const result = verifyCommitFinalAssertionResponseMessage(
-      TAG,
-      signer,
-      response,
-      session,
-      logger,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(result.assignmentAssertionClaim).toBeDefined();
-    expect(getMessageHash(result, MessageType.ACK_COMMIT_FINAL)).not.toBe("");
+    expect(() =>
+      verifyCommitFinalAssertionResponseMessage(
+        TAG,
+        signer,
+        response,
+        session,
+        logger,
+      ),
+    ).not.toThrow();
   });
 });
 
@@ -354,22 +325,13 @@ describe("verifyTransferCompleteResponseMessage", () => {
     ).toThrow(SessionError);
   });
 
-  it("passes, marks the session completed and records the message", () => {
+  it("passes for a valid response", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const response = makeTransferCompleteResponse();
 
-    const result = verifyTransferCompleteResponseMessage(
-      TAG,
-      signer,
-      response,
-      session,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(result.state).toBe(State.COMPLETED);
-    expect(result.hashes?.stage3?.transferCompleteResponseMessageHash).not.toBe(
-      "",
-    );
+    expect(() =>
+      verifyTransferCompleteResponseMessage(TAG, signer, response, session),
+    ).not.toThrow();
   });
 });

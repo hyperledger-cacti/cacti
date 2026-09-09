@@ -12,7 +12,6 @@ import {
 } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
-  SessionType,
   TimestampType,
   getMessageHash,
   getMessageTimestamp,
@@ -31,12 +30,17 @@ import {
 } from "../satp-service";
 import {
   verifyTransferProposalRequestMessage,
+  verifyTransferProposalRequestSignature,
   verifyTransferCommenceRequestMessage,
+  verifyTransferCommenceResponse,
+  verifyTransferProposalResponse,
 } from "../verifier/stage-1-server-service-verifications";
-import { SessionError } from "../../errors/satp-service-errors";
 import { SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
-import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
+import {
+  State,
+  type SessionData,
+} from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -46,8 +50,6 @@ export class Stage1ServerService extends SATPService {
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
   constructor(ops: ISATPServerServiceOptions) {
-    // for now stage1serverservice does not have any different options than the SATPService class
-
     const commonOptions: ISATPServiceOptions = {
       stage: Stage1ServerService.SATP_STAGE,
       loggerOptions: ops.loggerOptions,
@@ -72,17 +74,9 @@ export class Stage1ServerService extends SATPService {
         const messageType = MessageType[MessageType.INIT_RECEIPT];
         this.Log.debug(`${fnTag}, transferProposalResponse...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(
-          fnTag,
-          SessionType.SERVER,
-          session.getServerSessionData().state == State.REJECTED,
-        );
-
+        verifyTransferProposalResponse(fnTag, session);
         const sessionData = session.getServerSessionData();
+        sessionData.lastSequenceNumber += BigInt(1);
 
         await this.dbLogger.persistLogEntry({
           sessionId: sessionData.id,
@@ -114,9 +108,6 @@ export class Stage1ServerService extends SATPService {
             sessionId: sessionData.id,
             transferContextId: sessionData.transferContextId,
           });
-
-          sessionData.lastSequenceNumber =
-            sessionData.lastSequenceNumber + BigInt(1);
 
           const transferProposalReceiptMessage = create(
             TransferProposalResponseSchema,
@@ -150,8 +141,6 @@ export class Stage1ServerService extends SATPService {
             MessageType.INIT_PROPOSAL,
           );
 
-          //TODO implement conditional reject
-
           const messageSignature = bufArray2HexStr(
             sign(
               this.Signer,
@@ -159,7 +148,6 @@ export class Stage1ServerService extends SATPService {
             ),
           );
 
-          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(sessionData, commonBody.messageType, messageSignature);
 
           saveHash(
@@ -223,7 +211,6 @@ export class Stage1ServerService extends SATPService {
         }
         errorResponse.common = commonBody;
 
-        // v13: per-message signatures removed; JWS wrapping used instead
         return errorResponse;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
@@ -277,13 +264,9 @@ export class Stage1ServerService extends SATPService {
         const messageType = MessageType[MessageType.TRANSFER_COMMENCE_RESPONSE];
         this.Log.debug(`${fnTag}, transferCommenceResponse...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.SERVER);
-
+        verifyTransferCommenceResponse(fnTag, session);
         const sessionData = session.getServerSessionData();
+        sessionData.lastSequenceNumber += BigInt(1);
         await this.dbLogger.persistLogEntry({
           sessionId: sessionData.id,
           type: messageType,
@@ -307,9 +290,6 @@ export class Stage1ServerService extends SATPService {
             transferContextId: sessionData.transferContextId,
             messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
           });
-          sessionData.lastSequenceNumber =
-            sessionData.lastSequenceNumber + BigInt(1);
-
           const transferCommenceResponseMessage = create(
             TransferCommenceResponseSchema,
             {
@@ -391,18 +371,36 @@ export class Stage1ServerService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkTransferProposalRequestMessage...`);
 
-        const { rejected } = verifyTransferProposalRequestMessage(
+        const rejected = verifyTransferProposalRequestMessage(
           fnTag,
-          this.Signer,
           request,
           session,
           supportedDLTs,
           this.Log,
         );
 
+        const sessionData = session.getServerSessionData();
+
         if (rejected) {
+          sessionData.state = State.REJECTED;
           return;
         }
+
+        this.#populateSessionFromProposal(sessionData, request);
+
+        verifyTransferProposalRequestSignature(
+          fnTag,
+          this.Signer,
+          request,
+          session,
+        );
+
+        saveHash(sessionData, MessageType.INIT_PROPOSAL, getHash(request));
+        saveTimestamp(
+          sessionData,
+          MessageType.INIT_PROPOSAL,
+          TimestampType.RECEIVED,
+        );
 
         this.Log.info(`${fnTag}, TransferProposalRequest passed all checks.`);
       } catch (err) {
@@ -413,6 +411,33 @@ export class Stage1ServerService extends SATPService {
         span.end();
       }
     });
+  }
+
+  #populateSessionFromProposal(
+    sessionData: SessionData,
+    request: TransferProposalRequest,
+  ): void {
+    sessionData.version = request.common!.version;
+    sessionData.digitalAssetId = request.transferInitClaims!.digitalAssetId;
+    sessionData.senderGatewayNetworkId =
+      request.transferInitClaims!.senderGatewayNetworkId;
+    sessionData.recipientGatewayNetworkId =
+      request.transferInitClaims!.recipientGatewayNetworkId;
+    sessionData.clientGatewayPubkey =
+      request.transferInitClaims!.senderGatewaySignaturePublicKey;
+    sessionData.serverGatewayPubkey =
+      request.transferInitClaims!.receiverGatewaySignaturePublicKey;
+    sessionData.receiverGatewayOwnerId =
+      request.transferInitClaims!.receiverGatewayOwnerId;
+    sessionData.senderGatewayOwnerId =
+      request.transferInitClaims!.senderGatewayOwnerId;
+    sessionData.signatureAlgorithm =
+      request.networkCapabilities!.gatewayDefaultSignatureAlgorithm;
+    sessionData.lockType = request.networkCapabilities!.networkLockType;
+    sessionData.lockExpirationTime =
+      request.networkCapabilities!.networkLockExpirationTime;
+    sessionData.gatewayTlsScheme =
+      request.networkCapabilities!.gatewayTlsScheme;
   }
 
   async checkTransferCommenceRequestMessage(
@@ -430,6 +455,19 @@ export class Stage1ServerService extends SATPService {
           request,
           session,
         );
+
+        const sessionData = session.getServerSessionData();
+        saveHash(
+          sessionData,
+          MessageType.TRANSFER_COMMENCE_REQUEST,
+          getHash(request),
+        );
+        saveTimestamp(
+          sessionData,
+          MessageType.TRANSFER_COMMENCE_REQUEST,
+          TimestampType.RECEIVED,
+        );
+        sessionData.state = State.ONGOING;
 
         this.Log.info(`${fnTag}, TransferCommenceRequest passed all checks.`);
       } catch (err) {

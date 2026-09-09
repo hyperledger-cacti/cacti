@@ -36,6 +36,7 @@ import {
   SATPServiceType,
 } from "../satp-service";
 import { SATPSession } from "../../satp-session";
+import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { LockAssertionResponse } from "../../../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import {
   verifyCommitFinalAssertionResponseMessage,
@@ -472,6 +473,14 @@ export class Stage3ClientService extends SATPService {
           session,
         );
 
+        const sessionData = session.getClientSessionData();
+        saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
+        saveTimestamp(
+          sessionData,
+          MessageType.ASSERTION_RECEIPT,
+          TimestampType.RECEIVED,
+        );
+
         this.Log.info(`${fnTag}, LockAssertionResponse passed all checks.`);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
@@ -500,6 +509,19 @@ export class Stage3ClientService extends SATPService {
           response,
           session,
           this.Log,
+        );
+
+        const sessionData = session.getClientSessionData();
+        if (response.mintAssertionClaimFormat != undefined) {
+          sessionData.mintAssertionClaimFormat =
+            response.mintAssertionClaimFormat;
+        }
+        sessionData.mintAssertionClaim = response.mintAssertionClaim!;
+        saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_READY,
+          TimestampType.RECEIVED,
         );
 
         this.Log.info(`${fnTag}, CommitPreparationResponse passed all checks.`);
@@ -532,6 +554,20 @@ export class Stage3ClientService extends SATPService {
           this.Log,
         );
 
+        const sessionData = session.getClientSessionData();
+        sessionData.assignmentAssertionClaim =
+          response.assignmentAssertionClaim!;
+        if (response.assignmentAssertionClaimFormat != undefined) {
+          sessionData.assignmentAssertionClaimFormat =
+            response.assignmentAssertionClaimFormat;
+        }
+        saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
+        saveTimestamp(
+          sessionData,
+          MessageType.ACK_COMMIT_FINAL,
+          TimestampType.RECEIVED,
+        );
+
         this.Log.info(
           `${fnTag}, CommitFinalAssertionResponse passed all checks.`,
         );
@@ -561,6 +597,19 @@ export class Stage3ClientService extends SATPService {
           this.Signer,
           response,
           session,
+        );
+
+        const sessionData = session.getClientSessionData();
+        sessionData.state = State.COMPLETED;
+        saveHash(
+          sessionData,
+          MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+          getHash(response),
+        );
+        saveTimestamp(
+          sessionData,
+          MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+          TimestampType.RECEIVED,
         );
 
         this.Log.info(`${fnTag}, TransferCompleteResponse passed all checks.`);

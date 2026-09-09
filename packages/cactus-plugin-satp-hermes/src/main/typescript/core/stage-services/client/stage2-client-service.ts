@@ -226,6 +226,18 @@ export class Stage2ClientService extends SATPService {
           session,
         );
 
+        const sessionData = session.getClientSessionData();
+        saveHash(
+          sessionData,
+          MessageType.TRANSFER_COMMENCE_RESPONSE,
+          getHash(response),
+        );
+        saveTimestamp(
+          sessionData,
+          MessageType.TRANSFER_COMMENCE_RESPONSE,
+          TimestampType.RECEIVED,
+        );
+
         this.Log.info(`${fnTag}, TransferCommenceResponse passed all checks.`);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
