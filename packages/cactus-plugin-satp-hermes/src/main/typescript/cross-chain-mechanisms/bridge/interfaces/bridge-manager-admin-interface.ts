@@ -94,7 +94,7 @@ import { IBridgeLeafOptions } from "../bridge-leaf";
  * }
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 3.1
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link IBridgeLeafOptions} for deployment configuration options
  * @see {@link BridgeLeaf} for bridge leaf implementation details
  * @see {@link SATPGateway} for gateway architecture integration
@@ -158,7 +158,7 @@ export abstract class BridgeManagerAdminInterface {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link IBridgeLeafOptions} for comprehensive configuration options
    * @see {@link BridgeLeaf.deployContracts} for contract deployment details
    * @see {@link SATPGatewayRegistry} for gateway registration process

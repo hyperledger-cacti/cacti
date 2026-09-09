@@ -142,7 +142,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link getDeployFungibleWrapperContractReceipt} for deployment receipt retrieval
    * @see {@link wrapAsset} for asset wrapping operations
    */
@@ -222,7 +222,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link unwrapAsset} for asset unwrapping operations
    * @see {@link Asset} for asset data structure
    * @see {@link TransactionResponse} for response format
@@ -264,7 +264,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link wrapAsset} for asset wrapping operations
    * @see {@link TransactionResponse} for response format
    */

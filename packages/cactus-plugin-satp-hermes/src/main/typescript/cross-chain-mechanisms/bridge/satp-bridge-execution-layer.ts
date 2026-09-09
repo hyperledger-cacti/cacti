@@ -163,7 +163,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    */
   public abstract wrapAsset(asset: Asset): Promise<TransactionReceipt>;
   /**
@@ -190,7 +190,7 @@ export abstract class SATPBridgeExecutionLayer {
    * @throws {WrapperContractError} When wrapper contract interaction fails
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    */
   public abstract unwrapAsset(asset: Asset): Promise<TransactionReceipt>;
   /**

@@ -68,6 +68,7 @@
  */
 
 import { asError } from "@hyperledger-cacti/cactus-common";
+import type { ErrorRequestHandler } from "express";
 import { RuntimeError } from "run-time-error-cjs";
 import { SATPErrorType } from "./satp-error-type";
 import { type ErrorCode, satpErrorTypeToV13Code } from "./iana-error-codes";
@@ -283,6 +284,23 @@ export class SATPInternalError extends RuntimeError {
     };
   }
 }
+
+export const satpProblemDetailsErrorMiddleware: ErrorRequestHandler = (
+  error: unknown,
+  _request,
+  response,
+  next,
+) => {
+  if (!(error instanceof SATPInternalError)) {
+    next(error);
+    return;
+  }
+
+  response
+    .status(error.code)
+    .type("application/problem+json")
+    .json(error.toProblemDetails());
+};
 
 /**
  * Error thrown when attempting to bootstrap a gateway manager that has already been initialized.
