@@ -440,10 +440,10 @@ export class GatewayOrchestrator {
 
         this.logger.debug(
           "Transport:" +
-          identity.address +
-          ":" +
-          identity.gatewayServerPort +
-          `/${SatpStageKey.Stage0}`,
+            identity.address +
+            ":" +
+            identity.gatewayServerPort +
+            `/${SatpStageKey.Stage0}`,
         );
 
         const transport1 = createGrpcWebTransport({

@@ -195,7 +195,8 @@ interface EthereumResponse {
  */
 export class EthereumLeaf
   extends BridgeLeaf
-  implements BridgeLeafFungible, BridgeLeafNonFungible {
+  implements BridgeLeafFungible, BridgeLeafNonFungible
+{
   /**
    * Static class identifier used for logging, error reporting, and debugging.
    *

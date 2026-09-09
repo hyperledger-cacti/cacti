@@ -14,10 +14,10 @@
  */
 
 import {
-	SATPError,
-	SATPInternalError,
-	SATP_ERROR_URN_PREFIX,
-	formatSATPErrorTypeURN,
+  SATPError,
+  SATPInternalError,
+  SATP_ERROR_URN_PREFIX,
+  formatSATPErrorTypeURN,
 } from "../../../main/typescript/core/errors/satp-errors";
 import { SATPErrorType } from "../../../main/typescript/core/errors/satp-error-type";
 import { SatpCommonBodyError } from "../../../main/typescript/core/errors/satp-service-errors";
@@ -28,118 +28,118 @@ import http from "node:http";
 import { AddressInfo } from "node:net";
 
 describe("Δ02 — draft-ietf-satp-core-16 §11.3 + RFC 9457 Problem Details compliance", () => {
-	describe("compliant baseline — SATPError.toJSON() (PASS)", () => {
-		it("SATPError.fromInternalError().toJSON().type matches SATP_ERROR_URN_PREFIX", () => {
-			const internal = new SATPInternalError(
-				"test internal",
-				null,
-				422,
-				"trace-rfc9457-01",
-			);
-			const clientErr = SATPError.fromInternalError(internal);
-			const json = clientErr.toJSON();
+  describe("compliant baseline — SATPError.toJSON() (PASS)", () => {
+    it("SATPError.fromInternalError().toJSON().type matches SATP_ERROR_URN_PREFIX", () => {
+      const internal = new SATPInternalError(
+        "test internal",
+        null,
+        422,
+        "trace-rfc9457-01",
+      );
+      const clientErr = SATPError.fromInternalError(internal);
+      const json = clientErr.toJSON();
 
-			// SPEC REF: draft-ietf-satp-core-16 §11.3 — type MUST be a URN with the error prefix
-			expect(json.type).toMatch(new RegExp(`^${SATP_ERROR_URN_PREFIX}`));
-		});
+      // SPEC REF: draft-ietf-satp-core-16 §11.3 — type MUST be a URN with the error prefix
+      expect(json.type).toMatch(new RegExp(`^${SATP_ERROR_URN_PREFIX}`));
+    });
 
-		it("SATPError.toJSON() contains type, title, status, detail fields", () => {
-			const err = new SATPError(
-				"some error",
-				422,
-				SATPErrorType.MISSING_PARAMETER,
-			);
-			const json = err.toJSON();
+    it("SATPError.toJSON() contains type, title, status, detail fields", () => {
+      const err = new SATPError(
+        "some error",
+        422,
+        SATPErrorType.MISSING_PARAMETER,
+      );
+      const json = err.toJSON();
 
-			// SPEC REF: draft-ietf-satp-core-16 §11.3 references RFC 9457 fields
-			expect(json).toHaveProperty("type");
-			expect(json).toHaveProperty("status");
-			expect(json).toHaveProperty("title");
-			expect(json).toHaveProperty("detail");
-		});
+      // SPEC REF: draft-ietf-satp-core-16 §11.3 references RFC 9457 fields
+      expect(json).toHaveProperty("type");
+      expect(json).toHaveProperty("status");
+      expect(json).toHaveProperty("title");
+      expect(json).toHaveProperty("detail");
+    });
 
-		it("SATPError.toJSON().type is a valid URN under the satp error namespace", () => {
-			const err = new SATPError(
-				"urn-test",
-				415,
-				SATPErrorType.BADLY_FORMATED_MESSAGE,
-			);
-			// SPEC REF: draft-ietf-satp-core-16 §11.3, §13.1
-			expect(err.toJSON().type).toContain("urn:ietf:params:satp:");
-		});
+    it("SATPError.toJSON().type is a valid URN under the satp error namespace", () => {
+      const err = new SATPError(
+        "urn-test",
+        415,
+        SATPErrorType.BADLY_FORMATED_MESSAGE,
+      );
+      // SPEC REF: draft-ietf-satp-core-16 §11.3, §13.1
+      expect(err.toJSON().type).toContain("urn:ietf:params:satp:");
+    });
 
-		it("formatSATPErrorTypeURN produces a type URI matching the error prefix", () => {
-			const urn = formatSATPErrorTypeURN(SATPErrorType.MISSING_PARAMETER);
-			// SPEC REF: draft-ietf-satp-core-16 §11.3 — urn:ietf:params:satp:core:error:<code>
-			expect(urn).toMatch(new RegExp(`^${SATP_ERROR_URN_PREFIX}`));
-		});
-	});
+    it("formatSATPErrorTypeURN produces a type URI matching the error prefix", () => {
+      const urn = formatSATPErrorTypeURN(SATPErrorType.MISSING_PARAMETER);
+      // SPEC REF: draft-ietf-satp-core-16 §11.3 — urn:ietf:params:satp:core:error:<code>
+      expect(urn).toMatch(new RegExp(`^${SATP_ERROR_URN_PREFIX}`));
+    });
+  });
 
-	describe("SatpCommonBodyError.toProblemDetails()", () => {
-		it("SatpCommonBodyError exposes toProblemDetails() returning an RFC 9457 object", () => {
-			// SPEC REF: draft-ietf-satp-core-16 §11.3
-			// SatpCommonBodyError is the per-message validation error. v16 requires ALL
-			// SATP errors to be representable as Problem Details.
-			// Currently SATPInternalError has no toProblemDetails() method.
-			const err = new SatpCommonBodyError(
-				"Stage1ServerService#test",
-				'{"sessionId":"x"}',
-				null,
-			);
+  describe("SatpCommonBodyError.toProblemDetails()", () => {
+    it("SatpCommonBodyError exposes toProblemDetails() returning an RFC 9457 object", () => {
+      // SPEC REF: draft-ietf-satp-core-16 §11.3
+      // SatpCommonBodyError is the per-message validation error. v16 requires ALL
+      // SATP errors to be representable as Problem Details.
+      // Currently SATPInternalError has no toProblemDetails() method.
+      const err = new SatpCommonBodyError(
+        "Stage1ServerService#test",
+        '{"sessionId":"x"}',
+        null,
+      );
 
-			expect(typeof err.toProblemDetails).toBe("function");
-		});
+      expect(typeof err.toProblemDetails).toBe("function");
+    });
 
-		it("toProblemDetails() returns { type, title, status, detail } with satp error URN", () => {
-			const err = new SatpCommonBodyError("tag", "data", null);
+    it("toProblemDetails() returns { type, title, status, detail } with satp error URN", () => {
+      const err = new SatpCommonBodyError("tag", "data", null);
 
-			const pd: unknown = err.toProblemDetails?.();
+      const pd: unknown = err.toProblemDetails?.();
 
-			// SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3
-			// pd would need to have: { type: "urn:ietf:params:satp:...", title, status, detail }
-			expect(pd).toBeDefined();
-			expect((pd as Record<string, unknown>)?.type).toMatch(
-				new RegExp(`^${SATP_ERROR_URN_PREFIX}`),
-			);
-		});
+      // SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3
+      // pd would need to have: { type: "urn:ietf:params:satp:...", title, status, detail }
+      expect(pd).toBeDefined();
+      expect((pd as Record<string, unknown>)?.type).toMatch(
+        new RegExp(`^${SATP_ERROR_URN_PREFIX}`),
+      );
+    });
 
-		it("serializes SATPInternalError as application/problem+json at the HTTP boundary", async () => {
-			const app = express();
-			app.get("/satp-error", (_request, _response, next) => {
-				next(new SatpCommonBodyError("test#http", "{}", null));
-			});
-			app.use(satpProblemDetailsErrorMiddleware);
-			const server = http.createServer(app);
+    it("serializes SATPInternalError as application/problem+json at the HTTP boundary", async () => {
+      const app = express();
+      app.get("/satp-error", (_request, _response, next) => {
+        next(new SatpCommonBodyError("test#http", "{}", null));
+      });
+      app.use(satpProblemDetailsErrorMiddleware);
+      const server = http.createServer(app);
 
-			try {
-				const address = (await Servers.listen({
-					hostname: "127.0.0.1",
-					port: 0,
-					server,
-				})) as AddressInfo;
-				const response = await fetch(
-					`http://${address.address}:${address.port}/satp-error`,
-				);
-				const body = (await response.json()) as Record<string, unknown>;
+      try {
+        const address = (await Servers.listen({
+          hostname: "127.0.0.1",
+          port: 0,
+          server,
+        })) as AddressInfo;
+        const response = await fetch(
+          `http://${address.address}:${address.port}/satp-error`,
+        );
+        const body = (await response.json()) as Record<string, unknown>;
 
-				// SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3
-				expect(response.status).toBe(400);
-				// SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3
-				expect(response.headers.get("content-type")).toMatch(
-					/^application\/problem\+json/,
-				);
-				// SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3.1
-				expect(body).toEqual(
-					expect.objectContaining({
-						type: expect.stringMatching(/^urn:ietf:params:satp:error:/),
-						title: "SatpCommonBodyError",
-						status: 400,
-						detail: expect.any(String),
-					}),
-				);
-			} finally {
-				await Servers.shutdown(server);
-			}
-		});
-	});
+        // SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3
+        expect(response.status).toBe(400);
+        // SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3
+        expect(response.headers.get("content-type")).toMatch(
+          /^application\/problem\+json/,
+        );
+        // SPEC REF: draft-ietf-satp-core-16 §11.3, RFC 9457 §3.1
+        expect(body).toEqual(
+          expect.objectContaining({
+            type: expect.stringMatching(/^urn:ietf:params:satp:error:/),
+            title: "SatpCommonBodyError",
+            status: 400,
+            detail: expect.any(String),
+          }),
+        );
+      } finally {
+        await Servers.shutdown(server);
+      }
+    });
+  });
 });

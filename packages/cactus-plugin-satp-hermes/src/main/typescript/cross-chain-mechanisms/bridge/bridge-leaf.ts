@@ -6,7 +6,7 @@
  * form the endpoint connections in cross-chain bridges, handling network-specific
  * operations for asset transfers following the IETF SATP v13 specification.
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */

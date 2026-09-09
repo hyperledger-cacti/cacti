@@ -206,7 +206,8 @@ interface BesuResponse {
 
 export class BesuLeaf
   extends BridgeLeaf
-  implements BridgeLeafFungible, BridgeLeafNonFungible {
+  implements BridgeLeafFungible, BridgeLeafNonFungible
+{
   public static readonly CLASS_NAME = "BesuLeaf";
 
   protected readonly log: Logger;

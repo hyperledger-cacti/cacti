@@ -171,7 +171,7 @@ export interface IFabricLeafNeworkOptions extends INetworkOptions {
 
 export interface IFabricLeafOptions
   extends IBridgeLeafOptions,
-  IFabricLeafNeworkOptions { }
+    IFabricLeafNeworkOptions {}
 
 /**
  * The `FabricLeaf` class extends the `BridgeLeaf` class and implements the `BridgeLeafFungible` and `BridgeLeafNonFungible` interfaces.
@@ -224,7 +224,8 @@ export interface IFabricLeafOptions
 
 export class FabricLeaf
   extends BridgeLeaf
-  implements BridgeLeafFungible, BridgeLeafNonFungible {
+  implements BridgeLeafFungible, BridgeLeafNonFungible
+{
   public static readonly CLASS_NAME = "FabricLeaf";
 
   protected readonly log: Logger;
@@ -983,10 +984,10 @@ export class FabricLeaf
           params:
             uniqueDescriptor !== undefined
               ? [
-                assetId,
-                assetAttribute.toString(),
-                uniqueDescriptor.toString(),
-              ]
+                  assetId,
+                  assetAttribute.toString(),
+                  uniqueDescriptor.toString(),
+                ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
@@ -1045,10 +1046,10 @@ export class FabricLeaf
           params:
             uniqueDescriptor !== undefined
               ? [
-                assetId,
-                assetAttribute.toString(),
-                uniqueDescriptor.toString(),
-              ]
+                  assetId,
+                  assetAttribute.toString(),
+                  uniqueDescriptor.toString(),
+                ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
@@ -1107,10 +1108,10 @@ export class FabricLeaf
           params:
             uniqueDescriptor !== undefined
               ? [
-                assetId,
-                assetAttribute.toString(),
-                uniqueDescriptor.toString(),
-              ]
+                  assetId,
+                  assetAttribute.toString(),
+                  uniqueDescriptor.toString(),
+                ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
@@ -1169,10 +1170,10 @@ export class FabricLeaf
           params:
             uniqueDescriptor !== undefined
               ? [
-                assetId,
-                assetAttribute.toString(),
-                uniqueDescriptor.toString(),
-              ]
+                  assetId,
+                  assetAttribute.toString(),
+                  uniqueDescriptor.toString(),
+                ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,
@@ -1233,11 +1234,11 @@ export class FabricLeaf
           params:
             uniqueDescriptor !== undefined
               ? [
-                assetId,
-                to,
-                assetAttribute.toString(),
-                uniqueDescriptor.toString(),
-              ]
+                  assetId,
+                  to,
+                  assetAttribute.toString(),
+                  uniqueDescriptor.toString(),
+                ]
               : [assetId, to, assetAttribute.toString()],
           contractName: this.wrapperContractName,
           invocationType: FabricContractInvocationType.Send,

@@ -11,7 +11,7 @@
  * - Bridge operation parameters
  * - Cross-chain interaction types
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -350,7 +350,7 @@ export interface IEthereumNetworkConfig extends INetworkOptions {
  */
 export interface IEthereumLeafOptions
   extends IBridgeLeafOptions,
-  IEthereumNetworkConfig { }
+    IEthereumNetworkConfig {}
 
 export interface IBesuNetworkConfig extends INetworkOptions {
   signingCredential: BesuWeb3SigningCredential;
@@ -365,4 +365,4 @@ export interface IBesuNetworkConfig extends INetworkOptions {
 
 export interface IBesuLeafOptions
   extends IBridgeLeafOptions,
-  IBesuNetworkConfig { }
+    IBesuNetworkConfig {}

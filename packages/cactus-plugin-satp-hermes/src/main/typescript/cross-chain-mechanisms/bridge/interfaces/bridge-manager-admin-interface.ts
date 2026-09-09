@@ -47,7 +47,7 @@
  * ]);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link IBridgeLeafOptions} for bridge leaf deployment configuration
  * @see {@link BridgeManagerClientInterface} for client-side bridge operations
  * @see {@link SATPBridgeExecutionLayer} for asset transfer execution layer

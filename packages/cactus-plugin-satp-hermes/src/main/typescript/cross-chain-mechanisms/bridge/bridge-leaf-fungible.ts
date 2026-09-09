@@ -56,7 +56,7 @@ import { Amount, Asset, UniqueTokenID } from "./ontology/assets/asset";
  * await sourceLeaf.burnAsset(asset.id, transferAmount);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link BridgeLeaf} for base bridge leaf interface
  * @see {@link BridgeLeafNonFungible} for non-fungible asset operations
  * @see {@link SATPBridgeExecutionLayer} for higher-level execution coordination

@@ -777,7 +777,7 @@ export class EthereumTestEnvironment {
       id: EthereumTestEnvironment.ETH_NFT_ASSET_ID,
       referenceId:
         EthereumTestEnvironment.ETHREFERENCE_ID[
-        TokenType.NONSTANDARD_NONFUNGIBLE
+          TokenType.NONSTANDARD_NONFUNGIBLE
         ],
       owner: WHALE_ACCOUNT_ADDRESS,
       contractName:

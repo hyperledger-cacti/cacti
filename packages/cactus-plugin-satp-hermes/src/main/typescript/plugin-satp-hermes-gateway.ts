@@ -165,7 +165,7 @@ import type { AdapterLayerConfiguration } from "./adapters/adapter-config";
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link SATPGateway} for the main gateway implementation
  * @see {@link GatewayIdentity} for gateway identity structure
  * @see {@link ICrossChainMechanismsOptions} for bridge configuration
@@ -484,7 +484,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
  * await gateway.shutdown();
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGatewayConfig} for configuration options
  * @see {@link BLODispatcher} for protocol message dispatching
@@ -825,9 +825,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         if (this.config.enableCrashRecovery) {
           throw new Error(
             "Crash recovery and rollback are not yet supported. " +
-            "They are defined in the IETF SATP Crash Recovery draft " +
-            "(https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/) " +
-            "and will be supported in a future release.",
+              "They are defined in the IETF SATP Crash Recovery draft " +
+              "(https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/) " +
+              "and will be supported in a future release.",
           );
         } else {
           this.logger.info("CrashManager is disabled!");
@@ -1194,7 +1194,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         const address =
           this.options.gid?.address?.includes("localhost") ||
-            this.options.gid?.address?.includes("127.0.0.1")
+          this.options.gid?.address?.includes("127.0.0.1")
             ? "localhost"
             : "0.0.0.0";
 
@@ -1307,7 +1307,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             this.GOLServer = http.createServer(this.GOLApplication);
             const address =
               this.options.gid?.address?.includes("localhost") || // When running a gateway in localhost we don't want to bind it to 0.0.0.0 because if we do it will be accessible from the outside network
-                this.options.gid?.address?.includes("127.0.0.1")
+              this.options.gid?.address?.includes("127.0.0.1")
                 ? "localhost"
                 : "0.0.0.0";
 
