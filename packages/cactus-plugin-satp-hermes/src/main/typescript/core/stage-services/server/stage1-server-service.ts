@@ -8,13 +8,9 @@ import {
 } from "../../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   MessageType,
-  NetworkCapabilities,
-  LockType,
   CommonSatpSchema,
 } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
-// eslint-disable-next-line prettier/prettier
 import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
-import { TransferClaims } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   SessionType,
   TimestampType,
@@ -33,21 +29,17 @@ import {
   ISATPServerServiceOptions,
   ISATPServiceOptions,
 } from "../satp-service";
-import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
-  DLTNotSupportedError,
-  NetworkCapabilitiesError,
-  SessionError,
-  TransferInitClaimsError,
-  TransferInitClaimsHashError,
-} from "../../errors/satp-service-errors";
+  verifyTransferProposalRequestMessage,
+  verifyTransferCommenceRequestMessage,
+} from "../verifier/stage-1-server-service-verifications";
+import { SessionError } from "../../errors/satp-service-errors";
 import { SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
 import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { NetworkId } from "../../../public-api";
 import { context, SpanStatusCode } from "@opentelemetry/api";
-import { isTLS13Suite } from "../service-utils";
 export class Stage1ServerService extends SATPService {
   public static readonly SATP_STAGE = "1";
   public static readonly SERVICE_TYPE = SATPServiceType.Server;
@@ -399,88 +391,18 @@ export class Stage1ServerService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkTransferProposalRequestMessage...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
+        const { rejected } = verifyTransferProposalRequestMessage(
+          fnTag,
+          this.Signer,
+          request,
+          session,
+          supportedDLTs,
+          this.Log,
+        );
 
-        const sessionData = session.getServerSessionData();
-
-        this.checkNetworkCapabilities(request.networkCapabilities, fnTag);
-
-        if (this.checkTransferClaims(request.transferInitClaims, fnTag)) {
-          this.Log.info(`${fnTag}, TransferProposalRequest was accepted...`);
-        } else if (false) {
-          sessionData.state = State.CONDITIONAL_REJECTED;
-          //TODO Implement
-        } else {
-          this.Log.info(`${fnTag}, TransferProposalRequest was rejected...`);
-          sessionData.state = State.REJECTED;
+        if (rejected) {
           return;
         }
-
-        if (sessionData.receiverAsset == undefined) {
-          throw new TransferInitClaimsError(fnTag);
-        }
-        if (sessionData.receiverAsset?.networkId == undefined) {
-          throw new TransferInitClaimsError(fnTag);
-        }
-
-        const receiverId = sessionData.receiverAsset?.networkId?.id;
-
-        if (
-          !supportedDLTs
-            .map((id) => {
-              return id.id;
-            })
-            .includes(receiverId)
-        ) {
-          throw new DLTNotSupportedError(fnTag, receiverId); //todo change this to the transferClaims check
-        }
-
-        sessionData.version = request.common!.version;
-        sessionData.digitalAssetId = request.transferInitClaims!.digitalAssetId;
-        sessionData.senderGatewayNetworkId =
-          request.transferInitClaims!.senderGatewayNetworkId;
-        sessionData.recipientGatewayNetworkId =
-          request.transferInitClaims!.recipientGatewayNetworkId;
-        sessionData.clientGatewayPubkey =
-          request.transferInitClaims!.senderGatewaySignaturePublicKey;
-        sessionData.serverGatewayPubkey =
-          request.transferInitClaims!.receiverGatewaySignaturePublicKey;
-        sessionData.receiverGatewayOwnerId =
-          request.transferInitClaims!.receiverGatewayOwnerId;
-        sessionData.senderGatewayOwnerId =
-          request.transferInitClaims!.senderGatewayOwnerId;
-        sessionData.signatureAlgorithm =
-          request.networkCapabilities!.gatewayDefaultSignatureAlgorithm;
-        sessionData.lockType = request.networkCapabilities!.networkLockType;
-        sessionData.lockExpirationTime =
-          request.networkCapabilities!.networkLockExpirationTime;
-        sessionData.gatewayTlsScheme =
-          request.networkCapabilities!.gatewayTlsScheme;
-
-        session.verify(fnTag, SessionType.SERVER);
-
-        commonBodyVerifier(
-          fnTag,
-          request.common,
-          sessionData,
-          MessageType.INIT_PROPOSAL,
-        );
-
-        signatureVerifier(fnTag, this.Signer, request, sessionData);
-
-        this.Log.info(
-          `${fnTag}, Session data created for session id ${sessionData.id}`,
-        );
-
-        saveHash(sessionData, MessageType.INIT_PROPOSAL, getHash(request));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.INIT_PROPOSAL,
-          TimestampType.RECEIVED,
-        );
 
         this.Log.info(`${fnTag}, TransferProposalRequest passed all checks.`);
       } catch (err) {
@@ -502,178 +424,14 @@ export class Stage1ServerService extends SATPService {
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     await context.with(ctx, () => {
       try {
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.SERVER);
-
-        const sessionData = session.getServerSessionData();
-
-        commonBodyVerifier(
+        verifyTransferCommenceRequestMessage(
           fnTag,
-          request.common,
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_REQUEST,
+          this.Signer,
+          request,
+          session,
         );
-
-        signatureVerifier(fnTag, this.Signer, request, sessionData);
-
-        if (
-          request.hashTransferInitClaims == "" ||
-          request.hashTransferInitClaims != sessionData.hashTransferInitClaims
-        ) {
-          throw new TransferInitClaimsHashError(fnTag);
-        }
-
-        saveHash(
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_REQUEST,
-          getHash(request),
-        );
-
-        saveTimestamp(
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_REQUEST,
-          TimestampType.RECEIVED,
-        );
-
-        //if the conditional parameters where accepted, the session state is still ongoing
-        //TODO timeout for accepting the parameters
-        sessionData.state = State.ONGOING;
 
         this.Log.info(`${fnTag}, TransferCommenceRequest passed all checks.`);
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
-      } finally {
-        span.end();
-      }
-    });
-  }
-
-  private checkTransferClaims(
-    transferClaims: TransferClaims | undefined,
-    tag: string,
-  ): boolean {
-    const stepTag = `checkTransferClaims()`;
-    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        if (transferClaims == undefined) {
-          throw new TransferInitClaimsError(tag);
-        }
-        if (transferClaims.digitalAssetId == "") {
-          this.Log.error(`${tag}, digitalAssetId is missing`);
-        }
-        if (transferClaims.assetProfileId == "") {
-          this.Log.error(`${tag}, assetProfileId is missing`);
-          //return false;
-        }
-        if (transferClaims.verifiedOriginatorEntityId == "") {
-          this.Log.error(`${tag}, verifiedOriginatorEntityId is missing`);
-          //return false;
-        }
-        if (transferClaims.verifiedBeneficiaryEntityId == "") {
-          this.Log.error(`${tag}, verifiedBeneficiaryEntityId is missing`);
-        }
-        if (transferClaims.senderGatewayNetworkId != "") {
-          this.Log.info(
-            `${tag}, optional variable senderGatewayNetworkId loaded`,
-          );
-        }
-        if (transferClaims.recipientGatewayNetworkId != "") {
-          this.Log.info(
-            `${tag}, optional variable recipientGatewayNetworkId loaded`,
-          );
-        }
-        if (transferClaims.senderGatewaySignaturePublicKey == "") {
-          this.Log.error(`${tag}, senderGatewaySignaturePublicKey is missing`);
-          return false;
-        }
-        if (transferClaims.receiverGatewaySignaturePublicKey == "") {
-          this.Log.error(
-            `${tag}, receiverGatewaySignaturePublicKey is missing`,
-          );
-          return false;
-        }
-        if (transferClaims.senderGatewayOwnerId != "") {
-          this.Log.info(
-            `${tag}, optional variable senderGatewayNetworkId loaded`,
-          );
-        }
-        if (transferClaims.receiverGatewayOwnerId != "") {
-          this.Log.info(
-            `${tag}, optional variable receiverGatewayOwnerId loaded`,
-          );
-        }
-        //todo
-        return true;
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
-      } finally {
-        span.end();
-      }
-    });
-  }
-
-  private checkNetworkCapabilities(
-    networkCapabilities: NetworkCapabilities | undefined,
-    tag: string,
-  ): boolean {
-    const stepTag = `checkNetworkCapabilities()`;
-    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        if (networkCapabilities == undefined) {
-          throw new NetworkCapabilitiesError(tag);
-        }
-        if (networkCapabilities.gatewayDefaultSignatureAlgorithm == "") {
-        }
-        if (
-          networkCapabilities.gatewaySupportedSignatureAlgorithms.length == 0
-        ) {
-        }
-        if (networkCapabilities.networkLockType == LockType.UNSPECIFIED) {
-        }
-        if (networkCapabilities.networkLockExpirationTime == BigInt(0)) {
-        }
-        if (!isTLS13Suite(networkCapabilities.gatewayTlsScheme)) {
-          throw new NetworkCapabilitiesError(
-            tag,
-            `Unsupported TLS scheme: ${networkCapabilities.gatewayTlsScheme}`,
-          );
-        }
-        //todo
-        return true;
-      } catch (err) {
-        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        span.recordException(err);
-        throw err;
-      } finally {
-        span.end();
-      }
-    });
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  private counterProposalTransferClaims(
-    oldClaims: TransferClaims,
-  ): TransferClaims {
-    const stepTag = `counterProposalTransferClaims()`;
-    const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        //todo
-        return oldClaims;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
