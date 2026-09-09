@@ -36,10 +36,13 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { SATPSession } from "../../../core/satp-session";
-import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
+import {
+  verifyCommitFinalAssertionRequestMessage,
+  verifyCommitPreparationRequestMessage,
+  verifyTransferCompleteRequestMessage,
+} from "../verifier/stage-3-server-service-verifications";
 import {
   AssignmentAssertionClaimError,
-  BurnAssertionClaimError,
   MintAssertionClaimError,
   MissingBridgeManagerError,
   SessionError,
@@ -49,7 +52,6 @@ import {
   SessionNotFoundError,
 } from "../../errors/satp-handler-errors";
 import { SATPInternalError } from "../../errors/satp-errors";
-import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { type BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -402,29 +404,11 @@ export class Stage3ServerService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkCommitPreparationRequest...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.SERVER);
-
-        const sessionData = session.getServerSessionData();
-
-        commonBodyVerifier(
+        verifyCommitPreparationRequestMessage(
           fnTag,
-          request.common,
-          sessionData,
-          MessageType.COMMIT_PREPARE,
-        );
-
-        signatureVerifier(fnTag, this.Signer, request, sessionData);
-
-        saveHash(sessionData, MessageType.COMMIT_PREPARE, getHash(request));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.COMMIT_PREPARE,
-          TimestampType.RECEIVED,
+          this.Signer,
+          request,
+          session,
         );
 
         this.Log.info(`${fnTag}, CommitPreparationRequest passed all checks.`);
@@ -449,44 +433,12 @@ export class Stage3ServerService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkCommitFinalAssertionRequest...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.SERVER);
-
-        const sessionData = session.getServerSessionData();
-
-        commonBodyVerifier(
+        verifyCommitFinalAssertionRequestMessage(
           fnTag,
-          request.common,
-          sessionData,
-          MessageType.COMMIT_FINAL,
-        );
-
-        signatureVerifier(fnTag, this.Signer, request, sessionData);
-
-        //todo check burn
-        if (request.burnAssertionClaim == undefined) {
-          throw new BurnAssertionClaimError(fnTag);
-        }
-
-        sessionData.burnAssertionClaim = request.burnAssertionClaim;
-
-        if (request.burnAssertionClaimFormat != undefined) {
-          this.Log.info(
-            `${fnTag}, optional variable loaded: burnAssertionClaimFormat`,
-          );
-          sessionData.burnAssertionClaimFormat =
-            request.burnAssertionClaimFormat;
-        }
-
-        saveHash(sessionData, MessageType.COMMIT_FINAL, getHash(request));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.COMMIT_FINAL,
-          TimestampType.RECEIVED,
+          this.Signer,
+          request,
+          session,
+          this.Log,
         );
 
         this.Log.info(
@@ -513,37 +465,11 @@ export class Stage3ServerService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkTransferCompleteRequest...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.SERVER);
-
-        const sessionData = session.getServerSessionData();
-
-        commonBodyVerifier(
+        verifyTransferCompleteRequestMessage(
           fnTag,
-          request.common,
-          sessionData,
-          MessageType.COMMIT_TRANSFER_COMPLETE,
-        );
-
-        signatureVerifier(fnTag, this.Signer, request, sessionData);
-
-        this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
-
-        sessionData.state = State.COMPLETED;
-
-        saveHash(
-          sessionData,
-          MessageType.COMMIT_TRANSFER_COMPLETE,
-          getHash(request),
-        );
-
-        saveTimestamp(
-          sessionData,
-          MessageType.COMMIT_TRANSFER_COMPLETE,
-          TimestampType.RECEIVED,
+          this.Signer,
+          request,
+          session,
         );
 
         this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);

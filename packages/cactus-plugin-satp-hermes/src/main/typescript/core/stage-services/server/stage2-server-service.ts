@@ -25,13 +25,8 @@ import {
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { SATPSession } from "../../../core/satp-session";
-import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
-import {
-  LockAssertionClaimError,
-  LockAssertionClaimFormatError,
-  LockAssertionExpirationError,
-  SessionError,
-} from "../../errors/satp-service-errors";
+import { verifyLockAssertionRequestMessage } from "../verifier/stage-2-server-service-verifications";
+import { SessionError } from "../../errors/satp-service-errors";
 import { SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
 import { create } from "@bufbuild/protobuf";
@@ -204,61 +199,7 @@ export class Stage2ServerService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkLockAssertionRequest...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.SERVER);
-
-        const sessionData = session.getServerSessionData();
-
-        commonBodyVerifier(
-          fnTag,
-          request.common,
-          sessionData,
-          MessageType.LOCK_ASSERT,
-        );
-
-        signatureVerifier(fnTag, this.Signer, request, sessionData);
-
-        if (request.lockAssertionClaim == undefined) {
-          throw new LockAssertionClaimError(fnTag);
-        }
-
-        sessionData.lockAssertionClaim = request.lockAssertionClaim;
-
-        if (request.lockAssertionClaimFormat == undefined) {
-          throw new LockAssertionClaimFormatError(fnTag);
-        }
-
-        sessionData.lockAssertionClaimFormat = request.lockAssertionClaimFormat; //todo check if valid
-
-        const currentTime = BigInt(Date.now());
-        const maximumExpiration = currentTime + sessionData.lockExpirationTime;
-
-        if (request.lockAssertionExpiration <= currentTime) {
-          throw new LockAssertionExpirationError(
-            fnTag,
-            "lock assertion already expired",
-          );
-        }
-
-        if (request.lockAssertionExpiration > maximumExpiration) {
-          throw new LockAssertionExpirationError(
-            fnTag,
-            "lock assertion exceeds the negotiated expiration time",
-          );
-        }
-
-        sessionData.lockAssertionExpiration = request.lockAssertionExpiration;
-
-        saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.LOCK_ASSERT,
-          TimestampType.RECEIVED,
-        );
+        verifyLockAssertionRequestMessage(fnTag, this.Signer, request, session);
 
         this.Log.info(`${fnTag}, LockAssertionRequest passed all checks.`);
       } catch (err) {

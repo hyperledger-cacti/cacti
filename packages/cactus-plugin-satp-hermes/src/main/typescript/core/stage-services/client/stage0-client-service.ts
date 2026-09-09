@@ -82,7 +82,7 @@ import {
   SessionType,
   TimestampType,
 } from "../../session-utils";
-import { signatureVerifier } from "../data-verifier";
+import { signatureVerifier } from "../verifier/data-verifier";
 import {
   SATPService,
   SATPServiceType,
@@ -354,6 +354,11 @@ export class Stage0ClientService extends SATPService {
     session: SATPSession,
     sessionIds: string[],
   ): Promise<SATPSession> {
+    // TODO: extract these inline checks into a bespoke Stage 0 verifier function
+    // under core/stage-services/verifier/ composing on verifyMessage, mirroring
+    // the Stage 1-3 refactor. Stage 0 uses hashPreviousMessage (not
+    // hashPrevMessage) and carries legacy signature fields, so verifyMessage
+    // needs care before delegating here.
     const stepTag = `checkNewSessionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 

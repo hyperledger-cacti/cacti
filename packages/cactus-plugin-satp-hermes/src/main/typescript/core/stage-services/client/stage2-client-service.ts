@@ -28,7 +28,7 @@ import {
   SATPServiceType,
 } from "../satp-service";
 import { ISATPServiceOptions } from "../satp-service";
-import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
+import { verifyTransferCommenceResponseMessage } from "../verifier/stage-2-client-service-verifications";
 import {
   LockAssertionExpirationError,
   MissingBridgeManagerError,
@@ -219,33 +219,11 @@ export class Stage2ClientService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkTransferCommenceResponse...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.CLIENT);
-
-        const sessionData = session.getClientSessionData();
-
-        commonBodyVerifier(
+        verifyTransferCommenceResponseMessage(
           fnTag,
-          response.common,
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_RESPONSE,
-        );
-
-        signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        saveHash(
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_RESPONSE,
-          getHash(response),
-        );
-
-        saveTimestamp(
-          sessionData,
-          MessageType.TRANSFER_COMMENCE_RESPONSE,
-          TimestampType.RECEIVED,
+          this.Signer,
+          response,
+          session,
         );
 
         this.Log.info(`${fnTag}, TransferCommenceResponse passed all checks.`);

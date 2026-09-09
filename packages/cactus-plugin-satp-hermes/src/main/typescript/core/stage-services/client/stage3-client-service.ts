@@ -37,16 +37,18 @@ import {
 } from "../satp-service";
 import { SATPSession } from "../../satp-session";
 import { LockAssertionResponse } from "../../../generated/proto/cacti/satp/v13/service/stage_2_pb";
-import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
 import {
-  AssignmentAssertionClaimError,
+  verifyCommitFinalAssertionResponseMessage,
+  verifyCommitPreparationResponseMessage,
+  verifyLockAssertionResponseMessage,
+  verifyTransferCompleteResponseMessage,
+} from "../verifier/stage-3-client-service-verifications";
+import {
   BurnAssertionClaimError,
-  MintAssertionClaimError,
   MissingBridgeManagerError,
   SessionError,
 } from "../../errors/satp-service-errors";
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
-import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { create } from "@bufbuild/protobuf";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -463,29 +465,11 @@ export class Stage3ClientService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, CheckLockAssertionResponse...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.CLIENT);
-
-        const sessionData = session.getClientSessionData();
-
-        commonBodyVerifier(
+        verifyLockAssertionResponseMessage(
           fnTag,
-          response.common,
-          sessionData,
-          MessageType.ASSERTION_RECEIPT,
-        );
-
-        signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        saveHash(sessionData, MessageType.ASSERTION_RECEIPT, getHash(response));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.ASSERTION_RECEIPT,
-          TimestampType.RECEIVED,
+          this.Signer,
+          response,
+          session,
         );
 
         this.Log.info(`${fnTag}, LockAssertionResponse passed all checks.`);
@@ -510,45 +494,12 @@ export class Stage3ClientService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, CommitPreparationResponse...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.CLIENT);
-
-        const sessionData = session.getClientSessionData();
-
-        commonBodyVerifier(
+        verifyCommitPreparationResponseMessage(
           fnTag,
-          response.common,
-          sessionData,
-          MessageType.COMMIT_READY,
-        );
-
-        signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        if (response.mintAssertionClaimFormat != undefined) {
-          //todo
-          this.Log.info(
-            `${fnTag},  Optional variable loaded: mintAssertionClaimsFormat `,
-          );
-          sessionData.mintAssertionClaimFormat =
-            response.mintAssertionClaimFormat;
-        }
-
-        if (response.mintAssertionClaim == undefined) {
-          //todo
-          throw new MintAssertionClaimError(fnTag);
-        }
-
-        sessionData.mintAssertionClaim = response.mintAssertionClaim;
-
-        saveHash(sessionData, MessageType.COMMIT_READY, getHash(response));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.COMMIT_READY,
-          TimestampType.RECEIVED,
+          this.Signer,
+          response,
+          session,
+          this.Log,
         );
 
         this.Log.info(`${fnTag}, CommitPreparationResponse passed all checks.`);
@@ -573,44 +524,12 @@ export class Stage3ClientService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, CommitFinalAcknowledgementReceipt...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.CLIENT);
-
-        const sessionData = session.getClientSessionData();
-
-        commonBodyVerifier(
+        verifyCommitFinalAssertionResponseMessage(
           fnTag,
-          response.common,
-          sessionData,
-          MessageType.ACK_COMMIT_FINAL,
-        );
-
-        signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        if (response.assignmentAssertionClaim == undefined) {
-          throw new AssignmentAssertionClaimError(fnTag);
-        }
-
-        sessionData.assignmentAssertionClaim =
-          response.assignmentAssertionClaim;
-
-        if (response.assignmentAssertionClaimFormat != undefined) {
-          this.Log.info(
-            `${fnTag},  Optional variable loaded: assignmentAssertionClaimFormat `,
-          );
-          sessionData.assignmentAssertionClaimFormat =
-            response.assignmentAssertionClaimFormat;
-        }
-
-        saveHash(sessionData, MessageType.ACK_COMMIT_FINAL, getHash(response));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.ACK_COMMIT_FINAL,
-          TimestampType.RECEIVED,
+          this.Signer,
+          response,
+          session,
+          this.Log,
         );
 
         this.Log.info(
@@ -637,38 +556,14 @@ export class Stage3ClientService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, TransferComplete...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.CLIENT);
-
-        const sessionData = session.getClientSessionData();
-
-        commonBodyVerifier(
+        verifyTransferCompleteResponseMessage(
           fnTag,
-          response.common,
-          sessionData,
-          MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
+          this.Signer,
+          response,
+          session,
         );
 
-        signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        sessionData.state = State.COMPLETED;
-
-        saveHash(
-          sessionData,
-          MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-          getHash(response),
-        );
-
-        saveTimestamp(
-          sessionData,
-          MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-          TimestampType.RECEIVED,
-        );
-
-        this.Log.info(`${fnTag}, TransferCompleteRequest passed all checks.`);
+        this.Log.info(`${fnTag}, TransferCompleteResponse passed all checks.`);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

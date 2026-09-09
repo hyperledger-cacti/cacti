@@ -7,7 +7,6 @@ import {
 } from "../../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   MessageType,
-  TransferClaims,
   CommonSatpSchema,
   TransferClaimsSchema,
   NetworkCapabilitiesSchema,
@@ -30,16 +29,11 @@ import {
   ISATPClientServiceOptions,
   ISATPServiceOptions,
 } from "../satp-service";
-import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
-import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import {
-  HashError,
-  MessageTypeError,
-  SessionError,
-  TokenIdMissingError,
-  TransferContextIdError,
-  WrapAssertionClaimError,
-} from "../../errors/satp-service-errors";
+  verifyPreSATPTransferResponse,
+  verifyTransferProposalResponse,
+} from "../verifier/stage-1-client-service-verifications";
+import { SessionError } from "../../errors/satp-service-errors";
 import { PreSATPTransferResponse } from "../../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
 import { NetworkId } from "../../../public-api";
@@ -51,8 +45,6 @@ export class Stage1ClientService extends SATPService {
   public static readonly SATP_SERVICE_INTERNAL_NAME = `stage-${this.SATP_STAGE}-${SATPServiceType[this.SERVICE_TYPE].toLowerCase()}`;
 
   constructor(ops: ISATPClientServiceOptions) {
-    // for now stage1serverservice does not have any different options than the SATPService class
-
     const commonOptions: ISATPServiceOptions = {
       stage: Stage1ClientService.SATP_STAGE,
       loggerOptions: ops.loggerOptions,
@@ -126,7 +118,7 @@ export class Stage1ClientService extends SATPService {
             version: sessionData.version,
             messageType: MessageType.INIT_PROPOSAL,
             sessionId: sessionData.id,
-            transferContextId: sessionData.transferContextId ?? "",
+            transferContextId: sessionData.transferContextId,
           });
 
           const transferInitClaims = create(TransferClaimsSchema, {
@@ -292,7 +284,6 @@ export class Stage1ClientService extends SATPService {
             ),
           );
 
-          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(
             sessionData,
             MessageType.TRANSFER_COMMENCE_REQUEST,
@@ -354,73 +345,7 @@ export class Stage1ClientService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkPreSATPTransferResponse...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        if (response.recipientGatewayNetworkId == "") {
-          throw new Error(`${fnTag}, recipientGatewayNetworkId is missing`);
-        }
-
-        const sessionData = session.getClientSessionData();
-
-        sessionData.recipientGatewayNetworkId =
-          response.recipientGatewayNetworkId;
-
-        session.verify(fnTag, SessionType.CLIENT);
-        if (
-          response.contextId == "" ||
-          response.contextId != sessionData.transferContextId
-        ) {
-          throw new TransferContextIdError(
-            fnTag,
-            response.contextId,
-            sessionData.transferContextId,
-          );
-        }
-
-        if (response.wrapAssertionClaim == undefined) {
-          throw new WrapAssertionClaimError(fnTag);
-        }
-
-        if (response.recipientTokenId == "") {
-          throw new TokenIdMissingError(fnTag);
-        }
-
-        if (response.messageType != MessageType.PRE_SATP_TRANSFER_RESPONSE) {
-          throw new MessageTypeError(
-            fnTag,
-            response.messageType.toString(),
-            MessageType.PRE_SATP_TRANSFER_RESPONSE.toString(),
-          );
-        }
-
-        if (
-          response.hashPreviousMessage !=
-          getMessageHash(sessionData, MessageType.PRE_SATP_TRANSFER_REQUEST)
-        ) {
-          throw new HashError(
-            fnTag,
-            response.hashPreviousMessage,
-            getMessageHash(sessionData, MessageType.PRE_SATP_TRANSFER_REQUEST),
-          );
-        }
-
-        signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        sessionData.receiverAsset!.tokenId = response.recipientTokenId;
-
-        saveHash(
-          sessionData,
-          MessageType.PRE_SATP_TRANSFER_RESPONSE,
-          getHash(response),
-        );
-
-        saveTimestamp(
-          sessionData,
-          MessageType.PRE_SATP_TRANSFER_RESPONSE,
-          TimestampType.RECEIVED,
-        );
+        verifyPreSATPTransferResponse(fnTag, this.Signer, response, session);
 
         this.Log.info(`${fnTag}, PreSATPTransferResponse passed all checks.`);
       } catch (err) {
@@ -440,78 +365,27 @@ export class Stage1ClientService extends SATPService {
     const stepTag = `checkTransferProposalResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, async () => {
+    return context.with(ctx, () => {
       try {
         this.Log.debug(`${fnTag}, checkTransferProposalResponse...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.CLIENT);
-
-        const sessionData = session.getClientSessionData();
-
-        commonBodyVerifier(
+        const accepted = verifyTransferProposalResponse(
           fnTag,
-          response.common,
-          sessionData,
-          MessageType.INIT_RECEIPT,
-          MessageType.INIT_REJECT,
+          this.Signer,
+          response,
+          session,
+          this.Log,
         );
 
-        signatureVerifier(fnTag, this.Signer, response, sessionData);
-
-        // assume that it is INIT_REJECT. otherwise it will be overriden with INIT_RECEIPT below
-        saveTimestamp(
-          sessionData,
-          MessageType.INIT_REJECT,
-          TimestampType.RECEIVED,
-        );
-
-        if (response.common!.messageType == MessageType.INIT_REJECT) {
-          this.Log.info(
-            `${fnTag}, TransferProposalReceipt proposedTransferClaims were rejected`,
-          );
-          sessionData.state = State.REJECTED;
-          saveHash(sessionData, MessageType.INIT_REJECT, getHash(response));
-          return false;
+        if (accepted) {
+          this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);
         }
 
-        saveHash(sessionData, MessageType.INIT_RECEIPT, getHash(response));
-
-        saveTimestamp(
-          sessionData,
-          MessageType.INIT_RECEIPT,
-          TimestampType.RECEIVED,
-        );
-
-        this.Log.info(`${fnTag}, TransferProposalReceipt passed all checks.`);
-        return true;
+        return accepted;
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
         throw err;
-      } finally {
-        span.end();
-      }
-    });
-  }
-
-  async checkProposedTransferClaims(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    counterTransfer: TransferClaims,
-  ): Promise<boolean> {
-    const fnTag = `${this.getServiceIdentifier()}#checkCounterTransferClaims()`;
-    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    return context.with(ctx, () => {
-      try {
-        //todo
-        return true;
-        // } catch (err) {
-        //   span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
-        //   span.recordException(err);
-        //   throw err;
       } finally {
         span.end();
       }

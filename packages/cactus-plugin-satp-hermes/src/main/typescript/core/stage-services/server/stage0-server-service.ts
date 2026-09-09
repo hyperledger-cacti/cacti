@@ -194,6 +194,11 @@ export class Stage0ServerService extends SATPService {
     session: SATPSession | undefined,
     clientPubKey: string,
   ): Promise<SATPSession> {
+    // TODO: extract these inline checks into bespoke Stage 0 verifier functions
+    // under core/stage-services/verifier/ composing on verifyMessage, mirroring
+    // the Stage 1-3 refactor. Stage 0 uses hashPreviousMessage (not
+    // hashPrevMessage) and carries legacy signature fields, so verifyMessage
+    // needs care before delegating here.
     const stepTag = `checkNewSessionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
@@ -304,6 +309,9 @@ export class Stage0ServerService extends SATPService {
     request: PreSATPTransferRequest,
     session: SATPSession,
   ): Promise<void> {
+    // TODO: extract these inline checks into a bespoke Stage 0 verifier function
+    // under core/stage-services/verifier/ composing on verifyMessage, mirroring
+    // the Stage 1-3 refactor.
     const stepTag = `checkPreSATPTransferRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
