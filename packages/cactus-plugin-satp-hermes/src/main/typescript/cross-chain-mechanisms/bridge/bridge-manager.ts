@@ -30,7 +30,7 @@
  * ]);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -92,7 +92,8 @@ interface IBridgeManagerOptions {
  * @class BridgeManager
  */
 export class BridgeManager
-  implements BridgeManagerAdminInterface, BridgeManagerClientInterface {
+  implements BridgeManagerAdminInterface, BridgeManagerClientInterface
+{
   public static readonly CLASS_NAME = "BridgeManager";
   private readonly log: Logger;
   private readonly logLevel: LogLevelDesc;

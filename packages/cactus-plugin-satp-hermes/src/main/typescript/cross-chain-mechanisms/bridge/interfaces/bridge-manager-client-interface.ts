@@ -50,7 +50,7 @@
  * );
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link BridgeLeaf} for bridge endpoint implementation details
  * @see {@link SATPBridgeExecutionLayer} for execution layer capabilities
  * @see {@link BridgeManagerAdminInterface} for administrative bridge operations

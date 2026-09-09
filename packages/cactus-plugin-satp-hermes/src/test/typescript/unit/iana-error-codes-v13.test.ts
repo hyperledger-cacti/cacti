@@ -33,7 +33,7 @@ describe("v13 IANA Error Codes", () => {
     ...STAGE_2_ERROR_CODES,
     ...STAGE_3_ERROR_CODES,
   ];
-  
+
   describe("ALL_V13_ERROR_CODES", () => {
     it("contains exactly 73 error codes", () => {
       expect(ALL_V13_ERROR_CODES).toHaveLength(73);

@@ -38,7 +38,7 @@
  * const endpoints = await dispatcher.getOrCreateWebServices();
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -1011,7 +1011,7 @@ export class BLODispatcher {
       try {
         this.logger.info(
           `Inbound webhook decision request: adapter="${req.adapterId}" ` +
-          `session="${req.sessionId}" continue=${req.continue}`,
+            `session="${req.sessionId}" continue=${req.continue}`,
         );
         if (this.isShuttingDown) {
           throw new GatewayShuttingDownError(

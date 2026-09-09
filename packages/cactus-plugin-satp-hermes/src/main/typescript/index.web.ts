@@ -61,7 +61,7 @@
  * });
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link ./index} for full Node.js/server-side entry point
  * @see {@link ./generated/gateway-client/typescript-axios} for REST API client interfaces
  * @see {@link SATPGateway} for server-side gateway implementation (Node.js only)
@@ -74,4 +74,4 @@
  * Consider using the generated API clients and server-side gateways for
  * production SATP implementations.
  */
-export { };
+export {};

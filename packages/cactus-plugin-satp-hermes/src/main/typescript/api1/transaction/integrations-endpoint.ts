@@ -25,7 +25,7 @@
  * await endpoint.registerExpress(app);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -106,7 +106,7 @@ export class IntegrationsEndpointV1 implements IWebServiceEndpoint {
   public getPath(): string {
     const apiPath =
       OAS.paths[
-      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.path;
   }
@@ -114,7 +114,7 @@ export class IntegrationsEndpointV1 implements IWebServiceEndpoint {
   public getVerbLowerCase(): string {
     const apiPath =
       OAS.paths[
-      "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
+        "/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations"
       ];
     return apiPath.get["x-hyperledger-cacti"].http.verbLowerCase;
   }

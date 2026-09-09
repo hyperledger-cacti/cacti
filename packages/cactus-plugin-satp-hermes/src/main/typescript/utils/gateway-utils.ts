@@ -41,7 +41,7 @@
  * const dataHash = getHash({ transferId: 'tx-456', amount: 100 });
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link JsObjectSigner} for cryptographic signing implementation
  * @see {@link GatewayPersistence} for log management using these utilities
  * @see {@link SATPGateway} for main gateway implementation using these utilities

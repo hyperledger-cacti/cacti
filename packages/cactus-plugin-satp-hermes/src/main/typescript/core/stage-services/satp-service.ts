@@ -180,7 +180,7 @@ export type ISATPServiceOptions = {
  */
 export interface SATPServiceStatic {
   /** Constructor signature for creating new service instances */
-  new(options: ISATPServiceOptions): SATPService;
+  new (options: ISATPServiceOptions): SATPService;
   /** Immutable service type designation (Client or Server) */
   readonly SERVICE_TYPE: SATPServiceType;
   /** SATP protocol stage identifier (0-3) */

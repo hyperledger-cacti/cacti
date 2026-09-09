@@ -30,7 +30,7 @@
  * ]);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -870,7 +870,7 @@ export class OracleManager {
               ...task.dstContract,
               params:
                 task.dstContract.params !== undefined &&
-                  task.dstContract.params?.length !== 0 // if params are empty, use the read response
+                task.dstContract.params?.length !== 0 // if params are empty, use the read response
                   ? task.dstContract.params
                   : writeContent,
             },
