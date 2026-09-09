@@ -14,7 +14,6 @@
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
-import { getHash } from "../../../utils/gateway-utils";
 import {
   MessageType,
   LockType,
@@ -25,18 +24,10 @@ import type {
   TransferProposalRequest,
   TransferCommenceRequest,
 } from "../../../generated/proto/cacti/satp/v13/service/stage_1_pb";
-import {
-  State,
-  type SessionData,
-} from "../../../generated/proto/cacti/satp/v13/session/session_pb";
+import { State } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import type { SATPSession } from "../../satp-session";
 import type { SATPLogger as Logger } from "../../satp-logger";
-import {
-  SessionType,
-  TimestampType,
-  saveHash,
-  saveTimestamp,
-} from "../../session-utils";
+import { SessionType } from "../../session-utils";
 import {
   DLTNotSupportedError,
   NetworkCapabilitiesError,
@@ -125,15 +116,15 @@ export function checkTransferClaims(
 }
 
 /**
- * Full Stage 1 server verification of an incoming `TransferProposalRequest`.
+ * Stage 1 server validation of an incoming `TransferProposalRequest`.
  *
- * It runs the bespoke capability/claims/DLT checks, populates the server
- * session data from the request, then delegates the common message checks
- * (session state, common body, signature) to {@link verifyMessage}.
+ * Runs the bespoke capability/claims/DLT checks and reports whether the
+ * proposal must be rejected. Populating the session from the request and
+ * validating the common body/signature are performed separately by the caller
+ * (see {@link verifyTransferProposalRequestSignature}), because the signature
+ * check relies on the gateway public keys the caller writes to the session.
  *
- * @returns The resolved session data and whether the proposal was rejected.
- *   When `rejected` is `true` the session state is set to {@link State.REJECTED}
- *   and the caller should stop processing.
+ * @returns `true` when the proposal must be rejected.
  * @throws {SessionError} When the session is undefined
  * @throws {NetworkCapabilitiesError} When capabilities are invalid
  * @throws {TransferInitClaimsError} When mandatory claims/session assets are missing
@@ -141,12 +132,11 @@ export function checkTransferClaims(
  */
 export function verifyTransferProposalRequestMessage(
   tag: string,
-  signer: JsObjectSigner,
   request: TransferProposalRequest,
   session: SATPSession | undefined,
   supportedDLTs: NetworkId[],
   logger: Logger,
-): { sessionData: SessionData; rejected: boolean } {
+): boolean {
   if (session == undefined) {
     throw new SessionError(tag);
   }
@@ -159,8 +149,7 @@ export function verifyTransferProposalRequestMessage(
     logger.info(`${tag}, TransferProposalRequest was accepted...`);
   } else {
     logger.info(`${tag}, TransferProposalRequest was rejected...`);
-    sessionData.state = State.REJECTED;
-    return { sessionData, rejected: true };
+    return true;
   }
 
   if (sessionData.receiverAsset == undefined) {
@@ -176,27 +165,23 @@ export function verifyTransferProposalRequestMessage(
     throw new DLTNotSupportedError(tag, receiverId);
   }
 
-  sessionData.version = request.common!.version;
-  sessionData.digitalAssetId = request.transferInitClaims!.digitalAssetId;
-  sessionData.senderGatewayNetworkId =
-    request.transferInitClaims!.senderGatewayNetworkId;
-  sessionData.recipientGatewayNetworkId =
-    request.transferInitClaims!.recipientGatewayNetworkId;
-  sessionData.clientGatewayPubkey =
-    request.transferInitClaims!.senderGatewaySignaturePublicKey;
-  sessionData.serverGatewayPubkey =
-    request.transferInitClaims!.receiverGatewaySignaturePublicKey;
-  sessionData.receiverGatewayOwnerId =
-    request.transferInitClaims!.receiverGatewayOwnerId;
-  sessionData.senderGatewayOwnerId =
-    request.transferInitClaims!.senderGatewayOwnerId;
-  sessionData.signatureAlgorithm =
-    request.networkCapabilities!.gatewayDefaultSignatureAlgorithm;
-  sessionData.lockType = request.networkCapabilities!.networkLockType;
-  sessionData.lockExpirationTime =
-    request.networkCapabilities!.networkLockExpirationTime;
-  sessionData.gatewayTlsScheme = request.networkCapabilities!.gatewayTlsScheme;
+  return false;
+}
 
+/**
+ * Validates the common body and signature of a `TransferProposalRequest`.
+ *
+ * Must run after the caller has populated the session from the request, since
+ * the signature check relies on the gateway public keys stored on the session.
+ *
+ * @throws {SessionError} When the session is undefined
+ */
+export function verifyTransferProposalRequestSignature(
+  tag: string,
+  signer: JsObjectSigner,
+  request: TransferProposalRequest,
+  session: SATPSession | undefined,
+): void {
   // INIT_PROPOSAL is the first Stage 1 message, so there is no hash chain yet.
   verifyMessage(
     tag,
@@ -207,11 +192,29 @@ export function verifyTransferProposalRequestMessage(
     MessageType.INIT_PROPOSAL,
     { checkHashPrevMessage: false },
   );
+}
 
-  saveHash(sessionData, MessageType.INIT_PROPOSAL, getHash(request));
-  saveTimestamp(sessionData, MessageType.INIT_PROPOSAL, TimestampType.RECEIVED);
+export function verifyTransferProposalResponse(
+  tag: string,
+  session: SATPSession | undefined,
+): void {
+  if (session == undefined) {
+    throw new SessionError(tag);
+  }
 
-  return { sessionData, rejected: false };
+  const sessionData = session.getServerSessionData();
+  session.verify(tag, SessionType.SERVER, sessionData.state == State.REJECTED);
+}
+
+export function verifyTransferCommenceResponse(
+  tag: string,
+  session: SATPSession | undefined,
+): void {
+  if (session == undefined) {
+    throw new SessionError(tag);
+  }
+
+  session.verify(tag, SessionType.SERVER);
 }
 
 /**
@@ -229,8 +232,8 @@ export function verifyTransferCommenceRequestMessage(
   signer: JsObjectSigner,
   request: TransferCommenceRequest,
   session: SATPSession | undefined,
-): SessionData {
-  const sessionData = verifyMessage(
+): void {
+  verifyMessage(
     tag,
     signer,
     request,
@@ -243,19 +246,4 @@ export function verifyTransferCommenceRequestMessage(
       hashTransferInitClaims: request.hashTransferInitClaims,
     },
   );
-
-  saveHash(
-    sessionData,
-    MessageType.TRANSFER_COMMENCE_REQUEST,
-    getHash(request),
-  );
-  saveTimestamp(
-    sessionData,
-    MessageType.TRANSFER_COMMENCE_REQUEST,
-    TimestampType.RECEIVED,
-  );
-
-  sessionData.state = State.ONGOING;
-
-  return sessionData;
 }

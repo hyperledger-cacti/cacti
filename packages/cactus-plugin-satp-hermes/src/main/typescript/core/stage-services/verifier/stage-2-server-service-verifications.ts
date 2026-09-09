@@ -13,17 +13,10 @@
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
-import { getHash } from "../../../utils/gateway-utils";
 import { MessageType } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import type { LockAssertionRequest } from "../../../generated/proto/cacti/satp/v13/service/stage_2_pb";
-import type { SessionData } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import type { SATPSession } from "../../satp-session";
-import {
-  SessionType,
-  TimestampType,
-  saveHash,
-  saveTimestamp,
-} from "../../session-utils";
+import { SessionType } from "../../session-utils";
 import {
   LockAssertionClaimError,
   LockAssertionClaimFormatError,
@@ -36,9 +29,8 @@ import { verifyMessage } from "./data-verifier";
  *
  * Delegates the common checks (session state, common body, signature) to
  * {@link verifyMessage}, then validates the lock-assertion claim, its format,
- * and the expiration bounds before recording the message on the session.
+ * and the expiration bounds.
  *
- * @returns The resolved server session data.
  * @throws {SessionError} When the session is undefined
  * @throws {LockAssertionClaimError} When the lock-assertion claim is missing
  * @throws {LockAssertionClaimFormatError} When the claim format is missing
@@ -49,7 +41,7 @@ export function verifyLockAssertionRequestMessage(
   signer: JsObjectSigner,
   request: LockAssertionRequest,
   session: SATPSession | undefined,
-): SessionData {
+): void {
   const sessionData = verifyMessage(
     tag,
     signer,
@@ -63,12 +55,10 @@ export function verifyLockAssertionRequestMessage(
   if (request.lockAssertionClaim == undefined) {
     throw new LockAssertionClaimError(tag);
   }
-  sessionData.lockAssertionClaim = request.lockAssertionClaim;
 
   if (request.lockAssertionClaimFormat == undefined) {
     throw new LockAssertionClaimFormatError(tag);
   }
-  sessionData.lockAssertionClaimFormat = request.lockAssertionClaimFormat;
 
   const currentTime = BigInt(Date.now());
   const maximumExpiration = currentTime + sessionData.lockExpirationTime;
@@ -86,11 +76,4 @@ export function verifyLockAssertionRequestMessage(
       "lock assertion exceeds the negotiated expiration time",
     );
   }
-
-  sessionData.lockAssertionExpiration = request.lockAssertionExpiration;
-
-  saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
-  saveTimestamp(sessionData, MessageType.LOCK_ASSERT, TimestampType.RECEIVED);
-
-  return sessionData;
 }

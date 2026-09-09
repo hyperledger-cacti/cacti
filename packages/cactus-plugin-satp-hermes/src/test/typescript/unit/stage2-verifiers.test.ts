@@ -37,7 +37,6 @@ import {
   TransferCommenceResponseSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_1_pb";
 import { SATP_VERSION } from "../../../main/typescript/core/constants";
-import { getMessageHash } from "../../../main/typescript/core/session-utils";
 import { verifyLockAssertionRequestMessage } from "../../../main/typescript/core/stage-services/verifier/stage-2-server-service-verifications";
 import { verifyTransferCommenceResponseMessage } from "../../../main/typescript/core/stage-services/verifier/stage-2-client-service-verifications";
 import {
@@ -162,24 +161,15 @@ describe("verifyLockAssertionRequestMessage", () => {
     ).toThrow(LockAssertionExpirationError);
   });
 
-  it("passes and records the message for a valid request", () => {
+  it("passes for a valid request", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const expiration = BigInt(Date.now()) + BigInt(60_000);
     const request = makeLockAssertionRequest(expiration);
 
-    const result = verifyLockAssertionRequestMessage(
-      TAG,
-      signer,
-      request,
-      session,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(result.lockAssertionClaim).toBeDefined();
-    expect(result.lockAssertionClaimFormat).toBeDefined();
-    expect(result.lockAssertionExpiration).toBe(expiration);
-    expect(getMessageHash(result, MessageType.LOCK_ASSERT)).not.toBe("");
+    expect(() =>
+      verifyLockAssertionRequestMessage(TAG, signer, request, session),
+    ).not.toThrow();
   });
 });
 
@@ -191,21 +181,13 @@ describe("verifyTransferCommenceResponseMessage", () => {
     ).toThrow(SessionError);
   });
 
-  it("passes and records the message for a valid response", () => {
+  it("passes for a valid response", () => {
     const sessionData = makeSessionData();
     const session = makeSession(sessionData);
     const response = makeTransferCommenceResponse();
 
-    const result = verifyTransferCommenceResponseMessage(
-      TAG,
-      signer,
-      response,
-      session,
-    );
-
-    expect(result).toBe(sessionData);
-    expect(
-      getMessageHash(result, MessageType.TRANSFER_COMMENCE_RESPONSE),
-    ).not.toBe("");
+    expect(() =>
+      verifyTransferCommenceResponseMessage(TAG, signer, response, session),
+    ).not.toThrow();
   });
 });
