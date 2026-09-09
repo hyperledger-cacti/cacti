@@ -9,7 +9,7 @@
       }
     }
   },
-  "description": "SATP implementation targeting IETF SATP Core draft-ietf-satp-core-13, based on the papers 1) HERMES: Fault-Tolerant Middleware for Blockchain Interoperability and 2) CBDC bridging between Hyperledger Fabric and permissioned EVM-based blockchains",
+  "description": "Open-source SATP Typescript implementation, based on the paper \"HERMES: Fault-Tolerant Middleware for Blockchain Interoperability\"",
   "keywords": [
     "Hyperledger",
     "Cacti",
@@ -39,21 +39,21 @@
   },
   "contributors": [
     {
+      "name": "Rafael Belchior",
+      "url": "https://github.com/RafaelAPB"
+    },
+    {
       "name": "André Augusto",
       "email": "andre.augusto@tecnico.ulisboa.pt",
       "url": "https://github.com/AndreAugusto11"
     },
     {
-      "name": "Eduardo Vasques",
-      "url": "https://github.com/eduv07"
-    },
-    {
-      "name": "Rafael Belchior",
-      "url": "https://github.com/RafaelAPB"
-    },
-    {
       "name": "Carlos Amaro",
       "url": "https://github.com/LordKubaya"
+    },
+    {
+      "name": "Eduardo Vasques",
+      "url": "https://github.com/eduv07"
     },
     {
       "name": "Bruno Mateus",
@@ -135,7 +135,7 @@
     "docs:validate": "typedoc --options typedoc.json --validation.notDocumented",
     "docs:validate:strict": "typedoc --options typedoc.json --validation.notDocumented --treatWarningsAsErrors",
     "docs:watch": "typedoc --options typedoc.json --watch",
-    "forge:algl": "run-s 'forge:build:all' 'forge:test'",
+    "forge:all": "run-s 'forge:build:all' 'forge:test'",
     "forge:build:all": "run-s forge:build:contracts forge:build:test",
     "forge:build:contracts": "forge build ./src/main/solidity/contracts/*.sol --out ./src/main/solidity/generated",
     "forge:build:test": "forge build ./src/test/solidity/contracts/*.sol --out ./src/test/solidity/generated",
