@@ -1,80 +1,108 @@
 import {
   JWSAlgorithm,
+  generateSigningKeyPair,
+  importSigningKey,
   jwsSign,
   jwsVerify,
-  jwsDecodePayload,
-} from "../../../main/typescript/core/jws-utils";
+  jwsDecodeProtectedHeader,
+} from "../../../main/typescript/core/cryptography/jws-utils";
 
-describe("JWS utilities (TASK-064 stub)", () => {
-  const sampleMessage = {
-    sessionId: "test-session-123",
-    messageType: 7,
-    version: "v13",
-  };
+describe("JWS utilities (v13 ES256)", () => {
+  const payload = new TextEncoder().encode(
+    JSON.stringify({
+      sessionId: "test-session-123",
+      messageType: 7,
+      version: "v13",
+    }),
+  );
+
+  describe("generateSigningKeyPair", () => {
+    it("produces an EC P-256 key pair as JWKs", async () => {
+      const { publicKey, privateKey } = await generateSigningKeyPair();
+      expect(publicKey.kty).toBe("EC");
+      expect(publicKey.crv).toBe("P-256");
+      expect(privateKey.kty).toBe("EC");
+      expect(privateKey.crv).toBe("P-256");
+      // private key must carry the private scalar, public key must not
+      expect(typeof privateKey.d).toBe("string");
+      expect(publicKey.d).toBeUndefined();
+    });
+  });
 
   describe("jwsSign", () => {
-    it("produces a three-part compact serialization", () => {
-      const jws = jwsSign(sampleMessage);
-      const parts = jws.split(".");
-      expect(parts).toHaveLength(3);
+    it("produces a three-part compact serialization", async () => {
+      const { privateKey } = await generateSigningKeyPair();
+      const key = await importSigningKey(privateKey);
+      const jws = await jwsSign(payload, key);
+      expect(jws.split(".")).toHaveLength(3);
     });
 
-    it("encodes the correct header with ES256 by default", () => {
-      const jws = jwsSign(sampleMessage);
-      const header = JSON.parse(
-        Buffer.from(jws.split(".")[0], "base64url").toString(),
-      );
-      expect(header.alg).toBe("ES256");
-      expect(header.typ).toBe("satp+jws");
-    });
-
-    it("encodes the message in the payload", () => {
-      const jws = jwsSign(sampleMessage);
-      const payload = JSON.parse(
-        Buffer.from(jws.split(".")[1], "base64url").toString(),
-      );
-      expect(payload.sessionId).toBe("test-session-123");
-      expect(payload.version).toBe("v13");
-    });
-
-    it("uses STUB_SIGNATURE as placeholder", () => {
-      const jws = jwsSign(sampleMessage);
-      expect(jws.split(".")[2]).toBe("STUB_SIGNATURE");
+    it("encodes an ES256 header with typ and kid", async () => {
+      const { privateKey } = await generateSigningKeyPair();
+      const key = await importSigningKey(privateKey);
+      const jws = await jwsSign(payload, key, { kid: "gateway-a" });
+      const header = jwsDecodeProtectedHeader(jws);
+      expect(header.alg).toBe(JWSAlgorithm.ES256);
+      expect(header.kid).toBe("gateway-a");
     });
   });
 
   describe("jwsVerify", () => {
-    it("returns verified=true for any valid JWS (stub)", () => {
-      const jws = jwsSign(sampleMessage);
-      const result = jwsVerify(jws);
+    it("verifies a valid signature and returns the payload", async () => {
+      const { publicKey, privateKey } = await generateSigningKeyPair();
+      const priv = await importSigningKey(privateKey);
+      const pub = await importSigningKey(publicKey);
+
+      const jws = await jwsSign(payload, priv, { kid: "gateway-a" });
+      const result = await jwsVerify(jws, pub);
+
       expect(result.verified).toBe(true);
-      expect(result.algorithm).toBe(JWSAlgorithm.ES256);
+      expect(result.protectedHeader.alg).toBe(JWSAlgorithm.ES256);
+      expect(result.protectedHeader.kid).toBe("gateway-a");
+      expect(Array.from(result.payload)).toEqual(Array.from(payload));
     });
 
-    it("decodes the payload correctly", () => {
-      const jws = jwsSign(sampleMessage);
-      const result = jwsVerify(jws);
-      const parsed = JSON.parse(result.payload);
-      expect(parsed.sessionId).toBe("test-session-123");
-    });
+    it("rejects a signature verified with the wrong public key", async () => {
+      const { privateKey } = await generateSigningKeyPair();
+      const other = await generateSigningKeyPair();
+      const priv = await importSigningKey(privateKey);
+      const wrongPub = await importSigningKey(other.publicKey);
 
-    it("returns verified=false for malformed input", () => {
-      const result = jwsVerify("not-a-jws");
+      const jws = await jwsSign(payload, priv);
+      const result = await jwsVerify(jws, wrongPub);
+
       expect(result.verified).toBe(false);
-      expect(result.payload).toBe("");
+      expect(result.payload).toHaveLength(0);
+    });
+
+    it("rejects a tampered payload", async () => {
+      const { publicKey, privateKey } = await generateSigningKeyPair();
+      const priv = await importSigningKey(privateKey);
+      const pub = await importSigningKey(publicKey);
+
+      const jws = await jwsSign(payload, priv);
+      const [header, , signature] = jws.split(".");
+      const forgedPayload = Buffer.from(
+        new TextEncoder().encode("tampered"),
+      ).toString("base64url");
+      const tampered = `${header}.${forgedPayload}.${signature}`;
+
+      const result = await jwsVerify(tampered, pub);
+      expect(result.verified).toBe(false);
+    });
+
+    it("returns verified=false for malformed input", async () => {
+      const { publicKey } = await generateSigningKeyPair();
+      const pub = await importSigningKey(publicKey);
+      const result = await jwsVerify("not-a-jws", pub);
+      expect(result.verified).toBe(false);
+      expect(result.payload).toHaveLength(0);
     });
   });
 
-  describe("jwsDecodePayload", () => {
-    it("extracts payload without verification", () => {
-      const jws = jwsSign(sampleMessage);
-      const payload = jwsDecodePayload(jws);
-      const parsed = JSON.parse(payload);
-      expect(parsed.messageType).toBe(7);
-    });
-
-    it("returns empty string for malformed input", () => {
-      expect(jwsDecodePayload("bad")).toBe("");
+  describe("jwsDecodeProtectedHeader", () => {
+    it("returns an empty alg for malformed input", () => {
+      expect(jwsDecodeProtectedHeader("bad").alg).toBe("");
     });
   });
 });
