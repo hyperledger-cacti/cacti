@@ -27,6 +27,7 @@ import {
 import {
   Client as ConnectClient,
   Transport as ConnectTransport,
+  Interceptor,
 } from "@connectrpc/connect";
 
 import { Express } from "express";
@@ -63,6 +64,14 @@ import { NetworkId } from "../../public-api";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { satpProblemDetailsErrorMiddleware } from "../../core/errors/satp-errors";
+import {
+  resolveLocalSigningPrivateKey,
+  resolveSigningPublicKey,
+} from "../../core/cryptography/signing-keys";
+import {
+  createSignatureSigningInterceptor,
+  createSignatureVerificationInterceptor,
+} from "../../core/cryptography/jws-interceptors";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -78,6 +87,12 @@ export class GatewayOrchestrator {
   private channels: Map<string, GatewayChannel> = new Map();
   private readonly logger: Logger;
 
+  // v13 JWS envelope signing (stages 1-3). Built eagerly; signing keys are
+  // resolved per request so counterparty SIGNATURE keys added after startup
+  // are picked up without restarting the gateway.
+  private readonly signingInterceptor: Interceptor;
+  private readonly verificationInterceptor: Interceptor;
+
   constructor(options: IGatewayOrchestratorOptions) {
     const fnTag = `${this.label}#constructor()`;
     // add checks
@@ -90,6 +105,18 @@ export class GatewayOrchestrator {
     this.monitorService = options.monitorService;
 
     this.logger = LoggerProvider.getOrCreate(logOptions, this.monitorService);
+
+    this.signingInterceptor = createSignatureSigningInterceptor({
+      getPrivateKey: () =>
+        resolveLocalSigningPrivateKey(this.localGateway, this.logger),
+      gatewayId: this.localGateway.id,
+    });
+    this.verificationInterceptor = createSignatureVerificationInterceptor({
+      resolvePublicKey: (kid) =>
+        resolveSigningPublicKey(
+          kid === undefined ? undefined : this.getGatewayIdentity(kid),
+        ),
+    });
 
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 
@@ -189,10 +216,20 @@ export class GatewayOrchestrator {
             );
           }
 
+          // v13 JWS verification for stages 1-3 only.
+          // TODO(stage-0 + crash-recovery): these still use per-message proto
+          // signatures; migrate to JWS envelope signing and verify here too.
+          const stageKey = handler.getStage();
+          const verifySignature =
+            stageKey !== SatpStageKey.Stage0 && stageKey !== SatpStageKey.Crash;
+
           this.expressServer.use(
             expressConnectMiddleware({
               routes: handler.setupRouter.bind(handler),
               requestPathPrefix: httpPath,
+              interceptors: verifySignature
+                ? [this.verificationInterceptor]
+                : [],
             }),
           );
         }
@@ -412,6 +449,8 @@ export class GatewayOrchestrator {
         this.logger.debug(
           `Creating clients for gateway ${safeStableStringify(identity)}`,
         );
+        // TODO(stage-0): stage 0 still uses per-message proto signatures;
+        // migrate to JWS envelope signing and add the signing interceptor.
         const transport0 = createGrpcWebTransport({
           baseUrl:
             identity.address +
@@ -429,6 +468,8 @@ export class GatewayOrchestrator {
             `/${SatpStageKey.Stage0}`,
         );
 
+        const signingInterceptor = this.signingInterceptor;
+
         const transport1 = createGrpcWebTransport({
           baseUrl:
             identity.address +
@@ -436,6 +477,7 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage1}`,
           httpVersion: "1.1",
+          interceptors: [signingInterceptor],
         });
 
         const transport2 = createGrpcWebTransport({
@@ -445,6 +487,7 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage2}`,
           httpVersion: "1.1",
+          interceptors: [signingInterceptor],
         });
 
         const transport3 = createGrpcWebTransport({
@@ -454,8 +497,11 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage3}`,
           httpVersion: "1.1",
+          interceptors: [signingInterceptor],
         });
 
+        // TODO(crash-recovery): crash-recovery still uses per-message proto
+        // signatures; migrate to JWS envelope signing and add the interceptor.
         const transportCrash = createGrpcWebTransport({
           baseUrl:
             identity.address + ":" + identity.gatewayServerPort + `/${"crash"}`,
