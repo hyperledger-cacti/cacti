@@ -146,25 +146,27 @@ export {
 } from "./core/types";
 
 /**
- * Gateway Port Constants - Default port configurations for SATP gateway services.
+ * SATP protocol constants - defaults, versions, and ledger support metadata.
  *
  * @description
- * Standard port definitions for SATP gateway server, client, and OpenAPI endpoints.
- * Ensures consistent networking configuration across gateway deployments and
- * facilitates gateway-to-gateway discovery and communication.
+ * Exposes the canonical SATP configuration values used by the gateway, protocol
+ * services, and bridge support code. These constants define the default network
+ * endpoints, protocol versions, TLS requirements, and supported ledger set.
  *
- * **Port Usage:**
- * - `DEFAULT_PORT_GATEWAY_SERVER`: Main gateway server endpoint (3010)
- * - `DEFAULT_PORT_GATEWAY_CLIENT`: Client communication port (3011)
- * - `DEFAULT_PORT_GATEWAY_OAPI`: OpenAPI documentation and testing (4010)
- *
- * @see {@link SATPGatewayConfig} for gateway configuration using these ports
+ * @see {@link SATPGatewayConfig} for gateway configuration using these values
  * @see {@link GatewayIdentity} for gateway network identity and addressing
  */
 export {
   DEFAULT_PORT_GATEWAY_CLIENT,
-  DEFAULT_PORT_GATEWAY_SERVER,
   DEFAULT_PORT_GATEWAY_OAPI,
+  DEFAULT_PORT_GATEWAY_SERVER,
+  DEFAULT_PORT_GATEWAY_UI,
+  SATP_ARCHITECTURE_VERSION,
+  SATP_CORE_VERSION,
+  SATP_CRASH_VERSION,
+  SATP_IMPLEMENTED_LEDGERS,
+  SATP_VERSION,
+  DEFAULT_TLS13_CIPHER_SUITE,
 } from "./core/constants";
 
 /**
@@ -206,17 +208,6 @@ export { IEthereumNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-t
 export { GatewayIdentity } from "./core/types";
 export { GatewayKeyPurpose } from "./core/types";
 export { GatewayKey } from "./core/types";
-export {
-  JWSAlgorithm,
-  jwsSign,
-  jwsVerify,
-  jwsDecodePayload,
-} from "./core/jws-utils";
-export type {
-  IJWSSignOptions,
-  IJWSVerifyOptions,
-  IJWSVerificationResult,
-} from "./core/jws-utils";
 
 /**
  * SATP Protocol Mapping - Type-safe SATP protocol stage and step definitions.

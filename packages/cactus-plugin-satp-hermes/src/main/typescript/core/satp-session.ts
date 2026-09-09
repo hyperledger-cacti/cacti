@@ -542,7 +542,6 @@ export class SATPSession {
           if (sessionData.lockExpirationTime == BigInt(0)) {
             throw new lockExpirationTimeError(tag);
           }
-          // v13: loggingProfile and accessControlProfile removed from NetworkCapabilities
           if (sessionData.transferContextId == "") {
             throw new TransferContextIdError(tag);
           }

@@ -172,7 +172,6 @@ export function createSessionAbortMessage(
 export function checkAbortEffectiveness(
   lastCompletedMessageType: MessageType,
 ): IAbortEffectivenessResult {
-  // Messages that indicate we're past the point of no return (commit-final sent/acked)
   const pastCommitFinal = [
     MessageType.COMMIT_FINAL,
     MessageType.ACK_COMMIT_FINAL,

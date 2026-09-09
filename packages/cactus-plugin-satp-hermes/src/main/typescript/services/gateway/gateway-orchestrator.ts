@@ -29,7 +29,7 @@ import {
   Transport as ConnectTransport,
 } from "@connectrpc/connect";
 
-import { ErrorRequestHandler, Express } from "express";
+import { Express } from "express";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
@@ -62,24 +62,7 @@ import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridg
 import { NetworkId } from "../../public-api";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
-import { SATPInternalError } from "../../core/errors/satp-errors";
-
-export const satpProblemDetailsErrorMiddleware: ErrorRequestHandler = (
-  error: unknown,
-  _request,
-  response,
-  next,
-) => {
-  if (!(error instanceof SATPInternalError)) {
-    next(error);
-    return;
-  }
-
-  response
-    .status(error.code)
-    .type("application/problem+json")
-    .json(error.toProblemDetails());
-};
+import { satpProblemDetailsErrorMiddleware } from "../../core/errors/satp-errors";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";

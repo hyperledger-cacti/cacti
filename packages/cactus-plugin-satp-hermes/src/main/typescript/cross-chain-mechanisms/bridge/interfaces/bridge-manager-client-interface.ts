@@ -331,7 +331,7 @@ export abstract class BridgeManagerClientInterface {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link TokenType} for supported asset type enumeration
    * @see {@link NetworkId} for network identification structure
    * @see {@link BridgeLeaf.getApproveAddress} for implementation details
