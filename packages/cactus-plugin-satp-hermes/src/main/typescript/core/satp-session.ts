@@ -546,17 +546,6 @@ export class SATPSession {
           if (sessionData.transferContextId == "") {
             throw new TransferContextIdError(tag);
           }
-          if (
-            // sessionData.maxRetries == undefined ||
-            // sessionData.maxTimeout == undefined ||
-            // sessionData.lastSequenceNumber == BigInt(0) ||
-            false
-          ) {
-            throw new SessionDataNotLoadedCorrectlyError(
-              tag,
-              safeStableStringify(sessionData)!,
-            );
-          }
           if (sessionData.version != SATP_VERSION) {
             throw new SATPVersionError(tag, sessionData.version, SATP_VERSION);
           }

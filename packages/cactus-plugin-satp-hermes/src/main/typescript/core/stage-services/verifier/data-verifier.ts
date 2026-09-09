@@ -74,15 +74,15 @@
  */
 
 import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
-import { verifySignature } from "../../utils/gateway-utils";
+import { verifySignature } from "../../../utils/gateway-utils";
 import {
   CommonSatp,
   MessageType,
-} from "../../generated/proto/cacti/satp/v13/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
-import { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
-import { SATP_VERSION } from "../constants";
+import { SessionData } from "../../../generated/proto/cacti/satp/v13/session/session_pb";
+import { SATP_VERSION } from "../../constants";
 import {
   MessageTypeError,
   SatpCommonBodyError,
@@ -95,14 +95,14 @@ import {
   SequenceNumberError,
   SessionError,
   TransferInitClaimsHashError,
-} from "../errors/satp-service-errors";
+} from "../../errors/satp-service-errors";
 import {
   getMessageHash,
   getPreviousMessageType,
   SessionType,
-} from "../session-utils";
-import { SATPSession } from "../satp-session";
-import { getMessageTypeName } from "../satp-utils";
+} from "../../session-utils";
+import { SATPSession } from "../../satp-session";
+import { getMessageTypeName } from "../../satp-utils";
 
 /**
  * Verifies the common body structure and protocol compliance of SATP messages.
@@ -547,6 +547,9 @@ export interface IVerifyMessageOptions {
  *    supplied (via {@link sequenceNumberVerifier}).
  * 6. **Transfer-init-claims hash matches** — when `hashTransferInitClaims` is
  *    supplied (via a {@link TransferInitClaimsHashError} on mismatch).
+ *
+ * Stage-specific checks (claims, network capabilities, etc.) live in the
+ * per-stage verifier modules and compose on top of this function.
  *
  * @param tag - Context tag for error reporting
  * @param signer - Signer used to validate the message signature

@@ -16,7 +16,7 @@ import {
   SessionData,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
 import { SATP_VERSION } from "../../../main/typescript/core/constants";
-import { commonBodyVerifier } from "../../../main/typescript/core/stage-services/data-verifier";
+import { commonBodyVerifier } from "../../../main/typescript/core/stage-services/verifier/data-verifier";
 import {
   SatpCommonBodyError,
   SATPVersionError,

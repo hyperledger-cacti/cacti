@@ -24,7 +24,7 @@ import { SATP_VERSION } from "../../../main/typescript/core/constants";
 import {
   commonBodyVerifier,
   hashPrevMessageVerifier,
-} from "../../../main/typescript/core/stage-services/data-verifier";
+} from "../../../main/typescript/core/stage-services/verifier/data-verifier";
 import { SATPInternalError } from "../../../main/typescript/core/errors/satp-errors";
 import { SATPErrorType } from "../../../main/typescript/core/errors/satp-error-type";
 import {

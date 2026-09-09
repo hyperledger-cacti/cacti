@@ -46,7 +46,7 @@
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} 
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGateway} for main gateway implementation
  * @see {@link PluginFactorySATPGateway} for gateway factory and instantiation
@@ -285,7 +285,12 @@ export {
   MissingTransferContextIdError,
 } from "./core/errors/satp-service-errors";
 
-export { hashPrevMessageVerifier } from "./core/stage-services/data-verifier";
+export {
+  hashPrevMessageVerifier,
+  sequenceNumberVerifier,
+  verifyMessage,
+} from "./core/stage-services/verifier/data-verifier";
+export type { IVerifyMessageOptions } from "./core/stage-services/verifier/data-verifier";
 
 /**
  * Fabric Network Validation - Hyperledger Fabric configuration validation utilities.
