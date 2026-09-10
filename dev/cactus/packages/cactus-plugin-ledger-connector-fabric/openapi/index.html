@@ -1,0 +1,1479 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cactus Plugin - Connector Fabric</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cactus Plugin - Connector Fabric</h1>
+    <div class="app-desc">Can perform basic tasks on a fabric ledger</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#deployContractV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract</code></a></li>
+  <li><a href="#getBlockV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block</code></a></li>
+  <li><a href="#getChainInfoV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info</code></a></li>
+  <li><a href="#getDiscoveryResultsV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results</code></a></li>
+  <li><a href="#getPrometheusMetricsV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics</code></a></li>
+  <li><a href="#getTransactionReceiptByTxIDV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid</code></a></li>
+  <li><a href="#runDelegatedSignTransactionV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction</code></a></li>
+  <li><a href="#runTransactionV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="deployContractV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract</code></pre></div>
+    <div class="method-summary">Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The 'v1' suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version. (<span class="nickname">deployContractV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">DeployContractV1Request <a href="#DeployContractV1Request">DeployContractV1Request</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#DeployContractV1Response">DeployContractV1Response</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "lifecycle" : {
+    "init" : {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    },
+    "commit" : {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    },
+    "installList" : [ {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    }, {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    } ],
+    "queryCommitted" : {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    },
+    "packaging" : {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    },
+    "approveForMyOrgList" : [ {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    }, {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    } ],
+    "queryInstalledList" : [ {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    }, {
+      "code" : 0,
+      "stdout" : "stdout",
+      "stderr" : "stderr",
+      "signal" : "signal"
+    } ]
+  },
+  "success" : true,
+  "packageIds" : [ "f8c8e06bfc27771028c4bbc3564341887881e29b92a844c66c30bac0ff83966e", "f8c8e06bfc27771028c4bbc3564341887881e29b92a844c66c30bac0ff83966e" ]
+}</code></pre>
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: text/plain</div>
+    <pre class="example"><code>Custom MIME type example not yet supported: text/plain</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#DeployContractV1Response">DeployContractV1Response</a>
+    <h4 class="field-label">501</h4>
+    Not implemented
+        <a href="#deployContractV1_501_response">deployContractV1_501_response</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getBlockV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block</code></pre></div>
+    <div class="method-summary">Get block from the channel using one of selectors from the input. Works only on Fabric 2.x. (<span class="nickname">getBlockV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetBlockRequestV1 <a href="#GetBlockRequestV1">GetBlockRequestV1</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetBlockResponseV1">GetBlockResponseV1</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>null</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetBlockResponseV1">GetBlockResponseV1</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getChainInfoV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info</code></pre></div>
+    <div class="method-summary">Get fabric ledger chain info. (<span class="nickname">getChainInfoV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetChainInfoRequestV1 <a href="#GetChainInfoRequestV1">GetChainInfoRequestV1</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetChainInfoResponseV1">GetChainInfoResponseV1</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "previousBlockHash" : "previousBlockHash",
+  "currentBlockHash" : "currentBlockHash",
+  "height" : 0.8008281904610115
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetChainInfoResponseV1">GetChainInfoResponseV1</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getDiscoveryResultsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results</code></pre></div>
+    <div class="method-summary">Get fabric ledger node structure (from the discovery service). (<span class="nickname">getDiscoveryResultsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetDiscoveryResultsRequestV1 <a href="#GetDiscoveryResultsRequestV1">GetDiscoveryResultsRequestV1</a> (optional)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetDiscoveryResultsResponseV1">GetDiscoveryResultsResponseV1</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "peersByMSP" : {
+    "key" : {
+      "peers" : [ {
+        "mspid" : "Org1MSP",
+        "endpoint" : "peer0.org1.example.com:7051",
+        "chaincodes" : [ {
+          "name" : "_lifecycle",
+          "version" : "1"
+        }, {
+          "name" : "_lifecycle",
+          "version" : "1"
+        } ],
+        "name" : "peer0.org1.example.com:7051",
+        "ledgerHeight" : 123
+      }, {
+        "mspid" : "Org1MSP",
+        "endpoint" : "peer0.org1.example.com:7051",
+        "chaincodes" : [ {
+          "name" : "_lifecycle",
+          "version" : "1"
+        }, {
+          "name" : "_lifecycle",
+          "version" : "1"
+        } ],
+        "name" : "peer0.org1.example.com:7051",
+        "ledgerHeight" : 123
+      } ]
+    }
+  },
+  "msps" : {
+    "key" : {
+      "tlsIntermediateCerts" : "tlsIntermediateCerts",
+      "name" : "OrdererMSP",
+      "tlsRootCerts" : "-----BEGIN CERTIFICATE-----\\n...\\n-----END CERTIFICATE-----",
+      "intermediateCerts" : "intermediateCerts",
+      "id" : "OrdererMSP",
+      "organizationalUnitIdentifiers" : [ "organizationalUnitIdentifiers", "organizationalUnitIdentifiers" ],
+      "rootCerts" : "-----BEGIN CERTIFICATE-----\\n...\\n-----END CERTIFICATE-----",
+      "admins" : "admins"
+    }
+  },
+  "orderers" : {
+    "key" : {
+      "endpoints" : [ {
+        "port" : 7050,
+        "host" : "orderer.example.com",
+        "name" : "orderer.example.com:7050"
+      }, {
+        "port" : 7050,
+        "host" : "orderer.example.com",
+        "name" : "orderer.example.com:7050"
+      } ]
+    }
+  },
+  "timestamp" : 1737125074324
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetDiscoveryResultsResponseV1">GetDiscoveryResultsResponseV1</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getPrometheusMetricsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics</code></pre></div>
+    <div class="method-summary">Get the Prometheus Metrics (<span class="nickname">getPrometheusMetricsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      String
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>text/plain</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#String">String</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getTransactionReceiptByTxIDV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid</code></pre></div>
+    <div class="method-summary">get a transaction receipt by tx id on a Fabric ledger. (<span class="nickname">getTransactionReceiptByTxIDV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">RunTransactionRequest <a href="#RunTransactionRequest">RunTransactionRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetTransactionReceiptResponse">GetTransactionReceiptResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "chainCodeVersion" : "chainCodeVersion",
+  "blockMetaData" : {
+    "mspid" : "mspid",
+    "blockCreatorID" : "blockCreatorID",
+    "signature" : "signature"
+  },
+  "transactionCreator" : {
+    "mspid" : "mspid",
+    "creatorID" : "creatorID"
+  },
+  "blockNumber" : "blockNumber",
+  "chainCodeName" : "chainCodeName",
+  "transactionEndorsement" : [ {
+    "mspid" : "mspid",
+    "signature" : "signature",
+    "endorserID" : "endorserID"
+  }, {
+    "mspid" : "mspid",
+    "signature" : "signature",
+    "endorserID" : "endorserID"
+  } ],
+  "responseStatus" : "responseStatus",
+  "channelID" : "channelID",
+  "rwsetWriteData" : "rwsetWriteData",
+  "rwsetKey" : "rwsetKey"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#GetTransactionReceiptResponse">GetTransactionReceiptResponse</a>
+    <h4 class="field-label">404</h4>
+    
+        <a href="#"></a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="runDelegatedSignTransactionV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction</code></pre></div>
+    <div class="method-summary">Runs a transaction on a Fabric ledger using user-provided signing callback. (<span class="nickname">runDelegatedSignTransactionV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">RunDelegatedSignTransactionRequest <a href="#RunDelegatedSignTransactionRequest">RunDelegatedSignTransactionRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#RunTransactionResponse">RunTransactionResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "functionOutput" : "functionOutput",
+  "transactionId" : "transactionId"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#RunTransactionResponse">RunTransactionResponse</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="runTransactionV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction</code></pre></div>
+    <div class="method-summary">Runs a transaction on a Fabric ledger. (<span class="nickname">runTransactionV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">RunTransactionRequest <a href="#RunTransactionRequest">RunTransactionRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#RunTransactionResponse">RunTransactionResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "functionOutput" : "functionOutput",
+  "transactionId" : "transactionId"
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    OK
+        <a href="#RunTransactionResponse">RunTransactionResponse</a>
+    <h4 class="field-label">500</h4>
+    Internal Server Error
+        <a href="#ErrorExceptionResponseV1">ErrorExceptionResponseV1</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#CactiBlockFullEventV1"><code>CactiBlockFullEventV1</code> - </a></li>
+    <li><a href="#CactiBlockFullResponseV1"><code>CactiBlockFullResponseV1</code> - </a></li>
+    <li><a href="#CactiBlockTransactionEventV1"><code>CactiBlockTransactionEventV1</code> - </a></li>
+    <li><a href="#CactiBlockTransactionsResponseV1"><code>CactiBlockTransactionsResponseV1</code> - </a></li>
+    <li><a href="#ChainCodeLanguageRuntime"><code>ChainCodeLanguageRuntime</code> - </a></li>
+    <li><a href="#ChainCodeLifeCycleCommandResponses"><code>ChainCodeLifeCycleCommandResponses</code> - </a></li>
+    <li><a href="#ChainCodeProgrammingLanguage"><code>ChainCodeProgrammingLanguage</code> - </a></li>
+    <li><a href="#ConnectionProfile"><code>ConnectionProfile</code> - </a></li>
+    <li><a href="#ConnectionProfile_client"><code>ConnectionProfile_client</code> - </a></li>
+    <li><a href="#DefaultEventHandlerStrategy"><code>DefaultEventHandlerStrategy</code> - </a></li>
+    <li><a href="#DeployContractV1Request"><code>DeployContractV1Request</code> - </a></li>
+    <li><a href="#DeployContractV1Request_constructorArgs"><code>DeployContractV1Request_constructorArgs</code> - </a></li>
+    <li><a href="#DeployContractV1Response"><code>DeployContractV1Response</code> - </a></li>
+    <li><a href="#DeploymentTargetOrgFabric2x"><code>DeploymentTargetOrgFabric2x</code> - </a></li>
+    <li><a href="#DeploymentTargetOrganization"><code>DeploymentTargetOrganization</code> - </a></li>
+    <li><a href="#ErrorExceptionResponseV1"><code>ErrorExceptionResponseV1</code> - </a></li>
+    <li><a href="#FabricCertificateIdentityV1"><code>FabricCertificateIdentityV1</code> - </a></li>
+    <li><a href="#FabricContractInvocationType"><code>FabricContractInvocationType</code> - </a></li>
+    <li><a href="#FabricSigningCredential"><code>FabricSigningCredential</code> - </a></li>
+    <li><a href="#FabricSigningCredentialType"><code>FabricSigningCredentialType</code> - </a></li>
+    <li><a href="#FabricX509CertificateV1"><code>FabricX509CertificateV1</code> - </a></li>
+    <li><a href="#FileBase64"><code>FileBase64</code> - </a></li>
+    <li><a href="#FullBlockTransactionActionV1"><code>FullBlockTransactionActionV1</code> - </a></li>
+    <li><a href="#FullBlockTransactionEndorsementV1"><code>FullBlockTransactionEndorsementV1</code> - </a></li>
+    <li><a href="#FullBlockTransactionEventV1"><code>FullBlockTransactionEventV1</code> - </a></li>
+    <li><a href="#GatewayDiscoveryOptions"><code>GatewayDiscoveryOptions</code> - </a></li>
+    <li><a href="#GatewayEventHandlerOptions"><code>GatewayEventHandlerOptions</code> - </a></li>
+    <li><a href="#GatewayOptions"><code>GatewayOptions</code> - </a></li>
+    <li><a href="#GatewayOptions_wallet"><code>GatewayOptions_wallet</code> - </a></li>
+    <li><a href="#GetBlockRequestV1"><code>GetBlockRequestV1</code> - </a></li>
+    <li><a href="#GetBlockRequestV1_query"><code>GetBlockRequestV1_query</code> - </a></li>
+    <li><a href="#GetBlockRequestV1_query_blockHash"><code>GetBlockRequestV1_query_blockHash</code> - </a></li>
+    <li><a href="#GetBlockResponseDecodedV1"><code>GetBlockResponseDecodedV1</code> - </a></li>
+    <li><a href="#GetBlockResponseEncodedV1"><code>GetBlockResponseEncodedV1</code> - </a></li>
+    <li><a href="#GetBlockResponseTypeV1"><code>GetBlockResponseTypeV1</code> - </a></li>
+    <li><a href="#GetBlockResponseV1"><code>GetBlockResponseV1</code> - </a></li>
+    <li><a href="#GetChainInfoRequestV1"><code>GetChainInfoRequestV1</code> - </a></li>
+    <li><a href="#GetChainInfoResponseV1"><code>GetChainInfoResponseV1</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsRequestV1"><code>GetDiscoveryResultsRequestV1</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsResponseV1"><code>GetDiscoveryResultsResponseV1</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsResponseV1_msps_value"><code>GetDiscoveryResultsResponseV1_msps_value</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsResponseV1_orderers_value"><code>GetDiscoveryResultsResponseV1_orderers_value</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner"><code>GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsResponseV1_peersByMSP_value"><code>GetDiscoveryResultsResponseV1_peersByMSP_value</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner"><code>GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner</code> - </a></li>
+    <li><a href="#GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner"><code>GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner</code> - </a></li>
+    <li><a href="#GetTransactionReceiptResponse"><code>GetTransactionReceiptResponse</code> - </a></li>
+    <li><a href="#RunDelegatedSignTransactionRequest"><code>RunDelegatedSignTransactionRequest</code> - </a></li>
+    <li><a href="#RunTransactionRequest"><code>RunTransactionRequest</code> - </a></li>
+    <li><a href="#RunTransactionResponse"><code>RunTransactionResponse</code> - </a></li>
+    <li><a href="#RunTransactionResponseType"><code>RunTransactionResponseType</code> - </a></li>
+    <li><a href="#SSHExecCommandResponse"><code>SSHExecCommandResponse</code> - </a></li>
+    <li><a href="#TransactReceiptBlockMetaData"><code>TransactReceiptBlockMetaData</code> - </a></li>
+    <li><a href="#TransactReceiptTransactionCreator"><code>TransactReceiptTransactionCreator</code> - </a></li>
+    <li><a href="#TransactReceiptTransactionEndorsement"><code>TransactReceiptTransactionEndorsement</code> - </a></li>
+    <li><a href="#VaultTransitKey"><code>VaultTransitKey</code> - </a></li>
+    <li><a href="#WatchBlocksCactusErrorResponseV1"><code>WatchBlocksCactusErrorResponseV1</code> - </a></li>
+    <li><a href="#WatchBlocksDelegatedSignOptionsV1"><code>WatchBlocksDelegatedSignOptionsV1</code> - </a></li>
+    <li><a href="#WatchBlocksFilteredResponseV1"><code>WatchBlocksFilteredResponseV1</code> - </a></li>
+    <li><a href="#WatchBlocksFullResponseV1"><code>WatchBlocksFullResponseV1</code> - </a></li>
+    <li><a href="#WatchBlocksListenerTypeV1"><code>WatchBlocksListenerTypeV1</code> - </a></li>
+    <li><a href="#WatchBlocksOptionsV1"><code>WatchBlocksOptionsV1</code> - </a></li>
+    <li><a href="#WatchBlocksPrivateResponseV1"><code>WatchBlocksPrivateResponseV1</code> - </a></li>
+    <li><a href="#WatchBlocksResponseV1"><code>WatchBlocksResponseV1</code> - </a></li>
+    <li><a href="#WatchBlocksV1"><code>WatchBlocksV1</code> - </a></li>
+    <li><a href="#WebSocketKey"><code>WebSocketKey</code> - </a></li>
+    <li><a href="#deployContractV1_501_response"><code>deployContractV1_501_response</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="CactiBlockFullEventV1"><code>CactiBlockFullEventV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Custom format full fabric block with transactions</div>
+    <div class="field-items">
+      <div class="param">blockNumber </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">blockHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">previousBlockHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionCount </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">cactiTransactionsEvents </div><div class="param-desc"><span class="param-type"><a href="#FullBlockTransactionEventV1">array[FullBlockTransactionEventV1]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactiBlockFullResponseV1"><code>CactiBlockFullResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Custom response containing full block summary.</div>
+    <div class="field-items">
+      <div class="param">cactiFullEvents </div><div class="param-desc"><span class="param-type"><a href="#CactiBlockFullEventV1">CactiBlockFullEventV1</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactiBlockTransactionEventV1"><code>CactiBlockTransactionEventV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction summary from commited block.</div>
+    <div class="field-items">
+      <div class="param">chaincodeId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> ChainCode containing function that was executed. </div>
+<div class="param">transactionId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Transaction identifier. </div>
+<div class="param">functionName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Function name that was executed. </div>
+<div class="param">functionArgs </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> List of function arguments. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CactiBlockTransactionsResponseV1"><code>CactiBlockTransactionsResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Custom response containing block transactions summary. Compatible with legacy fabric-socketio connector monitoring.</div>
+    <div class="field-items">
+      <div class="param">cactiTransactionsEvents </div><div class="param-desc"><span class="param-type"><a href="#CactiBlockTransactionEventV1">array[CactiBlockTransactionEventV1]</a></span> List of transactions summary </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ChainCodeLanguageRuntime"><code>ChainCodeLanguageRuntime</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Enumerates the supported programming language runtimes of Hyperledger Fabric</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ChainCodeLifeCycleCommandResponses"><code>ChainCodeLifeCycleCommandResponses</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">packaging (optional)</div><div class="param-desc"><span class="param-type"><a href="#SSHExecCommandResponse">SSHExecCommandResponse</a></span>  </div>
+<div class="param">installList </div><div class="param-desc"><span class="param-type"><a href="#SSHExecCommandResponse">array[SSHExecCommandResponse]</a></span>  </div>
+<div class="param">queryInstalledList </div><div class="param-desc"><span class="param-type"><a href="#SSHExecCommandResponse">array[SSHExecCommandResponse]</a></span>  </div>
+<div class="param">approveForMyOrgList </div><div class="param-desc"><span class="param-type"><a href="#SSHExecCommandResponse">array[SSHExecCommandResponse]</a></span>  </div>
+<div class="param">commit (optional)</div><div class="param-desc"><span class="param-type"><a href="#SSHExecCommandResponse">SSHExecCommandResponse</a></span>  </div>
+<div class="param">queryCommitted (optional)</div><div class="param-desc"><span class="param-type"><a href="#SSHExecCommandResponse">SSHExecCommandResponse</a></span>  </div>
+<div class="param">init (optional)</div><div class="param-desc"><span class="param-type"><a href="#SSHExecCommandResponse">SSHExecCommandResponse</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ChainCodeProgrammingLanguage"><code>ChainCodeProgrammingLanguage</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Enumerates the supported source code programming languages of Hyperledger Fabric</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConnectionProfile"><code>ConnectionProfile</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">xMinustype (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">description (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">version </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">client (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionProfile_client">ConnectionProfile_client</a></span>  </div>
+<div class="param">channels (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+<div class="param">organizations </div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+<div class="param">orderers (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+<div class="param">peers </div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+<div class="param">certificateAuthorities (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ConnectionProfile_client"><code>ConnectionProfile_client</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">organization (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DefaultEventHandlerStrategy"><code>DefaultEventHandlerStrategy</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractV1Request"><code>DeployContractV1Request</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">ccLang </div><div class="param-desc"><span class="param-type"><a href="#ChainCodeProgrammingLanguage">ChainCodeProgrammingLanguage</a></span>  </div>
+<div class="param">caFile </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> CA certificate file that will be used to verify the TLS connection to the orderer. </div>
+<div class="param">orderer </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Ordering service endpoint specified as <hostname or IP address>:<port> </div>
+<div class="param">ordererTLSHostnameOverride </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The hostname override to use when validating the TLS connection to the orderer </div>
+<div class="param">connTimeout (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> Timeout for client to connect (default 3s) </div>
+<div class="param">signaturePolicy (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Passed in to the peer via the --signature-policy argument on the command line. See also: https://hyperledger-fabric.readthedocs.io/en/release-2.2/endorsement-policies.html#setting-chaincode-level-endorsement-policies </div>
+<div class="param">collectionsConfigFile (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Name of the collections config file as present in the sourceFiles array of the request. </div>
+<div class="param">channelId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The name of the Fabric channel where the contract will get instantiated. </div>
+<div class="param">targetOrganizations </div><div class="param-desc"><span class="param-type"><a href="#DeploymentTargetOrganization">array[DeploymentTargetOrganization]</a></span>  </div>
+<div class="param">constructorArgs (optional)</div><div class="param-desc"><span class="param-type"><a href="#DeployContractV1Request_constructorArgs">DeployContractV1Request_constructorArgs</a></span>  </div>
+<div class="param">ccSequence </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">ccVersion </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ccName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ccLabel </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Human readable label to uniquely identify the contract. Recommended to include in this at least the contract name and the exact version in order to make it easily distinguishable from other deployments of the same contract. </div>
+<div class="param">sourceFiles </div><div class="param-desc"><span class="param-type"><a href="#FileBase64">array[FileBase64]</a></span> The your-smart-contract.go file where the functionality of your contract is implemented. </div>
+<div class="param">coreYamlFile </div><div class="param-desc"><span class="param-type"><a href="#">FileBase64</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractV1Request_constructorArgs"><code>DeployContractV1Request_constructorArgs</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">Args (optional)</div><div class="param-desc"><span class="param-type"><a href="#AnyType">array[oas_any_type_not_mapped]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeployContractV1Response"><code>DeployContractV1Response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">success </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">packageIds </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">lifecycle </div><div class="param-desc"><span class="param-type"><a href="#ChainCodeLifeCycleCommandResponses">ChainCodeLifeCycleCommandResponses</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeploymentTargetOrgFabric2x"><code>DeploymentTargetOrgFabric2x</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">transient (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Transient map of arguments in JSON encoding </div>
+<div class="param">CORE_PEER_LOCALMSPID </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">CORE_PEER_ADDRESS </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">CORE_PEER_MSPCONFIGPATH </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">CORE_PEER_TLS_ROOTCERT_FILE </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">ORDERER_TLS_ROOTCERT_FILE </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="DeploymentTargetOrganization"><code>DeploymentTargetOrganization</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">CORE_PEER_LOCALMSPID </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">CORE_PEER_ADDRESS </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">CORE_PEER_MSPCONFIG </div><div class="param-desc"><span class="param-type"><a href="#FileBase64">array[FileBase64]</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">CORE_PEER_TLS_ROOTCERT </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+<div class="param">ORDERER_TLS_ROOTCERT </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Mapped to environment variables of the Fabric CLI container. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorExceptionResponseV1"><code>ErrorExceptionResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">error </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FabricCertificateIdentityV1"><code>FabricCertificateIdentityV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Combination of certificate and it's MSP ID used to identify fabric actors.</div>
+    <div class="field-items">
+      <div class="param">mspid </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">cert </div><div class="param-desc"><span class="param-type"><a href="#FabricX509CertificateV1">FabricX509CertificateV1</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FabricContractInvocationType"><code>FabricContractInvocationType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FabricSigningCredential"><code>FabricSigningCredential</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">keychainId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">keychainRef </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">type (optional)</div><div class="param-desc"><span class="param-type"><a href="#FabricSigningCredentialType">FabricSigningCredentialType</a></span>  </div>
+<div class="param">vaultTransitKey (optional)</div><div class="param-desc"><span class="param-type"><a href="#VaultTransitKey">VaultTransitKey</a></span>  </div>
+<div class="param">webSocketKey (optional)</div><div class="param-desc"><span class="param-type"><a href="#WebSocketKey">WebSocketKey</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FabricSigningCredentialType"><code>FabricSigningCredentialType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>different type of identity provider for singing fabric messages supported by this package</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FabricX509CertificateV1"><code>FabricX509CertificateV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction endorser certificate object</div>
+    <div class="field-items">
+      <div class="param">issuer </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">serialNumber </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">subject </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">subjectAltName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">validFrom </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">validTo </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">pem </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FileBase64"><code>FileBase64</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Represents a file-system file that has a name and a body which holds the file contents as a Base64 encoded string</div>
+    <div class="field-items">
+      <div class="param">body </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The file's contents encoded as a Base64 string. </div>
+<div class="param">filename </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The name as referred to on a file system </div>
+<div class="param">filepath (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The relative path of the file, if it should be placed in a sub-directory </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FullBlockTransactionActionV1"><code>FullBlockTransactionActionV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction action returned from fabric block.</div>
+    <div class="field-items">
+      <div class="param">functionName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">functionArgs </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">chaincodeId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">creator </div><div class="param-desc"><span class="param-type"><a href="#FabricCertificateIdentityV1">FabricCertificateIdentityV1</a></span>  </div>
+<div class="param">endorsements </div><div class="param-desc"><span class="param-type"><a href="#FullBlockTransactionEndorsementV1">array[FullBlockTransactionEndorsementV1]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FullBlockTransactionEndorsementV1"><code>FullBlockTransactionEndorsementV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction endorsment object returned from fabric block.</div>
+    <div class="field-items">
+      <div class="param">signer </div><div class="param-desc"><span class="param-type"><a href="#FabricCertificateIdentityV1">FabricCertificateIdentityV1</a></span>  </div>
+<div class="param">signature </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="FullBlockTransactionEventV1"><code>FullBlockTransactionEventV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Transaction returned from fabric block.</div>
+    <div class="field-items">
+      <div class="param">hash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">channelId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">timestamp </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">protocolVersion </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">transactionType </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">epoch </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">actions </div><div class="param-desc"><span class="param-type"><a href="#FullBlockTransactionActionV1">array[FullBlockTransactionActionV1]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GatewayDiscoveryOptions"><code>GatewayDiscoveryOptions</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">asLocalhost (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+<div class="param">enabled (optional)</div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GatewayEventHandlerOptions"><code>GatewayEventHandlerOptions</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">commitTimeout (optional)</div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">endorseTimeout (optional)</div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">strategy </div><div class="param-desc"><span class="param-type"><a href="#DefaultEventHandlerStrategy">DefaultEventHandlerStrategy</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GatewayOptions"><code>GatewayOptions</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">connectionProfile (optional)</div><div class="param-desc"><span class="param-type"><a href="#ConnectionProfile">ConnectionProfile</a></span>  </div>
+<div class="param">discovery (optional)</div><div class="param-desc"><span class="param-type"><a href="#GatewayDiscoveryOptions">GatewayDiscoveryOptions</a></span>  </div>
+<div class="param">eventHandlerOptions (optional)</div><div class="param-desc"><span class="param-type"><a href="#GatewayEventHandlerOptions">GatewayEventHandlerOptions</a></span>  </div>
+<div class="param">identity </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">wallet </div><div class="param-desc"><span class="param-type"><a href="#GatewayOptions_wallet">GatewayOptions_wallet</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GatewayOptions_wallet"><code>GatewayOptions_wallet</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">keychain (optional)</div><div class="param-desc"><span class="param-type"><a href="#FabricSigningCredential">FabricSigningCredential</a></span>  </div>
+<div class="param">json (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBlockRequestV1"><code>GetBlockRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Request for GetBlock endpoint.</div>
+    <div class="field-items">
+      <div class="param">channelName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Fabric channel which we want to query. </div>
+<div class="param">connectionChannelName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used </div>
+<div class="param">gatewayOptions </div><div class="param-desc"><span class="param-type"><a href="#GatewayOptions">GatewayOptions</a></span>  </div>
+<div class="param">query </div><div class="param-desc"><span class="param-type"><a href="#GetBlockRequestV1_query">GetBlockRequestV1_query</a></span>  </div>
+<div class="param">responseType (optional)</div><div class="param-desc"><span class="param-type"><a href="#GetBlockResponseTypeV1">GetBlockResponseTypeV1</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBlockRequestV1_query"><code>GetBlockRequestV1_query</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Query selector, caller must provide at least one of them. First found will be used, rest will be ignored, so it's recommended to pass single selector.</div>
+    <div class="field-items">
+      <div class="param">blockNumber (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Select block by it's number. </div>
+<div class="param">blockHash (optional)</div><div class="param-desc"><span class="param-type"><a href="#GetBlockRequestV1_query_blockHash">GetBlockRequestV1_query_blockHash</a></span>  </div>
+<div class="param">transactionId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Select block by id of transaction that it contains. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBlockRequestV1_query_blockHash"><code>GetBlockRequestV1_query_blockHash</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Select block by it's hash.</div>
+    <div class="field-items">
+      <div class="param">encoding (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> NodeJS Buffer encoding (utf-8, hex, binary, base64, etc...). Passed directly to <code>Buffer.from()</code> call on hashBuffer. If not provided then JSON buffer format is assumed. </div>
+<div class="param">buffer </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Buffer of blockHash. It's encoding should be described in <code>encoding</code> parameter. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBlockResponseDecodedV1"><code>GetBlockResponseDecodedV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>When skipDecode is false (default) then decoded block object is returned.</div>
+    <div class="field-items">
+      <div class="param">decodedBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Full hyperledger fabric block data. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBlockResponseEncodedV1"><code>GetBlockResponseEncodedV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>When skipDecode is true then encoded block Buffer is returned.</div>
+    <div class="field-items">
+      <div class="param">encodedBlock </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBlockResponseTypeV1"><code>GetBlockResponseTypeV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response type from GetBlock.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetBlockResponseV1"><code>GetBlockResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response from GetBlock endpoint.</div>
+    <div class="field-items">
+      <div class="param">cactiTransactionsEvents </div><div class="param-desc"><span class="param-type"><a href="#CactiBlockTransactionEventV1">array[CactiBlockTransactionEventV1]</a></span> List of transactions summary </div>
+<div class="param">cactiFullEvents </div><div class="param-desc"><span class="param-type"><a href="#CactiBlockFullEventV1">CactiBlockFullEventV1</a></span>  </div>
+<div class="param">decodedBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Full hyperledger fabric block data. </div>
+<div class="param">encodedBlock </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetChainInfoRequestV1"><code>GetChainInfoRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Request for GetChainInfo endpoint.</div>
+    <div class="field-items">
+      <div class="param">channelName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Fabric channel which we want to query. </div>
+<div class="param">connectionChannelName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Fabric channel we want to connect to. If not provided, then one from channelName parameter will be used </div>
+<div class="param">gatewayOptions </div><div class="param-desc"><span class="param-type"><a href="#GatewayOptions">GatewayOptions</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetChainInfoResponseV1"><code>GetChainInfoResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response from GetChainInfo endpoint.</div>
+    <div class="field-items">
+      <div class="param">height </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Current height of fabric ledger </div>
+<div class="param">currentBlockHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Current block hash of fabric ledger </div>
+<div class="param">previousBlockHash </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Previous block hash of fabric ledger </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsRequestV1"><code>GetDiscoveryResultsRequestV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Request for GetDiscoveryResults endpoint.</div>
+    <div class="field-items">
+      <div class="param">channelName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Fabric channel which we want to query. </div>
+<div class="param">gatewayOptions </div><div class="param-desc"><span class="param-type"><a href="#GatewayOptions">GatewayOptions</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsResponseV1"><code>GetDiscoveryResultsResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response for GetDiscoveryResults endpoint.</div>
+    <div class="field-items">
+      <div class="param">msps </div><div class="param-desc"><span class="param-type"><a href="#GetDiscoveryResultsResponseV1_msps_value">map[String, GetDiscoveryResultsResponseV1_msps_value]</a></span> Definitions of all MSP defined on the channel </div>
+<div class="param">orderers </div><div class="param-desc"><span class="param-type"><a href="#GetDiscoveryResultsResponseV1_orderers_value">map[String, GetDiscoveryResultsResponseV1_orderers_value]</a></span> List of orderers defined on the channel </div>
+<div class="param">peersByMSP </div><div class="param-desc"><span class="param-type"><a href="#GetDiscoveryResultsResponseV1_peersByMSP_value">map[String, GetDiscoveryResultsResponseV1_peersByMSP_value]</a></span> List of peers organized by owner MSP. </div>
+<div class="param">timestamp </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsResponseV1_msps_value"><code>GetDiscoveryResultsResponseV1_msps_value</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">id </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">organizationalUnitIdentifiers </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">rootCerts </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">intermediateCerts </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">admins </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">tlsRootCerts </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">tlsIntermediateCerts </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsResponseV1_orderers_value"><code>GetDiscoveryResultsResponseV1_orderers_value</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">endpoints </div><div class="param-desc"><span class="param-type"><a href="#GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner">array[GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner"><code>GetDiscoveryResultsResponseV1_orderers_value_endpoints_inner</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">host </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">port </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsResponseV1_peersByMSP_value"><code>GetDiscoveryResultsResponseV1_peersByMSP_value</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">peers </div><div class="param-desc"><span class="param-type"><a href="#GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner">array[GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner"><code>GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">mspid </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">endpoint </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">ledgerHeight </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span>  </div>
+<div class="param">chaincodes </div><div class="param-desc"><span class="param-type"><a href="#GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner">array[GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner"><code>GetDiscoveryResultsResponseV1_peersByMSP_value_peers_inner_chaincodes_inner</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">name </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">version </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetTransactionReceiptResponse"><code>GetTransactionReceiptResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">blockNumber (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">channelID (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionCreator (optional)</div><div class="param-desc"><span class="param-type"><a href="#TransactReceiptTransactionCreator">TransactReceiptTransactionCreator</a></span>  </div>
+<div class="param">transactionEndorsement (optional)</div><div class="param-desc"><span class="param-type"><a href="#TransactReceiptTransactionEndorsement">array[TransactReceiptTransactionEndorsement]</a></span>  </div>
+<div class="param">blockMetaData (optional)</div><div class="param-desc"><span class="param-type"><a href="#TransactReceiptBlockMetaData">TransactReceiptBlockMetaData</a></span>  </div>
+<div class="param">chainCodeName (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">chainCodeVersion (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">responseStatus (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">rwsetKey (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">rwsetWriteData (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunDelegatedSignTransactionRequest"><code>RunDelegatedSignTransactionRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">endorsingPeers (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> An array of endorsing peers (name or url) for the transaction. </div>
+<div class="param">endorsingOrgs (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> An array of endorsing organizations (by mspID or issuer org name on certificate) for the transaction. </div>
+<div class="param">transientData (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span>  </div>
+<div class="param">signerCertificate </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signerMspID </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">uniqueTransactionData (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Can be used to uniquely identify and authorize signing request </div>
+<div class="param">channelName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">contractName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">invocationType </div><div class="param-desc"><span class="param-type"><a href="#FabricContractInvocationType">FabricContractInvocationType</a></span>  </div>
+<div class="param">methodName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">params </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">responseType (optional)</div><div class="param-desc"><span class="param-type"><a href="#RunTransactionResponseType">RunTransactionResponseType</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionRequest"><code>RunTransactionRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">endorsingPeers (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> An array of endorsing peers (name or url) for the transaction. </div>
+<div class="param">endorsingOrgs (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span> An array of endorsing organizations (by mspID or issuer org name on certificate) for the transaction. </div>
+<div class="param">transientData (optional)</div><div class="param-desc"><span class="param-type"><a href="#">Object</a></span>  </div>
+<div class="param">gatewayOptions (optional)</div><div class="param-desc"><span class="param-type"><a href="#GatewayOptions">GatewayOptions</a></span>  </div>
+<div class="param">signingCredential </div><div class="param-desc"><span class="param-type"><a href="#FabricSigningCredential">FabricSigningCredential</a></span>  </div>
+<div class="param">channelName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">contractName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">invocationType </div><div class="param-desc"><span class="param-type"><a href="#FabricContractInvocationType">FabricContractInvocationType</a></span>  </div>
+<div class="param">methodName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">params </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">responseType (optional)</div><div class="param-desc"><span class="param-type"><a href="#RunTransactionResponseType">RunTransactionResponseType</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionResponse"><code>RunTransactionResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">functionOutput </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">transactionId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionResponseType"><code>RunTransactionResponseType</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response format from transaction / query execution</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="SSHExecCommandResponse"><code>SSHExecCommandResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">stdout </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">stderr </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  </div>
+<div class="param">signal </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TransactReceiptBlockMetaData"><code>TransactReceiptBlockMetaData</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">mspid (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">blockCreatorID (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signature (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TransactReceiptTransactionCreator"><code>TransactReceiptTransactionCreator</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">mspid (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">creatorID (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="TransactReceiptTransactionEndorsement"><code>TransactReceiptTransactionEndorsement</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">mspid (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">endorserID (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signature (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="VaultTransitKey"><code>VaultTransitKey</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>vault key details for signing fabric message with private key stored with transit engine.</div>
+    <div class="field-items">
+      <div class="param">keyName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> label of private key </div>
+<div class="param">token </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> token for accessing private key </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksCactusErrorResponseV1"><code>WatchBlocksCactusErrorResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Error response from WatchBlocks operation.</div>
+    <div class="field-items">
+      <div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Error code. </div>
+<div class="param">errorMessage </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Description of the error. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksDelegatedSignOptionsV1"><code>WatchBlocksDelegatedSignOptionsV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Options passed when subscribing to block monitoring with delegated signing.</div>
+    <div class="field-items">
+      <div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#WatchBlocksListenerTypeV1">WatchBlocksListenerTypeV1</a></span>  </div>
+<div class="param">startBlock (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> From which block start monitoring. Defaults to latest. </div>
+<div class="param">channelName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signerCertificate </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">signerMspID </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">uniqueTransactionData (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Can be used to uniquely identify and authorize signing request </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksFilteredResponseV1"><code>WatchBlocksFilteredResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response that corresponds to Fabric SDK 'filtered' EventType.</div>
+    <div class="field-items">
+      <div class="param">filteredBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Filtered commited block. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksFullResponseV1"><code>WatchBlocksFullResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response that corresponds to Fabric SDK 'full' EventType.</div>
+    <div class="field-items">
+      <div class="param">fullBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Full commited block. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksListenerTypeV1"><code>WatchBlocksListenerTypeV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response type from WatchBlocks. 'Cacti*' are custom views, others correspond to fabric SDK call.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksOptionsV1"><code>WatchBlocksOptionsV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Options passed when subscribing to block monitoring.</div>
+    <div class="field-items">
+      <div class="param">channelName </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Hyperledger Fabric channel to connect to. </div>
+<div class="param">gatewayOptions </div><div class="param-desc"><span class="param-type"><a href="#GatewayOptions">GatewayOptions</a></span>  </div>
+<div class="param">type </div><div class="param-desc"><span class="param-type"><a href="#WatchBlocksListenerTypeV1">WatchBlocksListenerTypeV1</a></span>  </div>
+<div class="param">startBlock (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> From which block start monitoring. Defaults to latest. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksPrivateResponseV1"><code>WatchBlocksPrivateResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response that corresponds to Fabric SDK 'private' EventType.</div>
+    <div class="field-items">
+      <div class="param">privateBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Private commited block. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksResponseV1"><code>WatchBlocksResponseV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Response block from WatchBlocks endpoint. Depends on 'type' passed in subscription options.</div>
+    <div class="field-items">
+      <div class="param">cactiTransactionsEvents </div><div class="param-desc"><span class="param-type"><a href="#CactiBlockTransactionEventV1">array[CactiBlockTransactionEventV1]</a></span> List of transactions summary </div>
+<div class="param">cactiFullEvents </div><div class="param-desc"><span class="param-type"><a href="#CactiBlockFullEventV1">CactiBlockFullEventV1</a></span>  </div>
+<div class="param">fullBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Full commited block. </div>
+<div class="param">filteredBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Filtered commited block. </div>
+<div class="param">privateBlock </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> Private commited block. </div>
+<div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#number">BigDecimal</a></span> Error code. </div>
+<div class="param">errorMessage </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Description of the error. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WatchBlocksV1"><code>WatchBlocksV1</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>Websocket requests for monitoring new blocks.</div>
+    <div class="field-items">
+          </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="WebSocketKey"><code>WebSocketKey</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>web-socket key details for signing fabric message with private key stored with external client</div>
+    <div class="field-items">
+      <div class="param">sessionId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> session Id to access client </div>
+<div class="param">signature </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> signature of the session ID </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="deployContractV1_501_response"><code>deployContractV1_501_response</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">message (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

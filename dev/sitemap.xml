@@ -129,6 +129,38 @@
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-copm-core/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-copm-test/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-ledger-browser/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-plugin-consortium-static/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-plugin-copm-corda/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-plugin-copm-fabric/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-plugin-ledger-connector-stellar/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-plugin-weaver-driver-fabric/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
          <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-api-client/</loc>
          <lastmod>2026-09-10</lastmod>
     </url>
@@ -141,7 +173,31 @@
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-core-api/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
          <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-core/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-bungee-hermes/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-coordinator-besu/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-eth-besu-erc20/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-eth-besu/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-keychain-memory/</loc>
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
@@ -153,7 +209,27 @@
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-ledger-connector-ethereum/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
          <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-ledger-connector-fabric/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-object-store-ipfs/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-persistence-ethereum/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-persistence-fabric/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/</loc>
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
@@ -165,7 +241,139 @@
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-test-geth-ledger/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-test-plugin-htlc-eth-besu-erc20/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-test-plugin-htlc-eth-besu/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-test-plugin-ledger-connector-besu/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-test-plugin-ledger-connector-ethereum/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
          <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-test-tooling/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-copm-core/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-plugin-consortium-static/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cacti-plugin-ledger-connector-stellar/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-cmd-api-server/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-core-api/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-bungee-hermes/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-coordinator-besu/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-coordinator-besu/docs/flow/htlc-coordinator-alice-flow/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-coordinator-besu/docs/flow/htlc-coordinator-bob-flow/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-eth-besu/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-htlc-eth-besu-erc20/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-keychain-memory/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-ledger-connector-besu/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-ledger-connector-corda/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-ledger-connector-ethereum/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-ledger-connector-fabric/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-object-store-ipfs/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-persistence-ethereum/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-persistence-fabric/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/oapi/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/api3-adapter-spec/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/configuration/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/database/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/fabric-tests-to-fix/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/operations/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/satp-release-process/</loc>
+         <lastmod>2026-09-10</lastmod>
+    </url>
+    <url>
+         <loc>https://hyperledger-cacti.github.io/cacti/dev/cactus/packages/cactus-plugin-satp-hermes/docs/architecture/satp-hermes/</loc>
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
@@ -274,74 +482,6 @@
     </url>
     <url>
          <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cacti-copm-core_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cacti-plugin-consortium-static_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cacti-plugin-ledger-connector-stellar_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-cmd-api-server_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-core-api_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-bungee-hermes_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-htlc-coordinator-besu_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-htlc-eth-besu-erc20_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-htlc-eth-besu_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-keychain-memory_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-ledger-connector-besu_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-ledger-connector-corda_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-ledger-connector-ethereum_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-ledger-connector-fabric_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-object-store-ipfs_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-persistence-ethereum_openapi/</loc>
-         <lastmod>2026-09-10</lastmod>
-    </url>
-    <url>
-         <loc>https://hyperledger-cacti.github.io/cacti/dev/references/openapi/cactus-plugin-persistence-fabric_openapi/</loc>
          <lastmod>2026-09-10</lastmod>
     </url>
     <url>
