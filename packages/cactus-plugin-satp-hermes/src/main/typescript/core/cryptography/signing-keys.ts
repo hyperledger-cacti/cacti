@@ -1,8 +1,8 @@
 /**
  * ES256 signing-key resolution for SATP gateways.
  *
- * Bridges a {@link GatewayIdentity}'s `SIGNATURE` key material (JWK) to the
- * WebCrypto {@link CryptoKey} handles consumed by the JWS signing and
+ * Bridges a {@link GatewayIdentity}'s `ENVELOPE_SIGNATURE` key material (JWK)
+ * to the WebCrypto {@link CryptoKey} handles consumed by the JWS signing and
  * verification interceptors in `./jws-interceptors`.
  *
  * @module core/cryptography/signing-keys
@@ -26,9 +26,9 @@ import {
 /**
  * Resolve the local gateway's ES256 signing private key.
  *
- * Prefers the `SIGNATURE` key from `localGateway`. When none is configured,
- * an ephemeral ES256 key pair is generated and stored on the identity so
- * its public key can be distributed; a warning is logged because
+ * Prefers the `ENVELOPE_SIGNATURE` key from `localGateway`. When none is
+ * configured, an ephemeral ES256 key pair is generated and stored on the
+ * identity so its public key can be distributed; a warning is logged because
  * counterparties cannot verify signatures until that public key is shared.
  *
  * @param localGateway - The local gateway identity; mutated in place when
@@ -40,13 +40,14 @@ export async function resolveLocalSigningPrivateKey(
   localGateway: GatewayIdentity,
   logger: Logger,
 ): Promise<CryptoKey> {
-  let privateJwk = localGateway.keys?.[GatewayKeyPurpose.SIGNATURE]?.privateKey;
+  let privateJwk =
+    localGateway.keys?.[GatewayKeyPurpose.ENVELOPE_SIGNATURE]?.privateKey;
   if (privateJwk === undefined) {
     const { publicKey, privateKey } = await generateSigningKeyPair();
     localGateway.keys = {
       ...localGateway.keys,
-      [GatewayKeyPurpose.SIGNATURE]: {
-        purpose: GatewayKeyPurpose.SIGNATURE,
+      [GatewayKeyPurpose.ENVELOPE_SIGNATURE]: {
+        purpose: GatewayKeyPurpose.ENVELOPE_SIGNATURE,
         algorithm: SupportedSigningAlgorithms.ES256,
         publicKey: publicKey as unknown as Record<string, unknown>,
         privateKey: privateKey as unknown as Record<string, unknown>,
@@ -54,30 +55,31 @@ export async function resolveLocalSigningPrivateKey(
     };
     privateJwk = privateKey as unknown as Record<string, unknown>;
     logger.warn(
-      "no SIGNATURE key configured; generated an ephemeral ES256 key. " +
-        "Counterparty gateways cannot verify this gateway's signatures " +
-        "until its public SIGNATURE key is distributed.",
+      "no ENVELOPE_SIGNATURE key configured; generated an ephemeral ES256 " +
+        "key. Counterparty gateways cannot verify this gateway's signatures " +
+        "until its public ENVELOPE_SIGNATURE key is distributed.",
     );
   }
-  // TODO: support PEM / hex-encoded SIGNATURE keys; JWK only for now.
+  // TODO: support PEM / hex-encoded ENVELOPE_SIGNATURE keys; JWK only for now.
   return importSigningKey(privateJwk as unknown as JWK);
 }
 
 /**
  * Resolve the ES256 signing public key for a gateway identity.
  *
- * @param gateway - The gateway identity whose `SIGNATURE` public key to
- *   import, or `undefined` when the gateway is unknown.
+ * @param gateway - The gateway identity whose `ENVELOPE_SIGNATURE` public key
+ *   to import, or `undefined` when the gateway is unknown.
  * @returns The imported ES256 public key, or `undefined` when the gateway
- *   or its `SIGNATURE` public key is unknown.
+ *   or its `ENVELOPE_SIGNATURE` public key is unknown.
  */
 export async function resolveSigningPublicKey(
   gateway: GatewayIdentity | undefined,
 ): Promise<CryptoKey | undefined> {
-  const publicJwk = gateway?.keys?.[GatewayKeyPurpose.SIGNATURE]?.publicKey;
+  const publicJwk =
+    gateway?.keys?.[GatewayKeyPurpose.ENVELOPE_SIGNATURE]?.publicKey;
   if (publicJwk === undefined) {
     return undefined;
   }
-  // TODO: support PEM / hex-encoded SIGNATURE keys; JWK only for now.
+  // TODO: support PEM / hex-encoded ENVELOPE_SIGNATURE keys; JWK only for now.
   return importSigningKey(publicJwk as unknown as JWK);
 }

@@ -11,7 +11,10 @@
  * `verifyMessage` entry point.
  */
 import { create } from "@bufbuild/protobuf";
-import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
+import {
+  JsObjectSigner,
+  Secp256k1Keys,
+} from "@hyperledger-cacti/cactus-common";
 import {
   AssignmentAssertionClaimSchema,
   BurnAssertionClaimSchema,
@@ -66,6 +69,7 @@ import {
 import {
   AssignmentAssertionClaimError,
   BurnAssertionClaimError,
+  ClaimSignatureError,
   MintAssertionClaimError,
   SessionError,
 } from "../../../main/typescript/core/errors/satp-service-errors";
@@ -74,9 +78,20 @@ import type { SATPLogger as Logger } from "../../../main/typescript/core/satp-lo
 
 const TAG = "TestStage3Verifier";
 
-// signatureVerifier only inspects legacy signature fields, which are absent on
-// the v13 messages built here, so a dummy signer is never exercised.
-const signer = {} as JsObjectSigner;
+// Real secp256k1 signer so claim signatures are actually produced and
+// verified — matches how the gateway signs claims in production.
+const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
+const signer = new JsObjectSigner({
+  privateKey: new Uint8Array(keyPairs.privateKey),
+});
+
+// Hex pubkey of the claim-issuing gateway, as stored in session data.
+const claimIssuerPubkey = Buffer.from(keyPairs.publicKey).toString("hex");
+
+// A claim signed like the gateway does it: sign(signer, receipt), hex-encoded.
+function makeSignedClaimReceipt(): string {
+  return "0x" + Buffer.from(`receipt-${Date.now()}`).toString("hex");
+}
 
 // The optional-variable info logs are the only logger interaction the verifiers
 // perform, so a no-op stub is sufficient.
@@ -130,9 +145,13 @@ function makeCommitPreparationRequest(): CommitPreparationRequest {
 }
 
 function makeCommitFinalAssertionRequest(): CommitFinalAssertionRequest {
+  const receipt = makeSignedClaimReceipt();
   return create(CommitFinalAssertionRequestSchema, {
     common: common(MessageType.COMMIT_FINAL),
-    burnAssertionClaim: create(BurnAssertionClaimSchema, {}),
+    burnAssertionClaim: create(BurnAssertionClaimSchema, {
+      receipt,
+      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+    }),
   });
 }
 
@@ -149,16 +168,24 @@ function makeLockAssertionResponse(): LockAssertionResponse {
 }
 
 function makeCommitPreparationResponse(): CommitPreparationResponse {
+  const receipt = makeSignedClaimReceipt();
   return create(CommitPreparationResponseSchema, {
     common: common(MessageType.COMMIT_READY),
-    mintAssertionClaim: create(MintAssertionClaimSchema, {}),
+    mintAssertionClaim: create(MintAssertionClaimSchema, {
+      receipt,
+      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+    }),
   });
 }
 
 function makeCommitFinalAssertionResponse(): CommitFinalAssertionResponse {
+  const receipt = makeSignedClaimReceipt();
   return create(CommitFinalAssertionResponseSchema, {
     common: common(MessageType.ACK_COMMIT_FINAL),
-    assignmentAssertionClaim: create(AssignmentAssertionClaimSchema, {}),
+    assignmentAssertionClaim: create(AssignmentAssertionClaimSchema, {
+      receipt,
+      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+    }),
   });
 }
 
@@ -204,7 +231,9 @@ describe("verifyCommitFinalAssertionRequestMessage", () => {
   });
 
   it("passes for a valid request", () => {
-    const sessionData = makeSessionData();
+    const sessionData = makeSessionData({
+      clientGatewayPubkey: claimIssuerPubkey,
+    });
     const session = makeSession(sessionData);
     const request = makeCommitFinalAssertionRequest();
 
@@ -217,6 +246,25 @@ describe("verifyCommitFinalAssertionRequestMessage", () => {
         logger,
       ),
     ).not.toThrow();
+  });
+
+  it("throws ClaimSignatureError when the burn-claim signature is invalid", () => {
+    const sessionData = makeSessionData({
+      clientGatewayPubkey: claimIssuerPubkey,
+    });
+    const session = makeSession(sessionData);
+    const request = makeCommitFinalAssertionRequest();
+    request.burnAssertionClaim!.signature = "deadbeef";
+
+    expect(() =>
+      verifyCommitFinalAssertionRequestMessage(
+        TAG,
+        signer,
+        request,
+        session,
+        logger,
+      ),
+    ).toThrow(ClaimSignatureError);
   });
 });
 
@@ -268,7 +316,9 @@ describe("verifyCommitPreparationResponseMessage", () => {
   });
 
   it("passes for a valid response", () => {
-    const sessionData = makeSessionData();
+    const sessionData = makeSessionData({
+      serverGatewayPubkey: claimIssuerPubkey,
+    });
     const session = makeSession(sessionData);
     const response = makeCommitPreparationResponse();
 
@@ -281,6 +331,25 @@ describe("verifyCommitPreparationResponseMessage", () => {
         logger,
       ),
     ).not.toThrow();
+  });
+
+  it("throws ClaimSignatureError when the mint-claim signature is invalid", () => {
+    const sessionData = makeSessionData({
+      serverGatewayPubkey: claimIssuerPubkey,
+    });
+    const session = makeSession(sessionData);
+    const response = makeCommitPreparationResponse();
+    response.mintAssertionClaim!.signature = "deadbeef";
+
+    expect(() =>
+      verifyCommitPreparationResponseMessage(
+        TAG,
+        signer,
+        response,
+        session,
+        logger,
+      ),
+    ).toThrow(ClaimSignatureError);
   });
 });
 
@@ -301,7 +370,9 @@ describe("verifyCommitFinalAssertionResponseMessage", () => {
   });
 
   it("passes for a valid response", () => {
-    const sessionData = makeSessionData();
+    const sessionData = makeSessionData({
+      serverGatewayPubkey: claimIssuerPubkey,
+    });
     const session = makeSession(sessionData);
     const response = makeCommitFinalAssertionResponse();
 
@@ -314,6 +385,25 @@ describe("verifyCommitFinalAssertionResponseMessage", () => {
         logger,
       ),
     ).not.toThrow();
+  });
+
+  it("throws ClaimSignatureError when the assignment-claim signature is invalid", () => {
+    const sessionData = makeSessionData({
+      serverGatewayPubkey: claimIssuerPubkey,
+    });
+    const session = makeSession(sessionData);
+    const response = makeCommitFinalAssertionResponse();
+    response.assignmentAssertionClaim!.signature = "deadbeef";
+
+    expect(() =>
+      verifyCommitFinalAssertionResponseMessage(
+        TAG,
+        signer,
+        response,
+        session,
+        logger,
+      ),
+    ).toThrow(ClaimSignatureError);
   });
 });
 

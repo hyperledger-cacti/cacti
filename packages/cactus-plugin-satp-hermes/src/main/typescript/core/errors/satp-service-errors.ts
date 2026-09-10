@@ -1301,6 +1301,28 @@ export class WrapAssertionClaimError extends SATPInternalError {
 }
 
 /**
+ * Error thrown when an assertion-claim signature is missing or invalid.
+ *
+ * @description
+ * Assertion claims (wrap/lock/mint/burn/assignment) carry a signature
+ * produced by the claim-issuing gateway over the claim's receipt. This
+ * durable, message-independent signature exists so the claim remains
+ * provable after transport, for dispute resolution and audit. This error
+ * is raised when that signature is absent or fails verification against
+ * the issuing gateway's public key stored in the session.
+ *
+ * @class ClaimSignatureError
+ * @extends SATPInternalError
+ * @since 3.1.0
+ */
+export class ClaimSignatureError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(`${tag}, claim signature missing or invalid`, cause ?? null, 400);
+    this.errorType = SATPErrorType.SIGNATURE_VERIFICATION_FAILED;
+  }
+}
+
+/**
  * Error thrown when token ID is missing.
  *
  * @description

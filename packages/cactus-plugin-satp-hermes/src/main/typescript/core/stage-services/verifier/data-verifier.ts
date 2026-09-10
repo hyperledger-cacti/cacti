@@ -89,6 +89,7 @@ import {
   SATPVersionError,
   SessionDataNotLoadedCorrectlyError,
   SignatureVerificationError,
+  ClaimSignatureError,
   TransferContextIdError,
   MissingTransferContextIdError,
   HashPrevMessageError,
@@ -421,6 +422,54 @@ export function signatureVerifier(
     }
   }
   // No signature fields present — v13 JWS wrapping expected (TASK-064)
+}
+
+/**
+ * Verifies the signature of an assertion claim (wrap/lock/mint/burn/
+ * assignment) against the claim's receipt.
+ *
+ * Claim signatures are produced by the claim-issuing gateway with
+ * `sign(signer, claim.receipt)` (hex-encoded) and are independent of the
+ * JWS envelope signing: claims outlive transport and must stay verifiable
+ * for dispute resolution and audit. The receipt itself is opaque to this
+ * verifier — only the signature over it is checked here.
+ *
+ * @param tag - Context tag for error reporting
+ * @param signer - Signer used for the cryptographic verification
+ * @param claim - The assertion claim carrying `receipt` and `signature`
+ * @param pubKey - Hex public key of the claim-issuing gateway
+ * @throws {ClaimSignatureError} When the signature is missing, malformed,
+ *   or fails verification
+ *
+ * @since 3.1.0
+ */
+export function claimSignatureVerifier(
+  tag: string,
+  signer: JsObjectSigner,
+  claim: { receipt: string; signature: string } | undefined,
+  pubKey: string | undefined,
+): void {
+  if (
+    claim == undefined ||
+    claim.signature === "" ||
+    pubKey === undefined ||
+    pubKey === ""
+  ) {
+    throw new ClaimSignatureError(tag);
+  }
+  let valid: boolean;
+  try {
+    valid = signer.verify(
+      claim.receipt,
+      new Uint8Array(Buffer.from(claim.signature, "hex")),
+      new Uint8Array(Buffer.from(pubKey, "hex")),
+    );
+  } catch (error) {
+    throw new ClaimSignatureError(tag, error as Error);
+  }
+  if (!valid) {
+    throw new ClaimSignatureError(tag);
+  }
 }
 
 /**

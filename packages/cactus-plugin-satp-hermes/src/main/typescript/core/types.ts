@@ -166,7 +166,9 @@ export enum SupportedSigningAlgorithms {
  */
 export enum GatewayKeyPurpose {
   /** Signs SATP protocol messages (JWS envelope). */
-  SIGNATURE = "SIGNATURE",
+  ENVELOPE_SIGNATURE = "ENVELOPE_SIGNATURE",
+  /** Signs claims asserting gateway attributes or capabilities. */
+  CLAIM_SIGNATURE = "CLAIM_SIGNATURE",
   /** Establishes secure channels (e.g., TLS client cert). */
   SECURE_CHANNEL = "SECURE_CHANNEL",
   /** Identifies the gateway itself. */
