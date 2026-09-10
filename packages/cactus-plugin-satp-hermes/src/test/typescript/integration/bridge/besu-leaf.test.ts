@@ -30,7 +30,7 @@ let ontologyManager: OntologyManager;
 let asset: EvmFungibleAsset;
 let nonFungibleAsset: EvmNonFungibleAsset;
 
-const uniqueTokenId1: string = "1001";
+const uniqueTokenId1: string = "9007199254740993";
 const uniqueTokenId2: string = "1002";
 
 const monitorService = MonitorService.createOrGetMonitorService({
@@ -466,7 +466,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
       owner: besuEnv.nonFungibleDefaultAsset.owner,
       contractName: besuEnv.nonFungibleDefaultAsset.contractName,
       contractAddress: besuEnv.nonFungibleDefaultAsset.contractAddress!,
-      uniqueDescriptor: Number(uniqueTokenId1) as UniqueTokenID,
+      uniqueDescriptor: BigInt(uniqueTokenId1) as UniqueTokenID,
       network: {
         id: BesuTestEnvironment.BESU_NETWORK_ID,
         ledgerType: LedgerType.Besu2X,
@@ -517,7 +517,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
 
     const response = await besuLeaf.lockAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -536,7 +536,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
 
     const response2 = (await besuLeaf.getAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     )) as EvmNonFungibleAsset;
     expect(response2).toBeDefined();
     expect(response2.id).toBe(nonFungibleAsset.id);
@@ -547,7 +547,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
       besuEnv.nonFungibleDefaultAsset.contractName,
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     log.info(`Locked token ${uniqueTokenId1} successfully`);
 
@@ -584,7 +584,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
 
     const response = await besuLeaf.unlockAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -615,7 +615,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
       besuEnv.nonFungibleDefaultAsset.contractName,
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      0 as UniqueTokenID,
+      0n as UniqueTokenID,
     );
     log.info(`Unlocked token ${uniqueTokenId1} successfully`);
 
@@ -652,7 +652,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
     );
     const response = await besuLeaf.lockAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -661,7 +661,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
 
     const response2 = await besuLeaf.burnAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId1) as UniqueTokenID,
+      BigInt(uniqueTokenId1) as UniqueTokenID,
     );
     expect(response2).toBeDefined();
     expect(response2.transactionId).toBeDefined();
@@ -682,7 +682,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
       besuEnv.nonFungibleDefaultAsset.contractName,
     );
     expect(response3.uniqueDescriptor as UniqueTokenID).toBe(
-      0 as UniqueTokenID,
+      0n as UniqueTokenID,
     );
 
     await besuEnv.checkBalance(
@@ -711,7 +711,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
   it("Should Mint a token", async () => {
     const response = await besuLeaf.mintAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -720,7 +720,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
 
     const response2 = (await besuLeaf.getAsset(
       nonFungibleAsset.id,
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     )) as EvmNonFungibleAsset;
     expect(response2).toBeDefined();
     expect(response2.id).toBe(nonFungibleAsset.id);
@@ -730,7 +730,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
       besuEnv.getTestNonFungibleContractAddress(),
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     );
     log.info(`Minted token ${uniqueTokenId2} successfully`);
 
@@ -751,7 +751,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
     const response = await besuLeaf.assignAsset(
       nonFungibleAsset.id,
       nonFungibleAsset.owner,
-      Number(uniqueTokenId2) as UniqueTokenID,
+      BigInt(uniqueTokenId2) as UniqueTokenID,
     );
     expect(response).toBeDefined();
     expect(response.transactionId).toBeDefined();
@@ -769,7 +769,7 @@ describe("Besu Leaf Test with Non Fungible Tokens", () => {
       besuEnv.getTestNonFungibleContractAddress(),
     );
     expect(response2.uniqueDescriptor as UniqueTokenID).toBe(
-      0 as UniqueTokenID,
+      0n as UniqueTokenID,
     );
     log.info(
       `Assigned token ${uniqueTokenId2} successfully from wrapper account`,
