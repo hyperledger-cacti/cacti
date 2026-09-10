@@ -15,11 +15,11 @@ As mentioned in the [overview](./overview.md), DLTs that integrate with Weaver m
 
 When Fabric is the requesting network, the IOP module is used to verify the proof and then forward the state onto the application chaincode.
 
-![](../../../images-weaver-docs/architecture-assets/fabric_dapp_flow1.png)
+![](../../images-weaver-docs/architecture-assets/fabric_dapp_flow1.png)
 
 When Fabric is the responding network, the IOP module is in charge of verifying the identity of the requester, making sure the requester has access to the state they are requesting, and then finally retrieving the state from the application chaincode to send back to the requesting network.
 
-![](../../../images-weaver-docs/architecture-assets/fabric_dapp_flow2.png)
+![](../../images-weaver-docs/architecture-assets/fabric_dapp_flow2.png)
 
 Verification Policy, Access Control and Membership are modular components within the interop chaincode for separation of concerns of the code.
 
@@ -27,6 +27,6 @@ Verification Policy, Access Control and Membership are modular components within
 
 As can be seen from the diagrams below, the architecture for Corda is very similar to that of Fabric. The main difference is that the interop module and the application specific flows are in separate CorDapps, instead of separate chaincodes like in Fabric.
 
-![](../../../images-weaver-docs/architecture-assets/corda_dapp_flow1.png)
+![](../../images-weaver-docs/architecture-assets/corda_dapp_flow1.png)
 
-![](../../../images-weaver-docs/architecture-assets/corda_dapp_flow2.png)
+![](../../images-weaver-docs/architecture-assets/corda_dapp_flow2.png)

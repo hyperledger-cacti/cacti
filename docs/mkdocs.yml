@@ -101,7 +101,6 @@ nav:
       - Building: cactus/build.md
       - Examples:
         - Overview: cactus/examples.md
-        - Supply Chain Application: cactus/examples/supply-chain-app.md
       - Governance: cactus/governance.md
       - Code of Conduct: cactus/code-of-conduct.md
       - Contributing: cactus/contributing.md

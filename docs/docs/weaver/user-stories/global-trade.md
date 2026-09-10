@@ -31,12 +31,12 @@ Also, we will henceforth use the terms _buyer_ and _seller_ instead of _importer
 ### Initiating a Trade
 Our trade process begins offline, with buyer and seller negotiating and agreeing on the sale of particular goods for given payment. We will assume that a _purchase order_ is created and contains a unique id we can use as reference in subsequent steps. This is illustrated in the figure below.
 
-![alt text](../../../images-weaver-docs/use-cases/purchase-order.png)
+![alt text](../../images-weaver-docs/use-cases/purchase-order.png)
 
 ### Trade Logistics Network
 The figure below represents a trade logistics network consisting of a seller and a carrier, loosely inspired by the TradeLens network built on Hyperledger Fabric. Think of the seller as a coffee plantation owner is Brazil, for example, and the carrier as a prominent shipping company like Maersk.
 
-![alt text](../../../images-weaver-docs/use-cases/trade-logistics-network.png)
+![alt text](../../images-weaver-docs/use-cases/trade-logistics-network.png)
 
 The seller begins by booking a shipping consignment (associated with the purchase order id) and then registering its creation. It then hands the consignment over to the carrier. In a real life export scenario, this process involves a lot of documentation and approval cycles, but we are going to ignore all of those here. The carrier supplies documents certifying its possession of the consignment and the contents within it. The _bill of lading_ (B/L for short) is one of these documents, and though there may be others, like a packing list and a shipping manifest, we only need one to motivate interoperability. So we will keep it simple and assume that the carrier simply uploads a B/L. The seller examines and accepts this document, following which the carrier dispatches the consignment.
 
@@ -45,7 +45,7 @@ __Note that, at this point, a valid B/L is recorded on the trade logistics netwo
 ### Trade Finance Network
 The figure below represents a trade finance network consisting of a seller, a buyer, and their respective banks. This is loosely inspired by the We.Trade network built on Hyperledger Fabric and the Marco Polo network built on R3 Corda. Think of the seller as our coffee plantation owner in the logistics network, the buyer as Starbucks, and the banks as Bank of America and HSBC Bank, for example.
 
-![alt text](../../../images-weaver-docs/use-cases/trade-finance-network.png)
+![alt text](../../images-weaver-docs/use-cases/trade-finance-network.png)
 
 Traders and banks use a variety of mechanisms to mitigate counterparty risk, one of them being _open accounting_, used in networks like We.Trade. We pick the popular _letter of credit_ (L/C for short) instrument for our trade finance story as this exemplifies the inherent link between logistics and finance (we will see this later). The process begins with the buyer requesting an L/C from its bank for a given trade, referring to the id of the purchase order generated earlier. In simplest terms, an L/C is a promise made by a bank to pay a certain amount to the bearer of certain documents associated with a given export shipment. In our scenario, the buyer's bank issues an L/C promising to pay the seller (through its bank) the amount due to it upon production of a valid B/L. This L/C proposal is recorded on the ledger, and subsequently approved by the seller's bank. After the seller uploads a B/L, the seller's bank is allowed to register a request for payment. This leaves a payment obligation for the buyer's bank on the ledger, which is where we will conclude the scenario, as the actual payment is carried out through a separate process on a different network.
 
@@ -56,7 +56,7 @@ It is obvious that the logistics and finance processes are linked. Both begin wi
 
 This hazard can be avoided if the networks are interoperable, and can share data with each other. Specifically, if the trade logistics network can share a B/L recorded on its ledger _institutionally_ with the trade finance network. To see how this works, see the diagram below, which contains both the networks and merges their flows.
 
-![alt text](../../../images-weaver-docs/use-cases/interop-bl.png)
+![alt text](../../images-weaver-docs/use-cases/interop-bl.png)
 
 Step 4 in the [isolated trade finance network](./global-trade#trade-finance-network) is now replaced with an interoperation step (Step 10) whereby the trade finance network obtains a B/L from the trade logistics network via a data-sharing protocol. This avoids the hazard of having to depend on an unreliable seller to supply a valid B/L. But it is not enough for the trade logistics network to share B/L data. It must also share some _proof_ or evidence that the B/L is presently on record in its shared ledger.
 
@@ -69,7 +69,7 @@ The present trade logistics network allows a consignment to be created and dispa
 
 The process augmentation is illustrated in the figure below with the insertion of a new Step 6 between the booking and the creation of a shipping consignment.
 
-![alt text](../../../images-weaver-docs/use-cases/interop-lc-bl.png)
+![alt text](../../images-weaver-docs/use-cases/interop-lc-bl.png)
 
 Like Step 11 (Step 10 in the earlier figure), this is a data-sharing interoperation step where the L/C proposed and accepted on the trade finance network's ledger is copied to the trade logistics network's ledger. (As with the B/L sharing, proof of the L/C ledger record must accompany L/C data.) In this new process, the trade logistics network will not waste time processing shipments that do not have a backing L/C guarantee from the trade finance network.
 
@@ -82,7 +82,7 @@ To show how this will work, we will add two more networks to the mix. Business n
 
 The figure below presents our vision for how cross-network data sharing can help smoothen and simplify all aspects of global trade despite the fact that different sub-processes occur on independent private networks.
 
-![alt text](../../../images-weaver-docs/use-cases/interop-four-networks-trade.png)
+![alt text](../../images-weaver-docs/use-cases/interop-four-networks-trade.png)
 
 The _Food Tracking Network_ is loosely inspired by IBM Food Trust and the _Payments Network_ loosely inspired by Stellar.
 

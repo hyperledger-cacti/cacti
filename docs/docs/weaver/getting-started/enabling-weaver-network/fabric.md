@@ -15,11 +15,11 @@ After testing the Weaver interoperation mechanisms on [basic sample networks](..
 
 The figure below illustrates a typical Fabric network. The infrastructure consists of a set of peers, ordering service nodes, and CAs that perform the roles of MSPs; each serves a given _organization_ which is one of the constituent units of the network. On the peers are installed one or more smart contracts (_chaincode_), representing shared business logic across the different organizations. Further up lie the so-called Layer-2 (or client) applications that consist of organization-specific business logic and invoke the smart contracts using APIs exposed by the Fabric SDK and with wallet credentials issued by their respective organizations' CAs.
 
-![alt text](../../../../images-weaver-docs/enabling-weaver/fabric-network-model.png)
+![alt text](../../../images-weaver-docs/enabling-weaver/fabric-network-model.png)
 
 Such a network equipped with Weaver components and capabilities will look like the figure below. Legacy components are marked in grey and Weaver and bridging components in green.
 
-![alt text](../../../../images-weaver-docs/enabling-weaver/fabric-weaver-model.png)
+![alt text](../../../images-weaver-docs/enabling-weaver/fabric-weaver-model.png)
 
 The relay and driver are the only additional infrastructure that need to be installed. One or more relays can be installed, as can one or more drivers. The drivers are illustrated in Layer-2 rather than in the bottom layer because, though they are coupled with relays, they exercise contracts using the Fabric SDK and organization-issued credentials just like any Layer-2 application does.
 
