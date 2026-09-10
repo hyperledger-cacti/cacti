@@ -115,6 +115,10 @@ jobs:
           mkdir -p docs/docs/satp-hermes/assets
           cp -r packages/cactus-plugin-satp-hermes/assets/diagrams docs/docs/satp-hermes/assets/
 
+      - name: Verify documentation
+        run: mkdocs build --strict
+        working-directory: docs
+
       - name: Configure git identity for mike
         # mike commits the built site to the gh-pages branch, so it needs an author.
         run: |

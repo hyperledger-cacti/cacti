@@ -13,7 +13,7 @@ Established models of information systems interoperability stratify interoperabi
 
 Above the protocol and application levels there are two additional levels that require careful attention when enabling interoperability. These cover governance and policy decisions when communicating state as well as the legal and regulatory implications of networks under different jurisdictions.
 
-![](../../../images-weaver-docs/levels-of-interoperability.jpg)
+![](../../images-weaver-docs/levels-of-interoperability.jpg)
 
 
 * **Technical**: The technical level is a low-level concern that focuses on the underlying wire protocol used for communication. Examples of protocols at this level include gRPC, Apache Thrift, ASN.1 and CBOR. Protocols at this level are point-to-point and addresses additional concerns such as version negotiation and message delivery guarantees.
@@ -27,6 +27,5 @@ Above the protocol and application levels there are two additional levels that r
 * **Governance and Policies**: The governing members of a ledger play a critical role in extending business processes to external systems. Interoperability necessitates that the governing bodies of the respective systems agree on the nature of their collaboration. The policies enforce these decisions and covers aspects such as access control and conditions for determining the validity of state proofs.
 
 * **Legal and Regulation**: Networks residing in different jurisdictions must be comply with existing laws and regulations when communicating state.
-
 
 

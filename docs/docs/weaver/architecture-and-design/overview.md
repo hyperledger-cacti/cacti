@@ -11,7 +11,7 @@ title: Overview
 
 The below diagram shows a high level architecture diagram of the Weaver framework.
 
-![](../../../images-weaver-docs/architecture-assets/architecture_overview.png)
+![](../../images-weaver-docs/architecture-assets/architecture_overview.png)
 
 ## Network
 
