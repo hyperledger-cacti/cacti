@@ -88,7 +88,7 @@ export class GatewayOrchestrator {
   private readonly logger: Logger;
 
   // v13 JWS envelope signing (stages 1-3). Built eagerly; signing keys are
-  // resolved per request so counterparty SIGNATURE keys added after startup
+  // resolved per request so counterparty ENVELOPE_SIGNATURE keys added after startup
   // are picked up without restarting the gateway.
   private readonly signingInterceptor: Interceptor;
   private readonly verificationInterceptor: Interceptor;
@@ -220,14 +220,15 @@ export class GatewayOrchestrator {
           // TODO(stage-0 + crash-recovery): these still use per-message proto
           // signatures; migrate to JWS envelope signing and verify here too.
           const stageKey = handler.getStage();
-          const verifySignature =
+          const shouldVerifySignature =
             stageKey !== SatpStageKey.Stage0 && stageKey !== SatpStageKey.Crash;
 
           this.expressServer.use(
             expressConnectMiddleware({
               routes: handler.setupRouter.bind(handler),
               requestPathPrefix: httpPath,
-              interceptors: verifySignature
+              // server side verification
+              interceptors: shouldVerifySignature
                 ? [this.verificationInterceptor]
                 : [],
             }),
@@ -477,6 +478,7 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage1}`,
           httpVersion: "1.1",
+          // for every outgoing message
           interceptors: [signingInterceptor],
         });
 

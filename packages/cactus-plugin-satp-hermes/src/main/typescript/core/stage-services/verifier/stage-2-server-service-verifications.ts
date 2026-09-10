@@ -22,7 +22,7 @@ import {
   LockAssertionClaimFormatError,
   LockAssertionExpirationError,
 } from "../../errors/satp-service-errors";
-import { verifyMessage } from "./data-verifier";
+import { claimSignatureVerifier, verifyMessage } from "./data-verifier";
 
 /**
  * Full Stage 2 server verification of an incoming `LockAssertionRequest`.
@@ -59,6 +59,15 @@ export function verifyLockAssertionRequestMessage(
   if (request.lockAssertionClaimFormat == undefined) {
     throw new LockAssertionClaimFormatError(tag);
   }
+
+  // Durable proof of the client gateway's lock assertion over the receipt,
+  // independent of the message envelope's JWS. Issued by the client.
+  claimSignatureVerifier(
+    tag,
+    signer,
+    request.lockAssertionClaim,
+    sessionData.clientGatewayPubkey,
+  );
 
   const currentTime = BigInt(Date.now());
   const maximumExpiration = currentTime + sessionData.lockExpirationTime;

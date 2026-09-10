@@ -105,7 +105,7 @@ export interface IJWSVerifyOptions {
  * Generate a fresh ES256 (P-256) signing key pair as JWKs.
  *
  * The returned JWKs are serializable and can be stored in a
- * `GatewayIdentity`'s `keys[SIGNATURE]` entry. The private JWK MUST
+ * `GatewayIdentity`'s `keys[ENVELOPE_SIGNATURE]` entry. The private JWK MUST
  * remain on the owning gateway; only the public JWK is shared.
  *
  * @returns The public and private keys as JWK objects.

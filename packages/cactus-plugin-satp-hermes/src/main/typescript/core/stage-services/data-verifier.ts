@@ -401,9 +401,6 @@ export function signatureVerifier(
     throw new SessionDataNotLoadedCorrectlyError(tag, "undefined");
   }
 
-  // v13: per-message clientSignature/serverSignature removed.
-  // JWS wrapping will be implemented in TASK-064.
-  // For now, verify only if legacy signature fields are present.
   if (message.serverSignature != undefined && message.serverSignature != "") {
     if (
       !verifySignature(signer, message, sessionData?.serverGatewayPubkey || "")

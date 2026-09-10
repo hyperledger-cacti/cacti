@@ -1305,6 +1305,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             this.gatewayOrchestrator?.startServices();
 
             this.GOLServer = http.createServer(this.GOLApplication);
+            // TODO(SECURE_CHANNEL): the GOL server currently runs plain
+            // HTTP. Provision the gateway's dedicated TLS key pair
+            // (see GatewayKeyPurpose.SECURE_CHANNEL in core/types.ts) and
+            // serve this server over TLS/mTLS so the secure channel is
+            // established with a key that is independent of the signing
+            // keys, per SATP v13 Section 5.3.3.
             const address =
               this.options.gid?.address?.includes("localhost") || // When running a gateway in localhost we don't want to bind it to 0.0.0.0 because if we do it will be accessible from the outside network
               this.options.gid?.address?.includes("127.0.0.1")

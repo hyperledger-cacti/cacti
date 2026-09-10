@@ -23,7 +23,7 @@ import type { SATPSession } from "../../satp-session";
 import type { SATPLogger as Logger } from "../../satp-logger";
 import { SessionType } from "../../session-utils";
 import { BurnAssertionClaimError } from "../../errors/satp-service-errors";
-import { verifyMessage } from "./data-verifier";
+import { claimSignatureVerifier, verifyMessage } from "./data-verifier";
 
 /**
  * Full Stage 3 server verification of an incoming `CommitPreparationRequest`.
@@ -79,6 +79,15 @@ export function verifyCommitFinalAssertionRequestMessage(
   if (request.burnAssertionClaim == undefined) {
     throw new BurnAssertionClaimError(tag);
   }
+
+  // Durable proof of the client gateway's burn assertion over the receipt,
+  // independent of the message envelope's JWS. Issued by the client.
+  claimSignatureVerifier(
+    tag,
+    signer,
+    request.burnAssertionClaim,
+    session!.getServerSessionData().clientGatewayPubkey,
+  );
 
   if (request.burnAssertionClaimFormat != undefined) {
     logger.info(`${tag}, optional variable loaded: burnAssertionClaimFormat`);

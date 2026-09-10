@@ -7,7 +7,10 @@
  * the shared `verifyMessage` entry point.
  */
 import { create } from "@bufbuild/protobuf";
-import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
+import {
+  JsObjectSigner,
+  Secp256k1Keys,
+} from "@hyperledger-cacti/cactus-common";
 import {
   CommonSatpSchema,
   LockAssertionClaimFormatSchema,
@@ -43,6 +46,7 @@ import {
   LockAssertionClaimError,
   LockAssertionClaimFormatError,
   LockAssertionExpirationError,
+  ClaimSignatureError,
   SessionError,
 } from "../../../main/typescript/core/errors/satp-service-errors";
 import type { SATPSession } from "../../../main/typescript/core/satp-session";
@@ -50,9 +54,17 @@ import type { SATPSession } from "../../../main/typescript/core/satp-session";
 const TAG = "TestStage2Verifier";
 const LOCK_EXPIRATION_TIME = BigInt(5 * 60 * 1000);
 
-// signatureVerifier only inspects legacy signature fields, which are absent on
-// the v13 messages built here, so a dummy signer is never exercised.
-const signer = {} as JsObjectSigner;
+// Real secp256k1 signer so claim signatures are actually produced and
+// verified — matches how the gateway signs claims in production.
+const keyPairs = Secp256k1Keys.generateKeyPairsBuffer();
+const signer = new JsObjectSigner({
+  privateKey: new Uint8Array(keyPairs.privateKey),
+});
+
+// A claim signed like the gateway does it: sign(signer, receipt), hex-encoded.
+function makeSignedClaimReceipt(): string {
+  return "0x" + Buffer.from(`receipt-${Date.now()}`).toString("hex");
+}
 
 function makeSessionData(overrides?: Record<string, unknown>): SessionData {
   return create(SessionDataSchema, {
@@ -87,6 +99,7 @@ function makeSession(sessionData: SessionData): SATPSession {
 function makeLockAssertionRequest(
   lockAssertionExpiration: bigint,
 ): LockAssertionRequest {
+  const receipt = makeSignedClaimReceipt();
   return create(LockAssertionRequestSchema, {
     common: create(CommonSatpSchema, {
       version: SATP_VERSION,
@@ -94,7 +107,10 @@ function makeLockAssertionRequest(
       sessionId: "session-001",
       transferContextId: "ctx-001",
     }),
-    lockAssertionClaim: create(LockAssertionClaimSchema, {}),
+    lockAssertionClaim: create(LockAssertionClaimSchema, {
+      receipt,
+      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+    }),
     lockAssertionClaimFormat: create(LockAssertionClaimFormatSchema, {}),
     lockAssertionExpiration,
   });
@@ -162,7 +178,9 @@ describe("verifyLockAssertionRequestMessage", () => {
   });
 
   it("passes for a valid request", () => {
-    const sessionData = makeSessionData();
+    const sessionData = makeSessionData({
+      clientGatewayPubkey: Buffer.from(keyPairs.publicKey).toString("hex"),
+    });
     const session = makeSession(sessionData);
     const expiration = BigInt(Date.now()) + BigInt(60_000);
     const request = makeLockAssertionRequest(expiration);
@@ -170,6 +188,30 @@ describe("verifyLockAssertionRequestMessage", () => {
     expect(() =>
       verifyLockAssertionRequestMessage(TAG, signer, request, session),
     ).not.toThrow();
+  });
+
+  it("throws ClaimSignatureError when the claim signature is invalid", () => {
+    const sessionData = makeSessionData({
+      clientGatewayPubkey: Buffer.from(keyPairs.publicKey).toString("hex"),
+    });
+    const session = makeSession(sessionData);
+    const expiration = BigInt(Date.now()) + BigInt(60_000);
+    const request = makeLockAssertionRequest(expiration);
+    request.lockAssertionClaim!.signature = "deadbeef";
+
+    expect(() =>
+      verifyLockAssertionRequestMessage(TAG, signer, request, session),
+    ).toThrow(ClaimSignatureError);
+  });
+
+  it("throws ClaimSignatureError when the session has no client gateway pubkey", () => {
+    const session = makeSession(makeSessionData());
+    const expiration = BigInt(Date.now()) + BigInt(60_000);
+    const request = makeLockAssertionRequest(expiration);
+
+    expect(() =>
+      verifyLockAssertionRequestMessage(TAG, signer, request, session),
+    ).toThrow(ClaimSignatureError);
   });
 });
 

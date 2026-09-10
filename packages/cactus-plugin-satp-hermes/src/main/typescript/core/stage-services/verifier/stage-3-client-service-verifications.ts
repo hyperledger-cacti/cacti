@@ -27,7 +27,7 @@ import {
   AssignmentAssertionClaimError,
   MintAssertionClaimError,
 } from "../../errors/satp-service-errors";
-import { verifyMessage } from "./data-verifier";
+import { claimSignatureVerifier, verifyMessage } from "./data-verifier";
 
 /**
  * Full Stage 3 client verification of an incoming `LockAssertionResponse`.
@@ -87,6 +87,15 @@ export function verifyCommitPreparationResponseMessage(
   if (response.mintAssertionClaim == undefined) {
     throw new MintAssertionClaimError(tag);
   }
+
+  // Durable proof of the server gateway's mint assertion over the receipt,
+  // independent of the message envelope's JWS. Issued by the server.
+  claimSignatureVerifier(
+    tag,
+    signer,
+    response.mintAssertionClaim,
+    session!.getClientSessionData().serverGatewayPubkey,
+  );
 }
 
 /**
@@ -118,6 +127,15 @@ export function verifyCommitFinalAssertionResponseMessage(
   if (response.assignmentAssertionClaim == undefined) {
     throw new AssignmentAssertionClaimError(tag);
   }
+
+  // Durable proof of the server gateway's assignment assertion over the
+  // receipt, independent of the message envelope's JWS. Issued by the server.
+  claimSignatureVerifier(
+    tag,
+    signer,
+    response.assignmentAssertionClaim,
+    session!.getClientSessionData().serverGatewayPubkey,
+  );
 
   if (response.assignmentAssertionClaimFormat != undefined) {
     logger.info(
