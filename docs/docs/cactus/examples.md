@@ -1,10 +1,8 @@
-Examples
-==================================================
+# Examples
 
-This section shows the sample applications that are provisioned by the Hyperledger Cacti.
+Example applications for Hyperledger Cacti are maintained in the
+[Cacti Demos repository](https://github.com/hyperledger-cacti/cacti-demos).
 
-*   [Supply Chain App](examples/supply-chain-app.md)
-
-[Previous](build.md "Hyperledger Cacti Build Instructions") [Next](examples/supply-chain-app.md "Hyperledger Cacti Example - Supply Chain App")
+[Previous](build.md "Hyperledger Cacti Build Instructions") [Next](governance.md "Governance")
 
 * * *

@@ -1,6 +1,6 @@
 <!-- --8<-- [start:content] -->
 - [Hyperledger Cacti Build Instructions](#hyperledger-cacti-build-instructions)
-- [Fast Developer Flow / Code Iterations](#fast-developer-flow--code-iterations)
+- [Fast Developer Flow / Code Iterations][build-fast-developer-flow]
 - [Getting Started](#getting-started)
   - [Dev Container Quickstart](#dev-container-quickstart-recommended)
   - [Nix Flake Quickstart](#nix-flake-quickstart)
@@ -43,7 +43,7 @@ It also supports re-running the OpenAPI generator when you update any
 
 The `npm run watch` script in action:
 
-![Fast Developer Flow / Code Iterations](./docs/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif)
+![Fast Developer Flow / Code Iterations][build-watch-demo]
 
 ## Getting Started
 
@@ -119,7 +119,7 @@ other required toolchains, no manual installation necessary.
 * [Docker](https://www.docker.com/) (daemon must be running on the host for integration tests)
 
 > **Note:** If you are new to Nix, see the detailed
-> [Nix Setup Guide](./docs/docs/guides/nix-setup.md) for installation and
+> [Nix Setup Guide][build-nix-setup] for installation and
 > configuration instructions.
 
 #### Step-by-Step Setup
@@ -378,7 +378,7 @@ line of code for example.
 To figure out which script could work for rebuilding Cactus, please follow
 the following decision tree (and keep in mind that we have `npm run watch` too)
 
-![Build Script Decision Tree](./docs/docs/cactus/_images/build-script-decision-tree-2021-03-06.png)
+![Build Script Decision Tree][build-decision-tree]
 
 ## Running CI Checks Locally Before Pushing
 
@@ -445,3 +445,17 @@ By creating a PR for the edited `ci.yml` file, this will allow the CI to run the
 
 Click on the `CI Cactus workflow`. The new job you created should be listed underneath the `build (ubuntu-22.04)` jobs. Click on the new job (the name you gave your build) and locate the SSH Session within the `Setup Upterm Session` dropdown. Copy the SSH command that starts with `ssh` and ends in `.dev` (ex. ssh **********:***********@uptermd.upterm.dev). Open your terminal and paste the SSH command to begin an upterm session.
 <!-- --8<-- [end:content] -->
+
+<!--
+=============================================================================
+GITHUB REFERENCE LINKS
+These links are used when viewing this file directly on GitHub.
+When this file is rendered via MkDocs (through a snippet wrapper), the
+wrapper file provides its own set of reference links that override these.
+=============================================================================
+-->
+
+[build-fast-developer-flow]: #fast-developer-flow--code-iterations
+[build-watch-demo]: ./docs/docs/cactus/_images/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif
+[build-nix-setup]: ./docs/docs/guides/nix-setup.md
+[build-decision-tree]: ./docs/docs/cactus/_images/build-script-decision-tree-2021-03-06.png

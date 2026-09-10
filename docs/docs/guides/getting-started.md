@@ -20,7 +20,7 @@ Cacti is a **modular, pluggable framework** for blockchain interoperability. Pic
 
 ### Technology Stack Diagram
 
-![Cacti Technology Stack](../../assets/cacti-architecture-stack.png)
+![Cacti Technology Stack](../assets/cacti-architecture-stack.png)
 
 ---
 
@@ -82,7 +82,7 @@ Understanding what Cacti provides (and what it doesn't) is crucial for successfu
 
 ### Architecture
 
-![Level 1 - Connector as Library](../../assets/level1-connector-flow.png)
+![Level 1 - Connector as Library](../assets/level1-connector-flow.png)
 
 ### Tutorial: Using the Ethereum Connector in Your Existing Project
 
@@ -308,7 +308,7 @@ export default router;
 
 ### Architecture
 
-![Level 2 - API Server with Plugins](../../assets/level2-api-server-flow.png)
+![Level 2 - API Server with Plugins](../assets/level2-api-server-flow.png)
 
 ### Tutorial: Running Cacti API Server with Ethereum Connector
 
@@ -570,7 +570,7 @@ Once the server is running, access the OpenAPI documentation at:
 
 ### Architecture
 
-![Level 3 - Full Framework Integration](../../assets/level3-full-framework.png)
+![Level 3 - Full Framework Integration](../assets/level3-full-framework.png)
 
 ### Tutorial: Building a Complete Application
 
@@ -880,7 +880,7 @@ main().catch(console.error);
 
 - **Level 1**: Check out the [connector documentation](../cactus/packages.md) for your target ledger
 - **Level 2**: See the [API Server configuration guide](../cactus/packages/cactus-cmd-api-server.md)
-- **Level 3**: Study the [Supply Chain Example](../cactus/examples/supply-chain-app.md) as a complete reference
+- **Level 3**: Study the applications in the [Cacti Demos repository](https://github.com/hyperledger-cacti/cacti-demos) as complete references
 
 ## Getting Help
 

@@ -31,7 +31,7 @@ Enabling interoperation between distributed ledgers presents numerous technical 
 ### Single-party vs Multi-party Trust 
 In distributed ledger architectures, the authority over state lies in a collective and the protocol they employ to ensure its integrity. When one network or an entity consumes state from another, it would need to establish the veracity of the state according to the shared consensus view of parties in the network. This requirement is different than traditional integration with centralised systems wherein the trust for the validity of data is placed on the single party providing the data. Establishing the veracity of state in a decentralized network is not trivial. In most cases, a consumer of state might not be able to observe the full ledger of the network itself. Hence, a consumer needs to obtain an independently verifiable cryptographic proof on the validity of state according to the consensus rules and policies of the source network.
 
-![single-party vs multi-party trust model](../../../images-weaver-docs/multi-party-trust-model.png)
+![single-party vs multi-party trust model](../../images-weaver-docs/multi-party-trust-model.png)
 
 ### Data vs Asset
 Interoperation should not compromise the invariants enforced by individual networks such as protections against double spends on assets.

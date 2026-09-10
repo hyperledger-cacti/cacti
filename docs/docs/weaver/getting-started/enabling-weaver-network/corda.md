@@ -15,11 +15,11 @@ After testing the Weaver interoperation mechanisms on [basic sample networks](..
 
 The figure below illustrates a typical Corda network. The infrastructure consists of a set of nodes (each maintaining its share of the global state in a local vault), notaries, and CAs. On the nodes are installed one or more CorDapps, representing shared business logic across subsets of those nodes. The core of a CorDapp consists of a collection of workflows (or flows) and contracts acting on states; we layer the flows above the contracts in thebelow image just to illustrate that flows represent transaction (state update) triggers, and contract validations occur during the executions of flows. Further up in the stack lie client applications associated with CorDapps that can are used to trigger flows (and by implication, contracts).
 
-![alt text](../../../../images-weaver-docs/enabling-weaver/corda-network-model.png)
+![alt text](../../../images-weaver-docs/enabling-weaver/corda-network-model.png)
 
 Such a network equipped with Weaver components and capabilities will look like the figure below. Legacy components are marked in grey and Weaver and bridging components in green.
 
-![alt text](../../../../images-weaver-docs/enabling-weaver/corda-weaver-model.png)
+![alt text](../../../images-weaver-docs/enabling-weaver/corda-weaver-model.png)
 
 The relay and driver are the only additional infrastructure that need to be installed. One or more relays can be installed, as can one or more drivers. The drivers are illustrated in the client layer rather than in the bottom layer because, though they are coupled with relays, they trigger flows just like any client application does.
 

@@ -19,7 +19,7 @@ The figure below depicts this scenario in the context of two organisations--*Org
 
 To effect the settlement of this exchange between *Org-A* and *Org-B*, the following two transactions will have to happen atomically across both networks: i) transfer of payment from *Org-B*'s currency account in the CBDC ledger to *Org-A* while at the same time ii) the entitlements of the designated securities are transferred from *Org-A* to *Org-B*. The scenario would need to guarantee that after the transaction execution, either both parties have their end of the exchange or neither does and that this exchange is performed in a timely manner.
 
-![Simple DvP scenario in financial markets](../../../images-weaver-docs/use-cases/financial-markets-1.png)
+![Simple DvP scenario in financial markets](../../images-weaver-docs/use-cases/financial-markets-1.png)
 
 The settlement of the exchange of securities from *Org-A* to *Org-B* in the Financial Securities Network for a simultaneous payment from *Org-B* to *Org-A* in the CBDC network is coordinated by Weaver using [Hashed Time Lock Contracts](https://en.bitcoin.it/wiki/Hash_Time_Locked_Contracts).
 This protocol essentially has three phases:
@@ -36,4 +36,4 @@ The process proceeds as follows, and is further illustrated in the figure below:
 4. **Org-A claims payments in CBDC ledger**: *Org-A* submits a transaction to claim the payments tokens, by revealing the secret S.
 5. **Org-B claims securities in FSN ledger**: *Org-B* observes that the value of S has been revealed in the CBDC network by *Org-A* in step 4, and submits a transaction to claim the securities in the FSN network using the revealed secret.
 
-![Simple DvP scenario in financial markets](../../../images-weaver-docs/use-cases/financial-markets-2.png)
+![Simple DvP scenario in financial markets](../../images-weaver-docs/use-cases/financial-markets-2.png)

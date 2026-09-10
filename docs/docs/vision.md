@@ -13,8 +13,8 @@ As a fusion of two earlier systems (Cactus and Weaver) that have similar philoso
 <img src="../images/tx-orchestration-modes.png">
 
 The present (initial) version of the Cacti code base is simply an aggregation of the legacy Cactus and Weaver code bases with their original folder structures. Until merge and integration (see further below), users should examine, test, and use them separately as follows:
-- Cactus code and documentation lies within this (root) folder, excluding the `weaver` folder. See [Cactus documentation](./README-cactus.md) to test and use Cactus.
-- Weaver code and documentation lies within the [weaver](./weaver/) folder. See [Weaver documentation](./weaver/README.md) to test and use Weaver.
+- Cactus code and documentation lies within this root folder, excluding the `weaver` folder. See the [Cactus documentation](./cactus/introduction.md) to test and use Cactus.
+- Weaver code lies within the [weaver](https://github.com/hyperledger-cacti/cacti/tree/main/weaver) folder. See the [Weaver documentation](./weaver/introduction.md) to test and use Weaver.
 
 ## Project Roadmap
 

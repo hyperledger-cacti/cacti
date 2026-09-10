@@ -9,7 +9,7 @@ title: Relay
  SPDX-License-Identifier: CC-BY-4.0
  -->
 
-![](../../../images-weaver-docs/architecture-assets/relay_architecture.png)
+![](../../images-weaver-docs/architecture-assets/relay_architecture.png)
 
 As mentioned in the overview, relays facilitate communication of protocols between networks. To do this, they are composed of three main pieces:
 
@@ -19,7 +19,7 @@ As mentioned in the overview, relays facilitate communication of protocols betwe
 
 The diagram below shows an example communication between two networks, A and B, where network A is requesting state from network B.
 
-![](../../../images-weaver-docs/architecture-assets/relay_flow.png)
+![](../../images-weaver-docs/architecture-assets/relay_flow.png)
 
 1. An application sends a request to their networks relay over gRPC
 2. The local relay inspects the query within the request and uses the relevant information to forward the request to the correct remote relay

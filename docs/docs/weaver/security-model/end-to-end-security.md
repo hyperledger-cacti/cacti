@@ -39,7 +39,7 @@ The configurations described below assume that:
 
 ### 1. Confidential Message Exchange Between Groups of Parties
 
-![Confidential Message Exchange](../../../images-weaver-docs/relayd/confidential-message-exchange.png "Confidential Message Exchange")
+![Confidential Message Exchange](../../images-weaver-docs/relayd/confidential-message-exchange.png "Confidential Message Exchange")
 
 **Goals** 
 
@@ -69,7 +69,7 @@ A suitable deployment configuration that addresses these threat assumptions:
 
 In the following configuration, a group in one network maintains confidential data and have similar goals as above. The data in the providing network is private but visible to all organizations. The relay in the providing network can be operated by any organization with access to the data (the implications of this are examined next).
 
-![Confidential Message Exchange](../../../images-weaver-docs/relayd/confidential-message-exchange2.png "Confidential Message Exchange")
+![Confidential Message Exchange](../../images-weaver-docs/relayd/confidential-message-exchange2.png "Confidential Message Exchange")
 
 ### 2. Private Message Exchange Between Networks
 
@@ -99,7 +99,7 @@ A suitable deployment configuration that addresses the threat assumptions:
 * The inclusion of a nonce in the proof enables replays of past messages to be detected.
 * The deployment of multiple relays ensures availability and resistance to censorship.
 
-![Private Message Exchange](../../../images-weaver-docs/relayd/private-message-exchange.png "Private Message Exchange")
+![Private Message Exchange](../../images-weaver-docs/relayd/private-message-exchange.png "Private Message Exchange")
 
 
 ### 3. Public Message Exchange Between Networks
@@ -131,15 +131,15 @@ A suitable deployment configuration that addresses the threat assumptions:
 * The inclusion of a nonce in the proof enables replays of past messages to be detected.
 * The deployment of multiple relays ensures availability and resistance to censorship.
 
-![Private Public Data Exchange](../../../images-weaver-docs/relayd/private-public-message-exchange.png "Private-Public Message Exchange")
+![Private Public Data Exchange](../../images-weaver-docs/relayd/private-public-message-exchange.png "Private-Public Message Exchange")
 
 The following alternate configuration allows for a public node to be operated by a single organization. The oracle provides trusted meta-data to ensure proofs can be validated correctly (E.g. current validator set used for signing blocks in PoS/BFT sysmtems and block height to verify currency of state. A formal study on mechanisms for proof construction and their short-commings has been deferred).
 
-![Private Public Data Exchange](../../../images-weaver-docs/relayd/private-public-message-exchange2.png "Private-Public Message Exchange")
+![Private Public Data Exchange](../../images-weaver-docs/relayd/private-public-message-exchange2.png "Private-Public Message Exchange")
 
 In the following configuration an external notary acts as an authoritative source for public ledger data. A secure channel (mutual TLS) between the relays prevents external adversaries from evesdropping on the communication.
 
-![Private Public Data Exchange](../../../images-weaver-docs/relayd/private-public-message-exchange3.png "Private-Public Message Exchange")
+![Private Public Data Exchange](../../images-weaver-docs/relayd/private-public-message-exchange3.png "Private-Public Message Exchange")
 
 
 ## Nonces and Replay Attacks

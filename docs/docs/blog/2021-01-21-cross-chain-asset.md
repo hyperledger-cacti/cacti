@@ -20,7 +20,7 @@ Over the past few years, we have been seeing significant efforts in digitising a
 
 Against this backdrop, a number of central banks have been exploring the potential of performing DvP settlement across a currency ledger and a securities ledger. In this article, we use this as a motivating use-case for our discussions. The scenario involves two decentralised ledgers, namely, a currency ledger and a securities ledger, based on different DLT protocols performing a coordinated transfer of assets in their respective ledgers. Figure 1 depicts this scenario in the context of two organisations--Bank A and Bank B--in which Bank B wants to purchase some securities owned by Bank A and both organisations have accounts on both ledgers. To effect this exchange the following two transactions will have to happen atomically across both networks: i) transfer of payment from Bank B's currency account to Bank A while at the same time ii) the entitlements of the designated securities is transferred from Bank A to Bank B. The scenario would need to guarantee that after the transaction execution, either both parties have their end of the exchange or neither does and that this exchange is performed in a timely manner. 
 
-![alt text](../../images-weaver-docs/simple-dvp.png)
+![alt text](../images-weaver-docs/simple-dvp.png)
 
 Figure 1. A typical DvP use-case.
 

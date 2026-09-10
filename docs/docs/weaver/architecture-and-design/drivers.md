@@ -14,4 +14,4 @@ The driver is responsible for all communication between the relay and its networ
 1. There must exist a different driver for each network type (e.g. Fabric, Corda etc.) and therefore having the driver as a separate process makes it easy to "plug" different drivers into the relay.
 2. A possible use case of the relay is that a single relay instance may have multiple drivers (e.g. if multiple entities in the network want to run their own driver). In this case, this plugin style approach of drivers makes it possible to do without having to modify code for each configuration.
 
-![](../../../images-weaver-docs/architecture-assets/driver_architecture.png)
+![](../../images-weaver-docs/architecture-assets/driver_architecture.png)
