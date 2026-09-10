@@ -40,6 +40,7 @@ import { SATPService } from "../types/satp-protocol";
 import { Client as ConnectClient } from "@connectrpc/connect";
 import { SATPServiceInstance } from "./stage-services/satp-service";
 import { NetworkId } from "../public-api";
+import { SatpProtocolStep } from "./satp-protocol-map";
 
 /**
  * Function signature for SATP Connect protocol handlers.
@@ -322,6 +323,8 @@ export interface AuditEntry {
   auditEntryId: string;
   session: LocalLog;
   timestamp: number;
+  // added now
+  // proofs: SessionProof[];
 }
 
 export interface Audit {
@@ -333,4 +336,11 @@ export type SessionData = {
   sessionId: string;
   localLog: LocalLog;
   proof: string;
+};
+
+export type SessionProof = {
+  sessionId: string;
+  step: SatpProtocolStep;
+  claim: string;
+  signedClaim: string;
 };

@@ -192,6 +192,22 @@ export const CI_TEST_TIMEOUT = 900000;
 const testFilesDirectory = `${__dirname}/../../../cache/`;
 
 /**
+ * Claims must carry a durable signature over their receipt, exactly as the
+ * gateway signs them in production (sign(signer, claim.receipt), hex-encoded).
+ * Fixture claims injected directly into session data bypass the
+ * wrap/mint/burn/assignment asset operations that normally sign them, so
+ * they are signed here with the provided signer (all services in a test
+ * usually share one keypair).
+ */
+export function signClaimFixture<
+  T extends { receipt: string; signature: string },
+>(claim: T, receipt: string, signer: { sign: (msg: string) => Uint8Array }): T {
+  claim.receipt = receipt;
+  claim.signature = Buffer.from(signer.sign(receipt)).toString("hex");
+  return claim;
+}
+
+/**
  * Lower bound (inclusive) of the "safe" port range we return from
  * `getFreePort` / `getFreePorts`. We exclude the well-known/privileged
  * range (0-1023) so the returned port can be bound by an unprivileged
