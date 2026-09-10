@@ -21,6 +21,7 @@ import {
   TimestampType,
 } from "../../session-utils";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { getStepByTag } from "../../satp-protocol-map";
 
 import { SATPSession } from "../../../core/satp-session";
 import {
@@ -344,12 +345,12 @@ export class Stage1ClientService extends SATPService {
         // first verification after stage 0, prior to transfer commence request
         // persist the signature-verified wrap-assertion claim so it stays
         // provable for dispute resolution and audit after transport ends
-        await this.dbLogger.persistLogEntry({
+        const proofStep = getStepByTag(0, "checkPreSATPTransferResponse");
+        await this.dbLogger.persistSessionProof({
           sessionId: sessionData.id,
-          type: MessageType[MessageType.PRE_SATP_TRANSFER_RESPONSE],
-          operation: "claim-verified",
-          data: safeStableStringify(response.wrapAssertionClaim) ?? "",
-          sequenceNumber: Number(sessionData.lastSequenceNumber),
+          step: proofStep!,
+          claim: safeStableStringify(response.wrapAssertionClaim) ?? "",
+          signedClaim: response.wrapAssertionClaim!.signature,
         });
 
         sessionData.recipientGatewayNetworkId =

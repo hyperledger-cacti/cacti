@@ -28,6 +28,7 @@ import {
   TimestampType,
 } from "../../session-utils";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { getStepByTag } from "../../satp-protocol-map";
 
 import {
   SATPService,
@@ -454,12 +455,12 @@ export class Stage3ServerService extends SATPService {
 
         // persist the signature-verified burn-assertion claim so it stays
         // provable for dispute resolution and audit after transport ends
-        await this.dbLogger.persistLogEntry({
+        const proofStep = getStepByTag(3, "checkCommitFinalAssertionRequest");
+        await this.dbLogger.persistSessionProof({
           sessionId: sessionData.id,
-          type: MessageType[MessageType.COMMIT_FINAL],
-          operation: "claim-verified",
-          data: safeStableStringify(request.burnAssertionClaim) ?? "",
-          sequenceNumber: Number(sessionData.lastSequenceNumber),
+          step: proofStep!,
+          claim: safeStableStringify(request.burnAssertionClaim) ?? "",
+          signedClaim: request.burnAssertionClaim!.signature,
         });
 
         sessionData.burnAssertionClaim = request.burnAssertionClaim!;

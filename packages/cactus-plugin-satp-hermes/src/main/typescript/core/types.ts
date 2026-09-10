@@ -323,15 +323,13 @@ export interface AuditEntry {
   auditEntryId: string;
   session: LocalLog;
   timestamp: number;
-  // added now
-  // proofs: SessionProof[];
+  proofs: SessionProof[];
 }
 
 export interface Audit {
   auditEntries: AuditEntry[];
 }
 
-//TODO
 export type SessionData = {
   sessionId: string;
   localLog: LocalLog;

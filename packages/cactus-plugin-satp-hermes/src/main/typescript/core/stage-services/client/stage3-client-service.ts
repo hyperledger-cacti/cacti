@@ -28,6 +28,7 @@ import {
   TimestampType,
 } from "../../session-utils";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { getStepByTag } from "../../satp-protocol-map";
 
 import {
   SATPService,
@@ -515,12 +516,12 @@ export class Stage3ClientService extends SATPService {
 
         // persist the signature-verified mint-assertion claim so it stays
         // provable for dispute resolution and audit after transport ends
-        await this.dbLogger.persistLogEntry({
+        const proofStep = getStepByTag(3, "checkCommitPreparationResponse");
+        await this.dbLogger.persistSessionProof({
           sessionId: sessionData.id,
-          type: MessageType[MessageType.COMMIT_READY],
-          operation: "claim-verified",
-          data: safeStableStringify(response.mintAssertionClaim) ?? "",
-          sequenceNumber: Number(sessionData.lastSequenceNumber),
+          step: proofStep!,
+          claim: safeStableStringify(response.mintAssertionClaim) ?? "",
+          signedClaim: response.mintAssertionClaim!.signature,
         });
 
         if (response.mintAssertionClaimFormat != undefined) {
@@ -569,12 +570,12 @@ export class Stage3ClientService extends SATPService {
 
         // persist the signature-verified assignment-assertion claim so it
         // stays provable for dispute resolution and audit after transport ends
-        await this.dbLogger.persistLogEntry({
+        const proofStep = getStepByTag(3, "checkCommitFinalAssertionResponse");
+        await this.dbLogger.persistSessionProof({
           sessionId: sessionData.id,
-          type: MessageType[MessageType.ACK_COMMIT_FINAL],
-          operation: "claim-verified",
-          data: safeStableStringify(response.assignmentAssertionClaim) ?? "",
-          sequenceNumber: Number(sessionData.lastSequenceNumber),
+          step: proofStep!,
+          claim: safeStableStringify(response.assignmentAssertionClaim) ?? "",
+          signedClaim: response.assignmentAssertionClaim!.signature,
         });
 
         sessionData.assignmentAssertionClaim =
