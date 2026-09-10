@@ -4,7 +4,9 @@ import type {
   AuditEntry,
   Audit,
   LocalLog,
+  SessionProof,
 } from "../../../../main/typescript/core/types";
+import { SATP_PROTOCOL_MAP } from "../../../../main/typescript/core/satp-protocol-map";
 import { v4 as uuidv4 } from "uuid";
 import { AuditEntryNotFoundError } from "../../../../main/typescript/core/errors/satp-errors";
 
@@ -278,6 +280,7 @@ describe("AuditEntry Repository Integration Tests", () => {
   });
 
   beforeEach(async () => {
+    await repository.getSessionProofsTable().del();
     await repository.getAuditEntriesTable().del();
   });
 
@@ -291,6 +294,7 @@ describe("AuditEntry Repository Integration Tests", () => {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp: Date.now(),
+      proofs: [],
     };
 
     // When
@@ -313,11 +317,13 @@ describe("AuditEntry Repository Integration Tests", () => {
         auditEntryId: uuidv4(),
         session: mockLocalLog,
         timestamp: now,
+        proofs: [],
       },
       {
         auditEntryId: uuidv4(),
         session: mockLocalLog2,
         timestamp: now + 10000,
+        proofs: [],
       },
     ];
 
@@ -349,6 +355,7 @@ describe("AuditEntry Repository Integration Tests", () => {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp: Date.now(),
+      proofs: [],
     };
     await repository.create(auditEntry);
 
@@ -358,6 +365,171 @@ describe("AuditEntry Repository Integration Tests", () => {
 
     // Then
     expect(allEntries.length).toEqual(0);
+  });
+
+  it("Given a valid SessionProof, When creating it and reading by session ID, Then it should return the same proof", async () => {
+    // Given
+    const proof: SessionProof = {
+      sessionId: mockLocalLog.sessionId,
+      step: SATP_PROTOCOL_MAP[3].steps.find(
+        (s) => s.tag === "checkCommitPreparationResponse",
+      )!,
+      claim: JSON.stringify({ receipt: "MOCK_MINT_RECEIPT" }),
+      signedClaim: "MOCK_MINT_CLAIM_SIGNATURE",
+    };
+
+    // When
+    const created = await repository.createProof(proof);
+    const retrieved = await repository.readProofsBySessionIds([
+      proof.sessionId,
+    ]);
+
+    // Then
+    expect(created).toEqual(proof);
+    expect(retrieved).toHaveLength(1);
+    expect(retrieved[0].sessionId).toEqual(proof.sessionId);
+    expect(retrieved[0].step).toEqual(proof.step);
+    expect(retrieved[0].claim).toEqual(proof.claim);
+    expect(retrieved[0].signedClaim).toEqual(proof.signedClaim);
+  });
+
+  it("Given proofs from multiple sessions, When reading by session ID, Then it should return only the proofs of the requested sessions", async () => {
+    // Given
+    const proof1: SessionProof = {
+      sessionId: mockLocalLog.sessionId,
+      step: SATP_PROTOCOL_MAP[2].steps.find(
+        (s) => s.tag === "checkLockAssertionRequest",
+      )!,
+      claim: JSON.stringify({ receipt: "MOCK_LOCK_RECEIPT" }),
+      signedClaim: "MOCK_LOCK_CLAIM_SIGNATURE",
+    };
+    const proof2: SessionProof = {
+      sessionId: mockLocalLog2.sessionId,
+      step: SATP_PROTOCOL_MAP[3].steps.find(
+        (s) => s.tag === "checkCommitFinalAssertionRequest",
+      )!,
+      claim: JSON.stringify({ receipt: "MOCK_BURN_RECEIPT" }),
+      signedClaim: "MOCK_BURN_CLAIM_SIGNATURE",
+    };
+    await repository.createProof(proof1);
+    await repository.createProof(proof2);
+
+    // When
+    const retrieved = await repository.readProofsBySessionIds([
+      mockLocalLog.sessionId,
+    ]);
+
+    // The
+    expect(retrieved).toHaveLength(1);
+    expect(retrieved[0].sessionId).toEqual(mockLocalLog.sessionId);
+  });
+
+  it("Given the same proof persisted twice, When reading by session ID, Then only a single proof row should exist", async () => {
+    // Given
+    const proof: SessionProof = {
+      sessionId: mockLocalLog.sessionId,
+      step: SATP_PROTOCOL_MAP[2].steps.find(
+        (s) => s.tag === "checkLockAssertionRequest",
+      )!,
+      claim: JSON.stringify({ receipt: "MOCK_LOCK_RECEIPT" }),
+      signedClaim: "MOCK_LOCK_CLAIM_SIGNATURE",
+    };
+
+    // When
+    await repository.createProof(proof);
+    await repository.createProof(proof);
+
+    // Then
+    const retrieved = await repository.readProofsBySessionIds([
+      proof.sessionId,
+    ]);
+    expect(retrieved).toHaveLength(1);
+    expect(retrieved[0].sessionId).toEqual(proof.sessionId);
+    expect(retrieved[0].signedClaim).toEqual(proof.signedClaim);
+  });
+
+  it("Given proofs persisted for a session, When reading the audit entry by ID, Then the entry should include the session proofs", async () => {
+    // Given
+    const auditEntry: AuditEntry = {
+      auditEntryId: uuidv4(),
+      session: mockLocalLog,
+      timestamp: Date.now(),
+      proofs: [],
+    };
+    await repository.create(auditEntry);
+    const proof: SessionProof = {
+      sessionId: mockLocalLog.sessionId,
+      step: SATP_PROTOCOL_MAP[3].steps.find(
+        (s) => s.tag === "checkCommitFinalAssertionResponse",
+      )!,
+      claim: JSON.stringify({ receipt: "MOCK_ASSIGNMENT_RECEIPT" }),
+      signedClaim: "MOCK_ASSIGNMENT_CLAIM_SIGNATURE",
+    };
+    await repository.createProof(proof);
+
+    const retrieved = await repository.readById(auditEntry.auditEntryId);
+
+    // Then
+    expect(retrieved.proofs).toHaveLength(1);
+    expect(retrieved.proofs[0].sessionId).toEqual(proof.sessionId);
+    expect(retrieved.proofs[0].step.tag).toEqual(
+      "checkCommitFinalAssertionResponse",
+    );
+    expect(retrieved.proofs[0].signedClaim).toEqual(proof.signedClaim);
+  });
+
+  it("Given proofs persisted for a session, When reading by time interval, Then the returned audit entries should include the session proofs", async () => {
+    // Given
+    const now = Date.now();
+    const auditEntry: AuditEntry = {
+      auditEntryId: uuidv4(),
+      session: mockLocalLog,
+      timestamp: now,
+      proofs: [],
+    };
+    await repository.create(auditEntry);
+    const proof: SessionProof = {
+      sessionId: mockLocalLog.sessionId,
+      step: SATP_PROTOCOL_MAP[0].steps.find(
+        (s) => s.tag === "checkPreSATPTransferResponse",
+      )!,
+      claim: JSON.stringify({ receipt: "MOCK_RECEIVER_WRAP_RECEIPT" }),
+      signedClaim: "MOCK_WRAP_CLAIM_SIGNATURE",
+    };
+    await repository.createProof(proof);
+
+    // When
+    const audit: Audit = await repository.readByTimeInterval(
+      now - 1000,
+      now + 1000,
+    );
+
+    // Then
+    expect(audit.auditEntries).toHaveLength(1);
+    expect(audit.auditEntries[0].proofs).toHaveLength(1);
+    expect(audit.auditEntries[0].proofs[0].step.tag).toEqual(
+      "checkPreSATPTransferResponse",
+    );
+  });
+
+  it("Given existing proofs, When resetting the database, Then all proofs should be removed", async () => {
+    // Given
+    const proof: SessionProof = {
+      sessionId: mockLocalLog.sessionId,
+      step: SATP_PROTOCOL_MAP[2].steps.find(
+        (s) => s.tag === "checkLockAssertionRequest",
+      )!,
+      claim: JSON.stringify({ receipt: "MOCK_LOCK_RECEIPT" }),
+      signedClaim: "MOCK_LOCK_CLAIM_SIGNATURE",
+    };
+    await repository.createProof(proof);
+
+    // When
+    await repository.reset();
+    const allProofs = await repository.getSessionProofsTable().select();
+
+    // Then
+    expect(allProofs.length).toEqual(0);
   });
 
   it("Given a repository instance, When destroying it, Then the database connection should close without errors", async () => {

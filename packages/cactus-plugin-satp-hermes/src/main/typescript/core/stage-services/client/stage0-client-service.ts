@@ -58,6 +58,7 @@ import {
 } from "../../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { getStepByTag } from "../../satp-protocol-map";
 
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import {
@@ -677,6 +678,18 @@ export class Stage0ClientService extends SATPService {
           sessionData.senderWrapAssertionClaim.signature = bufArray2HexStr(
             sign(this.Signer, sessionData.senderWrapAssertionClaim.receipt),
           );
+
+          // persist the signed sender wrap-assertion claim at creation so it
+          // stays provable for dispute resolution and audit after transport
+          // ends (this claim has no counterparty verification step in stage 0)
+          const proofStep = getStepByTag(0, "preSATPTransferRequest");
+          await this.dbLogger.persistSessionProof({
+            sessionId: sessionData.id,
+            step: proofStep!,
+            claim:
+              safeStableStringify(sessionData.senderWrapAssertionClaim) ?? "",
+            signedClaim: sessionData.senderWrapAssertionClaim.signature,
+          });
 
           await this.dbLogger.storeProof({
             sessionId: sessionData.id,

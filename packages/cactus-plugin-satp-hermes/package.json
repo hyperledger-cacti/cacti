@@ -1,14 +1,6 @@
 {
   "name": "@hyperledger-cacti/cactus-plugin-satp-hermes",
   "version": "3.0.1",
-  "satp": {
-    "versions": {
-      "core": {
-        "specVersion": "draft-ietf-satp-core-13",
-        "specUrl": "https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt"
-      }
-    }
-  },
   "description": "Open-source SATP Typescript implementation, based on the paper \"HERMES: Fault-Tolerant Middleware for Blockchain Interoperability\"",
   "keywords": [
     "Hyperledger",
@@ -152,7 +144,6 @@
     "lint:protobuf": "buf lint --verbose",
     "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
     "test": "run-s test:unit test:integration",
-    "test:report": "yarn run test 2>&1 | tee reports/satp-test-report-$(date +%Y-%m-%d-%H-%M)-$(date +%s | tail -c 5).out",
     "test:integration": "NODE_OPTIONS=--max-old-space-size=8192 npx jest ./src/test/typescript/integration --runInBand --forceExit --config=jest.config-integration.ts",
     "test:integration:adapter": "JEST_JUNIT_OUTPUT_NAME=satp-hermes-tests-integration-adapter.xml NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/adapter --runInBand --forceExit --config=jest.config-integration.ts",
     "test:integration:bridge": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/bridge --runInBand --forceExit --config=jest.config-integration-bridge.ts",
@@ -161,6 +152,7 @@
     "test:integration:oracle": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/oracle --runInBand --forceExit --config=jest.config-integration-oracle.ts",
     "test:integration:recovery": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/recovery --runInBand --forceExit --config=jest.config-integration.ts",
     "test:integration:rollback": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/rollback --runInBand --forceExit --config=jest.config-integration.ts",
+    "test:report": "yarn run test 2>&1 | tee reports/satp-test-report-$(date +%Y-%m-%d-%H-%M)-$(date +%s | tail -c 5).out",
     "test:unit": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/unit --runInBand --forceExit --config=jest.config-unit.ts",
     "pretsc": "npm run generate-sdk",
     "tsc": "tsc --project ./tsconfig.json",
@@ -340,6 +332,14 @@
       "satp-crash": "02"
     },
     "cacti-version": "3.0.1"
+  },
+  "satp": {
+    "versions": {
+      "core": {
+        "specVersion": "draft-ietf-satp-core-13",
+        "specUrl": "https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt"
+      }
+    }
   },
   "watch": {
     "tsc": {

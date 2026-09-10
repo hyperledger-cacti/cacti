@@ -127,6 +127,7 @@ let auditRepository: IAuditEntryRepository;
 let dbLogger: GatewayPersistence;
 let dateNowSpy: jest.SpyInstance | undefined;
 let persistLogEntrySpy: jest.SpyInstance;
+let persistSessionProofSpy: jest.SpyInstance;
 let bridgeManager: BridgeManagerClientInterface;
 
 let mockSession: SATPSession;
@@ -217,6 +218,7 @@ beforeAll(async () => {
   });
 
   persistLogEntrySpy = jest.spyOn(dbLogger, "persistLogEntry");
+  persistSessionProofSpy = jest.spyOn(dbLogger, "persistSessionProof");
 
   mockSession = new SATPSession({
     contextID: "MOCK_CONTEXT_ID",
@@ -269,6 +271,7 @@ afterEach(() => {
   dateNowSpy?.mockRestore();
   dateNowSpy = undefined;
   persistLogEntrySpy.mockClear();
+  persistSessionProofSpy.mockClear();
 });
 
 afterAll(async () => {
@@ -508,6 +511,13 @@ describe("SATP Services Testing", () => {
       preSATPTransferResponseMessage,
       mockSession,
     );
+
+    expect(persistSessionProofSpy).toHaveBeenCalledTimes(1);
+    const wrapProof = persistSessionProofSpy.mock.calls[0][0];
+    expect(wrapProof.sessionId).toBe(mockSession.getClientSessionData().id);
+    expect(wrapProof.step.tag).toBe("checkPreSATPTransferResponse");
+    expect(wrapProof.claim).toContain("MOCK_RECEIVER_WRAP_RECEIPT");
+    expect(wrapProof.signedClaim).not.toBe("");
 
     expect(mockSession.getClientSessionData()).toBeDefined();
     expect(mockSession.getClientSessionData()?.receiverAsset?.tokenId).toBe(
@@ -759,6 +769,12 @@ describe("SATP Services Testing", () => {
       lockAssertionRequestMessage,
       mockSession,
     );
+
+    expect(persistSessionProofSpy).toHaveBeenCalledTimes(1);
+    const lockProof = persistSessionProofSpy.mock.calls[0][0];
+    expect(lockProof.sessionId).toBe(mockSession.getServerSessionData().id);
+    expect(lockProof.step.tag).toBe("checkLockAssertionRequest");
+    expect(lockProof.signedClaim).not.toBe("");
   });
   it("Service2Server lockAssertionResponse", async () => {
     lockAssertionReceiptMessage =
@@ -860,6 +876,13 @@ describe("SATP Services Testing", () => {
       commitReadyResponseMessage,
       mockSession,
     );
+
+    expect(persistSessionProofSpy).toHaveBeenCalledTimes(1);
+    const mintProof = persistSessionProofSpy.mock.calls[0][0];
+    expect(mintProof.sessionId).toBe(mockSession.getClientSessionData().id);
+    expect(mintProof.step.tag).toBe("checkCommitPreparationResponse");
+    expect(mintProof.claim).toContain("MOCK_MINT_RECEIPT");
+    expect(mintProof.signedClaim).not.toBe("");
   });
   it("Service3Client commitFinalAssertion", async () => {
     expect(satpClientService3).toBeDefined();
@@ -906,6 +929,13 @@ describe("SATP Services Testing", () => {
       commitFinalAssertionRequestMessage,
       mockSession,
     );
+
+    expect(persistSessionProofSpy).toHaveBeenCalledTimes(1);
+    const burnProof = persistSessionProofSpy.mock.calls[0][0];
+    expect(burnProof.sessionId).toBe(mockSession.getServerSessionData().id);
+    expect(burnProof.step.tag).toBe("checkCommitFinalAssertionRequest");
+    expect(burnProof.claim).toContain("MOCK_BURN_RECEIPT");
+    expect(burnProof.signedClaim).not.toBe("");
   });
   it("Service3Server commitFinalAcknowledgementReceiptResponse", async () => {
     expect(satpServerService3).toBeDefined();
@@ -947,6 +977,15 @@ describe("SATP Services Testing", () => {
       commitFinalAcknowledgementReceiptResponseMessage,
       mockSession,
     );
+
+    expect(persistSessionProofSpy).toHaveBeenCalledTimes(1);
+    const assignmentProof = persistSessionProofSpy.mock.calls[0][0];
+    expect(assignmentProof.sessionId).toBe(
+      mockSession.getClientSessionData().id,
+    );
+    expect(assignmentProof.step.tag).toBe("checkCommitFinalAssertionResponse");
+    expect(assignmentProof.claim).toContain("MOCK_ASSIGNMENT_RECEIPT");
+    expect(assignmentProof.signedClaim).not.toBe("");
   });
   it("Service3Client transferComplete", async () => {
     expect(satpClientService3).toBeDefined();

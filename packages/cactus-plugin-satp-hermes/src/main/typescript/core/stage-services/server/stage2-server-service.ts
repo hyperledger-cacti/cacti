@@ -23,6 +23,7 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { getStepByTag } from "../../satp-protocol-map";
 
 import { SATPSession } from "../../../core/satp-session";
 import { verifyLockAssertionRequestMessage } from "../verifier/stage-2-server-service-verifications";
@@ -205,12 +206,12 @@ export class Stage2ServerService extends SATPService {
 
         // persist the signature-verified lock-assertion claim so it stays
         // provable for dispute resolution and audit after transport ends
-        await this.dbLogger.persistLogEntry({
+        const proofStep = getStepByTag(2, "checkLockAssertionRequest");
+        await this.dbLogger.persistSessionProof({
           sessionId: sessionData.id,
-          type: MessageType[MessageType.LOCK_ASSERT],
-          operation: "claim-verified",
-          data: safeStableStringify(request.lockAssertionClaim) ?? "",
-          sequenceNumber: Number(sessionData.lastSequenceNumber),
+          step: proofStep!,
+          claim: safeStableStringify(request.lockAssertionClaim) ?? "",
+          signedClaim: request.lockAssertionClaim!.signature,
         });
 
         sessionData.lockAssertionClaim = request.lockAssertionClaim!;

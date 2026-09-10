@@ -26,5 +26,9 @@ Do not place credentials in tracked gateway example files. Supply secrets throug
 
 The repository classes call `migrate.latest()` during initialization and use the migrations under [`src/main/typescript/database/migrations/`](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-satp-hermes/src/main/typescript/database/migrations). Rollback support is implemented by the repository classes for controlled test and recovery flows.
 
+## Session proofs
+
+Signature-verified protocol claims (wrap, lock, mint, burn, and assignment assertion claims) are persisted in the audit database as session proofs in the `session_proofs` table, created by the `20260910120000_add_session_proofs_table` migration. Each proof records the session ID, the SATP protocol step at which the claim was verified, the serialized claim, and the claim signature, keeping the signed claims provable for dispute resolution and audit after transport ends. Proofs are returned with audit entries through the `performAudit` API.
+
 The package manifest currently contains legacy `db:*` scripts that reference the former `src/knex/` layout. Do not use those scripts until their paths are updated in a dedicated code change.
 <!-- --8<-- [end:content] -->

@@ -949,6 +949,12 @@ export interface AuditEntry {
      * @memberof AuditEntry
      */
     'timestamp': number;
+    /**
+     * Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry. 
+     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
+     * @memberof AuditEntry
+     */
+    'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
 }
 /**
  * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
@@ -2765,6 +2771,19 @@ export interface GetRoutes200ResponseRoutesInnerStepsInnerToolDetails {
     'logoURI': string;
 }
 /**
+ * Response schema for a session proofs request. Contains the signature-verified SessionProofs persisted in the audit database for the requested sessions.
+ * @export
+ * @interface GetSessionProofs200Response
+ */
+export interface GetSessionProofs200Response {
+    /**
+     * Signature-verified session proofs for the requested SATP sessions.
+     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
+     * @memberof GetSessionProofs200Response
+     */
+    'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
+}
+/**
  * List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
  * @export
  * @interface GetSupportedLedgers200Response
@@ -4011,7 +4030,90 @@ export interface PerformAudit200ResponseAuditEntriesEntriesInner {
      * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
      */
     'timestamp': number;
+    /**
+     * Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry. 
+     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
+     */
+    'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
 }
+/**
+ * A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends. 
+ * @export
+ * @interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
+ */
+export interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner {
+    /**
+     * Unique identifier of the SATP session this proof belongs to.
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
+     */
+    'sessionId': string;
+    /**
+     * 
+     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
+     */
+    'step': PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep;
+    /**
+     * JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step. 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
+     */
+    'claim': string;
+    /**
+     * The signature carried by the claim, produced by the asset/bridge operation over the claim receipt. 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
+     */
+    'signedClaim': string;
+}
+/**
+ * The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map. 
+ * @export
+ * @interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
+ */
+export interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep {
+    /**
+     * Step tag identifier from the SATP protocol map.
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
+     */
+    'tag': string;
+    /**
+     * Human-readable description of the protocol step.
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
+     */
+    'description': string;
+    /**
+     * Gateway role executing the step (client/server/both).
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
+     */
+    'role': PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum;
+    /**
+     * Sequence number of the step within its stage.
+     * @type {number}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
+     */
+    'sequence': number;
+    /**
+     * SATP message type associated with the step, if any. 
+     * @type {string}
+     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
+     */
+    'messageType'?: string;
+}
+
+export const PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum = {
+    Client: 'client',
+    Server: 'server',
+    Both: 'both'
+} as const;
+
+export type PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum = typeof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum[keyof typeof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum];
+
 /**
  * Represents a persisted local audit/log record generated during the lifecycle of a SATP transfer session. Each entry captures the operation performed, its contextual identifiers, serialized session state data, and ordering metadata. 
  * @export
@@ -4410,6 +4512,50 @@ export const SatpStageKey = {
 export type SatpStageKey = typeof SatpStageKey[keyof typeof SatpStageKey];
 
 
+/**
+ * A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends. 
+ * @export
+ * @interface SessionProof
+ */
+export interface SessionProof {
+    /**
+     * Unique identifier of the SATP session this proof belongs to.
+     * @type {string}
+     * @memberof SessionProof
+     */
+    'sessionId': string;
+    /**
+     * 
+     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep}
+     * @memberof SessionProof
+     */
+    'step': PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep;
+    /**
+     * JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step. 
+     * @type {string}
+     * @memberof SessionProof
+     */
+    'claim': string;
+    /**
+     * The signature carried by the claim, produced by the asset/bridge operation over the claim receipt. 
+     * @type {string}
+     * @memberof SessionProof
+     */
+    'signedClaim': string;
+}
+/**
+ * Response schema for a session proofs request. Contains the signature-verified SessionProofs persisted in the audit database for the requested sessions.
+ * @export
+ * @interface SessionProofsResponse
+ */
+export interface SessionProofsResponse {
+    /**
+     * Signature-verified session proofs for the requested SATP sessions.
+     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
+     * @memberof SessionProofsResponse
+     */
+    'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
+}
 /**
  * Request for retrieving the current status of a session, identified by the session ID.
  * @export
@@ -5288,6 +5434,43 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             };
         },
         /**
+         * Retrieves the signature-verified SessionProofs (claims recorded at each SATP protocol step) persisted in the audit database for the given session IDs. 
+         * @summary Get session proofs
+         * @param {string} sessionIds Comma-separated list of SATP session IDs to retrieve proofs for.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSessionProofs: async (sessionIds: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'sessionIds' is not null or undefined
+            assertParamExists('getSessionProofs', 'sessionIds', sessionIds)
+            const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (sessionIds !== undefined) {
+                localVarQueryParameter['sessionIds'] = sessionIds;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Retrieve the status of a SATP session
          * @summary Get SATP current session data
          * @param {string} sessionID Unique identifier for the session.
@@ -5479,6 +5662,17 @@ export const AdminApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Retrieves the signature-verified SessionProofs (claims recorded at each SATP protocol step) persisted in the audit database for the given session IDs. 
+         * @summary Get session proofs
+         * @param {string} sessionIds Comma-separated list of SATP session IDs to retrieve proofs for.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSessionProofs(sessionIds: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetSessionProofs200Response>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSessionProofs(sessionIds, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Retrieve the status of a SATP session
          * @summary Get SATP current session data
          * @param {string} sessionID Unique identifier for the session.
@@ -5560,6 +5754,16 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          */
         getSessionIds(sessionsRequest?: object, options?: any): AxiosPromise<Array<string>> {
             return localVarFp.getSessionIds(sessionsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Retrieves the signature-verified SessionProofs (claims recorded at each SATP protocol step) persisted in the audit database for the given session IDs. 
+         * @summary Get session proofs
+         * @param {string} sessionIds Comma-separated list of SATP session IDs to retrieve proofs for.
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSessionProofs(sessionIds: string, options?: any): AxiosPromise<GetSessionProofs200Response> {
+            return localVarFp.getSessionProofs(sessionIds, options).then((request) => request(axios, basePath));
         },
         /**
          * Retrieve the status of a SATP session
@@ -5644,6 +5848,18 @@ export class AdminApi extends BaseAPI {
      */
     public getSessionIds(sessionsRequest?: object, options?: AxiosRequestConfig) {
         return AdminApiFp(this.configuration).getSessionIds(sessionsRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Retrieves the signature-verified SessionProofs (claims recorded at each SATP protocol step) persisted in the audit database for the given session IDs. 
+     * @summary Get session proofs
+     * @param {string} sessionIds Comma-separated list of SATP session IDs to retrieve proofs for.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AdminApi
+     */
+    public getSessionProofs(sessionIds: string, options?: AxiosRequestConfig) {
+        return AdminApiFp(this.configuration).getSessionProofs(sessionIds, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

@@ -40,10 +40,37 @@ import {
   AuditRequest,
   AuditResponse,
 } from "../../generated/gateway-client/typescript-axios/api";
+import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import type { IAuditEntryRepository } from "../../database/repository/interfaces/repository";
 
-import type { Audit } from "../../core/types";
+import type { Audit, SessionProof } from "../../core/types";
+
+/**
+ * Convert a core SessionProof into its API representation.
+ *
+ * The protocol step's messageType is stored as a numeric proto enum in the
+ * audit database and exposed as its enum name string through the API.
+ *
+ * @param proof - Core SessionProof read from the audit repository
+ * @returns SessionProof shaped for the audit API response
+ */
+export function mapSessionProof(proof: SessionProof) {
+  return {
+    sessionId: proof.sessionId,
+    step: {
+      tag: proof.step.tag,
+      description: proof.step.description,
+      role: proof.step.role,
+      sequence: proof.step.sequence,
+      ...(proof.step.messageType != undefined
+        ? { messageType: MessageType[proof.step.messageType] }
+        : {}),
+    },
+    claim: proof.claim,
+    signedClaim: proof.signedClaim,
+  };
+}
 
 /**
  * Execute audit operations for SATP sessions and transactions.
@@ -156,6 +183,7 @@ export async function getAuditData(
         auditEntryId: entry.auditEntryId,
         session: entry.session,
         timestamp: entry.timestamp,
+        proofs: (entry.proofs ?? []).map(mapSessionProof),
       })),
     },
     startTimestamp: req.startTimestamp,
