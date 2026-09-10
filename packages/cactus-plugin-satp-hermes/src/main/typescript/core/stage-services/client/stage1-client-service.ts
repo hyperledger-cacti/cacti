@@ -202,7 +202,7 @@ export class Stage1ClientService extends SATPService {
   }
 
   async transferCommenceRequest(
-    _: TransferProposalResponse,
+    response: TransferProposalResponse,
     session: SATPSession,
   ): Promise<void | TransferCommenceRequest> {
     const stepTag = `transferCommenceRequest()`;
@@ -218,8 +218,18 @@ export class Stage1ClientService extends SATPService {
         }
 
         session.verify(fnTag, SessionType.CLIENT);
-
         const sessionData = session.getClientSessionData();
+
+        // persist the signature-verified wrap-assertion claim so it stays
+        // provable for dispute resolution and audit after transport ends
+        // TODO consider persisting in separate DB more suitable for audits/long term storage
+        await this.dbLogger.persistLogEntry({
+          sessionId: sessionData.id,
+          type: MessageType[MessageType.TRANSFER_COMMENCE_REQUEST],
+          operation: "claim-verified",
+          data: safeStableStringify(response.hashTransferInitClaims) ?? "",
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
 
         await this.dbLogger.persistLogEntry({
           sessionId: sessionData.id,
@@ -322,7 +332,7 @@ export class Stage1ClientService extends SATPService {
     const stepTag = `checkPreSATPTransferResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    await context.with(ctx, () => {
+    await context.with(ctx, async () => {
       try {
         this.Log.debug(`${fnTag}, checkPreSATPTransferResponse...`);
 
@@ -330,6 +340,18 @@ export class Stage1ClientService extends SATPService {
 
         // update state
         const sessionData = session.getClientSessionData();
+
+        // first verification after stage 0, prior to transfer commence request
+        // persist the signature-verified wrap-assertion claim so it stays
+        // provable for dispute resolution and audit after transport ends
+        await this.dbLogger.persistLogEntry({
+          sessionId: sessionData.id,
+          type: MessageType[MessageType.PRE_SATP_TRANSFER_RESPONSE],
+          operation: "claim-verified",
+          data: safeStableStringify(response.wrapAssertionClaim) ?? "",
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+
         sessionData.recipientGatewayNetworkId =
           response.recipientGatewayNetworkId;
         sessionData.receiverAsset!.tokenId = response.recipientTokenId;

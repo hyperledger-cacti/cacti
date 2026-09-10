@@ -499,7 +499,7 @@ export class Stage3ClientService extends SATPService {
     const stepTag = `checkCommitPreparationResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    await context.with(ctx, () => {
+    await context.with(ctx, async () => {
       try {
         this.Log.debug(`${fnTag}, CommitPreparationResponse...`);
 
@@ -512,6 +512,17 @@ export class Stage3ClientService extends SATPService {
         );
 
         const sessionData = session.getClientSessionData();
+
+        // persist the signature-verified mint-assertion claim so it stays
+        // provable for dispute resolution and audit after transport ends
+        await this.dbLogger.persistLogEntry({
+          sessionId: sessionData.id,
+          type: MessageType[MessageType.COMMIT_READY],
+          operation: "claim-verified",
+          data: safeStableStringify(response.mintAssertionClaim) ?? "",
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+
         if (response.mintAssertionClaimFormat != undefined) {
           sessionData.mintAssertionClaimFormat =
             response.mintAssertionClaimFormat;
@@ -542,7 +553,7 @@ export class Stage3ClientService extends SATPService {
     const stepTag = `checkCommitFinalAssertionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    await context.with(ctx, () => {
+    await context.with(ctx, async () => {
       try {
         this.Log.debug(`${fnTag}, CommitFinalAcknowledgementReceipt...`);
 
@@ -555,6 +566,17 @@ export class Stage3ClientService extends SATPService {
         );
 
         const sessionData = session.getClientSessionData();
+
+        // persist the signature-verified assignment-assertion claim so it
+        // stays provable for dispute resolution and audit after transport ends
+        await this.dbLogger.persistLogEntry({
+          sessionId: sessionData.id,
+          type: MessageType[MessageType.ACK_COMMIT_FINAL],
+          operation: "claim-verified",
+          data: safeStableStringify(response.assignmentAssertionClaim) ?? "",
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+
         sessionData.assignmentAssertionClaim =
           response.assignmentAssertionClaim!;
         if (response.assignmentAssertionClaimFormat != undefined) {

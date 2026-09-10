@@ -91,6 +91,7 @@ import { knexLocalInstance } from "../../../main/typescript/database/knexfile";
 import { knexRemoteInstance } from "../../../main/typescript/database/knexfile-remote";
 import { MonitorService } from "../../../main/typescript/services/monitoring/monitor";
 import { LockAssertionExpirationError } from "../../../main/typescript/core/errors/satp-service-errors";
+import { signClaimFixture } from "../test-utils";
 
 const logLevel: LogLevelDesc = "DEBUG";
 
@@ -472,9 +473,10 @@ describe("SATP Services Testing", () => {
       throw new Error("Session data not found");
     }
 
-    sessionData.receiverWrapAssertionClaim = create(
-      WrapAssertionClaimSchema,
-      {},
+    sessionData.receiverWrapAssertionClaim = signClaimFixture(
+      create(WrapAssertionClaimSchema, {}),
+      "MOCK_RECEIVER_WRAP_RECEIPT",
+      signer,
     );
 
     preSATPTransferResponseMessage =
@@ -582,7 +584,7 @@ describe("SATP Services Testing", () => {
         transferProposalRequestMessage,
         mockSession,
       )) as TransferProposalResponse;
-    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(4);
     expect(
       isMessage(
         transferProposalResponseMessage,
@@ -610,7 +612,7 @@ describe("SATP Services Testing", () => {
         transferProposalResponseMessage,
         mockSession,
       )) as TransferCommenceRequest;
-    expect(persistLogEntrySpy).toHaveBeenCalledTimes(3);
+    expect(persistLogEntrySpy).toHaveBeenCalledTimes(4);
     expect(
       isMessage(transferCommenceRequestMessage, TransferCommenceRequestSchema),
     ).toBe(true);
@@ -826,7 +828,11 @@ describe("SATP Services Testing", () => {
     );
     //mock claims
     (mockSession.getServerSessionData() as SessionData).mintAssertionClaim =
-      create(MintAssertionClaimSchema, {});
+      signClaimFixture(
+        create(MintAssertionClaimSchema, {}),
+        "MOCK_MINT_RECEIPT",
+        signer,
+      );
 
     commitReadyResponseMessage = (await satpServerService3.commitReadyResponse(
       commitPreparationRequestMessage,
@@ -863,7 +869,11 @@ describe("SATP Services Testing", () => {
 
     //mock claims
     (mockSession.getClientSessionData() as SessionData).burnAssertionClaim =
-      create(BurnAssertionClaimSchema, {});
+      signClaimFixture(
+        create(BurnAssertionClaimSchema, {}),
+        "MOCK_BURN_RECEIPT",
+        signer,
+      );
 
     commitFinalAssertionRequestMessage =
       (await satpClientService3.commitFinalAssertion(
@@ -906,7 +916,11 @@ describe("SATP Services Testing", () => {
     //mock claims
     (
       mockSession.getServerSessionData() as SessionData
-    ).assignmentAssertionClaim = create(AssignmentAssertionClaimSchema, {});
+    ).assignmentAssertionClaim = signClaimFixture(
+      create(AssignmentAssertionClaimSchema, {}),
+      "MOCK_ASSIGNMENT_RECEIPT",
+      signer,
+    );
 
     commitFinalAcknowledgementReceiptResponseMessage =
       (await satpServerService3.commitFinalAcknowledgementReceiptResponse(

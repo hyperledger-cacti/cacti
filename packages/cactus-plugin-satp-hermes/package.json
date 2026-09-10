@@ -152,7 +152,7 @@
     "lint:protobuf": "buf lint --verbose",
     "start-gateway": "node ./dist/lib/main/typescript/plugin-satp-hermes-gateway-cli.js",
     "test": "run-s test:unit test:integration",
-    "test:log": "yarn run test 2>&1 | tee reports/test-$(date +%Y-%m-%d-%H-%M)-$(date +%s | tail -c 5).out",
+    "test:report": "yarn run test 2>&1 | tee reports/satp-test-report-$(date +%Y-%m-%d-%H-%M)-$(date +%s | tail -c 5).out",
     "test:integration": "NODE_OPTIONS=--max-old-space-size=8192 npx jest ./src/test/typescript/integration --runInBand --forceExit --config=jest.config-integration.ts",
     "test:integration:adapter": "JEST_JUNIT_OUTPUT_NAME=satp-hermes-tests-integration-adapter.xml NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/adapter --runInBand --forceExit --config=jest.config-integration.ts",
     "test:integration:bridge": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/bridge --runInBand --forceExit --config=jest.config-integration-bridge.ts",

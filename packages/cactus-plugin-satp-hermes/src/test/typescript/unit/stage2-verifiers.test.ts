@@ -160,7 +160,10 @@ describe("verifyLockAssertionRequestMessage", () => {
   });
 
   it("throws LockAssertionExpirationError when already expired", () => {
-    const session = makeSession(makeSessionData());
+    const sessionData = makeSessionData({
+      clientGatewayPubkey: Buffer.from(keyPairs.publicKey).toString("hex"),
+    });
+    const session = makeSession(sessionData);
     const request = makeLockAssertionRequest(BigInt(1));
     expect(() =>
       verifyLockAssertionRequestMessage(TAG, signer, request, session),
@@ -168,7 +171,10 @@ describe("verifyLockAssertionRequestMessage", () => {
   });
 
   it("throws LockAssertionExpirationError when beyond the negotiated window", () => {
-    const session = makeSession(makeSessionData());
+    const sessionData = makeSessionData({
+      clientGatewayPubkey: Buffer.from(keyPairs.publicKey).toString("hex"),
+    });
+    const session = makeSession(sessionData);
     const request = makeLockAssertionRequest(
       BigInt(Date.now()) + LOCK_EXPIRATION_TIME + BigInt(60_000),
     );

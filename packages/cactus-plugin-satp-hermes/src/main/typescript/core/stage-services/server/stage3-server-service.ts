@@ -438,7 +438,7 @@ export class Stage3ServerService extends SATPService {
     const stepTag = `checkCommitFinalAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    await context.with(ctx, () => {
+    await context.with(ctx, async () => {
       try {
         this.Log.debug(`${fnTag}, checkCommitFinalAssertionRequest...`);
 
@@ -451,6 +451,17 @@ export class Stage3ServerService extends SATPService {
         );
 
         const sessionData = session.getServerSessionData();
+
+        // persist the signature-verified burn-assertion claim so it stays
+        // provable for dispute resolution and audit after transport ends
+        await this.dbLogger.persistLogEntry({
+          sessionId: sessionData.id,
+          type: MessageType[MessageType.COMMIT_FINAL],
+          operation: "claim-verified",
+          data: safeStableStringify(request.burnAssertionClaim) ?? "",
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+
         sessionData.burnAssertionClaim = request.burnAssertionClaim!;
         if (request.burnAssertionClaimFormat != undefined) {
           sessionData.burnAssertionClaimFormat =

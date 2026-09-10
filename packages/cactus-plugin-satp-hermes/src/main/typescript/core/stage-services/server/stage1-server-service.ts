@@ -85,6 +85,18 @@ export class Stage1ServerService extends SATPService {
           data: safeStableStringify(sessionData),
           sequenceNumber: Number(sessionData.lastSequenceNumber),
         });
+
+        // persist the signature-verified wrap-assertion claim so it stays
+        // provable for dispute resolution and audit after transport ends
+        // TODO consider persisting in separate DB more suitable for audits/long term storage
+        await this.dbLogger.persistLogEntry({
+          sessionId: sessionData.id,
+          type: MessageType[MessageType.TRANSFER_COMMENCE_RESPONSE],
+          operation: "claim-verified",
+          data: safeStableStringify(request.transferInitClaims) ?? "",
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+
         try {
           this.Log.info(`exec-${messageType}`);
           await this.dbLogger.persistLogEntry({

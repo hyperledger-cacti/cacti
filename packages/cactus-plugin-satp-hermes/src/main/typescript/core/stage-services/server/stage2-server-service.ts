@@ -195,13 +195,24 @@ export class Stage2ServerService extends SATPService {
     const stepTag = `checkLockAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    await context.with(ctx, () => {
+    await context.with(ctx, async () => {
       try {
         this.Log.debug(`${fnTag}, checkLockAssertionRequest...`);
 
         verifyLockAssertionRequestMessage(fnTag, this.Signer, request, session);
 
         const sessionData = session.getServerSessionData();
+
+        // persist the signature-verified lock-assertion claim so it stays
+        // provable for dispute resolution and audit after transport ends
+        await this.dbLogger.persistLogEntry({
+          sessionId: sessionData.id,
+          type: MessageType[MessageType.LOCK_ASSERT],
+          operation: "claim-verified",
+          data: safeStableStringify(request.lockAssertionClaim) ?? "",
+          sequenceNumber: Number(sessionData.lastSequenceNumber),
+        });
+
         sessionData.lockAssertionClaim = request.lockAssertionClaim!;
         sessionData.lockAssertionClaimFormat =
           request.lockAssertionClaimFormat!;
