@@ -334,7 +334,7 @@
         "specVersion": "draft-ietf-satp-core-13",
         "specUrl": "https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt"
       }
-  },
+    },
     "cacti-version": "3.0.1"
   },
   "watch": {
