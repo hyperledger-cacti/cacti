@@ -84,7 +84,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage1ServerService} for server-side business logic
  * @see {@link Stage1ClientService} for client-side business logic
@@ -119,7 +119,12 @@ import {
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
-import { getSessionId, buildAdapterPayload } from "./handler-utils";
+import {
+  getSessionId,
+  buildAdapterPayload,
+  applyCrossStageProtocolMessage,
+  abortOnReceivedProtocolTermination,
+} from "./handler-utils";
 import { PreSATPTransferResponse } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 import { getMessageTypeName } from "../satp-utils";
@@ -507,6 +512,11 @@ export class Stage1SATPHandler implements SATPHandler {
           throw new SessionNotFoundError(fnTag);
         }
 
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
+
         await this.adapterManager?.executeAdaptersOrSkip(
           buildAdapterPayload(
             SatpStageKey.Stage1,
@@ -609,6 +619,7 @@ export class Stage1SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.INIT_REJECT, error);
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
         span.recordException(error);
@@ -707,6 +718,11 @@ export class Stage1SATPHandler implements SATPHandler {
         if (!session) {
           throw new SessionNotFoundError(fnTag);
         }
+
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         await this.adapterManager?.executeAdaptersOrSkip(
           buildAdapterPayload(
@@ -807,6 +823,7 @@ export class Stage1SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.TRANSFER_COMMENCE_RESPONSE, error);
         if (session) {
           attributes = collectSessionAttributes(session, "server");

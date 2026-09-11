@@ -1,210 +1,200 @@
 /**
- * IETF SATP v13 IANA Error Codes Registry.
+ * IETF SATP Protocol Errors Codes Registry.
  *
- * Defines all 53 error codes from SATP Core v13 Section 14 (IANA Considerations,
- * Table 1) organized by protocol stage and error category.
+ * Transcribes the SATP Error Codes Registry (Table 2) of
+ * [draft-ietf-satp-core-16] Section 11.4, organized by protocol stage and
+ * error category. Error messages on the wire carry these codes as
+ * Problem Details `type` URNs (`urn:ietf:params:satp:core:error:<code>`,
+ * Section 11.3), so the code meanings here MUST match the registry — a
+ * peer receiving `reasonCode`/`type` interprets it per the registry.
  *
  * Error code format: `err_<stage>.<sub>.<seq>` where:
+ * - stage 0 = General errors
  * - stage 1 = Stage 1 (Transfer Initiation)
  * - stage 2 = Stage 2 (Lock-Evidence Verification)
  * - stage 3 = Stage 3 (Commitment Establishment)
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} Section 14
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} Section 11.4
  */
+
+// ---------------------------------------------------------------------------
+// General errors (draft-16 Section 11.4, stage 0)
+// ---------------------------------------------------------------------------
+
+/** General — badly formed message: invalid message type */
+export const ERR_0_1_1 = "err_0.1.1";
+/** General — authorization error: insufficient permissions */
+export const ERR_0_1_2 = "err_0.1.2";
+/** General — badly formed message: bad signature */
+export const ERR_0_1_3 = "err_0.1.3";
 
 // ---------------------------------------------------------------------------
 // Stage 1 — Transfer Proposal / Receipt
 // ---------------------------------------------------------------------------
 
-/** Badly formed message — general */
+/** Transfer Proposal/Receipt — badly formed message: invalid transferContextId */
 export const ERR_1_1_1 = "err_1.1.1";
-/** Badly formed message — missing mandatory field */
+/** Transfer Proposal/Receipt — badly formed message: invalid sessionId */
 export const ERR_1_1_2 = "err_1.1.2";
-/** Badly formed message — unrecognized message type */
+/** Transfer Proposal/Receipt — badly formed message: incorrect transferInitClaimFormat */
 export const ERR_1_1_3 = "err_1.1.3";
-/** Badly formed message — invalid digital asset identifier */
-export const ERR_1_1_4 = "err_1.1.4";
-/** Badly formed message — invalid asset profile identifier */
-export const ERR_1_1_5 = "err_1.1.5";
-/** Badly formed message — invalid verified originator entity */
-export const ERR_1_1_6 = "err_1.1.6";
-/** Badly formed message — invalid verified beneficiary entity */
-export const ERR_1_1_7 = "err_1.1.7";
-/** Badly formed message — invalid originator gateway network id */
-export const ERR_1_1_8 = "err_1.1.8";
-/** Badly formed message — invalid beneficiary gateway network id */
-export const ERR_1_1_9 = "err_1.1.9";
-/** Badly formed message — invalid sender gateway device identity public key */
-export const ERR_1_1_10 = "err_1.1.10";
 
-/** Badly formed claim — invalid client identity info */
+/** Transfer Proposal/Receipt — badly formed claim: invalid digitalAssetId */
 export const ERR_1_1_11 = "err_1.1.11";
-/** Badly formed claim — invalid server identity info */
+/** Transfer Proposal/Receipt — badly formed claim: invalid assetProfileId */
 export const ERR_1_1_12 = "err_1.1.12";
-/** Badly formed claim — invalid sender gateway owner id */
+/** Transfer Proposal/Receipt — badly formed claim: invalid verifiedOriginatorEntityId */
 export const ERR_1_1_13 = "err_1.1.13";
-/** Badly formed claim — invalid receiver gateway owner id */
+/** Transfer Proposal/Receipt — badly formed claim: invalid verifiedBeneficiaryEntityId */
 export const ERR_1_1_14 = "err_1.1.14";
-/** Badly formed claim — invalid sender gateway signature public key */
+/** Transfer Proposal/Receipt — badly formed claim: invalid originatorPublicKey */
 export const ERR_1_1_15 = "err_1.1.15";
-/** Badly formed claim — invalid receiver gateway signature public key */
+/** Transfer Proposal/Receipt — badly formed claim: invalid beneficiaryPublicKey */
 export const ERR_1_1_16 = "err_1.1.16";
-/** Badly formed claim — invalid sender gateway device identity public key */
+/** Transfer Proposal/Receipt — badly formed claim: invalid senderGatewaySignaturePublicKey */
 export const ERR_1_1_17 = "err_1.1.17";
-/** Badly formed claim — invalid receiver gateway device identity public key */
+/** Transfer Proposal/Receipt — badly formed claim: invalid receiverGatewaySignaturePublicKey */
 export const ERR_1_1_18 = "err_1.1.18";
-/** Badly formed claim — invalid hash transfer init claims */
+/** Transfer Proposal/Receipt — badly formed claim: invalid senderGatewayId */
 export const ERR_1_1_19 = "err_1.1.19";
-/** Badly formed claim — invalid transfer context id */
+/** Transfer Proposal/Receipt — badly formed claim: invalid recipientGatewayId */
 export const ERR_1_1_20 = "err_1.1.20";
 
-/** Badly formed parameter — invalid network lock type */
+/** Transfer Proposal/Receipt — badly formed parameter: unsupported gatewayDefaultSignatureAlgorithm */
 export const ERR_1_1_31 = "err_1.1.31";
-/** Badly formed parameter — invalid network lock expiration time */
+/** Transfer Proposal/Receipt — badly formed parameter: unsupported networkLockType */
 export const ERR_1_1_32 = "err_1.1.32";
-/** Badly formed parameter — invalid gateway default signature algorithm */
+/** Transfer Proposal/Receipt — badly formed parameter: unsupported networkLockExpirationTime */
 export const ERR_1_1_33 = "err_1.1.33";
-/** Badly formed parameter — invalid supported DLTs */
+/** Transfer Proposal/Receipt — badly formed parameter: unsupported gatewayTlsScheme */
 export const ERR_1_1_34 = "err_1.1.34";
-/** Badly formed parameter — invalid gateway capabilities version */
+/** Transfer Proposal/Receipt — badly formed parameter: unsupported gatewayLoggingProfile */
 export const ERR_1_1_35 = "err_1.1.35";
-/** Badly formed parameter — invalid max retries */
+/** Transfer Proposal/Receipt — badly formed parameter: unsupported gatewayAccessControlProfile */
 export const ERR_1_1_36 = "err_1.1.36";
 
-/** Mismatch — session id mismatch */
+/** Transfer Commence — badly formed message: mismatch transferContextId */
 export const ERR_1_2_1 = "err_1.2.1";
-/** Mismatch — transfer context id mismatch */
+/** Transfer Commence — badly formed message: mismatch sessionId */
 export const ERR_1_2_2 = "err_1.2.2";
-/** Mismatch — hash previous message mismatch */
+/** Transfer Commence — badly formed message: mismatch hashTransferInitClaim */
 export const ERR_1_2_3 = "err_1.2.3";
-/** Mismatch — message type mismatch */
-export const ERR_1_2_4 = "err_1.2.4";
 
-/** Transfer Commence — badly formed commence message */
+/** Transfer Commence — badly formed message: mismatch transferContextId */
 export const ERR_1_3_1 = "err_1.3.1";
-/** Transfer Commence — missing hash transfer init claims */
+/** Transfer Commence — badly formed message: mismatch sessionId */
 export const ERR_1_3_2 = "err_1.3.2";
-/** Transfer Commence — hash transfer init claims mismatch */
+/** Transfer Commence — badly formed message: mismatch hashTransferInitClaim */
 export const ERR_1_3_3 = "err_1.3.3";
-/** Transfer Commence — missing transfer context id */
+/** Transfer Commence — badly formed message: mismatch hashPrevMessage */
 export const ERR_1_3_4 = "err_1.3.4";
-/** Transfer Commence — invalid hash previous message */
-export const ERR_1_3_5 = "err_1.3.5";
 
-/** ACK Commence — badly formed ack commence */
+/** ACK Commence — badly formed message: mismatch transferContextId */
 export const ERR_1_4_1 = "err_1.4.1";
-/** ACK Commence — missing transfer context id */
+/** ACK Commence — badly formed message: mismatch sessionId */
 export const ERR_1_4_2 = "err_1.4.2";
-/** ACK Commence — session id mismatch */
+/** ACK Commence — badly formed message: mismatch hashPrevMessage */
 export const ERR_1_4_3 = "err_1.4.3";
-/** ACK Commence — invalid hash previous message */
-export const ERR_1_4_4 = "err_1.4.4";
 
 // ---------------------------------------------------------------------------
 // Stage 2 — Lock-Evidence Verification
 // ---------------------------------------------------------------------------
 
-/** Lock Assertion — badly formed lock assertion */
+/** Lock Assertion — badly formed message: mismatch transferContextId */
 export const ERR_2_2_1 = "err_2.2.1";
-/** Lock Assertion — missing lock assertion claim */
+/** Lock Assertion — badly formed message: mismatch sessionId */
 export const ERR_2_2_2 = "err_2.2.2";
-/** Lock Assertion — invalid lock assertion claim format */
+/** Lock Assertion — badly formed message: unsupported lockAssertionClaimFormat */
 export const ERR_2_2_3 = "err_2.2.3";
-/** Lock Assertion — lock assertion expiration error */
+/** Lock Assertion — badly formed message: unsupported lockAssertionExpiration */
 export const ERR_2_2_4 = "err_2.2.4";
-/** Lock Assertion — missing transfer context id */
+/** Lock Assertion — badly formed message: mismatch hashPrevMessage */
 export const ERR_2_2_5 = "err_2.2.5";
-/** Lock Assertion — invalid hash previous message */
-export const ERR_2_2_6 = "err_2.2.6";
 
-/** Lock Assertion Receipt — badly formed receipt */
+/** Lock Assertion — semantic error: asset not found */
+export const ERR_2_2_7 = "err_2.2.7";
+/** Lock Assertion — semantic error: asset already locked */
+export const ERR_2_2_8 = "err_2.2.8";
+/** Lock Assertion — semantic error: asset lock expired */
+export const ERR_2_2_9 = "err_2.2.9";
+
+/** Lock Assertion Receipt — badly formed message: mismatch transferContextId */
 export const ERR_2_4_1 = "err_2.4.1";
-/** Lock Assertion Receipt — missing transfer context id */
+/** Lock Assertion Receipt — badly formed message: mismatch sessionId */
 export const ERR_2_4_2 = "err_2.4.2";
-/** Lock Assertion Receipt — session id mismatch */
+/** Lock Assertion Receipt — badly formed message: mismatch hashPrevMessage */
 export const ERR_2_4_3 = "err_2.4.3";
-/** Lock Assertion Receipt — invalid hash previous message */
-export const ERR_2_4_4 = "err_2.4.4";
 
 // ---------------------------------------------------------------------------
 // Stage 3 — Commitment Establishment
 // ---------------------------------------------------------------------------
 
-/** Commit Preparation — badly formed commit prepare */
+/** Commit Preparation — badly formed message: mismatch transferContextId */
 export const ERR_3_1_1 = "err_3.1.1";
-/** Commit Preparation — missing transfer context id */
+/** Commit Preparation — badly formed message: mismatch sessionId */
 export const ERR_3_1_2 = "err_3.1.2";
-/** Commit Preparation — session id mismatch */
+/** Commit Preparation — badly formed message: mismatch hashPrevMessage */
 export const ERR_3_1_3 = "err_3.1.3";
-/** Commit Preparation — invalid hash previous message */
-export const ERR_3_1_4 = "err_3.1.4";
 
-/** Commit Ready — badly formed commit ready */
+/** Commit Ready — badly formed message: mismatch transferContextId */
 export const ERR_3_3_1 = "err_3.3.1";
-/** Commit Ready — missing transfer context id */
+/** Commit Ready — badly formed message: mismatch sessionId */
 export const ERR_3_3_2 = "err_3.3.2";
-/** Commit Ready — missing mint assertion claim */
+/** Commit Ready — badly formed message: mismatch hashPrevMessage */
 export const ERR_3_3_3 = "err_3.3.3";
-/** Commit Ready — session id mismatch */
+/** Commit Ready — badly formed message: unsupported mintAssertionFormat */
 export const ERR_3_3_4 = "err_3.3.4";
-/** Commit Ready — invalid hash previous message */
-export const ERR_3_3_5 = "err_3.3.5";
 
-/** Commit Final Assertion — badly formed commit final */
+/** Commit Final Assertion — badly formed message: mismatch transferContextId */
 export const ERR_3_5_1 = "err_3.5.1";
-/** Commit Final Assertion — missing burn assertion claim */
+/** Commit Final Assertion — badly formed message: mismatch sessionId */
 export const ERR_3_5_2 = "err_3.5.2";
-/** Commit Final Assertion — missing transfer context id */
+/** Commit Final Assertion — badly formed message: mismatch hashPrevMessage */
 export const ERR_3_5_3 = "err_3.5.3";
-/** Commit Final Assertion — session id mismatch */
+/** Commit Final Assertion — badly formed message: unsupported burnAssertionClaimFormat */
 export const ERR_3_5_4 = "err_3.5.4";
-/** Commit Final Assertion — invalid hash previous message */
-export const ERR_3_5_5 = "err_3.5.5";
 
-/** Commit Final Ack Receipt — badly formed ack receipt */
+/** Commit Final Ack Receipt — badly formed message: mismatch transferContextId */
 export const ERR_3_7_1 = "err_3.7.1";
-/** Commit Final Ack Receipt — missing assignment assertion claim */
+/** Commit Final Ack Receipt — badly formed message: mismatch sessionId */
 export const ERR_3_7_2 = "err_3.7.2";
-/** Commit Final Ack Receipt — missing transfer context id */
+/** Commit Final Ack Receipt — badly formed message: mismatch hashPrevMessage */
 export const ERR_3_7_3 = "err_3.7.3";
-/** Commit Final Ack Receipt — session id mismatch */
+/** Commit Final Ack Receipt — badly formed message: unsupported assignmentAssertionClaimFormat */
 export const ERR_3_7_4 = "err_3.7.4";
-/** Commit Final Ack Receipt — invalid hash previous message */
-export const ERR_3_7_5 = "err_3.7.5";
 
-/** Transfer Complete — badly formed transfer complete */
+/** Transfer Complete — badly formed message: mismatch transferContextId */
 export const ERR_3_9_1 = "err_3.9.1";
-/** Transfer Complete — missing transfer context id */
+/** Transfer Complete — badly formed message: mismatch sessionId */
 export const ERR_3_9_2 = "err_3.9.2";
-/** Transfer Complete — invalid transfer complete claim */
+/** Transfer Complete — badly formed message: mismatch hashPrevMessage */
 export const ERR_3_9_3 = "err_3.9.3";
-/** Transfer Complete — session id mismatch */
+/** Transfer Complete — badly formed message: mismatch hashTransferCommence */
 export const ERR_3_9_4 = "err_3.9.4";
-/** Transfer Complete — invalid hash previous message */
-export const ERR_3_9_5 = "err_3.9.5";
 
 // ---------------------------------------------------------------------------
 // Aggregate collections
 // ---------------------------------------------------------------------------
 
+type GeneralErrorCode = (typeof GENERAL_ERROR_CODES)[number];
 type Stage1ErrorCode = (typeof STAGE_1_ERROR_CODES)[number];
 type Stage2ErrorCode = (typeof STAGE_2_ERROR_CODES)[number];
 type Stage3ErrorCode = (typeof STAGE_3_ERROR_CODES)[number];
 
-export type ErrorCode = Stage1ErrorCode | Stage2ErrorCode | Stage3ErrorCode;
+export type ErrorCode =
+  | GeneralErrorCode
+  | Stage1ErrorCode
+  | Stage2ErrorCode
+  | Stage3ErrorCode;
+
+/** General (stage-0) error codes. */
+export const GENERAL_ERROR_CODES = [ERR_0_1_1, ERR_0_1_2, ERR_0_1_3] as const;
 
 /** Stage 1 error codes. */
 export const STAGE_1_ERROR_CODES = [
   ERR_1_1_1,
   ERR_1_1_2,
   ERR_1_1_3,
-  ERR_1_1_4,
-  ERR_1_1_5,
-  ERR_1_1_6,
-  ERR_1_1_7,
-  ERR_1_1_8,
-  ERR_1_1_9,
-  ERR_1_1_10,
   ERR_1_1_11,
   ERR_1_1_12,
   ERR_1_1_13,
@@ -224,16 +214,13 @@ export const STAGE_1_ERROR_CODES = [
   ERR_1_2_1,
   ERR_1_2_2,
   ERR_1_2_3,
-  ERR_1_2_4,
   ERR_1_3_1,
   ERR_1_3_2,
   ERR_1_3_3,
   ERR_1_3_4,
-  ERR_1_3_5,
   ERR_1_4_1,
   ERR_1_4_2,
   ERR_1_4_3,
-  ERR_1_4_4,
 ] as const;
 
 /** Stage 2 error codes. */
@@ -243,11 +230,12 @@ export const STAGE_2_ERROR_CODES = [
   ERR_2_2_3,
   ERR_2_2_4,
   ERR_2_2_5,
-  ERR_2_2_6,
+  ERR_2_2_7,
+  ERR_2_2_8,
+  ERR_2_2_9,
   ERR_2_4_1,
   ERR_2_4_2,
   ERR_2_4_3,
-  ERR_2_4_4,
 ] as const;
 
 /** Stage 3 error codes. */
@@ -255,183 +243,248 @@ export const STAGE_3_ERROR_CODES = [
   ERR_3_1_1,
   ERR_3_1_2,
   ERR_3_1_3,
-  ERR_3_1_4,
   ERR_3_3_1,
   ERR_3_3_2,
   ERR_3_3_3,
   ERR_3_3_4,
-  ERR_3_3_5,
   ERR_3_5_1,
   ERR_3_5_2,
   ERR_3_5_3,
   ERR_3_5_4,
-  ERR_3_5_5,
   ERR_3_7_1,
   ERR_3_7_2,
   ERR_3_7_3,
   ERR_3_7_4,
-  ERR_3_7_5,
   ERR_3_9_1,
   ERR_3_9_2,
   ERR_3_9_3,
   ERR_3_9_4,
-  ERR_3_9_5,
 ] as const;
 
 // ---------------------------------------------------------------------------
-// Description lookup
+// Description lookup (the registry's Description column; the Problem Details
+// `title` SHOULD correspond to it per draft-16 Section 11.3)
 // ---------------------------------------------------------------------------
 
-/** Human-readable description for each v13 IANA error code. */
+/** Human-readable description for each SATP error code. */
 export const V13_ERROR_DESCRIPTIONS: Record<ErrorCode, string> = {
-  [ERR_1_1_1]: "Badly formed message — general",
-  [ERR_1_1_2]: "Badly formed message — missing mandatory field",
-  [ERR_1_1_3]: "Badly formed message — unrecognized message type",
-  [ERR_1_1_4]: "Badly formed message — invalid digital asset identifier",
-  [ERR_1_1_5]: "Badly formed message — invalid asset profile identifier",
-  [ERR_1_1_6]: "Badly formed message — invalid verified originator entity",
-  [ERR_1_1_7]: "Badly formed message — invalid verified beneficiary entity",
-  [ERR_1_1_8]: "Badly formed message — invalid originator gateway network id",
-  [ERR_1_1_9]: "Badly formed message — invalid beneficiary gateway network id",
-  [ERR_1_1_10]:
-    "Badly formed message — invalid sender gateway device identity public key",
-  [ERR_1_1_11]: "Badly formed claim — invalid client identity info",
-  [ERR_1_1_12]: "Badly formed claim — invalid server identity info",
-  [ERR_1_1_13]: "Badly formed claim — invalid sender gateway owner id",
-  [ERR_1_1_14]: "Badly formed claim — invalid receiver gateway owner id",
-  [ERR_1_1_15]:
-    "Badly formed claim — invalid sender gateway signature public key",
-  [ERR_1_1_16]:
-    "Badly formed claim — invalid receiver gateway signature public key",
-  [ERR_1_1_17]:
-    "Badly formed claim — invalid sender gateway device identity public key",
-  [ERR_1_1_18]:
-    "Badly formed claim — invalid receiver gateway device identity public key",
-  [ERR_1_1_19]: "Badly formed claim — invalid hash transfer init claims",
-  [ERR_1_1_20]: "Badly formed claim — invalid transfer context id",
-  [ERR_1_1_31]: "Badly formed parameter — invalid network lock type",
-  [ERR_1_1_32]: "Badly formed parameter — invalid network lock expiration time",
-  [ERR_1_1_33]:
-    "Badly formed parameter — invalid gateway default signature algorithm",
-  [ERR_1_1_34]: "Badly formed parameter — invalid supported DLTs",
-  [ERR_1_1_35]: "Badly formed parameter — invalid gateway capabilities version",
-  [ERR_1_1_36]: "Badly formed parameter — invalid max retries",
-  [ERR_1_2_1]: "Mismatch — session id mismatch",
-  [ERR_1_2_2]: "Mismatch — transfer context id mismatch",
-  [ERR_1_2_3]: "Mismatch — hash previous message mismatch",
-  [ERR_1_2_4]: "Mismatch — message type mismatch",
-  [ERR_1_3_1]: "Transfer Commence — badly formed commence message",
-  [ERR_1_3_2]: "Transfer Commence — missing hash transfer init claims",
-  [ERR_1_3_3]: "Transfer Commence — hash transfer init claims mismatch",
-  [ERR_1_3_4]: "Transfer Commence — missing transfer context id",
-  [ERR_1_3_5]: "Transfer Commence — invalid hash previous message",
-  [ERR_1_4_1]: "ACK Commence — badly formed ack commence",
-  [ERR_1_4_2]: "ACK Commence — missing transfer context id",
-  [ERR_1_4_3]: "ACK Commence — session id mismatch",
-  [ERR_1_4_4]: "ACK Commence — invalid hash previous message",
-  [ERR_2_2_1]: "Lock Assertion — badly formed lock assertion",
-  [ERR_2_2_2]: "Lock Assertion — missing lock assertion claim",
-  [ERR_2_2_3]: "Lock Assertion — invalid lock assertion claim format",
-  [ERR_2_2_4]: "Lock Assertion — lock assertion expiration error",
-  [ERR_2_2_5]: "Lock Assertion — missing transfer context id",
-  [ERR_2_2_6]: "Lock Assertion — invalid hash previous message",
-  [ERR_2_4_1]: "Lock Assertion Receipt — badly formed receipt",
-  [ERR_2_4_2]: "Lock Assertion Receipt — missing transfer context id",
-  [ERR_2_4_3]: "Lock Assertion Receipt — session id mismatch",
-  [ERR_2_4_4]: "Lock Assertion Receipt — invalid hash previous message",
-  [ERR_3_1_1]: "Commit Preparation — badly formed commit prepare",
-  [ERR_3_1_2]: "Commit Preparation — missing transfer context id",
-  [ERR_3_1_3]: "Commit Preparation — session id mismatch",
-  [ERR_3_1_4]: "Commit Preparation — invalid hash previous message",
-  [ERR_3_3_1]: "Commit Ready — badly formed commit ready",
-  [ERR_3_3_2]: "Commit Ready — missing transfer context id",
-  [ERR_3_3_3]: "Commit Ready — missing mint assertion claim",
-  [ERR_3_3_4]: "Commit Ready — session id mismatch",
-  [ERR_3_3_5]: "Commit Ready — invalid hash previous message",
-  [ERR_3_5_1]: "Commit Final Assertion — badly formed commit final",
-  [ERR_3_5_2]: "Commit Final Assertion — missing burn assertion claim",
-  [ERR_3_5_3]: "Commit Final Assertion — missing transfer context id",
-  [ERR_3_5_4]: "Commit Final Assertion — session id mismatch",
-  [ERR_3_5_5]: "Commit Final Assertion — invalid hash previous message",
-  [ERR_3_7_1]: "Commit Final Ack Receipt — badly formed ack receipt",
-  [ERR_3_7_2]: "Commit Final Ack Receipt — missing assignment assertion claim",
-  [ERR_3_7_3]: "Commit Final Ack Receipt — missing transfer context id",
-  [ERR_3_7_4]: "Commit Final Ack Receipt — session id mismatch",
-  [ERR_3_7_5]: "Commit Final Ack Receipt — invalid hash previous message",
-  [ERR_3_9_1]: "Transfer Complete — badly formed transfer complete",
-  [ERR_3_9_2]: "Transfer Complete — missing transfer context id",
-  [ERR_3_9_3]: "Transfer Complete — invalid transfer complete claim",
-  [ERR_3_9_4]: "Transfer Complete — session id mismatch",
-  [ERR_3_9_5]: "Transfer Complete — invalid hash previous message",
+  [ERR_0_1_1]: "invalid message type",
+  [ERR_0_1_2]: "insufficient permissions",
+  [ERR_0_1_3]: "bad signature",
+  [ERR_1_1_1]: "invalid transferContextId",
+  [ERR_1_1_2]: "invalid sessionId",
+  [ERR_1_1_3]: "incorrect transferInitClaimFormat",
+  [ERR_1_1_11]: "invalid digitalAssetId",
+  [ERR_1_1_12]: "invalid assetProfileId",
+  [ERR_1_1_13]: "invalid verifiedOriginatorEntityId",
+  [ERR_1_1_14]: "invalid verifiedBeneficiaryEntityId",
+  [ERR_1_1_15]: "invalid originatorPublicKey",
+  [ERR_1_1_16]: "invalid beneficiaryPublicKey",
+  [ERR_1_1_17]: "invalid senderGatewaySignaturePublicKey",
+  [ERR_1_1_18]: "invalid receiverGatewaySignaturePublicKey",
+  [ERR_1_1_19]: "invalid senderGatewayId",
+  [ERR_1_1_20]: "invalid recipientGatewayId",
+  [ERR_1_1_31]: "unsupported gatewayDefaultSignatureAlgorithm",
+  [ERR_1_1_32]: "unsupported networkLockType",
+  [ERR_1_1_33]: "unsupported networkLockExpirationTime",
+  [ERR_1_1_34]: "unsupported gatewayTlsScheme",
+  [ERR_1_1_35]: "unsupported gatewayLoggingProfile",
+  [ERR_1_1_36]: "unsupported gatewayAccessControlProfile",
+  [ERR_1_2_1]: "mismatch transferContextId",
+  [ERR_1_2_2]: "mismatch sessionId",
+  [ERR_1_2_3]: "mismatch hashTransferInitClaim",
+  [ERR_1_3_1]: "mismatch transferContextId",
+  [ERR_1_3_2]: "mismatch sessionId",
+  [ERR_1_3_3]: "mismatch hashTransferInitClaim",
+  [ERR_1_3_4]: "mismatch hashPrevMessage",
+  [ERR_1_4_1]: "mismatch transferContextId",
+  [ERR_1_4_2]: "mismatch sessionId",
+  [ERR_1_4_3]: "mismatch hashPrevMessage",
+  [ERR_2_2_1]: "mismatch transferContextId",
+  [ERR_2_2_2]: "mismatch sessionId",
+  [ERR_2_2_3]: "unsupported lockAssertionClaimFormat",
+  [ERR_2_2_4]: "unsupported lockAssertionExpiration",
+  [ERR_2_2_5]: "mismatch hashPrevMessage",
+  [ERR_2_2_7]: "asset not found",
+  [ERR_2_2_8]: "asset already locked",
+  [ERR_2_2_9]: "asset lock expired",
+  [ERR_2_4_1]: "mismatch transferContextId",
+  [ERR_2_4_2]: "mismatch sessionId",
+  [ERR_2_4_3]: "mismatch hashPrevMessage",
+  [ERR_3_1_1]: "mismatch transferContextId",
+  [ERR_3_1_2]: "mismatch sessionId",
+  [ERR_3_1_3]: "mismatch hashPrevMessage",
+  [ERR_3_3_1]: "mismatch transferContextId",
+  [ERR_3_3_2]: "mismatch sessionId",
+  [ERR_3_3_3]: "mismatch hashPrevMessage",
+  [ERR_3_3_4]: "unsupported mintAssertionFormat",
+  [ERR_3_5_1]: "mismatch transferContextId",
+  [ERR_3_5_2]: "mismatch sessionId",
+  [ERR_3_5_3]: "mismatch hashPrevMessage",
+  [ERR_3_5_4]: "unsupported burnAssertionClaimFormat",
+  [ERR_3_7_1]: "mismatch transferContextId",
+  [ERR_3_7_2]: "mismatch sessionId",
+  [ERR_3_7_3]: "mismatch hashPrevMessage",
+  [ERR_3_7_4]: "unsupported assignmentAssertionClaimFormat",
+  [ERR_3_9_1]: "mismatch transferContextId",
+  [ERR_3_9_2]: "mismatch sessionId",
+  [ERR_3_9_3]: "mismatch hashPrevMessage",
+  [ERR_3_9_4]: "mismatch hashTransferCommence",
+};
+
+/**
+ * The registry's HTTP Status column (draft-16 Section 11.4). The Problem
+ * Details `status` MUST be consistent with it per Section 11.3.
+ */
+export const V13_ERROR_HTTP_STATUS: Record<ErrorCode, number> = {
+  [ERR_0_1_1]: 400,
+  [ERR_0_1_2]: 403,
+  [ERR_0_1_3]: 422,
+  [ERR_1_1_1]: 422,
+  [ERR_1_1_2]: 422,
+  [ERR_1_1_3]: 422,
+  [ERR_1_1_11]: 422,
+  [ERR_1_1_12]: 422,
+  [ERR_1_1_13]: 422,
+  [ERR_1_1_14]: 422,
+  [ERR_1_1_15]: 422,
+  [ERR_1_1_16]: 422,
+  [ERR_1_1_17]: 422,
+  [ERR_1_1_18]: 422,
+  [ERR_1_1_19]: 422,
+  [ERR_1_1_20]: 422,
+  [ERR_1_1_31]: 415,
+  [ERR_1_1_32]: 415,
+  [ERR_1_1_33]: 415,
+  [ERR_1_1_34]: 415,
+  [ERR_1_1_35]: 415,
+  [ERR_1_1_36]: 415,
+  [ERR_1_2_1]: 404,
+  [ERR_1_2_2]: 404,
+  [ERR_1_2_3]: 404,
+  [ERR_1_3_1]: 404,
+  [ERR_1_3_2]: 404,
+  [ERR_1_3_3]: 404,
+  [ERR_1_3_4]: 404,
+  [ERR_1_4_1]: 404,
+  [ERR_1_4_2]: 404,
+  [ERR_1_4_3]: 404,
+  [ERR_2_2_1]: 404,
+  [ERR_2_2_2]: 404,
+  [ERR_2_2_3]: 415,
+  [ERR_2_2_4]: 415,
+  [ERR_2_2_5]: 404,
+  [ERR_2_2_7]: 404,
+  [ERR_2_2_8]: 409,
+  [ERR_2_2_9]: 410,
+  [ERR_2_4_1]: 404,
+  [ERR_2_4_2]: 404,
+  [ERR_2_4_3]: 404,
+  [ERR_3_1_1]: 404,
+  [ERR_3_1_2]: 404,
+  [ERR_3_1_3]: 404,
+  [ERR_3_3_1]: 404,
+  [ERR_3_3_2]: 404,
+  [ERR_3_3_3]: 404,
+  [ERR_3_3_4]: 415,
+  [ERR_3_5_1]: 404,
+  [ERR_3_5_2]: 404,
+  [ERR_3_5_3]: 404,
+  [ERR_3_5_4]: 415,
+  [ERR_3_7_1]: 404,
+  [ERR_3_7_2]: 404,
+  [ERR_3_7_3]: 404,
+  [ERR_3_7_4]: 415,
+  [ERR_3_9_1]: 404,
+  [ERR_3_9_2]: 404,
+  [ERR_3_9_3]: 404,
+  [ERR_3_9_4]: 404,
 };
 
 // ---------------------------------------------------------------------------
-// Mapping from internal SATPErrorType → closest v13 IANA code
+// Mapping from internal SATPErrorType → closest registry code
 // ---------------------------------------------------------------------------
 
 import { SATPErrorType } from "./satp-error-type";
 
 /**
- * Maps internal SATPErrorType values to the closest v13 IANA error code.
- * For error types that are generic (not stage-specific), the Stage 1 general
- * code is used as the default since it is the broadest category.
+ * Maps internal SATPErrorType values to the closest registry error code.
+ *
+ * The registry only enumerates message-level protocol errors, so internal
+ * error types without an exact registry counterpart map to the closest
+ * code by the registry's meaning — never to a code whose registry meaning
+ * contradicts the usage (a peer interprets the code per the registry):
+ *
+ * - Signature failures map to the general `err_0.1.3` (bad signature), not
+ *   to an identifier code.
+ * - Session/context identity problems map to `err_1.1.2` (invalid
+ *   sessionId) / `err_1.1.1` (invalid transferContextId) respectively.
+ * - Assertion-claim problems map to the matching stage's "unsupported
+ *   ...Format" code.
+ * - Everything without a registry counterpart falls back to the general
+ *   `err_0.1.1` (badly formed message: invalid message type); the Problem
+ *   Details `detail` field carries the specifics.
  */
 export const SATP_ERROR_TYPE_TO_V13: Partial<Record<SATPErrorType, ErrorCode>> =
   {
-    [SATPErrorType.BADLY_FORMATED_MESSAGE]: ERR_1_1_1,
-    [SATPErrorType.UNSPECIFIED]: ERR_1_1_1,
-    [SATPErrorType.DLT_NOT_SUPPORTED]: ERR_1_1_1,
-    [SATPErrorType.BRIDGE_PROBLEM]: ERR_1_1_1,
-    [SATPErrorType.INCORRECT_PARAMETER]: ERR_1_1_2,
-    [SATPErrorType.BADLY_FORMATED_MESSAGE_CLAIM]: ERR_1_1_19,
-    [SATPErrorType.BADLY_FORMATED_MESSAGE_BAD_SIGNATURE]: ERR_1_1_1,
-    [SATPErrorType.BADLY_FORMATED_MESSAGE_WRONG_TRANSACTION_ID]: ERR_1_1_20,
+    [SATPErrorType.UNSPECIFIED]: ERR_0_1_1,
+    [SATPErrorType.BADLY_FORMATED_MESSAGE]: ERR_0_1_1,
+    [SATPErrorType.COMMON_BODY_BADLY_FORMATED]: ERR_0_1_1,
+    [SATPErrorType.INCORRECT_PARAMETER]: ERR_0_1_1,
+    [SATPErrorType.MISSING_PARAMETER]: ERR_0_1_1,
+    [SATPErrorType.SATP_VERSION_NOT_SUPPORTED]: ERR_0_1_1,
+    [SATPErrorType.MESSAGE_OUT_OF_SEQUENCE]: ERR_0_1_1,
+    [SATPErrorType.DLT_NOT_SUPPORTED]: ERR_0_1_1,
+    [SATPErrorType.BRIDGE_PROBLEM]: ERR_0_1_1,
+    [SATPErrorType.LOCK_ASSERTION_BADLY_FORMATED]: ERR_0_1_1,
+    [SATPErrorType.BADLY_FORMATED_MESSAGE_BAD_SIGNATURE]: ERR_0_1_3,
+    [SATPErrorType.SIGNATURE_VERIFICATION_FAILED]: ERR_0_1_3,
+    [SATPErrorType.BADLY_FORMATED_MESSAGE_CLAIM]: ERR_1_1_11,
+    [SATPErrorType.BADLY_FORMATED_MESSAGE_WRONG_TRANSACTION_ID]: ERR_1_1_1,
+    [SATPErrorType.SESSION_NOT_FOUND]: ERR_1_1_2,
+    [SATPErrorType.SESSION_ID_NOT_FOUND]: ERR_1_1_2,
+    [SATPErrorType.SESSION_MISS_MATCH]: ERR_1_1_2,
+    [SATPErrorType.CONTEXT_ID_MISS_MATCH]: ERR_1_2_1,
     [SATPErrorType.BADLY_FORMATED_MESSAGE_MISMATCH_HASH_VALUES]: ERR_1_2_3,
-    [SATPErrorType.MESSAGE_OUT_OF_SEQUENCE]: ERR_1_2_4,
-    [SATPErrorType.SESSION_NOT_FOUND]: ERR_1_2_1,
-    [SATPErrorType.SESSION_ID_NOT_FOUND]: ERR_1_2_1,
-    [SATPErrorType.SESSION_MISS_MATCH]: ERR_1_2_1,
-    [SATPErrorType.COMMON_BODY_BADLY_FORMATED]: ERR_1_1_1,
-    [SATPErrorType.MISSING_PARAMETER]: ERR_1_1_2,
-    [SATPErrorType.SATP_VERSION_NOT_SUPPORTED]: ERR_1_1_1,
-    [SATPErrorType.SIGNATURE_VERIFICATION_FAILED]: ERR_1_1_1,
     [SATPErrorType.HASH_MISS_MATCH]: ERR_1_2_3,
-    [SATPErrorType.CONTEXT_ID_MISS_MATCH]: ERR_1_2_2,
-    [SATPErrorType.LOCK_ASSERTION_BADLY_FORMATED]: ERR_2_2_1,
     [SATPErrorType.LOCK_ASSERTION_CLAIM_FORMAT_MISSING]: ERR_2_2_3,
     [SATPErrorType.LOCK_ASSERTION_EXPIRATION_ERROR]: ERR_2_2_4,
-    [SATPErrorType.BURN_ASSERTION_BADLY_FORMATED]: ERR_3_5_2,
-    [SATPErrorType.MINT_ASSERTION_BADLY_FORMATED]: ERR_3_3_3,
-    [SATPErrorType.ASSIGNMENT_ASSERTION_BADLY_FORMATED]: ERR_3_7_2,
+    [SATPErrorType.MINT_ASSERTION_BADLY_FORMATED]: ERR_3_3_4,
+    [SATPErrorType.BURN_ASSERTION_BADLY_FORMATED]: ERR_3_5_4,
+    [SATPErrorType.ASSIGNMENT_ASSERTION_BADLY_FORMATED]: ERR_3_7_4,
   };
 
 /**
- * Returns the v13 IANA error code string for an internal SATPErrorType.
- * Falls back to `err_1.1.1` (general badly formed message) for unmapped types.
+ * The fallback code for internal error types without a closer registry
+ * counterpart: the general "badly formed message: invalid message type".
  */
-export function satpErrorTypeToV13Code(
-  errorType: SATPErrorType,
-): ErrorCode | Error {
-  return (
-    SATP_ERROR_TYPE_TO_V13[errorType] ?? new Error("Cannot find SATP error")
-  );
+export const DEFAULT_SATP_ERROR_CODE: ErrorCode = ERR_0_1_1;
+
+/**
+ * Returns the registry error code for an internal SATPErrorType, falling
+ * back to {@link DEFAULT_SATP_ERROR_CODE} for unmapped types.
+ */
+export function satpErrorTypeToV13Code(errorType: SATPErrorType): ErrorCode {
+  return SATP_ERROR_TYPE_TO_V13[errorType] ?? DEFAULT_SATP_ERROR_CODE;
 }
 
 /**
- * Returns the human-readable description for a v13 IANA error code.
+ * Returns the human-readable description for an error code (the registry's
+ * Description column).
  */
 export function v13ErrorDescription(code: ErrorCode): string {
   return V13_ERROR_DESCRIPTIONS[code];
 }
 
 const V13_ERROR_CODE_SET = new Set<string>([
+  ...GENERAL_ERROR_CODES,
   ...STAGE_1_ERROR_CODES,
   ...STAGE_2_ERROR_CODES,
   ...STAGE_3_ERROR_CODES,
 ]);
 
 /**
- * Checks if a string is a valid v13 IANA error code.
+ * Checks if a string is a valid registry error code.
  */
 export function isV13ErrorCode(code: string): code is ErrorCode {
   return V13_ERROR_CODE_SET.has(code);

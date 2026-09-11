@@ -1,11 +1,17 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { Code, ConnectError } from "@connectrpc/connect";
-import type { Interceptor, UnaryRequest } from "@connectrpc/connect";
+import { Code } from "@connectrpc/connect";
+import type {
+  Interceptor,
+  UnaryRequest,
+  UnaryResponse,
+} from "@connectrpc/connect";
 
 import { TransferProposalRequestSchema } from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_1_pb";
 import { CommonSatpSchema } from "../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import {
   SATP_SIGNATURE,
+  createResponseSigningInterceptor,
+  createResponseVerificationInterceptor,
   createSignatureSigningInterceptor,
   createSignatureVerificationInterceptor,
 } from "../../../main/typescript/core/cryptography/jws-interceptors";
@@ -14,6 +20,7 @@ import {
   importSigningKey,
   jwsSign,
   type CryptoKey,
+  type JWK,
 } from "../../../main/typescript/core/cryptography/jws-utils";
 
 type StageMessage = ReturnType<
@@ -32,6 +39,18 @@ function makeUnaryRequest(
   } as unknown as UnaryRequest;
 }
 
+function makeUnaryResponse(
+  message: StageMessage,
+  header: Headers = new Headers(),
+): UnaryResponse {
+  return {
+    stream: false,
+    header,
+    method: { output: TransferProposalRequestSchema },
+    message,
+  } as unknown as UnaryResponse;
+}
+
 async function runInterceptor(
   interceptor: Interceptor,
   req: UnaryRequest,
@@ -45,10 +64,24 @@ async function runInterceptor(
   return seen;
 }
 
+/**
+ * Runs an interceptor whose next() returns the given response, and returns
+ * the response the interceptor produced (after any mutation).
+ */
+async function runInterceptorWithResponse(
+  interceptor: Interceptor,
+  req: UnaryRequest,
+  response: UnaryResponse,
+): Promise<UnaryResponse> {
+  const next = async (): Promise<UnaryResponse> => response;
+  return (await interceptor(next as never)(req)) as UnaryResponse;
+}
+
 describe("JWS signing/verification interceptors (v13)", () => {
   const gatewayId = "gateway-a";
   let priv: CryptoKey;
   let pub: CryptoKey;
+  let publicJwk: JWK;
   let signing: Interceptor;
 
   beforeAll(async () => {
@@ -57,8 +90,10 @@ describe("JWS signing/verification interceptors (v13)", () => {
     const testPayload = encoder.encode("test payload");
     priv = await importSigningKey(privateKey);
     pub = await importSigningKey(publicKey);
+    publicJwk = publicKey;
     signing = createSignatureSigningInterceptor({
       getPrivateKey: async () => priv,
+      getPublicJwk: async () => publicJwk,
       gatewayId,
     });
     const testSignature = await jwsSign(testPayload, priv);
@@ -100,10 +135,13 @@ describe("JWS signing/verification interceptors (v13)", () => {
     });
   });
 
-  it("rejects when the signer's public key is unknown", async () => {
+  it("rejects a request whose signer has no pinned key (pinned keys only)", async () => {
     const message = create(TransferProposalRequestSchema, {});
     const signed = await runInterceptor(signing, makeUnaryRequest(message));
 
+    // The signer embeds its public JWK, but the verifier has no pinned key
+    // for it: the untrusted embedded JWK must NOT be accepted as the
+    // verification key.
     const verification = createSignatureVerificationInterceptor({
       resolvePublicKey: async () => undefined,
     });
@@ -112,7 +150,66 @@ describe("JWS signing/verification interceptors (v13)", () => {
 
     await expect(
       runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
-    ).rejects.toBeInstanceOf(ConnectError);
+    ).rejects.toMatchObject({ code: Code.Unauthenticated });
+  });
+
+  it("rejects when no key is pinned and no JWK is embedded", async () => {
+    const message = create(TransferProposalRequestSchema, {});
+    const bytes = toBinary(TransferProposalRequestSchema, message);
+    // A JWS signed without an embedded public JWK.
+    const unsignedHeaderJws = await jwsSign(bytes, priv, {
+      kid: "unknown-gateway",
+    });
+
+    const verification = createSignatureVerificationInterceptor({
+      resolvePublicKey: async () => undefined,
+    });
+    const serverHeader = new Headers();
+    serverHeader.set(SATP_SIGNATURE, unsignedHeaderJws);
+
+    await expect(
+      runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
+    ).rejects.toMatchObject({ code: Code.Unauthenticated });
+  });
+
+  it("rejects when the embedded JWK differs from the pinned key", async () => {
+    const message = create(TransferProposalRequestSchema, {});
+    // Signed by a different key pair than the pinned one, embedding its
+    // own public JWK.
+    const rogue = await generateSigningKeyPair();
+    const roguePriv = await importSigningKey(rogue.privateKey);
+    const bytes = toBinary(TransferProposalRequestSchema, message);
+    const rogueJws = await jwsSign(bytes, roguePriv, {
+      kid: gatewayId,
+      jwk: rogue.publicKey,
+    });
+
+    const verification = createSignatureVerificationInterceptor({
+      resolvePublicKey: async () => pub,
+      resolvePinnedJwk: async () => publicJwk,
+    });
+    const serverHeader = new Headers();
+    serverHeader.set(SATP_SIGNATURE, rogueJws);
+
+    await expect(
+      runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
+    ).rejects.toMatchObject({ code: Code.Unauthenticated });
+  });
+
+  it("verifies with a pinned key whose JWK matches the embedded one", async () => {
+    const message = create(TransferProposalRequestSchema, {});
+    const signed = await runInterceptor(signing, makeUnaryRequest(message));
+
+    const verification = createSignatureVerificationInterceptor({
+      resolvePublicKey: async () => pub,
+      resolvePinnedJwk: async () => publicJwk,
+    });
+    const serverHeader = new Headers();
+    serverHeader.set(SATP_SIGNATURE, signed.header.get(SATP_SIGNATURE)!);
+
+    await expect(
+      runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
+    ).resolves.toBeDefined();
   });
 
   it("rejects when the received message does not match the signed payload", async () => {
@@ -138,5 +235,128 @@ describe("JWS signing/verification interceptors (v13)", () => {
     await expect(
       runInterceptor(verification, makeUnaryRequest(tampered, serverHeader)),
     ).rejects.toMatchObject({ code: Code.Unauthenticated });
+  });
+
+  describe("response signing/verification interceptors (v13)", () => {
+    it("signs a unary response and places a JWS in the SATP_SIGNATURE header", async () => {
+      const message = create(TransferProposalRequestSchema, {});
+      const responseSigning = createResponseSigningInterceptor({
+        getPrivateKey: async () => priv,
+        gatewayId,
+      });
+
+      const res = await runInterceptorWithResponse(
+        responseSigning,
+        makeUnaryRequest(message),
+        makeUnaryResponse(message),
+      );
+      const jws = res.header.get(SATP_SIGNATURE);
+      expect(jws).toBeTruthy();
+      expect(jws?.split(".")).toHaveLength(3);
+    });
+
+    it("verifies a signed response against the pinned counterparty key", async () => {
+      const message = create(TransferProposalRequestSchema, {});
+      const responseSigning = createResponseSigningInterceptor({
+        getPrivateKey: async () => priv,
+        gatewayId,
+      });
+      const signed = await runInterceptorWithResponse(
+        responseSigning,
+        makeUnaryRequest(message),
+        makeUnaryResponse(message),
+      );
+
+      const responseVerification = createResponseVerificationInterceptor({
+        resolveCounterpartyPublicKey: async () => pub,
+      });
+      const res = await runInterceptorWithResponse(
+        responseVerification,
+        makeUnaryRequest(message),
+        signed,
+      );
+      expect(res.message).toBeDefined();
+    });
+
+    it("rejects an unsigned response (fail closed)", async () => {
+      const message = create(TransferProposalRequestSchema, {});
+      const responseVerification = createResponseVerificationInterceptor({
+        resolveCounterpartyPublicKey: async () => pub,
+      });
+      await expect(
+        runInterceptorWithResponse(
+          responseVerification,
+          makeUnaryRequest(message),
+          makeUnaryResponse(message),
+        ),
+      ).rejects.toMatchObject({ code: Code.Unauthenticated });
+    });
+
+    it("rejects a response with no pinned counterparty key", async () => {
+      const message = create(TransferProposalRequestSchema, {});
+      const responseVerification = createResponseVerificationInterceptor({
+        resolveCounterpartyPublicKey: async () => undefined,
+      });
+      await expect(
+        runInterceptorWithResponse(
+          responseVerification,
+          makeUnaryRequest(message),
+          makeUnaryResponse(message),
+        ),
+      ).rejects.toMatchObject({ code: Code.Unauthenticated });
+    });
+
+    it("rejects a tampered response body", async () => {
+      const message = create(TransferProposalRequestSchema, {});
+      const responseSigning = createResponseSigningInterceptor({
+        getPrivateKey: async () => priv,
+        gatewayId,
+      });
+      const signed = await runInterceptorWithResponse(
+        responseSigning,
+        makeUnaryRequest(message),
+        makeUnaryResponse(message),
+      );
+
+      const tampered = create(TransferProposalRequestSchema, {
+        common: create(CommonSatpSchema, { sessionId: "tampered-session" }),
+      });
+      const responseVerification = createResponseVerificationInterceptor({
+        resolveCounterpartyPublicKey: async () => pub,
+      });
+      await expect(
+        runInterceptorWithResponse(
+          responseVerification,
+          makeUnaryRequest(message),
+          makeUnaryResponse(tampered, signed.header),
+        ),
+      ).rejects.toMatchObject({ code: Code.Unauthenticated });
+    });
+
+    it("rejects a response signed by a different key than the pinned one", async () => {
+      const message = create(TransferProposalRequestSchema, {});
+      const rogue = await generateSigningKeyPair();
+      const roguePriv = await importSigningKey(rogue.privateKey);
+      const responseSigning = createResponseSigningInterceptor({
+        getPrivateKey: async () => roguePriv,
+        gatewayId: "rogue-gateway",
+      });
+      const signed = await runInterceptorWithResponse(
+        responseSigning,
+        makeUnaryRequest(message),
+        makeUnaryResponse(message),
+      );
+
+      const responseVerification = createResponseVerificationInterceptor({
+        resolveCounterpartyPublicKey: async () => pub,
+      });
+      await expect(
+        runInterceptorWithResponse(
+          responseVerification,
+          makeUnaryRequest(message),
+          signed,
+        ),
+      ).rejects.toMatchObject({ code: Code.Unauthenticated });
+    });
   });
 });

@@ -35,7 +35,7 @@ import {
 } from "class-validator";
 
 import {
-  GatewayKeyType,
+  GatewayCredential,
   SupportedSigningAlgorithms,
   type GatewayIdentity,
   type ShutdownHook,
@@ -44,6 +44,7 @@ import {
   validateTlsConfig,
   type IGatewayTlsConfig,
 } from "./services/validation/config-validating-functions/validate-tls-config";
+import { provisionLocalSigningPrivateKey } from "./core/cryptography/signing-keys";
 import {
   createJwtAuthMiddleware,
   type IJwtAuthOptions,
@@ -56,9 +57,11 @@ import express, { type Express } from "express";
 import http from "node:http";
 import https from "node:https";
 import {
+  DEFAULT_KEEP_ALIVE_TIMEOUT_MS,
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_OAPI,
   DEFAULT_PORT_GATEWAY_SERVER,
+  HTTP_SERVER_HEADERS_TIMEOUT_MS,
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
@@ -175,7 +178,7 @@ import type { AdapterLayerConfiguration } from "./adapters/adapter-config";
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
  * @see {@link SATPGateway} for the main gateway implementation
  * @see {@link GatewayIdentity} for gateway identity structure
  * @see {@link ICrossChainMechanismsOptions} for bridge configuration
@@ -219,6 +222,26 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
   keyPair?: ISignerKeyPair;
 
   /**
+   * Local ES256 private key (JWK) for the v13 `ENVELOPE_SIGNATURE`
+   * credential.
+   * @description
+   * Private key material for signing the JWS envelope of stage 1-3
+   * messages. It is deliberately kept OUTSIDE {@link GatewayIdentity}
+   * (`gid`), which is exposed through `SATPGateway.Identity` and shared
+   * with counterparties — the identity only ever carries the matching
+   * public JWK in `gid.credentials[ENVELOPE_SIGNATURE].publicKey`, which
+   * counterparties pin to verify signatures.
+   *
+   * When omitted, an ephemeral key pair is generated at startup (with a
+   * warning); counterparties must then pin the generated public JWK for
+   * verification to succeed, so production deployments should provision
+   * the key pair explicitly.
+   *
+   * @see {@link GatewayCredential.ENVELOPE_SIGNATURE}
+   */
+  envelopeSignaturePrivateKey?: Record<string, unknown>;
+
+  /**
    * Deployment environment configuration for gateway behavior.
    * @description
    * Specifies runtime environment affecting logging levels, validation strictness,
@@ -243,7 +266,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
    * @description
    * When configured, the gateway server is served over HTTPS with TLS 1.3
    * enforced as the minimum protocol version and TLS 1.3 cipher suites only
-   * (RFC 8446, SATP v13 Section 5.3.3). The configuration is validated at
+   * (RFC 8446, SATP draft-16 Section 5.4.2). The configuration is validated at
    * startup and the gateway refuses to start with below-TLS-1.3 settings.
    *
    * @see {@link validateTlsConfig}
@@ -517,7 +540,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
  * await gateway.shutdown();
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGatewayConfig} for configuration options
  * @see {@link BLODispatcher} for protocol message dispatching
@@ -577,7 +600,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
   private initialSpanContext: { span: Span; context: Context };
-
+  /**
+   * Placeholder value assigned to `GatewayIdentity.proofID` when the
+   * gateway configuration does not supply one (see
+   * `ProcessGatewayCoordinatorConfig`). It is **not** a real proof
+   * identifier: SATP v13 does not yet define the proof-registry lookup
+   * this field is meant to point at.
+   */
+  static STATIC_PROOF_ID_PLACEHOLDER_V1: string = "bungee-v1-placeholder";
   /**
    * SATPGateway Constructor - Initialize fault-tolerant cross-chain gateway.
    *
@@ -650,8 +680,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     this.config = SATPGateway.ProcessGatewayCoordinatorConfig(options);
-    // Enforce TLS 1.3 secure-channel requirements at startup: the gateway
-    // refuses to start with below-TLS-1.3 protocol versions or cipher suites.
+    // Enforce TLS 1.3 secure-channel requirements at startup
     this.tls = validateTlsConfig({ configValue: options.tls });
     this.shutdownHooks = [];
     const level = this.config.logLevel;
@@ -788,6 +817,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             signer: this.signer,
             enableCrashRecovery: this.config.enableCrashRecovery,
             monitorService: this.monitorService,
+            tls: this.tls,
           };
           this.logger.info(
             "Initializing gateway connection manager with seed gateways",
@@ -1018,9 +1048,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!pluginOptions.gid) {
       pluginOptions.gid = {
         id: id,
-        keys: {
-          [GatewayKeyType.CLAIM_SIGNATURE]: {
-            purpose: GatewayKeyType.CLAIM_SIGNATURE,
+        credentials: {
+          [GatewayCredential.CLAIM_SIGNATURE]: {
+            purpose: GatewayCredential.CLAIM_SIGNATURE,
             algorithm: SupportedSigningAlgorithms.SECP256K1,
             publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
           },
@@ -1034,7 +1064,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           },
         ],
         connectedDLTs: [],
-        proofID: "mockProofID1",
+        proofID: this.STATIC_PROOF_ID_PLACEHOLDER_V1,
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
         address: "http://localhost",
@@ -1048,11 +1078,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.name = id;
       }
 
-      if (!pluginOptions.gid.keys?.[GatewayKeyType.CLAIM_SIGNATURE]) {
-        pluginOptions.gid.keys = {
-          ...pluginOptions.gid.keys,
-          [GatewayKeyType.CLAIM_SIGNATURE]: {
-            purpose: GatewayKeyType.CLAIM_SIGNATURE,
+      if (!pluginOptions.gid.credentials?.[GatewayCredential.CLAIM_SIGNATURE]) {
+        pluginOptions.gid.credentials = {
+          ...pluginOptions.gid.credentials,
+          [GatewayCredential.CLAIM_SIGNATURE]: {
+            purpose: GatewayCredential.CLAIM_SIGNATURE,
             algorithm: SupportedSigningAlgorithms.SECP256K1,
             publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
           },
@@ -1074,7 +1104,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       }
 
       if (!pluginOptions.gid.proofID) {
-        pluginOptions.gid.proofID = "mockProofID1";
+        pluginOptions.gid.proofID = this.STATIC_PROOF_ID_PLACEHOLDER_V1;
       }
 
       if (!pluginOptions.gid.gatewayServerPort) {
@@ -1201,6 +1231,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         await this.createDBRepository();
         await this.SATPCCManager?.deployCCMechanisms(this.options.ccConfig!);
 
+        // Resolve (and cache) the ENVELOPE_SIGNATURE key pair before any
+        // signed RPC: fails startup on a mismatched configured pair and
+        // warns loudly when an ephemeral key had to be generated.
+        await this.gatewayOrchestrator?.resolveLocalSigningKeys();
+
         // start everything before starting the GOL server
         await this.startupGOLServer();
         this.initialSpanContext.span.setStatus({ code: SpanStatusCode.OK });
@@ -1241,6 +1276,16 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
 
         if (!this.config.gid) {
           throw new Error("GatewayIdentity is not defined");
+        }
+
+        // Provision the local-only ENVELOPE_SIGNATURE private key (v13 JWS
+        // envelope signing). The key material never touches the GatewayIdentity,
+        // which only carries the matching public JWK that counterparties pin.
+        if (this.config.envelopeSignaturePrivateKey !== undefined) {
+          provisionLocalSigningPrivateKey(
+            this.config.gid,
+            this.config.envelopeSignaturePrivateKey,
+          );
         }
 
         if (!this.config.gid.gatewayOapiPort) {
@@ -1360,8 +1405,16 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             this.gatewayOrchestrator?.startServices();
 
             if (this.tls?.enabled && this.tls.cert && this.tls.key) {
-              // Secure channel per SATP v13 Section 5.3.3: TLS 1.3 minimum,
+              // Secure channel per SATP draft-16 Section 5.4.2: TLS 1.3 minimum,
               // TLS 1.3 cipher suites only (validated at startup).
+              //
+              // The keep-alive window deliberately spans a full asset transfer
+              // (DEFAULT_KEEP_ALIVE_TIMEOUT_MS, incl. ~2-minute blockchain
+              // transaction legs): Node's 5s default would tear the connection
+              // down between SATP stages, forcing every stage message into a
+              // fresh TCP + TLS handshake and re-paying the (PQC-expensive)
+              // handshake cost per stage instead of amortizing it across the
+              // persistent per-counterparty association.
               this.GOLServer = https.createServer(
                 {
                   key: this.tls.key,
@@ -1372,17 +1425,38 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
                 },
                 this.GOLApplication,
               );
+              this.GOLServer.keepAliveTimeout = DEFAULT_KEEP_ALIVE_TIMEOUT_MS;
+              this.GOLServer.headersTimeout = HTTP_SERVER_HEADERS_TIMEOUT_MS;
               this.logger.info(
                 "GOL server TLS enabled (minVersion: TLSv1.3, cipherSuites: " +
                   `${this.tls.cipherSuites?.join(":")})`,
               );
+            } else if (this.tls?.enabled) {
+              // TLS was explicitly requested but the certificate material is
+              // incomplete: fail closed instead of silently serving plain
+              // HTTP, which would violate the v13 secure-channel requirement.
+              const missing = [
+                !this.tls.cert && "cert",
+                !this.tls.key && "key",
+              ].filter(Boolean);
+              this.logger.error(
+                `TLS is enabled but ${missing.join(" and ")} missing; ` +
+                  "refusing to serve the GOL server over plain HTTP",
+              );
+              reject(
+                new Error(
+                  `TLS enabled but ${missing.join(" and ")} missing: ` +
+                    "cannot start the gateway server without a complete TLS " +
+                    "configuration (SATP draft-16 Section 5.4.2)",
+                ),
+              );
+              return;
             } else {
-              if (this.tls?.enabled) {
-                this.logger.warn(
-                  "TLS enabled but cert/key missing; serving GOL server over plain HTTP",
-                );
-              }
+              // Plain-HTTP development mode: same transfer-spanning keep-alive
+              // window as the TLS server (see the comment above).
               this.GOLServer = http.createServer(this.GOLApplication);
+              this.GOLServer.keepAliveTimeout = DEFAULT_KEEP_ALIVE_TIMEOUT_MS;
+              this.GOLServer.headersTimeout = HTTP_SERVER_HEADERS_TIMEOUT_MS;
             }
             const address =
               this.options.gid?.address?.includes("localhost") || // When running a gateway in localhost we don't want to bind it to 0.0.0.0 because if we do it will be accessible from the outside network

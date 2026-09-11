@@ -520,6 +520,14 @@ export interface GatewayDockerConfig {
     privateKey: string;
     publicKey: string;
   };
+  /**
+   * Local-only ES256 private JWK for v13 JWS envelope signing. Pair it with
+   * the matching public JWK pinned in each counterparty identity's
+   * ENVELOPE_SIGNATURE credential; required whenever the gateways run in
+   * separate processes (dockerized tests), since ephemeral keys generated
+   * inside one container cannot be pinned by another.
+   */
+  envelopeSignaturePrivateKey?: Record<string, unknown>;
   extensions?: ExtensionConfig[];
 }
 
@@ -537,6 +545,7 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     localRepository,
     remoteRepository,
     gatewayKeyPair,
+    envelopeSignaturePrivateKey,
     extensions,
   } = config;
 
@@ -559,6 +568,7 @@ export function setupGatewayDockerFiles(config: GatewayDockerConfig): {
     environment: "development",
     ccConfig,
     keyPair: gatewayKeyPair,
+    envelopeSignaturePrivateKey,
     enableCrashRecovery: enableCrashRecovery,
     ontologyPath: "/opt/cacti/satp-hermes/ontologies",
     extensions,

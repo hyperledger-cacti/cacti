@@ -214,7 +214,7 @@ contract SATPWrapperTest is Test{
         wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_NONFUNGIBLE, contract1.name(), "refID", address(user), signatures, ERCTokenStandard.ERC721);
         Token memory token = wrapperContract.getToken(contract1.name(), 1001);
         assertEq(uint256(token.ercTokenStandard), uint256(ERCTokenStandard.ERC721), "erc standard mismatch");
-        Token memory tokenWithDescriptor = wrapperContract.getToken(contract1.name(), 1001, ERCTokenStandard.ERC721);
+        Token memory tokenWithDescriptor = wrapperContract.getTokenByErcStandard(contract1.name(), 1001, ERCTokenStandard.ERC721);
         assertEq(uint256(tokenWithDescriptor.ercTokenStandard), uint256(ERCTokenStandard.ERC721), "erc standard mismatch");
         assertNotEq(uint256(tokenWithDescriptor.ercTokenStandard), uint256(ERCTokenStandard.ERC20), "erc standard mismatch");
     }

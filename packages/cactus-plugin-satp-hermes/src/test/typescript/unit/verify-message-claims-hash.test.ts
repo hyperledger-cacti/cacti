@@ -15,6 +15,11 @@ import {
 import {
   SessionData,
   SessionDataSchema,
+  MessageStagesTimestampsSchema,
+  Stage0TimestampsSchema,
+  Stage1TimestampsSchema,
+  Stage2TimestampsSchema,
+  Stage3TimestampsSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
 import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
 import { verifyMessage } from "../../../main/typescript/core/stage-services/verifier/data-verifier";
@@ -31,6 +36,18 @@ function makeSessionData(overrides?: Record<string, unknown>): SessionData {
     transferContextId: "ctx-001",
     version: SATP_CORE_VERSION,
     hashTransferInitClaims: CLAIMS_HASH,
+    processedTimestamps: create(MessageStagesTimestampsSchema, {
+      stage0: create(Stage0TimestampsSchema),
+      stage1: create(Stage1TimestampsSchema),
+      stage2: create(Stage2TimestampsSchema),
+      stage3: create(Stage3TimestampsSchema),
+    }),
+    receivedTimestamps: create(MessageStagesTimestampsSchema, {
+      stage0: create(Stage0TimestampsSchema),
+      stage1: create(Stage1TimestampsSchema),
+      stage2: create(Stage2TimestampsSchema),
+      stage3: create(Stage3TimestampsSchema),
+    }),
     ...overrides,
   } as Record<string, unknown>);
 }

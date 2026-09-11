@@ -44,7 +44,7 @@ import { TransactionResponse } from "./bridge-types";
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link BridgeLeafFungible} for fungible asset operations
  * @see {@link BridgeManagerClientInterface} for bridge endpoint management
  * @see {@link SATPBridgeExecutionLayer} for transaction execution
@@ -97,7 +97,7 @@ import { TransactionResponse } from "./bridge-types";
  *
  * @abstract
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
  * @see {@link https://eips.ethereum.org/EIPS/eip-721} ERC-721 NFT Standard
  * @see {@link BridgeLeafFungible} for fungible asset operations
  */
@@ -147,7 +147,7 @@ export abstract class BridgeLeafNonFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
    * @see {@link https://eips.ethereum.org/EIPS/eip-721} ERC-721 NFT Standard
    * @see {@link getDeployNonFungibleWrapperContractReceipt} for deployment receipt
    */
@@ -202,7 +202,7 @@ export abstract class BridgeLeafNonFungible {
    *
    * @since 0.0.3-beta
    * @see {@link deployNonFungibleWrapperContract} for wrapper deployment
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
    */
   public abstract getDeployWrapperContractReceipt(): unknown;
   /**
@@ -324,7 +324,7 @@ export abstract class BridgeLeafNonFungible {
   // - Gas optimization for batch operations
   // - Compliance with ERC-721/ERC-1155 standards where applicable
   //
-  // @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+  // @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
   // @see {@link https://eips.ethereum.org/EIPS/eip-721} ERC-721 NFT Standard
   // @see {@link https://eips.ethereum.org/EIPS/eip-1155} ERC-1155 Multi-Token Standard
 }

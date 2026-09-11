@@ -1,7 +1,8 @@
 import "jest-extended";
-import fs from "fs";
-import path from "path";
+import path from "node:path";
 import { Knex } from "knex";
+import { promises as fsPromises } from "node:fs";
+import { v4 as uuidv4 } from "uuid";
 import { KnexOracleLogRepository } from "../../../main/typescript/database/repository/knex-oracle-log-repository";
 import {
   OraclePersistence,
@@ -472,39 +473,51 @@ describe("Oracle Logging", () => {
   });
 });
 
-/**
- * Derive the same DATA_DIR that createOracleLogKnexConfig uses.
- * Mirrors the logic in knexfile.ts so we can delete on-disk files.
- */
-const ORACLE_DATA_DIR = path.resolve(
-  __dirname,
-  "../../../main/typescript/database/data",
-);
-
-function oracleDbPath(instanceId: string): string {
-  return path.join(ORACLE_DATA_DIR, `.oracle-logs-${instanceId}.sqlite3`);
-}
-
-function removeOracleDbFiles(...instanceIds: string[]): void {
-  for (const id of instanceIds) {
-    const p = oracleDbPath(id);
-    if (fs.existsSync(p)) {
-      fs.rmSync(p, { force: true });
-    }
-  }
-}
-
 describe("SQLite oracle log database isolation", () => {
-  afterAll(() => {
-    // Clean up all on-disk SQLite files created by tests in this suite
-    removeOracleDbFiles("same-db-test", "alpha", "beta", "migrate-then-insert");
+  // Unique file names per run: a previous run's stale database (with
+  // leftover rows or an old schema) must never collide with this run —
+  // that was the source of flaky UNIQUE constraint failures on
+  // oracle_logs.key.
+  const fileDbInstanceIds = [
+    `same-db-test-${uuidv4()}`,
+    `alpha-${uuidv4()}`,
+    `beta-${uuidv4()}`,
+    `migrate-then-insert-${uuidv4()}`,
+  ];
+  const fileDbPaths = fileDbInstanceIds.map((id) =>
+    path.join(
+      path.resolve(__dirname, "../../../main/typescript/database/data"),
+      `.oracle-logs-${id}.sqlite3`,
+    ),
+  );
+
+  beforeAll(async () => {
+    // Remove databases left behind by older runs of this suite, which used
+    // fixed file names — their leftover rows caused UNIQUE constraint
+    // failures on oracle_logs.key.
+    const legacyPaths = ["same-db-test", "alpha", "beta", "migrate-then-insert"]
+      .map((id) =>
+        path.join(
+          path.resolve(__dirname, "../../../main/typescript/database/data"),
+          `.oracle-logs-${id}.sqlite3`,
+        ),
+      )
+      .map((p) => fsPromises.unlink(p).catch(() => undefined));
+    await Promise.all(legacyPaths);
   });
+
+  afterAll(async () => {
+    // Remove the per-run databases so the data directory does not
+    // accumulate files across runs.
+    await Promise.all(
+      fileDbPaths.map((p) => fsPromises.unlink(p).catch(() => undefined)),
+    );
+  });
+
   it("two repos with the same instanceId share the same file database", async () => {
     // Two KnexOracleLogRepository instances backed by the same file path
     // behave as connections to the same database.
-    const instanceId = "same-db-test";
-    // Delete any stale file left by a previous CI run before opening
-    removeOracleDbFiles(instanceId);
+    const instanceId = fileDbInstanceIds[0];
     const repoA = new KnexOracleLogRepository(
       createOracleLogKnexConfig(instanceId),
     );
@@ -537,13 +550,11 @@ describe("SQLite oracle log database isolation", () => {
   });
 
   it("two file-based databases with different instanceIds are isolated", async () => {
-    // Delete any stale files left by a previous CI run
-    removeOracleDbFiles("alpha", "beta");
     const repoAlpha = new KnexOracleLogRepository(
-      createOracleLogKnexConfig("alpha"),
+      createOracleLogKnexConfig(fileDbInstanceIds[1]),
     );
     const repoBeta = new KnexOracleLogRepository(
-      createOracleLogKnexConfig("beta"),
+      createOracleLogKnexConfig(fileDbInstanceIds[2]),
     );
 
     await repoAlpha.database.migrate.latest();
@@ -571,9 +582,7 @@ describe("SQLite oracle log database isolation", () => {
   });
 
   it("migrate.latest() then insert does not produce 'no such table' error", async () => {
-    const instanceId = "migrate-then-insert";
-    // Delete any stale file left by a previous CI run
-    removeOracleDbFiles(instanceId);
+    const instanceId = fileDbInstanceIds[3];
     const repo = new KnexOracleLogRepository(
       createOracleLogKnexConfig(instanceId),
     );

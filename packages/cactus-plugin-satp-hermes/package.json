@@ -151,7 +151,6 @@
     "test:integration:gateway": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/gateway --runInBand --forceExit --config=jest.config-integration-gateway.ts",
     "test:integration:oracle": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/oracle --runInBand --forceExit --config=jest.config-integration-oracle.ts",
     "test:integration:recovery": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/recovery --runInBand --forceExit --config=jest.config-integration.ts",
-    "test:integration:rollback": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/integration/rollback --runInBand --forceExit --config=jest.config-integration.ts",
     "test:report": "yarn run test 2>&1 | tee reports/satp-test-report-$(date +%Y-%m-%d-%H-%M)-$(date +%s | tail -c 5).out",
     "test:unit": "NODE_OPTIONS=--max-old-space-size=4096 npx jest ./src/test/typescript/unit --runInBand --forceExit --config=jest.config-unit.ts",
     "pretsc": "npm run generate-sdk",

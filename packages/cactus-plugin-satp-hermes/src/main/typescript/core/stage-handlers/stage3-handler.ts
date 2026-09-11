@@ -96,7 +96,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage3ServerService} for server-side business logic
  * @see {@link Stage3ClientService} for client-side business logic
@@ -127,7 +127,12 @@ import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { Stage3ClientService } from "../stage-services/client/stage3-client-service";
-import { getSessionId, buildAdapterPayload } from "./handler-utils";
+import {
+  getSessionId,
+  buildAdapterPayload,
+  applyCrossStageProtocolMessage,
+  abortOnReceivedProtocolTermination,
+} from "./handler-utils";
 import {
   FailedToCreateMessageError,
   FailedToProcessError,
@@ -567,6 +572,11 @@ export class Stage3SATPHandler implements SATPHandler {
           throw new SessionNotFoundError(fnTag);
         }
 
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
+
         span.setAttribute("sessionId", session.getSessionId() || "");
 
         await this.adapterManager?.executeAdaptersOrSkip(
@@ -649,6 +659,7 @@ export class Stage3SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.COMMIT_READY, error);
 
         if (session) {
@@ -744,6 +755,11 @@ export class Stage3SATPHandler implements SATPHandler {
           throw new SessionNotFoundError(fnTag);
         }
 
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
+
         span.setAttribute("sessionId", session.getSessionId() || "");
 
         await this.adapterManager?.executeAdaptersOrSkip(
@@ -828,6 +844,7 @@ export class Stage3SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.ACK_COMMIT_FINAL, error);
 
         if (session) {
@@ -914,6 +931,11 @@ export class Stage3SATPHandler implements SATPHandler {
         if (!session) {
           throw new SessionNotFoundError(fnTag);
         }
+
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
@@ -1039,6 +1061,7 @@ export class Stage3SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE, error);
 
         if (session) {

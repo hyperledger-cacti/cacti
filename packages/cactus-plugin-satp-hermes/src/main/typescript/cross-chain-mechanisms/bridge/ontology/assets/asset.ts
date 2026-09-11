@@ -38,7 +38,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link TokenType} for supported asset types
  * @see {@link NetworkId} for network identification
  * @see {@link EvmAsset} for EVM-specific asset extensions

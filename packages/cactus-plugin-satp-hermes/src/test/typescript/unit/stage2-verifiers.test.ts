@@ -52,6 +52,11 @@ import {
 import type { SATPSession } from "../../../main/typescript/core/satp-session";
 
 const TAG = "TestStage2Verifier";
+
+// Hash-chain fixture: every inbound message references the stored hash of
+// its predecessor, exactly as the stage services record it via saveHash
+// when they send the predecessor.
+const PREV_HASH = "prev-message-hash";
 const LOCK_EXPIRATION_TIME = BigInt(5 * 60 * 1000);
 
 // Real secp256k1 signer so claim signatures are actually produced and
@@ -74,9 +79,18 @@ function makeSessionData(overrides?: Record<string, unknown>): SessionData {
     lockExpirationTime: LOCK_EXPIRATION_TIME,
     hashes: create(MessageStagesHashesSchema, {
       stage0: create(Stage0HashesSchema),
-      stage1: create(Stage1HashesSchema),
+      stage1: create(Stage1HashesSchema, {
+        transferCommenceRequestMessageHash: PREV_HASH,
+        transferCommenceResponseMessageHash: PREV_HASH,
+      }),
       stage2: create(Stage2HashesSchema),
       stage3: create(Stage3HashesSchema),
+    }),
+    processedTimestamps: create(MessageStagesTimestampsSchema, {
+      stage0: create(Stage0TimestampsSchema),
+      stage1: create(Stage1TimestampsSchema),
+      stage2: create(Stage2TimestampsSchema),
+      stage3: create(Stage3TimestampsSchema),
     }),
     receivedTimestamps: create(MessageStagesTimestampsSchema, {
       stage0: create(Stage0TimestampsSchema),
@@ -107,6 +121,7 @@ function makeLockAssertionRequest(
       sessionId: "session-001",
       transferContextId: "ctx-001",
     }),
+    hashPrevMessage: PREV_HASH,
     lockAssertionClaim: create(LockAssertionClaimSchema, {
       receipt,
       signature: Buffer.from(signer.sign(receipt)).toString("hex"),
@@ -124,6 +139,7 @@ function makeTransferCommenceResponse(): TransferCommenceResponse {
       sessionId: "session-001",
       transferContextId: "ctx-001",
     }),
+    hashPrevMessage: PREV_HASH,
   });
 }
 

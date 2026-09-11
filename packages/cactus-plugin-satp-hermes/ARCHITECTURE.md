@@ -266,9 +266,49 @@ mutable session bag.
 
 ### JWS Envelope Signing Model
 All gateway-to-gateway messages are wrapped in a JWS (JSON Web Signature)
-envelope. The signing key is the gateway's long-term key pair. Verification
-uses the counterparty gateway's public key. This replaces the v02 model where
-each message had an individual `signature` field.
+envelope. The signing key is the gateway's `ENVELOPE_SIGNATURE` ES256
+(P-256) key. Verification uses the counterparty gateway's public key. This
+replaces the v02 model where each message had an individual `signature`
+field.
+
+Key distribution is handled on the wire: the signer's public JWK is embedded
+in the JWS protected header (RFC 7515 §4.1.3), so a counterparty that has not
+pre-provisioned the key can still verify (the signature itself proves
+possession of the matching private key). When a counterparty key **is**
+pre-provisioned (pinned) in the gateway identity, the pinned key takes
+precedence and an embedded JWK that differs from it is rejected.
+
+Private key material generated for envelope signing is kept in non-exported
+gateway state; the `GatewayIdentity` (exposed via `SATPGateway.Identity`)
+carries public key material only.
+
+### Classified Gateway Key Model
+Gateway keys follow the v13 Section 5.3.3 classified key set: each
+`GatewayKeyType` (ENVELOPE_SIGNATURE, CLAIM_SIGNATURE, SECURE_CHANNEL,
+IDENTITY, OWNER_IDENTITY) maps to its key material in the gateway
+identity's `keys` record. The legacy single-key `identificationCredential`
+has been removed. Key material format is purpose-aware and validated at
+configuration time:
+- `ENVELOPE_SIGNATURE`: JWK object (ES256/P-256), imported via WebCrypto.
+- `CLAIM_SIGNATURE`: non-empty hex string (secp256k1), used by the claim
+  signature verifier.
+
+### Cross-Stage Protocol Messages
+Inbound `reject-msg`, `error-msg`, and `session-abort-msg` (v13 Sections
+8.5, 10.6, 10.7) are routed through `handleIncomingProtocolRejectMessage()` in
+`protocol-message-service.ts`, which validates the common envelope, applies
+IANA reason codes, and enforces Section 11.4 abort-effectiveness semantics:
+aborts before commit-final terminate the session, aborts after commit-final
+are not effective.
+
+### Gateway Transport Security
+- **TLS 1.3**: the gateway server enforces TLS 1.3 as the minimum protocol
+  version with TLS 1.3 cipher suites only (RFC 8446); the configuration is
+  validated at startup and the server is served over HTTPS when TLS is
+  configured.
+- **JWT / OAuth 2.0**: the Client Application API can require
+  `Authorization: Bearer` JWTs (HS256 with `exp`/`nbf`/`iss`/`aud` claim
+  enforcement, RFC 6750) via the `jwtAuth` gateway configuration.
 
 ### IANA Error Code Registry
 Error handling uses the IANA-registered SATP error code registry:

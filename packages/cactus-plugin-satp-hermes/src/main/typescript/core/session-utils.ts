@@ -291,6 +291,13 @@ export function populateClientSessionData(
   }
   sessionData.version = version;
   sessionData.digitalAssetId = uuidv4();
+  // draft-16: assetProfileId, verifiedOriginatorEntityId and
+  // verifiedBeneficiaryEntityId are required TransferInitClaims fields; the
+  // gateway acts as its own verification authority here, deriving the
+  // originator/beneficiary identities from the transact request asset owners.
+  sessionData.assetProfileId = uuidv4();
+  sessionData.verifiedOriginatorEntityId = sourceOwner;
+  sessionData.verifiedBeneficiaryEntityId = receiverOwner;
   sessionData.clientGatewayPubkey = clientGatewayPubkey;
   sessionData.serverGatewayPubkey = serverGatewayPubkey;
   sessionData.receiverGatewayOwnerId = receiverGatewayOwnerId;
@@ -892,8 +899,10 @@ export function getMessageTimestamp(
         .commitFinalAcknowledgementReceiptResponseMessageTimestamp;
     case MessageType.COMMIT_TRANSFER_COMPLETE:
       return timestamps.stage3.transferCompleteMessageTimestamp;
+    case MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE:
+      return timestamps.stage3.transferCompleteResponseMessageTimestamp;
     default:
-      throw new Error("Message hash not found");
+      throw new Error("Message timestamp not found");
   }
 }
 

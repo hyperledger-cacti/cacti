@@ -2,7 +2,7 @@
  * Unit tests for v13 protocol constants (Phase 1 — TASK-005).
  *
  * Verifies that all protocol constant values match the v13 specification
- * requirements documented in draft-ietf-satp-core-13.
+ * requirements documented in draft-ietf-satp-core-16.
  */
 import {
   SATP_CORE_VERSION,

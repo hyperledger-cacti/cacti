@@ -52,6 +52,26 @@ export const SATP_CRASH_VERSION = "v06";
 /** Mandatory-to-implement TLS 1.3 cipher suite from RFC 8446 Section 9.1. */
 export const DEFAULT_TLS13_CIPHER_SUITE = "TLS_AES_128_GCM_SHA256";
 
+/**
+ * Idle keep-alive timeout for the gateway (GOL) HTTP(S) server.
+ */
+export const DEFAULT_KEEP_ALIVE_TIMEOUT_MS = 5 * 60 * 1000;
+
+/**
+ * Server headers timeout. Node caps the effective keep-alive window at the
+ * headers timeout, so this must strictly exceed
+ * {@link DEFAULT_KEEP_ALIVE_TIMEOUT_MS}.
+ */
+export const HTTP_SERVER_HEADERS_TIMEOUT_MS =
+  DEFAULT_KEEP_ALIVE_TIMEOUT_MS + 10 * 1000;
+
+/**
+ * TCP keep-alive probe interval for the per-counterparty HTTP agent sockets,
+ * keeping intermediate NATs/proxies from dropping pooled connections during
+ * long stage gaps.
+ */
+export const HTTP_AGENT_KEEP_ALIVE_MSECS = 15 * 1000;
+
 /** Ledger types with bridge implementations available to SATP. */
 export const SATP_IMPLEMENTED_LEDGERS = new Set<LedgerType>([
   LedgerType.Besu1X,

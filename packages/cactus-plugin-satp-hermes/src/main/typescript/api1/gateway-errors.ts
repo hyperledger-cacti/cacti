@@ -30,7 +30,7 @@
  * throw new GatewayShuttingDownError('TransactionHandler');
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} IETF SATP Core v13 Error Handling
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} IETF SATP Core v13 Error Handling
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */

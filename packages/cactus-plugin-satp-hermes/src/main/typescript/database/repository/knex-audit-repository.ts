@@ -21,6 +21,29 @@ import { createHash } from "crypto";
 import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 /**
+ * Raw `audit_entries` row shape, as returned by Knex `.select()`.
+ * Mirrors the columns written by {@link create}.
+ */
+interface IAuditEntryRow {
+  auditEntryId: string;
+  session: string;
+  timestamp: number;
+}
+
+/**
+ * Raw `session_proofs` row shape, as returned by Knex `.select()`.
+ * Mirrors the columns written by {@link createProof}.
+ */
+interface ISessionProofRow {
+  proofId: string;
+  sessionId: string;
+  step: string;
+  claim: string;
+  signedClaim: string;
+  timestamp: number;
+}
+
+/**
  * Knex.js-based implementation of local SATP gateway log repository.
  *
  * Provides SQLite-backed persistence for local SATP protocol logs, supporting
@@ -170,7 +193,7 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
       .select();
 
     const sessionIds = rows.map(
-      (row: any) => JSON.parse(row.session).sessionId,
+      (row: IAuditEntryRow) => JSON.parse(row.session).sessionId,
     );
     const proofs = await this.readProofsBySessionIds(sessionIds);
     const proofsBySessionId = new Map<string, SessionProof[]>();
@@ -181,7 +204,7 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
     }
 
     return {
-      auditEntries: rows.map((row: any) => {
+      auditEntries: rows.map((row: IAuditEntryRow) => {
         const session = JSON.parse(row.session);
         return {
           auditEntryId: row.auditEntryId,
@@ -248,7 +271,7 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
       .orderBy("timestamp", "asc")
       .select();
 
-    return rows.map((row: any) => ({
+    return rows.map((row: ISessionProofRow) => ({
       sessionId: row.sessionId,
       step: JSON.parse(row.step),
       claim: row.claim,

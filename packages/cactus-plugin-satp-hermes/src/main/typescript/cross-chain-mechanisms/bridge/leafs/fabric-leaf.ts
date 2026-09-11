@@ -139,7 +139,7 @@ import { context, SpanStatusCode } from "@opentelemetry/api";
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link https://hyperledger-fabric.readthedocs.io/} Hyperledger Fabric Documentation
  * @see {@link BridgeLeafFungible} for fungible asset interface
  * @see {@link BridgeLeafNonFungible} for non-fungible asset interface

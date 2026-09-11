@@ -16,7 +16,7 @@
  *
  * Each stage contains multiple steps executed by both client and server gateways.
  * Step tags identify specific protocol messages and operations.
- * @url https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt
+ * @url https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt
  * @module satp-protocol-map
  * @since 0.0.3-beta
  */
@@ -51,7 +51,7 @@ export type Stage0StepTag =
 
 /**
  * Step tags for Stage 1 - Transfer Initiation and Commencement Flows
- * @see https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-13#section-8
+ * @see https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-16#section-8
  *
  * Ordered according to protocol flow per IETF SATP Core v13 spec section 8:
  *

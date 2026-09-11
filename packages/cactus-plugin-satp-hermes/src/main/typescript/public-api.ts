@@ -46,7 +46,7 @@
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGateway} for main gateway implementation
  * @see {@link PluginFactorySATPGateway} for gateway factory and instantiation
@@ -205,8 +205,20 @@ export { IEthereumNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-t
  * @see {@link SATPGatewayConfig} for identity configuration options
  */
 export { GatewayIdentity } from "./core/types";
-export { GatewayKeyPurpose } from "./core/types";
+/**
+ * Gateway key-purpose classification (e.g. `ENVELOPE_SIGNATURE`) per the
+ * SATP gateway credential model. Each purpose identifies a distinct key
+ * pair a gateway maintains; counterparty public keys are pinned per
+ * purpose on their {@link GatewayIdentity} credentials.
+ */
+export { GatewayCredential } from "./core/types";
+/**
+ * A single gateway credential entry: the key purpose, its signing
+ * algorithm, and the public key material (JWK) advertised to
+ * counterparties for pinning.
+ */
 export { GatewayKey } from "./core/types";
+export { SupportedSigningAlgorithms } from "./core/types";
 
 /**
  * SATP Protocol Mapping - Type-safe SATP protocol stage and step definitions.
@@ -245,12 +257,18 @@ export {
   createErrorMessage,
   createSessionAbortMessage,
   checkAbortEffectiveness,
+  handleIncomingRejectMessage,
+  handleIncomingErrorMessage,
+  handleIncomingSessionAbortMessage,
+  handleIncomingProtocolRejectMessage,
+  getLastReceivedMessageType,
 } from "./core/stage-services/protocol-message-service";
 export type {
   IRejectMessageOptions,
   IErrorMessageOptions,
   ISessionAbortOptions,
   IAbortEffectivenessResult,
+  IIncomingProtocolMessageResult,
 } from "./core/stage-services/protocol-message-service";
 
 export {

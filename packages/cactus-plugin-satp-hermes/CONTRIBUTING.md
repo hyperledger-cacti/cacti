@@ -182,8 +182,6 @@ yarn workspace @hyperledger/cactus-plugin-satp-hermes docker:run:dev
 | Adapter | `test:integration:adapter` | Ledger adapter tests |
 | Bridge | `test:integration:bridge` | Cross-chain bridge tests |
 | Gateway | `test:integration:gateway` | Gateway communication tests |
-| Recovery | `test:integration:recovery` | Crash recovery tests |
-| Rollback | `test:integration:rollback` | Transaction rollback tests |
 | Solidity | `forge:test` | Smart contract tests |
 
 ### Running Tests
@@ -201,7 +199,6 @@ yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration
 # Specific integration test categories
 yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:gateway
 yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:bridge
-yarn workspace @hyperledger/cactus-plugin-satp-hermes test:integration:recovery
 
 # Solidity tests
 yarn workspace @hyperledger/cactus-plugin-satp-hermes forge:test

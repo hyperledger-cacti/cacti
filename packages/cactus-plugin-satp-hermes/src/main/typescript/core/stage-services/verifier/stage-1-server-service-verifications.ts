@@ -10,7 +10,7 @@
  * implementations thin.
  *
  * @since 3.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
@@ -66,7 +66,7 @@ export function checkNetworkCapabilities(
 /**
  * Validates the transfer-init claims carried by a Stage 1 proposal request.
  *
- * Per draft-ietf-satp-core-13, every field checked here is REQUIRED: a
+ * Per draft-ietf-satp-core-16, every field checked here is REQUIRED: a
  * proposal with any of them missing must be rejected, not merely logged.
  * Optional fields are accepted when empty and only logged.
  *

@@ -32,10 +32,12 @@ import { CrashRecoveryClientService } from "../../core/crash-management/client-s
 import type { GatewayOrchestrator } from "./gateway-orchestrator";
 import type { Client as PromiseConnectClient } from "@connectrpc/connect";
 import type { GatewayIdentity } from "../../core/types";
+import { GatewayCredential } from "../../core/types";
 import type { CrashRecoveryService } from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import type { SATPHandler } from "../../types/satp-protocol";
 import { CrashStatus } from "../../core/types";
 import { verifySignature } from "../../utils/gateway-utils";
+import { SignatureVerificationError } from "../../core/errors/satp-service-errors";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 
@@ -649,11 +651,27 @@ export class CrashManager {
     return context.with(ctx, async () => {
       try {
         try {
-          verifySignature(
-            this.signer,
-            message,
-            sessionData.clientGatewayPubkey,
-          );
+          // The RecoverResponse carries a serverSignature produced with the
+          // SERVER gateway's private key (see
+          // CrashRecoveryServerService.handleRecover). Verify it against the
+          // counterparty's (server) pinned public key — the same resolution
+          // every other client-side server-signature check uses (e.g.
+          // data-verifier signatureVerifier, stage-1/3 claim verifiers) —
+          // and enforce the result: recovered logs may only be applied when
+          // the response really originates from the server gateway. A bad or
+          // missing signature fails closed here (SignatureVerificationError
+          // -> the catch below returns false -> the recovery loop retries
+          // and escalates to rollback), so forged responses are never
+          // applied to the local session or log repository.
+          if (
+            !verifySignature(
+              this.signer,
+              message,
+              sessionData.serverGatewayPubkey,
+            )
+          ) {
+            throw new SignatureVerificationError(fnTag);
+          }
 
           const recoveredLogs = message.recoveredLogs;
 
@@ -969,24 +987,22 @@ export class CrashManager {
     context.with(ctx, () => {
       try {
         for (const gateway of gateways.values()) {
-          if (gateway.identificationCredential) {
-            this.gatewaysPubKeys.set(
-              gateway.id,
-              gateway.identificationCredential.pubKey,
-            );
+          const claimPubKey =
+            gateway.credentials?.[GatewayCredential.CLAIM_SIGNATURE]?.publicKey;
+          if (typeof claimPubKey === "string" && claimPubKey !== "") {
+            this.gatewaysPubKeys.set(gateway.id, claimPubKey);
           }
         }
 
-        if (!this.orchestrator.ourGateway.identificationCredential) {
-          throw new Error(
-            "Our gateway identificationCredential with pubKey not found!",
-          );
+        const ourClaimPubKey =
+          this.orchestrator.ourGateway.credentials?.[
+            GatewayCredential.CLAIM_SIGNATURE
+          ]?.publicKey;
+        if (typeof ourClaimPubKey !== "string" || ourClaimPubKey === "") {
+          throw new Error("Our gateway CLAIM_SIGNATURE public key not found!");
         }
 
-        this.gatewaysPubKeys.set(
-          this.orchestrator.getSelfId(),
-          this.orchestrator.ourGateway.identificationCredential.pubKey,
-        );
+        this.gatewaysPubKeys.set(this.orchestrator.getSelfId(), ourClaimPubKey);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

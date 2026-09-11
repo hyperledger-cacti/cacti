@@ -64,7 +64,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link CommonSatp} for common message structure
  * @see {@link SessionData} for session data structure
  *
@@ -85,6 +85,7 @@ import { SessionData } from "../../../generated/proto/cacti/satp/v13/session/ses
 import { SATP_CORE_VERSION } from "../../constants";
 import {
   MessageTypeError,
+  ReplayedMessageError,
   SatpCommonBodyError,
   SATPVersionError,
   SessionDataNotLoadedCorrectlyError,
@@ -99,8 +100,10 @@ import {
 } from "../../errors/satp-service-errors";
 import {
   getMessageHash,
+  getMessageTimestamp,
   getPreviousMessageType,
   SessionType,
+  TimestampType,
 } from "../../session-utils";
 import { SATPSession } from "../../satp-session";
 import { getMessageTypeName } from "../../satp-utils";
@@ -238,7 +241,6 @@ export function commonBodyVerifier(
     common.messageType == undefined ||
     common.sessionId == ""
   ) {
-    console.error("errorcommon", safeStableStringify(common));
     throw new SatpCommonBodyError(tag, safeStableStringify(common));
   }
 
@@ -392,19 +394,33 @@ export function commonBodyVerifier(
  * @see {@link verifySignature} for underlying signature verification logic
  * @see {@link SessionData} for session data and public key storage
  */
+/**
+ * The legacy per-message signature fields carried by stage 0 messages.
+ * Stage 1-3 v13 messages have no such fields; their traffic is
+ * authenticated by the JWS envelope instead.
+ */
+interface ILegacySignedMessage {
+  serverSignature?: string;
+  clientSignature?: string;
+}
+
 export function signatureVerifier(
   tag: string,
   signer: JsObjectSigner,
-  message: any,
+  message: ILegacySignedMessage,
   sessionData: SessionData | undefined,
 ) {
   if (sessionData == undefined) {
     throw new SessionDataNotLoadedCorrectlyError(tag, "undefined");
   }
 
-  // v13: per-message clientSignature/serverSignature removed.
-  // JWS wrapping will be implemented in TASK-064.
-  // For now, verify only if legacy signature fields are present.
+  // v13: per-message clientSignature/serverSignature removed from stage 1-3
+  // messages. Stage 1-3 traffic is authenticated by the JWS envelope
+  // (see core/cryptography/jws-interceptors.ts): requests are signed by the
+  // client and verified by the server interceptor, and responses are signed
+  // by the server and verified by the client interceptor, so unsigned or
+  // forged envelopes are rejected before reaching the protocol layer.
+  // Here, verify only if legacy signature fields are present (stage 0).
   if (message.serverSignature != undefined && message.serverSignature != "") {
     if (
       !verifySignature(signer, message, sessionData?.serverGatewayPubkey || "")
@@ -421,7 +437,6 @@ export function signatureVerifier(
       throw new SignatureVerificationError(tag);
     }
   }
-  // No signature fields present — v13 JWS wrapping expected (TASK-064)
 }
 
 /**
@@ -431,15 +446,17 @@ export function signatureVerifier(
  * Claim signatures are produced by the claim-issuing gateway with
  * `sign(signer, claim.receipt)` (hex-encoded) and are independent of the
  * JWS envelope signing: claims outlive transport and must stay verifiable
- * for dispute resolution and audit. The receipt itself is opaque to this
- * verifier — only the signature over it is checked here.
+ * for dispute resolution and audit. The receipt is opaque to this
+ * verifier — only the signature over it is checked here — but it MUST be
+ * non-empty: an empty receipt has no verifiable claim content, so it is
+ * rejected before the signature check.
  *
  * @param tag - Context tag for error reporting
  * @param signer - Signer used for the cryptographic verification
  * @param claim - The assertion claim carrying `receipt` and `signature`
  * @param pubKey - Hex public key of the claim-issuing gateway
- * @throws {ClaimSignatureError} When the signature is missing, malformed,
- *   or fails verification
+ * @throws {ClaimSignatureError} When the receipt or signature is missing or
+ *   empty, the public key is missing, or the signature fails verification
  *
  * @since 3.1.0
  */
@@ -451,6 +468,7 @@ export function claimSignatureVerifier(
 ): void {
   if (
     claim == undefined ||
+    claim.receipt === "" ||
     claim.signature === "" ||
     pubKey === undefined ||
     pubKey === ""
@@ -488,7 +506,7 @@ export function claimSignatureVerifier(
  * @throws {SessionDataNotLoadedCorrectlyError} When session data is undefined
  *
  * @since 2.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} Sections 8–10
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} Sections 8–10
  */
 export function hashPrevMessageVerifier(
   tag: string,
@@ -578,21 +596,102 @@ export interface IVerifyMessageOptions {
 }
 
 /**
+ * Total order of the stage 1–3 protocol messages, from Transfer Proposal to
+ * Transfer Complete Response (draft-16 Sections 8–10). Each position lists
+ * the message types that are mutually exclusive at that point of the flow
+ * (e.g. INIT_RECEIPT and INIT_REJECT both terminate Stage 1's proposal).
+ * Stage 0 messages are not part of this order.
+ */
+const MESSAGE_TOTAL_ORDER: MessageType[][] = [
+  [MessageType.INIT_PROPOSAL],
+  [MessageType.INIT_RECEIPT, MessageType.INIT_REJECT],
+  [MessageType.TRANSFER_COMMENCE_REQUEST],
+  [MessageType.TRANSFER_COMMENCE_RESPONSE],
+  [MessageType.LOCK_ASSERT],
+  [MessageType.ASSERTION_RECEIPT],
+  [MessageType.COMMIT_PREPARE],
+  [MessageType.COMMIT_READY],
+  [MessageType.COMMIT_FINAL],
+  [MessageType.ACK_COMMIT_FINAL],
+  [MessageType.COMMIT_TRANSFER_COMPLETE],
+  [MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE],
+];
+
+function totalOrderIndex(messageType: MessageType): number {
+  return MESSAGE_TOTAL_ORDER.findIndex((position) =>
+    position.includes(messageType),
+  );
+}
+
+/**
+ * Rejects messages replayed from the session's past (an in-session replay
+ * defense on top of the hash-chain check, which binds a message to its
+ * predecessor but cannot detect re-delivery of an already-processed one).
+ *
+ * A message at position N of {@link MESSAGE_TOTAL_ORDER} is rejected when
+ * the session has already recorded a timestamp for a message at position
+ * >= N+2: the flow has definitively moved on, so this message can only be
+ * a replay. A duplicate of the immediately preceding exchange (position
+ * N+1) is tolerated — a party may legitimately re-deliver the in-flight
+ * request whose response it lost, and crash-recovery re-delivery routes
+ * through the same handlers.
+ *
+ * @param tag - Context tag for error reporting
+ * @param sessionData - The receiving side's session data (its timestamps
+ *   are the progress marker)
+ * @param messageType - The inbound message's type
+ * @throws {ReplayedMessageError} When a later message of the flow has
+ *   already been processed, proving this one is a replay
+ *
+ * @since 3.1.0
+ */
+export function pastMessageReplayVerifier(
+  tag: string,
+  sessionData: SessionData,
+  messageType: MessageType,
+): void {
+  const position = totalOrderIndex(messageType);
+  if (position < 0) {
+    return; // stage-0 / non-core messages are not ordered here
+  }
+  for (let later = position + 2; later < MESSAGE_TOTAL_ORDER.length; later++) {
+    for (const laterType of MESSAGE_TOTAL_ORDER[later]) {
+      const processed = getMessageTimestamp(
+        sessionData,
+        laterType,
+        TimestampType.PROCESSED,
+      );
+      const received = getMessageTimestamp(
+        sessionData,
+        laterType,
+        TimestampType.RECEIVED,
+      );
+      if (processed !== "" || received !== "") {
+        throw new ReplayedMessageError(tag, messageType, laterType);
+      }
+    }
+  }
+}
+
+/**
  * Common validation entry point shared by every client and server stage
  * service for an inbound SATP message. It resolves the session data for the
  * given side and bundles the checks that every received message must pass:
  *
  * 1. **Session is usable** — the session is defined and passes
  *    {@link SATPSession.verify} for the given {@link SessionType}.
- * 2. **Everything is defined** — the common body is present and carries the
+ * 2. **Not a replayed past message** — the flow has not already moved past
+ *    the message's position in the protocol sequence
+ *    (via {@link pastMessageReplayVerifier}).
+ * 3. **Everything is defined** — the common body is present and carries the
  *    correct version, transfer context id, and message type
  *    (via {@link commonBodyVerifier}).
- * 3. **Signature is valid** — via {@link signatureVerifier}.
- * 4. **Hash of the previous message is correct** — the message's hash-chain
+ * 4. **Signature is valid** — via {@link signatureVerifier}.
+ * 5. **Hash of the previous message is correct** — the message's hash-chain
  *    link matches the stored hash of its predecessor
  *    (via {@link hashPrevMessageVerifier}). The predecessor is derived
  *    automatically unless overridden. Skipped when there is no predecessor.
- * 5. **Sequence number matches** — when both received and expected values are
+ * 6. **Sequence number matches** — when both received and expected values are
  *    supplied (via {@link sequenceNumberVerifier}).
  * 6. **Transfer-init-claims hash matches** — when `hashTransferInitClaims` is
  *    supplied (via a {@link TransferInitClaimsHashError} on mismatch).
@@ -644,6 +743,8 @@ export function verifyMessage(
       ? session.getServerSessionData()
       : session.getClientSessionData();
 
+  pastMessageReplayVerifier(tag, sessionData, messageType);
+
   commonBodyVerifier(
     tag,
     message.common,
@@ -652,7 +753,10 @@ export function verifyMessage(
     options.secondaryMessageType,
   );
 
-  signatureVerifier(tag, signer, message, sessionData);
+  // Stage 1-3 v13 messages structurally carry no legacy signature fields,
+  // so this check is a no-op for them (the JWS envelope authenticates the
+  // traffic); stage 0 messages carry them and are verified here.
+  signatureVerifier(tag, signer, message as ILegacySignedMessage, sessionData);
 
   if (options.checkHashPrevMessage ?? true) {
     const previousMessageType =

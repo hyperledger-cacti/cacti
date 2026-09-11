@@ -14,10 +14,10 @@
  * signing/verification interceptors in `core/cryptography/jws-interceptors.ts`.
  *
  * Only `ES256` (ECDSA using P-256 and SHA-256) is implemented — the
- * REQUIRED algorithm per v13 Section 5.3.3 and [RFC7518 Section 3.1].
+ * REQUIRED algorithm per draft-16 Section 5.2 and [RFC7518 Section 3.1].
  *
  * @module core/cryptography/jws-utils
- * @see https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-13
+ * @see https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-16
  * @see https://www.rfc-editor.org/rfc/rfc7515 — JWS specification
  * @see https://www.rfc-editor.org/rfc/rfc7518#section-3.1 — JWA ES256
  */
@@ -69,6 +69,11 @@ export interface IJWSProtectedHeader {
   alg: string;
   /** Key ID — the signing gateway's id, used to resolve the verifying key. */
   kid?: string;
+  /**
+   * The signer's public JWK, embedded per RFC 7515 Section 4.1.3 so a
+   * counterparty that has not yet provisioned the key can still verify.
+   */
+  jwk?: JWK;
 }
 
 /**
@@ -91,6 +96,12 @@ export interface IJWSSignOptions {
   algorithm?: JWSAlgorithm;
   /** Key ID to embed in the protected header (the signer gateway id). */
   kid?: string;
+  /**
+   * The signer's public JWK to embed in the protected header
+   * (RFC 7515 Section 4.1.3), enabling verification without prior
+   * key distribution.
+   */
+  jwk?: JWK;
 }
 
 /**
@@ -146,6 +157,29 @@ export async function importSigningKey(jwk: JWK): Promise<CryptoKey> {
 }
 
 /**
+ * Derive the public JWK that corresponds to a private ES256 JWK.
+ *
+ * Exports the private key and strips the private `d` parameter, leaving
+ * only the public parameters (`kty`, `crv`, `x`, `y`). Used to check that
+ * a configured public JWK matches the configured private key.
+ *
+ * @param privateJwk - The private key material in JWK format.
+ * @returns The matching public JWK.
+ */
+export async function derivePublicJwk(privateJwk: JWK): Promise<JWK> {
+  const key = await webcrypto.subtle.importKey(
+    "jwk",
+    privateJwk,
+    ES256_KEY_ALGORITHM,
+    true,
+    ["sign"],
+  );
+  const exported = await webcrypto.subtle.exportKey("jwk", key);
+  const { d: _d, ...publicJwk } = exported;
+  return publicJwk;
+}
+
+/**
  * Produce a JWS Compact Serialization over the given payload bytes.
  *
  * @param payload - The bytes to sign (the message's protobuf binary).
@@ -168,6 +202,9 @@ export async function jwsSign(
   };
   if (options?.kid !== undefined) {
     header.kid = options.kid;
+  }
+  if (options?.jwk !== undefined) {
+    header.jwk = options.jwk;
   }
   const encodedHeader = base64UrlEncode(
     new TextEncoder().encode(JSON.stringify(header)),
@@ -259,7 +296,7 @@ export function jwsDecodeProtectedHeader(jws: string): IJWSProtectedHeader {
     const header = JSON.parse(
       Buffer.from(encodedHeader, "base64url").toString("utf8"),
     ) as IJWSProtectedHeader;
-    return { alg: header.alg ?? "", kid: header.kid };
+    return { alg: header.alg ?? "", kid: header.kid, jwk: header.jwk };
   } catch {
     return { alg: "" };
   }

@@ -94,7 +94,7 @@
  * node plugin-satp-hermes-gateway-cli.js
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
  * @see {@link SATPGateway} for gateway implementation
  * @see {@link SATPGatewayConfig} for configuration structure
  * @see {@link AdapterLayerConfiguration} for adapter configuration schema
@@ -108,6 +108,7 @@ import {
   SATPGateway,
   type SATPGatewayConfig,
 } from "./plugin-satp-hermes-gateway";
+import { provisionLocalSigningPrivateKey } from "./core/cryptography/signing-keys";
 
 // Process-level error handlers for container/CLI deployment
 // These ensure that unhandled errors are properly logged before exit
@@ -408,12 +409,21 @@ export async function launchGateway(
       : undefined;
 
   logger.debug("Creating SATPGatewayConfig...");
+  // Local-only ENVELOPE_SIGNATURE private key (JWK) for v13 JWS envelope
+  // signing. Optional: when absent the gateway generates an ephemeral pair,
+  // which only works when counterparties share the gateway's process
+  // (single-instance topologies). Dockerized/separate-process deployments
+  // must pre-provision the pair so the pinned public JWKs match.
+  const envelopeSignaturePrivateKey = config.envelopeSignaturePrivateKey as
+    | Record<string, unknown>
+    | undefined;
   const gatewayConfig: SATPGatewayConfig = {
     instanceId: instanceId || uuidv4(),
     gid,
     counterPartyGateways,
     logLevel,
     keyPair: toKeyPairBuffers(keyPair),
+    envelopeSignaturePrivateKey,
     environment,
     validationOptions,
     privacyPolicies,
@@ -432,6 +442,20 @@ export async function launchGateway(
 
   logger.info("SATPGatewayConfig created successfully");
   logger.debug(`SATPGatewayConfig: ${JSON.stringify(gatewayConfig, null, 2)}`);
+
+  // Provision the local-only ENVELOPE_SIGNATURE private key BEFORE any
+  // startup step: startup() eagerly resolves the signing key pair and would
+  // otherwise generate an ephemeral pair that overwrites the pinned public
+  // JWK, causing a key-material mismatch when this key is provisioned later.
+  if (
+    envelopeSignaturePrivateKey !== undefined &&
+    gatewayConfig.gid !== undefined
+  ) {
+    provisionLocalSigningPrivateKey(
+      gatewayConfig.gid,
+      envelopeSignaturePrivateKey,
+    );
+  }
 
   const gateway = new SATPGateway(gatewayConfig);
   try {

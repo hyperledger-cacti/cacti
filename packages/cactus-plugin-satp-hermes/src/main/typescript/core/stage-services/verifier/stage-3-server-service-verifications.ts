@@ -9,7 +9,7 @@
  * service step implementations thin.
  *
  * @since 3.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
@@ -46,7 +46,11 @@ export function verifyCommitPreparationRequestMessage(
     session,
     SessionType.SERVER,
     MessageType.COMMIT_PREPARE,
-    { checkHashPrevMessage: false },
+    {
+      // The commit preparation must link back to the ASSERTION_RECEIPT the
+      // server sent, keeping the v13 message hash chain intact.
+      hashPrevMessage: request.hashPrevMessage,
+    },
   );
 }
 
@@ -73,7 +77,11 @@ export function verifyCommitFinalAssertionRequestMessage(
     session,
     SessionType.SERVER,
     MessageType.COMMIT_FINAL,
-    { checkHashPrevMessage: false },
+    {
+      // The commit final assertion must link back to the COMMIT_READY
+      // response the server sent, keeping the v13 message hash chain intact.
+      hashPrevMessage: request.hashPrevMessage,
+    },
   );
 
   if (request.burnAssertionClaim == undefined) {
@@ -114,6 +122,10 @@ export function verifyTransferCompleteRequestMessage(
     session,
     SessionType.SERVER,
     MessageType.COMMIT_TRANSFER_COMPLETE,
-    { checkHashPrevMessage: false },
+    {
+      // The transfer completion must link back to the ACK_COMMIT_FINAL
+      // response the server sent, keeping the v13 message hash chain intact.
+      hashPrevMessage: request.hashPrevMessage,
+    },
   );
 }

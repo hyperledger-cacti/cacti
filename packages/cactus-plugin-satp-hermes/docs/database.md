@@ -30,5 +30,9 @@ The repository classes call `migrate.latest()` during initialization and use the
 
 Signature-verified protocol claims (wrap, lock, mint, burn, and assignment assertion claims) are persisted in the audit database as session proofs in the `session_proofs` table, created by the `20260910120000_add_session_proofs_table` migration. Each proof records the session ID, the SATP protocol step at which the claim was verified, the serialized claim, and the claim signature, keeping the signed claims provable for dispute resolution and audit after transport ends. Proofs are returned with audit entries through the `performAudit` API.
 
+**Idempotent writes.** Each proof's primary key is derived deterministically from the session ID, step tag and claim (SHA-256). Re-verifying the same claim at the same step — e.g. after a retry or crash recovery — does not create duplicate rows; the existing proof is left untouched. `GatewayPersistence.persistSessionProof()` additionally rejects proofs missing a session ID, step tag, claim, or signature before they reach the database.
+
+**Retrieval endpoint.** Proofs can be queried directly by session ID via `GET /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs` (`getSessionProofs` on the admin API), accepting a comma-separated list of session IDs and returning the matching `SessionProof`s.
+
 The package manifest currently contains legacy `db:*` scripts that reference the former `src/knex/` layout. Do not use those scripts until their paths are updated in a dedicated code change.
 <!-- --8<-- [end:content] -->

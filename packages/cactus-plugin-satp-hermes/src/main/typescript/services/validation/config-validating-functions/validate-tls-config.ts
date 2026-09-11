@@ -32,12 +32,15 @@ export interface IGatewayTlsConfig {
  * Returns a normalized copy of the configuration with `minVersion` forced
  * to `TLSv1.3` and `cipherSuites` defaulted to the mandatory-to-implement
  * suite. Throws when a configuration below TLS 1.3 or with non-TLS-1.3
- * cipher suites is requested.
+ * cipher suites is requested, or when TLS is `enabled` without both
+ * `cert` and `key` — the gateway must never silently fall back to plain
+ * HTTP.
  *
  * @param opts.configValue - The raw TLS configuration (may be undefined)
  * @returns The normalized TLS configuration, or `undefined` when none was given
  * @throws {TypeError} When the configuration is not an object
- * @throws {Error} When the configuration requests below-TLS-1.3 security
+ * @throws {Error} When the configuration requests below-TLS-1.3 security or
+ *   enables TLS without complete certificate material
  */
 export function validateTlsConfig(opts: {
   readonly configValue: unknown;
@@ -55,11 +58,24 @@ export function validateTlsConfig(opts: {
 
   const raw = config as IGatewayTlsConfig;
 
+  if (raw.enabled === true) {
+    const missing = [!raw.cert && "cert", !raw.key && "key"].filter(
+      Boolean,
+    ) as string[];
+    if (missing.length > 0) {
+      throw new Error(
+        `Invalid config.tls: enabled but ${missing.join(" and ")} missing. ` +
+          "A gateway with TLS enabled must not fall back to plain HTTP " +
+          "(SATP draft-16 Section 5.4.2 secure-channel requirement)",
+      );
+    }
+  }
+
   if (raw.minVersion !== undefined && raw.minVersion !== "TLSv1.3") {
     throw new Error(
       `Invalid config.tls.minVersion: "${raw.minVersion}". ` +
         "SATP gateways MUST enforce TLS 1.3 as the minimum protocol version " +
-        "(RFC 8446, SATP v13 Section 5.3.3)",
+        "(RFC 8446, SATP draft-16 Section 5.4.2)",
     );
   }
 
@@ -71,7 +87,7 @@ export function validateTlsConfig(opts: {
       throw new Error(
         `Invalid config.tls.cipherSuites: ${invalid.join(", ")}. ` +
           "Only TLS 1.3 cipher suites are permitted " +
-          "(RFC 8446, SATP v13 Section 5.3.3)",
+          "(RFC 8446, SATP draft-16 Section 5.4.2)",
       );
     }
   }

@@ -34,7 +34,7 @@ describe("draft-ietf-satp-core-16 compliance", () => {
   it("uses registered error and message type URNs", () => {
     const error = new SATPError("test", 400, SATPErrorType.UNSPECIFIED);
 
-    expect(SATP_ERROR_URN_PREFIX).toBe("urn:ietf:params:satp:error:");
+    expect(SATP_ERROR_URN_PREFIX).toBe("urn:ietf:params:satp:core:error:");
     expect(SATP_MSG_TYPE_URN_PREFIX).toBe("urn:ietf:params:satp:core:msgtype:");
     expect(error.messageType).toBe(
       "urn:ietf:params:satp:core:msgtype:error-msg",
@@ -83,8 +83,8 @@ describe("draft-ietf-satp-core-16 compliance", () => {
       );
       expect(body).toEqual(
         expect.objectContaining({
-          type: expect.stringMatching(/^urn:ietf:params:satp:error:/),
-          title: "SatpCommonBodyError",
+          type: expect.stringMatching(/^urn:ietf:params:satp:core:error:/),
+          title: "invalid message type",
           status: 400,
         }),
       );

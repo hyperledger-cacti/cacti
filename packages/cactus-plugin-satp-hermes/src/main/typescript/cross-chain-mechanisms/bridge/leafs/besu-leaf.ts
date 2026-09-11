@@ -193,7 +193,7 @@ interface BesuResponse {
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link https://besu.hyperledger.org/} Hyperledger Besu Documentation
  * @see {@link BridgeLeafFungible} for fungible asset interface
  * @see {@link BridgeLeafNonFungible} for non-fungible asset interface

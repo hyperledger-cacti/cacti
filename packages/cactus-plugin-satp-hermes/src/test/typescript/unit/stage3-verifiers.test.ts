@@ -70,13 +70,22 @@ import {
   AssignmentAssertionClaimError,
   BurnAssertionClaimError,
   ClaimSignatureError,
+  HashPrevMessageError,
   MintAssertionClaimError,
+  ReplayedMessageError,
   SessionError,
 } from "../../../main/typescript/core/errors/satp-service-errors";
 import type { SATPSession } from "../../../main/typescript/core/satp-session";
 import type { SATPLogger as Logger } from "../../../main/typescript/core/satp-logger";
 
 const TAG = "TestStage3Verifier";
+
+// Hash-chain fixture: every inbound message references the stored hash of
+// its predecessor, exactly as the stage services record it via saveHash
+// when they send the predecessor. The value itself is arbitrary — the
+// verifiers only compare the message's hashPrevMessage against the stored
+// predecessor hash.
+const PREV_HASH = "prev-message-hash";
 
 // Real secp256k1 signer so claim signatures are actually produced and
 // verified — matches how the gateway signs claims in production.
@@ -108,8 +117,23 @@ function makeSessionData(overrides?: Record<string, unknown>): SessionData {
     hashes: create(MessageStagesHashesSchema, {
       stage0: create(Stage0HashesSchema),
       stage1: create(Stage1HashesSchema),
-      stage2: create(Stage2HashesSchema),
-      stage3: create(Stage3HashesSchema),
+      stage2: create(Stage2HashesSchema, {
+        lockAssertionRequestMessageHash: PREV_HASH,
+        lockAssertionReceiptMessageHash: PREV_HASH,
+      }),
+      stage3: create(Stage3HashesSchema, {
+        commitPreparationRequestMessageHash: PREV_HASH,
+        commitReadyResponseMessageHash: PREV_HASH,
+        commitFinalAssertionRequestMessageHash: PREV_HASH,
+        commitFinalAcknowledgementReceiptResponseMessageHash: PREV_HASH,
+        transferCompleteMessageHash: PREV_HASH,
+      }),
+    }),
+    processedTimestamps: create(MessageStagesTimestampsSchema, {
+      stage0: create(Stage0TimestampsSchema),
+      stage1: create(Stage1TimestampsSchema),
+      stage2: create(Stage2TimestampsSchema),
+      stage3: create(Stage3TimestampsSchema),
     }),
     receivedTimestamps: create(MessageStagesTimestampsSchema, {
       stage0: create(Stage0TimestampsSchema),
@@ -141,6 +165,7 @@ function common(messageType: MessageType) {
 function makeCommitPreparationRequest(): CommitPreparationRequest {
   return create(CommitPreparationRequestSchema, {
     common: common(MessageType.COMMIT_PREPARE),
+    hashPrevMessage: PREV_HASH,
   });
 }
 
@@ -148,6 +173,7 @@ function makeCommitFinalAssertionRequest(): CommitFinalAssertionRequest {
   const receipt = makeSignedClaimReceipt();
   return create(CommitFinalAssertionRequestSchema, {
     common: common(MessageType.COMMIT_FINAL),
+    hashPrevMessage: PREV_HASH,
     burnAssertionClaim: create(BurnAssertionClaimSchema, {
       receipt,
       signature: Buffer.from(signer.sign(receipt)).toString("hex"),
@@ -158,12 +184,14 @@ function makeCommitFinalAssertionRequest(): CommitFinalAssertionRequest {
 function makeTransferCompleteRequest(): TransferCompleteRequest {
   return create(TransferCompleteRequestSchema, {
     common: common(MessageType.COMMIT_TRANSFER_COMPLETE),
+    hashPrevMessage: PREV_HASH,
   });
 }
 
 function makeLockAssertionResponse(): LockAssertionResponse {
   return create(LockAssertionResponseSchema, {
     common: common(MessageType.ASSERTION_RECEIPT),
+    hashPrevMessage: PREV_HASH,
   });
 }
 
@@ -171,6 +199,7 @@ function makeCommitPreparationResponse(): CommitPreparationResponse {
   const receipt = makeSignedClaimReceipt();
   return create(CommitPreparationResponseSchema, {
     common: common(MessageType.COMMIT_READY),
+    hashPrevMessage: PREV_HASH,
     mintAssertionClaim: create(MintAssertionClaimSchema, {
       receipt,
       signature: Buffer.from(signer.sign(receipt)).toString("hex"),
@@ -182,6 +211,7 @@ function makeCommitFinalAssertionResponse(): CommitFinalAssertionResponse {
   const receipt = makeSignedClaimReceipt();
   return create(CommitFinalAssertionResponseSchema, {
     common: common(MessageType.ACK_COMMIT_FINAL),
+    hashPrevMessage: PREV_HASH,
     assignmentAssertionClaim: create(AssignmentAssertionClaimSchema, {
       receipt,
       signature: Buffer.from(signer.sign(receipt)).toString("hex"),
@@ -211,6 +241,17 @@ describe("verifyCommitPreparationRequestMessage", () => {
     expect(() =>
       verifyCommitPreparationRequestMessage(TAG, signer, request, session),
     ).not.toThrow();
+  });
+
+  it("throws HashPrevMessageError when the hash chain is broken", () => {
+    const sessionData = makeSessionData();
+    const session = makeSession(sessionData);
+    const request = makeCommitPreparationRequest();
+    request.hashPrevMessage = "tampered-hash";
+
+    expect(() =>
+      verifyCommitPreparationRequestMessage(TAG, signer, request, session),
+    ).toThrow(HashPrevMessageError);
   });
 });
 
@@ -423,5 +464,83 @@ describe("verifyTransferCompleteResponseMessage", () => {
     expect(() =>
       verifyTransferCompleteResponseMessage(TAG, signer, response, session),
     ).not.toThrow();
+  });
+});
+
+describe("pastMessageReplayVerifier (in-session replay defense)", () => {
+  const TS = Date.now().toString();
+
+  it("passes when the flow has not moved past the message", () => {
+    const sessionData = makeSessionData();
+    const session = makeSession(sessionData);
+    const request = makeCommitPreparationRequest();
+
+    expect(() =>
+      verifyCommitPreparationRequestMessage(TAG, signer, request, session),
+    ).not.toThrow();
+  });
+
+  it("tolerates a duplicate of the in-flight exchange", () => {
+    // COMMIT_READY is COMMIT_PREPARE's immediate successor: the server
+    // already processed (sent) it, but a re-delivered COMMIT_PREPARE may
+    // legitimately arrive while the response is still in flight.
+    const sessionData = makeSessionData({
+      processedTimestamps: create(MessageStagesTimestampsSchema, {
+        stage0: create(Stage0TimestampsSchema),
+        stage1: create(Stage1TimestampsSchema),
+        stage2: create(Stage2TimestampsSchema),
+        stage3: create(Stage3TimestampsSchema, {
+          commitReadyResponseMessageTimestamp: TS,
+        }),
+      }),
+    });
+    const session = makeSession(sessionData);
+    const request = makeCommitPreparationRequest();
+
+    expect(() =>
+      verifyCommitPreparationRequestMessage(TAG, signer, request, session),
+    ).not.toThrow();
+  });
+
+  it("rejects a message replayed after the flow moved on", () => {
+    // COMMIT_FINAL is two positions past COMMIT_PREPARE: processing a
+    // COMMIT_PREPARE now can only be a replay.
+    const sessionData = makeSessionData({
+      receivedTimestamps: create(MessageStagesTimestampsSchema, {
+        stage0: create(Stage0TimestampsSchema),
+        stage1: create(Stage1TimestampsSchema),
+        stage2: create(Stage2TimestampsSchema),
+        stage3: create(Stage3TimestampsSchema, {
+          commitFinalAssertionRequestMessageTimestamp: TS,
+        }),
+      }),
+    });
+    const session = makeSession(sessionData);
+    const request = makeCommitPreparationRequest();
+
+    expect(() =>
+      verifyCommitPreparationRequestMessage(TAG, signer, request, session),
+    ).toThrow(ReplayedMessageError);
+  });
+
+  it("rejects cross-stage replays of a stage-2 message", () => {
+    // The client already has the server's COMMIT_READY; a re-delivered
+    // ASSERTION_RECEIPT (stage 2) is a replay from the session's past.
+    const sessionData = makeSessionData({
+      receivedTimestamps: create(MessageStagesTimestampsSchema, {
+        stage0: create(Stage0TimestampsSchema),
+        stage1: create(Stage1TimestampsSchema),
+        stage2: create(Stage2TimestampsSchema),
+        stage3: create(Stage3TimestampsSchema, {
+          commitReadyResponseMessageTimestamp: TS,
+        }),
+      }),
+    });
+    const session = makeSession(sessionData);
+    const response = makeLockAssertionResponse();
+
+    expect(() =>
+      verifyLockAssertionResponseMessage(TAG, signer, response, session),
+    ).toThrow(ReplayedMessageError);
   });
 });

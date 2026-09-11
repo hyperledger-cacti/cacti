@@ -9,7 +9,7 @@
  * validation) keeps the Stage 1 client service step implementations thin.
  *
  * @since 3.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
@@ -41,7 +41,7 @@ export function verifyTransferProposalRequest(
   connectedDLTs: NetworkId[],
 ): void {
   if (sessionData.senderAsset == undefined) {
-    throw new Error(`${tag}, receiverAsset is missing`);
+    throw new Error(`${tag}, senderAsset is missing`);
   }
 
   if (sessionData.senderAsset.networkId == undefined) {
@@ -88,7 +88,8 @@ export function verifyTransferProposalResponse(
   session: SATPSession | undefined,
   logger: Logger,
 ): boolean {
-  // INIT_RECEIPT has no hash-chain predecessor to validate here.
+  // The receipt/reject links back to the INIT_PROPOSAL the client sent
+  // (the only Stage 1 message with no predecessor is the proposal itself).
   verifyMessage(
     tag,
     signer,
@@ -98,7 +99,7 @@ export function verifyTransferProposalResponse(
     MessageType.INIT_RECEIPT,
     {
       secondaryMessageType: MessageType.INIT_REJECT,
-      checkHashPrevMessage: false,
+      hashPrevMessage: response.hashPrevMessage,
     },
   );
 

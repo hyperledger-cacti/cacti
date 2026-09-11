@@ -33,8 +33,8 @@ import {
   SessionDataNotLoadedCorrectlyError,
 } from "../../../main/typescript/core/errors/satp-service-errors";
 import {
-  ERR_1_1_1,
-  ERR_1_2_2,
+  ERR_0_1_1,
+  ERR_1_2_1,
   ERR_1_2_3,
 } from "../../../main/typescript/core/errors/iana-error-codes";
 import { saveHash } from "../../../main/typescript/core/session-utils";
@@ -67,15 +67,15 @@ function makeCommon(overrides?: Record<string, unknown>) {
 }
 
 describe("SATPInternalError.getSATPErrorCode()", () => {
-  it("returns ERR_1_1_1 for default UNSPECIFIED error type", () => {
+  it("returns ERR_0_1_1 for default UNSPECIFIED error type", () => {
     const err = new SATPInternalError("test error", null, 500);
-    expect(err.getSATPErrorCode()).toBe(ERR_1_1_1);
+    expect(err.getSATPErrorCode()).toBe(ERR_0_1_1);
   });
 
   it("returns the mapped v13 code for a specific error type", () => {
     const err = new MissingTransferContextIdError("test");
     expect(err.getSATPErrorType()).toBe(SATPErrorType.CONTEXT_ID_MISS_MATCH);
-    expect(err.getSATPErrorCode()).toBe(ERR_1_2_2);
+    expect(err.getSATPErrorCode()).toBe(ERR_1_2_1);
   });
 
   it("returns ERR_1_2_3 for HashPrevMessageError", () => {

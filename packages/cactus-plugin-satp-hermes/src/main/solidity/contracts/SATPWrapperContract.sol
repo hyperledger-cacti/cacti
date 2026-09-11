@@ -504,23 +504,50 @@ contract SATPWrapperContract is Ownable, ITraceableContract, IERC721Receiver{
 
     /**
      * Gets a token with the given token ID and a unique descriptor for multi-token standards such as ERC1155 and ERC6909.
+     * Preserves the original ABI (uint256 uniqueDescriptor) so existing deployed
+     * wrappers and callers keep interoperating.
      * @param tokenId The unique identifier of the token.
      * @param assetAttribute The asset attribute of the token.
      * @param uniqueDescriptor The token-specific descriptor (e.g. ERC1155/ERC6909 token ID).
      * @return token the token with the given token ID, asset attribute, and unique descriptor.
      */
-    function getToken(string memory tokenId, uint256 assetAttribute, ERCTokenStandard uniqueDescriptor) view public returns (Token memory token) {
+    function getToken(string memory tokenId, uint256 assetAttribute, uint256 uniqueDescriptor) view public returns (Token memory token) {
+        TokenType tt = tokens[tokenId].tokenType;
+
+        if (tt == TokenType.NONSTANDARD_FUNGIBLE) {
+            return tokens[tokenId];
+        }
+        else if (tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
+            if(NFT_IDs[tokenId][assetAttribute]) {
+                return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, assetAttribute, tokens[tokenId].ercTokenStandard);
+            }
+            else {
+                return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, 0, tokens[tokenId].ercTokenStandard);
+            }
+        }
+    }
+
+    /**
+     * Gets a token with the given token ID, verifying that its ERC token
+     * standard matches the expected one. Versioned variant of
+     * `getToken(string, uint256, uint256)` for callers that want the strict
+     * standard check; kept as a separate method so the original selector is
+     * preserved.
+     * @param tokenId The unique identifier of the token.
+     * @param assetAttribute The asset attribute of the token.
+     * @param ercTokenStandard The expected ERC token standard of the token.
+     * @return token the token with the given token ID and asset attribute.
+     */
+    function getTokenByErcStandard(string memory tokenId, uint256 assetAttribute, ERCTokenStandard ercTokenStandard) view public returns (Token memory token) {
         TokenType tt = tokens[tokenId].tokenType;
         ERCTokenStandard descriptor = tokens[tokenId].ercTokenStandard;
 
         if (tt == TokenType.NONSTANDARD_FUNGIBLE) {
             return tokens[tokenId];
         }
-        
         else if (tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
-            assert(descriptor == uniqueDescriptor);
+            require(descriptor == ercTokenStandard, "token standard mismatch");
             if(NFT_IDs[tokenId][assetAttribute]) {
-
                 return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, assetAttribute, descriptor);
             }
             else {

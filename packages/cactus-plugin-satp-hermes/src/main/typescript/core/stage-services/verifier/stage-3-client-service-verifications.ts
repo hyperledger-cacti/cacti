@@ -9,7 +9,7 @@
  * the Stage 3 client service step implementations thin.
  *
  * @since 3.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
@@ -50,7 +50,11 @@ export function verifyLockAssertionResponseMessage(
     session,
     SessionType.CLIENT,
     MessageType.ASSERTION_RECEIPT,
-    { checkHashPrevMessage: false },
+    {
+      // The lock-assertion receipt must link back to the LOCK_ASSERT
+      // request the client sent, keeping the v13 message hash chain intact.
+      hashPrevMessage: response.hashPrevMessage,
+    },
   );
 }
 
@@ -77,7 +81,11 @@ export function verifyCommitPreparationResponseMessage(
     session,
     SessionType.CLIENT,
     MessageType.COMMIT_READY,
-    { checkHashPrevMessage: false },
+    {
+      // The commit-ready receipt must link back to the COMMIT_PREPARE
+      // request the client sent, keeping the v13 message hash chain intact.
+      hashPrevMessage: response.hashPrevMessage,
+    },
   );
 
   if (response.mintAssertionClaimFormat != undefined) {
@@ -121,7 +129,11 @@ export function verifyCommitFinalAssertionResponseMessage(
     session,
     SessionType.CLIENT,
     MessageType.ACK_COMMIT_FINAL,
-    { checkHashPrevMessage: false },
+    {
+      // The commit-final acknowledgement must link back to the COMMIT_FINAL
+      // request the client sent, keeping the v13 message hash chain intact.
+      hashPrevMessage: response.hashPrevMessage,
+    },
   );
 
   if (response.assignmentAssertionClaim == undefined) {
@@ -164,6 +176,12 @@ export function verifyTransferCompleteResponseMessage(
     session,
     SessionType.CLIENT,
     MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
-    { checkHashPrevMessage: false },
+    {
+      // The TransferCompleteResponse proto carries no hashPrevMessage
+      // field (draft-16 Section 10.5: a bare receipt), so there is no
+      // chain link to verify on this message; its authenticity is
+      // enforced by the JWS envelope and the session state.
+      checkHashPrevMessage: false,
+    },
   );
 }

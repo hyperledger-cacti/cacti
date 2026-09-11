@@ -47,8 +47,8 @@ message NetworkCapabilities {
     string gateway_tls_scheme = 5;                                
 }
 
-// ── Message Types (v13 Section 13.3–13.4, IANA URNs) ───
-// urn:ietf:satp:GROUP, where GROUP = stage0, core, crash, id, error
+// ── Message Types (draft-16 Sections 8-10, 13.1 IANA URNs) ───
+// urn:ietf:params:satp:core:msgtype, per the IANA "satp" namespace
 
 enum MessageType {
     MESSAGE_TYPE_UNSPECIFIED = 0;
@@ -59,20 +59,20 @@ enum MessageType {
     MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_REQUEST = 4;
     MESSAGE_TYPE_PRE_TRANSFER_COMMENCE_RESPONSE = 5;
     // Stage 1 — v13 Sections 8.3–8.7
-    MESSAGE_TYPE_INIT_PROPOSAL = 6;                     // urn:ietf:satp:core:transfer-proposal-msg
-    MESSAGE_TYPE_INIT_RECEIPT = 7;                      // urn:ietf:satp:core:msgtype:proposal-receipt-msg
-    MESSAGE_TYPE_INIT_REJECT = 8;                       // urn:ietf:satp:core:msgtype:reject-msg (generalized)
-    MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST = 9;         // urn:ietf:satp:core:msgtype:transfer-commence-msg
-    MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE = 10;       // urn:ietf:satp:core:msgtype:ack-commence-msg
+    MESSAGE_TYPE_INIT_PROPOSAL = 6;                     // urn:ietf:params:satp:core:msgtype:transfer-proposal-msg
+    MESSAGE_TYPE_INIT_RECEIPT = 7;                      // urn:ietf:params:satp:core:msgtype:proposal-receipt-msg
+    MESSAGE_TYPE_INIT_REJECT = 8;                       // urn:ietf:params:satp:core:msgtype:reject-msg (generalized)
+    MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST = 9;         // urn:ietf:params:satp:core:msgtype:transfer-commence-msg
+    MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE = 10;       // urn:ietf:params:satp:core:msgtype:ack-commence-msg
     // Stage 2 — v13 Sections 9.1–9.2
-    MESSAGE_TYPE_LOCK_ASSERT = 11;                      // urn:ietf:satp:core:msgtype:lock-assert-msg
-    MESSAGE_TYPE_ASSERTION_RECEIPT = 12;                 // urn:ietf:satp:core:msgtype:assertion-receipt-msg
+    MESSAGE_TYPE_LOCK_ASSERT = 11;                      // urn:ietf:params:satp:core:msgtype:lock-assert-msg
+    MESSAGE_TYPE_ASSERTION_RECEIPT = 12;                 // urn:ietf:params:satp:core:msgtype:assertion-receipt-msg
     // Stage 3 — v13 Sections 10.1–10.5
-    MESSAGE_TYPE_COMMIT_PREPARE = 13;                   // urn:ietf:satp:core:msgtype:commit-prepare-msg
-    MESSAGE_TYPE_COMMIT_READY = 14;                     // urn:ietf:satp:core:msgtype:commit-ready-msg
-    MESSAGE_TYPE_COMMIT_FINAL = 15;                     // urn:ietf:satp:core:msgtype:commit-final-msg
-    MESSAGE_TYPE_ACK_COMMIT_FINAL = 16;                 // urn:ietf:satp:core:msgtype:ack-commit-final-msg
-    MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 17;         // urn:ietf:satp:core:msgtype:commit-transfer-complete-msg
+    MESSAGE_TYPE_COMMIT_PREPARE = 13;                   // urn:ietf:params:satp:core:msgtype:commit-prepare-msg
+    MESSAGE_TYPE_COMMIT_READY = 14;                     // urn:ietf:params:satp:core:msgtype:commit-ready-msg
+    MESSAGE_TYPE_COMMIT_FINAL = 15;                     // urn:ietf:params:satp:core:msgtype:commit-final-msg
+    MESSAGE_TYPE_ACK_COMMIT_FINAL = 16;                 // urn:ietf:params:satp:core:msgtype:ack-commit-final-msg
+    MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 17;         // urn:ietf:params:satp:core:msgtype:commit-transfer-complete-msg
     // Stage 0 — non-standard extension
     MESSAGE_TYPE_NEW_SESSION_REQUEST = 18;
     MESSAGE_TYPE_NEW_SESSION_RESPONSE = 19;
@@ -80,8 +80,8 @@ enum MessageType {
     MESSAGE_TYPE_PRE_SATP_TRANSFER_RESPONSE = 21;
     MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE_RESPONSE = 22;
     // NEW in v13 — Sections 10.6–10.7
-    MESSAGE_TYPE_ERROR = 23;                            // urn:ietf:satp:core:msgtype:error-msg
-    MESSAGE_TYPE_SESSION_ABORT = 24;                    // urn:ietf:satp:core:msgtype:session-abort-msg
+    MESSAGE_TYPE_ERROR = 23;                            // urn:ietf:params:satp:core:msgtype:error-msg
+    MESSAGE_TYPE_SESSION_ABORT = 24;                    // urn:ietf:params:satp:core:msgtype:session-abort-msg
 }
 
 // ── Common SATP Envelope (v13 Section 5.3) ─────────────

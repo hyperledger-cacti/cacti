@@ -48,7 +48,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType} for protocol error type enumeration
  *
@@ -59,6 +59,7 @@
 
 import { SATPInternalError } from "./satp-errors";
 import { SATPErrorType } from "./satp-error-type";
+import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 
 /**
  * Error thrown when SATP message common body is missing or malformed.
@@ -914,6 +915,36 @@ export class SequenceNumberError extends SATPInternalError {
 }
 
 /**
+ * Error thrown when a message replayed from the session's past is received:
+ * the session has already progressed beyond the message's position in the
+ * protocol sequence, so processing it again would violate the one-message-
+ * per-exchange invariant and could re-trigger ledger operations.
+ *
+ * **SATP Error Type:** MESSAGE_OUT_OF_SEQUENCE - Protocol sequence violation
+ * **HTTP Status:** 400 Bad Request - Protocol flow error
+ *
+ * @class ReplayedMessageError
+ * @extends SATPInternalError
+ * @since 3.1.0
+ */
+export class ReplayedMessageError extends SATPInternalError {
+  constructor(
+    tag: string,
+    received: MessageType,
+    laterMessageType: MessageType,
+    cause?: string | Error | null,
+  ) {
+    super(
+      `${tag}, replayed message: ${MessageType[received]} was already superseded ` +
+        `by ${MessageType[laterMessageType]}, which this session has already processed`,
+      cause ?? null,
+      400,
+    );
+    this.errorType = SATPErrorType.MESSAGE_OUT_OF_SEQUENCE;
+  }
+}
+
+/**
  * Error thrown when cryptographic hashes don't match expected values.
  *
  * @description
@@ -1442,7 +1473,7 @@ export class PubKeyError extends SATPInternalError {
  * @class HashPrevMessageError
  * @extends SATPInternalError
  * @since 2.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} Sections 8–10
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} Sections 8–10
  */
 export class HashPrevMessageError extends SATPInternalError {
   constructor(
@@ -1469,7 +1500,7 @@ export class HashPrevMessageError extends SATPInternalError {
  * @class MissingTransferContextIdError
  * @extends SATPInternalError
  * @since 2.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} Section 7
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} Section 7
  */
 export class MissingTransferContextIdError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {

@@ -20,7 +20,7 @@ describe("AuditEntry Repository Integration Tests", () => {
     operation: "init",
     timestamp: "1751969518906",
     data: JSON.stringify({
-      $typeName: "cacti.satp.v02.session.SessionData",
+      $typeName: "cacti.satp.v13.session.SessionData",
       accessControlProfile: "MOCK_ACCESS_CONTROL_PROFILE",
       applicationProfile: "",
       assetProfileId: "",
@@ -34,9 +34,9 @@ describe("AuditEntry Repository Integration Tests", () => {
       errorCode: 0,
       hashTransferInitClaims: "",
       hashes: {
-        $typeName: "cacti.satp.v02.session.MessageStagesHashes",
+        $typeName: "cacti.satp.v13.session.MessageStagesHashes",
         stage0: {
-          $typeName: "cacti.satp.v02.session.Stage0Hashes",
+          $typeName: "cacti.satp.v13.session.Stage0Hashes",
           newSessionRequestMessageHash: "Server#0#newSessionResponse()",
           newSessionResponseMessageHash: "",
           preSatpTransferRequestMessageHash:
@@ -46,7 +46,7 @@ describe("AuditEntry Repository Integration Tests", () => {
           preTransferVerificationResponseMessageHash: "",
         },
         stage1: {
-          $typeName: "cacti.satp.v02.session.Stage1Hashes",
+          $typeName: "cacti.satp.v13.session.Stage1Hashes",
           transferCommenceRequestMessageHash: "",
           transferCommenceResponseMessageHash: "",
           transferProposalReceiptMessageHash: "",
@@ -55,12 +55,12 @@ describe("AuditEntry Repository Integration Tests", () => {
             "2817b6d2ee20c3818a8d2012332af1ae945efa381a3cb0ac4410afdb4c4e30c2",
         },
         stage2: {
-          $typeName: "cacti.satp.v02.session.Stage2Hashes",
+          $typeName: "cacti.satp.v13.session.Stage2Hashes",
           lockAssertionReceiptMessageHash: "",
           lockAssertionRequestMessageHash: "",
         },
         stage3: {
-          $typeName: "cacti.satp.v02.session.Stage3Hashes",
+          $typeName: "cacti.satp.v13.session.Stage3Hashes",
           commitFinalAcknowledgementReceiptResponseMessageHash: "",
           commitFinalAssertionRequestMessageHash: "",
           commitPreparationRequestMessageHash: "",
@@ -85,9 +85,9 @@ describe("AuditEntry Repository Integration Tests", () => {
       originatorPubkey: "",
       phaseError: 0,
       processedTimestamps: {
-        $typeName: "cacti.satp.v02.session.MessageStagesTimestamps",
+        $typeName: "cacti.satp.v13.session.MessageStagesTimestamps",
         stage0: {
-          $typeName: "cacti.satp.v02.session.Stage0Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage0Timestamps",
           newSessionRequestMessageTimestamp: "1751969518586",
           newSessionResponseMessageTimestamp: "",
           preSatpTransferRequestMessageTimestamp: "1751969518846",
@@ -96,7 +96,7 @@ describe("AuditEntry Repository Integration Tests", () => {
           preTransferVerificationResponseMessageTimestamp: "",
         },
         stage1: {
-          $typeName: "cacti.satp.v02.session.Stage1Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage1Timestamps",
           transferCommenceRequestMessageTimestamp: "",
           transferCommenceResponseMessageTimestamp: "",
           transferProposalReceiptMessageTimestamp: "",
@@ -104,12 +104,12 @@ describe("AuditEntry Repository Integration Tests", () => {
           transferProposalRequestMessageTimestamp: "",
         },
         stage2: {
-          $typeName: "cacti.satp.v02.session.Stage2Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage2Timestamps",
           lockAssertionReceiptMessageTimestamp: "",
           lockAssertionRequestMessageTimestamp: "",
         },
         stage3: {
-          $typeName: "cacti.satp.v02.session.Stage3Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage3Timestamps",
           commitFinalAcknowledgementReceiptResponseMessageTimestamp: "",
           commitFinalAssertionRequestMessageTimestamp: "",
           commitPreparationRequestMessageTimestamp: "",
@@ -120,9 +120,9 @@ describe("AuditEntry Repository Integration Tests", () => {
       },
       proposedTransferInitClaims: "",
       receivedTimestamps: {
-        $typeName: "cacti.satp.v02.session.MessageStagesTimestamps",
+        $typeName: "cacti.satp.v13.session.MessageStagesTimestamps",
         stage0: {
-          $typeName: "cacti.satp.v02.session.Stage0Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage0Timestamps",
           newSessionRequestMessageTimestamp: "1751969518554",
           newSessionResponseMessageTimestamp: "",
           preSatpTransferRequestMessageTimestamp: "1751969518813",
@@ -131,7 +131,7 @@ describe("AuditEntry Repository Integration Tests", () => {
           preTransferVerificationResponseMessageTimestamp: "",
         },
         stage1: {
-          $typeName: "cacti.satp.v02.session.Stage1Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage1Timestamps",
           transferCommenceRequestMessageTimestamp: "",
           transferCommenceResponseMessageTimestamp: "",
           transferProposalReceiptMessageTimestamp: "",
@@ -139,12 +139,12 @@ describe("AuditEntry Repository Integration Tests", () => {
           transferProposalRequestMessageTimestamp: "1751969518905",
         },
         stage2: {
-          $typeName: "cacti.satp.v02.session.Stage2Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage2Timestamps",
           lockAssertionReceiptMessageTimestamp: "",
           lockAssertionRequestMessageTimestamp: "",
         },
         stage3: {
-          $typeName: "cacti.satp.v02.session.Stage3Timestamps",
+          $typeName: "cacti.satp.v13.session.Stage3Timestamps",
           commitFinalAcknowledgementReceiptResponseMessageTimestamp: "",
           commitFinalAssertionRequestMessageTimestamp: "",
           commitPreparationRequestMessageTimestamp: "",
@@ -154,14 +154,14 @@ describe("AuditEntry Repository Integration Tests", () => {
         },
       },
       receiverAsset: {
-        $typeName: "cacti.satp.v02.common.Asset",
+        $typeName: "cacti.satp.v13.common.Asset",
         amount: 0,
         channelName: "MOCK_CHANNEL_ID",
         contractAddress: "",
         contractName: "MOCK_RECEIVER_ASSET_CONTRACT_NAME",
         mspId: "MOCK_RECEIVER_ASSET_MSP_ID",
         networkId: {
-          $typeName: "cacti.satp.v02.common.NetworkId",
+          $typeName: "cacti.satp.v13.common.NetworkId",
           id: "FABRIC",
           type: "FABRIC_2",
         },
@@ -172,7 +172,7 @@ describe("AuditEntry Repository Integration Tests", () => {
       },
       receiverGatewayOwnerId: "MOCK_RECEIVER_GATEWAY_OWNER_ID",
       receiverWrapAssertionClaim: {
-        $typeName: "cacti.satp.v02.common.WrapAssertionClaim",
+        $typeName: "cacti.satp.v13.common.WrapAssertionClaim",
         proof: "",
         receipt: "",
         signature: "",
@@ -184,21 +184,21 @@ describe("AuditEntry Repository Integration Tests", () => {
       resourceUrl: "MOCK_RESOURCE_URL",
       role: 0,
       satpMessages: {
-        $typeName: "cacti.satp.v02.session.SATPMessages",
-        stage0: { $typeName: "cacti.satp.v02.session.Stage0Messages" },
-        stage1: { $typeName: "cacti.satp.v02.session.Stage1Messages" },
-        stage2: { $typeName: "cacti.satp.v02.session.Stage2Messages" },
-        stage3: { $typeName: "cacti.satp.v02.session.Stage3Messages" },
+        $typeName: "cacti.satp.v13.session.SATPMessages",
+        stage0: { $typeName: "cacti.satp.v13.session.Stage0Messages" },
+        stage1: { $typeName: "cacti.satp.v13.session.Stage1Messages" },
+        stage2: { $typeName: "cacti.satp.v13.session.Stage2Messages" },
+        stage3: { $typeName: "cacti.satp.v13.session.Stage3Messages" },
       },
       senderAsset: {
-        $typeName: "cacti.satp.v02.common.Asset",
+        $typeName: "cacti.satp.v13.common.Asset",
         amount: 0,
         channelName: "",
         contractAddress: "MOCK_SENDER_ASSET_CONTRACT_ADDRESS",
         contractName: "MOCK_SENDER_ASSET_CONTRACT_NAME",
         mspId: "",
         networkId: {
-          $typeName: "cacti.satp.v02.common.NetworkId",
+          $typeName: "cacti.satp.v13.common.NetworkId",
           id: "BESU",
           type: "BESU_2X",
         },
@@ -214,9 +214,9 @@ describe("AuditEntry Repository Integration Tests", () => {
       serverTransferNumber: "",
       signatureAlgorithm: 1,
       signatures: {
-        $typeName: "cacti.satp.v02.session.MessageStagesSignatures",
+        $typeName: "cacti.satp.v13.session.MessageStagesSignatures",
         stage0: {
-          $typeName: "cacti.satp.v02.session.Stage0Signatures",
+          $typeName: "cacti.satp.v13.session.Stage0Signatures",
           newSessionRequestMessageSignature:
             "afb6120cabb96adbdef18cc337c80669a6ef7a625482cd9599c15b9f2836000e22b63c3fbc8c6e9b027e1d2f5de05de57927f73f69f49b1e6b371d833e67174e",
           newSessionResponseMessageSignature: "",
@@ -227,7 +227,7 @@ describe("AuditEntry Repository Integration Tests", () => {
           preTransferVerificationResponseMessageSignature: "",
         },
         stage1: {
-          $typeName: "cacti.satp.v02.session.Stage1Signatures",
+          $typeName: "cacti.satp.v13.session.Stage1Signatures",
           transferCommenceRequestMessageSignature: "",
           transferCommenceResponseMessageSignature: "",
           transferProposalReceiptMessageSignature: "",
@@ -235,12 +235,12 @@ describe("AuditEntry Repository Integration Tests", () => {
           transferProposalRequestMessageSignature: "",
         },
         stage2: {
-          $typeName: "cacti.satp.v02.session.Stage2Signatures",
+          $typeName: "cacti.satp.v13.session.Stage2Signatures",
           lockAssertionReceiptMessageSignature: "",
           lockAssertionRequestMessageSignature: "",
         },
         stage3: {
-          $typeName: "cacti.satp.v02.session.Stage3Signatures",
+          $typeName: "cacti.satp.v13.session.Stage3Signatures",
           commitFinalAcknowledgementReceiptResponseMessageSignature: "",
           commitFinalAssertionRequestMessageSignature: "",
           commitPreparationRequestMessageSignature: "",
@@ -255,7 +255,7 @@ describe("AuditEntry Repository Integration Tests", () => {
       transferContextId: "MOCK_CONTEXT_ID",
       verifiedBeneficiaryEntityId: "",
       verifiedOriginatorEntityId: "",
-      version: "v02",
+      version: "v13",
     }),
     sequenceNumber: 0,
   };

@@ -10,7 +10,7 @@
  * 2 client service step implementation thin.
  *
  * @since 3.1.0
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  */
 
 import type { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
@@ -42,6 +42,10 @@ export function verifyTransferCommenceResponseMessage(
     session,
     SessionType.CLIENT,
     MessageType.TRANSFER_COMMENCE_RESPONSE,
-    { checkHashPrevMessage: false },
+    {
+      // The response must link back to the TRANSFER_COMMENCE_REQUEST the
+      // client sent, keeping the v13 message hash chain intact.
+      hashPrevMessage: response.hashPrevMessage,
+    },
   );
 }

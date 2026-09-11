@@ -789,35 +789,35 @@ export enum MessageType {
   /**
    * Stage 1 — v13 Sections 8.3–8.7
    *
-   * urn:ietf:satp:core:transfer-proposal-msg
+   * urn:ietf:params:satp:core:msgtype:transfer-proposal-msg
    *
    * @generated from enum value: MESSAGE_TYPE_INIT_PROPOSAL = 6;
    */
   INIT_PROPOSAL = 6,
 
   /**
-   * urn:ietf:satp:core:msgtype:proposal-receipt-msg
+   * urn:ietf:params:satp:core:msgtype:proposal-receipt-msg
    *
    * @generated from enum value: MESSAGE_TYPE_INIT_RECEIPT = 7;
    */
   INIT_RECEIPT = 7,
 
   /**
-   * urn:ietf:satp:core:msgtype:reject-msg (generalized)
+   * urn:ietf:params:satp:core:msgtype:reject-msg (generalized)
    *
    * @generated from enum value: MESSAGE_TYPE_INIT_REJECT = 8;
    */
   INIT_REJECT = 8,
 
   /**
-   * urn:ietf:satp:core:msgtype:transfer-commence-msg
+   * urn:ietf:params:satp:core:msgtype:transfer-commence-msg
    *
    * @generated from enum value: MESSAGE_TYPE_TRANSFER_COMMENCE_REQUEST = 9;
    */
   TRANSFER_COMMENCE_REQUEST = 9,
 
   /**
-   * urn:ietf:satp:core:msgtype:ack-commence-msg
+   * urn:ietf:params:satp:core:msgtype:ack-commence-msg
    *
    * @generated from enum value: MESSAGE_TYPE_TRANSFER_COMMENCE_RESPONSE = 10;
    */
@@ -826,14 +826,14 @@ export enum MessageType {
   /**
    * Stage 2 — v13 Sections 9.1–9.2
    *
-   * urn:ietf:satp:core:msgtype:lock-assert-msg
+   * urn:ietf:params:satp:core:msgtype:lock-assert-msg
    *
    * @generated from enum value: MESSAGE_TYPE_LOCK_ASSERT = 11;
    */
   LOCK_ASSERT = 11,
 
   /**
-   * urn:ietf:satp:core:msgtype:assertion-receipt-msg
+   * urn:ietf:params:satp:core:msgtype:assertion-receipt-msg
    *
    * @generated from enum value: MESSAGE_TYPE_ASSERTION_RECEIPT = 12;
    */
@@ -842,35 +842,35 @@ export enum MessageType {
   /**
    * Stage 3 — v13 Sections 10.1–10.5
    *
-   * urn:ietf:satp:core:msgtype:commit-prepare-msg
+   * urn:ietf:params:satp:core:msgtype:commit-prepare-msg
    *
    * @generated from enum value: MESSAGE_TYPE_COMMIT_PREPARE = 13;
    */
   COMMIT_PREPARE = 13,
 
   /**
-   * urn:ietf:satp:core:msgtype:commit-ready-msg
+   * urn:ietf:params:satp:core:msgtype:commit-ready-msg
    *
    * @generated from enum value: MESSAGE_TYPE_COMMIT_READY = 14;
    */
   COMMIT_READY = 14,
 
   /**
-   * urn:ietf:satp:core:msgtype:commit-final-msg
+   * urn:ietf:params:satp:core:msgtype:commit-final-msg
    *
    * @generated from enum value: MESSAGE_TYPE_COMMIT_FINAL = 15;
    */
   COMMIT_FINAL = 15,
 
   /**
-   * urn:ietf:satp:core:msgtype:ack-commit-final-msg
+   * urn:ietf:params:satp:core:msgtype:ack-commit-final-msg
    *
    * @generated from enum value: MESSAGE_TYPE_ACK_COMMIT_FINAL = 16;
    */
   ACK_COMMIT_FINAL = 16,
 
   /**
-   * urn:ietf:satp:core:msgtype:commit-transfer-complete-msg
+   * urn:ietf:params:satp:core:msgtype:commit-transfer-complete-msg
    *
    * @generated from enum value: MESSAGE_TYPE_COMMIT_TRANSFER_COMPLETE = 17;
    */
@@ -906,14 +906,14 @@ export enum MessageType {
   /**
    * NEW in v13 — Sections 10.6–10.7
    *
-   * urn:ietf:satp:core:msgtype:error-msg
+   * urn:ietf:params:satp:core:msgtype:error-msg
    *
    * @generated from enum value: MESSAGE_TYPE_ERROR = 23;
    */
   ERROR = 23,
 
   /**
-   * urn:ietf:satp:core:msgtype:session-abort-msg
+   * urn:ietf:params:satp:core:msgtype:session-abort-msg
    *
    * @generated from enum value: MESSAGE_TYPE_SESSION_ABORT = 24;
    */

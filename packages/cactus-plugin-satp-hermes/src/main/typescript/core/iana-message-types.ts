@@ -1,12 +1,12 @@
 /**
  * @fileoverview
- * IANA Message Type URN Mapping — v13 Section 13.3–13.4
+ * IANA Message Type URN Mapping — draft-16 Sections 8-10, 13.1
  *
  * Maps the internal MessageType protobuf enum values to the IANA-registered
- * URN strings defined in draft-ietf-satp-core-13.
+ * URN strings defined in draft-ietf-satp-core-16.
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
- * Sections 13.3–13.4
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
+ * Sections 8-10, 13.1
  */
 import { MessageType } from "../generated/proto/cacti/satp/v13/common/message_pb";
 

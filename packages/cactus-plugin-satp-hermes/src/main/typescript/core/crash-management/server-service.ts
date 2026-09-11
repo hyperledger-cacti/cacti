@@ -64,7 +64,7 @@ export class CrashRecoveryServerService {
           }
 
           if (
-            !verifySignature(this.signer, req, sessionData.serverGatewayPubkey)
+            !verifySignature(this.signer, req, sessionData.clientGatewayPubkey)
           ) {
             throw new SignatureVerificationError(fnTag);
           }
@@ -142,7 +142,7 @@ export class CrashRecoveryServerService {
           }
 
           if (
-            !verifySignature(this.signer, req, sessionData.serverGatewayPubkey)
+            !verifySignature(this.signer, req, sessionData.clientGatewayPubkey)
           ) {
             throw new SignatureVerificationError(fnTag);
           }
@@ -208,7 +208,7 @@ export class CrashRecoveryServerService {
           }
 
           if (
-            !verifySignature(this.signer, req, sessionData.serverGatewayPubkey)
+            !verifySignature(this.signer, req, sessionData.clientGatewayPubkey)
           ) {
             throw new SignatureVerificationError(fnTag);
           }

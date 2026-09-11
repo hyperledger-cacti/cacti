@@ -6,7 +6,7 @@
  * LockType (6 → 3), and added RejectMessage, ErrorMessage, SessionAbortMessage.
  *
  * These tests verify the generated TypeScript types match the v13 specification
- * requirements documented in draft-ietf-satp-core-13.
+ * requirements documented in draft-ietf-satp-core-16.
  */
 import { create } from "@bufbuild/protobuf";
 import {
