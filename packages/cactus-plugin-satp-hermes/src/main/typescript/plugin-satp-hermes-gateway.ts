@@ -35,16 +35,26 @@ import {
 } from "class-validator";
 
 import {
+  GatewayKeyType,
   SupportedSigningAlgorithms,
   type GatewayIdentity,
   type ShutdownHook,
 } from "./core/types";
+import {
+  validateTlsConfig,
+  type IGatewayTlsConfig,
+} from "./services/validation/config-validating-functions/validate-tls-config";
+import {
+  createJwtAuthMiddleware,
+  type IJwtAuthOptions,
+} from "./core/authentication/jwt-auth-middleware";
 import {
   GatewayOrchestrator,
   type IGatewayOrchestratorOptions,
 } from "./services/gateway/gateway-orchestrator";
 import express, { type Express } from "express";
 import http from "node:http";
+import https from "node:https";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_OAPI,
@@ -227,6 +237,29 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
    * @see {@link ValidatorOptions} for validation configuration options
    */
   validationOptions?: ValidatorOptions;
+
+  /**
+   * TLS configuration for the gateway secure channel.
+   * @description
+   * When configured, the gateway server is served over HTTPS with TLS 1.3
+   * enforced as the minimum protocol version and TLS 1.3 cipher suites only
+   * (RFC 8446, SATP v13 Section 5.3.3). The configuration is validated at
+   * startup and the gateway refuses to start with below-TLS-1.3 settings.
+   *
+   * @see {@link validateTlsConfig}
+   */
+  tls?: IGatewayTlsConfig;
+
+  /**
+   * JWT + OAuth 2.0 bearer authentication for the Client Application API.
+   * @description
+   * When enabled, requests to the gateway REST endpoints must carry a valid
+   * `Authorization: Bearer <JWT>` token (HS256 signed, with standard
+   * `exp`/`nbf`/`iss`/`aud` claim enforcement per RFC 6750).
+   *
+   * @see {@link IJwtAuthOptions}
+   */
+  jwtAuth?: IJwtAuthOptions;
 
   /**
    * Privacy policies for sensitive data handling.
@@ -506,6 +539,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsObject()
   private readonly config: SATPGatewayConfig;
 
+  /** Validated TLS configuration (TLS 1.3 enforced); undefined when unset. */
+  private readonly tls: IGatewayTlsConfig | undefined;
+
   @IsString()
   @Contains("Gateway")
   public readonly className = "SATPGateway";
@@ -614,6 +650,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     this.config = SATPGateway.ProcessGatewayCoordinatorConfig(options);
+    // Enforce TLS 1.3 secure-channel requirements at startup: the gateway
+    // refuses to start with below-TLS-1.3 protocol versions or cipher suites.
+    this.tls = validateTlsConfig({ configValue: options.tls });
     this.shutdownHooks = [];
     const level = this.config.logLevel;
     const logOptions: ILoggerOptions = {
@@ -879,6 +918,15 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return context.with(ctx, async () => {
       try {
         const webServices = await this.getOrCreateWebServices();
+
+        // Optional JWT + OAuth 2.0 bearer authentication for the Client
+        // Application API (RFC 6750). Applied before endpoint registration
+        // so every registered route is protected.
+        if (this.options.jwtAuth?.enabled) {
+          this.logger.info("JWT authentication enabled for gateway REST API");
+          app.use(createJwtAuthMiddleware(this.options.jwtAuth));
+        }
+
         for (const ws of webServices) {
           this.logger.debug(`Registering service ${ws.getPath()}`);
           ws.registerExpress(app);
@@ -970,9 +1018,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!pluginOptions.gid) {
       pluginOptions.gid = {
         id: id,
-        identificationCredential: {
-          signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-          pubKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+        keys: {
+          [GatewayKeyType.CLAIM_SIGNATURE]: {
+            purpose: GatewayKeyType.CLAIM_SIGNATURE,
+            algorithm: SupportedSigningAlgorithms.SECP256K1,
+            publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+          },
         },
         name: id,
         version: [
@@ -997,10 +1048,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.name = id;
       }
 
-      if (!pluginOptions.gid.identificationCredential) {
-        pluginOptions.gid.identificationCredential = {
-          signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-          pubKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+      if (!pluginOptions.gid.keys?.[GatewayKeyType.CLAIM_SIGNATURE]) {
+        pluginOptions.gid.keys = {
+          ...pluginOptions.gid.keys,
+          [GatewayKeyType.CLAIM_SIGNATURE]: {
+            purpose: GatewayKeyType.CLAIM_SIGNATURE,
+            algorithm: SupportedSigningAlgorithms.SECP256K1,
+            publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+          },
         };
       }
 
@@ -1304,13 +1359,31 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             this.gatewayOrchestrator?.addGOLServer(this.GOLApplication);
             this.gatewayOrchestrator?.startServices();
 
-            this.GOLServer = http.createServer(this.GOLApplication);
-            // TODO(SECURE_CHANNEL): the GOL server currently runs plain
-            // HTTP. Provision the gateway's dedicated TLS key pair
-            // (see GatewayKeyPurpose.SECURE_CHANNEL in core/types.ts) and
-            // serve this server over TLS/mTLS so the secure channel is
-            // established with a key that is independent of the signing
-            // keys, per SATP v13 Section 5.3.3.
+            if (this.tls?.enabled && this.tls.cert && this.tls.key) {
+              // Secure channel per SATP v13 Section 5.3.3: TLS 1.3 minimum,
+              // TLS 1.3 cipher suites only (validated at startup).
+              this.GOLServer = https.createServer(
+                {
+                  key: this.tls.key,
+                  cert: this.tls.cert,
+                  minVersion: this.tls.minVersion,
+                  ciphers: this.tls.cipherSuites?.join(":"),
+                  honorCipherOrder: true,
+                },
+                this.GOLApplication,
+              );
+              this.logger.info(
+                "GOL server TLS enabled (minVersion: TLSv1.3, cipherSuites: " +
+                  `${this.tls.cipherSuites?.join(":")})`,
+              );
+            } else {
+              if (this.tls?.enabled) {
+                this.logger.warn(
+                  "TLS enabled but cert/key missing; serving GOL server over plain HTTP",
+                );
+              }
+              this.GOLServer = http.createServer(this.GOLApplication);
+            }
             const address =
               this.options.gid?.address?.includes("localhost") || // When running a gateway in localhost we don't want to bind it to 0.0.0.0 because if we do it will be accessible from the outside network
               this.options.gid?.address?.includes("127.0.0.1")
