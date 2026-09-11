@@ -27,7 +27,7 @@ import { Stage1ServerService } from "../../core/stage-services/server/stage1-ser
 import { Stage2ServerService } from "../../core/stage-services/server/stage2-server-service";
 import { Stage3ServerService } from "../../core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../../core/satp-session";
-import { GatewayIdentity } from "../../core/types";
+import { GatewayIdentity, GatewayKeyType } from "../../core/types";
 import { Stage0ClientService } from "../../core/stage-services/client/stage0-client-service";
 import { Stage1ClientService } from "../../core/stage-services/client/stage1-client-service";
 import { Stage2ClientService } from "../../core/stage-services/client/stage2-client-service";
@@ -626,17 +626,21 @@ export class SATPManager {
 
   private loadPubKeys(gateways: Map<string, GatewayIdentity>): void {
     gateways.forEach((gateway) => {
-      if (gateway.identificationCredential) {
-        this.gatewaysPubKeys.set(
-          gateway.id,
-          gateway.identificationCredential.pubKey,
-        );
+      const claimPubKey =
+        gateway.keys?.[GatewayKeyType.CLAIM_SIGNATURE]?.publicKey;
+      if (typeof claimPubKey === "string" && claimPubKey !== "") {
+        this.gatewaysPubKeys.set(gateway.id, claimPubKey);
       }
     });
-    this.gatewaysPubKeys.set(
-      this.orchestrator.getSelfId(),
-      this.orchestrator.ourGateway.identificationCredential!.pubKey,
-    );
+    const ourClaimPubKey =
+      this.orchestrator.ourGateway.keys?.[GatewayKeyType.CLAIM_SIGNATURE]
+        ?.publicKey;
+    if (typeof ourClaimPubKey !== "string" || ourClaimPubKey === "") {
+      throw new Error(
+        `${"loadPubKeys()"}, our gateway is missing a CLAIM_SIGNATURE public key`,
+      );
+    }
+    this.gatewaysPubKeys.set(this.orchestrator.getSelfId(), ourClaimPubKey);
   }
 
   public async transfer(
@@ -717,12 +721,16 @@ export class SATPManager {
             throw new Error(`${fnTag}, Failed to get clientSatpStage3`);
           }
 
-          if (!counterGatewayID.identificationCredential) {
+          const serverClaimPubKey =
+            counterGatewayID.keys?.[GatewayKeyType.CLAIM_SIGNATURE]?.publicKey;
+          if (
+            typeof serverClaimPubKey !== "string" ||
+            serverClaimPubKey === ""
+          ) {
             throw new Error(`${fnTag}, Failed to retrieve serverGatewayPubkey`);
           }
 
-          sessionData.serverGatewayPubkey =
-            counterGatewayID.identificationCredential.pubKey;
+          sessionData.serverGatewayPubkey = serverClaimPubKey;
 
           let newSessionRequest: NewSessionRequest | undefined;
           let newSessionResponse: NewSessionResponse | undefined;
