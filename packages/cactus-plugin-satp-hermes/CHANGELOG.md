@@ -60,8 +60,10 @@ For the full migration plan, rationale, and per-task details see
   the `v02` namespace.
 
 #### Protocol Constants & Types
-- `SATP_VERSION` → `"v13"`, `SATP_CORE_VERSION` → `"v13"`.
-- Added `SATP_PROTOCOL_VERSION = "1.0"` (v13 Section 5.3.1 wire format).
+- `SATP_CORE_VERSION` → `"v13"` (wire protocol value exchanged in session data
+  and message common bodies; verified exactly by the verifiers).
+- The SATP-Hermes implementation version is tracked by `package.json`, not by
+  a protocol constant.
 - `CurrentDrafts` enum and `DraftVersions` type updated with v13 values.
 - `SATPStagesV02` type alias renamed to `SATPStages`.
 
@@ -92,10 +94,44 @@ For the full migration plan, rationale, and per-task details see
   enum values.
 
 #### JWS Envelope Signing
-- Added `core/jws-utils.ts` with `jwsSign()` / `jwsVerify()` stubs for
-  JWS envelope signing (replacing per-message `signature` fields).
-- Stub implementation signs/verifies; real ECDSA P-256 signing is deferred
-  (see Deferred Work below).
+- Added `core/jws-utils.ts` with `jwsSign()` / `jwsVerify()` for JWS envelope
+  signing (replacing per-message `signature` fields).
+- Implements ECDSA P-256 (ES256) signing and verification via WebCrypto,
+  including key generation; the mandatory algorithm per v13 Section 5.2.
+- Outgoing JWS protected headers embed the signer's public JWK
+  (RFC 7515 §4.1.3) so counterparties can verify without prior key
+  distribution; pre-provisioned (pinned) counterparty keys take precedence
+  and a mismatched embedded JWK is rejected.
+
+#### Gateway Key Model
+- Replaced the legacy single-key `identificationCredential` with the v13
+  classified key set: `GatewayIdentity.keys` maps each `GatewayKeyType`
+  (ENVELOPE_SIGNATURE, CLAIM_SIGNATURE, SECURE_CHANNEL, IDENTITY,
+  OWNER_IDENTITY) to its key material.
+- Key material format is purpose-aware and validated at configuration time:
+  `ENVELOPE_SIGNATURE` must be a JWK object, `CLAIM_SIGNATURE` must be a
+  non-empty hex string.
+- Private key material generated for envelope signing is kept in
+  non-exported gateway state and never written to the (public) identity.
+
+#### Transport Security
+- Added `tls` gateway configuration with startup validation: TLS 1.3 minimum
+  protocol version, TLS 1.3 cipher suites only; the gateway server is served
+  over HTTPS when TLS is configured.
+- Added `jwtAuth` gateway configuration: JWT + OAuth 2.0 bearer
+  authentication (HS256, `exp`/`nbf`/`iss`/`aud` claim enforcement,
+  RFC 6750) for the Client Application API.
+
+#### Inbound Protocol Messages
+- Added inbound handling of `reject-msg`, `error-msg`, and
+  `session-abort-msg` via `handleIncomingProtocolRejectMessage()` in
+  `protocol-message-service.ts`, including common-envelope validation,
+  IANA reason codes, and v13 §11.4 abort-effectiveness semantics.
+
+#### Session Proofs Retrieval API
+- Added `GET /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs`
+  (`getSessionProofs`) for querying persisted session proofs by
+  comma-separated session IDs.
 
 #### IANA Message Type URN Mapping
 - Added `core/iana-message-types.ts` with bidirectional
@@ -209,16 +245,15 @@ For the full migration plan, rationale, and per-task details see
 
 ### Deferred Work
 
-These items are tracked but not blocking the v13 migration:
+These items were previously tracked as deferred work and are now implemented:
 
-| Item | Priority | Description |
-|------|----------|-------------|
-| Real JWS signing (ECDSA P-256) | High | Replace stub `jwsSign()`/`jwsVerify()` with actual ECDSA P-256 + SHA-256 signing. |
-| Gateway key classification | Medium | Wire `GatewayKeyPurpose`/`GatewayKey` types into gateway config for 4 distinct key types. |
-| ConnectRPC handler dispatch | Medium | Route incoming `reject-msg`, `error-msg`, `session-abort-msg` to `protocol-message-service.ts`. |
-| TLS 1.3 enforcement | Medium | Enforce TLS 1.3 minimum with `TLS_AES_128_GCM_SHA256` cipher suite in gateway config. |
-| JWT/OAuth2 auth | Low | Implement JWT + OAuth 2.0 for Client Application API authentication. |
-| Remove v02 proto directory | Low | Delete `src/main/proto/cacti/satp/v02/` and generated output after all v13 tests pass. |
+| Item | Status |
+|------|--------|
+| Envelope-signature key pinning | Implemented — outgoing JWS headers embed the signer's public `ENVELOPE_SIGNATURE` JWK (RFC 7515 §4.1.3) so verification works without prior distribution; pre-provisioned (pinned) counterparty keys take precedence and a mismatched embedded JWK is rejected. |
+| ConnectRPC handler dispatch | Implemented — inbound `reject-msg`, `error-msg`, `session-abort-msg` are routed through `handleIncomingProtocolRejectMessage()` in `protocol-message-service.ts`, with IANA reason handling and v13 §11.4 abort-effectiveness semantics. |
+| TLS 1.3 enforcement | Implemented — `validateTlsConfig()` enforces TLS 1.3 minimum and TLS 1.3-only cipher suites at startup; the gateway server is served over HTTPS when `tls` is configured. |
+| JWT/OAuth2 auth | Implemented — `createJwtAuthMiddleware()` verifies `Authorization: Bearer` JWTs (HS256 + `exp`/`nbf`/`iss`/`aud` claims, RFC 6750) on the Client Application API when `jwtAuth` is enabled. |
+| Remove v02 proto directory | Implemented — `src/main/proto/cacti/satp/v02/` and its generated output removed; nothing referenced the v02 namespace. |
 
 # [2.1.0](https://github.com/hyperledger/cacti/compare/v2.0.0...v2.1.0) (2024-12-01)
 

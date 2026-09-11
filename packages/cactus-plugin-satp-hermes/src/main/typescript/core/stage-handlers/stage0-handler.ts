@@ -128,7 +128,11 @@ import { getMessageTypeName } from "../satp-utils";
 import { MonitorService } from "../../services/monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import type { AdapterManager } from "../../adapters/adapter-manager";
-import { buildAdapterPayload } from "./handler-utils";
+import {
+  buildAdapterPayload,
+  applyCrossStageProtocolMessage,
+  abortOnReceivedProtocolTermination,
+} from "./handler-utils";
 
 /**
  * SATP Stage 0 Handler for Transfer Initiation and Session Establishment.
@@ -595,6 +599,13 @@ export class Stage0SATPHandler implements SATPHandler {
 
         session = this.sessions.get(req.sessionId);
 
+        if (session) {
+          applyCrossStageProtocolMessage(
+            session.getServerSessionData(),
+            req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+          );
+        }
+
         if (req.gatewayId == "") {
           throw new SenderGatewayNetworkIdError(fnTag);
         }
@@ -711,6 +722,7 @@ export class Stage0SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.NEW_SESSION_RESPONSE, error);
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
         span.recordException(error);
@@ -803,6 +815,11 @@ export class Stage0SATPHandler implements SATPHandler {
         if (!session) {
           throw new SessionNotFoundError(fnTag);
         }
+
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
@@ -903,6 +920,7 @@ export class Stage0SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.PRE_SATP_TRANSFER_RESPONSE, error);
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
         span.recordException(error);

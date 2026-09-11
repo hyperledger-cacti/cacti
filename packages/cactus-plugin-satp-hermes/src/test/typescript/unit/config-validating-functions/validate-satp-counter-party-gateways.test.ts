@@ -3,6 +3,7 @@ import { validateSatpCounterPartyGateways } from "../../../../main/typescript/se
 import {
   type Address,
   type GatewayIdentity,
+  GatewayCredential,
   SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
@@ -34,9 +35,12 @@ describe("validateSatpCounterPartyGateways", () => {
           ledgerType: "ETHEREUM",
         },
       ],
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: "0xdef456",
+      credentials: {
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: "0xdef456",
+        },
       },
       proofID: "mockProofID10",
       address: "http://localhost" as Address,

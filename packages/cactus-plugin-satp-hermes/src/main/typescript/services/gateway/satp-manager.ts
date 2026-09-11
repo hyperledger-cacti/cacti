@@ -27,7 +27,7 @@ import { Stage1ServerService } from "../../core/stage-services/server/stage1-ser
 import { Stage2ServerService } from "../../core/stage-services/server/stage2-server-service";
 import { Stage3ServerService } from "../../core/stage-services/server/stage3-server-service";
 import { SATPSession } from "../../core/satp-session";
-import { GatewayIdentity, GatewayKeyType } from "../../core/types";
+import { GatewayIdentity, GatewayCredential } from "../../core/types";
 import { Stage0ClientService } from "../../core/stage-services/client/stage0-client-service";
 import { Stage1ClientService } from "../../core/stage-services/client/stage1-client-service";
 import { Stage2ClientService } from "../../core/stage-services/client/stage2-client-service";
@@ -627,14 +627,15 @@ export class SATPManager {
   private loadPubKeys(gateways: Map<string, GatewayIdentity>): void {
     gateways.forEach((gateway) => {
       const claimPubKey =
-        gateway.keys?.[GatewayKeyType.CLAIM_SIGNATURE]?.publicKey;
+        gateway.credentials?.[GatewayCredential.CLAIM_SIGNATURE]?.publicKey;
       if (typeof claimPubKey === "string" && claimPubKey !== "") {
         this.gatewaysPubKeys.set(gateway.id, claimPubKey);
       }
     });
     const ourClaimPubKey =
-      this.orchestrator.ourGateway.keys?.[GatewayKeyType.CLAIM_SIGNATURE]
-        ?.publicKey;
+      this.orchestrator.ourGateway.credentials?.[
+        GatewayCredential.CLAIM_SIGNATURE
+      ]?.publicKey;
     if (typeof ourClaimPubKey !== "string" || ourClaimPubKey === "") {
       throw new Error(
         `${"loadPubKeys()"}, our gateway is missing a CLAIM_SIGNATURE public key`,
@@ -722,7 +723,8 @@ export class SATPManager {
           }
 
           const serverClaimPubKey =
-            counterGatewayID.keys?.[GatewayKeyType.CLAIM_SIGNATURE]?.publicKey;
+            counterGatewayID.credentials?.[GatewayCredential.CLAIM_SIGNATURE]
+              ?.publicKey;
           if (
             typeof serverClaimPubKey !== "string" ||
             serverClaimPubKey === ""

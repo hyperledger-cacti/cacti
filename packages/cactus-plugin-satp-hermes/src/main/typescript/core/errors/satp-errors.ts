@@ -303,6 +303,85 @@ export const satpProblemDetailsErrorMiddleware: ErrorRequestHandler = (
 };
 
 /**
+ * Error raised when the gateway receives a protocol reject message from a peer.
+ *
+ * Reject messages are protocol-level session termination signals and should abort
+ * the current stage flow immediately while preserving the session state change.
+ */
+export class ReceivedRejectMessageError extends SATPInternalError {
+  constructor(
+    message: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Received protocol reject message: ${message}`,
+      cause ?? null,
+      400,
+      traceID,
+      trace,
+    );
+    this.errorType = SATPErrorType.UNSPECIFIED;
+  }
+}
+
+/**
+ * Error raised when the gateway receives a protocol error message from a peer.
+ */
+export class ReceivedErrorMessageError extends SATPInternalError {
+  constructor(
+    message: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Received protocol error message: ${message}`,
+      cause ?? null,
+      400,
+      traceID,
+      trace,
+    );
+    this.errorType = SATPErrorType.UNSPECIFIED;
+  }
+}
+
+/**
+ * Error raised when the gateway receives a session-abort protocol message from a peer.
+ */
+export class ReceivedSessionAbortError extends SATPInternalError {
+  constructor(
+    message: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Received session abort message: ${message}`,
+      cause ?? null,
+      400,
+      traceID,
+      trace,
+    );
+    this.errorType = SATPErrorType.UNSPECIFIED;
+  }
+}
+
+export function isReceivedProtocolTerminationError(
+  error: unknown,
+): error is
+  | ReceivedRejectMessageError
+  | ReceivedErrorMessageError
+  | ReceivedSessionAbortError {
+  return (
+    error instanceof ReceivedRejectMessageError ||
+    error instanceof ReceivedErrorMessageError ||
+    error instanceof ReceivedSessionAbortError
+  );
+}
+
+/**
  * Error thrown when attempting to bootstrap a gateway manager that has already been initialized.
  *
  * @description

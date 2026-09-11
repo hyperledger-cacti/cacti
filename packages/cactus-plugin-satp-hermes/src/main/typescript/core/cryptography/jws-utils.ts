@@ -69,6 +69,11 @@ export interface IJWSProtectedHeader {
   alg: string;
   /** Key ID — the signing gateway's id, used to resolve the verifying key. */
   kid?: string;
+  /**
+   * The signer's public JWK, embedded per RFC 7515 Section 4.1.3 so a
+   * counterparty that has not yet provisioned the key can still verify.
+   */
+  jwk?: JWK;
 }
 
 /**
@@ -91,6 +96,12 @@ export interface IJWSSignOptions {
   algorithm?: JWSAlgorithm;
   /** Key ID to embed in the protected header (the signer gateway id). */
   kid?: string;
+  /**
+   * The signer's public JWK to embed in the protected header
+   * (RFC 7515 Section 4.1.3), enabling verification without prior
+   * key distribution.
+   */
+  jwk?: JWK;
 }
 
 /**
@@ -168,6 +179,9 @@ export async function jwsSign(
   };
   if (options?.kid !== undefined) {
     header.kid = options.kid;
+  }
+  if (options?.jwk !== undefined) {
+    header.jwk = options.jwk;
   }
   const encodedHeader = base64UrlEncode(
     new TextEncoder().encode(JSON.stringify(header)),
@@ -259,7 +273,7 @@ export function jwsDecodeProtectedHeader(jws: string): IJWSProtectedHeader {
     const header = JSON.parse(
       Buffer.from(encodedHeader, "base64url").toString("utf8"),
     ) as IJWSProtectedHeader;
-    return { alg: header.alg ?? "", kid: header.kid };
+    return { alg: header.alg ?? "", kid: header.kid, jwk: header.jwk };
   } catch {
     return { alg: "" };
   }

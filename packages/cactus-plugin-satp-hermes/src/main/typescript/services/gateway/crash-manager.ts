@@ -32,6 +32,7 @@ import { CrashRecoveryClientService } from "../../core/crash-management/client-s
 import type { GatewayOrchestrator } from "./gateway-orchestrator";
 import type { Client as PromiseConnectClient } from "@connectrpc/connect";
 import type { GatewayIdentity } from "../../core/types";
+import { GatewayCredential } from "../../core/types";
 import type { CrashRecoveryService } from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import type { SATPHandler } from "../../types/satp-protocol";
 import { CrashStatus } from "../../core/types";
@@ -969,24 +970,22 @@ export class CrashManager {
     context.with(ctx, () => {
       try {
         for (const gateway of gateways.values()) {
-          if (gateway.identificationCredential) {
-            this.gatewaysPubKeys.set(
-              gateway.id,
-              gateway.identificationCredential.pubKey,
-            );
+          const claimPubKey =
+            gateway.credentials?.[GatewayCredential.CLAIM_SIGNATURE]?.publicKey;
+          if (typeof claimPubKey === "string" && claimPubKey !== "") {
+            this.gatewaysPubKeys.set(gateway.id, claimPubKey);
           }
         }
 
-        if (!this.orchestrator.ourGateway.identificationCredential) {
-          throw new Error(
-            "Our gateway identificationCredential with pubKey not found!",
-          );
+        const ourClaimPubKey =
+          this.orchestrator.ourGateway.credentials?.[
+            GatewayCredential.CLAIM_SIGNATURE
+          ]?.publicKey;
+        if (typeof ourClaimPubKey !== "string" || ourClaimPubKey === "") {
+          throw new Error("Our gateway CLAIM_SIGNATURE public key not found!");
         }
 
-        this.gatewaysPubKeys.set(
-          this.orchestrator.getSelfId(),
-          this.orchestrator.ourGateway.identificationCredential.pubKey,
-        );
+        this.gatewaysPubKeys.set(this.orchestrator.getSelfId(), ourClaimPubKey);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

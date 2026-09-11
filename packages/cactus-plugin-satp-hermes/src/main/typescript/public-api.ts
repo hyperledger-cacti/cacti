@@ -205,7 +205,7 @@ export { IEthereumNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-t
  * @see {@link SATPGatewayConfig} for identity configuration options
  */
 export { GatewayIdentity } from "./core/types";
-export { GatewayKeyPurpose } from "./core/types";
+export { GatewayCredential } from "./core/types";
 export { GatewayKey } from "./core/types";
 
 /**
@@ -245,12 +245,18 @@ export {
   createErrorMessage,
   createSessionAbortMessage,
   checkAbortEffectiveness,
+  handleIncomingRejectMessage,
+  handleIncomingErrorMessage,
+  handleIncomingSessionAbortMessage,
+  handleIncomingProtocolRejectMessage,
+  getLastReceivedMessageType,
 } from "./core/stage-services/protocol-message-service";
 export type {
   IRejectMessageOptions,
   IErrorMessageOptions,
   ISessionAbortOptions,
   IAbortEffectivenessResult,
+  IIncomingProtocolMessageResult,
 } from "./core/stage-services/protocol-message-service";
 
 export {

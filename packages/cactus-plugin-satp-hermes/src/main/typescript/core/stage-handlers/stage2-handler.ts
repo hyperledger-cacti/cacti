@@ -107,7 +107,12 @@ import {
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
-import { getSessionId, buildAdapterPayload } from "./handler-utils";
+import {
+  getSessionId,
+  buildAdapterPayload,
+  applyCrossStageProtocolMessage,
+  abortOnReceivedProtocolTermination,
+} from "./handler-utils";
 import { getMessageTypeName } from "../satp-utils";
 import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
@@ -522,7 +527,10 @@ export class Stage2SATPHandler implements SATPHandler {
           throw new SessionNotFoundError(fnTag);
         }
 
-        span.setAttribute("sessionId", session.getSessionId() || "");
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         await this.adapterManager?.executeAdaptersOrSkip(
           buildAdapterPayload(
@@ -597,6 +605,7 @@ export class Stage2SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.ASSERTION_RECEIPT, error);
 
         if (session) {

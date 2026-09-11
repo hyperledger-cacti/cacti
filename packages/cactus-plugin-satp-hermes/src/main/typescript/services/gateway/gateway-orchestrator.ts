@@ -64,14 +64,7 @@ import { NetworkId } from "../../public-api";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { satpProblemDetailsErrorMiddleware } from "../../core/errors/satp-errors";
-import {
-  resolveLocalSigningPrivateKey,
-  resolveSigningPublicKey,
-} from "../../core/cryptography/signing-keys";
-import {
-  createSignatureSigningInterceptor,
-  createSignatureVerificationInterceptor,
-} from "../../core/cryptography/jws-interceptors";
+import { createGatewaySignatureInterceptors } from "../../core/cryptography/gateway-signature-interceptors";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -106,17 +99,13 @@ export class GatewayOrchestrator {
 
     this.logger = LoggerProvider.getOrCreate(logOptions, this.monitorService);
 
-    this.signingInterceptor = createSignatureSigningInterceptor({
-      getPrivateKey: () =>
-        resolveLocalSigningPrivateKey(this.localGateway, this.logger),
-      gatewayId: this.localGateway.id,
+    const { signing, verification } = createGatewaySignatureInterceptors({
+      localGateway: this.localGateway,
+      getGatewayIdentity: (id) => this.getGatewayIdentity(id),
+      logger: this.logger,
     });
-    this.verificationInterceptor = createSignatureVerificationInterceptor({
-      resolvePublicKey: (kid) =>
-        resolveSigningPublicKey(
-          kid === undefined ? undefined : this.getGatewayIdentity(kid),
-        ),
-    });
+    this.signingInterceptor = signing;
+    this.verificationInterceptor = verification;
 
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 

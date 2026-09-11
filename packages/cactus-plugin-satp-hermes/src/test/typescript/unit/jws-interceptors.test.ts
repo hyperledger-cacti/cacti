@@ -1,5 +1,5 @@
 import { create, toBinary } from "@bufbuild/protobuf";
-import { Code, ConnectError } from "@connectrpc/connect";
+import { Code } from "@connectrpc/connect";
 import type { Interceptor, UnaryRequest } from "@connectrpc/connect";
 
 import { TransferProposalRequestSchema } from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_1_pb";
@@ -14,6 +14,7 @@ import {
   importSigningKey,
   jwsSign,
   type CryptoKey,
+  type JWK,
 } from "../../../main/typescript/core/cryptography/jws-utils";
 
 type StageMessage = ReturnType<
@@ -49,6 +50,7 @@ describe("JWS signing/verification interceptors (v13)", () => {
   const gatewayId = "gateway-a";
   let priv: CryptoKey;
   let pub: CryptoKey;
+  let publicJwk: JWK;
   let signing: Interceptor;
 
   beforeAll(async () => {
@@ -57,8 +59,10 @@ describe("JWS signing/verification interceptors (v13)", () => {
     const testPayload = encoder.encode("test payload");
     priv = await importSigningKey(privateKey);
     pub = await importSigningKey(publicKey);
+    publicJwk = publicKey;
     signing = createSignatureSigningInterceptor({
       getPrivateKey: async () => priv,
+      getPublicJwk: async () => publicJwk,
       gatewayId,
     });
     const testSignature = await jwsSign(testPayload, priv);
@@ -100,7 +104,7 @@ describe("JWS signing/verification interceptors (v13)", () => {
     });
   });
 
-  it("rejects when the signer's public key is unknown", async () => {
+  it("verifies using the embedded public JWK when no key is pinned", async () => {
     const message = create(TransferProposalRequestSchema, {});
     const signed = await runInterceptor(signing, makeUnaryRequest(message));
 
@@ -112,7 +116,66 @@ describe("JWS signing/verification interceptors (v13)", () => {
 
     await expect(
       runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
-    ).rejects.toBeInstanceOf(ConnectError);
+    ).resolves.toBeDefined();
+  });
+
+  it("rejects when no key is pinned and no JWK is embedded", async () => {
+    const message = create(TransferProposalRequestSchema, {});
+    const bytes = toBinary(TransferProposalRequestSchema, message);
+    // A JWS signed without an embedded public JWK.
+    const unsignedHeaderJws = await jwsSign(bytes, priv, {
+      kid: "unknown-gateway",
+    });
+
+    const verification = createSignatureVerificationInterceptor({
+      resolvePublicKey: async () => undefined,
+    });
+    const serverHeader = new Headers();
+    serverHeader.set(SATP_SIGNATURE, unsignedHeaderJws);
+
+    await expect(
+      runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
+    ).rejects.toMatchObject({ code: Code.Unauthenticated });
+  });
+
+  it("rejects when the embedded JWK differs from the pinned key", async () => {
+    const message = create(TransferProposalRequestSchema, {});
+    // Signed by a different key pair than the pinned one, embedding its
+    // own public JWK.
+    const rogue = await generateSigningKeyPair();
+    const roguePriv = await importSigningKey(rogue.privateKey);
+    const bytes = toBinary(TransferProposalRequestSchema, message);
+    const rogueJws = await jwsSign(bytes, roguePriv, {
+      kid: gatewayId,
+      jwk: rogue.publicKey,
+    });
+
+    const verification = createSignatureVerificationInterceptor({
+      resolvePublicKey: async () => pub,
+      resolvePinnedJwk: async () => publicJwk,
+    });
+    const serverHeader = new Headers();
+    serverHeader.set(SATP_SIGNATURE, rogueJws);
+
+    await expect(
+      runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
+    ).rejects.toMatchObject({ code: Code.Unauthenticated });
+  });
+
+  it("verifies with a pinned key whose JWK matches the embedded one", async () => {
+    const message = create(TransferProposalRequestSchema, {});
+    const signed = await runInterceptor(signing, makeUnaryRequest(message));
+
+    const verification = createSignatureVerificationInterceptor({
+      resolvePublicKey: async () => pub,
+      resolvePinnedJwk: async () => publicJwk,
+    });
+    const serverHeader = new Headers();
+    serverHeader.set(SATP_SIGNATURE, signed.header.get(SATP_SIGNATURE)!);
+
+    await expect(
+      runInterceptor(verification, makeUnaryRequest(message, serverHeader)),
+    ).resolves.toBeDefined();
   });
 
   it("rejects when the received message does not match the signed payload", async () => {

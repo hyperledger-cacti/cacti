@@ -35,7 +35,7 @@ import {
 } from "class-validator";
 
 import {
-  GatewayKeyType,
+  GatewayCredential,
   SupportedSigningAlgorithms,
   type GatewayIdentity,
   type ShutdownHook,
@@ -577,7 +577,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
   private initialSpanContext: { span: Span; context: Context };
-
+  static PROOF_ID_TODO: string = "bungee-v1-placeholder";
   /**
    * SATPGateway Constructor - Initialize fault-tolerant cross-chain gateway.
    *
@@ -1018,9 +1018,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!pluginOptions.gid) {
       pluginOptions.gid = {
         id: id,
-        keys: {
-          [GatewayKeyType.CLAIM_SIGNATURE]: {
-            purpose: GatewayKeyType.CLAIM_SIGNATURE,
+        credentials: {
+          [GatewayCredential.CLAIM_SIGNATURE]: {
+            purpose: GatewayCredential.CLAIM_SIGNATURE,
             algorithm: SupportedSigningAlgorithms.SECP256K1,
             publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
           },
@@ -1034,7 +1034,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           },
         ],
         connectedDLTs: [],
-        proofID: "mockProofID1",
+        proofID: this.PROOF_ID_TODO,
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
         address: "http://localhost",
@@ -1048,11 +1048,11 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.name = id;
       }
 
-      if (!pluginOptions.gid.keys?.[GatewayKeyType.CLAIM_SIGNATURE]) {
-        pluginOptions.gid.keys = {
-          ...pluginOptions.gid.keys,
-          [GatewayKeyType.CLAIM_SIGNATURE]: {
-            purpose: GatewayKeyType.CLAIM_SIGNATURE,
+      if (!pluginOptions.gid.credentials?.[GatewayCredential.CLAIM_SIGNATURE]) {
+        pluginOptions.gid.credentials = {
+          ...pluginOptions.gid.credentials,
+          [GatewayCredential.CLAIM_SIGNATURE]: {
+            purpose: GatewayCredential.CLAIM_SIGNATURE,
             algorithm: SupportedSigningAlgorithms.SECP256K1,
             publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
           },
@@ -1074,7 +1074,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       }
 
       if (!pluginOptions.gid.proofID) {
-        pluginOptions.gid.proofID = "mockProofID1";
+        pluginOptions.gid.proofID = this.PROOF_ID_TODO;
       }
 
       if (!pluginOptions.gid.gatewayServerPort) {

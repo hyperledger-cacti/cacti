@@ -165,7 +165,7 @@ export enum SupportedSigningAlgorithms {
  *
  * @see https://datatracker.ietf.org/doc/draft-ietf-satp-core/13/
  */
-export enum GatewayKeyPurpose {
+export enum GatewayCredential {
   /** Signs SATP protocol messages (JWS envelope). */
   ENVELOPE_SIGNATURE = "ENVELOPE_SIGNATURE",
   /** Signs claims asserting gateway attributes or capabilities. */
@@ -183,37 +183,28 @@ export enum GatewayKeyPurpose {
  *
  * Represents a public (and optionally private) key annotated with
  * its intended purpose and the algorithm it was generated with.
- * The key material can be a JWK object, a PEM string, or a raw
- * hex-encoded public key depending on the deployment.
+ *
+ * The accepted key material format depends on the purpose:
+ * - `ENVELOPE_SIGNATURE` MUST be a JWK object (ES256/P-256); it is imported
+ *   via WebCrypto `importKey("jwk", ...)` and PEM/hex strings fail at
+ *   runtime.
+ * - `CLAIM_SIGNATURE` carries the claim-signing public key as a
+ *   hex-encoded string (secp256k1), consumed by the claim signature
+ *   verifier.
  */
 export type GatewayKey = {
   /** What this key is used for. */
-  purpose: GatewayKeyPurpose;
+  purpose: GatewayCredential;
   /** Algorithm family (must be from SupportedSigningAlgorithms). */
   algorithm: SupportedSigningAlgorithms;
-  /**
-   * Public key material.
-   * Accepts JWK object, PEM string, or hex-encoded key.
-   */
+  /** Public key material (see purpose-specific format above). */
   publicKey: string | Record<string, unknown>;
   /**
-   * Private key material — only present on the owning gateway.
-   * MUST NOT be shared or transmitted.
+   * Private key material — only present on the owning gateway, in local
+   * configuration only. MUST NOT be shared, transmitted, or serialized
+   * into any published identity.
    */
   privateKey?: string | Record<string, unknown>;
-};
-
-/**
- * Identification credential structure for gateways.
- *
- * @description
- * Defines the structure for gateway identification credentials
- * including the signing algorithm used for key generation and
- * the respective public key.
- */
-export type IdentificationCredential = {
-  signingAlgorithm: SupportedSigningAlgorithms;
-  pubKey: string;
 };
 
 /**
@@ -227,16 +218,12 @@ export type GatewayIdentity = {
   /** Unique gateway identifier */
   id: string;
   /**
-   * Legacy identification credential (single key).
-   * @deprecated Use `keys` for v13 classified key model.
-   */
-  identificationCredential?: IdentificationCredential;
-  /**
    * v13 classified key set.
-   * Maps each {@link GatewayKeyPurpose} to its key material.
-   * When present, takes precedence over `identificationCredential`.
+   * Maps each {@link GatewayCredential} to its key material. Private key
+   * material is only present on the owning gateway and is never part of a
+   * shared or published identity.
    */
-  keys?: Partial<Record<GatewayKeyPurpose, GatewayKey>>;
+  credentials?: Partial<Record<GatewayCredential, GatewayKey>>;
   /** Optional human-readable gateway name */
   name?: string;
   /** Supported SATP draft versions */

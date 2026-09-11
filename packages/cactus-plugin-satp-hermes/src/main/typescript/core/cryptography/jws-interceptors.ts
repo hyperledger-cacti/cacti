@@ -31,10 +31,12 @@ import { timingSafeEqual } from "node:crypto";
 import { toBinary } from "@bufbuild/protobuf";
 import { Code, ConnectError, type Interceptor } from "@connectrpc/connect";
 import {
+  importSigningKey,
   jwsDecodeProtectedHeader,
   jwsSign,
   jwsVerify,
   type CryptoKey,
+  type JWK,
 } from "./jws-utils";
 
 /**
@@ -49,6 +51,12 @@ export const SATP_SIGNATURE = "satp-signature";
 export interface ISignatureSigningInterceptorOptions {
   /** Resolve (and cache) the local gateway's ES256 private key. */
   getPrivateKey: () => Promise<CryptoKey>;
+  /**
+   * Resolve the local gateway's public ES256 JWK, embedded in the JWS
+   * protected header (RFC 7515 Section 4.1.3) so counterparties without a
+   * pre-provisioned key can still verify.
+   */
+  getPublicJwk: () => Promise<JWK>;
   /** The local gateway id, embedded as the JWS `kid`. */
   gatewayId: string;
 }
@@ -56,15 +64,44 @@ export interface ISignatureSigningInterceptorOptions {
 /** Options for the server-side verification interceptor. */
 export interface ISignatureVerificationInterceptorOptions {
   /**
-   * Resolve the ES256 public key for the signer identified by the JWS
-   * `kid` (the sender gateway id). Returns `undefined` when unknown.
+   * Resolve the pre-provisioned (pinned) ES256 public key for the signer
+   * identified by the JWS `kid` (the sender gateway id). Returns
+   * `undefined` when no key is pinned for that gateway.
    */
   resolvePublicKey: (kid: string | undefined) => Promise<CryptoKey | undefined>;
+  /**
+   * Optional: resolve the pinned public JWK for the signer, used to
+   * detect key-substitution when the JWS also embeds a JWK. When a key
+   * is pinned and the embedded JWK differs from the pinned one, the
+   * request is rejected.
+   */
+  resolvePinnedJwk?: (kid: string | undefined) => Promise<JWK | undefined>;
+}
+
+/**
+ * Compare two JWK objects for equality, independent of property order.
+ * Only the public parameters matter; the private `d` parameter (if any)
+ * is never part of an embedded/pinned public JWK.
+ */
+function jwkMatches(a: JWK, b: JWK): boolean {
+  const canonical = (jwk: JWK): string =>
+    JSON.stringify(
+      Object.keys(jwk as Record<string, unknown>)
+        .sort()
+        .reduce<Record<string, unknown>>((acc, key) => {
+          acc[key] = (jwk as Record<string, unknown>)[key];
+          return acc;
+        }, {}),
+    );
+  return canonical(a) === canonical(b);
 }
 
 /**
  * Create a client interceptor that signs each unary request and places
  * the JWS in the {@link SATP_SIGNATURE} header.
+ *
+ * The JWS protected header carries the signer's public JWK, so the
+ * counterparty can verify without prior key distribution.
  *
  * Streaming RPCs are passed through unsigned.
  */
@@ -74,9 +111,13 @@ export function createSignatureSigningInterceptor(
   return (next) => async (req) => {
     if (!req.stream) {
       const bytes = toBinary(req.method.input, req.message);
-      const privateKey = await options.getPrivateKey();
+      const [privateKey, publicJwk] = await Promise.all([
+        options.getPrivateKey(),
+        options.getPublicJwk(),
+      ]);
       const jws = await jwsSign(bytes, privateKey, {
         kid: options.gatewayId,
+        jwk: publicJwk,
       });
       req.header.set(SATP_SIGNATURE, jws);
     }
@@ -88,9 +129,16 @@ export function createSignatureSigningInterceptor(
  * Create a server interceptor that verifies the {@link SATP_SIGNATURE}
  * header on each unary request.
  *
+ * Key resolution: a pre-provisioned (pinned) key for the `kid` takes
+ * precedence; when none is pinned, the public JWK embedded in the JWS
+ * protected header is used. An embedded JWK is only trusted when it was
+ * actually signed by the matching private key — i.e. the verification
+ * itself proves possession.
+ *
  * Throws {@link ConnectError} with `Code.Unauthenticated` when the
- * signature is missing, the signer key is unknown, the signature is
- * invalid, or the signed payload does not match the received message.
+ * signature is missing, no verification key can be resolved, the
+ * signature is invalid, or the signed payload does not match the
+ * received message.
  *
  * Streaming RPCs are passed through without verification.
  */
@@ -106,8 +154,20 @@ export function createSignatureVerificationInterceptor(
           Code.Unauthenticated,
         );
       }
-      const { kid } = jwsDecodeProtectedHeader(jws);
-      const publicKey = await options.resolvePublicKey(kid);
+      const { kid, jwk } = jwsDecodeProtectedHeader(jws);
+      let publicKey = await options.resolvePublicKey(kid);
+      if (publicKey && jwk && options.resolvePinnedJwk) {
+        const pinnedJwk = await options.resolvePinnedJwk(kid);
+        if (pinnedJwk && !jwkMatches(jwk, pinnedJwk)) {
+          throw new ConnectError(
+            `Embedded JWK does not match pinned key for gateway '${kid ?? "unknown"}'`,
+            Code.Unauthenticated,
+          );
+        }
+      }
+      if (!publicKey && jwk) {
+        publicKey = await importSigningKey(jwk);
+      }
       if (!publicKey) {
         throw new ConnectError(
           `No signature verification key for gateway '${kid ?? "unknown"}'`,
