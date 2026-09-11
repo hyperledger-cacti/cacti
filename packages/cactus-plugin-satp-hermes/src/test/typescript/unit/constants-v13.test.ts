@@ -5,7 +5,7 @@
  * requirements documented in draft-ietf-satp-core-13.
  */
 import {
-  SATP_VERSION,
+  SATP_CORE_VERSION,
   SATP_ARCHITECTURE_VERSION,
   SATP_CRASH_VERSION,
   DEFAULT_PORT_GATEWAY_SERVER,
@@ -16,12 +16,8 @@ import {
 
 describe("v13 Protocol Constants", () => {
   describe("version strings", () => {
-    it('SATP_VERSION is at least "v13"', () => {
-      expect(SATP_VERSION).toMatch(/^v?(1[3-9]|[2-9]\d)\./);
-    });
-
-    it('SATP_CORE_VERSION is "v13"', () => {
-      expect(SATP_VERSION).toMatch(/^v?(1[3-9]|[2-9]\d)\./);
+    it('SATP_CORE_VERSION is the wire protocol version "v13"', () => {
+      expect(SATP_CORE_VERSION).toBe("v13");
     });
 
     it('SATP_ARCHITECTURE_VERSION is "v09"', () => {

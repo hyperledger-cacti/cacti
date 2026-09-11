@@ -326,20 +326,16 @@
     "registry": "https://registry.npmjs.org/"
   },
   "customMetadata": {
-    "satp-draft-versions": {
-      "satp-core": "02",
-      "satp-architecture": "02",
-      "satp-crash": "02"
+    "satp-implementation-versions": {
+      "core": "v13.0.1"
     },
-    "cacti-version": "3.0.1"
-  },
-  "satp": {
-    "versions": {
+    "satp-draft-versions": {
       "core": {
         "specVersion": "draft-ietf-satp-core-13",
         "specUrl": "https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt"
       }
-    }
+  },
+    "cacti-version": "3.0.1"
   },
   "watch": {
     "tsc": {

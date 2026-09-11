@@ -20,7 +20,7 @@ import {
   Stage2HashesSchema,
   Stage3HashesSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
-import { SATP_VERSION } from "../../../main/typescript/core/constants";
+import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
 import {
   commonBodyVerifier,
   hashPrevMessageVerifier,
@@ -45,7 +45,7 @@ function makeSessionData(
   return create(SessionDataSchema, {
     id: "session-001",
     transferContextId: "ctx-001",
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     hashes: create(MessageStagesHashesSchema, {
       stage0: create(Stage0HashesSchema),
       stage1: create(Stage1HashesSchema),
@@ -58,7 +58,7 @@ function makeSessionData(
 
 function makeCommon(overrides?: Record<string, unknown>) {
   return create(CommonSatpSchema, {
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     messageType: MessageType.INIT_PROPOSAL,
     sessionId: "session-001",
     transferContextId: "ctx-001",

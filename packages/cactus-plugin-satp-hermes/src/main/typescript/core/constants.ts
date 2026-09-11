@@ -41,9 +41,9 @@ export const DEFAULT_PORT_GATEWAY_CLIENT = DEFAULT_PORT_GATEWAY_SERVER + 1;
 export const DEFAULT_PORT_GATEWAY_UI = DEFAULT_PORT_GATEWAY_SERVER + 2;
 /** Default port for SATP gateway OpenAPI documentation */
 export const DEFAULT_PORT_GATEWAY_OAPI = 4010;
-/** Current SATP protocol version identifier */
-export const SATP_VERSION = "v13.0.1";
-/** SATP Core specification version */
+/** Current SATP core protocol version identifier (wire protocol value exchanged in
+ * session data and message common bodies; verified exactly by the verifiers).
+ * The SATP-Hermes implementation version is tracked by package.json */
 export const SATP_CORE_VERSION = "v13";
 /** SATP Architecture specification version */
 export const SATP_ARCHITECTURE_VERSION = "v09";

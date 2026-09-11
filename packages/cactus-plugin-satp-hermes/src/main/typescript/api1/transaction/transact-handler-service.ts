@@ -8,7 +8,10 @@ import { LockType } from "../../generated/proto/cacti/satp/v13/common/message_pb
 import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { GatewayOrchestrator } from "../../services/gateway/gateway-orchestrator";
 import { GatewayIdentity } from "../../core/types";
-import { DEFAULT_TLS13_CIPHER_SUITE, SATP_VERSION } from "../../core/constants";
+import {
+  DEFAULT_TLS13_CIPHER_SUITE,
+  SATP_CORE_VERSION,
+} from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";
 import { ercStandardToEnum } from "../../core/satp-utils";
 
@@ -52,7 +55,7 @@ export async function executeTransact(
   let session = manager.getOrCreateSession(undefined, req.contextID);
   session = populateClientSessionData(
     session,
-    SATP_VERSION,
+    SATP_CORE_VERSION,
     req.sourceAsset.contractAddress,
     req.receiverAsset.contractAddress,
     manager.pubKey,

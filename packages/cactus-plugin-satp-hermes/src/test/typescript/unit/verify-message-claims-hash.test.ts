@@ -16,7 +16,7 @@ import {
   SessionData,
   SessionDataSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
-import { SATP_VERSION } from "../../../main/typescript/core/constants";
+import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
 import { verifyMessage } from "../../../main/typescript/core/stage-services/verifier/data-verifier";
 import { SessionType } from "../../../main/typescript/core/session-utils";
 import { TransferInitClaimsHashError } from "../../../main/typescript/core/errors/satp-service-errors";
@@ -29,7 +29,7 @@ function makeSessionData(overrides?: Record<string, unknown>): SessionData {
   return create(SessionDataSchema, {
     id: "session-001",
     transferContextId: "ctx-001",
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     hashTransferInitClaims: CLAIMS_HASH,
     ...overrides,
   } as Record<string, unknown>);
@@ -46,7 +46,7 @@ function makeSession(sessionData: SessionData): SATPSession {
 function makeMessage(overrides?: Record<string, unknown>) {
   return {
     common: create(CommonSatpSchema, {
-      version: SATP_VERSION,
+      version: SATP_CORE_VERSION,
       messageType: MessageType.TRANSFER_COMMENCE_REQUEST,
       sessionId: "session-001",
       transferContextId: "ctx-001",

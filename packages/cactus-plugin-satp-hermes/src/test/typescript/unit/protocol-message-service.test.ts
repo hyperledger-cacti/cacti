@@ -11,7 +11,7 @@ import {
   SessionData,
   SessionDataSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
-import { SATP_VERSION } from "../../../main/typescript/core/constants";
+import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
 import {
   createRejectMessage,
   createErrorMessage,
@@ -23,7 +23,7 @@ function makeSessionData(): SessionData {
   return create(SessionDataSchema, {
     id: "test-session-id",
     transferContextId: "ctx-123",
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     lastSequenceNumber: BigInt(5),
   });
 }
@@ -39,7 +39,7 @@ describe("protocol-message-service", () => {
       });
 
       expect(msg.common).toBeDefined();
-      expect(msg.common!.version).toBe(SATP_VERSION);
+      expect(msg.common!.version).toBe(SATP_CORE_VERSION);
       expect(msg.common!.messageType).toBe(MessageType.INIT_REJECT);
       expect(msg.common!.sessionId).toBe("test-session-id");
       expect(msg.common!.transferContextId).toBe("ctx-123");
