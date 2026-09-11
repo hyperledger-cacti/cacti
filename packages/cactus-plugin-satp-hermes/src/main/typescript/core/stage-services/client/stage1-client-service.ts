@@ -337,10 +337,17 @@ export class Stage1ClientService extends SATPService {
       try {
         this.Log.debug(`${fnTag}, checkPreSATPTransferResponse...`);
 
-        verifyPreSATPTransferResponse(fnTag, this.Signer, response, session);
-
         // update state
         const sessionData = session.getClientSessionData();
+
+        // The response carries the recipient gateway network id that
+        // session.verify() checks for, so it must be loaded into the session
+        // data before verification runs.
+        sessionData.recipientGatewayNetworkId =
+          response.recipientGatewayNetworkId;
+        sessionData.receiverAsset!.tokenId = response.recipientTokenId;
+
+        verifyPreSATPTransferResponse(fnTag, this.Signer, response, session);
 
         // first verification after stage 0, prior to transfer commence request
         // persist the signature-verified wrap-assertion claim so it stays
@@ -353,9 +360,6 @@ export class Stage1ClientService extends SATPService {
           signedClaim: response.wrapAssertionClaim!.signature,
         });
 
-        sessionData.recipientGatewayNetworkId =
-          response.recipientGatewayNetworkId;
-        sessionData.receiverAsset!.tokenId = response.recipientTokenId;
         saveHash(
           sessionData,
           MessageType.PRE_SATP_TRANSFER_RESPONSE,

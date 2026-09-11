@@ -39,7 +39,7 @@ import {
   TransferCommenceResponse,
   TransferCommenceResponseSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_1_pb";
-import { SATP_VERSION } from "../../../main/typescript/core/constants";
+import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
 import { verifyLockAssertionRequestMessage } from "../../../main/typescript/core/stage-services/verifier/stage-2-server-service-verifications";
 import { verifyTransferCommenceResponseMessage } from "../../../main/typescript/core/stage-services/verifier/stage-2-client-service-verifications";
 import {
@@ -70,7 +70,7 @@ function makeSessionData(overrides?: Record<string, unknown>): SessionData {
   return create(SessionDataSchema, {
     id: "session-001",
     transferContextId: "ctx-001",
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     lockExpirationTime: LOCK_EXPIRATION_TIME,
     hashes: create(MessageStagesHashesSchema, {
       stage0: create(Stage0HashesSchema),
@@ -102,7 +102,7 @@ function makeLockAssertionRequest(
   const receipt = makeSignedClaimReceipt();
   return create(LockAssertionRequestSchema, {
     common: create(CommonSatpSchema, {
-      version: SATP_VERSION,
+      version: SATP_CORE_VERSION,
       messageType: MessageType.LOCK_ASSERT,
       sessionId: "session-001",
       transferContextId: "ctx-001",
@@ -119,7 +119,7 @@ function makeLockAssertionRequest(
 function makeTransferCommenceResponse(): TransferCommenceResponse {
   return create(TransferCommenceResponseSchema, {
     common: create(CommonSatpSchema, {
-      version: SATP_VERSION,
+      version: SATP_CORE_VERSION,
       messageType: MessageType.TRANSFER_COMMENCE_RESPONSE,
       sessionId: "session-001",
       transferContextId: "ctx-001",

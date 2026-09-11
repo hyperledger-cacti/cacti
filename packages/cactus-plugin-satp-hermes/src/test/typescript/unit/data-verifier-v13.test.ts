@@ -15,7 +15,7 @@ import {
   SessionDataSchema,
   SessionData,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/session/session_pb";
-import { SATP_VERSION } from "../../../main/typescript/core/constants";
+import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
 import { commonBodyVerifier } from "../../../main/typescript/core/stage-services/verifier/data-verifier";
 import {
   SatpCommonBodyError,
@@ -32,14 +32,14 @@ function makeSessionData(
   return create(SessionDataSchema, {
     id: "session-001",
     transferContextId: "ctx-001",
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     ...overrides,
   } as Record<string, unknown>);
 }
 
 function makeCommon(overrides?: Record<string, unknown>) {
   return create(CommonSatpSchema, {
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     messageType: MessageType.INIT_PROPOSAL,
     sessionId: "session-001",
     transferContextId: "ctx-001",
@@ -53,6 +53,15 @@ describe("commonBodyVerifier — v13 validation", () => {
   it("passes for valid v13 CommonSatp with matching session data", () => {
     const sessionData = makeSessionData();
     const common = makeCommon();
+
+    expect(() => {
+      commonBodyVerifier(TAG, common, sessionData, MessageType.INIT_PROPOSAL);
+    }).not.toThrow();
+  });
+
+  it("accepts the wire protocol version reported by a standard v13 peer", () => {
+    const sessionData = makeSessionData({ version: "v13" });
+    const common = makeCommon({ version: "v13" });
 
     expect(() => {
       commonBodyVerifier(TAG, common, sessionData, MessageType.INIT_PROPOSAL);
@@ -98,7 +107,7 @@ describe("commonBodyVerifier — v13 validation", () => {
     }).toThrow(SatpCommonBodyError);
   });
 
-  it("throws SATPVersionError when version does not match SATP_VERSION", () => {
+  it("throws SATPVersionError when version does not match SATP_CORE_VERSION", () => {
     const sessionData = makeSessionData();
     const common = makeCommon({ version: "v02" });
 
@@ -176,7 +185,7 @@ describe("commonBodyVerifier — v13 validation", () => {
     // no sequenceNumber, resourceUrl, or pubkey fields exist.
     const sessionData = makeSessionData();
     const common = create(CommonSatpSchema, {
-      version: SATP_VERSION,
+      version: SATP_CORE_VERSION,
       messageType: MessageType.COMMIT_PREPARE,
       sessionId: "session-001",
       transferContextId: "ctx-001",

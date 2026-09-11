@@ -91,7 +91,7 @@ import {
   SignatureAlgorithmError,
   TransferContextIdError,
 } from "./errors/satp-service-errors";
-import { SATP_VERSION } from "./constants";
+import { SATP_CORE_VERSION } from "./constants";
 import { LockType } from "../generated/proto/cacti/satp/v13/common/message_pb";
 import { SessionType } from "./session-utils";
 import { create } from "@bufbuild/protobuf";
@@ -545,8 +545,12 @@ export class SATPSession {
           if (sessionData.transferContextId == "") {
             throw new TransferContextIdError(tag);
           }
-          if (sessionData.version != SATP_VERSION) {
-            throw new SATPVersionError(tag, sessionData.version, SATP_VERSION);
+          if (sessionData.version != SATP_CORE_VERSION) {
+            throw new SATPVersionError(
+              tag,
+              sessionData.version,
+              SATP_CORE_VERSION,
+            );
           }
         } catch (error) {
           console.error(`${tag}, error: ${error}`);

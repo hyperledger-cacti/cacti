@@ -6,7 +6,7 @@ import {
   MessageType,
   //TokenType,
 } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
-import { SATP_VERSION } from "../../constants";
+import { SATP_CORE_VERSION } from "../../constants";
 import {
   CommitFinalAssertionResponse,
   CommitFinalAssertionRequest,
@@ -126,7 +126,7 @@ export class Stage3ClientService extends SATPService {
           });
 
           const commonBody = create(CommonSatpSchema, {
-            version: SATP_VERSION,
+            version: SATP_CORE_VERSION,
             messageType: MessageType.COMMIT_PREPARE,
             sessionId: response.common!.sessionId,
             transferContextId: sessionData.transferContextId ?? "",
@@ -242,7 +242,7 @@ export class Stage3ClientService extends SATPService {
           });
 
           const commonBody = create(CommonSatpSchema, {
-            version: SATP_VERSION,
+            version: SATP_CORE_VERSION,
             messageType: MessageType.COMMIT_FINAL,
             sessionId: response.common!.sessionId,
             transferContextId: sessionData.transferContextId ?? "",
@@ -368,7 +368,7 @@ export class Stage3ClientService extends SATPService {
             sequenceNumber: Number(sessionData.lastSequenceNumber),
           });
           const commonBody = create(CommonSatpSchema, {
-            version: SATP_VERSION,
+            version: SATP_CORE_VERSION,
             messageType: MessageType.COMMIT_TRANSFER_COMPLETE,
             sessionId: response.common!.sessionId,
             transferContextId: sessionData.transferContextId ?? "",

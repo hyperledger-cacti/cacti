@@ -66,9 +66,13 @@ export function checkNetworkCapabilities(
 /**
  * Validates the transfer-init claims carried by a Stage 1 proposal request.
  *
+ * Per draft-ietf-satp-core-13, every field checked here is REQUIRED: a
+ * proposal with any of them missing must be rejected, not merely logged.
+ * Optional fields are accepted when empty and only logged.
+ *
  * @param tag - Context tag for error reporting
  * @param transferClaims - The claims block from the request
- * @param logger - Logger used to report missing mandatory/optional fields
+ * @param logger - Logger used to report missing optional fields
  * @returns `true` when the proposal is acceptable, `false` when it must be rejected
  * @throws {TransferInitClaimsError} When the claims block is missing
  */
@@ -82,15 +86,19 @@ export function checkTransferClaims(
   }
   if (transferClaims.digitalAssetId == "") {
     logger.error(`${tag}, digitalAssetId is missing`);
+    return false;
   }
   if (transferClaims.assetProfileId == "") {
     logger.error(`${tag}, assetProfileId is missing`);
+    return false;
   }
   if (transferClaims.verifiedOriginatorEntityId == "") {
     logger.error(`${tag}, verifiedOriginatorEntityId is missing`);
+    return false;
   }
   if (transferClaims.verifiedBeneficiaryEntityId == "") {
     logger.error(`${tag}, verifiedBeneficiaryEntityId is missing`);
+    return false;
   }
   if (transferClaims.senderGatewayNetworkId != "") {
     logger.info(`${tag}, optional variable senderGatewayNetworkId loaded`);

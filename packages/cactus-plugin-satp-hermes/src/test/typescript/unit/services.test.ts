@@ -17,7 +17,7 @@ import { Stage3ServerService } from "../../../main/typescript/core/stage-service
 import { SATPSession } from "../../../main/typescript/core/satp-session";
 import {
   DEFAULT_TLS13_CIPHER_SUITE,
-  SATP_VERSION,
+  SATP_CORE_VERSION,
 } from "../../../main/typescript/core/constants";
 import {
   AssetSchema,
@@ -311,7 +311,7 @@ describe("SATP Services Testing", () => {
       throw new Error("Session data not found");
     }
 
-    sessionData.version = SATP_VERSION;
+    sessionData.version = SATP_CORE_VERSION;
     sessionData.clientGatewayPubkey = Buffer.from(keyPairs.publicKey).toString(
       "hex",
     );
@@ -527,6 +527,29 @@ describe("SATP Services Testing", () => {
       preSATPTransferResponseMessage.recipientGatewayNetworkId,
     );
   });
+  it("Service1Client checkPreSATPTransferResponse loads recipientGatewayNetworkId before session verification", async () => {
+    // Given: a session whose client data does not yet know the recipient
+    // gateway network id (as in a real transfer, where the id arrives with
+    // this response)
+    expect(satpClientService1).toBeDefined();
+    const sessionData = mockSession.getClientSessionData();
+    if (!sessionData) {
+      throw new Error("Session data not found");
+    }
+    sessionData.recipientGatewayNetworkId = "";
+
+    // When: the response is checked
+    await satpClientService1.checkPreSATPTransferResponse(
+      preSATPTransferResponseMessage,
+      mockSession,
+    );
+
+    // Then: verification passed and the network id was loaded from the
+    // response into the session data
+    expect(mockSession.getClientSessionData().recipientGatewayNetworkId).toBe(
+      preSATPTransferResponseMessage.recipientGatewayNetworkId,
+    );
+  });
   it("Service1Client transferProposalRequest", async () => {
     expect(satpClientService1).toBeDefined();
     expect(satpClientService1.getServiceIdentifier()).toBe(
@@ -551,7 +574,9 @@ describe("SATP Services Testing", () => {
     expect(transferProposalRequestMessage.common?.transferContextId).toBe(
       sessionData.transferContextId,
     );
-    expect(transferProposalRequestMessage.common?.version).toBe(SATP_VERSION);
+    expect(transferProposalRequestMessage.common?.version).toBe(
+      SATP_CORE_VERSION,
+    );
     expect(
       transferProposalRequestMessage.transferInitClaims?.digitalAssetId,
     ).toBe("MOCK_DIGITAL_ASSET_ID");
@@ -605,7 +630,9 @@ describe("SATP Services Testing", () => {
     expect(transferProposalResponseMessage.common?.transferContextId).toBe(
       transferProposalRequestMessage.common?.transferContextId,
     );
-    expect(transferProposalResponseMessage.common?.version).toBe(SATP_VERSION);
+    expect(transferProposalResponseMessage.common?.version).toBe(
+      SATP_CORE_VERSION,
+    );
     expect(
       transferProposalResponseMessage.hashTransferInitClaims,
     ).toBeDefined();
@@ -632,7 +659,9 @@ describe("SATP Services Testing", () => {
     expect(transferCommenceRequestMessage.common?.transferContextId).toBe(
       transferProposalResponseMessage.common?.transferContextId,
     );
-    expect(transferCommenceRequestMessage.common?.version).toBe(SATP_VERSION);
+    expect(transferCommenceRequestMessage.common?.version).toBe(
+      SATP_CORE_VERSION,
+    );
     expect(transferCommenceRequestMessage.hashTransferInitClaims).toBeDefined();
   });
 
@@ -717,7 +746,7 @@ describe("SATP Services Testing", () => {
     expect(lockAssertionRequestMessage.common?.transferContextId).toBe(
       transferCommenceResponseMessage.common?.transferContextId,
     );
-    expect(lockAssertionRequestMessage.common?.version).toBe(SATP_VERSION);
+    expect(lockAssertionRequestMessage.common?.version).toBe(SATP_CORE_VERSION);
     expect(lockAssertionRequestMessage.lockAssertionClaim).toBeDefined();
     expect(lockAssertionRequestMessage.lockAssertionClaimFormat).toBeDefined();
     expect(lockAssertionRequestMessage.lockAssertionExpiration).toBe(
@@ -787,7 +816,7 @@ describe("SATP Services Testing", () => {
     expect(lockAssertionReceiptMessage.common?.transferContextId).toBe(
       lockAssertionRequestMessage.common?.transferContextId,
     );
-    expect(lockAssertionReceiptMessage.common?.version).toBe(SATP_VERSION);
+    expect(lockAssertionReceiptMessage.common?.version).toBe(SATP_CORE_VERSION);
     expect(lockAssertionReceiptMessage.common?.messageType).toBe(
       MessageType.ASSERTION_RECEIPT,
     );
@@ -821,7 +850,9 @@ describe("SATP Services Testing", () => {
     expect(commitPreparationRequestMessage.common?.transferContextId).toBe(
       lockAssertionReceiptMessage.common?.transferContextId,
     );
-    expect(commitPreparationRequestMessage.common?.version).toBe(SATP_VERSION);
+    expect(commitPreparationRequestMessage.common?.version).toBe(
+      SATP_CORE_VERSION,
+    );
     expect(commitPreparationRequestMessage.common?.messageType).toBe(
       MessageType.COMMIT_PREPARE,
     );
@@ -862,7 +893,7 @@ describe("SATP Services Testing", () => {
     expect(commitReadyResponseMessage.common?.transferContextId).toBe(
       commitPreparationRequestMessage.common?.transferContextId,
     );
-    expect(commitReadyResponseMessage.common?.version).toBe(SATP_VERSION);
+    expect(commitReadyResponseMessage.common?.version).toBe(SATP_CORE_VERSION);
     expect(commitReadyResponseMessage.common?.messageType).toBe(
       MessageType.COMMIT_READY,
     );
@@ -912,7 +943,7 @@ describe("SATP Services Testing", () => {
       commitReadyResponseMessage.common?.transferContextId,
     );
     expect(commitFinalAssertionRequestMessage.common?.version).toBe(
-      SATP_VERSION,
+      SATP_CORE_VERSION,
     );
     expect(commitFinalAssertionRequestMessage.common?.messageType).toBe(
       MessageType.COMMIT_FINAL,
@@ -1007,7 +1038,9 @@ describe("SATP Services Testing", () => {
       commitFinalAcknowledgementReceiptResponseMessage.common
         ?.transferContextId,
     );
-    expect(transferCompleteRequestMessage.common?.version).toBe(SATP_VERSION);
+    expect(transferCompleteRequestMessage.common?.version).toBe(
+      SATP_CORE_VERSION,
+    );
     expect(transferCompleteRequestMessage.common?.messageType).toBe(
       MessageType.COMMIT_TRANSFER_COMPLETE,
     );
@@ -1048,7 +1081,9 @@ describe("SATP Services Testing", () => {
     expect(transferCompleteResponseMessage.common?.transferContextId).toBe(
       transferCompleteRequestMessage.common?.transferContextId,
     );
-    expect(transferCompleteResponseMessage.common?.version).toBe(SATP_VERSION);
+    expect(transferCompleteResponseMessage.common?.version).toBe(
+      SATP_CORE_VERSION,
+    );
     expect(transferCompleteResponseMessage.common?.messageType).toBe(
       MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE,
     );

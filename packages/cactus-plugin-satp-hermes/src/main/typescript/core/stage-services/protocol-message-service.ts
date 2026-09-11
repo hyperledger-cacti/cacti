@@ -24,7 +24,7 @@ import {
   SessionAbortMessageSchema,
 } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
-import { SATP_VERSION } from "../constants";
+import { SATP_CORE_VERSION } from "../constants";
 import { getMessageHash } from "../session-utils";
 
 /**
@@ -86,7 +86,7 @@ export function createRejectMessage(
   const { sessionData, reasonCode, lastReceivedMessageType } = options;
 
   const common = create(CommonSatpSchema, {
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     messageType: MessageType.INIT_REJECT,
     sessionId: sessionData.id,
     transferContextId: sessionData.transferContextId,
@@ -119,7 +119,7 @@ export function createErrorMessage(
   const { sessionData, errorMsgType, errorType, errorSeverity } = options;
 
   const common = create(CommonSatpSchema, {
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     messageType: MessageType.ERROR,
     sessionId: sessionData.id,
     transferContextId: sessionData.transferContextId,
@@ -145,7 +145,7 @@ export function createSessionAbortMessage(
   const { sessionData } = options;
 
   const common = create(CommonSatpSchema, {
-    version: SATP_VERSION,
+    version: SATP_CORE_VERSION,
     messageType: MessageType.SESSION_ABORT,
     sessionId: sessionData.id,
     transferContextId: sessionData.transferContextId,

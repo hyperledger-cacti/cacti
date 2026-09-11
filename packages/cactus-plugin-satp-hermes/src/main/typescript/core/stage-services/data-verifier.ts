@@ -82,7 +82,7 @@ import {
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
-import { SATP_VERSION } from "../constants";
+import { SATP_CORE_VERSION } from "../constants";
 import {
   MessageTypeError,
   SatpCommonBodyError,
@@ -241,8 +241,8 @@ export function commonBodyVerifier(
     throw new SatpCommonBodyError(tag, safeStableStringify(common));
   }
 
-  if (common.version != SATP_VERSION) {
-    throw new SATPVersionError(tag, common.version, SATP_VERSION);
+  if (common.version != SATP_CORE_VERSION) {
+    throw new SATPVersionError(tag, common.version, SATP_CORE_VERSION);
   }
 
   // v13: clientGatewayPubkey, serverGatewayPubkey, sequenceNumber,
