@@ -67,9 +67,81 @@ AuditEntry:
       type: integer
       format: int64
       description: The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).
+    proofs:
+      type: array
+      description: >
+        Signature-verified protocol claims (SessionProofs) recorded in the
+        audit database for the session associated with this audit entry.
+      items:
+        $ref: "./schemas.yml#/SessionProof"
   required:
     - session
     - timestamp
+    - proofs
+
+SessionProof:
+  type: object
+  description: >
+    A signature-verified claim exchanged at a SATP protocol step, persisted in
+    the audit database so it stays provable for dispute resolution and audit
+    after transport ends.
+  x-category: response
+  properties:
+    sessionId:
+      type: string
+      description: Unique identifier of the SATP session this proof belongs to.
+      example: "691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID"
+    step:
+      type: object
+      description: >
+        The SATP protocol step definition (tag, description, role, sequence,
+        message type) at which the claim was verified, from the SATP protocol map.
+      properties:
+        tag:
+          type: string
+          description: Step tag identifier from the SATP protocol map.
+          example: "checkCommitPreparationResponse"
+        description:
+          type: string
+          description: Human-readable description of the protocol step.
+          example: "Client validates commit ready response"
+        role:
+          type: string
+          description: Gateway role executing the step (client/server/both).
+          enum:
+            - client
+            - server
+            - both
+          example: "client"
+        sequence:
+          type: integer
+          description: Sequence number of the step within its stage.
+          example: 5
+        messageType:
+          type: string
+          description: >
+            SATP message type associated with the step, if any.
+          example: "COMMIT_READY"
+      required:
+        - tag
+        - description
+        - role
+        - sequence
+    claim:
+      type: string
+      description: >
+        JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or
+        assignment assertion claim) as verified at the protocol step.
+    signedClaim:
+      type: string
+      description: >
+        The signature carried by the claim, produced by the asset/bridge
+        operation over the claim receipt.
+  required:
+    - sessionId
+    - step
+    - claim
+    - signedClaim
 
 LocalLog:
   type: object
@@ -174,6 +246,18 @@ AuditResponse:
     - startTimestamp
     - endTimestamp
 
+SessionProofsResponse:
+  description: "Response schema for a session proofs request. Contains the signature-verified SessionProofs persisted in the audit database for the requested sessions."
+  type: object
+  x-category: response
+  properties:
+    proofs:
+      type: array
+      description: "Signature-verified session proofs for the requested SATP sessions."
+      items:
+        $ref: "./schemas.yml#/SessionProof"
+  required:
+    - proofs
 
 StatusResponse:
   description: "Provides the current status of the SATP session including detailed information on the progress, such as substatus, stage, and step, along with the session start time and chain information."

@@ -20,7 +20,7 @@
  * - Comprehensive error handling and transaction validation
  *
  * **SATP Protocol Compliance:**
- * The implementation follows IETF SATP Core v2 specification requirements for
+ * The implementation follows IETF SATP Core v13 specification requirements for
  * Ethereum-based cross-chain asset transfers, including atomic operations,
  * cryptographic proof generation, and secure asset custody management.
  *
@@ -78,7 +78,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link https://ethereum.org/en/developers/docs/} Ethereum Development Documentation
  * @see {@link BridgeLeafFungible} for fungible asset interface
  * @see {@link BridgeLeafNonFungible} for non-fungible asset interface
@@ -118,7 +118,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   ClaimFormat,
   TokenType,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { OntologyManager } from "../ontology/ontology-manager";
 import { Web3TransactionReceipt } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";

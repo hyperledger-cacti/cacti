@@ -428,6 +428,41 @@ paths:
             application/json:
               schema:
                 $ref: ./schemas.yml#/AuditResponse
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs:
+    get:
+      tags:
+        - admin
+      summary: Get session proofs
+      description: >
+        Retrieves the signature-verified SessionProofs (claims recorded at each
+        SATP protocol step) persisted in the audit database for the given
+        session IDs.
+      operationId: GetSessionProofs
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs
+      parameters:
+        - name: sessionIds
+          in: query
+          description: Comma-separated list of SATP session IDs to retrieve proofs for.
+          required: true
+          schema:
+            type: string
+            example: "691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID"
+      responses:
+        '200':
+          description: Session proofs for the requested sessions
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/SessionProofsResponse
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                $ref: ./schemas.yml#/APIError
   /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address:
     get:
       tags:

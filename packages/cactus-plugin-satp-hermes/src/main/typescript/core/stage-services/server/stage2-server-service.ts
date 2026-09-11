@@ -2,11 +2,11 @@ import {
   LockAssertionResponse,
   LockAssertionResponseSchema,
   LockAssertionRequest,
-} from "../../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import {
   CommonSatpSchema,
   MessageType,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
 import {
   getMessageHash,
@@ -23,16 +23,12 @@ import {
   ISATPServiceOptions,
 } from "../satp-service";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { getStepByTag } from "../../satp-protocol-map";
 
 import { SATPSession } from "../../../core/satp-session";
-import { commonBodyVerifier, signatureVerifier } from "../data-verifier";
-import {
-  LockAssertionClaimError,
-  LockAssertionClaimFormatError,
-  LockAssertionExpirationError,
-  SessionError,
-} from "../../errors/satp-service-errors";
-import { SATPError, SATPInternalError } from "../../errors/satp-errors";
+import { verifyLockAssertionRequestMessage } from "../verifier/stage-2-server-service-verifications";
+import { SessionError } from "../../errors/satp-service-errors";
+import { SATPInternalError } from "../../errors/satp-errors";
 import { SessionNotFoundError } from "../../errors/satp-handler-errors";
 import { create } from "@bufbuild/protobuf";
 import { context, SpanStatusCode } from "@opentelemetry/api";
@@ -92,42 +88,29 @@ export class Stage2ServerService extends SATPService {
           const commonBody = create(CommonSatpSchema, {
             version: sessionData.version,
             messageType: MessageType.ASSERTION_RECEIPT,
-            sequenceNumber: request.common!.sequenceNumber + BigInt(1),
-            hashPreviousMessage: getMessageHash(
-              sessionData,
-              MessageType.LOCK_ASSERT,
-            ),
             sessionId: request.common!.sessionId,
-            clientGatewayPubkey: sessionData.clientGatewayPubkey,
-            serverGatewayPubkey: sessionData.serverGatewayPubkey,
-            resourceUrl: sessionData.resourceUrl,
+            transferContextId: sessionData.transferContextId ?? "",
           });
 
-          sessionData.lastSequenceNumber = commonBody.sequenceNumber;
+          sessionData.lastSequenceNumber =
+            sessionData.lastSequenceNumber + BigInt(1);
 
           const lockAssertionReceiptMessage = create(
             LockAssertionResponseSchema,
             {
               common: commonBody,
+              hashPrevMessage: getMessageHash(
+                sessionData,
+                MessageType.LOCK_ASSERT,
+              ),
             },
           );
-
-          if (sessionData.transferContextId != undefined) {
-            lockAssertionReceiptMessage.common!.transferContextId =
-              sessionData.transferContextId;
-          }
-
-          if (sessionData.serverTransferNumber != undefined) {
-            lockAssertionReceiptMessage.serverTransferNumber =
-              sessionData.serverTransferNumber;
-          }
 
           const messageSignature = bufArray2HexStr(
             sign(this.Signer, safeStableStringify(lockAssertionReceiptMessage)),
           );
 
-          lockAssertionReceiptMessage.serverSignature = messageSignature;
-
+          // v13: per-message signatures removed; JWS wrapping used instead
           saveSignature(
             sessionData,
             MessageType.ASSERTION_RECEIPT,
@@ -186,23 +169,14 @@ export class Stage2ServerService extends SATPService {
     return context.with(ctx, () => {
       try {
         const errorResponse = create(LockAssertionResponseSchema, {});
-        const clientError = SATPError.fromInternalError(error);
         const commonBody = create(CommonSatpSchema, {
           messageType: MessageType.ASSERTION_RECEIPT,
-          error: true,
-          errorCode: clientError.errorType,
         });
 
         if (!(error instanceof SessionNotFoundError) && session != undefined) {
           commonBody.sessionId = session.getServerSessionData().id;
         }
         errorResponse.common = commonBody;
-
-        const messageSignature = bufArray2HexStr(
-          sign(this.Signer, safeStableStringify(errorResponse)),
-        );
-
-        errorResponse.serverSignature = messageSignature;
 
         return errorResponse;
       } catch (err) {
@@ -222,70 +196,29 @@ export class Stage2ServerService extends SATPService {
     const stepTag = `checkLockAssertionRequest()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
-    await context.with(ctx, () => {
+    await context.with(ctx, async () => {
       try {
         this.Log.debug(`${fnTag}, checkLockAssertionRequest...`);
 
-        if (session == undefined) {
-          throw new SessionError(fnTag);
-        }
-
-        session.verify(fnTag, SessionType.SERVER);
+        verifyLockAssertionRequestMessage(fnTag, this.Signer, request, session);
 
         const sessionData = session.getServerSessionData();
 
-        commonBodyVerifier(
-          fnTag,
-          request.common,
-          sessionData,
-          MessageType.LOCK_ASSERT,
-        );
+        // persist the signature-verified lock-assertion claim so it stays
+        // provable for dispute resolution and audit after transport ends
+        const proofStep = getStepByTag(2, "checkLockAssertionRequest");
+        await this.dbLogger.persistSessionProof({
+          sessionId: sessionData.id,
+          step: proofStep!,
+          claim: safeStableStringify(request.lockAssertionClaim) ?? "",
+          signedClaim: request.lockAssertionClaim!.signature,
+        });
 
-        signatureVerifier(fnTag, this.Signer, request, sessionData);
-
-        if (request.lockAssertionClaim == undefined) {
-          throw new LockAssertionClaimError(fnTag);
-        }
-
-        sessionData.lockAssertionClaim = request.lockAssertionClaim;
-
-        if (request.lockAssertionClaimFormat == undefined) {
-          throw new LockAssertionClaimFormatError(fnTag);
-        }
-
-        sessionData.lockAssertionClaimFormat = request.lockAssertionClaimFormat; //todo check if valid
-
-        const currentTime = BigInt(Date.now());
-        const maximumExpiration = currentTime + sessionData.lockExpirationTime;
-
-        if (request.lockAssertionExpiration <= currentTime) {
-          throw new LockAssertionExpirationError(
-            fnTag,
-            "lock assertion already expired",
-          );
-        }
-
-        if (request.lockAssertionExpiration > maximumExpiration) {
-          throw new LockAssertionExpirationError(
-            fnTag,
-            "lock assertion exceeds the negotiated expiration time",
-          );
-        }
-
+        sessionData.lockAssertionClaim = request.lockAssertionClaim!;
+        sessionData.lockAssertionClaimFormat =
+          request.lockAssertionClaimFormat!;
         sessionData.lockAssertionExpiration = request.lockAssertionExpiration;
-
-        if (
-          sessionData.clientTransferNumber != "" &&
-          request.clientTransferNumber != sessionData.clientTransferNumber
-        ) {
-          // This does not throw an error because the clientTransferNumber is only meaningful to the client.
-          this.Log.info(
-            `${fnTag}, LockAssertionRequest clientTransferNumber does not match the one that was sent`,
-          );
-        }
-
         saveHash(sessionData, MessageType.LOCK_ASSERT, getHash(request));
-
         saveTimestamp(
           sessionData,
           MessageType.LOCK_ASSERT,

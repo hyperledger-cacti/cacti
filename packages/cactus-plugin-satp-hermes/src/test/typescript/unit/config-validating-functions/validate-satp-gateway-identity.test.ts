@@ -3,6 +3,7 @@ import { validateSatpGatewayIdentity } from "../../../../main/typescript/service
 import {
   type Address,
   type GatewayIdentity,
+  GatewayCredential,
   SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
@@ -34,9 +35,12 @@ describe("validateSatpGatewayIdentity", () => {
           ledgerType: "ETHEREUM",
         },
       ],
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: "0xdef456",
+      credentials: {
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: "0xdef456",
+        },
       },
       proofID: "mockProofID10",
       address: "http://localhost" as Address,
@@ -336,5 +340,80 @@ describe("validateSatpGatewayIdentity", () => {
     ).toThrowError(
       `Invalid config.gid: ${JSON.stringify(invalidGatewayIdentity)}`,
     );
+  });
+
+  describe("purpose-aware key material validation", () => {
+    function makeIdentity(keys: unknown): Record<string, unknown> {
+      return {
+        id: "mockID",
+        name: "CustomGateway",
+        version: [
+          {
+            Core: SATP_CORE_VERSION,
+            Architecture: SATP_ARCHITECTURE_VERSION,
+            Crash: SATP_CRASH_VERSION,
+          },
+        ],
+        keys,
+        address: "http://localhost" as Address,
+      };
+    }
+
+    it("accepts a hex CLAIM_SIGNATURE key and a JWK ENVELOPE_SIGNATURE key", () => {
+      const identity = makeIdentity({
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: "0xdef456",
+        },
+        [GatewayCredential.ENVELOPE_SIGNATURE]: {
+          purpose: GatewayCredential.ENVELOPE_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.ES256,
+          publicKey: { kty: "EC", crv: "P-256", x: "abc", y: "def" },
+        },
+      });
+      expect(() =>
+        validateSatpGatewayIdentity({ configValue: identity }, logger),
+      ).not.toThrow();
+    });
+
+    it("rejects a string ENVELOPE_SIGNATURE key (must be a JWK object)", () => {
+      const identity = makeIdentity({
+        [GatewayCredential.ENVELOPE_SIGNATURE]: {
+          purpose: GatewayCredential.ENVELOPE_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.ES256,
+          publicKey: "pem-or-hex-that-would-fail-importKey",
+        },
+      });
+      expect(() =>
+        validateSatpGatewayIdentity({ configValue: identity }, logger),
+      ).toThrow();
+    });
+
+    it("rejects an empty CLAIM_SIGNATURE key material", () => {
+      const identity = makeIdentity({
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: "",
+        },
+      });
+      expect(() =>
+        validateSatpGatewayIdentity({ configValue: identity }, logger),
+      ).toThrow();
+    });
+
+    it("rejects an object CLAIM_SIGNATURE key material (must be a hex string)", () => {
+      const identity = makeIdentity({
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: { notHex: true },
+        },
+      });
+      expect(() =>
+        validateSatpGatewayIdentity({ configValue: identity }, logger),
+      ).toThrow();
+    });
   });
 });

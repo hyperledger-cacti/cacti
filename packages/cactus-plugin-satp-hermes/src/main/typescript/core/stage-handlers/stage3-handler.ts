@@ -3,7 +3,7 @@
  * SATP Stage 3 Handler for Commit Preparation, Final Assertion, and Transfer Completion.
  *
  * @description
- * This module implements the Stage 3 handler of the IETF SATP Core v2 protocol,
+ * This module implements the Stage 3 handler of the IETF SATP Core v13 protocol,
  * responsible for managing the final phase of cross-chain asset transfers.
  * Stage 3 encompasses commit preparation, final commit assertions, and transfer
  * completion operations that finalize the atomic cross-chain asset movement
@@ -96,7 +96,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage3ServerService} for server-side business logic
  * @see {@link Stage3ClientService} for client-side business logic
@@ -107,7 +107,7 @@
  */
 
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
 import {
   CommitFinalAssertionResponse,
   CommitFinalAssertionRequest,
@@ -115,7 +115,7 @@ import {
   CommitPreparationResponse,
   TransferCompleteRequest,
   TransferCompleteResponse,
-} from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
 import { Stage3ServerService } from "../stage-services/server/stage3-server-service";
 import { SATPSession } from "../satp-session";
 import {
@@ -127,15 +127,20 @@ import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
 import { Stage3ClientService } from "../stage-services/client/stage3-client-service";
-import { getSessionId, buildAdapterPayload } from "./handler-utils";
+import {
+  getSessionId,
+  buildAdapterPayload,
+  applyCrossStageProtocolMessage,
+  abortOnReceivedProtocolTermination,
+} from "./handler-utils";
 import {
   FailedToCreateMessageError,
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
-import { LockAssertionResponse } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import { LockAssertionResponse } from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import { getMessageTypeName } from "../satp-utils";
-import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   collectSessionAttributes,
   saveMessageInSessionData,
@@ -154,7 +159,7 @@ import type { AdapterManager } from "../../adapters/adapter-manager";
  * SATP Stage 3 Handler for Commit Preparation, Final Assertion, and Transfer Completion.
  *
  * @description
- * Implements the Stage 3 phase of the IETF SATP Core v2 protocol, managing
+ * Implements the Stage 3 phase of the IETF SATP Core v13 protocol, managing
  * the critical final operations of cross-chain asset transfers. This handler
  * orchestrates commit preparation, final assertions with burn proofs, and
  * transfer completion operations that ensure atomic and secure settlement
@@ -491,7 +496,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * Returns the SATP protocol stage identifier for this handler.
    *
    * @description
-   * Provides the stage identifier as defined in the IETF SATP Core v2
+   * Provides the stage identifier as defined in the IETF SATP Core v13
    * specification, used for protocol compliance and message routing.
    *
    * @public
@@ -513,7 +518,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * Processes incoming CommitPreparationRequest messages from client gateways
    * to initiate destination asset minting operations. This method implements
    * the server-side logic for commit preparation, asset minting, and response
-   * generation according to the IETF SATP Core v2 specification.
+   * generation according to the IETF SATP Core v13 specification.
    *
    * **Processing Steps:**
    * 1. **Session Validation**: Ensures session exists and is in valid state
@@ -566,6 +571,11 @@ export class Stage3SATPHandler implements SATPHandler {
         if (!session) {
           throw new SessionNotFoundError(fnTag);
         }
+
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
@@ -649,6 +659,7 @@ export class Stage3SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.COMMIT_READY, error);
 
         if (session) {
@@ -683,7 +694,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * Processes incoming CommitFinalAssertionRequest messages from client gateways
    * to validate burn proofs and assign destination assets. This method implements
    * the server-side logic for final assertion validation, asset assignment, and
-   * acknowledgment generation according to the IETF SATP Core v2 specification.
+   * acknowledgment generation according to the IETF SATP Core v13 specification.
    *
    * **Processing Steps:**
    * 1. **Session Validation**: Ensures session exists and is in valid state
@@ -743,6 +754,11 @@ export class Stage3SATPHandler implements SATPHandler {
         if (!session) {
           throw new SessionNotFoundError(fnTag);
         }
+
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
@@ -828,6 +844,7 @@ export class Stage3SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.ACK_COMMIT_FINAL, error);
 
         if (session) {
@@ -862,7 +879,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * Processes incoming TransferCompleteRequest messages from client gateways
    * to finalize cross-chain transfer operations. This method implements the
    * server-side logic for transfer completion validation and final response
-   * generation according to the IETF SATP Core v2 specification.
+   * generation according to the IETF SATP Core v13 specification.
    *
    * **Processing Steps:**
    * 1. **Session Validation**: Ensures session exists and is in completion state
@@ -914,6 +931,11 @@ export class Stage3SATPHandler implements SATPHandler {
         if (!session) {
           throw new SessionNotFoundError(fnTag);
         }
+
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         span.setAttribute("sessionId", session.getSessionId() || "");
 
@@ -1039,6 +1061,7 @@ export class Stage3SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.COMMIT_TRANSFER_COMPLETE_RESPONSE, error);
 
         if (session) {
@@ -1074,7 +1097,7 @@ export class Stage3SATPHandler implements SATPHandler {
    * messages by registering the appropriate service methods. This enables
    * the handler to receive and process CommitPreparation, CommitFinalAssertion,
    * and TransferComplete requests from client gateways according to the
-   * IETF SATP Core v2 specification.
+   * IETF SATP Core v13 specification.
    *
    * **Registered Service Methods:**
    * - **commitPreparation**: Handles CommitPreparationRequest for asset minting

@@ -6,8 +6,8 @@ import {
 import {
   TokenType,
   ERCTokenStandard,
-} from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { WHALE_ACCOUNT_ADDRESS } from "@hyperledger-cacti/cactus-test-geth-ledger";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { EthereumLeaf } from "../../../../main/typescript/cross-chain-mechanisms/bridge/leafs/ethereum-leaf";

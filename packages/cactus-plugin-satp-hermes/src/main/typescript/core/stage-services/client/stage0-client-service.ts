@@ -30,7 +30,7 @@
  * - **Database Persistence**: Stores session data, proofs, and audit trails
  *
  * **Protocol Compliance:**
- * This implementation follows the IETF SATP Core v2 specification for Stage 0
+ * This implementation follows the IETF SATP Core v13 specification for Stage 0
  * operations, ensuring interoperability with compliant SATP implementations
  * across different gateway vendors and blockchain networks.
  *
@@ -48,16 +48,17 @@ import {
   ClaimFormat,
   MessageType,
   WrapAssertionClaimSchema,
-} from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   NewSessionRequest,
   NewSessionResponse,
   PreSATPTransferRequest,
   NewSessionRequestSchema,
   PreSATPTransferRequestSchema,
-} from "../../../generated/proto/cacti/satp/v02/service/stage_0_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/stage_0_pb";
 import { create } from "@bufbuild/protobuf";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+import { getStepByTag } from "../../satp-protocol-map";
 
 import { FailedToProcessError } from "../../errors/satp-handler-errors";
 import {
@@ -82,7 +83,7 @@ import {
   SessionType,
   TimestampType,
 } from "../../session-utils";
-import { signatureVerifier } from "../data-verifier";
+import { signatureVerifier } from "../verifier/data-verifier";
 import {
   SATPService,
   SATPServiceType,
@@ -354,6 +355,11 @@ export class Stage0ClientService extends SATPService {
     session: SATPSession,
     sessionIds: string[],
   ): Promise<SATPSession> {
+    // TODO: extract these inline checks into a bespoke Stage 0 verifier function
+    // under core/stage-services/verifier/ composing on verifyMessage, mirroring
+    // the Stage 1-3 refactor. Stage 0 uses hashPreviousMessage (not
+    // hashPrevMessage) and carries legacy signature fields, so verifyMessage
+    // needs care before delegating here.
     const stepTag = `checkNewSessionResponse()`;
     const fnTag = `${this.getServiceIdentifier()}#${stepTag}`;
 
@@ -672,6 +678,18 @@ export class Stage0ClientService extends SATPService {
           sessionData.senderWrapAssertionClaim.signature = bufArray2HexStr(
             sign(this.Signer, sessionData.senderWrapAssertionClaim.receipt),
           );
+
+          // persist the signed sender wrap-assertion claim at creation so it
+          // stays provable for dispute resolution and audit after transport
+          // ends (this claim has no counterparty verification step in stage 0)
+          const proofStep = getStepByTag(0, "preSATPTransferRequest");
+          await this.dbLogger.persistSessionProof({
+            sessionId: sessionData.id,
+            step: proofStep!,
+            claim:
+              safeStableStringify(sessionData.senderWrapAssertionClaim) ?? "",
+            signedClaim: sessionData.senderWrapAssertionClaim.signature,
+          });
 
           await this.dbLogger.storeProof({
             sessionId: sessionData.id,

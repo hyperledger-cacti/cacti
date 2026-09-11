@@ -2,7 +2,7 @@
  * SATP-Hermes Public API - Secure Asset Transfer Protocol Implementation
  *
  * @fileoverview
- * Public API exports for the SATP-Hermes plugin, implementing the IETF SATP v2 core specification
+ * Public API exports for the SATP-Hermes plugin, implementing the IETF SATP v13 core specification
  * for fault-tolerant cross-chain asset transfers. Provides gateway-based interoperability with
  * crash recovery mechanisms and atomic transaction guarantees.
  *
@@ -46,7 +46,7 @@
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGateway} for main gateway implementation
  * @see {@link PluginFactorySATPGateway} for gateway factory and instantiation
@@ -76,19 +76,19 @@ export * from "./generated/gateway-client/typescript-axios";
  * @description
  * Defines claim formats used in SATP protocol messages for asset ownership proofs,
  * transfer evidence, and cryptographic attestations during cross-chain operations.
- * Based on IETF SATP v2 common message protobuf definitions.
+ * Based on IETF SATP v13 common message protobuf definitions.
  *
  * @see {@link sign} for claim signing operations
  * @see {@link verifySignature} for claim verification
  */
-export { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
+export { ClaimFormat } from "./generated/proto/cacti/satp/v13/common/message_pb";
 
 /**
  * SATP Gateway Core Implementation - Main gateway class and configuration.
  *
  * @description
  * Core SATP gateway implementation providing fault-tolerant cross-chain asset transfer
- * capabilities. Implements the complete IETF SATP v2 protocol with crash recovery,
+ * capabilities. Implements the complete IETF SATP v13 protocol with crash recovery,
  * session management, and atomic transaction guarantees across blockchain networks.
  *
  * @see {@link PluginFactorySATPGateway} for gateway instantiation
@@ -146,25 +146,26 @@ export {
 } from "./core/types";
 
 /**
- * Gateway Port Constants - Default port configurations for SATP gateway services.
+ * SATP protocol constants - defaults, versions, and ledger support metadata.
  *
  * @description
- * Standard port definitions for SATP gateway server, client, and OpenAPI endpoints.
- * Ensures consistent networking configuration across gateway deployments and
- * facilitates gateway-to-gateway discovery and communication.
+ * Exposes the canonical SATP configuration values used by the gateway, protocol
+ * services, and bridge support code. These constants define the default network
+ * endpoints, protocol versions, TLS requirements, and supported ledger set.
  *
- * **Port Usage:**
- * - `DEFAULT_PORT_GATEWAY_SERVER`: Main gateway server endpoint (3010)
- * - `DEFAULT_PORT_GATEWAY_CLIENT`: Client communication port (3011)
- * - `DEFAULT_PORT_GATEWAY_OAPI`: OpenAPI documentation and testing (4010)
- *
- * @see {@link SATPGatewayConfig} for gateway configuration using these ports
+ * @see {@link SATPGatewayConfig} for gateway configuration using these values
  * @see {@link GatewayIdentity} for gateway network identity and addressing
  */
 export {
   DEFAULT_PORT_GATEWAY_CLIENT,
-  DEFAULT_PORT_GATEWAY_SERVER,
   DEFAULT_PORT_GATEWAY_OAPI,
+  DEFAULT_PORT_GATEWAY_SERVER,
+  DEFAULT_PORT_GATEWAY_UI,
+  SATP_ARCHITECTURE_VERSION,
+  SATP_CRASH_VERSION,
+  SATP_IMPLEMENTED_LEDGERS,
+  SATP_CORE_VERSION,
+  DEFAULT_TLS13_CIPHER_SUITE,
 } from "./core/constants";
 
 /**
@@ -204,6 +205,8 @@ export { IEthereumNetworkConfig } from "./cross-chain-mechanisms/bridge/bridge-t
  * @see {@link SATPGatewayConfig} for identity configuration options
  */
 export { GatewayIdentity } from "./core/types";
+export { GatewayCredential } from "./core/types";
+export { GatewayKey } from "./core/types";
 
 /**
  * SATP Protocol Mapping - Type-safe SATP protocol stage and step definitions.
@@ -236,6 +239,54 @@ export {
   validateStepTagForStage,
   type StepTagValidationResult,
 } from "./core/satp-protocol-map";
+
+export {
+  createRejectMessage,
+  createErrorMessage,
+  createSessionAbortMessage,
+  checkAbortEffectiveness,
+  handleIncomingRejectMessage,
+  handleIncomingErrorMessage,
+  handleIncomingSessionAbortMessage,
+  handleIncomingProtocolRejectMessage,
+  getLastReceivedMessageType,
+} from "./core/stage-services/protocol-message-service";
+export type {
+  IRejectMessageOptions,
+  IErrorMessageOptions,
+  ISessionAbortOptions,
+  IAbortEffectivenessResult,
+  IIncomingProtocolMessageResult,
+} from "./core/stage-services/protocol-message-service";
+
+export {
+  messageTypeToUrn,
+  urnToMessageType,
+  SATP_MSGTYPE_URN_PREFIX,
+} from "./core/iana-message-types";
+
+export {
+  STAGE_1_ERROR_CODES,
+  STAGE_2_ERROR_CODES,
+  STAGE_3_ERROR_CODES,
+  V13_ERROR_DESCRIPTIONS,
+  satpErrorTypeToV13Code,
+  v13ErrorDescription,
+  isV13ErrorCode,
+} from "./core/errors/iana-error-codes";
+export type { ErrorCode } from "./core/errors/iana-error-codes";
+
+export {
+  HashPrevMessageError,
+  MissingTransferContextIdError,
+} from "./core/errors/satp-service-errors";
+
+export {
+  hashPrevMessageVerifier,
+  sequenceNumberVerifier,
+  verifyMessage,
+} from "./core/stage-services/verifier/data-verifier";
+export type { IVerifyMessageOptions } from "./core/stage-services/verifier/data-verifier";
 
 /**
  * Fabric Network Validation - Hyperledger Fabric configuration validation utilities.

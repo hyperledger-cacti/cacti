@@ -4,15 +4,14 @@ import {
   populateClientSessionData,
   validateTransactRequest,
 } from "../../core/session-utils";
-import {
-  CredentialProfile,
-  LockType,
-  SignatureAlgorithm,
-} from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { LockType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { LoggerProvider, LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { GatewayOrchestrator } from "../../services/gateway/gateway-orchestrator";
 import { GatewayIdentity } from "../../core/types";
-import { SATP_VERSION } from "../../core/constants";
+import {
+  DEFAULT_TLS13_CIPHER_SUITE,
+  SATP_CORE_VERSION,
+} from "../../core/constants";
 import { getStatusService } from "../admin/get-status-handler-service";
 import { ercStandardToEnum } from "../../core/satp-utils";
 
@@ -41,14 +40,13 @@ export async function executeTransact(
   const receiverGatewayOwnerId: string = "";
 
   //Default, make it configurable by injecting sign function
-  const signatureAlgorithm: SignatureAlgorithm = SignatureAlgorithm.ECDSA;
+  const signatureAlgorithm = "ES256";
 
   //Default, TODO
-  const lockType: LockType = LockType.DESTROYBURN;
+  const lockType: LockType = LockType.TIME_LOCK;
   //In milliseconds (5min)
   const lockExpirationTime: bigint = BigInt(1000 * 60 * 5);
 
-  const credentialProfile: CredentialProfile = CredentialProfile.UNSPECIFIED;
   const loggingProfile: string = "MOCK_LOGGING_PROFILE";
   const accessControlProfile: string = "MOCK_ACCESS_CONTROL_PROFILE";
 
@@ -57,7 +55,7 @@ export async function executeTransact(
   let session = manager.getOrCreateSession(undefined, req.contextID);
   session = populateClientSessionData(
     session,
-    SATP_VERSION,
+    SATP_CORE_VERSION,
     req.sourceAsset.contractAddress,
     req.receiverAsset.contractAddress,
     manager.pubKey,
@@ -65,9 +63,9 @@ export async function executeTransact(
     receiverGatewayOwnerId,
     senderGatewayOwnerId,
     signatureAlgorithm,
+    DEFAULT_TLS13_CIPHER_SUITE,
     lockType,
     lockExpirationTime,
-    credentialProfile,
     loggingProfile ? loggingProfile : "",
     accessControlProfile,
     req.sourceAsset.amount,

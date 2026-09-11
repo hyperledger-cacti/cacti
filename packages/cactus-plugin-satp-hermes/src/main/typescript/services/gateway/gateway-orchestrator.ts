@@ -27,6 +27,7 @@ import {
 import {
   Client as ConnectClient,
   Transport as ConnectTransport,
+  Interceptor,
 } from "@connectrpc/connect";
 
 import { Express } from "express";
@@ -34,11 +35,11 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
-import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
-import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
+import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 
 export interface IGatewayOrchestratorOptions {
@@ -62,6 +63,8 @@ import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridg
 import { NetworkId } from "../../public-api";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import { satpProblemDetailsErrorMiddleware } from "../../core/errors/satp-errors";
+import { createGatewaySignatureInterceptors } from "../../core/cryptography/gateway-signature-interceptors";
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -77,6 +80,12 @@ export class GatewayOrchestrator {
   private channels: Map<string, GatewayChannel> = new Map();
   private readonly logger: Logger;
 
+  // v13 JWS envelope signing (stages 1-3). Built eagerly; signing keys are
+  // resolved per request so counterparty ENVELOPE_SIGNATURE keys added after startup
+  // are picked up without restarting the gateway.
+  private readonly signingInterceptor: Interceptor;
+  private readonly verificationInterceptor: Interceptor;
+
   constructor(options: IGatewayOrchestratorOptions) {
     const fnTag = `${this.label}#constructor()`;
     // add checks
@@ -89,6 +98,14 @@ export class GatewayOrchestrator {
     this.monitorService = options.monitorService;
 
     this.logger = LoggerProvider.getOrCreate(logOptions, this.monitorService);
+
+    const { signing, verification } = createGatewaySignatureInterceptors({
+      localGateway: this.localGateway,
+      getGatewayIdentity: (id) => this.getGatewayIdentity(id),
+      logger: this.logger,
+    });
+    this.signingInterceptor = signing;
+    this.verificationInterceptor = verification;
 
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 
@@ -188,13 +205,26 @@ export class GatewayOrchestrator {
             );
           }
 
+          // v13 JWS verification for stages 1-3 only.
+          // TODO(stage-0 + crash-recovery): these still use per-message proto
+          // signatures; migrate to JWS envelope signing and verify here too.
+          const stageKey = handler.getStage();
+          const shouldVerifySignature =
+            stageKey !== SatpStageKey.Stage0 && stageKey !== SatpStageKey.Crash;
+
           this.expressServer.use(
             expressConnectMiddleware({
               routes: handler.setupRouter.bind(handler),
               requestPathPrefix: httpPath,
+              // server side verification
+              interceptors: shouldVerifySignature
+                ? [this.verificationInterceptor]
+                : [],
             }),
           );
         }
+
+        this.expressServer.use(satpProblemDetailsErrorMiddleware);
       } catch (error) {
         span.setStatus({
           code: SpanStatusCode.ERROR,
@@ -409,6 +439,8 @@ export class GatewayOrchestrator {
         this.logger.debug(
           `Creating clients for gateway ${safeStableStringify(identity)}`,
         );
+        // TODO(stage-0): stage 0 still uses per-message proto signatures;
+        // migrate to JWS envelope signing and add the signing interceptor.
         const transport0 = createGrpcWebTransport({
           baseUrl:
             identity.address +
@@ -426,6 +458,8 @@ export class GatewayOrchestrator {
             `/${SatpStageKey.Stage0}`,
         );
 
+        const signingInterceptor = this.signingInterceptor;
+
         const transport1 = createGrpcWebTransport({
           baseUrl:
             identity.address +
@@ -433,6 +467,8 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage1}`,
           httpVersion: "1.1",
+          // for every outgoing message
+          interceptors: [signingInterceptor],
         });
 
         const transport2 = createGrpcWebTransport({
@@ -442,6 +478,7 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage2}`,
           httpVersion: "1.1",
+          interceptors: [signingInterceptor],
         });
 
         const transport3 = createGrpcWebTransport({
@@ -451,8 +488,11 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage3}`,
           httpVersion: "1.1",
+          interceptors: [signingInterceptor],
         });
 
+        // TODO(crash-recovery): crash-recovery still uses per-message proto
+        // signatures; migrate to JWS envelope signing and add the interceptor.
         const transportCrash = createGrpcWebTransport({
           baseUrl:
             identity.address + ":" + identity.gatewayServerPort + `/${"crash"}`,

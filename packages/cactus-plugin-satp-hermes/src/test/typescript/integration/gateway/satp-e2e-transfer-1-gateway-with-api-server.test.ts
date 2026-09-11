@@ -14,12 +14,13 @@ import {
   Configuration,
   GetApproveAddressApi,
   TokenType,
+  AdminApi,
 } from "../../../../main/typescript";
 import {
   IPluginFactoryOptions,
   PluginImportType,
 } from "@hyperledger-cacti/cactus-core-api";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import {
   BesuTestEnvironment,
   EthereumTestEnvironment,
@@ -35,7 +36,7 @@ import { createMigrationSource } from "../../../../main/typescript/database/knex
 import { knexRemoteInstance } from "../../../../main/typescript/database/knexfile-remote";
 import { knexLocalInstance } from "../../../../main/typescript/database/knexfile";
 import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
-import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 import fs from "fs";
@@ -63,6 +64,83 @@ const auditConfig: Knex.Config = {
   connection: { filename: dbPath },
   useNullAsDefault: true,
 };
+
+/**
+ * Step tags of the session proofs a complete SATP transfer must record in
+ * the audit database: the sender wrap claim (persisted at creation in the
+ * client wrapToken operation) plus the five claims that cross a gateway
+ * boundary and are signature-verified by the counterparty gateway.
+ */
+const EXPECTED_PROOF_STEP_TAGS = [
+  "preSATPTransferRequest",
+  "checkPreSATPTransferResponse",
+  "checkLockAssertionRequest",
+  "checkCommitPreparationResponse",
+  "checkCommitFinalAssertionRequest",
+  "checkCommitFinalAssertionResponse",
+];
+
+/**
+ * Asserts that a completed transfer produced real session proofs: every
+ * expected step tag is present in the session_proofs table of the audit
+ * database with a serialized claim and a non-empty signature, and the
+ * performAudit API returns the same proofs hydrated on the audit entries.
+ */
+async function expectSessionProofsPersisted(
+  auditClient: Knex,
+  gatewayInstance: SATPGateway,
+): Promise<void> {
+  const proofs = await auditClient("session_proofs").select();
+  expect(proofs.length).toBeGreaterThanOrEqual(EXPECTED_PROOF_STEP_TAGS.length);
+
+  const stepTags = new Set(
+    proofs.map((proof) => JSON.parse(proof.step).tag as string),
+  );
+  for (const tag of EXPECTED_PROOF_STEP_TAGS) {
+    expect(stepTags).toContain(tag);
+  }
+
+  for (const proof of proofs) {
+    expect(proof.sessionId).toBeString();
+    expect(proof.claim).toBeString();
+    expect(proof.signedClaim).toBeString();
+    expect(proof.signedClaim.length).toBeGreaterThan(0);
+    const parsedClaim = JSON.parse(proof.claim);
+    expect(parsedClaim.receipt).toBeString();
+    expect(parsedClaim.signature).toEqual(proof.signedClaim);
+  }
+
+  const adminApi = new AdminApi(
+    new Configuration({ basePath: gatewayInstance.getAddressOApiAddress() }),
+  );
+  const auditResponse = await adminApi.performAudit(
+    new Date(Date.now() - 3_600_000).toISOString(),
+    new Date(Date.now() + 60_000).toISOString(),
+  );
+  expect(auditResponse.status).toBe(200);
+
+  const entriesWithProofs = auditResponse.data.auditEntries.entries.filter(
+    (entry) => entry.proofs.length > 0,
+  );
+  expect(entriesWithProofs.length).toBeGreaterThan(0);
+
+  const apiStepTags = new Set(
+    entriesWithProofs.flatMap((entry) =>
+      entry.proofs.map((proof) => proof.step.tag),
+    ),
+  );
+  for (const tag of EXPECTED_PROOF_STEP_TAGS) {
+    expect(apiStepTags).toContain(tag);
+  }
+  for (const entry of entriesWithProofs) {
+    for (const proof of entry.proofs) {
+      expect(proof.sessionId).toBeString();
+      expect(proof.claim).toBeString();
+      expect(proof.signedClaim).toBeString();
+      expect(proof.signedClaim.length).toBeGreaterThan(0);
+    }
+  }
+}
 
 const TIMEOUT = 900000; // 15 minutes
 afterAll(async () => {
@@ -712,6 +790,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     );
     log.info("Amount was transfer correctly to the Owner account");
 
+    await expectSessionProofsPersisted(knexAuditClient, gateway);
+
     await gateway.shutdown();
   });
 });
@@ -915,6 +995,8 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
     log.info(
       "Non fungible token was transferred correctly to the Owner account at Ethereum",
     );
+
+    await expectSessionProofsPersisted(knexAuditClient, gateway);
 
     await gateway.shutdown();
   });

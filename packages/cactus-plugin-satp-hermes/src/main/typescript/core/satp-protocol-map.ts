@@ -16,13 +16,13 @@
  *
  * Each stage contains multiple steps executed by both client and server gateways.
  * Step tags identify specific protocol messages and operations.
- * @url https://www.ietf.org/archive/id/draft-ietf-satp-core-12.txt
+ * @url https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt
  * @module satp-protocol-map
  * @since 0.0.3-beta
  */
 
 import { SatpStageKey } from "../generated/gateway-client/typescript-axios";
-import { MessageType } from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { MessageType } from "../generated/proto/cacti/satp/v13/common/message_pb";
 
 /**
  * SATP stage type - numeric representation (0-3)
@@ -51,19 +51,19 @@ export type Stage0StepTag =
 
 /**
  * Step tags for Stage 1 - Transfer Initiation and Commencement Flows
- * @see https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-02#section-7
+ * @see https://datatracker.ietf.org/doc/html/draft-ietf-satp-core-13#section-8
  *
- * Ordered according to protocol flow per IETF SATP Core spec section 7:
+ * Ordered according to protocol flow per IETF SATP Core v13 spec section 8:
  *
- * 1. Transfer Proposal (sections 7.3-7.5):
- *    - Note: steps 7.1 and 7.2 are encompassed on stage 0
- *    - 7.3: Transfer Proposal Request (INIT_PROPOSAL)
- *    - 7.4: Transfer Proposal Receipt Message
- *    - 7.5: Transfer Proposal Reject and Conditional Reject Message
+ * 1. Transfer Proposal (sections 8.3-8.5):
+ *    - Note: steps 8.1 and 8.2 are encompassed on stage 0
+ *    - 8.3: Transfer Proposal Request (INIT_PROPOSAL)
+ *    - 8.4: Transfer Proposal Receipt Message
+ *    - 8.5: Transfer Proposal Reject Message (generic reject-msg)
  *
- * 2. Transfer Commence (sections 7.6-7.7):
- *    - 7.6: Transfer Commence Message
- *    - 7.7: Commence Response Message (ACK-Commence)
+ * 2. Transfer Commence (sections 8.6-8.7):
+ *    - 8.6: Transfer Commence Message
+ *    - 8.7: Commence Response Message (ACK-Commence)
  *
  * **Implementation Note:**
  * `checkTransferCommenceResponse` validates a Stage 1 message but is implemented
@@ -71,23 +71,23 @@ export type Stage0StepTag =
  * workflow (bridges Stage 1 completion to Stage 2 initiation).
  */
 export type Stage1StepTag =
-  // === Transfer Proposal Flow (sections 7.3-7.5) ===
-  | "transferProposalRequest" // Client: sends INIT_PROPOSAL (7.3)
+  // Transfer Proposal Flow (sections 8.3-8.5) ===
+  | "transferProposalRequest" // Client: sends INIT_PROPOSAL (8.3)
   | "checkTransferProposalRequestMessage" // Server: validates proposal request
-  | "transferProposalResponse" // Server: sends INIT_RECEIPT or INIT_REJECT (7.4/7.5)
+  | "transferProposalResponse" // Server: sends INIT_RECEIPT or INIT_REJECT (8.4/8.5)
   | "checkTransferProposalResponse" // Client: validates proposal response
-  // === Transfer Commence Flow (sections 7.6-7.7) ===
-  | "transferCommenceRequest" // Client: sends TRANSFER_COMMENCE_REQUEST (7.6)
+  // === Transfer Commence Flow (sections 8.6-8.7) ===
+  | "transferCommenceRequest" // Client: sends TRANSFER_COMMENCE_REQUEST (8.6)
   | "checkTransferCommenceRequestMessage" // Server: validates commence request
-  | "transferCommenceResponse" // Server: sends ACK-Commence response (7.7)
+  | "transferCommenceResponse" // Server: sends ACK-Commence response (8.7)
   | "checkTransferCommenceResponse"; // Client: validates ACK-Commence (impl in Stage2ClientService)
 
 /**
  * Step tags for Stage 2 - Asset Locking
  *
- * Per IETF SATP Core spec section 8, Stage 2 includes:
- * - 8.1: Lock Assertion Message
- * - 8.2: Lock Assertion Receipt Message
+ * Per IETF SATP Core v13 spec section 9, Stage 2 includes:
+ * - 9.1: Lock Assertion Message
+ * - 9.2: Lock Assertion Receipt Message
  *
  * **Implementation Note:**
  * `checkLockAssertionResponse` validates a Stage 2 message but is implemented
@@ -103,6 +103,7 @@ export type Stage2StepTag =
 
 /**
  * Step tags for Stage 3 - Commitment and Finalization
+ * Per IETF SATP Core v13 spec sections 10.1-10.5.
  */
 export type Stage3StepTag =
   | "commitPreparation" // Client
@@ -257,11 +258,11 @@ export const SATP_PROTOCOL_MAP: Record<SatpStage, SatpStageDefinition> = {
     stage: 1,
     name: "Transfer Initiation and Commencement Flows",
     steps: [
-      // Transfer Proposal Flow (sections 7.3-7.5)
+      // Transfer Proposal Flow (sections 8.3-8.5)
       {
         tag: "transferProposalRequest",
         description:
-          "Client sends transfer proposal request (INIT_PROPOSAL) [7.3]",
+          "Client sends transfer proposal request (INIT_PROPOSAL) [8.3]",
         role: "client",
         sequence: 1,
         messageType: MessageType.INIT_PROPOSAL, // 6
@@ -276,7 +277,7 @@ export const SATP_PROTOCOL_MAP: Record<SatpStage, SatpStageDefinition> = {
       {
         tag: "transferProposalResponse",
         description:
-          "Server sends transfer proposal response (INIT_RECEIPT/INIT_REJECT) [7.4/7.5]",
+          "Server sends transfer proposal response (INIT_RECEIPT/INIT_REJECT) [8.4/8.5]",
         role: "server",
         sequence: 3,
         messageType: MessageType.INIT_RECEIPT, // 7 (or INIT_REJECT=8)
@@ -288,10 +289,10 @@ export const SATP_PROTOCOL_MAP: Record<SatpStage, SatpStageDefinition> = {
         sequence: 4,
         messageType: MessageType.INIT_RECEIPT, // 7 (validation of)
       },
-      // Transfer Commence Flow (sections 7.6-7.7)
+      // Transfer Commence Flow (sections 8.6-8.7)
       {
         tag: "transferCommenceRequest",
-        description: "Client sends transfer commence request [7.6]",
+        description: "Client sends transfer commence request [8.6]",
         role: "client",
         sequence: 5,
         messageType: MessageType.TRANSFER_COMMENCE_REQUEST, // 9
@@ -305,7 +306,7 @@ export const SATP_PROTOCOL_MAP: Record<SatpStage, SatpStageDefinition> = {
       },
       {
         tag: "transferCommenceResponse",
-        description: "Server sends ACK-Commence response [7.7]",
+        description: "Server sends ACK-Commence response [8.7]",
         role: "server",
         sequence: 7,
         messageType: MessageType.TRANSFER_COMMENCE_RESPONSE, // 10

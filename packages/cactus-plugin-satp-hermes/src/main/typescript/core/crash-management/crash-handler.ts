@@ -3,7 +3,7 @@ import type { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   CrashRecoveryService,
   type RecoverSuccessResponse,
-} from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+} from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import type { CrashRecoveryServerService } from "./server-service";
 import type { CrashRecoveryClientService } from "./client-service";
 import type {
@@ -13,9 +13,9 @@ import type {
   RollbackRequest,
   RollbackResponse,
   RollbackState,
-} from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+} from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import { type SATPHandler, SATPHandlerType } from "../../types/satp-protocol";
-import type { SessionData } from "../../generated/proto/cacti/satp/v02/session/session_pb";
+import type { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { MonitorService } from "../../services/monitoring/monitor";
 

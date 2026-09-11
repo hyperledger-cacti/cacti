@@ -16,7 +16,7 @@
  * - Type-safe asset creation and validation utilities
  *
  * **SATP Protocol Integration:**
- * Asset structures follow IETF SATP Core v2 specification requirements for
+ * Asset structures follow IETF SATP Core v13 specification requirements for
  * cross-chain asset identification, ownership tracking, and network association.
  *
  * @example
@@ -38,7 +38,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link TokenType} for supported asset types
  * @see {@link NetworkId} for network identification
  * @see {@link EvmAsset} for EVM-specific asset extensions
@@ -53,7 +53,7 @@ import { v4 as uuidv4 } from "uuid";
 import {
   ERCTokenStandard,
   TokenType,
-} from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { NetworkId } from "../../../../public-api";
 
 /**

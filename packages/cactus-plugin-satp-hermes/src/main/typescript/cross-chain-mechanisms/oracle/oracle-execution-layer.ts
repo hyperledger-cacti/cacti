@@ -4,7 +4,7 @@
 import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 import { SATPLoggerProvider as LoggerProvider } from "../../core/satp-logger-provider";
 import { SATPLogger as Logger } from "../../core/satp-logger";
-import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { ClaimFormatError, TransactionError } from "../common/errors";
 import { OracleAbstract } from "./oracle-abstract";
 import { IOracleEntryBase } from "./oracle-types";

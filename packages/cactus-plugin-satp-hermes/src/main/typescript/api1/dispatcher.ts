@@ -4,7 +4,7 @@
  * This module provides the main BLODispatcher class which serves as the central
  * request dispatcher for all SATP gateway API endpoints. It coordinates between
  * different service layers including admin operations, transaction handling,
- * oracle management, and cross-chain operations following the IETF SATP v2
+ * oracle management, and cross-chain operations following the IETF SATP v13
  * specification.
  *
  * The dispatcher manages:
@@ -38,7 +38,7 @@
  * const endpoints = await dispatcher.getOrCreateWebServices();
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -78,6 +78,7 @@ import type {
   OracleUnregisterRequest,
   StatusRequest,
   StatusResponse,
+  SessionProofsResponse,
   TransactRequest,
   TransactResponse,
 } from "../generated/gateway-client/typescript-axios/api";
@@ -105,7 +106,7 @@ import { GatewayShuttingDownError } from "./gateway-errors";
 import {
   ClaimFormat,
   TokenType,
-} from "../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../generated/proto/cacti/satp/v13/common/message_pb";
 import { GetApproveAddressEndpointV1 } from "./transaction/get-approve-address-endpoint";
 import { getEnumValueByKey } from "../services/utils";
 import { GatewayIdentity } from "../core/types";
@@ -121,8 +122,12 @@ import { OracleRegisterTaskEndpointV1 } from "./oracle/oracle-register-task-endp
 import { OracleUnregisterTaskEndpointV1 } from "./oracle/oracle-unregister-task-endpoint";
 import { GetOracleStatusEndpointV1 } from "./oracle/oracle-get-status-endpoint";
 import safeStableStringify from "safe-stable-stringify";
-import { executeAudit } from "./admin/get-audit-handler-service";
+import {
+  executeAudit,
+  mapSessionProof,
+} from "./admin/get-audit-handler-service";
 import { AuditEndpointV1 } from "./admin/audit-endpoint";
+import { GetSessionProofsEndpointV1 } from "./admin/get-session-proofs-endpoint";
 import { DecideInboundWebhookEndpointV1 } from "./webhook/decide-endpoint";
 import { SupportedLedgersEndpointV1 } from "./admin/supported-ledgers-endpoint";
 import {
@@ -431,6 +436,11 @@ export class BLODispatcher {
           logLevel: this.options.logLevel,
         });
 
+        const getSessionProofsEndpointV1 = new GetSessionProofsEndpointV1({
+          dispatcher: this,
+          logLevel: this.options.logLevel,
+        });
+
         const oracleExecuteTaskEndpointV1 = new OracleExecuteTaskEndpointV1({
           dispatcher: this,
           logLevel: this.options.logLevel,
@@ -473,6 +483,7 @@ export class BLODispatcher {
           transactEndpointV1,
           addCounterpartyGatewayEndpointV1,
           auditEndpointV1,
+          getSessionProofsEndpointV1,
           oracleExecuteTaskEndpointV1,
           oracleRegisterTaskEndpointV1,
           oracleUnregisterTaskEndpointV1,
@@ -832,6 +843,31 @@ export class BLODispatcher {
         );
 
         return result;
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
+  }
+
+  public async GetSessionProofs(
+    sessionIds: string[],
+  ): Promise<SessionProofsResponse> {
+    const fnTag = "API1#getSessionProofs()";
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    return context.with(ctx, async () => {
+      try {
+        this.logger.info(
+          `Get Session Proofs request: ${safeStableStringify(sessionIds)}`,
+        );
+
+        const proofs =
+          await this.auditRepository.readProofsBySessionIds(sessionIds);
+
+        return { proofs: proofs.map(mapSessionProof) };
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

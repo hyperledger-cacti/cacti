@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.21;
 
 import { SATPNFTokenContract } from "../contracts/SATPNFTokenContract.sol";
 import "forge-std/Test.sol";

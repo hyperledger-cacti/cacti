@@ -37,6 +37,7 @@ import type {
   RemoteLog,
   AuditEntry,
   Audit,
+  SessionProof,
 } from "../../../core/types";
 
 /**
@@ -214,6 +215,24 @@ export interface IAuditEntryRepository extends IRepository<AuditEntry, string> {
     endTimestamp: number,
   ): Promise<Audit>;
   create(auditEntry: AuditEntry): Promise<AuditEntry>;
+  /**
+   * Persist a session proof (signed protocol claim) in the audit database.
+   *
+   * The write is idempotent: persisting the same proof (same session, step and
+   * claim) more than once does not create duplicate rows. Proofs are immutable
+   * once persisted.
+   *
+   * @param proof - The SessionProof to persist
+   * @returns A promise resolving to the persisted proof
+   */
+  createProof(proof: SessionProof): Promise<SessionProof>;
+  /**
+   * Retrieve all session proofs associated with the given session IDs.
+   *
+   * @param sessionIds - Session IDs to look up proofs for
+   * @returns A promise resolving to the matching proofs (empty if none)
+   */
+  readProofsBySessionIds(sessionIds: string[]): Promise<SessionProof[]>;
   /** Clean up repository resources and connections */
   destroy(): Promise<void>;
   /** Reset repository to initial state */

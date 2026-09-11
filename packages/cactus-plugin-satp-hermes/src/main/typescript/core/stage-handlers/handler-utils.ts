@@ -6,7 +6,7 @@
  * This module provides common utility functions used across all SATP protocol stage handlers
  * for consistent message processing, session management, and protocol compliance validation.
  * These utilities ensure standardized handling of SATP message structures and session data
- * according to the IETF SATP Core v2 specification.
+ * according to the IETF SATP Core v13 specification.
  *
  * **Core Utilities:**
  * - **Session ID Extraction**: Safe extraction of session identifiers from SATP messages
@@ -35,7 +35,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SessionIdNotFoundError} for session validation error handling
  *
  * @author SATP Hermes Development Team
@@ -44,10 +44,28 @@
  */
 
 import { SessionIdNotFoundError } from "../errors/satp-handler-errors";
+import { isReceivedProtocolTerminationError } from "../errors/satp-errors";
 import type { ExecutionPointAdapterPayload } from "../../adapters/adapter-manager";
 import type { StageExecutionStep } from "../../adapters/adapter-config";
 import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
+import { type Span, SpanStatusCode } from "@opentelemetry/api";
+import {
+  ErrorMessage,
+  MessageType,
+  RejectMessage,
+  SessionAbortMessage,
+} from "../../generated/proto/cacti/satp/v13/common/message_pb";
+import { SessionData } from "../../generated/proto/cacti/satp/v13/session/session_pb";
 import { SATPSession } from "../satp-session";
+import {
+  handleIncomingProtocolRejectMessage,
+  type IIncomingProtocolMessageResult,
+} from "../stage-services/protocol-message-service";
+import {
+  ReceivedErrorMessageError,
+  ReceivedRejectMessageError,
+  ReceivedSessionAbortError,
+} from "../errors/satp-errors";
 
 /**
  * Safely extracts the session ID from a SATP protocol message.
@@ -65,7 +83,7 @@ import { SATPSession } from "../satp-session";
  * - Critical for maintaining transfer state consistency
  *
  * **Protocol Compliance:**
- * According to the IETF SATP Core v2 specification, all protocol messages must
+ * According to the IETF SATP Core v13 specification, all protocol messages must
  * include a session identifier in their common message fields to enable proper
  * session management and message correlation across the transfer workflow.
  *
@@ -217,6 +235,66 @@ export function buildAdapterPayload(
     metadata,
     payload,
   };
+}
+
+/**
+ * Apply cross-stage protocol message semantics before a normal stage message is
+ * processed. This keeps reject/error/session-abort handling centralized and
+ * ensures those message types short-circuit normal protocol flow.
+ */
+export function applyCrossStageProtocolMessage(
+  sessionData: SessionData,
+  message:
+    | RejectMessage
+    | ErrorMessage
+    | SessionAbortMessage
+    | { common?: { messageType?: number } },
+): IIncomingProtocolMessageResult | undefined {
+  if (!message || !message.common || message.common.messageType == undefined) {
+    return undefined;
+  }
+
+  const result = handleIncomingProtocolRejectMessage(
+    sessionData,
+    message as RejectMessage | ErrorMessage | SessionAbortMessage,
+  );
+
+  if (result?.terminate || message.common.messageType === MessageType.ERROR) {
+    const reason = result?.reason ?? "protocol cross-stage error message";
+    switch (message.common.messageType) {
+      case MessageType.INIT_REJECT:
+        throw new ReceivedRejectMessageError(reason);
+      case MessageType.ERROR:
+        throw new ReceivedErrorMessageError(reason);
+      case MessageType.SESSION_ABORT:
+        throw new ReceivedSessionAbortError(reason);
+      default:
+        throw new Error(reason);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Shared high-level guard applied once per stage handler catch block,
+ * mirroring the "session exists" check: if the inbound message was a
+ * peer-originated reject/error/session-abort message, the session state
+ * has already been updated by {@link applyCrossStageProtocolMessage}, so
+ * this records the failure on the span and rethrows to abort the RPC call
+ * without producing a peer-facing error response. Otherwise it is a no-op
+ * and normal local-failure handling (setError + *ErrorResponse) continues.
+ */
+export function abortOnReceivedProtocolTermination(
+  error: unknown,
+  span: Span,
+): void {
+  if (!isReceivedProtocolTerminationError(error)) {
+    return;
+  }
+  span.setStatus({ code: SpanStatusCode.ERROR, message: String(error) });
+  span.recordException(error);
+  throw error;
 }
 
 /**

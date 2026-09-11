@@ -1,0 +1,77 @@
+syntax = "proto3";
+package cacti.satp.v13.service;
+
+import "cacti/satp/v13/common/message.proto";
+
+// Stage 0 is non-standard in both v02 and v13
+// ("out of the scope of this specification" — v13 Section 7).
+// To be updated with findings from
+// https://datatracker.ietf.org/doc/html/draft-avrilionis-satp-setup-stage-04
+
+enum STATUS {
+  STATUS_UNSPECIFIED = 0;
+  STATUS_ACCEPTED = 1;
+  STATUS_REJECTED = 2;
+}
+
+message NewSessionRequest {
+  string session_id = 1;
+  string context_id = 2;
+  string client_transfer_number = 3;
+  string gateway_id = 5;
+  string client_signature = 6;
+  bool error = 7;
+  cacti.satp.v13.common.MessageType message_type = 9;
+  string sender_gateway_network_type = 10;
+}
+
+message NewSessionResponse {
+  string session_id = 1;
+  string context_id = 2;
+  STATUS status = 3;
+  string hash_previous_message = 4;
+  string server_signature = 5;
+  bool error = 6;
+  cacti.satp.v13.common.MessageType message_type = 8;
+  string receiver_gateway_network_type = 9;
+}
+
+message PreSATPTransferRequest {
+  string session_id = 1;
+  string context_id = 2;
+  string client_transfer_number = 3;
+  string sender_gateway_network_id = 4;
+  cacti.satp.v13.common.Asset sender_asset = 5;
+  cacti.satp.v13.common.Asset receiver_asset = 6;
+  cacti.satp.v13.common.WrapAssertionClaim wrap_assertion_claim = 7;
+  string hash_previous_message = 8;
+  string client_signature = 9;
+  bool error = 10;
+  cacti.satp.v13.common.MessageType message_type = 12;
+}
+
+message PreSATPTransferResponse {
+  string session_id = 1;
+  string context_id = 2;
+  string recipient_gateway_network_id = 3;
+  cacti.satp.v13.common.WrapAssertionClaim wrap_assertion_claim = 4;
+  string hash_previous_message = 5;
+  string recipient_token_id = 6;
+  string server_signature = 7;
+  bool error = 8;
+  cacti.satp.v13.common.MessageType message_type = 10;
+}
+
+message CheckRequest {
+  string check = 1;
+}
+
+message CheckResponse {
+  string check = 1;
+}
+
+service SatpStage0Service {
+  rpc NewSession(NewSessionRequest) returns (NewSessionResponse) {}
+  rpc PreSATPTransfer(PreSATPTransferRequest) returns (PreSATPTransferResponse) {}
+  rpc Check(CheckRequest) returns (CheckResponse) {}
+}

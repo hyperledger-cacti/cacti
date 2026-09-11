@@ -11,12 +11,13 @@
  * @since 0.0.3-beta
  */
 
-import type { AuditEntry, Audit } from "../../core/types";
+import type { AuditEntry, Audit, SessionProof } from "../../core/types";
 import type { IAuditEntryRepository } from "./interfaces/repository";
 import { AuditEntryNotFoundError } from "../../core/errors/satp-errors";
 import knex, { type Knex } from "knex";
 import { knexAuditInstance } from "../knexfile-audit";
 import { createMigrationSource } from "../knex-migration-source";
+import { createHash } from "crypto";
 import { LoggerProvider } from "@hyperledger-cacti/cactus-common";
 
 /**
@@ -116,6 +117,16 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
   }
 
   /**
+   * Get Knex query builder for the session proofs table.
+   *
+   * @returns Query builder configured for session proofs table
+   * @private
+   */
+  getSessionProofsTable(): Knex.QueryBuilder {
+    return this.database("session_proofs");
+  }
+
+  /**
    * Retrieve audit entry by unique identifier.
    *
    * @param auditEntryId - Unique audit entry identifier
@@ -131,10 +142,14 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
       throw new AuditEntryNotFoundError(auditEntryId);
     }
 
+    const session = JSON.parse(row.session);
+    const proofs = await this.readProofsBySessionIds([session.sessionId]);
+
     return {
       auditEntryId: row.auditEntryId,
-      session: JSON.parse(row.session),
+      session,
       timestamp: row.timestamp,
+      proofs,
     };
   }
 
@@ -149,17 +164,96 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
     startTimestamp: number,
     endTimestamp: number,
   ): Promise<Audit> {
-    return this.getAuditEntriesTable()
+    const rows = await this.getAuditEntriesTable()
       .where("timestamp", ">=", startTimestamp)
       .andWhere("timestamp", "<=", endTimestamp)
-      .select()
-      .then((rows) => ({
-        auditEntries: rows.map((row: any) => ({
+      .select();
+
+    const sessionIds = rows.map(
+      (row: any) => JSON.parse(row.session).sessionId,
+    );
+    const proofs = await this.readProofsBySessionIds(sessionIds);
+    const proofsBySessionId = new Map<string, SessionProof[]>();
+    for (const proof of proofs) {
+      const existing = proofsBySessionId.get(proof.sessionId) ?? [];
+      existing.push(proof);
+      proofsBySessionId.set(proof.sessionId, existing);
+    }
+
+    return {
+      auditEntries: rows.map((row: any) => {
+        const session = JSON.parse(row.session);
+        return {
           auditEntryId: row.auditEntryId,
-          session: JSON.parse(row.session),
+          session,
           timestamp: row.timestamp,
-        })),
-      }));
+          proofs: proofsBySessionId.get(session.sessionId) ?? [],
+        };
+      }),
+    };
+  }
+
+  /**
+   * Persist a session proof (signed protocol claim) in the audit database.
+   *
+   * Each SessionProof captures the signature-verified claim exchanged at a
+   * SATP protocol step, keeping it provable for dispute resolution and audit
+   * after transport ends. Proofs are immutable once persisted.
+   *
+   * The write is idempotent: the proof identifier is derived deterministically
+   * from the session ID, step tag and claim, so re-verifying the same claim at
+   * the same step (e.g. after a retry or crash recovery) does not duplicate
+   * rows — the existing proof is left untouched.
+   *
+   * @param proof - The SessionProof to persist
+   * @returns A promise resolving to the persisted proof
+   */
+  async createProof(proof: SessionProof): Promise<SessionProof> {
+    this.logger.debug(
+      `Creating session proof for session: ${proof.sessionId}, step: ${proof.step.tag}`,
+    );
+
+    const proofId = createHash("sha256")
+      .update(`${proof.sessionId}:${proof.step.tag}:${proof.claim}`)
+      .digest("hex");
+
+    await this.getSessionProofsTable()
+      .insert({
+        proofId,
+        sessionId: proof.sessionId,
+        step: JSON.stringify(proof.step),
+        claim: proof.claim,
+        signedClaim: proof.signedClaim,
+        timestamp: Date.now(),
+      })
+      .onConflict("proofId")
+      .ignore();
+
+    return proof;
+  }
+
+  /**
+   * Retrieve all session proofs associated with the given session IDs.
+   *
+   * @param sessionIds - Session IDs to look up proofs for
+   * @returns A promise resolving to the matching proofs (empty if none)
+   */
+  async readProofsBySessionIds(sessionIds: string[]): Promise<SessionProof[]> {
+    if (sessionIds.length === 0) {
+      return [];
+    }
+
+    const rows = await this.getSessionProofsTable()
+      .whereIn("sessionId", sessionIds)
+      .orderBy("timestamp", "asc")
+      .select();
+
+    return rows.map((row: any) => ({
+      sessionId: row.sessionId,
+      step: JSON.parse(row.step),
+      claim: row.claim,
+      signedClaim: row.signedClaim,
+    }));
   }
 
   /**
@@ -206,6 +300,8 @@ export class KnexAuditEntryRepository implements IAuditEntryRepository {
    * @since 0.0.3-beta
    */
   async reset() {
+    await this.getSessionProofsTable().del();
+    await this.getAuditEntriesTable().del();
     await this.database.migrate.rollback();
     await this.database.migrate.latest();
   }
