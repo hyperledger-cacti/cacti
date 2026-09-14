@@ -25,7 +25,7 @@
  * await endpoint.registerExpress(app);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -51,7 +51,7 @@ import {
 import { TransactRequest } from "../../generated/gateway-client/typescript-axios/api";
 import { SATPInternalError } from "../../core/errors/satp-errors";
 import { getEnumKeyByValue } from "../../services/utils";
-import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType } from "../../core/errors/satp-error-type";
 
 /**
  * Web service endpoint for SATP transaction operations.

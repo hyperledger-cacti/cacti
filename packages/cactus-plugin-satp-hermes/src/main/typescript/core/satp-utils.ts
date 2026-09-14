@@ -27,10 +27,8 @@ import { Asset } from "../cross-chain-mechanisms/bridge/ontology/assets/asset";
  * @see {@link getEnumKeyByValue} for enum utility functions
  */
 
-import {
-  ERCTokenStandard,
-  MessageType,
-} from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { ERCTokenStandard } from "../generated/proto/cacti/satp/v13/common/message_pb";
+import { MessageType } from "../generated/proto/cacti/satp/v13/common/message_pb";
 import { getEnumKeyByValue } from "../services/utils";
 import {
   TokenIdMissingError,
@@ -42,8 +40,12 @@ import { SATPLogger } from "./satp-logger";
 import { protoToAsset } from "./stage-services/service-utils";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { NetworkId } from "../public-api";
-import { TokenType } from "../generated/proto/cacti/satp/v02/common/message_pb";
-import { SessionData } from "../generated/proto/cacti/satp/v02/session/session_pb";
+import { TokenType } from "../generated/proto/cacti/satp/v13/common/message_pb";
+import { SessionData } from "../generated/proto/cacti/satp/v13/session/session_pb";
+import {
+  messageTypeToUrn,
+  SATP_MSGTYPE_URN_PREFIX,
+} from "./iana-message-types";
 
 /**
  * Aggregated asset and network information built from session data.
@@ -86,12 +88,19 @@ export enum SessionSide {
 export function getMessageTypeName(
   messageType: MessageType | undefined,
 ): string {
-  return (
-    (messageType
-      ? getEnumKeyByValue(MessageType, messageType)
-      : getEnumKeyByValue(MessageType, MessageType.UNSPECIFIED)) ||
-    "UNSPECIFIED"
+  if (messageType !== undefined) {
+    const messageTypeUrn = messageTypeToUrn(messageType);
+    if (messageTypeUrn) {
+      return messageTypeUrn.slice(SATP_MSGTYPE_URN_PREFIX.length);
+    }
+  }
+  const enumName = getEnumKeyByValue(
+    MessageType,
+    messageType ?? MessageType.UNSPECIFIED,
   );
+  return enumName
+    ? `${enumName.toLowerCase().replaceAll("_", "-")}-msg`
+    : "unspecified-msg";
 }
 
 /**

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.20;
+pragma solidity 0.8.21;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./ITraceableContract.sol";
@@ -509,17 +509,22 @@ contract SATPWrapperContract is Ownable, ITraceableContract, IERC721Receiver{
      * @param uniqueDescriptor The token-specific descriptor (e.g. ERC1155/ERC6909 token ID).
      * @return token the token with the given token ID, asset attribute, and unique descriptor.
      */
-    function getToken(string memory tokenId, uint256 assetAttribute, uint256 uniqueDescriptor) view public returns (Token memory token) {
+    function getToken(string memory tokenId, uint256 assetAttribute, ERCTokenStandard uniqueDescriptor) view public returns (Token memory token) {
         TokenType tt = tokens[tokenId].tokenType;
+        ERCTokenStandard descriptor = tokens[tokenId].ercTokenStandard;
+
         if (tt == TokenType.NONSTANDARD_FUNGIBLE) {
             return tokens[tokenId];
         }
+        
         else if (tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
+            assert(descriptor == uniqueDescriptor);
             if(NFT_IDs[tokenId][assetAttribute]) {
-                return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, assetAttribute, tokens[tokenId].ercTokenStandard);
+
+                return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, assetAttribute, descriptor);
             }
             else {
-                return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, 0, tokens[tokenId].ercTokenStandard);
+                return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, 0, descriptor);
             }
         }
     }

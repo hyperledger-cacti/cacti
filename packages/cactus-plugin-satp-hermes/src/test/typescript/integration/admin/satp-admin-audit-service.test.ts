@@ -111,6 +111,7 @@ describe("Admin Audit Service Integration Tests", () => {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp: timestamp,
+      proofs: [],
     };
     await repository.create(auditEntry);
 
@@ -136,6 +137,7 @@ describe("Admin Audit Service Integration Tests", () => {
     expect(entry.auditEntryId).toEqual(auditEntry.auditEntryId);
     expect(entry.timestamp).toEqual(auditEntry.timestamp);
     expect(entry.session).toEqual(auditEntry.session);
+    expect(entry.proofs).toEqual([]);
   });
 
   it("Given valid timestamps with no matching entries, When calling performAudit, Then it should return an empty auditEntries array", async () => {

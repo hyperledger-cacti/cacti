@@ -4,7 +4,7 @@
  * This module provides the main cross-chain coordination manager for the SATP
  * gateway system. It orchestrates bridge operations, oracle interactions, and
  * ontology management to enable secure asset transfers across different
- * blockchain networks following the IETF SATP v2 specification.
+ * blockchain networks following the IETF SATP v13 specification.
  *
  * @group Cross-Chain Mechanisms
  * @module cross-chain-mechanisms/satp-cc-manager
@@ -34,7 +34,7 @@
  * });
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */

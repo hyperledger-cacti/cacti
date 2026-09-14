@@ -56,7 +56,7 @@ import { Amount, Asset, UniqueTokenID } from "./ontology/assets/asset";
  * await sourceLeaf.burnAsset(asset.id, transferAmount);
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link BridgeLeaf} for base bridge leaf interface
  * @see {@link BridgeLeafNonFungible} for non-fungible asset operations
  * @see {@link SATPBridgeExecutionLayer} for higher-level execution coordination
@@ -105,7 +105,7 @@ import { TransactionResponse } from "./bridge-types";
  * }
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.2
  * @see {@link Asset} for asset data structure definition
  * @see {@link TransactionResponse} for transaction result interface
  * @see {@link BridgeLeaf} for base bridge leaf functionality
@@ -142,7 +142,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link getDeployFungibleWrapperContractReceipt} for deployment receipt retrieval
    * @see {@link wrapAsset} for asset wrapping operations
    */
@@ -222,7 +222,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link unwrapAsset} for asset unwrapping operations
    * @see {@link Asset} for asset data structure
    * @see {@link TransactionResponse} for response format
@@ -264,7 +264,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.1
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
    * @see {@link wrapAsset} for asset wrapping operations
    * @see {@link TransactionResponse} for response format
    */
@@ -305,7 +305,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.2
    * @see {@link unlockAsset} for asset unlocking operations
    * @see {@link TransactionResponse} for response format
    */
@@ -355,7 +355,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.2
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.2
    * @see {@link lockAsset} for asset locking operations
    * @see {@link TransactionResponse} for response format
    */
@@ -400,7 +400,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.3
    * @see {@link burnAsset} for asset burning operations
    * @see {@link TransactionResponse} for response format
    */
@@ -447,7 +447,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.3
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.3
    * @see {@link mintAsset} for asset minting operations
    * @see {@link TransactionResponse} for response format
    */
@@ -498,7 +498,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.4
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.4
    * @see {@link mintAsset} for asset minting operations
    * @see {@link TransactionResponse} for response format
    */
@@ -547,7 +547,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.5
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.5
    * @see {@link getReceipt} for transaction receipt retrieval
    * @see {@link TransactionResponse} for response format
    */
@@ -596,7 +596,7 @@ export abstract class BridgeLeafFungible {
    * ```
    *
    * @since 0.0.3-beta
-   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Section 4.6
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Section 4.6
    * @see {@link runTransaction} for transaction execution
    */
   public abstract getReceipt(transactionId: string): Promise<string>;

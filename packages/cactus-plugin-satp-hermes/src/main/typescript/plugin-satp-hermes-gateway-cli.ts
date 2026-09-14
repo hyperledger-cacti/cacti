@@ -94,7 +94,7 @@
  * node plugin-satp-hermes-gateway-cli.js
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link SATPGateway} for gateway implementation
  * @see {@link SATPGatewayConfig} for configuration structure
  * @see {@link AdapterLayerConfiguration} for adapter configuration schema

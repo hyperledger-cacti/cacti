@@ -4,12 +4,12 @@ import { Stage0RollbackStrategy } from "./stage0-rollback-strategy";
 import { Stage1RollbackStrategy } from "./stage1-rollback-strategy";
 import { Stage2RollbackStrategy } from "./stage2-rollback-strategy";
 import { Stage3RollbackStrategy } from "./stage3-rollback-strategy";
-import type { RollbackState } from "../../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import type { RollbackState } from "../../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import {
   type Type,
   SATPStage,
   type SessionData,
-} from "../../../generated/proto/cacti/satp/v02/session/session_pb";
+} from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { getCrashedStage } from "../../session-utils";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { context, SpanStatusCode } from "@opentelemetry/api";

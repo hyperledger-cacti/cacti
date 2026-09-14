@@ -16,7 +16,7 @@ import {
   NoSigningCredentialError,
   UnsupportedNetworkError,
 } from "../../common/errors";
-import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   BusinessLogicContract,
   IBesuNetworkConfig,

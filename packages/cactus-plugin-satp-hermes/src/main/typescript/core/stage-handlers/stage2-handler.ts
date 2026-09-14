@@ -3,7 +3,7 @@
  * SATP Stage 2 Handler for Lock Assertion and Asset Locking Operations.
  *
  * @description
- * This module implements the Stage 2 handler of the IETF SATP Core v2 protocol,
+ * This module implements the Stage 2 handler of the IETF SATP Core v13 protocol,
  * responsible for managing the lock assertion phase of cross-chain asset transfers.
  * Stage 2 establishes cryptographic proofs of asset locking on the source network,
  * providing the necessary evidence and assertions required for secure cross-chain
@@ -74,7 +74,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SATPHandler} for base handler interface
  * @see {@link Stage2ServerService} for server-side business logic
  * @see {@link Stage2ClientService} for client-side business logic
@@ -85,7 +85,7 @@
  */
 
 import { ConnectRouter } from "@connectrpc/connect";
-import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import { Stage2ServerService } from "../stage-services/server/stage2-server-service";
 import { SATPSession } from "../satp-session";
 import {
@@ -99,17 +99,22 @@ import { SATPLogger as Logger } from "../../core/satp-logger";
 import {
   LockAssertionResponse,
   LockAssertionRequest,
-} from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
+} from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
 import { Stage2ClientService } from "../stage-services/client/stage2-client-service";
-import { TransferCommenceResponse } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
+import { TransferCommenceResponse } from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
 import {
   FailedToCreateMessageError,
   FailedToProcessError,
   SessionNotFoundError,
 } from "../errors/satp-handler-errors";
-import { getSessionId, buildAdapterPayload } from "./handler-utils";
+import {
+  getSessionId,
+  buildAdapterPayload,
+  applyCrossStageProtocolMessage,
+  abortOnReceivedProtocolTermination,
+} from "./handler-utils";
 import { getMessageTypeName } from "../satp-utils";
-import { MessageType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   collectSessionAttributes,
   saveMessageInSessionData,
@@ -122,7 +127,7 @@ import type { AdapterManager } from "../../adapters/adapter-manager";
  * SATP Stage 2 Handler for Lock Assertion and Asset Locking Operations.
  *
  * @description
- * Implements the Stage 2 phase of the IETF SATP Core v2 protocol, managing
+ * Implements the Stage 2 phase of the IETF SATP Core v13 protocol, managing
  * the critical asset locking and lock assertion operations that provide
  * cryptographic proof of asset immobilization on source networks. This handler
  * coordinates between client and server gateways to establish verifiable
@@ -419,7 +424,7 @@ export class Stage2SATPHandler implements SATPHandler {
    * Returns the SATP protocol stage identifier for this handler.
    *
    * @description
-   * Provides the stage identifier as defined in the IETF SATP Core v2
+   * Provides the stage identifier as defined in the IETF SATP Core v13
    * specification, used for protocol compliance and message routing.
    *
    * @public
@@ -441,7 +446,7 @@ export class Stage2SATPHandler implements SATPHandler {
    * Processes incoming LockAssertionRequest messages from client gateways
    * to validate cryptographic proofs of asset locking operations. This method
    * implements the server-side logic for lock assertion validation, proof
-   * verification, and receipt generation according to the IETF SATP Core v2
+   * verification, and receipt generation according to the IETF SATP Core v13
    * specification.
    *
    * **Processing Steps:**
@@ -522,7 +527,10 @@ export class Stage2SATPHandler implements SATPHandler {
           throw new SessionNotFoundError(fnTag);
         }
 
-        span.setAttribute("sessionId", session.getSessionId() || "");
+        applyCrossStageProtocolMessage(
+          session.getServerSessionData(),
+          req as Parameters<typeof applyCrossStageProtocolMessage>[1],
+        );
 
         await this.adapterManager?.executeAdaptersOrSkip(
           buildAdapterPayload(
@@ -597,6 +605,7 @@ export class Stage2SATPHandler implements SATPHandler {
             error,
           )}`,
         );
+        abortOnReceivedProtocolTermination(error, span);
         setError(session, MessageType.ASSERTION_RECEIPT, error);
 
         if (session) {
@@ -630,7 +639,7 @@ export class Stage2SATPHandler implements SATPHandler {
    * Sets up the Connect RPC router to handle incoming Stage 2 SATP protocol
    * messages by registering the appropriate service methods. This enables
    * the handler to receive and process LockAssertion requests from client
-   * gateways according to the IETF SATP Core v2 specification.
+   * gateways according to the IETF SATP Core v13 specification.
    *
    * **Registered Service Methods:**
    * - **lockAssertion**: Handles LockAssertionRequest messages for lock proof validation

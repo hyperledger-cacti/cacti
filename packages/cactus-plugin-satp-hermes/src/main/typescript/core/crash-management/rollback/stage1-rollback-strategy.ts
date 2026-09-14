@@ -5,13 +5,13 @@ import {
   RollbackLogEntrySchema,
   type RollbackState,
   RollbackStateSchema,
-} from "../../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import { create } from "@bufbuild/protobuf";
 import {
   Type,
   SATPStage,
   type SessionData,
-} from "../../../generated/proto/cacti/satp/v02/session/session_pb";
+} from "../../../generated/proto/cacti/satp/v13/session/session_pb";
 import { context, SpanStatusCode } from "@opentelemetry/api";
 import { MonitorService } from "../../../services/monitoring/monitor";
 

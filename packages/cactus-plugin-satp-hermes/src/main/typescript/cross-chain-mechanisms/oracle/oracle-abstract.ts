@@ -4,7 +4,7 @@
  * This module provides the abstract base class for oracle implementations
  * in the SATP cross-chain system. Oracles handle off-chain computations,
  * data validation, and task execution that support complex cross-chain
- * operations following the IETF SATP v2 specification.
+ * operations following the IETF SATP v13 specification.
  *
  * The oracle abstraction provides:
  * - Network-specific oracle deployment
@@ -13,7 +13,7 @@
  * - Event listening and notification
  * - Integration with Bungee Hermes for data transport
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -27,7 +27,7 @@ import {
 } from "@hyperledger-cacti/cactus-core-api";
 import { v4 as uuidv4 } from "uuid";
 import { NetworkId, OracleOperation, OracleResponse } from "../../public-api";
-import { ClaimFormat } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { MonitorService } from "../../services/monitoring/monitor";
 
 /**

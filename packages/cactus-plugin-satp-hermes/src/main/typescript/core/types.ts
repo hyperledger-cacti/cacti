@@ -40,6 +40,7 @@ import { SATPService } from "../types/satp-protocol";
 import { Client as ConnectClient } from "@connectrpc/connect";
 import { SATPServiceInstance } from "./stage-services/satp-service";
 import { NetworkId } from "../public-api";
+import { SatpProtocolStep } from "./satp-protocol-map";
 
 /**
  * Function signature for SATP Connect protocol handlers.
@@ -145,23 +146,65 @@ export type Address =
  *
  * @description
  * Defines the cryptographic signing algorithms supported for
- * gateway identification credentials.
+ * gateway identification credentials. v13 mandates ECDSA P-256
+ * (ES256) as the minimum; SECP256K1 is retained for backward
+ * compatibility with legacy deployments.
  */
 export enum SupportedSigningAlgorithms {
   SECP256K1 = "SECP256K1",
+  /** ECDSA P-256 — REQUIRED by v13 [FIPS 186-5] */
+  ES256 = "ES256",
 }
 
 /**
- * Identification credential structure for gateways.
+ * Gateway key purpose classification per SATP v13.
  *
- * @description
- * Defines the structure for gateway identification credentials
- * including the signing algorithm used for key generation and
- * the respective public key.
+ * v13 Section 5.3.3 requires gateways to maintain four distinct
+ * key pairs, each serving a specific purpose. Keys are expressed
+ * in JWK format [RFC7517].
+ *
+ * @see https://datatracker.ietf.org/doc/draft-ietf-satp-core/13/
  */
-export type IdentificationCredential = {
-  signingAlgorithm: SupportedSigningAlgorithms;
-  pubKey: string;
+export enum GatewayCredential {
+  /** Signs SATP protocol messages (JWS envelope). */
+  ENVELOPE_SIGNATURE = "ENVELOPE_SIGNATURE",
+  /** Signs claims asserting gateway attributes or capabilities. */
+  CLAIM_SIGNATURE = "CLAIM_SIGNATURE",
+  /** Establishes secure channels (e.g., TLS client cert). */
+  SECURE_CHANNEL = "SECURE_CHANNEL",
+  /** Identifies the gateway itself. */
+  IDENTITY = "IDENTITY",
+  /** Identifies the gateway owner / organization. */
+  OWNER_IDENTITY = "OWNER_IDENTITY",
+}
+
+/**
+ * A single classified gateway key.
+ *
+ * Represents a public (and optionally private) key annotated with
+ * its intended purpose and the algorithm it was generated with.
+ *
+ * The accepted key material format depends on the purpose:
+ * - `ENVELOPE_SIGNATURE` MUST be a JWK object (ES256/P-256); it is imported
+ *   via WebCrypto `importKey("jwk", ...)` and PEM/hex strings fail at
+ *   runtime.
+ * - `CLAIM_SIGNATURE` carries the claim-signing public key as a
+ *   hex-encoded string (secp256k1), consumed by the claim signature
+ *   verifier.
+ */
+export type GatewayKey = {
+  /** What this key is used for. */
+  purpose: GatewayCredential;
+  /** Algorithm family (must be from SupportedSigningAlgorithms). */
+  algorithm: SupportedSigningAlgorithms;
+  /** Public key material (see purpose-specific format above). */
+  publicKey: string | Record<string, unknown>;
+  /**
+   * Private key material — only present on the owning gateway, in local
+   * configuration only. MUST NOT be shared, transmitted, or serialized
+   * into any published identity.
+   */
+  privateKey?: string | Record<string, unknown>;
 };
 
 /**
@@ -174,8 +217,13 @@ export type IdentificationCredential = {
 export type GatewayIdentity = {
   /** Unique gateway identifier */
   id: string;
-  /** Optional identification credential for the gateway*/
-  identificationCredential?: IdentificationCredential;
+  /**
+   * v13 classified key set.
+   * Maps each {@link GatewayCredential} to its key material. Private key
+   * material is only present on the owning gateway and is never part of a
+   * shared or published identity.
+   */
+  credentials?: Partial<Record<GatewayCredential, GatewayKey>>;
   /** Optional human-readable gateway name */
   name?: string;
   /** Supported SATP draft versions */
@@ -262,15 +310,22 @@ export interface AuditEntry {
   auditEntryId: string;
   session: LocalLog;
   timestamp: number;
+  proofs: SessionProof[];
 }
 
 export interface Audit {
   auditEntries: AuditEntry[];
 }
 
-//TODO
 export type SessionData = {
   sessionId: string;
   localLog: LocalLog;
   proof: string;
+};
+
+export type SessionProof = {
+  sessionId: string;
+  step: SatpProtocolStep;
+  claim: string;
+  signedClaim: string;
 };

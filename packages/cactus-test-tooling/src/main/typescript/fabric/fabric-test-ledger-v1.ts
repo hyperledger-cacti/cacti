@@ -1711,15 +1711,15 @@ export class FabricTestLedgerV1 implements ITestLedger {
     let lastStatus = "unknown";
 
     do {
+      if (Date.now() >= startedAt + timeoutMs) {
+        throw new Error(`${fnTag} timed out (${timeoutMs}ms)`);
+      }
       try {
         const { Status } = await this.getContainerInfo();
         lastStatus = Status;
         reachable = Status.endsWith(" (healthy)");
       } catch (ex) {
         reachable = false;
-        if (Date.now() >= startedAt + timeoutMs) {
-          throw new Error(`${fnTag} timed out (${timeoutMs}ms) -> ${ex}`);
-        }
       }
 
       // Checked outside the try/catch so the timeout error is not re-caught

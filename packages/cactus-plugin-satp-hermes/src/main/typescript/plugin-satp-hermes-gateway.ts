@@ -35,16 +35,26 @@ import {
 } from "class-validator";
 
 import {
+  GatewayCredential,
   SupportedSigningAlgorithms,
   type GatewayIdentity,
   type ShutdownHook,
 } from "./core/types";
+import {
+  validateTlsConfig,
+  type IGatewayTlsConfig,
+} from "./services/validation/config-validating-functions/validate-tls-config";
+import {
+  createJwtAuthMiddleware,
+  type IJwtAuthOptions,
+} from "./core/authentication/jwt-auth-middleware";
 import {
   GatewayOrchestrator,
   type IGatewayOrchestratorOptions,
 } from "./services/gateway/gateway-orchestrator";
 import express, { type Express } from "express";
 import http from "node:http";
+import https from "node:https";
 import {
   DEFAULT_PORT_GATEWAY_CLIENT,
   DEFAULT_PORT_GATEWAY_OAPI,
@@ -78,10 +88,7 @@ import {
   type ISATPCrossChainManagerOptions,
   SATPCrossChainManager,
 } from "./cross-chain-mechanisms/satp-cc-manager";
-import {
-  CrashManager,
-  type ICrashRecoveryManagerOptions,
-} from "./services/gateway/crash-manager";
+import { CrashManager } from "./services/gateway/crash-manager";
 import { OraclePersistence } from "./database/oracle-persistence";
 import * as OAS from "../json/oapi-api1-bundled.json";
 import {
@@ -91,7 +98,7 @@ import {
 import { knexAuditInstance } from "./database/knexfile-audit";
 import schedule, { Job } from "node-schedule";
 import { BLODispatcherErraneousError } from "./core/errors/satp-errors";
-import { ClaimFormat } from "./generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "./generated/proto/cacti/satp/v13/common/message_pb";
 import { getEnumKeyByValue, getEnumValueByKey } from "./services/utils";
 import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
 import { IPrivacyPolicyValue } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/view-creation/privacy-policies";
@@ -117,7 +124,7 @@ import type { AdapterLayerConfiguration } from "./adapters/adapter-config";
  * SATP Gateway Configuration Interface - Complete configuration for fault-tolerant gateway.
  *
  * @description
- * Configuration interface for SATP gateway instances implementing the IETF SATP v2 specification
+ * Configuration interface for SATP gateway instances implementing the IETF SATP v13 specification
  * with Hermes crash recovery mechanisms. Provides comprehensive setup for cross-chain asset
  * transfers with gateway-to-gateway communication, persistence, and fault tolerance.
  *
@@ -168,7 +175,7 @@ import type { AdapterLayerConfiguration } from "./adapters/adapter-config";
  * };
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link SATPGateway} for the main gateway implementation
  * @see {@link GatewayIdentity} for gateway identity structure
  * @see {@link ICrossChainMechanismsOptions} for bridge configuration
@@ -230,6 +237,29 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
    * @see {@link ValidatorOptions} for validation configuration options
    */
   validationOptions?: ValidatorOptions;
+
+  /**
+   * TLS configuration for the gateway secure channel.
+   * @description
+   * When configured, the gateway server is served over HTTPS with TLS 1.3
+   * enforced as the minimum protocol version and TLS 1.3 cipher suites only
+   * (RFC 8446, SATP v13 Section 5.3.3). The configuration is validated at
+   * startup and the gateway refuses to start with below-TLS-1.3 settings.
+   *
+   * @see {@link validateTlsConfig}
+   */
+  tls?: IGatewayTlsConfig;
+
+  /**
+   * JWT + OAuth 2.0 bearer authentication for the Client Application API.
+   * @description
+   * When enabled, requests to the gateway REST endpoints must carry a valid
+   * `Authorization: Bearer <JWT>` token (HS256 signed, with standard
+   * `exp`/`nbf`/`iss`/`aud` claim enforcement per RFC 6750).
+   *
+   * @see {@link IJwtAuthOptions}
+   */
+  jwtAuth?: IJwtAuthOptions;
 
   /**
    * Privacy policies for sensitive data handling.
@@ -316,11 +346,14 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
   /**
    * Enable crash recovery mechanisms.
    * @description
-   * Activates Hermes crash recovery features including checkpoint logging,
-   * session recovery, and rollback mechanisms. When enabled, the gateway
-   * can recover from crashes and continue interrupted asset transfers.
+   * **NOT YET SUPPORTED.** Crash recovery and rollback are defined in the
+   * IETF SATP Crash Recovery draft
+   * ({@link https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/})
+   * and will be supported in a future release.
    *
-   * @see {@link CrashManager} for crash recovery implementation
+   * Setting this option to `true` will throw an error at gateway startup.
+   *
+   * @deprecated Not yet implemented — will throw if set to `true`.
    */
   enableCrashRecovery?: boolean;
 
@@ -404,7 +437,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
  *
  * @description
  * Core implementation of the Secure Asset Transfer Protocol (SATP) gateway following the
- * IETF SATP v2 specification with Hermes crash recovery mechanisms. Provides fault-tolerant
+ * IETF SATP v13 specification with Hermes crash recovery mechanisms. Provides fault-tolerant
  * cross-chain asset transfers through gateway-to-gateway communication with atomic transaction
  * guarantees and crash recovery capabilities.
  *
@@ -484,7 +517,7 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
  * await gateway.shutdown();
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link https://www.sciencedirect.com/science/article/abs/pii/S0167739X21004337} Hermes Research Paper
  * @see {@link SATPGatewayConfig} for configuration options
  * @see {@link BLODispatcher} for protocol message dispatching
@@ -505,6 +538,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   @IsNotEmptyObject()
   @IsObject()
   private readonly config: SATPGatewayConfig;
+
+  /** Validated TLS configuration (TLS 1.3 enforced); undefined when unset. */
+  private readonly tls: IGatewayTlsConfig | undefined;
 
   @IsString()
   @Contains("Gateway")
@@ -541,7 +577,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
   private sessionVerificationJob: Job | null = null;
   private activeJobs: Set<schedule.Job> = new Set();
   private initialSpanContext: { span: Span; context: Context };
-
+  static PROOF_ID_TODO: string = "bungee-v1-placeholder";
   /**
    * SATPGateway Constructor - Initialize fault-tolerant cross-chain gateway.
    *
@@ -614,6 +650,9 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     this.config = SATPGateway.ProcessGatewayCoordinatorConfig(options);
+    // Enforce TLS 1.3 secure-channel requirements at startup: the gateway
+    // refuses to start with below-TLS-1.3 protocol versions or cipher suites.
+    this.tls = validateTlsConfig({ configValue: options.tls });
     this.shutdownHooks = [];
     const level = this.config.logLevel;
     const logOptions: ILoggerOptions = {
@@ -823,18 +862,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         this.BLODispatcher = new BLODispatcher(dispatcherOps);
 
         if (this.config.enableCrashRecovery) {
-          const crashOptions: ICrashRecoveryManagerOptions = {
-            instanceId: this.instanceId,
-            logLevel: this.config.logLevel,
-            ccManager: this.SATPCCManager,
-            orchestrator: this.gatewayOrchestrator,
-            localRepository: this.localRepository,
-            remoteRepository: this.remoteRepository,
-            signer: this.signer,
-            monitorService: this.monitorService,
-          };
-          this.crashManager = new CrashManager(crashOptions);
-          this.logger.info("CrashManager has been initialized.");
+          throw new Error(
+            "Crash recovery and rollback are not yet supported. " +
+              "They are defined in the IETF SATP Crash Recovery draft " +
+              "(https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/) " +
+              "and will be supported in a future release.",
+          );
         } else {
           this.logger.info("CrashManager is disabled!");
         }
@@ -885,6 +918,15 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     return context.with(ctx, async () => {
       try {
         const webServices = await this.getOrCreateWebServices();
+
+        // Optional JWT + OAuth 2.0 bearer authentication for the Client
+        // Application API (RFC 6750). Applied before endpoint registration
+        // so every registered route is protected.
+        if (this.options.jwtAuth?.enabled) {
+          this.logger.info("JWT authentication enabled for gateway REST API");
+          app.use(createJwtAuthMiddleware(this.options.jwtAuth));
+        }
+
         for (const ws of webServices) {
           this.logger.debug(`Registering service ${ws.getPath()}`);
           ws.registerExpress(app);
@@ -976,9 +1018,12 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     if (!pluginOptions.gid) {
       pluginOptions.gid = {
         id: id,
-        identificationCredential: {
-          signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-          pubKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+        credentials: {
+          [GatewayCredential.CLAIM_SIGNATURE]: {
+            purpose: GatewayCredential.CLAIM_SIGNATURE,
+            algorithm: SupportedSigningAlgorithms.SECP256K1,
+            publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+          },
         },
         name: id,
         version: [
@@ -989,7 +1034,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
           },
         ],
         connectedDLTs: [],
-        proofID: "mockProofID1",
+        proofID: this.PROOF_ID_TODO,
         gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
         gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
         address: "http://localhost",
@@ -1003,10 +1048,14 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
         pluginOptions.gid.name = id;
       }
 
-      if (!pluginOptions.gid.identificationCredential) {
-        pluginOptions.gid.identificationCredential = {
-          signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-          pubKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+      if (!pluginOptions.gid.credentials?.[GatewayCredential.CLAIM_SIGNATURE]) {
+        pluginOptions.gid.credentials = {
+          ...pluginOptions.gid.credentials,
+          [GatewayCredential.CLAIM_SIGNATURE]: {
+            purpose: GatewayCredential.CLAIM_SIGNATURE,
+            algorithm: SupportedSigningAlgorithms.SECP256K1,
+            publicKey: bufArray2HexStr(pluginOptions.keyPair.publicKey),
+          },
         };
       }
 
@@ -1025,7 +1074,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
       }
 
       if (!pluginOptions.gid.proofID) {
-        pluginOptions.gid.proofID = "mockProofID1";
+        pluginOptions.gid.proofID = this.PROOF_ID_TODO;
       }
 
       if (!pluginOptions.gid.gatewayServerPort) {
@@ -1310,7 +1359,31 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
             this.gatewayOrchestrator?.addGOLServer(this.GOLApplication);
             this.gatewayOrchestrator?.startServices();
 
-            this.GOLServer = http.createServer(this.GOLApplication);
+            if (this.tls?.enabled && this.tls.cert && this.tls.key) {
+              // Secure channel per SATP v13 Section 5.3.3: TLS 1.3 minimum,
+              // TLS 1.3 cipher suites only (validated at startup).
+              this.GOLServer = https.createServer(
+                {
+                  key: this.tls.key,
+                  cert: this.tls.cert,
+                  minVersion: this.tls.minVersion,
+                  ciphers: this.tls.cipherSuites?.join(":"),
+                  honorCipherOrder: true,
+                },
+                this.GOLApplication,
+              );
+              this.logger.info(
+                "GOL server TLS enabled (minVersion: TLSv1.3, cipherSuites: " +
+                  `${this.tls.cipherSuites?.join(":")})`,
+              );
+            } else {
+              if (this.tls?.enabled) {
+                this.logger.warn(
+                  "TLS enabled but cert/key missing; serving GOL server over plain HTTP",
+                );
+              }
+              this.GOLServer = http.createServer(this.GOLApplication);
+            }
             const address =
               this.options.gid?.address?.includes("localhost") || // When running a gateway in localhost we don't want to bind it to 0.0.0.0 because if we do it will be accessible from the outside network
               this.options.gid?.address?.includes("127.0.0.1")

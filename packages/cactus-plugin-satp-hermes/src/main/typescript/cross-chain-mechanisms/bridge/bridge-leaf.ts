@@ -4,9 +4,9 @@
  * This module provides the abstract base class for bridge leaf implementations
  * in the SATP cross-chain system. Bridge leafs are independent modules that
  * form the endpoint connections in cross-chain bridges, handling network-specific
- * operations for asset transfers following the IETF SATP v2 specification.
+ * operations for asset transfers following the IETF SATP v13 specification.
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @author Hyperledger Cacti Contributors
  * @since 0.0.3-beta
  */
@@ -20,7 +20,7 @@ import { ISignerKeyPair } from "@hyperledger-cacti/cactus-common";
 import {
   ClaimFormat,
   TokenType,
-} from "../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../generated/proto/cacti/satp/v13/common/message_pb";
 import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-hermes";
 import { OntologyManager } from "./ontology/ontology-manager";
 import { v4 as uuidv4 } from "uuid";

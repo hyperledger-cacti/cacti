@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.20;
+pragma solidity 0.8.21;
 
 import { SATPWrapperContract, InteractionSignature, InteractionType, AssetParameterIdentifier, TokenType, Token, ERCTokenStandard } from "../../../main/solidity/contracts/SATPWrapperContract.sol";
 import { SATPNFTokenContract } from "../contracts/SATPNFTokenContract.sol";
@@ -208,5 +208,14 @@ contract SATPWrapperTest is Test{
         }
         catch (bytes memory /*lowLevelData*/) {
         }
+    }
+
+    function testGetTokenWithDescriptior() public {
+        wrapperContract.wrap(contract1.name(), address(contract1), TokenType.NONSTANDARD_NONFUNGIBLE, contract1.name(), "refID", address(user), signatures, ERCTokenStandard.ERC721);
+        Token memory token = wrapperContract.getToken(contract1.name(), 1001);
+        assertEq(uint256(token.ercTokenStandard), uint256(ERCTokenStandard.ERC721), "erc standard mismatch");
+        Token memory tokenWithDescriptor = wrapperContract.getToken(contract1.name(), 1001, ERCTokenStandard.ERC721);
+        assertEq(uint256(tokenWithDescriptor.ercTokenStandard), uint256(ERCTokenStandard.ERC721), "erc standard mismatch");
+        assertNotEq(uint256(tokenWithDescriptor.ercTokenStandard), uint256(ERCTokenStandard.ERC20), "erc standard mismatch");
     }
 }

@@ -21,7 +21,7 @@ import { PluginKeychainMemory } from "@hyperledger-cacti/cactus-plugin-keychain-
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 import { randomUUID as uuidv4 } from "node:crypto";
 import { expect } from "@jest/globals";
-import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import {
   Asset,
   AssetTokenTypeEnum,
@@ -39,7 +39,7 @@ import {
   INetworkOptions,
 } from "../../../main/typescript/cross-chain-mechanisms/bridge/bridge-types";
 import Docker from "dockerode";
-import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType } from "../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { BesuGasConfig } from "../../../main/typescript/services/validation/config-validating-functions/bridges-config-validating-functions/validate-besu-config";
 export interface IBesuTestEnvironment {
   logLevel: LogLevelDesc;

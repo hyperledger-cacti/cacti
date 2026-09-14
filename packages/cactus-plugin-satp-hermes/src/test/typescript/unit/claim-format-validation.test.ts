@@ -1,5 +1,5 @@
 import { describe, expect, it } from "@jest/globals";
-import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { SATPBridgeExecutionLayerImpl } from "../../../main/typescript/cross-chain-mechanisms/bridge/satp-bridge-execution-layer-implementation";
 import { OracleExecutionLayer } from "../../../main/typescript/cross-chain-mechanisms/oracle/oracle-execution-layer";
 import { ClaimFormatError } from "../../../main/typescript/cross-chain-mechanisms/common/errors";

@@ -18,7 +18,7 @@ import { PluginBungeeHermes } from "@hyperledger-cacti/cactus-plugin-bungee-herm
 import { StrategyFabric } from "@hyperledger-cacti/cactus-plugin-bungee-hermes/dist/lib/main/typescript/strategy/strategy-fabric";
 import { OracleAbstract, type OracleAbstractOptions } from "../oracle-abstract";
 import { IOracleEntryBase, IOracleListenerBase } from "../oracle-types";
-import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import {
   NetworkId,
   OracleOperation,

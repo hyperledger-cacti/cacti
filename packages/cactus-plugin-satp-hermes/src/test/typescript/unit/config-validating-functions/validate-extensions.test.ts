@@ -25,7 +25,7 @@ describe("Validate CC Config", () => {
       },
     ];
     const result = validateExtensions({ configValue: extensionsConfig });
-    expect(result).toBeArray();
+    expect(Array.isArray(result)).toBe(true);
     expect(result).toHaveLength(1);
     expect(result?.[0]).toMatchObject(extensionsConfig[0]);
   });

@@ -27,7 +27,7 @@ import { EventEmitter } from "events";
 import { ICrossChainMechanismsOptions } from "../../main/typescript/cross-chain-mechanisms/satp-cc-manager";
 import { createMigrationSource } from "../../main/typescript/database/knex-migration-source";
 import { ExtensionConfig } from "../../main/typescript/services/validation/config-validating-functions/validate-extensions";
-import { TokenType as TransactAssetType } from "../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType as TransactAssetType } from "../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 
 // Re-export centralized database configuration for tests
 export {
@@ -190,6 +190,22 @@ export function cleanupKnexClients(
 
 export const CI_TEST_TIMEOUT = 900000;
 const testFilesDirectory = `${__dirname}/../../../cache/`;
+
+/**
+ * Claims must carry a durable signature over their receipt, exactly as the
+ * gateway signs them in production (sign(signer, claim.receipt), hex-encoded).
+ * Fixture claims injected directly into session data bypass the
+ * wrap/mint/burn/assignment asset operations that normally sign them, so
+ * they are signed here with the provided signer (all services in a test
+ * usually share one keypair).
+ */
+export function signClaimFixture<
+  T extends { receipt: string; signature: string },
+>(claim: T, receipt: string, signer: { sign: (msg: string) => Uint8Array }): T {
+  claim.receipt = receipt;
+  claim.signature = Buffer.from(signer.sign(receipt)).toString("hex");
+  return claim;
+}
 
 /**
  * Lower bound (inclusive) of the "safe" port range we return from

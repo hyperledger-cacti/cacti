@@ -41,6 +41,7 @@ import * as create_logs_table from "./migrations/20220331132128_create_logs_tabl
 import * as create_remote_logs_table from "./migrations/20240130234303_create_remote_logs_table";
 import * as create_audit_entries_table from "./migrations/20260118174651_create_audit_entries_table";
 import * as create_oracle_logs_table from "./migrations/20250323000000_create_oracle_logs_table";
+import * as add_session_proofs_table from "./migrations/20260910120000_add_session_proofs_table";
 
 /**
  * Interface for SATP database migration implementations.
@@ -142,6 +143,7 @@ export function createMigrationSource(): IKnexMigrationSource<IKnexMigration> {
   registerMigration(migrations, create_remote_logs_table);
   registerMigration(migrations, create_audit_entries_table);
   registerMigration(migrations, create_oracle_logs_table);
+  registerMigration(migrations, add_session_proofs_table);
 
   const kms: IKnexMigrationSource<IKnexMigration> = {
     getMigrations: async (): Promise<string[]> => {

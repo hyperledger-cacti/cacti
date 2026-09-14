@@ -18,7 +18,7 @@
  * connectors and cryptographic libraries used in the SATP bridge architecture.
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link ISignerKeyPair} for key pair interface
  * @see {@link EthereumLeaf} for Ethereum bridge leaf implementation
  * @see {@link BesuLeaf} for Besu bridge leaf implementation

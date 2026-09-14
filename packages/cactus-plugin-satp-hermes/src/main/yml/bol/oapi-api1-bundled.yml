@@ -2123,9 +2123,72 @@ paths:
                               type: integer
                               format: int64
                               description: 'The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).'
+                            proofs:
+                              type: array
+                              description: |
+                                Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry.
+                              items:
+                                type: object
+                                description: |
+                                  A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends.
+                                x-category: response
+                                properties:
+                                  sessionId:
+                                    type: string
+                                    description: Unique identifier of the SATP session this proof belongs to.
+                                    example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+                                  step:
+                                    type: object
+                                    description: |
+                                      The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map.
+                                    properties:
+                                      tag:
+                                        type: string
+                                        description: Step tag identifier from the SATP protocol map.
+                                        example: checkCommitPreparationResponse
+                                      description:
+                                        type: string
+                                        description: Human-readable description of the protocol step.
+                                        example: Client validates commit ready response
+                                      role:
+                                        type: string
+                                        description: Gateway role executing the step (client/server/both).
+                                        enum:
+                                          - client
+                                          - server
+                                          - both
+                                        example: client
+                                      sequence:
+                                        type: integer
+                                        description: Sequence number of the step within its stage.
+                                        example: 5
+                                      messageType:
+                                        type: string
+                                        description: |
+                                          SATP message type associated with the step, if any.
+                                        example: COMMIT_READY
+                                    required:
+                                      - tag
+                                      - description
+                                      - role
+                                      - sequence
+                                  claim:
+                                    type: string
+                                    description: |
+                                      JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step.
+                                  signedClaim:
+                                    type: string
+                                    description: |
+                                      The signature carried by the claim, produced by the asset/bridge operation over the claim receipt.
+                                required:
+                                  - sessionId
+                                  - step
+                                  - claim
+                                  - signedClaim
                           required:
                             - session
                             - timestamp
+                            - proofs
                     required:
                       - entries
                   startTimestamp:
@@ -2140,6 +2203,136 @@ paths:
                   - auditEntries
                   - startTimestamp
                   - endTimestamp
+  /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs:
+    get:
+      tags:
+        - admin
+      summary: Get session proofs
+      description: |
+        Retrieves the signature-verified SessionProofs (claims recorded at each SATP protocol step) persisted in the audit database for the given session IDs.
+      operationId: GetSessionProofs
+      x-hyperledger-cacti:
+        http:
+          verbLowerCase: get
+          path: /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs
+      parameters:
+        - name: sessionIds
+          in: query
+          description: Comma-separated list of SATP session IDs to retrieve proofs for.
+          required: true
+          schema:
+            type: string
+            example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+      responses:
+        '200':
+          description: Session proofs for the requested sessions
+          content:
+            application/json:
+              schema:
+                description: Response schema for a session proofs request. Contains the signature-verified SessionProofs persisted in the audit database for the requested sessions.
+                type: object
+                x-category: response
+                properties:
+                  proofs:
+                    type: array
+                    description: Signature-verified session proofs for the requested SATP sessions.
+                    items:
+                      type: object
+                      description: |
+                        A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends.
+                      x-category: response
+                      properties:
+                        sessionId:
+                          type: string
+                          description: Unique identifier of the SATP session this proof belongs to.
+                          example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+                        step:
+                          type: object
+                          description: |
+                            The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map.
+                          properties:
+                            tag:
+                              type: string
+                              description: Step tag identifier from the SATP protocol map.
+                              example: checkCommitPreparationResponse
+                            description:
+                              type: string
+                              description: Human-readable description of the protocol step.
+                              example: Client validates commit ready response
+                            role:
+                              type: string
+                              description: Gateway role executing the step (client/server/both).
+                              enum:
+                                - client
+                                - server
+                                - both
+                              example: client
+                            sequence:
+                              type: integer
+                              description: Sequence number of the step within its stage.
+                              example: 5
+                            messageType:
+                              type: string
+                              description: |
+                                SATP message type associated with the step, if any.
+                              example: COMMIT_READY
+                          required:
+                            - tag
+                            - description
+                            - role
+                            - sequence
+                        claim:
+                          type: string
+                          description: |
+                            JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step.
+                        signedClaim:
+                          type: string
+                          description: |
+                            The signature carried by the claim, produced by the asset/bridge operation over the claim receipt.
+                      required:
+                        - sessionId
+                        - step
+                        - claim
+                        - signedClaim
+                required:
+                  - proofs
+        default:
+          description: An error occurred
+          content:
+            application/json:
+              schema:
+                x-category: response
+                type: object
+                x-go-type: ApiError
+                x-go-name: ApiError
+                description: An Error
+                required:
+                  - message
+                  - type
+                  - code
+                  - status
+                  - timestamp
+                properties:
+                  type:
+                    type: string
+                    description: HTTP error type
+                    example: bad-request
+                  code:
+                    type: integer
+                    description: Numeric error code
+                    example: 16384
+                  status:
+                    type: integer
+                    description: HTTP status of the error
+                    example: 500
+                  message:
+                    type: string
+                    description: Long error description
+                    example: Oops there's been an internal error handling
+                  timestamp:
+                    type: string
+                    description: Timestamp of the error
+                    example: '2021-07-21T17:32:28Z'
   /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/approve-address:
     get:
       tags:
@@ -3633,9 +3826,72 @@ components:
                 type: integer
                 format: int64
                 description: 'The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).'
+              proofs:
+                type: array
+                description: |
+                  Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry.
+                items:
+                  type: object
+                  description: |
+                    A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends.
+                  x-category: response
+                  properties:
+                    sessionId:
+                      type: string
+                      description: Unique identifier of the SATP session this proof belongs to.
+                      example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+                    step:
+                      type: object
+                      description: |
+                        The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map.
+                      properties:
+                        tag:
+                          type: string
+                          description: Step tag identifier from the SATP protocol map.
+                          example: checkCommitPreparationResponse
+                        description:
+                          type: string
+                          description: Human-readable description of the protocol step.
+                          example: Client validates commit ready response
+                        role:
+                          type: string
+                          description: Gateway role executing the step (client/server/both).
+                          enum:
+                            - client
+                            - server
+                            - both
+                          example: client
+                        sequence:
+                          type: integer
+                          description: Sequence number of the step within its stage.
+                          example: 5
+                        messageType:
+                          type: string
+                          description: |
+                            SATP message type associated with the step, if any.
+                          example: COMMIT_READY
+                      required:
+                        - tag
+                        - description
+                        - role
+                        - sequence
+                    claim:
+                      type: string
+                      description: |
+                        JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step.
+                    signedClaim:
+                      type: string
+                      description: |
+                        The signature carried by the claim, produced by the asset/bridge operation over the claim receipt.
+                  required:
+                    - sessionId
+                    - step
+                    - claim
+                    - signedClaim
             required:
               - session
               - timestamp
+              - proofs
       required:
         - entries
     AuditEntry:
@@ -3698,9 +3954,130 @@ components:
           type: integer
           format: int64
           description: 'The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).'
+        proofs:
+          type: array
+          description: |
+            Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry.
+          items:
+            type: object
+            description: |
+              A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends.
+            x-category: response
+            properties:
+              sessionId:
+                type: string
+                description: Unique identifier of the SATP session this proof belongs to.
+                example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+              step:
+                type: object
+                description: |
+                  The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map.
+                properties:
+                  tag:
+                    type: string
+                    description: Step tag identifier from the SATP protocol map.
+                    example: checkCommitPreparationResponse
+                  description:
+                    type: string
+                    description: Human-readable description of the protocol step.
+                    example: Client validates commit ready response
+                  role:
+                    type: string
+                    description: Gateway role executing the step (client/server/both).
+                    enum:
+                      - client
+                      - server
+                      - both
+                    example: client
+                  sequence:
+                    type: integer
+                    description: Sequence number of the step within its stage.
+                    example: 5
+                  messageType:
+                    type: string
+                    description: |
+                      SATP message type associated with the step, if any.
+                    example: COMMIT_READY
+                required:
+                  - tag
+                  - description
+                  - role
+                  - sequence
+              claim:
+                type: string
+                description: |
+                  JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step.
+              signedClaim:
+                type: string
+                description: |
+                  The signature carried by the claim, produced by the asset/bridge operation over the claim receipt.
+            required:
+              - sessionId
+              - step
+              - claim
+              - signedClaim
       required:
         - session
         - timestamp
+        - proofs
+    SessionProof:
+      type: object
+      description: |
+        A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends.
+      x-category: response
+      properties:
+        sessionId:
+          type: string
+          description: Unique identifier of the SATP session this proof belongs to.
+          example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+        step:
+          type: object
+          description: |
+            The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map.
+          properties:
+            tag:
+              type: string
+              description: Step tag identifier from the SATP protocol map.
+              example: checkCommitPreparationResponse
+            description:
+              type: string
+              description: Human-readable description of the protocol step.
+              example: Client validates commit ready response
+            role:
+              type: string
+              description: Gateway role executing the step (client/server/both).
+              enum:
+                - client
+                - server
+                - both
+              example: client
+            sequence:
+              type: integer
+              description: Sequence number of the step within its stage.
+              example: 5
+            messageType:
+              type: string
+              description: |
+                SATP message type associated with the step, if any.
+              example: COMMIT_READY
+          required:
+            - tag
+            - description
+            - role
+            - sequence
+        claim:
+          type: string
+          description: |
+            JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step.
+        signedClaim:
+          type: string
+          description: |
+            The signature carried by the claim, produced by the asset/bridge operation over the claim receipt.
+      required:
+        - sessionId
+        - step
+        - claim
+        - signedClaim
     LocalLog:
       type: object
       description: |
@@ -3838,9 +4215,72 @@ components:
                     type: integer
                     format: int64
                     description: 'The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).'
+                  proofs:
+                    type: array
+                    description: |
+                      Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry.
+                    items:
+                      type: object
+                      description: |
+                        A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends.
+                      x-category: response
+                      properties:
+                        sessionId:
+                          type: string
+                          description: Unique identifier of the SATP session this proof belongs to.
+                          example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+                        step:
+                          type: object
+                          description: |
+                            The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map.
+                          properties:
+                            tag:
+                              type: string
+                              description: Step tag identifier from the SATP protocol map.
+                              example: checkCommitPreparationResponse
+                            description:
+                              type: string
+                              description: Human-readable description of the protocol step.
+                              example: Client validates commit ready response
+                            role:
+                              type: string
+                              description: Gateway role executing the step (client/server/both).
+                              enum:
+                                - client
+                                - server
+                                - both
+                              example: client
+                            sequence:
+                              type: integer
+                              description: Sequence number of the step within its stage.
+                              example: 5
+                            messageType:
+                              type: string
+                              description: |
+                                SATP message type associated with the step, if any.
+                              example: COMMIT_READY
+                          required:
+                            - tag
+                            - description
+                            - role
+                            - sequence
+                        claim:
+                          type: string
+                          description: |
+                            JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step.
+                        signedClaim:
+                          type: string
+                          description: |
+                            The signature carried by the claim, produced by the asset/bridge operation over the claim receipt.
+                      required:
+                        - sessionId
+                        - step
+                        - claim
+                        - signedClaim
                 required:
                   - session
                   - timestamp
+                  - proofs
           required:
             - entries
         startTimestamp:
@@ -3855,6 +4295,74 @@ components:
         - auditEntries
         - startTimestamp
         - endTimestamp
+    SessionProofsResponse:
+      description: Response schema for a session proofs request. Contains the signature-verified SessionProofs persisted in the audit database for the requested sessions.
+      type: object
+      x-category: response
+      properties:
+        proofs:
+          type: array
+          description: Signature-verified session proofs for the requested SATP sessions.
+          items:
+            type: object
+            description: |
+              A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends.
+            x-category: response
+            properties:
+              sessionId:
+                type: string
+                description: Unique identifier of the SATP session this proof belongs to.
+                example: 691f24ad-3d74-4a32-b40e-0d848339fb2a-MOCK_CONTEXT_ID
+              step:
+                type: object
+                description: |
+                  The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map.
+                properties:
+                  tag:
+                    type: string
+                    description: Step tag identifier from the SATP protocol map.
+                    example: checkCommitPreparationResponse
+                  description:
+                    type: string
+                    description: Human-readable description of the protocol step.
+                    example: Client validates commit ready response
+                  role:
+                    type: string
+                    description: Gateway role executing the step (client/server/both).
+                    enum:
+                      - client
+                      - server
+                      - both
+                    example: client
+                  sequence:
+                    type: integer
+                    description: Sequence number of the step within its stage.
+                    example: 5
+                  messageType:
+                    type: string
+                    description: |
+                      SATP message type associated with the step, if any.
+                    example: COMMIT_READY
+                required:
+                  - tag
+                  - description
+                  - role
+                  - sequence
+              claim:
+                type: string
+                description: |
+                  JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step.
+              signedClaim:
+                type: string
+                description: |
+                  The signature carried by the claim, produced by the asset/bridge operation over the claim receipt.
+            required:
+              - sessionId
+              - step
+              - claim
+              - signedClaim
+      required:
+        - proofs
     StatusResponse:
       description: 'Provides the current status of the SATP session including detailed information on the progress, such as substatus, stage, and step, along with the session start time and chain information.'
       type: object

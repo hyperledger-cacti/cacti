@@ -43,7 +43,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt} SATP Core Specification
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType} for protocol error type enumeration
  *
@@ -53,7 +53,7 @@
  */
 
 import { SATPInternalError } from "./satp-errors";
-import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType } from "./satp-error-type";
 
 /**
  * Error thrown when a SATP transfer session cannot be found during handler processing.

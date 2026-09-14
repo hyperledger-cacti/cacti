@@ -5,7 +5,7 @@
  * Essential utility functions supporting SATP gateway operations including cryptographic
  * operations, data format conversions, signature verification, and protocol message
  * handling. Provides foundational functionality for secure cross-chain asset transfers
- * following IETF SATP v2 specification requirements.
+ * following IETF SATP v13 specification requirements.
  *
  * **Utility Categories:**
  * - **Cryptographic Operations**: Signing, verification, and key format conversion
@@ -41,7 +41,7 @@
  * const dataHash = getHash({ transferId: 'tx-456', amount: 100 });
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt}
  * @see {@link JsObjectSigner} for cryptographic signing implementation
  * @see {@link GatewayPersistence} for log management using these utilities
  * @see {@link SATPGateway} for main gateway implementation using these utilities
@@ -64,7 +64,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
  *
  * **SATP Protocol Usage:**
  * Used extensively for converting cryptographic keys, digital signatures, and
- * protocol identifiers to the hexadecimal format required by IETF SATP v2
+ * protocol identifiers to the hexadecimal format required by IETF SATP v13
  * specification for gateway-to-gateway communication.
  *
  * @param array - Buffer data in various formats to convert to hex string
@@ -113,7 +113,7 @@ export function bufArray2HexStr(array: Uint8Array | Buffer | string): string {
  * @description
  * Generates digital signature for SATP protocol messages using the gateway's
  * cryptographic signer. Provides non-repudiation and message integrity for
- * cross-chain asset transfer operations following IETF SATP v2 security
+ * cross-chain asset transfer operations following IETF SATP v13 security
  * requirements.
  *
  * **SATP Security Context:**

@@ -2,11 +2,12 @@ import "jest-extended";
 import { validateSatpEnableCrashRecovery } from "../../../../main/typescript/services/validation/config-validating-functions/validate-satp-enable-crash-recovery";
 
 describe("validateSatpEnableCrashRecovery", () => {
-  it("should pass when flag is true", () => {
-    const result = validateSatpEnableCrashRecovery({
-      configValue: true,
-    });
-    expect(result).toEqual(true);
+  it("should throw when flag is true (crash recovery not yet supported)", () => {
+    expect(() =>
+      validateSatpEnableCrashRecovery({
+        configValue: true,
+      }),
+    ).toThrowError("Crash recovery and rollback are not yet supported.");
   });
 
   it("should pass when flag is false", () => {

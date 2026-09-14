@@ -8,8 +8,8 @@ import {
   pruneDockerContainersIfGithubAction,
 } from "@hyperledger-cacti/cactus-test-tooling";
 
-import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { FabricTestEnvironment } from "../../test-utils";
 import { FabricFungibleAsset } from "../../../../main/typescript/cross-chain-mechanisms/bridge/ontology/assets/fabric-asset";

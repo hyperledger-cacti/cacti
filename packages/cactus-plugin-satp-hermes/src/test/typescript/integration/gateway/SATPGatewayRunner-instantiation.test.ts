@@ -1,6 +1,9 @@
 import "jest-extended";
 import { LogLevelDesc, Secp256k1Keys } from "@hyperledger-cacti/cactus-common";
-import { SupportedSigningAlgorithms } from "../../../../main/typescript/core/types";
+import {
+  GatewayCredential,
+  SupportedSigningAlgorithms,
+} from "../../../../main/typescript/core/types";
 import {
   ISATPGatewayRunnerConstructorOptions,
   pruneDockerContainersIfGithubAction,
@@ -48,9 +51,12 @@ describe("Instantiate SATP Gateway Runner", () => {
     gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
     gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
     gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-    identificationCredential: {
-      signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-      pubKey: Buffer.from(gatewayKeyPair.publicKey).toString("hex"),
+    credentials: {
+      [GatewayCredential.CLAIM_SIGNATURE]: {
+        purpose: GatewayCredential.CLAIM_SIGNATURE,
+        algorithm: SupportedSigningAlgorithms.SECP256K1,
+        publicKey: Buffer.from(gatewayKeyPair.publicKey).toString("hex"),
+      },
     },
   } as GatewayIdentity;
 

@@ -685,8 +685,10 @@ export class AdapterManager {
     };
     bindings.sort((a, b) => {
       if (a.stage !== b.stage) return a.stage - b.stage;
-      const seqA = getStepSequenceNumber(a.stage, a.stepTag) ?? 9999;
-      const seqB = getStepSequenceNumber(b.stage, b.stepTag) ?? 9999;
+      const seqA =
+        getStepSequenceNumber(a.stage, a.stepTag) ?? Number.POSITIVE_INFINITY;
+      const seqB =
+        getStepSequenceNumber(b.stage, b.stepTag) ?? Number.POSITIVE_INFINITY;
       if (seqA !== seqB) return seqA - seqB;
       if (a.stepOrder !== b.stepOrder) {
         return stepOrderRank[a.stepOrder] - stepOrderRank[b.stepOrder];

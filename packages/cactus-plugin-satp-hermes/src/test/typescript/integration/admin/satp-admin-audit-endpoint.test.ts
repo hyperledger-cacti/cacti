@@ -116,6 +116,7 @@ describe("Audit Endpoint Integration Tests", () => {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp: timestamp,
+      proofs: [],
     };
     await repository.create(auditEntry);
 
@@ -146,6 +147,7 @@ describe("Audit Endpoint Integration Tests", () => {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp,
+      proofs: [],
     });
 
     const isoTimestamp = "2026-04-02T12:00:00.000Z";
@@ -193,12 +195,14 @@ describe("Audit Endpoint Integration Tests", () => {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp: insideTimestamp,
+      proofs: [],
     });
 
     await repository.create({
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp: outsideTimestamp,
+      proofs: [],
     });
 
     const api = new AdminApi(
@@ -294,6 +298,7 @@ describe("Audit Endpoint Integration Tests", () => {
       auditEntryId: uuidv4(),
       session: mockLocalLog,
       timestamp,
+      proofs: [],
     });
 
     const startIso = new Date(timestamp - 1000).toISOString();

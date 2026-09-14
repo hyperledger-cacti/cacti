@@ -6,7 +6,7 @@ import {
   SATP_MSG_TYPE_URN_PREFIX,
   formatSATPErrorTypeURN,
 } from "../../../main/typescript/core/errors/satp-errors";
-import { Error as SATPErrorType } from "../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType } from "../../../main/typescript/core/errors/satp-error-type";
 
 describe("SATPError & URN Registration Specification Compliance", () => {
   describe("formatSATPErrorTypeURN", () => {
@@ -40,7 +40,7 @@ describe("SATPError & URN Registration Specification Compliance", () => {
       expect(err.httpCode).toBe(400);
       expect(err.errorType).toBe(SATPErrorType.SESSION_NOT_FOUND);
       expect(err.traceID).toBe("trace-123-abc");
-      expect(err.messageType).toBe(`${SATP_MSG_TYPE_URN_PREFIX}reject-msg`);
+      expect(err.messageType).toBe(`${SATP_MSG_TYPE_URN_PREFIX}error-msg`);
       expect(err.version).toBe("1.0");
       expect(err.timestamp).toBeDefined();
     });
@@ -48,14 +48,14 @@ describe("SATPError & URN Registration Specification Compliance", () => {
     it("constructs with full ISATPErrorOptions and exports RFC 9457 toJSON() payload", () => {
       const options = {
         traceID: "trace-999",
-        messageType: "urn:ietf:satp:msgtype:error-msg",
+        messageType: "urn:ietf:params:satp:core:msgtype:error-msg",
         title: "Session ID Not Found",
         detail: "Session with id session-123 does not exist.",
         version: "1.0",
         sessionId: "session-123",
         transferContextId: "context-456",
         instance: "context-456",
-        prevMsgType: "urn:ietf:satp:msgtype:transfer-proposal-msg",
+        prevMsgType: "urn:ietf:params:satp:core:msgtype:transfer-proposal-msg",
         hashPrevMessage: "abc123hash",
         timestamp: "2026-08-03T12:00:00.000Z",
       };
@@ -73,14 +73,16 @@ describe("SATPError & URN Registration Specification Compliance", () => {
       expect(json.httpCode).toBe(404);
       expect(json.status).toBe(404);
       expect(json.type).toBe("urn:ietf:params:satp:error:session_id_not_found");
-      expect(json.messageType).toBe("urn:ietf:satp:msgtype:error-msg");
+      expect(json.messageType).toBe(
+        "urn:ietf:params:satp:core:msgtype:error-msg",
+      );
       expect(json.title).toBe("Session ID Not Found");
       expect(json.detail).toBe("Session with id session-123 does not exist.");
       expect(json.sessionId).toBe("session-123");
       expect(json.transferContextId).toBe("context-456");
       expect(json.instance).toBe("context-456");
       expect(json.prevMsgType).toBe(
-        "urn:ietf:satp:msgtype:transfer-proposal-msg",
+        "urn:ietf:params:satp:core:msgtype:transfer-proposal-msg",
       );
       expect(json.hashPrevMessage).toBe("abc123hash");
       expect(json.timestamp).toBe("2026-08-03T12:00:00.000Z");
