@@ -25,6 +25,16 @@ export {
 } from "./daml/daml-test-ledger";
 
 export {
+  CantonTestLedger,
+  CANTON_LOCALNET_APP_PROVIDER_PORTS,
+  CANTON_LOCALNET_SOURCE_REVISION,
+  CANTON_LOCALNET_VERSION,
+  CANTON_TEST_LEDGER_DEFAULT_OPTIONS,
+  ICantonTestLedgerConnectionInfo,
+  ICantonTestLedgerOptions,
+} from "./canton/canton-test-ledger";
+
+export {
   CordaTestLedger,
   ICordaTestLedgerConstructorOptions,
   CORDA_TEST_LEDGER_DEFAULT_OPTIONS,
