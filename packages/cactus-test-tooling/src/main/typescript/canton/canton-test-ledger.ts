@@ -20,8 +20,8 @@ import { RuntimeError } from "run-time-error-cjs";
 
 import { ITestLedger } from "../i-test-ledger";
 
-// cspell:ignore npipe
-
+// Official Canton LocalNet 0.8.1 release commit:
+// https://github.com/digital-asset/decentralized-canton-sync/commit/fb3c8c8a9259e98cdeb1cffc0cc77eaa7cc69e52
 export const CANTON_LOCALNET_VERSION = "0.8.1";
 export const CANTON_LOCALNET_SOURCE_REVISION =
   "fb3c8c8a9259e98cdeb1cffc0cc77eaa7cc69e52";
@@ -87,7 +87,8 @@ const EXECUTABLE_LOCALNET_ASSETS = new Set([
 
 const MINIMUM_DOCKER_COMPOSE_VERSION = "2.20.2";
 const SOURCE_MARKER_FILE = ".cacti-canton-localnet-source";
-const CACTI_COMPOSE_FILE = "compose.cacti.yaml";
+// Per-instance Compose file generated from the pinned upstream compose.yaml.
+const GENERATED_COMPOSE_FILE = "compose.cacti.yaml";
 
 export interface ICantonTestLedgerOptions {
   readonly cacheDirectory?: string;
@@ -663,7 +664,7 @@ export class CantonTestLedger implements ITestLedger {
       "--env-file",
       path.join(composeDirectory, "env", "common.env"),
       "--file",
-      path.join(composeDirectory, CACTI_COMPOSE_FILE),
+      path.join(composeDirectory, GENERATED_COMPOSE_FILE),
       "--file",
       path.join(composeDirectory, "resource-constraints.yaml"),
       "--profile",
@@ -843,7 +844,7 @@ export class CantonTestLedger implements ITestLedger {
       }
     }
     await fs.writeFile(
-      path.join(workspace, CACTI_COMPOSE_FILE),
+      path.join(workspace, GENERATED_COMPOSE_FILE),
       yaml.dump(document, { lineWidth: 120, noRefs: false }),
       "utf8",
     );
