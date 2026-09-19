@@ -61,25 +61,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/common@npm:20.3.27":
-  version: 20.3.27
-  resolution: "@angular/common@npm:20.3.27"
+"@angular/common@npm:20.3.28":
+  version: 20.3.28
+  resolution: "@angular/common@npm:20.3.28"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/core": 20.3.27
+    "@angular/core": 20.3.28
     rxjs: ^6.5.3 || ^7.4.0
-  checksum: 10/9c4216e73b6e992a949fe829293d2e214df807296c8edc37bb57ee79dc81d108be8cb27ba4fffb23cccb936d1deeff45455946e6164b158bbcc685e1189c69ce
+  checksum: 10/1b9cc8739f846f7268988c1f37cb00450ceec818cc789ee859769d3505735124570c273b08fc38bd2fd893baec9cd7db8df65e8bad9648e616aaff0afe142214
   languageName: node
   linkType: hard
 
-"@angular/core@npm:20.3.27":
-  version: 20.3.27
-  resolution: "@angular/core@npm:20.3.27"
+"@angular/core@npm:20.3.28":
+  version: 20.3.28
+  resolution: "@angular/core@npm:20.3.28"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler": 20.3.27
+    "@angular/compiler": 20.3.28
     rxjs: ^6.5.3 || ^7.4.0
     zone.js: ~0.15.0
   peerDependenciesMeta:
@@ -87,7 +87,7 @@ __metadata:
       optional: true
     zone.js:
       optional: true
-  checksum: 10/fa94c1d5025f77bf96ee9138398ca4befe8aae99e70c5009bd1c990a0c13004789b65bcc9f7496ae8cbb53c8639cb070a6cd9a7904f2ddce78017ee066d69c6b
+  checksum: 10/0ca7e669ca6b897e3f0dcac0057cd6aefeb21127561f4e44ff13f5327819aa88ed6478d39e5b50c89ba86e0dbb4790ef5a3908f7bc73701b19d515bffb5813f0
   languageName: node
   linkType: hard
 
@@ -4379,7 +4379,7 @@ __metadata:
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.4"
+    joi: "npm:17.13.6"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
@@ -4684,7 +4684,7 @@ __metadata:
     express-jwt: "npm:8.4.1"
     express-openapi-validator: "npm:5.6.2"
     express-rate-limit: "npm:6.7.0"
-    fastify: "npm:5.8.5"
+    fastify: "npm:5.12.1"
     fs-extra: "npm:11.2.0"
     google-protobuf: "npm:3.21.4"
     grpc-tools: "npm:1.12.4"
@@ -4727,7 +4727,7 @@ __metadata:
     loglevel: "npm:1.8.1"
     loglevel-plugin-prefix: "npm:0.8.4"
     run-time-error-cjs: "npm:1.4.0"
-    sanitize-html: "npm:2.17.5"
+    sanitize-html: "npm:2.17.7"
     secp256k1: "npm:5.0.1"
     sha3: "npm:2.1.4"
     uuid: "npm:11.1.1"
@@ -4848,7 +4848,7 @@ __metadata:
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.4"
+    joi: "npm:17.13.6"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -4872,7 +4872,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     axios: "npm:1.18.1"
     express: "npm:5.1.0"
-    joi: "npm:17.13.4"
+    joi: "npm:17.13.6"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
   languageName: unknown
@@ -4898,7 +4898,7 @@ __metadata:
     express: "npm:5.1.0"
     forge-std: "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.4"
+    joi: "npm:17.13.6"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
     web3js-quorum: "npm:22.4.0"
@@ -4959,7 +4959,7 @@ __metadata:
     http-errors: "npm:2.0.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.4"
+    joi: "npm:17.13.6"
     key-encoder: "npm:2.0.3"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
@@ -5003,7 +5003,7 @@ __metadata:
     http-errors-enhanced-cjs: "npm:2.0.1"
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.4"
+    joi: "npm:17.13.6"
     node-fetch: "npm:2.7.0"
     node-ssh: "npm:13.1.0"
     prom-client: "npm:15.1.3"
@@ -5042,12 +5042,12 @@ __metadata:
     express: "npm:5.1.0"
     http-proxy-middleware: "npm:3.0.7"
     jest-extended: "npm:7.0.0"
-    js-yaml: "npm:3.15.1"
+    js-yaml: "npm:3.15.2"
     minimist: "npm:1.2.8"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
-    sanitize-html: "npm:2.17.5"
+    sanitize-html: "npm:2.17.7"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
     typescript-optional: "npm:2.0.1"
@@ -5105,13 +5105,13 @@ __metadata:
     http-status-codes: "npm:2.1.4"
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.4"
-    js-yaml: "npm:3.15.1"
+    joi: "npm:17.13.6"
+    js-yaml: "npm:3.15.2"
     json5: "npm:2.2.3"
     jsrsasign: "npm:11.1.3"
     lodash: "npm:4.18.1"
     long: "npm:5.2.3"
-    multer: "npm:2.2.0"
+    multer: "npm:2.3.0"
     ngo: "npm:2.7.0"
     node-ssh: "npm:13.1.0"
     node-vault: "npm:0.9.22"
@@ -5121,7 +5121,7 @@ __metadata:
     run-time-error-cjs: "npm:1.4.0"
     rxjs: "npm:7.8.1"
     sanitize-filename: "npm:1.6.3"
-    sanitize-html: "npm:2.17.5"
+    sanitize-html: "npm:2.17.7"
     secp256k1: "npm:5.0.1"
     socket.io: "npm:4.6.2"
     socket.io-client-fixed-types: "npm:4.5.4"
@@ -5322,7 +5322,7 @@ __metadata:
     jest: "npm:29.5.0"
     jest-extended: "npm:7.0.0"
     jest-junit: "npm:16.0.0"
-    js-yaml: "npm:3.15.1"
+    js-yaml: "npm:3.15.2"
     jsonc: "npm:2.0.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.4"
@@ -5547,8 +5547,8 @@ __metadata:
     internal-ip: "npm:6.2.0"
     is-port-reachable: "npm:3.0.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.4"
-    js-yaml: "npm:3.15.1"
+    joi: "npm:17.13.6"
+    js-yaml: "npm:3.15.2"
     keycloak-admin: "npm:1.14.22"
     lodash: "npm:4.18.1"
     node-forge: "npm:1.4.0"
@@ -5574,8 +5574,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus@workspace:."
   dependencies:
-    "@angular/common": "npm:20.3.27"
-    "@angular/core": "npm:20.3.27"
+    "@angular/common": "npm:20.3.28"
+    "@angular/core": "npm:20.3.28"
     "@angular/platform-browser": "npm:19.2.20"
     "@angular/platform-browser-dynamic": "npm:19.2.20"
     "@angular/router": "npm:19.2.20"
@@ -5614,7 +5614,7 @@ __metadata:
     "@types/yargs": "npm:17.0.24"
     "@typescript-eslint/eslint-plugin": "npm:7.1.0"
     "@typescript-eslint/parser": "npm:7.1.0"
-    adm-zip: "npm:0.6.0"
+    adm-zip: "npm:0.6.1"
     benchmark: "npm:2.1.4"
     browserify-zlib: "npm:0.2.0"
     buffer: "npm:6.0.3"
@@ -5650,7 +5650,7 @@ __metadata:
     jest: "npm:29.6.2"
     jest-extended: "npm:4.0.1"
     jest-junit: "npm:16.0.0"
-    joi: "npm:17.13.4"
+    joi: "npm:17.13.6"
     json5: "npm:2.2.3"
     license-report: "npm:6.4.0"
     lint-staged: "npm:11.2.6"
@@ -15447,12 +15447,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"baseline-browser-mapping@npm:^2.10.38":
-  version: 2.10.42
-  resolution: "baseline-browser-mapping@npm:2.10.42"
+"baseline-browser-mapping@npm:^2.11.23":
+  version: 2.11.25
+  resolution: "baseline-browser-mapping@npm:2.11.25"
   bin:
     baseline-browser-mapping: dist/cli.cjs
-  checksum: 10/7ea956db54694e4386fd14de665d9582aaa53901c09f21925abfe0ee0d5751947947775b890daad73d21673ed51de5bbefd888076edb8f9aaf76e53da47b061f
+  checksum: 10/3f59955a3e836bae87e9a78c4823d83cd0928a2c054904c60aaa5f25b617faa89aa45bd91035b7171d11637efeb43b82bc5206f474c580aca701968427571688
   languageName: node
   linkType: hard
 
@@ -15865,17 +15865,17 @@ __metadata:
   linkType: hard
 
 "browserslist@npm:^4.24.0, browserslist@npm:^4.28.1":
-  version: 4.28.4
-  resolution: "browserslist@npm:4.28.4"
+  version: 4.29.0
+  resolution: "browserslist@npm:4.29.0"
   dependencies:
-    baseline-browser-mapping: "npm:^2.10.38"
-    caniuse-lite: "npm:^1.0.30001799"
-    electron-to-chromium: "npm:^1.5.376"
-    node-releases: "npm:^2.0.48"
-    update-browserslist-db: "npm:^1.2.3"
+    baseline-browser-mapping: "npm:^2.11.23"
+    caniuse-lite: "npm:^1.0.30001810"
+    electron-to-chromium: "npm:^1.5.427"
+    node-releases: "npm:^2.0.55"
+    update-browserslist-db: "npm:^1.3.3"
   bin:
     browserslist: cli.js
-  checksum: 10/beb030f5b301b6af3fc7df3291d56f9edb34b7e4bd3cdc50d379c84c3410ad1ba013602952bcec1d98af940cf6596609fc81ef09d200f7f2e25e9f84d9d38201
+  checksum: 10/d912cb1138a9828ab7865c4060e972b9682effd4972ef75935a9d2d926f5fe286ecf6b2819ffa780d230d9b91b12a747b8f272557bb4c277c117acf54cc06a37
   languageName: node
   linkType: hard
 
@@ -16369,10 +16369,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001799":
-  version: 1.0.30001800
-  resolution: "caniuse-lite@npm:1.0.30001800"
-  checksum: 10/7fb170f87cf0cf3633b660371eeabf981b7c878a14efcdb17c86f7262432e036cd43d228cbe2d442f3795194f8f9e0d520877d93b6d265ca841bcd2a4c16500a
+"caniuse-lite@npm:^1.0.30001810":
+  version: 1.0.30001810
+  resolution: "caniuse-lite@npm:1.0.30001810"
+  checksum: 10/47d7db627c3f3d1a10e06eef9efbb84295c6ef9d959b585b64032cc293637ca7b9b6af7e5d5752972b3e690d9561f14b9561db03890fbc6e38dc1aaa54e51d97
   languageName: node
   linkType: hard
 
@@ -19873,10 +19873,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron-to-chromium@npm:^1.5.376":
-  version: 1.5.387
-  resolution: "electron-to-chromium@npm:1.5.387"
-  checksum: 10/987c002c3a8e08b33977ae4130c7a67a7047c69120b1240cbaedd0a2b72e9a67d32c52d2644b521092dbb2ce058129690f77fd376e58d895cdba12a9eddea689
+"electron-to-chromium@npm:^1.5.427":
+  version: 1.5.433
+  resolution: "electron-to-chromium@npm:1.5.433"
+  checksum: 10/d341677104919d0bad34f41a1c8b8600467e9bcb8b6c5580d0915cfd49fd7eec1f0fda1696400ed288794cc27738ce7666c81120c24ceae333e68f51004f6349
   languageName: node
   linkType: hard
 
@@ -22079,20 +22079,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-json-stringify@npm:^6.0.0":
-  version: 6.4.0
-  resolution: "fast-json-stringify@npm:6.4.0"
-  dependencies:
-    "@fastify/merge-json-schemas": "npm:^0.2.0"
-    ajv: "npm:^8.12.0"
-    ajv-formats: "npm:^3.0.1"
-    fast-uri: "npm:^3.0.0"
-    json-schema-ref-resolver: "npm:^3.0.0"
-    rfdc: "npm:^1.2.0"
-  checksum: 10/d054885a632dccd8c735895f4f32825aa00573a55bde44f543115b4e925d39f95f40563549cbf638f6ab53d98fc282e5c2e1d9f2bea28393316a144b734d2ba1
-  languageName: node
-  linkType: hard
-
 "fast-json-stringify@npm:^7.0.0":
   version: 7.0.0
   resolution: "fast-json-stringify@npm:7.0.0"
@@ -22167,9 +22153,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:5.8.5":
-  version: 5.8.5
-  resolution: "fastify@npm:5.8.5"
+"fastify@npm:5.12.1":
+  version: 5.12.1
+  resolution: "fastify@npm:5.12.1"
   dependencies:
     "@fastify/ajv-compiler": "npm:^4.0.5"
     "@fastify/error": "npm:^4.0.0"
@@ -22177,16 +22163,16 @@ __metadata:
     "@fastify/proxy-addr": "npm:^5.0.0"
     abstract-logging: "npm:^2.0.1"
     avvio: "npm:^9.0.0"
-    fast-json-stringify: "npm:^6.0.0"
-    find-my-way: "npm:^9.0.0"
+    fast-json-stringify: "npm:^7.0.0"
+    find-my-way: "npm:^9.6.0"
     light-my-request: "npm:^6.0.0"
     pino: "npm:^9.14.0 || ^10.1.0"
-    process-warning: "npm:^5.0.0"
+    process-warning: "npm:^5.1.0"
     rfdc: "npm:^1.3.1"
     secure-json-parse: "npm:^4.0.0"
     semver: "npm:^7.6.0"
     toad-cache: "npm:^3.7.0"
-  checksum: 10/286054e09964743b3e36ae7fb5d78a46662adb818ac305efca6a09560c9f7346881b0f1ef51736bdd334f5bfecab4461dacdb55bef10e6b64829bbfcc397474d
+  checksum: 10/b1e189820cc458e91b75a246d11fa040ceaef0d4545eac29adee966a3affcf36a57751640e2568f78f5dc72eea8f1062723cc9ac91459de3ee0b3e1e00df4c44
   languageName: node
   linkType: hard
 
@@ -22460,14 +22446,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-my-way@npm:^9.0.0":
-  version: 9.7.0
-  resolution: "find-my-way@npm:9.7.0"
+"find-my-way@npm:^9.6.0":
+  version: 9.9.0
+  resolution: "find-my-way@npm:9.9.0"
   dependencies:
     fast-deep-equal: "npm:^3.1.3"
     fast-querystring: "npm:^1.0.0"
     safe-regex2: "npm:^5.0.0"
-  checksum: 10/c22817d48cdbc1174b7073b96fd75796777e63d39ddfc6b3d09437d4afe280ac9575c05b4e32a23f69ec1297b0204840f0229cf9d8ff35fb3b37b4c547598d96
+  checksum: 10/bf534727beeb94f188a5b3b46b5ee737a7f230be253fae12b64a9ee00d14ec9ce96c433d5a29d1a7430daf282ef09f65c743d1fa6aaf9a80cbabe28819b3e80d
   languageName: node
   linkType: hard
 
@@ -26905,16 +26891,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:17.13.4":
-  version: 17.13.4
-  resolution: "joi@npm:17.13.4"
+"joi@npm:17.13.6":
+  version: 17.13.6
+  resolution: "joi@npm:17.13.6"
   dependencies:
     "@hapi/hoek": "npm:^9.3.0"
     "@hapi/topo": "npm:^5.1.0"
     "@sideway/address": "npm:^4.1.5"
     "@sideway/formula": "npm:^3.0.1"
     "@sideway/pinpoint": "npm:^2.0.0"
-  checksum: 10/0e407d4cc6cb0830b93c2d107f8b85113338473296025c31a931589359b58883e61fd183dd7532d3ab1ee014a01a20830a8fca90d9f0217d0c0894ee2cbf9ff5
+  checksum: 10/9fd7f2ecdb39deaf298b12de824181e5f50e6d562dc1d05512ee3963e607994b54621299ce956b0e3b12c982f8eb71a7126883d3311ccdda1d6efff1986f2276
   languageName: node
   linkType: hard
 
@@ -27011,6 +26997,18 @@ __metadata:
   bin:
     js-yaml: bin/js-yaml.js
   checksum: 10/905842ce08c18b154ff2c187ff81bb41294cc5dda214331b5d9b8bcf395894e48b00fa37b9d4dd4c3ffec672b7496a94558e3876d3a8ad4d12b06248112e6d92
+  languageName: node
+  linkType: hard
+
+"js-yaml@npm:3.15.2":
+  version: 3.15.2
+  resolution: "js-yaml@npm:3.15.2"
+  dependencies:
+    argparse: "npm:^1.0.7"
+    esprima: "npm:^4.0.0"
+  bin:
+    js-yaml: bin/js-yaml.js
+  checksum: 10/320b5471c1b7309a15d9c0068ba273e2da7382a369038a9746c92ef649087c3d6d2a5c676810154efb4eb2ca9584179c8ae14e2fc2e4bd558d964e6bf4fafd3d
   languageName: node
   linkType: hard
 
@@ -30077,7 +30075,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multer@npm:2.2.0, multer@npm:^2.0.2":
+"multer@npm:2.3.0":
+  version: 2.3.0
+  resolution: "multer@npm:2.3.0"
+  dependencies:
+    append-field: "npm:^1.0.0"
+    busboy: "npm:^1.6.0"
+    concat-stream: "npm:^2.0.0"
+    type-is: "npm:^1.6.18"
+  checksum: 10/bd939b7d364aea9d859eb7ff7f86811b0ae620e9d4b5684d3ef33e9b336f062b053c06fc2f3d292a5e373835e84828d68ce8bc35aad63df0c5ba5769f146c50e
+  languageName: node
+  linkType: hard
+
+"multer@npm:^2.0.2":
   version: 2.2.0
   resolution: "multer@npm:2.2.0"
   dependencies:
@@ -30790,10 +30800,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-releases@npm:^2.0.48":
-  version: 2.0.50
-  resolution: "node-releases@npm:2.0.50"
-  checksum: 10/c40306176fc9d43d27b919034fab57ab0753448dfcabeb1ae669128d28f595fba4c329a269b2d7fa9bb7d5a6d2bda8b2bd8fe5e8446226bb809f448fec2e80fb
+"node-releases@npm:^2.0.55":
+  version: 2.0.56
+  resolution: "node-releases@npm:2.0.56"
+  checksum: 10/5a67cf6b1277376a475d318fb0b821bbaf9609c375dd4f74656ca09c26e75e8ab745695a0f3db5703937f1550a8feedb8c05be44606cf3024b13de16a452e08e
   languageName: node
   linkType: hard
 
@@ -33396,6 +33406,13 @@ __metadata:
   version: 5.0.0
   resolution: "process-warning@npm:5.0.0"
   checksum: 10/10f3e00ac9fc1943ec4566ff41fff2b964e660f853c283e622257719839d340b4616e707d62a02d6aa0038761bb1fa7c56bc7308d602d51bd96f05f9cd305dcd
+  languageName: node
+  linkType: hard
+
+"process-warning@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "process-warning@npm:5.1.0"
+  checksum: 10/ff3fccbc71b1a5af289fdc4d195b6c82c89f51f3fea5bb06bda6e533b9c98d381675571d3b0d66ff0fa85e59d9c69049726dd55a76996c2e6294759166072aa4
   languageName: node
   linkType: hard
 
@@ -39334,9 +39351,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"update-browserslist-db@npm:^1.2.3":
-  version: 1.2.3
-  resolution: "update-browserslist-db@npm:1.2.3"
+"update-browserslist-db@npm:^1.3.3":
+  version: 1.3.3
+  resolution: "update-browserslist-db@npm:1.3.3"
   dependencies:
     escalade: "npm:^3.2.0"
     picocolors: "npm:^1.1.1"
@@ -39344,7 +39361,7 @@ __metadata:
     browserslist: ">= 4.21.0"
   bin:
     update-browserslist-db: cli.js
-  checksum: 10/059f774300efb4b084a49293143c511f3ae946d40397b5c30914e900cd5691a12b8e61b41dd54ed73d3b56c8204165a0333107dd784ccf8f8c81790bcc423175
+  checksum: 10/c60c18c53ba53915b377830db55049cd3ee31129633b4e386d2e48f9a1a15ade7503a80a57dd11d66cbac583a8ad3f2d61e938895b1c2155323fd4367530f5b2
   languageName: node
   linkType: hard
 
