@@ -112,7 +112,7 @@ refactoring. This is a core contribution principle, not a suggestion.
 - **AI-generated PRs are not exempt.** AI tooling can easily produce
   large, sprawling changes. Contributors using AI assistants must
   still break work into focused, reviewable units — see
-  [AI Guidelines §2.4][ai_guidelines_compliance].
+  [AI Guidelines §2.5][ai_guidelines_compliance].
 
 Small, focused PRs significantly reduce the cognitive load on
 reviewers, speed up the review cycle, and keep the git history clean
@@ -137,16 +137,18 @@ including concrete examples.
      ```
 
 2. Clone the fork to your local machine
-3. (Optional) Create a local branch for minimizing code conflicts when you want to contribute multiple changes regarding different issues in parallel. See the [Git Branch Setup][recipe_git_branch] recipe for details.
+3. Create a local branch for minimizing code conflicts when you want to contribute multiple changes regarding different issues in parallel. See the [Git Branch Setup][recipe_git_branch] recipe for details.
 4. Complete the desired changes and where possible test locally
 5. Make sure you have set up your git signatures
    1. Note: Always sign your commits using the `git commit -s`
    2. For more information see [here](https://gist.github.com/tkuhrt/10211ae0a26a91a8c030d00344f7d11b)
-6. Think about/decide on what your commit message will be.
-   1. The commit message syntax might be hard to remember at first so we invite you to use the `npm run commit` command which upon execution presents you with a series of prompts that you can fill out and have your input validated in realtime, making it impossible (or at least much harder) to produce an invalid commit message that the commit lint bot on Github will flag with an error.
+6. Prepare a commit message that follows the Conventional Commits syntax
+   described below and in [PULL.md][pull_doc].
 7. Commit your changes
     1. Make sure your commit message follows the formatting requirements (details above) and here: [Conventional Commits syntax](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification); this aids in release notes generation which we intend to automate
-    2. Be aware that we are using git commit hooks for the automation of certain mundane tasks such as applying the required code style and formatting so your code will be wrapped at 80 characters each line automatically. If you wish to see how your changes will be altered by the formatter you can run the `npm run prettier` command from a terminal or install an IDE extension for the `Prettier` tool that can do the same (VSCode has one that is known to work).
+    2. The commit hooks format supported staged files. To format selected files
+       before committing, run `yarn format:files <file...>`, or use an editor
+       integration for Prettier.
     3. Ensure your code complies with the repository conventions documented in [CONVENTIONS.md][conventions_doc].
 8. Ensure your branch is rebased onto the `upstream` main branch where `upstream` is fancy git talk for the main Cacti repo on Github (the one you created your fork from).
    1. **Do not** duplicate your pull request after it has been reviewed. Duplication here means closing the existing PR and then opening a brand new one which does not contain the review history anymore. If you encounter issues with version control that you do not know how to solve the maintainers will be happy to assist to ensure that you do not need to open a new pull request from scratch.
@@ -175,8 +177,7 @@ These rules are well documented in
 [Chris Beam's blog post](https://chris.beams.io/posts/git-commit/#seven-rules).
 
 We use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#specification)
-syntax. You can use the interactive `npm run commit` command to help format your
-commit message correctly.
+syntax. The commit message hook validates the message when you commit.
 
 ### Commit Email Address
 
@@ -259,7 +260,7 @@ wrapper file provides its own set of reference links that override these.
 [weaver_intro]: https://hyperledger-cacti.github.io/cacti/weaver/introduction/
 [lf_coc]: https://lf-decentralized-trust.github.io/governance/governing-documents/code-of-conduct
 [ai_guidelines]: ./AI_GUIDELINES.md
-[ai_guidelines_compliance]: ./AI_GUIDELINES.md#24-compliance-with-project-standards
+[ai_guidelines_compliance]: ./AI_GUIDELINES.md#25-compliance-with-project-standards
 [pull_doc]: ./PULL.md
 [conventions_doc]: ./CONVENTIONS.md
 [recipe_git_branch]: ./docs/recipes/git-branch-setup.md

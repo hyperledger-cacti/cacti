@@ -27,13 +27,13 @@ migration, and combined on-chain-off-chain analytics".
 
 ## Summary
 
-- [`@hyperledger/cactus-plugin-bungee-hermes`](#hyperledgercactus-plugin-bungee-hermes)
+- [Overview](#overview)
   - [Summary](#summary)
   - [Getting Started](#getting-started)
     - [Prerequisites](#prerequisites)
   - [Architecture](#architecture)
-    - [BUNGEE - Hermes API](#bungee---hermes-api)
-  - [Running the tests](#running-the-tests)
+    - [BUNGEE Hermes API](#bungee-hermes-api)
+  - [Testing](#testing)
   - [Usage](#usage)
   - [Contributing](#contributing)
   - [License](#license)
@@ -82,7 +82,7 @@ The plugin stands _behind_ a cacti-ledger-connector, which is used to fetch info
 ```
 The plugin can then serve multiple purposes, and thus serve also other plugins or apps in more complex deployment architectures (where we link bungee to other components).
 
-### BUNGEE - Hermes API
+### BUNGEE Hermes API
 
 This plugin uses OpenAPI to generate the API paths.
 Endpoints exposed:

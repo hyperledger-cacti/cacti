@@ -25,12 +25,12 @@ Helpers for running test `go-ethereum` ledger in test scripts.
 
 - [Getting Started](#getting-started)
 - [Usage](#usage)
-- [Runing the tests](#running-the-tests)
+- [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
 
-## Usage
+## Getting Started
 
 Clone the git repository on your local machine. Follow these instructions that will get you a copy of the project up and running on
 your local machine for development and testing purposes.

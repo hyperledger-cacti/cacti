@@ -2,7 +2,7 @@ Hyperledger Cacti v3 Release Announcement
 
 Cacti v3 is the largest release in the project's history — the culmination of 18 months of sustained development across the entire platform.
 
-After many bug fixes and documentation improvements, we present SATP-Hermes, an extensible cross-chain asset transfer engine built on the IETF Secure Asset Transfer Protocol draft. We also present it ships two brand-new plugins ([BUNGEE-Hermes](#-new-plugin-bungee-hermes-cross-chain-views) and [COPM Corda](#-new-plugin-copm-cross-chain-operations--protocol-management)), real-time event streaming for both Fabric and Ethereum, deep observability, and a significantly expanded Ledger Browser.
+After many bug fixes and documentation improvements, we present SATP-Hermes, an extensible cross-chain asset transfer engine built on the IETF Secure Asset Transfer Protocol draft. We also present it ships two brand-new plugins ([BUNGEE-Hermes](#new-plugin-bungee-hermes-cross-chain-views) and [COPM Corda](#new-plugin-copm-cross-chain-operations-protocol-management)), real-time event streaming for both Fabric and Ethereum, deep observability, and a significantly expanded Ledger Browser.
 
 ---
 
@@ -29,7 +29,7 @@ The SATP Hermes gateway is the core of Cacti's cross-chain interoperability stor
 
 ---
 
-#### 🆕 New Plugin: BUNGEE-Hermes — Cross-Chain Views
+#### 🆕 New Plugin: BUNGEE-Hermes — Cross-Chain Views { #new-plugin-bungee-hermes-cross-chain-views }
 
 Package: [`@hyperledger-cacti/cactus-plugin-bungee-hermes`](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-bungee-hermes)
 
@@ -37,7 +37,7 @@ BUNGEE-Hermes is an implementation of a **cross-chain view generator**, enabling
 
 ---
 
-#### 🆕 New Plugin: COPM — Cross-Chain Operations & Protocol Management
+#### 🆕 New Plugin: COPM — Cross-Chain Operations & Protocol Management { #new-plugin-copm-cross-chain-operations-protocol-management }
 
 Packages: [`@hyperledger-cacti/cacti-plugin-copm-fabric`](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cacti-plugin-copm-fabric) · [`@hyperledger-cacti/cacti-plugin-copm-corda`](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cacti-plugin-copm-corda) · [`@hyperledger-cacti/cacti-copm-core`](https://github.com/hyperledger-cacti/cacti/tree/main/packages/cacti-copm-core)
 

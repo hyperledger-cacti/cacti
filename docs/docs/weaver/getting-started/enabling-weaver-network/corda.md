@@ -169,7 +169,7 @@ An agent from a foreign network can query either `http://partya.mynetwork.com:90
 
 Consider a scenario inspired by the [global trade use case](../../user-stories/global-trade.md) where a letter of credit (L/C) management business logic is installed in the `trade-finance-network` network, supports a flow named `UploadBillOfLading`, which validates and records a bill of lading (B/L) supplied by a user via a UI. Weaver will enable such a B/L to be fetched from a different network `trade-logistics-network` by querying the function `GetBillOfLading` exposed by the chaincode `shipmentcc` installed in the `tradelogisticschannel` channel (_The trade logistics network can be built on Corda as well. The steps for Weaver-enablement will mostly be the same, with the exception of view address creation logic. Here, for demonstration purposes, we assume that that counter-party network is built on Fabric_).
 
-(In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded in the vault of `trade-finance-network`. We will see how to do this in the [Startup and Bootstrap Weaver Components](#startup-and-bootstrap-weaver-components) section later.)
+(In preparation, a suitable access control policy must be recorded on `tradelogisticschannel` in `trade-logistics-network`, and a suitable verification policy must be recorded in the vault of `trade-finance-network`. We will see how to do this in the [Startup and Bootstrap Weaver Components](#startup-and-bootstrap-phase) section later.)
 
 You will need to insert some code in the client layer application that accepts a B/L and submits a `UploadBillOfLading` request in `trade-finance-network`. (No code changes need to be made in any application in the other network.) The logic to accept a B/L should be replaced (or you can simply add an alternative) by a call to the `InteroperableHelper.interopFlow` function offered by the [cacti-weaver-sdk-corda](https://github.com/hyperledger-cacti/cacti/packages/1856827) library. The following code sample illustrates this:
 
@@ -547,7 +547,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
   ```
     - `NETWORK_NAME` is only used as suffix for container and has no other significance.
     - `DRIVER_PORT` variable should be set to the port this driver will listen on.
-    - `DRIVER_RPC_USERNAME` variable should be set to rpc user created [above](#pre-configuration) for the driver.
+    - `DRIVER_RPC_USERNAME` variable should be set to rpc user created [above](#pre-configuration-phase) for the driver.
     - `DRIVER_RPC_PASSWORD` variable should be set to password of above rpc user.
     - `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Corda network.
     - **Enabling TLS**:

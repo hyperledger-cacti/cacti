@@ -29,9 +29,9 @@ Data in the database can later be analyzed and viewed in a GUI tool.
 ## Summary
 
 - [Remarks](#remarks)
-- [Getting Started](#getting-started)
+- [Usage](#usage)
 - [Endpoints](#endpoints)
-- [Running the tests](#running-the-tests)
+- [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)

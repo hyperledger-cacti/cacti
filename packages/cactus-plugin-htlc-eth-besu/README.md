@@ -24,9 +24,9 @@ Allows `Cacti` to interact with HTLC contract manager.
 
 ## Summary
 
-  - [Getting Started](#getting-started)
+  - [Usage](#usage)
   - [Installing](#installing)
-  - [Runing the tests](#running-the-tests)
+  - [Testing](#testing)
   - [Contributing](#contributing)
   - [License](#license)
 

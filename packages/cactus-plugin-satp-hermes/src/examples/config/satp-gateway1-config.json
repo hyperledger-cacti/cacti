@@ -48,7 +48,7 @@
       "gatewayClientPort": 3011,
       "gatewayServerPort": 3010,
       "gatewayOapiPort": 4010,
-      "identificationCredentials": {
+      "identificationCredential": {
         "signingAlgorithm": "SECP256K1",
         "pubKey": "024c0cf54f92d23dbb3d409a8047aa2a44abcb911767d3516b19fd94c2358dec65"
       }      

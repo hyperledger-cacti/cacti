@@ -542,7 +542,7 @@ Weaver provides a [pre-built image](https://github.com/hyperledger-cacti/cacti/p
     - The `RELAY_NAME` variable specifies a unique name for this relay. It should match what's specified in the `config.toml` (more on that below).
     - The `RELAY_PORT` variable specifies the port this relay server will listen on. It should match what's specified in the `config.toml` (more on that below).
     - The `EXTERNAL_NETWORK` variable should be set to the [name](https://docs.docker.com/compose/networking/) of your Fabric network.
-    - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](ility/pkgs/container/weaver-relay-server).
+    - The `DOCKER_*` variables are used to specify the image on which the container will be built. Make sure you set `DOCKER_TAG` to the latest version you see on [GitHub](https://github.com/hyperledger-cacti/cacti/pkgs/container/cacti-weaver-relay-server).
 
     For more details, see the [Relay Docker README](https://github.com/hyperledger-cacti/cacti/blob/main/weaver/core/relay/relay-docker.md) ("Relay Server Image" and "Running With Docker Compose" sections).
 
