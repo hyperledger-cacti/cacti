@@ -23,7 +23,7 @@ This component allows viewing ledger data in Supabase or other PostgreSQL compat
 
 ## Summary
 
-- [`@hyperledger/cacti-ledger-browser`](#hyperledgercacti-gui-tx-viewer)
+- [Overview](#overview)
   - [Summary](#summary)
   - [Remarks](#remarks)
   - [Getting Started](#getting-started)

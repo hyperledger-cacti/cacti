@@ -5,7 +5,7 @@
 
 The tracked [Compose file](https://github.com/hyperledger-cacti/cacti/blob/main/packages/cactus-plugin-satp-hermes/docker-compose-satp.yml) starts one SATP Hermes gateway and one Grafana OpenTelemetry LGTM container. The gateway publishes its protocol server on port `3010`, client service on port `3011`, and OpenAPI service on container port `4010`. The tracked Compose mapping exposes the OpenAPI service on host port `3012`.
 
-The gateway CLI uses `/opt/cacti/satp-hermes` as its default working directory. Mount gateway configuration into its `config` subdirectory. See [Gateway Configuration][package-doc-configuration-md] for the exact paths.
+The gateway CLI uses `/opt/cacti/satp-hermes` as its default working directory. The tracked Compose service mounts the Gateway 1 development configuration at `/opt/cacti/satp-hermes/config/config.json`, which is the path loaded by the container entry point. This example connects to an Ethereum JSON-RPC endpoint at `http://host.docker.internal:8545`; start the corresponding local development ledger before the gateway. Replace the example keys, credentials, and endpoint configuration for non-development deployments. See [Gateway Configuration][package-doc-configuration-md] for the configuration schema and path details.
 
 ## Container environment
 

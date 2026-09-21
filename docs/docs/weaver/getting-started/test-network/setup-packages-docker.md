@@ -241,7 +241,7 @@ If you are using a Linux system, make sure that lib64 is installed.
 You can install `fabric-cli` as follows (for both the Node.js and Golang versions):
 
 - Navigate to the `weaver/samples/fabric/fabric-cli` folder (for the Node.js version) or the `weaver/samples/fabric/go-cli` folder (for the Golang version).
-- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#package-access-token)..
+- Create `.npmrc` from template `.npmrc.template`, by replacing `<personal-access-token>` with yours created [above](#credentials)..
 - Run the following to install dependencies (for the Node.js version) or the executable (for the Golang version):
   ```bash
   make build
@@ -264,7 +264,7 @@ Follow the instructions below to build and launch the network:
 
 - Navigate to the `weaver/tests/network-setups/corda` folder.
 - Create copy of `github.properties.template` as `github.properties`.
-- Replace `<GITHUB email>` with your GitHub email, and `<GITHUB Personal Access Token>` with the access token created [above](#package-access-token).
+- Replace `<GITHUB email>` with your GitHub email, and `<GITHUB Personal Access Token>` with the access token created [above](#credentials).
 - To spin up the Corda networks with the Interoperation CorDapps:
     - Each consisting of 1 node and a notary (for data-transfer), run:
       ```bash

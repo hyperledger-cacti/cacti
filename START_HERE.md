@@ -69,8 +69,20 @@ cd cacti
 # 2. Enter the Nix development shell
 nix develop
 
-# 3. Install dependencies and build
+# 3. Install dependencies
+yarn install
+
+# 4. Configure and build the repository
 yarn run configure
+```
+
+After configuration, verify the environment by building and testing one
+package:
+
+```bash
+yarn lerna run build:bundle \
+  --scope=@hyperledger-cacti/cactus-plugin-satp-hermes
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes test:unit
 ```
 
 Alternative setup methods are available if Nix is not suitable for your

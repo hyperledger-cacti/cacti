@@ -2,15 +2,15 @@
 
 - [Overview](#overview)
 - [Usage](#usage)
-  - [Installation](#installation)
+  - [Install](#install)
   - [Data Sharing](#data-sharing)
     - [COPM Command](#copm-command)
     - [Figure: Data Sharing with getVerifiedState](#figure-data-sharing-with-getverifiedstate)
   - [Asset Transfer](#asset-transfer)
-    - [COPM Commands](#copm-commands)
+    - [COPM Commands for Asset Transfer](#copm-commands-for-asset-transfer)
     - [Figure: Asset Transfer Pledge and ClaimPledge](#figure-asset-transfer-pledge-and-claimpledge)
   - [Asset Exchange](#asset-exchange)
-    - [COPM Commands](#copm-commands-1)
+    - [COPM Commands for Asset Exchange](#copm-commands-for-asset-exchange)
     - [Figure: Asset Exchange with Lock and ClaimLock](#figure-asset-exchange-with-lock-and-claimlock)
 - [Development](#development)
 
@@ -96,7 +96,7 @@ sequenceDiagram
        - Contains details about the asset, who it is promised to 
    - Claim
         - A record created on Ledger B when the pledged asset is minted
-### COPM Commands
+### COPM Commands for Asset Transfer
   - Pledge
   - ClaimPledge
 
@@ -146,7 +146,7 @@ sequenceDiagram
  - No inter-network communication needed 
     - no relays 
 
-### COPM Commands
+### COPM Commands for Asset Exchange
  - Lock
  - ClaimLock 
   

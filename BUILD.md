@@ -138,7 +138,12 @@ nix develop
 The first run downloads and caches all dependencies (a few minutes). Subsequent
 runs are near-instantaneous.
 
-**3. Build the project**
+**3. Install dependencies**
+```bash
+yarn install
+```
+
+**4. Configure and build the project**
 ```bash
 yarn run configure
 ```

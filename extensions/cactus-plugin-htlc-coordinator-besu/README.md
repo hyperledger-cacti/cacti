@@ -43,7 +43,6 @@ web services. Request and response schemas are defined in the
     - [Flow](#flow)
   - [Contributing](#contributing)
   - [License](#license)
-  - [Acknowledgments](#acknowledgments)
 
 ## Usage
 

@@ -45,7 +45,7 @@ The plugin supports both bidirectional and unidirectional asset transfers with t
 ## Table of Contents
 
 - [Assumptions](#assumptions)
-- [Getting Started](#getting-started)
+- [Usage](#usage)
 - [Architecture](#architecture)
 - [Protocol Flow](#protocol-flow)
 - [Application-to-Gateway API (API Type 1)](#application-to-gateway-api-api-type-1)
@@ -284,6 +284,9 @@ docker build  \
 > The `--build` flag is going to save you 99% of the time from docker compose caching your image builds against your will or knowledge during development.
 
 ## Running local Gateway with Docker Compose
+
+The tracked Compose service mounts the Gateway 1 development configuration at the path expected by the container. That configuration connects to an Ethereum JSON-RPC endpoint at `http://host.docker.internal:8545`, so start the corresponding local development ledger before starting the gateway. Replace the example credentials and endpoint configuration outside local development.
+
 ```sh
 # Navigate to the directory containing the docker-compose file
 cd packages/cactus-plugin-satp-hermes/

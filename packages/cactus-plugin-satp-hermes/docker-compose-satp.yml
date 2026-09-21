@@ -13,6 +13,8 @@ services:
       - 3010:3010/tcp # SERVER_PORT
       - 3011:3011/tcp # CLIENT_PORT
       - 3012:4010/tcp # API_PORT
+    volumes:
+      - ./src/examples/config/satp-gateway1-config.json:/opt/cacti/satp-hermes/config/config.json:ro
     depends_on:
       - otel-lgtm
 
