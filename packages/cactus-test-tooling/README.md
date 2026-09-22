@@ -12,6 +12,7 @@ Test infrastructure harness for spinning up ephemeral DLT nodes and support serv
 ## Prerequisites
 - Node.js >= 18
 - Docker daemon must be running
+- Docker Compose >= 2.20.2
 
 ## Install
 ```bash
@@ -26,6 +27,7 @@ npm install --save-dev @hyperledger-cacti/cactus-test-tooling
 |---|---|
 | `BesuTestLedger` | Besu |
 | `BesuMpTestLedger` | Besu |
+| `CantonTestLedger` | Canton LocalNet |
 | `CordaTestLedger` | Corda |
 | `CordaV5TestLedger` | Corda |
 | `DamlTestLedger` | Daml |
@@ -71,6 +73,37 @@ const networkConfig = await ledger.getNetworkConfiguration();
 await ledger.stop();
 await ledger.destroy();
 ```
+
+### Canton LocalNet
+
+`CantonTestLedger` starts the
+[official Canton LocalNet](https://docs.dev.sync.global/app_dev/testing/localnet.html)
+`postgres`, `canton`, and `splice` services. The LocalNet source and image tag
+are pinned, while each ledger instance uses a unique Compose project and
+dynamically assigned host ports so that independent tests do not share state.
+
+```typescript
+import { CantonTestLedger } from "@hyperledger-cacti/cactus-test-tooling";
+
+const ledger = new CantonTestLedger();
+try {
+  await ledger.start();
+  const {
+    adminApiAddress,
+    jsonLedgerApiHost,
+    ledgerApiAddress,
+    ledgerApiAuthToken,
+  } = await ledger.getConnectionInfo();
+
+  // Use the endpoints in an integration test.
+} finally {
+  await ledger.destroy();
+}
+```
+
+The first ledger in each process downloads the pinned LocalNet configuration
+into a temporary cache. The gRPC APIs are returned as `host:port` addresses;
+the JSON Ledger API is an HTTP URL and includes a matching development JWT.
 
 ### Stellar Test Ledger Usage
 
