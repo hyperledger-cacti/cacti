@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789978931339,
+  "lastUpdate": 1790237648378,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -260,6 +260,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.65%",
             "unit": "ops/sec",
             "extra": "178 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Parth Singh",
+            "username": "ParthSinghPS",
+            "email": "posiedon.1721@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "d43374ba5df98f979f35d58a40bce47762c8d9bc",
+          "message": "docs(validation): fix audience path guidance\n\nAddresses #4596\n\nCorrect contributor, developer, and operator guidance found during validation.\n\nUpdate stale commands, links, and SATP deployment configuration.\n\nSigned-off-by: Parth Singh <posiedon.1721@gmail.com>",
+          "timestamp": "2026-09-21T04:24:21Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/d43374ba5df98f979f35d58a40bce47762c8d9bc"
+        },
+        "date": 1790237643950,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 1035,
+            "range": "±4.24%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 1159,
+            "range": "±3.24%",
+            "unit": "ops/sec",
+            "extra": "182 samples"
           }
         ]
       }
