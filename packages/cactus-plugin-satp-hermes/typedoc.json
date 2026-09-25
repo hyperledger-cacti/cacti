@@ -17,6 +17,8 @@
   "entryPointStrategy": "resolve",
   "out": "./public/typedoc",
   "theme": "default",
+  "customCss": "./docs/assets/typedoc-cacti.css",
+  "favicon": "../../docs/docs/images/HL_Cacti_Logo_Colorreverse.svg",
   "includeVersion": true,
   "exclude": [
     "**/node_modules/**",
@@ -69,7 +71,6 @@
   ],
   "cleanOutputDir": true,
   "navigationLinks": {
-    "Documentation": "./docs/",
     "SATP Protocol": "https://github.com/hyperledger-cacti/cacti/tree/main/packages/cactus-plugin-satp-hermes",
     "Hyperledger Cacti": "https://hyperledger-cacti.github.io/cacti/",
     "GitHub Repository": "https://github.com/hyperledger-cacti/cacti"

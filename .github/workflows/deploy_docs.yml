@@ -54,6 +54,9 @@ jobs:
               - 'extensions/*/images/**'
               - 'packages/*/src/main/json/**'
               - 'extensions/*/src/main/json/**'
+              - 'packages/cactus-plugin-satp-hermes/src/main/typescript/**'
+              - 'packages/cactus-plugin-satp-hermes/package.json'
+              - 'packages/cactus-plugin-satp-hermes/typedoc.json'
               - 'weaver/**/*.md'
 
   deploy-docs:
@@ -106,12 +109,14 @@ jobs:
         run: yarn puppeteer browsers install chrome-headless-shell
         working-directory: packages/cactus-plugin-satp-hermes
 
-      - name: Build SATP Hermes diagrams
-        run: yarn run docs:diagrams
+      - name: Build SATP Hermes documentation
+        run: yarn run docs:generate
         working-directory: packages/cactus-plugin-satp-hermes
 
       - name: Copy SATP Hermes docs to mkdocs
         run: |
+          test -f packages/cactus-plugin-satp-hermes/public/typedoc/index.html
+
           mkdir -p docs/docs/satp-hermes/assets
           cp -r packages/cactus-plugin-satp-hermes/assets/diagrams docs/docs/satp-hermes/assets/
 
