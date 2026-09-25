@@ -1,0 +1,14 @@
+:root {
+  --light-color-link: #4051b5;
+  --light-color-focus-outline: #4051b5;
+  --dark-color-link: #82aaff;
+  --dark-color-focus-outline: #82aaff;
+}
+
+.tsd-page-toolbar {
+  border-bottom: 3px solid #4051b5;
+}
+
+.tsd-toolbar-contents .title {
+  font-weight: 700;
+}
