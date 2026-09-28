@@ -78,6 +78,8 @@ plugins:
   - search
   - swagger-ui-tag
   - mike
+hooks:
+  - hooks/copy_satp_typedoc.py
 extra:
   analytics:
     provider: google
@@ -224,17 +226,7 @@ nav:
           - README: cactus/packages/cacti-ledger-browser.md
       - Connectors, Plugins, and Infrastructure:
         - cactus-plugin-satp-hermes:
-          - README: cactus/packages/cactus-plugin-satp-hermes.md
-          - Documentation:
-            - Documentation overview: cactus/packages/cactus-plugin-satp-hermes/docs/README.md
-            - API Type 3 adapter specification: cactus/packages/cactus-plugin-satp-hermes/docs/api3-adapter-spec.md
-            - Architecture: cactus/packages/cactus-plugin-satp-hermes/docs/architecture/satp-hermes.md
-            - Gateway configuration: cactus/packages/cactus-plugin-satp-hermes/docs/configuration.md
-            - Database and migrations: cactus/packages/cactus-plugin-satp-hermes/docs/database.md
-            - Fabric test limitation: cactus/packages/cactus-plugin-satp-hermes/docs/fabric-tests-to-fix.md
-            - Operations: cactus/packages/cactus-plugin-satp-hermes/docs/operations.md
-            - Release process: cactus/packages/cactus-plugin-satp-hermes/docs/satp-release-process.md
-          - OAPI spec: cactus/packages/cactus-plugin-satp-hermes/oapi.md
+          - TypeDoc: satp-hermes/typedoc/index.html
         - cactus-plugin-bungee-hermes:
           - README: cactus/packages/cactus-plugin-bungee-hermes.md
           - OAPI spec: cactus/packages/cactus-plugin-bungee-hermes/oapi.md
