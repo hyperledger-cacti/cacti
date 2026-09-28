@@ -9,9 +9,11 @@ let supabase: SupabaseClient | undefined;
  * Get or initialize (if not already done) a supabase client using environment variables.
  */
 function getSupabaseClient(): [SupabaseClient, string] {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-  const supabaseSchema = import.meta.env.VITE_SUPABASE_SCHEMA;
+  const supabaseUrl =
+    import.meta.env.VITE_SUPABASE_URL || "http://localhost:8000";
+  const supabaseKey =
+    import.meta.env.VITE_SUPABASE_KEY || "dummy-supabase-anon-key-placeholder";
+  const supabaseSchema = import.meta.env.VITE_SUPABASE_SCHEMA || "public";
 
   if (!supabase) {
     supabase = createClient(supabaseUrl, supabaseKey, {

@@ -1,3 +1,4 @@
+import React from "react";
 import {
   useRoutes,
   BrowserRouter,
@@ -12,7 +13,6 @@ import {
   QueryClientProvider,
   useQuery,
 } from "@tanstack/react-query";
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 import { themeOptions } from "./theme";
 import ContentLayout from "./components/Layout/ContentLayout";
@@ -23,11 +23,38 @@ import { patchAppRoutePath } from "./common/utils";
 import { NotificationProvider } from "./common/context/NotificationContext";
 import { guiAppConfig } from "./common/queries";
 import createApplications from "./common/createApplications";
-import ConnectionFailedDialog from "./components/ConnectionFailedDialog/ConnectionFailedDialog";
+import { GuiAppConfig } from "./common/supabase-types";
 
-/**
- * Create header bar for each app based on app menuEntries field in config.
- */
+const isoNow = new Date().toISOString();
+
+const STANDALONE_DEFAULT_APPS: GuiAppConfig[] = [
+  {
+    id: "satp-inspector-default",
+    app_id: "satpInspector",
+    instance_name: "SATP Gateway Inspector",
+    description: "Inspect cross-chain asset transfers, protocols, and audit logs",
+    path: "/satp",
+    options: {
+      gatewayApiUrl: "http://localhost:3000",
+      refreshIntervalMs: 5000,
+    },
+    created_at: isoNow,
+    updated_at: isoNow,
+  },
+  {
+    id: "tutorial-app-default",
+    app_id: "tutorialApplication",
+    instance_name: "Tutorial App",
+    description: "Sample tutorial application",
+    path: "/tutorial",
+    options: {
+      name: "Cacti",
+    },
+    created_at: isoNow,
+    updated_at: isoNow,
+  },
+];
+
 function getHeaderBarRoutes(appConfig: AppInstance[]) {
   const headerRoutesConfig = appConfig.map((app) => {
     return {
@@ -52,9 +79,6 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
   return useRoutes(headerRoutesConfig);
 }
 
-/**
- * Create content routes
- */
 function getContentRoutes(appConfig: AppInstance[]) {
   const appRoutes: RouteObject[] = appConfig.map((app) => {
     return {
@@ -72,7 +96,6 @@ function getContentRoutes(appConfig: AppInstance[]) {
     };
   });
 
-  // Include landing / welcome page
   appRoutes.push({
     index: true,
     element: <HomePage appConfig={appConfig} />,
@@ -90,18 +113,17 @@ function getContentRoutes(appConfig: AppInstance[]) {
 function App() {
   const { isError, isPending, data } = useQuery(guiAppConfig());
 
-  if (isError) {
-    return <ConnectionFailedDialog />;
-  }
-
-  const appConfig = createApplications(data);
+  // Use database apps if available; otherwise fallback to standalone apps seamlessly
+  const hasDbApps = Boolean(data && Array.isArray(data) && data.length > 0);
+  const activeApps = hasDbApps ? (data as GuiAppConfig[]) : STANDALONE_DEFAULT_APPS;
+  const appConfig = createApplications(activeApps);
 
   const headerRoutes = getHeaderBarRoutes(appConfig);
   const contentRoutes = getContentRoutes(appConfig);
 
   return (
     <div>
-      {isPending && (
+      {isPending && !isError && !hasDbApps && (
         <CircularProgress
           style={{
             position: "absolute",
@@ -117,10 +139,7 @@ function App() {
   );
 }
 
-// MUI Theme
 const theme = createTheme(themeOptions);
-
-// React Query client
 const queryClient = new QueryClient();
 
 export default function CactiLedgerBrowserApp() {
@@ -131,7 +150,6 @@ export default function CactiLedgerBrowserApp() {
           <NotificationProvider>
             <CssBaseline />
             <App />
-            {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </NotificationProvider>
         </QueryClientProvider>
       </ThemeProvider>
