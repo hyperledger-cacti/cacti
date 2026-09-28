@@ -27,7 +27,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: GitGuardian scan
-        uses: GitGuardian/ggshield-action@da20be06cafe5e8633dc24744efe1efe8d30f06b #v1.52.2
+        uses: GitGuardian/ggshield-action@2002482fb5990b486be5598ebcf48a8eba393fce #v1.53.0
         with:
           args: --show-secrets --exit-zero --all-policies --verbose
         env:
