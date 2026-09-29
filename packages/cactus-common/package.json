@@ -61,7 +61,7 @@
     "loglevel": "1.8.1",
     "loglevel-plugin-prefix": "0.8.4",
     "run-time-error-cjs": "1.4.0",
-    "sanitize-html": "2.17.5",
+    "sanitize-html": "2.17.7",
     "secp256k1": "5.0.1",
     "sha3": "2.1.4"
   },
@@ -72,7 +72,7 @@
     "@types/secp256k1": "4.0.3",
     "@types/uuid": "10.0.0",
     "jest-extended": "7.0.0",
-    "uuid": "11.1.1"
+    "uuid": "14.0.0"
   },
   "engines": {
     "node": ">=18",
