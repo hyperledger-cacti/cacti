@@ -186,9 +186,20 @@ If a PR closes/fixes an issue, keep naming aligned:
 
 - Issue title
 - PR title
-- Main commit title (typically the squash commit title)
+- Main commit title (typically the squash commit title; in a multi-commit PR
+  merged via rebase, the subject of the latest commit)
 
 They should describe the same change using the same Conventional Commit intent.
+A single commit per PR is preferred; multiple commits per PR are allowed as an
+exception, e.g. when the PR genuinely spans distinct units of work (core code
+plus test tooling, for instance). In a multi-commit PR the PR title must still
+match the latest commit subject exactly, and we suggest that each commit
+carries the issue reference (`Closes #N` / `Fixes #N`) in its body so the
+traceability between issue, PR and commits holds commit-by-commit. Each commit
+must individually follow the Conventional Commits rules above. Note that when
+the PR is squash-merged, GitHub uses the PR title as the squash commit title
+by default, so the PR title itself must be a valid Conventional Commit subject
+(≤ 72 characters).
 
 ## 7. Signed commits
 Have git sign-off at the end of the commit message (`Signed-off-by: Name <email>`) to certify the [Developer Certificate of Origin (DCO)](https://developercertificate.org/). Use the `-s` flag with `git commit`. See [signing commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) for more information. **AI agents must not add Signed-off-by tags** — only the human submitter may certify the DCO (see [AI Guidelines §7](./AI_GUIDELINES.md)).
@@ -212,6 +223,11 @@ keyword that links the PR to an issue:
 The referenced issue must carry the `Triage_Ready` label — meaning a
 maintainer has approved the design. PRs that reference
 an issue still marked `Triage_Needed`, or that reference no issue at all might be closed immediatly.
+
+The `Triage_Ready` check is enforced automatically: PRs without a valid link
+are labelled `Triage_Warning` and closed after a 7-day grace period. See the
+[Triage Gate guide](./docs/docs/contributing/triage-gate.md) for the full
+lifecycle and how the linking is validated.
 
 ### Examples of compliant commit bodies:
 
@@ -268,8 +284,10 @@ checklist. Every item must be ticked before you mark the PR ready for review.
       [DCO](https://developercertificate.org/).
 - [ ] My commit messages follow
       [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary).
-- [ ] Each commit is a small, self-contained logical unit (multiple commits
-      per PR are fine).
+- [ ] The PR title matches my latest commit subject exactly.
+- [ ] My PR is a single commit; if it has multiple commits (exception), each
+      one is a small, self-contained Conventional Commit carrying the issue
+      reference (`Closes #N` / `Fixes #N`) in its body.
 - [ ] If AI tools were used, the commit includes an `Assisted-by` tag per
       [AI Guidelines §2.2](./AI_GUIDELINES.md#22-disclosure).
 
