@@ -268,7 +268,8 @@ checklist. Every item must be ticked before you mark the PR ready for review.
       [DCO](https://developercertificate.org/).
 - [ ] My commit messages follow
       [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary).
-- [ ] The PR title matches my latest commit subject exactly.
+- [ ] Each commit is a small, self-contained logical unit (multiple commits
+      per PR are fine).
 - [ ] If AI tools were used, the commit includes an `Assisted-by` tag per
       [AI Guidelines §2.2](./AI_GUIDELINES.md#22-disclosure).
 
