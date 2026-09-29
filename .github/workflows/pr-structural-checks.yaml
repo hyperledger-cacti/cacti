@@ -48,7 +48,7 @@ jobs:
           configFile: commitlint.config.mjs
           failOnWarnings: false
           failOnErrors: true
-          helpURL: 'https://github.com/conventional-changelog/commitlint/#what-is-commitlint'
+          helpURL: "https://github.com/conventional-changelog/commitlint/#what-is-commitlint"
         env:
           VERBOSE: true
 
@@ -59,34 +59,6 @@ jobs:
       - uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 #v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  validate-title-match:
-    name: Validate PR title match with latest commit message
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
-        with:
-          fetch-depth: 1
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Verify PR Title Matches Latest Commit
-        env:
-          PR_TITLE: ${{ github.event.pull_request.title }}
-        run: |
-          LATEST_COMMIT_MSG=$(git log -1 --pretty=%s)
-
-          echo "PR Title: '$PR_TITLE'"
-          echo "Latest Commit Message: '$LATEST_COMMIT_MSG'"
-
-          if [ "$PR_TITLE" != "$LATEST_COMMIT_MSG" ]; then
-            echo "❌ ERROR: PR Title does not match your latest commit message!"
-            echo "Your PR Title must match your Git commit message exactly."
-            echo "To fix this, either rename your PR title on GitHub, or run:"
-            echo "  git commit --amend -m \"$PR_TITLE\" && git push --force"
-            exit 1
-          fi
-          echo "✅ PR Title matches the latest commit message."
 
   validate-type:
     name: Validate PR Type
@@ -122,15 +94,14 @@ jobs:
 
   # Single rollup gate for the structural PR checks above. Branch protection
   # only needs to require THIS one context instead of `Commit Lint`,
-  # `Validate PR title`, `Validate PR title match ...`, and `Validate PR Type`
-  # individually. `if: always()` runs it even when a dependency fails; a
-  # `skipped` dependency is treated as passing, only `failure`/`cancelled` fail.
+  # `Validate PR title`, and `Validate PR Type` individually. `if: always()`
+  # runs it even when a dependency fails; a `skipped` dependency is treated as
+  # passing, only `failure`/`cancelled` fail.
   structural-checks-success:
     name: PR Structural Checks Success
     needs:
       - commitlint
       - validate-pr-title
-      - validate-title-match
       - validate-type
     if: ${{ always() }}
     runs-on: ubuntu-22.04

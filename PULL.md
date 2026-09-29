@@ -186,9 +186,13 @@ If a PR closes/fixes an issue, keep naming aligned:
 
 - Issue title
 - PR title
-- Main commit title (typically the squash commit title)
 
 They should describe the same change using the same Conventional Commit intent.
+A PR may contain multiple commits — there is no requirement that the PR title
+matches any single commit subject. Each commit must individually follow the
+Conventional Commits rules above. Note that when the PR is squash-merged,
+GitHub uses the PR title as the squash commit title by default, so the PR
+title itself must be a valid Conventional Commit subject (≤ 72 characters).
 
 ## 7. Signed commits
 Have git sign-off at the end of the commit message (`Signed-off-by: Name <email>`) to certify the [Developer Certificate of Origin (DCO)](https://developercertificate.org/). Use the `-s` flag with `git commit`. See [signing commits](https://docs.github.com/en/authentication/managing-commit-signature-verification/signing-commits) for more information. **AI agents must not add Signed-off-by tags** — only the human submitter may certify the DCO (see [AI Guidelines §7](./AI_GUIDELINES.md)).
@@ -212,6 +216,11 @@ keyword that links the PR to an issue:
 The referenced issue must carry the `Triage_Ready` label — meaning a
 maintainer has approved the design. PRs that reference
 an issue still marked `Triage_Needed`, or that reference no issue at all might be closed immediatly.
+
+The `Triage_Ready` check is enforced automatically: PRs without a valid link
+are labelled `Triage_Warning` and closed after a 7-day grace period. See the
+[Triage Gate guide](./docs/docs/contributing/triage-gate.md) for the full
+lifecycle and how the linking is validated.
 
 ### Examples of compliant commit bodies:
 
