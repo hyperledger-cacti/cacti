@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   build-satp:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: false
     outputs:
       build_success: ${{ steps.build.outputs.success }}
@@ -59,11 +59,11 @@ jobs:
       - name: Build bundle
         id: build
         run: |
-          yarn lerna run build:bundle --scope=@hyperledger/cactus-plugin-satp-hermes
+          yarn lerna run build:bundle --scope=@hyperledger-cacti/cactus-plugin-satp-hermes
           echo "success=true" >> "$GITHUB_OUTPUT"
 
       - name: Lint
-        run: yarn lerna run lint:ci --scope=@hyperledger/cactus-plugin-satp-hermes
+        run: yarn lerna run lint:ci --scope=@hyperledger-cacti/cactus-plugin-satp-hermes
 
       # Upload build artifacts for reuse in other jobs
       - name: Upload build output

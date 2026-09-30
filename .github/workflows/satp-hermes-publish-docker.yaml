@@ -248,8 +248,11 @@ jobs:
           push: false
           tags: |
             satp-hermes-gateway:${{ needs.set-docker-tags.outputs.tag_version }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # Read the NAMED cache scope populated by the docker-local test job
+          # (satp-hermes-workflow.yaml): layers already built and validated by
+          # the local SATP tests are reused here
+          cache-from: type=gha,scope=satp-hermes-gateway
+          cache-to: type=gha,scope=satp-hermes-gateway,mode=max
 
       - name: Export image to tarball
         run: |

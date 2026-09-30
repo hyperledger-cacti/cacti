@@ -15,7 +15,7 @@ module.exports = {
     "^(\\.\\.?\\/.+)\\.jsx?$": "$1",
     "^(.+)/(.+)_pb\\.js$": "$1/$2_pb",
   },
-  testMatch: ["**/src/test/typescript/integration/docker/*.test.ts"],
+  testMatch: ["**/src/test/typescript/integration/docker-upstream/*.test.ts"],
   testPathIgnorePatterns: [],
   reporters: [
     "default",
@@ -23,7 +23,7 @@ module.exports = {
       "jest-junit",
       {
         outputDirectory: "reports/junit",
-        outputName: "satp-hermes-tests-integration-docker.xml",
+        outputName: "satp-hermes-tests-integration-docker-upstream.xml",
       },
     ],
   ],
