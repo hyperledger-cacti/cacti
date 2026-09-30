@@ -72,7 +72,7 @@ permissions:
 jobs:
   # Test execution jobs: run unit and integration tests in parallel
   run-satp-tests-unit:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
       actions: read
@@ -108,7 +108,7 @@ jobs:
 
       
   run-satp-tests-integration-bridge:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
       actions: read
@@ -125,15 +125,15 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+          image: ghcr.io/hyperledger-cacti/besu-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+          image: ghcr.io/hyperledger-cacti/cactus-geth-all-in-one:v3.0.1
 
       - name: build
         with:
@@ -158,7 +158,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   run-satp-tests-integration-oracle:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
       actions: read
@@ -175,15 +175,15 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+          image: ghcr.io/hyperledger-cacti/besu-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+          image: ghcr.io/hyperledger-cacti/cactus-geth-all-in-one:v3.0.1
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
@@ -207,7 +207,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   run-satp-tests-integration-admin:
-      runs-on: ubuntu-22.04
+      runs-on: ubuntu-latest
       continue-on-error: true
       env:
         JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/admin/.*/*.test.ts
@@ -220,15 +220,15 @@ jobs:
 
         - uses: ./.github/actions/docker-pull/
           with:
-            image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+            image: ghcr.io/hyperledger-cacti/besu-all-in-one:v3.0.1
         
         - uses: ./.github/actions/docker-pull/
           with:
-            image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+            image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.1
         
         - uses: ./.github/actions/docker-pull/
           with:
-            image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+            image: ghcr.io/hyperledger-cacti/cactus-geth-all-in-one:v3.0.1
         - name: build
           with:
             node_version: ${{ inputs.node_version }}
@@ -252,7 +252,7 @@ jobs:
             path: ./code-coverage-ts/**/
 
   run-satp-tests-integration-gateway:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: true
     timeout-minutes: 60
     permissions:
@@ -270,19 +270,19 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+          image: ghcr.io/hyperledger-cacti/besu-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+          image: ghcr.io/hyperledger-cacti/cactus-geth-all-in-one:v3.0.1
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: rafaelapb/cacti-satp-hermes-gateway:2026-06-10-dev-375a544e7
+          image: ghcr.io/hyperledger-cacti/cacti-satp-hermes-gateway:3.0.1
 
       - name: build
         with:
@@ -307,8 +307,8 @@ jobs:
           path: ./code-coverage-ts/**/
 
 
-  run-satp-tests-integration-docker:
-    runs-on: ubuntu-22.04
+  run-satp-tests-integration-docker-upstream:
+    runs-on: ubuntu-latest
     continue-on-error: true
     timeout-minutes: 60
     permissions:
@@ -316,29 +316,67 @@ jobs:
       checks: write
       contents: read
     env:
-      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/docker/.*/*.test.ts
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/docker-upstream/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: CI environment clean-up
         run: ./tools/ci-env-clean-up.sh
-      
+
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
-      
+          image: ghcr.io/hyperledger-cacti/cacti-satp-hermes-gateway:3.0.1
+
+      - name: build
+        with:
+          node_version: ${{ inputs.node_version }}
+          yarn_hardened_mode: '0'
+        uses: ./.github/actions/configure-repo/
+
+      - name: Run Jest Tests
+        uses: ./.github/actions/jest-runner/
+        with:
+          run_code_coverage: ${{ inputs.run_code_coverage }}
+          jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
+          jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
+          github_secret: ${{ secrets.GITHUB_TOKEN }}
+          report_name: "satp-gateway-docker-upstream-tests-report"
+
+      - name: Upload coverage reports as artifacts
+        if: ${{inputs.run_code_coverage == 'true' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+        with:
+          name: coverage-reports-satp-hermes-gateway-docker-upstream
+          path: ./code-coverage-ts/**/
+
+  # Builds the gateway image from the current branch source and runs the full
+  # oracle/transfer docker scenarios against it, so regressions are caught
+  # before an image is released.
+  run-satp-tests-integration-docker-local:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 90
+    permissions:
+      actions: read
+      checks: write
+      contents: read
+    env:
+      JEST_TEST_PATTERN: packages/cactus-plugin-satp-hermes/src/test/typescript/integration/docker-local/.*/*.test.ts
+      JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cactus-plugin-satp-hermes
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
+
+      - name: CI environment clean-up
+        run: ./tools/ci-env-clean-up.sh
+
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
-      
+          image: ghcr.io/hyperledger-cacti/besu-all-in-one:v3.0.1
+
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
-      
-      - uses: ./.github/actions/docker-pull/
-        with:
-          image: rafaelapb/cacti-satp-hermes-gateway:2026-06-10-dev-375a544e7
+          image: ghcr.io/hyperledger-cacti/cactus-geth-all-in-one:v3.0.1
 
       - uses: ./.github/actions/docker-pull/
         with:
@@ -347,9 +385,30 @@ jobs:
       - name: build
         with:
           node_version: ${{ inputs.node_version }}
-          yarn_hardened_mode: '0'         
+          yarn_hardened_mode: '0'
         uses: ./.github/actions/configure-repo/
-      
+
+      - name: Build gateway bundle
+        run: yarn lerna run build:bundle --scope=@hyperledger-cacti/cactus-plugin-satp-hermes
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c #v4.2.0
+
+      - name: Build gateway image from source
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a #v7.3.0
+        with:
+          context: ./packages/cactus-plugin-satp-hermes
+          file: ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile
+          load: true
+          push: false
+          tags: hyperledger/cacti-satp-hermes-gateway:local-dev
+          # Publish layers under a NAMED cache scope shared with the release
+          # pipeline (satp-hermes-publish-docker.yaml): the image validated by
+          # these docker-local tests is reused layer-for-layer when the
+          # release workflow builds the publishable image
+          cache-from: type=gha,scope=satp-hermes-gateway
+          cache-to: type=gha,scope=satp-hermes-gateway,mode=max
+
       - name: Run Jest Tests
         uses: ./.github/actions/jest-runner/
         with:
@@ -357,17 +416,17 @@ jobs:
           jest_test_pattern: ${{ env.JEST_TEST_PATTERN }}
           jest_test_coverage_path: ${{ env.JEST_TEST_COVERAGE_PATH }}
           github_secret: ${{ secrets.GITHUB_TOKEN }}
-          report_name: "satp-gateway-docker-tests-report"
+          report_name: "satp-gateway-docker-local-tests-report"
 
       - name: Upload coverage reports as artifacts
         if: ${{inputs.run_code_coverage == 'true' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
-          name: coverage-reports-satp-hermes-gateway-docker
+          name: coverage-reports-satp-hermes-gateway-docker-local
           path: ./code-coverage-ts/**/
 
   run-satp-tests-on-chain:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
       actions: read
@@ -411,7 +470,7 @@ jobs:
             packages/cactus-plugin-satp-hermes/src/main/solidity/generated/**/*
 
   run-satp-tests-recovery:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
       actions: read
@@ -428,15 +487,15 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+          image: ghcr.io/hyperledger-cacti/besu-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+          image: ghcr.io/hyperledger-cacti/cactus-geth-all-in-one:v3.0.1
 
       - name: build
         with:
@@ -461,7 +520,7 @@ jobs:
           path: ./code-coverage-ts/**/
 
   run-satp-tests-rollback:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     continue-on-error: true
     permissions:
       actions: read
@@ -478,15 +537,15 @@ jobs:
 
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cactus-besu-all-in-one:2024-06-09-cc2f9c5
+          image: ghcr.io/hyperledger-cacti/besu-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.1
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger/cacti-geth-all-in-one:2023-07-27-2a8c48ed6
+          image: ghcr.io/hyperledger-cacti/cactus-geth-all-in-one:v3.0.1
 
       - name: build
         with:

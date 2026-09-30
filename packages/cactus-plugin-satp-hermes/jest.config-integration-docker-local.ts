@@ -15,20 +15,15 @@ module.exports = {
     "^(\\.\\.?\\/.+)\\.jsx?$": "$1",
     "^(.+)/(.+)_pb\\.js$": "$1/$2_pb",
   },
-  testMatch: ["**/src/test/typescript/integration/**/*.test.ts"],
-  // The docker suites have docker build deps
-  testPathIgnorePatterns: [
-    "/integration/docker-local/",
-    "/integration/docker-upstream/",
-  ],
-  modulePathIgnorePatterns: ["<rootDir>/dist/"],
+  testMatch: ["**/src/test/typescript/integration/docker-local/*.test.ts"],
+  testPathIgnorePatterns: [],
   reporters: [
     "default",
     [
       "jest-junit",
       {
         outputDirectory: "reports/junit",
-        outputName: "satp-hermes-tests-integration.xml",
+        outputName: "satp-hermes-tests-integration-docker-local.xml",
       },
     ],
   ],

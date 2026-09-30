@@ -44,19 +44,42 @@ The plugin supports both bidirectional and unidirectional asset transfers with t
 
 ## Table of Contents
 
-- [Assumptions](#assumptions)
-- [Usage](#usage)
-- [Architecture](#architecture)
-- [Protocol Flow](#protocol-flow)
-- [Application-to-Gateway API (API Type 1)](#application-to-gateway-api-api-type-1)
-- [Gateway-to-Gateway API (API Type 2)](#gateway-to-gateway-api-api-type-2)
-- [Adapter Layer (API Type 3)](#adapter-layer-api-type-3)
-- [Gateway Configuration](#gateway-configuration)
-- [Containerization](#containerization)
-- [Running local Gateway with Docker Compose](#running-local-gateway-with-docker-compose)
-- [Contributing](#contributing)
-- [Release Process](#release-process)
-- [License](#license)
+- [`@hyperledger-cacti/cactus-plugin-satp-hermes`](#hyperledger-cacticactus-plugin-satp-hermes)
+  - [Overview](#overview)
+  - [Install](#install)
+  - [API Summary](#api-summary)
+  - [Key Features](#key-features)
+  - [Table of Contents](#table-of-contents)
+  - [Assumptions](#assumptions)
+  - [Usage](#usage)
+    - [Prerequisites](#prerequisites)
+  - [Architecture](#architecture)
+    - [Core Components](#core-components)
+      - [Gateway Layer](#gateway-layer)
+      - [Ledger Integration Layer](#ledger-integration-layer)
+      - [Persistence Layer](#persistence-layer)
+      - [Security Layer](#security-layer)
+    - [Protocol Flow](#protocol-flow)
+    - [Asset Identifier Fields: `token_id` vs `unique_descriptor`](#asset-identifier-fields-token_id-vs-unique_descriptor)
+    - [Crash Recovery Integration](#crash-recovery-integration)
+    - [Application-to-Gateway API (API Type 1)](#application-to-gateway-api-api-type-1)
+      - [API Endpoints](#api-endpoints)
+    - [Gateway-to-Gateway API (API Type 2)](#gateway-to-gateway-api-api-type-2)
+  - [Use case](#use-case)
+    - [Role of Crash Recovery in SATP](#role-of-crash-recovery-in-satp)
+    - [Future Work](#future-work)
+  - [Gateway Configuration](#gateway-configuration)
+  - [Adapter Layer (API Type 3)](#adapter-layer-api-type-3)
+  - [Containerization](#containerization)
+    - [Building the container image locally](#building-the-container-image-locally)
+    - [Build the image:](#build-the-image)
+  - [Running local Gateway with Docker Compose](#running-local-gateway-with-docker-compose)
+  - [Testing](#testing)
+    - [Running the docker tests locally](#running-the-docker-tests-locally)
+    - [Continuous Integration](#continuous-integration)
+  - [Contributing](#contributing)
+  - [Release Process](#release-process)
+  - [License](#license)
 
 ## Assumptions
 Regarding the crash recovery procedure in place, at the moment we only support crashes of gateways under certain assumptions detailed as follows:
@@ -319,9 +342,112 @@ yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes test:unit
 yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes test:integration:adapter
 ```
 
-The package also defines focused gateway, bridge, oracle, recovery, rollback, and
-container integration suites. These require the corresponding external ledger
-or container dependencies.
+The package also defines focused gateway, bridge, oracle, recovery, rollback,
+and container integration suites. These require the corresponding external
+ledger or container dependencies.
+
+### Running the docker tests locally
+
+The Docker suites run real SATP scenarios against gateways executing in
+containers. They are split in two:
+
+| Suite | Script | Image under test | Validates |
+|-------|--------|------------------|-----------|
+| `docker-upstream` | `test:integration:docker-upstream` | Pre-published upstream image (`SATP_DOCKER_IMAGE_NAME`/`SATP_DOCKER_IMAGE_VERSION` in `src/test/typescript/constants.ts`) | The published gateway image boots and serves its OAPI healthcheck |
+| `docker-local` | `test:integration:docker-local` | Image built from the current branch, tagged `hyperledger/cacti-satp-hermes-gateway:local-dev` | Oracle executions and end-to-end SATP transfers (Besu/Ethereum, single- and dual-gateway) against your branch code |
+
+Prerequisites (from the repository root):
+
+```sh
+# 1. Node 20 and dependencies, built once
+nvm use 20.20.0
+yarn configure
+
+# 2. Docker Desktop / Engine running (docker info should succeed)
+
+# 3. Build the gateway image from the current branch (docker-local only)
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes docker:build:local
+```
+
+`docker:build:local` runs the webpack bundle for the gateway CLI and then
+builds `satp-hermes-gateway.Dockerfile` with the tag `local-dev`.
+
+Run the suites:
+
+```sh
+# Full scenarios: spins up Besu and Go-Ethereum test ledgers, PostgreSQL
+# (postgres:17.2) containers, and the gateway container(s)
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes test:integration:docker-local
+
+# Fast smoke test: boots one gateway container and polls its healthcheck
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes test:integration:docker-upstream
+```
+
+Both suites run serially (`--runInBand`) with a one-hour per-test timeout, so
+budget time accordingly; `docker-local` additionally spends several minutes
+building the image the first time.
+
+To run a single test file, invoke Jest from the package directory:
+
+```sh
+cd packages/cactus-plugin-satp-hermes
+NODE_OPTIONS=--max-old-space-size=4096 npx jest \
+  src/test/typescript/integration/docker-local/satp-e2e-transfer-dockerization.test.ts \
+  --runInBand --forceExit --config=jest.config-integration-docker-local.ts
+```
+
+What gets created on your machine:
+
+- Gateway containers publish host ports `3010` (gRPC server), `3011` (gRPC
+  client), and `4010` (OpenAPI/healthcheck).
+- JUnit reports:
+  `reports/junit/satp-hermes-tests-integration-docker-{local,upstream}.xml`
+  (relative to the package directory).
+- Gateway `config.json` and log files mounted into the containers:
+  `cache/` (relative to the package directory, git-ignored).
+
+Common failure modes:
+
+- **Port already in use on 3010/3011/4010** — the gateway containers bind
+  those ports on the host; stop the conflicting process or container first.
+  Ledger and database containers use auto-assigned host ports, so they rarely
+  conflict.
+- **`docker-local` fails with "no such image"** — run `docker:build:local`
+  first; the tag must stay `hyperledger/cacti-satp-hermes-gateway:local-dev`
+  to match `SATP_LOCAL_DOCKER_IMAGE_NAME`/`SATP_LOCAL_DOCKER_IMAGE_VERSION`
+  in `src/test/typescript/constants.ts`.
+- **`docker-upstream` image pull fails** — the suite pulls
+  `ghcr.io/hyperledger-cacti/cacti-satp-hermes-gateway:3.0.1`; the tag is
+  pinned in `src/test/typescript/constants.ts` and in
+  `.github/workflows/satp-hermes-workflow.yaml`, so keep them in sync when
+  bumping the image.
+- **First build is slow** — `docker:build:local` bundles the gateway CLI and
+  installs OS packages inside the image; later runs reuse Docker's layer
+  cache and are much faster.
+- **Leftovers from an interrupted run** — check `docker ps` and remove
+  orphaned gateway/ledger containers before re-running.
+- **Out-of-memory kills** — the gateway image pins
+  `NODE_OPTIONS=--max-old-space-size=4096`; give the Docker engine enough
+  memory for several Node processes plus two ledgers at once (8 GB+
+  recommended).
+
+### Continuous Integration
+
+CI (`.github/workflows/satp-hermes-workflow.yaml`, invoked from `ci.yaml`
+whenever this package is affected) runs both Docker suites automatically as
+`continue-on-error` jobs:
+
+- `run-satp-tests-integration-docker-upstream` (60-minute job cap): pulls the
+  pinned upstream gateway image and runs the `docker-upstream` test pattern.
+- `run-satp-tests-integration-docker-local` (90-minute job cap): builds the
+  gateway image from the branch source with Docker Buildx (GHA layer cache),
+  tags it `hyperledger/cacti-satp-hermes-gateway:local-dev`, and runs the
+  `docker-local` test pattern.
+
+Each job publishes a JUnit-based check report
+(`satp-gateway-docker-upstream-tests-report` /
+`satp-gateway-docker-local-tests-report`) and, when code coverage is enabled,
+a `coverage-reports-satp-hermes-gateway-docker-{upstream,local}` artifact.
 
 ## Contributing
 We welcome contributions to Hyperledger Cacti in many forms, and there’s always interesting challenges!

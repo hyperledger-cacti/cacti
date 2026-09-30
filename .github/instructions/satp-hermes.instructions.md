@@ -214,7 +214,7 @@ OpenAPI source: `src/main/yml/bol/oapi-api1.yml` (not `openapi.json`).
 
 ## Testing
 
-### Test Configurations (6 Jest configs)
+### Test Configurations (7 Jest configs)
 
 | Config | Scope | Script |
 |--------|-------|--------|
@@ -223,7 +223,8 @@ OpenAPI source: `src/main/yml/bol/oapi-api1.yml` (not `openapi.json`).
 | `jest.config-integration-gateway.ts` | Gateway protocol tests | `test:integration:gateway` |
 | `jest.config-integration-oracle.ts` | Oracle tests | `test:integration:oracle` |
 | `jest.config-integration-bridge.ts` | Bridge tests | `test:integration:bridge` |
-| `jest.config-integration-docker.ts` | Docker-based tests | `test:integration:docker` |
+| `jest.config-integration-docker-local.ts` | Docker tests against an image built from the current branch (`docker:build:local`) | `test:integration:docker-local` |
+| `jest.config-integration-docker-upstream.ts` | Acceptance smoke test against the pre-published upstream image | `test:integration:docker-upstream` |
 
 Additional scoped scripts: `test:integration:adapter`,
 `test:integration:recovery`, `test:integration:rollback`.
