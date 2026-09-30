@@ -87,8 +87,10 @@ jobs:
               (response, done) => {
                 searchPages++;
                 if (searchPages >= MAX_PAGES) done();
-                // search endpoint wraps hits in { items: [...] }
-                return response.data.items;
+                // octokit's paginate normalizes the search envelope
+                // ({ total_count, items: [...] }) away, so response.data
+                // is already the hits array here.
+                return response.data;
               },
             );
             core.info(`Found ${results.length} open PR(s) with ${WARN_LABEL} (capped at ${MAX_PAGES} pages).`);
@@ -102,6 +104,10 @@ jobs:
             const kwPattern = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?|address(?:e[sd])?|refs?)\s+#(\d+)/gi;
 
             for (const item of results) {
+              if (!item) {
+                core.info('Skipping empty search result entry.');
+                continue;
+              }
               const num = item.number;
 
               // Refresh authoritative PR state — search results can be stale.
