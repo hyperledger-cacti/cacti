@@ -51,8 +51,8 @@ import {
 } from "../../../../main/typescript";
 import OracleTestContract from "../../../solidity/generated/OracleTestContract.sol/OracleTestContract.json";
 import {
-  SATP_DOCKER_IMAGE_NAME,
-  SATP_DOCKER_IMAGE_VERSION,
+  SATP_LOCAL_DOCKER_IMAGE_NAME,
+  SATP_LOCAL_DOCKER_IMAGE_VERSION,
 } from "../../constants";
 import { keccak256 } from "web3-utils";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
@@ -258,8 +258,8 @@ beforeAll(async () => {
 
   // gatewayRunner setup:
   const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
-    containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
-    containerImageName: SATP_DOCKER_IMAGE_NAME,
+    containerImageVersion: SATP_LOCAL_DOCKER_IMAGE_VERSION,
+    containerImageName: SATP_LOCAL_DOCKER_IMAGE_NAME,
     logLevel,
     emitContainerLogs: true,
     configPath: files.configPath,
@@ -271,7 +271,10 @@ beforeAll(async () => {
 
   gatewayRunner = new SATPGatewayRunner(gatewayRunnerOptions);
   log.debug("starting gatewayRunner...");
-  await gatewayRunner.start(false);
+  // The local image is built from the current branch via the
+  // `docker:build:local` script (or the CI build step) and exists only
+  // locally, so the gateway runner must not attempt to pull it.
+  await gatewayRunner.start(true);
   log.debug("gatewayRunner started successfully");
 
   oracleApi = new OracleApi(

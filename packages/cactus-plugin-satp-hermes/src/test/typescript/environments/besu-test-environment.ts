@@ -136,7 +136,7 @@ export class BesuTestEnvironment {
         "BESU_HOST_ALLOWLIST=*",
         "BESU_RPC_WS_HOST_ALLOWLIST=*",
       ],
-      containerImageVersion: "v2.2.0-rc.2",
+      containerImageVersion: "v3.0.1",
       containerImageName: "ghcr.io/hyperledger-cacti/besu-all-in-one",
       networkName: this.dockerNetwork,
     });

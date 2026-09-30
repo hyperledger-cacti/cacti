@@ -1,9 +1,15 @@
 <!-- --8<-- [start:content] -->
 - [Hyperledger Cacti Build Instructions](#hyperledger-cacti-build-instructions)
-- [Fast Developer Flow / Code Iterations][build-fast-developer-flow]
+- [Fast Developer Flow / Code Iterations](#fast-developer-flow--code-iterations)
 - [Getting Started](#getting-started)
-  - [Dev Container Quickstart](#dev-container-quickstart-recommended)
+  - [Dev Container Quickstart (Recommended)](#dev-container-quickstart-recommended)
+    - [Prerequisites](#prerequisites)
+    - [Step-by-Step Setup](#step-by-step-setup)
+    - [Known Issue (Important for New Contributors)](#known-issue-important-for-new-contributors)
+    - [Workaround](#workaround)
   - [Nix Flake Quickstart](#nix-flake-quickstart)
+    - [Prerequisites](#prerequisites-1)
+    - [Step-by-Step Setup](#step-by-step-setup-1)
   - [MacOS](#macos)
   - [Linux](#linux)
   - [Windows](#windows)
@@ -14,6 +20,7 @@
   - [Quick Checklist](#quick-checklist)
   - [Individual Steps](#individual-steps)
   - [Docker Tests](#docker-tests)
+    - [One-command deployment verification](#one-command-deployment-verification)
 - [Configuring SSH to use upterm](#configuring-ssh-to-use-upterm)
 
 ## Hyperledger Cacti Build Instructions
@@ -419,16 +426,103 @@ yarn run test:jest:all
 
 ### Docker Tests
 
-Some integration tests require Docker. Ensure Docker is running before executing:
+Most integration suites start and stop their own Docker containers
+(all-in-one ledgers, databases, gateways) directly from the test code, so
+there is no compose file or pre-provisioning to do. They only require:
+
+1. A running Docker engine (Docker Desktop or Docker Engine).
+2. `yarn configure` to have completed at least once, because test suites
+   import built code from sibling workspace packages.
+
+Suites pull any missing container images themselves, so first runs take
+longer while images download.
+
+Example — the SATP Hermes gateway docker suites in
+`packages/cactus-plugin-satp-hermes`:
 
 ```sh
-# Build all-in-one ledger images (if needed)
-cd tools/docker/<ledger>-all-in-one
-docker build -t <image-name> .
+# Build the gateway image from the current branch (needed once, and again
+# whenever the gateway source changes)
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes docker:build:local
 
-# Then run the integration tests that depend on Docker
-yarn jest --testPathPattern=integration
+# Full oracle / E2E transfer scenarios, against the locally built image
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes test:integration:docker-local
+
+# Quick acceptance check against the pre-published upstream gateway image
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes test:integration:docker-upstream
 ```
+
+#### One-command deployment verification
+
+`docker:verify` chains the three steps above — image build, then the
+local-image suites, then the upstream-image acceptance check — fail-fast,
+in order, timing each phase and printing a summary table. One command proves
+the gateway is deploy-ready:
+
+```sh
+corepack yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes docker:verify
+```
+
+What each phase proves:
+
+1. `docker:build:local` — the gateway image still builds from the current
+   branch (bundle + `docker build`).
+2. `test:integration:docker-local` — the full oracle / E2E transfer scenarios
+   run green against that freshly built image.
+3. `test:integration:docker-upstream` — the gateway interoperates with the
+   pre-published upstream image (quick acceptance check).
+
+For iteration, phases that already passed can be skipped, and the exact
+chain can be previewed without running anything:
+
+```sh
+cd packages/cactus-plugin-satp-hermes
+
+# Image already built from a previous pass; re-run only the two suites
+node docker-verify.mjs --skip-build
+
+# Print the command chain, run nothing
+node docker-verify.mjs --dry-run
+```
+
+Available flags: `--dry-run`, `--skip-build`, `--skip-local`,
+`--skip-upstream`, `--help`. Unknown flags are rejected with exit code 2;
+a failing phase stops the chain and the process exits with that phase's
+exit code.
+
+The pipeline wiring itself is guarded by unit tests that run in the standard
+unit suite (no docker needed): `docker-verify-pipeline.test.ts` asserts the
+script exists, that every phase command resolves to a real package.json
+script, that the dry-run output keeps listing the three commands in order
+and that flags are validated. The drift-guard tests in
+`docker-config-integrity.test.ts` and `ci-config-drift.test.ts` pin the
+split jest configs and the CI image pre-pulls on top of that.
+
+To run a single suite file, invoke Jest from the package directory:
+
+```sh
+cd packages/cactus-plugin-satp-hermes
+NODE_OPTIONS=--max-old-space-size=4096 npx jest \
+  src/test/typescript/integration/docker-local/satp-e2e-transfer-dockerization.test.ts \
+  --runInBand --forceExit --config=jest.config-integration-docker-local.ts
+```
+
+What to expect:
+
+- Gateway containers publish fixed host ports `3010`, `3011` and `4010`;
+  free those ports before running. Ledger and database containers use
+  auto-assigned host ports and rarely conflict.
+- JUnit XML reports are written to
+  `packages/cactus-plugin-satp-hermes/reports/junit/`, and the gateway
+  configuration/log files mounted into the containers are written to
+  `packages/cactus-plugin-satp-hermes/cache/`
+  (git-ignored).
+- Interrupted runs can leave containers behind; check `docker ps` and remove
+  leftovers before re-running.
+
+See the
+[package README](./packages/cactus-plugin-satp-hermes/README.md#running-the-integrationdocker-tests-locally)
+for the full step-by-step guide and common failure modes.
 
 > **Tip:** If you are only modifying documentation or configuration files, you can
 > skip the Docker tests. CI will run them automatically on your PR.

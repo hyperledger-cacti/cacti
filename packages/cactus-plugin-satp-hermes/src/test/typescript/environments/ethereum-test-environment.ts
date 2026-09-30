@@ -130,8 +130,8 @@ export class EthereumTestEnvironment {
     tokenType: tokenContractName[],
   ): Promise<void> {
     this.ledger = new GethTestLedger({
-      containerImageName: "ghcr.io/hyperledger/cacti-geth-all-in-one",
-      containerImageVersion: "2023-07-27-2a8c48ed6",
+      containerImageName: "ghcr.io/hyperledger-cacti/cactus-geth-all-in-one",
+      containerImageVersion: "v3.0.1",
       networkName: this.dockerNetwork,
     });
 

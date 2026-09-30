@@ -1,8 +1,8 @@
 import "jest-extended";
 import {
   LogLevelDesc,
-  Secp256k1Keys,
   LoggerProvider,
+  Secp256k1Keys,
 } from "@hyperledger-cacti/cactus-common";
 import {
   pruneDockerContainersIfGithubAction,
@@ -11,18 +11,17 @@ import {
   ISATPGatewayRunnerConstructorOptions,
 } from "@hyperledger-cacti/cactus-test-tooling";
 import {
+  Address,
   GatewayIdentity,
   SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
   setupGatewayDockerFiles,
   BesuTestEnvironment,
-  FabricTestEnvironment,
   getTransactRequest,
   EthereumTestEnvironment,
   createPGDatabase,
   setupDBTable,
-  getTestConfigFilesDirectory,
   createEnhancedTimeoutConfig,
   runCleanup,
   cleanupContainers,
@@ -47,18 +46,13 @@ import {
   TransactionApi,
 } from "../../../../main/typescript";
 import {
-  SATP_DOCKER_IMAGE_NAME,
-  SATP_DOCKER_IMAGE_VERSION,
+  SATP_LOCAL_DOCKER_IMAGE_VERSION,
+  SATP_LOCAL_DOCKER_IMAGE_NAME,
 } from "../../constants";
-import { MonitorService } from "../../../../main/typescript/services/monitoring/monitor";
 import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 
-const monitorService = MonitorService.createOrGetMonitorService({
-  enabled: false,
-});
-monitorService.init();
 const logLevel: LogLevelDesc = "TRACE";
 const log = LoggerProvider.getOrCreate({
   level: logLevel,
@@ -67,7 +61,6 @@ const log = LoggerProvider.getOrCreate({
 
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
-let fabricEnv: FabricTestEnvironment;
 
 const erc20TokenContract = "SATPContract";
 
@@ -82,21 +75,13 @@ let db_remote1: Container;
 let db_local2: Container;
 let db_remote2: Container;
 let gatewayRunner1: SATPGatewayRunner;
-let gatewayRunner2: SATPGatewayRunner;
+let gatewayRunner2: SATPGatewayRunner | undefined;
 
 const testNetwork = "test-network";
-
 const gateway1Address = "gateway1.satp-hermes";
 const gateway2Address = "gateway2.satp-hermes";
 
 const TIMEOUT = 900000; // 15 minutes
-afterAll(async () => {
-  await runCleanup(log, [
-    ...cleanupContainers({ db_local1, db_remote1, db_local2, db_remote2 }),
-    ...cleanupEnvs({ besuEnv, ethereumEnv, fabricEnv }),
-    { label: "monitorService.shutdown", fn: () => monitorService.shutdown() },
-  ]);
-}, TIMEOUT);
 
 afterEach(async () => {
   if (gatewayRunner1) {
@@ -118,6 +103,13 @@ afterEach(async () => {
       await Containers.logDiagnostics({ logLevel });
       fail("Pruning didn't throw OK");
     });
+}, TIMEOUT);
+
+afterAll(async () => {
+  await runCleanup(log, [
+    ...cleanupContainers({ db_local1, db_remote1, db_local2, db_remote2 }),
+    ...cleanupEnvs({ besuEnv, ethereumEnv }),
+  ]);
 }, TIMEOUT);
 
 beforeAll(async () => {
@@ -160,27 +152,8 @@ beforeAll(async () => {
   }));
   db_remote_host_config2 = createEnhancedTimeoutConfig(db_remote_host_config2);
   db_remote_config2 = createEnhancedTimeoutConfig(db_remote_config2);
-
   await setupDBTable(db_remote_host_config1);
   await setupDBTable(db_remote_host_config2);
-
-  try {
-    const satpContractName = "satp-contract";
-    fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
-      contractName: satpContractName,
-      logLevel,
-      network: testNetwork,
-      claimFormat: ClaimFormat.DEFAULT,
-    });
-    log.info("Fabric Ledger started successfully");
-    await fabricEnv.deployAndSetupContracts();
-  } catch (err) {
-    log.warn(
-      "Fabric ledger failed to start, non-Fabric tests will proceed.",
-      err,
-    );
-    fabricEnv = undefined as unknown as FabricTestEnvironment;
-  }
 
   {
     besuEnv = await BesuTestEnvironment.setupTestEnvironment(
@@ -217,28 +190,28 @@ beforeAll(async () => {
     await ethereumEnv.deployAndSetupContracts(ClaimFormat.DEFAULT);
   }
 
-  await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
+  // feeding the owner account with 200 tokens in Besu that will be used in the various transfers
+  await besuEnv.mintTokens("200", TokenTypeMain.NONSTANDARD_FUNGIBLE);
   await besuEnv.checkBalance(
     besuEnv.getTestFungibleContractName(),
     besuEnv.getTestFungibleContractAddress(),
     besuEnv.getTestFungibleContractAbi(),
     besuEnv.getTestOwnerAccount(),
-    "100",
+    "200",
     besuEnv.getTestOwnerSigningCredential(),
   );
 }, TIMEOUT);
 
-// TODO: Skipped — Fabric AIO container fails to start reliably.
-// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
-describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
+describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
-    // gatewayIds setup:
-    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
-    const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+    const address: Address = `http://${gateway1Address}`;
 
-    const gatewayIdentity1 = {
-      id: "mockID-1",
+    // gateway setup:
+    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
+    const gatewayIdentity = {
+      id: "mockID",
       name: "CustomGateway",
       version: [
         {
@@ -247,14 +220,8 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
           Crash: SATP_CRASH_VERSION,
         },
       ],
-      connectedDLTs: [
-        {
-          id: BesuTestEnvironment.BESU_NETWORK_ID,
-          ledgerType: LedgerType.Besu2X,
-        },
-      ],
       proofID: "mockProofID10",
-      address: `http://${gateway1Address}`,
+      address,
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -264,119 +231,60 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
       },
     } as GatewayIdentity;
 
-    // gateway setup:
-    const gatewayIdentity2 = {
-      id: "mockID-2",
-      name: "CustomGateway",
-      version: [
-        {
-          Core: SATP_CORE_VERSION,
-          Architecture: SATP_ARCHITECTURE_VERSION,
-          Crash: SATP_CRASH_VERSION,
-        },
-      ],
-      connectedDLTs: [
-        {
-          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
-          ledgerType: LedgerType.Fabric2,
-        },
-      ],
-      proofID: "mockProofID11",
-      address: `http://${gateway2Address}`,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
-      },
-    } as GatewayIdentity;
-
     // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
+    const besuConfig = await besuEnv.createBesuDockerConfig();
 
     // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
-      getTestConfigFilesDirectory(`gateway-info-${gatewayIdentity2.id}`),
-    );
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
 
-    const files1 = setupGatewayDockerFiles({
-      gatewayIdentity: gatewayIdentity1,
+    const files = setupGatewayDockerFiles({
+      gatewayIdentity: gatewayIdentity,
       logLevel,
-      counterPartyGateways: [gatewayIdentity2],
+      counterPartyGateways: [],
       enableCrashRecovery: false, // Crash recovery disabled
-      ccConfig: { bridgeConfig: [besuConfigJSON] },
+      ccConfig: { bridgeConfig: [besuConfig, ethereumConfig] },
       localRepository: db_local_config1,
       remoteRepository: db_remote_config1,
+      gatewayId: "gateway-1",
       gatewayKeyPair: {
-        privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
+        privateKey: gateway1KeyPair.privateKey.toString("hex"),
         publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
       },
     });
 
-    const files2 = setupGatewayDockerFiles({
-      gatewayIdentity: gatewayIdentity2,
-      logLevel,
-      counterPartyGateways: [gatewayIdentity1],
-      enableCrashRecovery: false, // Crash recovery disabled
-      ccConfig: { bridgeConfig: [fabricConfigJSON] },
-      localRepository: db_local_config2,
-      remoteRepository: db_remote_config2,
-      gatewayKeyPair: {
-        privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
-        publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
-      },
-    });
-
     // gatewayRunner setup:
-    const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
-      containerImageName: SATP_DOCKER_IMAGE_NAME,
-      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
+    const gatewayRunnerOptions: ISATPGatewayRunnerConstructorOptions = {
+      containerImageVersion: SATP_LOCAL_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_LOCAL_DOCKER_IMAGE_NAME,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
       logLevel,
       emitContainerLogs: true,
-      configPath: files1.configPath,
-      logsPath: files1.logsPath,
-      ontologiesPath: files1.ontologiesPath,
+      configPath: files.configPath,
+      logsPath: files.logsPath,
+      ontologiesPath: files.ontologiesPath,
       networkName: testNetwork,
       url: gateway1Address,
     };
 
-    // gatewayRunner setup:
-    const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
-      containerImageName: SATP_DOCKER_IMAGE_NAME,
-      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
-      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
-      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
-      logLevel,
-      emitContainerLogs: true,
-      configPath: files2.configPath,
-      logsPath: files2.logsPath,
-      ontologiesPath: files2.ontologiesPath,
-      networkName: testNetwork,
-      url: gateway2Address,
-    };
-
-    gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
+    gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions);
     log.debug("starting gatewayRunner...");
-    await gatewayRunner1.start();
+    // The local image is built from the current branch via the
+    // `docker:build:local` script (or the CI build step) and exists only
+    // locally, so the gateway runner must not attempt to pull it.
+    await gatewayRunner1.start(true);
     log.debug("gatewayRunner started successfully");
 
-    gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
-    log.debug("starting gatewayRunner...");
-    await gatewayRunner2.start();
-    log.debug("gatewayRunner started successfully");
+    log.debug(`http://${await gatewayRunner1.getOApiHost()}`);
 
-    const approveAddressApi1 = new GetApproveAddressApi(
+    const approveAddressApi = new GetApproveAddressApi(
       new Configuration({
         basePath: `http://${await gatewayRunner1.getOApiHost()}`,
       }),
     );
 
-    const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
+    const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
       TokenType.Fungible,
@@ -401,24 +309,21 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     }
     log.debug("Approved 100 amout to the Besu Bridge Address");
 
-    const approveAddressApi2 = new GetApproveAddressApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner2.getOApiHost()}`,
-      }),
-    );
-
-    const reqApproveFabricAddress = await approveAddressApi2.getApproveAddress(
-      fabricEnv.network.id,
-      fabricEnv.network.ledgerType,
+    const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
+      ethereumEnv.network.id,
+      ethereumEnv.network.ledgerType,
       TokenType.Fungible,
     );
-    expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
 
-    if (!reqApproveFabricAddress?.data.approveAddress) {
+    expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveEthereumAddress?.data.approveAddress) {
       throw new Error("Approve address is undefined");
     }
 
-    await fabricEnv.giveRoleToBridge("Org2MSP");
+    await ethereumEnv.giveRoleToBridge(
+      reqApproveEthereumAddress.data.approveAddress,
+    );
 
     const satpApi = new TransactionApi(
       new Configuration({
@@ -429,7 +334,7 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     const req = getTransactRequest(
       "mockContext",
       besuEnv,
-      fabricEnv,
+      ethereumEnv,
       "100",
       "100",
     );
@@ -444,7 +349,7 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
       besuEnv.getTestFungibleContractAddress(),
       besuEnv.getTestFungibleContractAbi(),
       besuEnv.getTestOwnerAccount(),
-      "0",
+      "100",
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly from the Owner account");
@@ -453,288 +358,35 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
       besuEnv.getTestFungibleContractName(),
       besuEnv.getTestFungibleContractAddress(),
       besuEnv.getTestFungibleContractAbi(),
-      reqApproveBesuAddress?.data.approveAddress,
+      besuEnv.getBridgeEthAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Wrapper account");
 
-    await fabricEnv.checkBalance(
-      fabricEnv.getTestContractName(),
-      fabricEnv.getTestChannelName(),
-      reqApproveFabricAddress?.data.approveAddress,
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestFungibleContractName(),
+      ethereumEnv.getTestFungibleContractAddress(),
+      ethereumEnv.getTestFungibleContractAbi(),
+      reqApproveEthereumAddress?.data.approveAddress,
       "0",
-      fabricEnv.getTestOwnerSigningCredential(),
+      ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly from the Bridge account");
 
-    await fabricEnv.checkBalance(
-      fabricEnv.getTestContractName(),
-      fabricEnv.getTestChannelName(),
-      fabricEnv.getTestOwnerAccount(),
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestFungibleContractName(),
+      ethereumEnv.getTestFungibleContractAddress(),
+      ethereumEnv.getTestFungibleContractAbi(),
+      ethereumEnv.getTestOwnerAccount(),
       "100",
-      fabricEnv.getTestOwnerSigningCredential(),
+      ethereumEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
   });
 });
 
-// TODO: Skipped — Fabric AIO container fails to start reliably.
-// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
-describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
-  jest.setTimeout(TIMEOUT);
-  it("should realize a transfer", async () => {
-    // gatewayIds setup:
-    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
-    const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
-
-    const gatewayIdentity1 = {
-      id: "mockID-1",
-      name: "CustomGateway",
-      version: [
-        {
-          Core: SATP_CORE_VERSION,
-          Architecture: SATP_ARCHITECTURE_VERSION,
-          Crash: SATP_CRASH_VERSION,
-        },
-      ],
-      connectedDLTs: [
-        {
-          id: FabricTestEnvironment.FABRIC_NETWORK_ID,
-          ledgerType: LedgerType.Fabric2,
-        },
-      ],
-      proofID: "mockProofID10",
-      address: `http://${gateway1Address}`,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
-      },
-    } as GatewayIdentity;
-
-    // gateway setup:
-    const gatewayIdentity2 = {
-      id: "mockID-2",
-      name: "CustomGateway",
-      version: [
-        {
-          Core: SATP_CORE_VERSION,
-          Architecture: SATP_ARCHITECTURE_VERSION,
-          Crash: SATP_CRASH_VERSION,
-        },
-      ],
-      connectedDLTs: [
-        {
-          id: BesuTestEnvironment.BESU_NETWORK_ID,
-          ledgerType: LedgerType.Besu2X,
-        },
-      ],
-      proofID: "mockProofID11",
-      address: `http://${gateway2Address}`,
-      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
-      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
-      },
-    } as GatewayIdentity;
-
-    // fabricConfig Json object setup:
-    const fabricConfigJSON = await fabricEnv.createFabricDockerConfig(
-      getTestConfigFilesDirectory(`gateway-info-${gatewayIdentity1.id}`),
-    );
-
-    // besuConfig Json object setup:
-    const besuConfigJSON = await besuEnv.createBesuDockerConfig();
-
-    // gateway configuration setup:
-    const files1 = setupGatewayDockerFiles({
-      gatewayIdentity: gatewayIdentity1,
-      logLevel,
-      counterPartyGateways: [gatewayIdentity2],
-      enableCrashRecovery: false, // Crash recovery disabled
-      ccConfig: { bridgeConfig: [fabricConfigJSON] },
-      localRepository: db_local_config1,
-      remoteRepository: db_remote_config1,
-      gatewayId: "gateway-1",
-      gatewayKeyPair: {
-        privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
-        publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
-      },
-    });
-
-    const files2 = setupGatewayDockerFiles({
-      gatewayIdentity: gatewayIdentity2,
-      logLevel,
-      counterPartyGateways: [gatewayIdentity1],
-      enableCrashRecovery: false, // Crash recovery disabled
-      ccConfig: { bridgeConfig: [besuConfigJSON] },
-      localRepository: db_local_config2,
-      remoteRepository: db_remote_config2,
-      gatewayId: "gateway-2",
-      gatewayKeyPair: {
-        privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
-        publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
-      },
-    });
-
-    // gatewayRunner setup:
-    const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
-      containerImageName: SATP_DOCKER_IMAGE_NAME,
-      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
-      clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
-      oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      logLevel,
-      emitContainerLogs: true,
-      configPath: files1.configPath,
-      logsPath: files1.logsPath,
-      ontologiesPath: files1.ontologiesPath,
-      networkName: testNetwork,
-      url: gateway1Address,
-    };
-
-    // gatewayRunner setup:
-    const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
-      containerImageName: SATP_DOCKER_IMAGE_NAME,
-      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
-      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
-      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
-      logLevel,
-      emitContainerLogs: true,
-      configPath: files2.configPath,
-      logsPath: files2.logsPath,
-      ontologiesPath: files2.ontologiesPath,
-      networkName: testNetwork,
-      url: gateway2Address,
-    };
-
-    gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
-    log.debug("starting gatewayRunner...");
-    await gatewayRunner1.start();
-    console.log("gatewayRunner started successfully");
-
-    gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
-    log.debug("starting gatewayRunner...");
-    await gatewayRunner2.start();
-    log.debug("gatewayRunner started successfully");
-
-    const approveAddressApi1 = new GetApproveAddressApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
-      }),
-    );
-
-    const reqApproveFabricAddress = await approveAddressApi1.getApproveAddress(
-      fabricEnv.network.id,
-      fabricEnv.network.ledgerType,
-      TokenType.Fungible,
-    );
-
-    if (!reqApproveFabricAddress?.data.approveAddress) {
-      throw new Error("Approve address is undefined");
-    }
-
-    expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
-
-    await fabricEnv.giveRoleToBridge("Org2MSP"); //This depend on the Fabric setup
-
-    if (reqApproveFabricAddress?.data.approveAddress) {
-      await fabricEnv.approveAmount(
-        reqApproveFabricAddress.data.approveAddress,
-        "100",
-      );
-    }
-
-    log.debug("Approved 100 amount to the Fabric Bridge Address");
-
-    const approveAddressApi2 = new GetApproveAddressApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner2.getOApiHost()}`,
-      }),
-    );
-
-    const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress(
-      besuEnv.network.id,
-      besuEnv.network.ledgerType,
-      TokenType.Fungible,
-    );
-
-    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
-
-    if (!reqApproveBesuAddress?.data.approveAddress) {
-      throw new Error("Approve address is undefined");
-    }
-
-    await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
-
-    const satpApi = new TransactionApi(
-      new Configuration({
-        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
-      }),
-    );
-
-    const req = getTransactRequest(
-      "mockContext",
-      fabricEnv,
-      besuEnv,
-      "100",
-      "100",
-    );
-
-    const res = await satpApi.transact(req);
-    log.info(res?.status);
-    log.info(res.data.statusResponse);
-    expect(res?.status).toBe(200);
-
-    await fabricEnv.checkBalance(
-      fabricEnv.getTestContractName(),
-      fabricEnv.getTestChannelName(),
-      fabricEnv.getTestOwnerAccount(),
-      "0",
-      fabricEnv.getTestOwnerSigningCredential(),
-    );
-    log.info("Amount was transferred correctly from the Owner account");
-
-    await fabricEnv.checkBalance(
-      fabricEnv.getTestContractName(),
-      fabricEnv.getTestChannelName(),
-      reqApproveFabricAddress?.data.approveAddress,
-      "0",
-      fabricEnv.getTestOwnerSigningCredential(),
-    );
-    log.info("Amount was transferred correctly to the Wrapper account");
-
-    await besuEnv.checkBalance(
-      besuEnv.getTestFungibleContractName(),
-      besuEnv.getTestFungibleContractAddress(),
-      besuEnv.getTestFungibleContractAbi(),
-      reqApproveBesuAddress?.data.approveAddress,
-      "0",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-    log.info("Amount was transferred correctly from the Bridge account");
-
-    await besuEnv.checkBalance(
-      besuEnv.getTestFungibleContractName(),
-      besuEnv.getTestFungibleContractAddress(),
-      besuEnv.getTestFungibleContractAbi(),
-      besuEnv.getTestOwnerAccount(),
-      "100",
-      besuEnv.getTestOwnerSigningCredential(),
-    );
-    log.info("Amount was transferred correctly to the Owner account");
-  });
-});
-
-// TODO: Skipped — depends on beforeAll which requires Fabric AIO.
-// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
-describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
+describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     // gatewayIds setup:
@@ -834,8 +486,8 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
-      containerImageName: SATP_DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_LOCAL_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_LOCAL_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
@@ -850,8 +502,8 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     // gatewayRunner setup:
     const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
-      containerImageVersion: SATP_DOCKER_IMAGE_VERSION,
-      containerImageName: SATP_DOCKER_IMAGE_NAME,
+      containerImageVersion: SATP_LOCAL_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_LOCAL_DOCKER_IMAGE_NAME,
       serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
       clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
       oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
@@ -866,12 +518,12 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
 
     gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
     log.debug("starting gatewayRunner...");
-    await gatewayRunner1.start();
+    await gatewayRunner1.start(true);
     log.debug("gatewayRunner started successfully");
 
     gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
     log.debug("starting gatewayRunner...");
-    await gatewayRunner2.start();
+    await gatewayRunner2.start(true);
     log.debug("gatewayRunner started successfully");
 
     const approveAddressApi1 = new GetApproveAddressApi(
@@ -933,6 +585,7 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
         basePath: `http://${await gatewayRunner1.getOApiHost()}`,
       }),
     );
+
     const adminApi = new AdminApi(
       new Configuration({
         basePath: `http://${await gatewayRunner1.getOApiHost()}`,
@@ -973,7 +626,7 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
       besuEnv.getTestFungibleContractName(),
       besuEnv.getTestFungibleContractAddress(),
       besuEnv.getTestFungibleContractAbi(),
-      besuEnv.getTestOwnerAccount(),
+      besuEnv.getBridgeEthAccount(),
       "0",
       besuEnv.getTestOwnerSigningCredential(),
     );
@@ -994,8 +647,295 @@ describe.skip("2 SATPGateways sending a token from Besu to Ethereum", () => {
       ethereumEnv.getTestFungibleContractAddress(),
       ethereumEnv.getTestFungibleContractAbi(),
       ethereumEnv.getTestOwnerAccount(),
-      "100",
+      "200",
       ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly to the Owner account");
+  });
+});
+
+describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
+  jest.setTimeout(TIMEOUT);
+  it("should realize a transfer", async () => {
+    // gatewayIds setup:
+    const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+    const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
+
+    const gatewayIdentity1 = {
+      id: "mockID-1",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      connectedDLTs: [
+        {
+          id: EthereumTestEnvironment.ETH_NETWORK_ID,
+          ledgerType: LedgerType.Ethereum,
+        },
+      ],
+      proofID: "mockProofID10",
+      address: `http://${gateway1Address}`,
+      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
+    } as GatewayIdentity;
+
+    // gateway setup:
+    const gatewayIdentity2 = {
+      id: "mockID-2",
+      name: "CustomGateway",
+      version: [
+        {
+          Core: SATP_CORE_VERSION,
+          Architecture: SATP_ARCHITECTURE_VERSION,
+          Crash: SATP_CRASH_VERSION,
+        },
+      ],
+      connectedDLTs: [
+        {
+          id: BesuTestEnvironment.BESU_NETWORK_ID,
+          ledgerType: LedgerType.Besu2X,
+        },
+      ],
+      proofID: "mockProofID11",
+      address: `http://${gateway2Address}`,
+      gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
+      gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      identificationCredential: {
+        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
+        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
+    } as GatewayIdentity;
+
+    // besuConfig Json object setup:
+    const besuConfig = await besuEnv.createBesuDockerConfig();
+
+    // fabricConfig Json object setup:
+    const ethereumConfig = await ethereumEnv.createEthereumDockerConfig();
+
+    const files1 = setupGatewayDockerFiles({
+      gatewayIdentity: gatewayIdentity1,
+      logLevel,
+      counterPartyGateways: [gatewayIdentity2],
+      enableCrashRecovery: false, // Crash recovery disabled
+      ccConfig: { bridgeConfig: [ethereumConfig] },
+      localRepository: db_local_config1,
+      remoteRepository: db_remote_config1,
+      gatewayId: "gateway-1",
+      gatewayKeyPair: {
+        privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
+        publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      },
+    });
+
+    const files2 = setupGatewayDockerFiles({
+      gatewayIdentity: gatewayIdentity2,
+      logLevel,
+      counterPartyGateways: [gatewayIdentity1],
+      enableCrashRecovery: false, // Crash recovery disabled
+      ccConfig: { bridgeConfig: [besuConfig] },
+      localRepository: db_local_config2,
+      remoteRepository: db_remote_config2,
+      gatewayId: "gateway-2",
+      gatewayKeyPair: {
+        privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
+        publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      },
+    });
+
+    // gatewayRunner setup:
+    const gatewayRunnerOptions1: ISATPGatewayRunnerConstructorOptions = {
+      containerImageVersion: SATP_LOCAL_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_LOCAL_DOCKER_IMAGE_NAME,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI,
+      logLevel,
+      emitContainerLogs: true,
+      configPath: files1.configPath,
+      logsPath: files1.logsPath,
+      ontologiesPath: files1.ontologiesPath,
+      networkName: testNetwork,
+      url: gateway1Address,
+    };
+
+    // gatewayRunner setup:
+    const gatewayRunnerOptions2: ISATPGatewayRunnerConstructorOptions = {
+      containerImageVersion: SATP_LOCAL_DOCKER_IMAGE_VERSION,
+      containerImageName: SATP_LOCAL_DOCKER_IMAGE_NAME,
+      serverPort: DEFAULT_PORT_GATEWAY_SERVER + 100,
+      clientPort: DEFAULT_PORT_GATEWAY_CLIENT + 100,
+      oapiPort: DEFAULT_PORT_GATEWAY_OAPI + 100,
+      logLevel,
+      emitContainerLogs: true,
+      configPath: files2.configPath,
+      logsPath: files2.logsPath,
+      ontologiesPath: files2.ontologiesPath,
+      networkName: testNetwork,
+      url: gateway2Address,
+    };
+
+    gatewayRunner1 = new SATPGatewayRunner(gatewayRunnerOptions1);
+    log.debug("starting gatewayRunner...");
+    await gatewayRunner1.start(true);
+    log.debug("gatewayRunner started successfully");
+
+    gatewayRunner2 = new SATPGatewayRunner(gatewayRunnerOptions2);
+    log.debug("starting gatewayRunner...");
+    await gatewayRunner2.start(true);
+    log.debug("gatewayRunner started successfully");
+
+    const approveAddressApi1 = new GetApproveAddressApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
+      }),
+    );
+
+    const reqApproveEthereumAddress =
+      await approveAddressApi1.getApproveAddress(
+        ethereumEnv.network.id,
+        ethereumEnv.network.ledgerType,
+        TokenType.Fungible,
+      );
+
+    if (!reqApproveEthereumAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
+
+    await ethereumEnv.giveRoleToBridge(
+      reqApproveEthereumAddress?.data.approveAddress,
+    );
+
+    if (reqApproveEthereumAddress?.data.approveAddress) {
+      await ethereumEnv.approveAssets(
+        reqApproveEthereumAddress.data.approveAddress,
+        "200",
+        TokenTypeMain.NONSTANDARD_FUNGIBLE,
+      );
+    } else {
+      throw new Error("Approve address is undefined");
+    }
+    log.debug("Approved 200 amout to the Ethereum Bridge Address");
+
+    const approveAddressApi2 = new GetApproveAddressApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner2.getOApiHost()}`,
+      }),
+    );
+
+    const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress(
+      besuEnv.network.id,
+      besuEnv.network.ledgerType,
+      TokenType.Fungible,
+    );
+
+    expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
+
+    if (!reqApproveBesuAddress?.data.approveAddress) {
+      throw new Error("Approve address is undefined");
+    }
+
+    await besuEnv.giveRoleToBridge(reqApproveBesuAddress.data.approveAddress);
+
+    const satpApi1 = new TransactionApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner1.getOApiHost()}`,
+      }),
+    );
+
+    const integrations1 = await satpApi1.getIntegrations();
+
+    expect(integrations1?.data.integrations).toBeDefined();
+    expect(integrations1?.data.integrations.length).toEqual(1);
+
+    const integration = integrations1?.data.integrations[0];
+    expect(integration).toBeDefined();
+    expect(integration.environment).toBe("testnet");
+    expect(integration.id).toBe("EthereumLedgerTestNetwork");
+    expect(integration.name).toBe("Ethereum");
+    expect(integration.type).toBe("ETHEREUM");
+
+    log.info("Integration 1 is correct");
+
+    const satpApi2 = new TransactionApi(
+      new Configuration({
+        basePath: `http://${await gatewayRunner2.getOApiHost()}`,
+      }),
+    );
+
+    const integrations2 = await satpApi2.getIntegrations();
+    expect(integrations2?.data.integrations).toBeDefined();
+    expect(integrations2?.data.integrations.length).toEqual(1);
+
+    const integration2 = integrations2?.data.integrations[0];
+    expect(integration2).toBeDefined();
+    expect(integration2.environment).toBe("testnet");
+    expect(integration2.id).toBe("BesuLedgerTestNetwork");
+    expect(integration2.name).toBe("Hyperledger Besu");
+    expect(integration2.type).toBe("BESU_2X");
+    log.info("Integration 2 is correct");
+
+    const req = getTransactRequest(
+      "mockContext",
+      ethereumEnv,
+      besuEnv,
+      "200",
+      "200",
+    );
+
+    const res = await satpApi1.transact(req);
+    log.info(res?.status);
+    log.info(res.data.statusResponse);
+    expect(res?.status).toBe(200);
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestFungibleContractName(),
+      ethereumEnv.getTestFungibleContractAddress(),
+      ethereumEnv.getTestFungibleContractAbi(),
+      ethereumEnv.getTestOwnerAccount(),
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly from the Owner account");
+
+    await ethereumEnv.checkBalance(
+      ethereumEnv.getTestFungibleContractName(),
+      ethereumEnv.getTestFungibleContractAddress(),
+      ethereumEnv.getTestFungibleContractAbi(),
+      ethereumEnv.getBridgeEthAccount(),
+      "0",
+      ethereumEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly to the Wrapper account");
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
+      reqApproveEthereumAddress?.data.approveAddress,
+      "0",
+      besuEnv.getTestOwnerSigningCredential(),
+    );
+    log.info("Amount was transfer correctly from the Bridge account");
+
+    await besuEnv.checkBalance(
+      besuEnv.getTestFungibleContractName(),
+      besuEnv.getTestFungibleContractAddress(),
+      besuEnv.getTestFungibleContractAbi(),
+      besuEnv.getTestOwnerAccount(),
+      "200",
+      besuEnv.getTestOwnerSigningCredential(),
     );
     log.info("Amount was transfer correctly to the Owner account");
   });
