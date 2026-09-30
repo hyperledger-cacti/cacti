@@ -87,3 +87,5 @@ packages/cactus-plugin-satp-hermes/.config
 result
 .direnv
 docs/internal
+.venv/
+.python-version
