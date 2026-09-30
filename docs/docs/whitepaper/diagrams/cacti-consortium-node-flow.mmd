@@ -1,0 +1,22 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'noteBkgColor':'#d1fae5', 'noteTextColor':'#065f46', 'actorBkg':'#22c55e','actorTextColor':'#ffffff','actorBorder':'#16a34a','signalColor':'#065f46','signalTextColor':'#065f46'}}}%%
+sequenceDiagram
+    autonumber
+    participant A as Cacti Node A<br/>(cactus-cmd-api-server)
+    participant CA as Consortium Plugin A<br/>(cactus-plugin-consortium-manual)
+    participant CB as Consortium Plugin B
+    participant B as Cacti Node B<br/>(cactus-cmd-api-server)
+
+    Note over CA,CB: A consortium is a signed list of member nodes —<br/>each entry pairs a public key with a service endpoint.
+    A->>CA: getConsortiumJws() / getNodeJws()
+    activate CA
+    CA-->>A: signed membership (JWS)
+    deactivate CA
+    A->>B: cross-node request<br/>(carries JWS-authenticated identity)
+    activate B
+    B->>CB: verify member signature & endpoint
+    activate CB
+    CB-->>B: member validated
+    deactivate CB
+    B-->>A: authorized cross-node response
+    deactivate B
+    Note over A,B: Each node stays sovereign — no shared chain.<br/>Trust is anchored in the consortium membership list.
