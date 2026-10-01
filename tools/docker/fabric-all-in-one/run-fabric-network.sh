@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+# The embedded docker daemon (started by supervisord in parallel with this
+# script) has not necessarily created /var/run/docker.sock yet. Without this
+# wait, the `tar ... | docker load` pipelines below fail with "Cannot connect
+# to the Docker daemon", `set -e` aborts the script, and supervisord
+# eventually moves it to a fatal state - the fabric network never boots
+# (cacti issue #3978).
+until docker info >/dev/null 2>&1; do sleep 0.2; done
+
 # Needed so that we have the "peer" binary on our path
 export PATH=/fabric-samples/bin/:$PATH
 
@@ -43,7 +51,7 @@ function main()
     echo "[FabricAIO] >>> channel created OK."
 
     if [ -n "$CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP" ]; then
-    echo "[FabricAIO] >>> Deploy CC with loose endorsment policy."
+    echo "[FabricAIO] >>> Deploy CC with loose endorsement policy."
       ./network.sh deployCC -ccn basic  -ccep "OR('Org1MSP.member','Org2MSP.member')" -ccp ../asset-transfer-basic/chaincode-go -ccl go
     else
       ./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-go -ccl go
@@ -70,7 +78,7 @@ function main()
     cd /fabric-samples/fabcar/
 
     if [ -n "$CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP" ]; then
-      echo "[FabricAIO] >>> PATCH - Changing to loose endorsment policy."
+      echo "[FabricAIO] >>> PATCH - Changing to loose endorsement policy."
       sed -i "s/AND('Org1MSP.member','Org2MSP.member')/OR('Org1MSP.member','Org2MSP.member')/g" ./startFabric.sh
     fi
 
