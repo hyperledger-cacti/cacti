@@ -56,6 +56,11 @@ import {
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_2_pb";
 import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
 import {
+  AssertionClaimType,
+  signAssertionClaim,
+} from "../../../main/typescript/utils/gateway-utils";
+import type { SatpStepTag } from "../../../main/typescript/core/satp-protocol-map";
+import {
   verifyCommitFinalAssertionRequestMessage,
   verifyCommitPreparationRequestMessage,
   verifyTransferCompleteRequestMessage,
@@ -97,7 +102,31 @@ const signer = new JsObjectSigner({
 // Hex pubkey of the claim-issuing gateway, as stored in session data.
 const claimIssuerPubkey = Buffer.from(keyPairs.publicKey).toString("hex");
 
-// A claim signed like the gateway does it: sign(signer, receipt), hex-encoded.
+// Session ID shared by the fixtures' messages and session data, so claim
+// signatures bind to the same session the verifier will reconstruct.
+const SESSION_ID = "session-001";
+
+// A claim signed like the gateway does it: the signature covers the
+// canonical payload binding receipt and proof to the claim type, protocol
+// step, and session ID (see signAssertionClaim), hex-encoded.
+const CLAIM_PROOF = "0x" + Buffer.from(`proof-${Date.now()}`).toString("hex");
+function makeSignedClaimSignature(
+  claimType: AssertionClaimType,
+  stepTag: SatpStepTag,
+  receipt: string,
+  proof: string = CLAIM_PROOF,
+): string {
+  return signAssertionClaim(
+    signer,
+    { receipt, proof },
+    {
+      claimType,
+      stepTag,
+      sessionId: SESSION_ID,
+    },
+  );
+}
+
 function makeSignedClaimReceipt(): string {
   return "0x" + Buffer.from(`receipt-${Date.now()}`).toString("hex");
 }
@@ -111,7 +140,7 @@ const logger = {
 
 function makeSessionData(overrides?: Record<string, unknown>): SessionData {
   return create(SessionDataSchema, {
-    id: "session-001",
+    id: SESSION_ID,
     transferContextId: "ctx-001",
     version: SATP_CORE_VERSION,
     hashes: create(MessageStagesHashesSchema, {
@@ -157,7 +186,7 @@ function common(messageType: MessageType) {
   return create(CommonSatpSchema, {
     version: SATP_CORE_VERSION,
     messageType,
-    sessionId: "session-001",
+    sessionId: SESSION_ID,
     transferContextId: "ctx-001",
   });
 }
@@ -176,7 +205,12 @@ function makeCommitFinalAssertionRequest(): CommitFinalAssertionRequest {
     hashPrevMessage: PREV_HASH,
     burnAssertionClaim: create(BurnAssertionClaimSchema, {
       receipt,
-      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+      proof: CLAIM_PROOF,
+      signature: makeSignedClaimSignature(
+        "BURN",
+        "commitFinalAssertion",
+        receipt,
+      ),
     }),
   });
 }
@@ -202,7 +236,12 @@ function makeCommitPreparationResponse(): CommitPreparationResponse {
     hashPrevMessage: PREV_HASH,
     mintAssertionClaim: create(MintAssertionClaimSchema, {
       receipt,
-      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+      proof: CLAIM_PROOF,
+      signature: makeSignedClaimSignature(
+        "MINT",
+        "commitReadyResponse",
+        receipt,
+      ),
     }),
   });
 }
@@ -214,7 +253,12 @@ function makeCommitFinalAssertionResponse(): CommitFinalAssertionResponse {
     hashPrevMessage: PREV_HASH,
     assignmentAssertionClaim: create(AssignmentAssertionClaimSchema, {
       receipt,
-      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+      proof: CLAIM_PROOF,
+      signature: makeSignedClaimSignature(
+        "ASSIGNMENT",
+        "commitFinalAcknowledgementReceiptResponse",
+        receipt,
+      ),
     }),
   });
 }

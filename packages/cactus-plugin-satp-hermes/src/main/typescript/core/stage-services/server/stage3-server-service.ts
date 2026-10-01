@@ -18,7 +18,12 @@ import {
   MintAssertionClaimFormatSchema,
   MintAssertionClaimSchema,
 } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
-import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
+import {
+  bufArray2HexStr,
+  getHash,
+  sign,
+  signAssertionClaim,
+} from "../../../utils/gateway-utils";
 import {
   getMessageHash,
   saveHash,
@@ -732,8 +737,14 @@ export class Stage3ServerService extends SATPService {
             },
           );
 
-          sessionData.mintAssertionClaim.signature = bufArray2HexStr(
-            sign(this.Signer, sessionData.mintAssertionClaim.receipt),
+          sessionData.mintAssertionClaim.signature = signAssertionClaim(
+            this.Signer,
+            sessionData.mintAssertionClaim,
+            {
+              claimType: "MINT",
+              stepTag: "commitReadyResponse",
+              sessionId: sessionData.id,
+            },
           );
           await this.dbLogger.storeProof({
             sessionId: sessionData.id,
@@ -827,8 +838,14 @@ export class Stage3ServerService extends SATPService {
               format: this.claimFormat,
             },
           );
-          sessionData.assignmentAssertionClaim.signature = bufArray2HexStr(
-            sign(this.Signer, sessionData.assignmentAssertionClaim.receipt),
+          sessionData.assignmentAssertionClaim.signature = signAssertionClaim(
+            this.Signer,
+            sessionData.assignmentAssertionClaim,
+            {
+              claimType: "ASSIGNMENT",
+              stepTag: "commitFinalAcknowledgementReceiptResponse",
+              sessionId: sessionData.id,
+            },
           );
           await this.dbLogger.storeProof({
             sessionId: sessionData.id,

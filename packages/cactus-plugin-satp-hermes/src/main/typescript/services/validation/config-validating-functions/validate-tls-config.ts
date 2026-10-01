@@ -34,16 +34,21 @@ export interface IGatewayTlsConfig {
  * suite. Throws when a configuration below TLS 1.3 or with non-TLS-1.3
  * cipher suites is requested, or when TLS is `enabled` without both
  * `cert` and `key` — the gateway must never silently fall back to plain
- * HTTP.
+ * HTTP. The missing-material check is the only relaxation `devMode`
+ * (DEV_MODE config/env, test deployments only) buys: the gateway then
+ * downgrades to plain HTTP with a loud warning instead of refusing.
  *
  * @param opts.configValue - The raw TLS configuration (may be undefined)
+ * @param opts.devMode - Whether DEV_MODE is active (skips the
+ *   missing-certificate-material check; testing only)
  * @returns The normalized TLS configuration, or `undefined` when none was given
  * @throws {TypeError} When the configuration is not an object
  * @throws {Error} When the configuration requests below-TLS-1.3 security or
- *   enables TLS without complete certificate material
+ *   enables TLS without complete certificate material (unless `devMode`)
  */
 export function validateTlsConfig(opts: {
   readonly configValue: unknown;
+  readonly devMode?: boolean;
 }): IGatewayTlsConfig | undefined {
   const config = opts?.configValue;
 
@@ -58,7 +63,10 @@ export function validateTlsConfig(opts: {
 
   const raw = config as IGatewayTlsConfig;
 
-  if (raw.enabled === true) {
+  // DEV_MODE relaxes only the missing-material check, so test deployments
+  // can intentionally run HTTP; protocol-version and cipher-suite
+  // strictness are never relaxed.
+  if (raw.enabled === true && !opts?.devMode) {
     const missing = [!raw.cert && "cert", !raw.key && "key"].filter(
       Boolean,
     ) as string[];
@@ -66,7 +74,8 @@ export function validateTlsConfig(opts: {
       throw new Error(
         `Invalid config.tls: enabled but ${missing.join(" and ")} missing. ` +
           "A gateway with TLS enabled must not fall back to plain HTTP " +
-          "(SATP draft-16 Section 5.4.2 secure-channel requirement)",
+          "(SATP draft-16 Section 5.4.2 secure-channel requirement). " +
+          "Set DEV_MODE for test deployments that intentionally use HTTP",
       );
     }
   }

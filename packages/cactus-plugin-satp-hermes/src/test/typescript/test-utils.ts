@@ -12,6 +12,10 @@ import { execSync } from "child_process";
 import { expect } from "@jest/globals";
 import { Address, GatewayIdentity } from "../../main/typescript/core/types";
 import {
+  AssertionClaimBindingContext,
+  canonicalAssertionPayload,
+} from "../../main/typescript/utils/gateway-utils";
+import {
   SATP_ARCHITECTURE_VERSION,
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
@@ -192,18 +196,27 @@ export const CI_TEST_TIMEOUT = 900000;
 const testFilesDirectory = `${__dirname}/../../../cache/`;
 
 /**
- * Claims must carry a durable signature over their receipt, exactly as the
- * gateway signs them in production (sign(signer, claim.receipt), hex-encoded).
+ * Claims must carry a durable signature over their canonical payload, exactly
+ * as the gateway signs them in production (the signature binds the receipt
+ * and the proof to the claim type, protocol step, and session ID — see
+ * `canonicalAssertionPayload`).
  * Fixture claims injected directly into session data bypass the
  * wrap/mint/burn/assignment asset operations that normally sign them, so
  * they are signed here with the provided signer (all services in a test
  * usually share one keypair).
  */
 export function signClaimFixture<
-  T extends { receipt: string; signature: string },
->(claim: T, receipt: string, signer: { sign: (msg: string) => Uint8Array }): T {
+  T extends { receipt: string; proof: string; signature: string },
+>(
+  claim: T,
+  receipt: string,
+  signer: { sign: (msg: string) => Uint8Array },
+  context: AssertionClaimBindingContext,
+): T {
   claim.receipt = receipt;
-  claim.signature = Buffer.from(signer.sign(receipt)).toString("hex");
+  claim.signature = Buffer.from(
+    signer.sign(canonicalAssertionPayload(claim, context)),
+  ).toString("hex");
   return claim;
 }
 

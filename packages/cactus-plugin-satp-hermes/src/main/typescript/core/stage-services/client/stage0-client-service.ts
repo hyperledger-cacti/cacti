@@ -43,7 +43,12 @@
  * @see {@link BridgeManagerClientInterface} Bridge integration interface
  */
 
-import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
+import {
+  bufArray2HexStr,
+  getHash,
+  sign,
+  signAssertionClaim,
+} from "../../../utils/gateway-utils";
 import {
   ClaimFormat,
   MessageType,
@@ -675,8 +680,14 @@ export class Stage0ClientService extends SATPService {
 
           sessionData.senderWrapAssertionClaim.proof = res.proof;
 
-          sessionData.senderWrapAssertionClaim.signature = bufArray2HexStr(
-            sign(this.Signer, sessionData.senderWrapAssertionClaim.receipt),
+          sessionData.senderWrapAssertionClaim.signature = signAssertionClaim(
+            this.Signer,
+            sessionData.senderWrapAssertionClaim,
+            {
+              claimType: "WRAP",
+              stepTag: "preSATPTransferRequest",
+              sessionId: sessionData.id,
+            },
           );
 
           // persist the signed sender wrap-assertion claim at creation so it

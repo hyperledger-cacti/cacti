@@ -480,6 +480,11 @@ describe("SATP Services Testing", () => {
       create(WrapAssertionClaimSchema, {}),
       "MOCK_RECEIVER_WRAP_RECEIPT",
       signer,
+      {
+        claimType: "WRAP",
+        stepTag: "preSATPTransferResponse",
+        sessionId: sessionData.id,
+      },
     );
 
     preSATPTransferResponseMessage =
@@ -879,6 +884,11 @@ describe("SATP Services Testing", () => {
         create(MintAssertionClaimSchema, {}),
         "MOCK_MINT_RECEIPT",
         signer,
+        {
+          claimType: "MINT",
+          stepTag: "commitReadyResponse",
+          sessionId: mockSession.getServerSessionData()!.id,
+        },
       );
 
     commitReadyResponseMessage = (await satpServerService3.commitReadyResponse(
@@ -927,6 +937,11 @@ describe("SATP Services Testing", () => {
         create(BurnAssertionClaimSchema, {}),
         "MOCK_BURN_RECEIPT",
         signer,
+        {
+          claimType: "BURN",
+          stepTag: "commitFinalAssertion",
+          sessionId: mockSession.getClientSessionData()!.id,
+        },
       );
 
     commitFinalAssertionRequestMessage =
@@ -981,6 +996,11 @@ describe("SATP Services Testing", () => {
       create(AssignmentAssertionClaimSchema, {}),
       "MOCK_ASSIGNMENT_RECEIPT",
       signer,
+      {
+        claimType: "ASSIGNMENT",
+        stepTag: "commitFinalAcknowledgementReceiptResponse",
+        sessionId: mockSession.getServerSessionData()!.id,
+      },
     );
 
     commitFinalAcknowledgementReceiptResponseMessage =

@@ -64,13 +64,19 @@ export function verifyLockAssertionRequestMessage(
     throw new LockAssertionClaimFormatError(tag);
   }
 
-  // Durable proof of the client gateway's lock assertion over the receipt,
+  // Durable proof of the client gateway's lock assertion over the canonical
+  // claim payload (receipt + proof + claim type + step + session),
   // independent of the message envelope's JWS. Issued by the client.
   claimSignatureVerifier(
     tag,
     signer,
     request.lockAssertionClaim,
     sessionData.clientGatewayPubkey,
+    {
+      claimType: "LOCK",
+      stepTag: "lockAssertionRequest",
+      sessionId: sessionData.id,
+    },
   );
 
   const currentTime = BigInt(Date.now());

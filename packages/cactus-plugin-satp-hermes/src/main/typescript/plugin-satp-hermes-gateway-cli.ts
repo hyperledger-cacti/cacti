@@ -148,6 +148,10 @@ import { validateInstanceId } from "./services/validation/config-validating-func
 import { v4 as uuidv4 } from "uuid";
 import { validateOntologyPath } from "./services/validation/config-validating-functions/validate-ontology-path";
 import { validateExtensions } from "./services/validation/config-validating-functions/validate-extensions";
+import {
+  validateTlsConfig,
+  type IGatewayTlsConfig,
+} from "./services/validation/config-validating-functions/validate-tls-config";
 import { validateAdapterConfig } from "./services/validation/config-validating-functions/validate-adapter-config";
 import { loadGatewayConfig } from "./services/validation/load-gateway-config";
 
@@ -255,6 +259,33 @@ export { loadGatewayConfig } from "./services/validation/load-gateway-config";
  *
  * @since 0.0.3-beta
  */
+
+/**
+ * Resolve whether DEV_MODE is active for this gateway launch.
+ *
+ * Precedence: an explicit `devMode` value in config.json always wins; the
+ * `DEV_MODE` environment variable (truthy: "1", "true", "yes", "on", case
+ * insensitive) applies only when the config field is absent. DEV_MODE
+ * relaxes the TLS certificate-material requirement for test deployments —
+ * the gateway then serves plain HTTP with a loud warning instead of
+ * refusing to start. Never enable it in production.
+ *
+ * @param configValue - The raw `devMode` field from config.json (if present)
+ * @param envValue - The raw `DEV_MODE` environment variable value (if set)
+ * @returns `true` when DEV_MODE is active
+ */
+export function resolveDevMode(
+  configValue: unknown,
+  envValue: string | undefined,
+): boolean {
+  if (configValue !== undefined) {
+    return configValue === true;
+  }
+  if (envValue === undefined) {
+    return false;
+  }
+  return ["1", "true", "yes", "on"].includes(envValue.trim().toLowerCase());
+}
 
 /**
  * Options for customizing the gateway launch configuration paths.
@@ -388,6 +419,19 @@ export async function launchGateway(
     validateOntologyPath({ configValue: config.ontologyPath }),
   );
 
+  const devMode = resolveDevMode(config.devMode, process.env.DEV_MODE);
+  if (devMode) {
+    logger.warn(
+      "DEV_MODE is active: TLS material requirements are relaxed for this " +
+        "test deployment and the gateway may serve plain HTTP. Never " +
+        "enable DEV_MODE in production (SATP draft-16 Section 5.4.2 " +
+        "secure-channel requirement)",
+    );
+  }
+  const tls = await runValidation("Gateway TLS Config", logger, () =>
+    validateTlsConfig({ configValue: config.tls, devMode }),
+  );
+
   const extensions = await runValidation("Extensions", logger, () =>
     validateExtensions({ configValue: config.extensions }),
   );
@@ -430,6 +474,8 @@ export async function launchGateway(
     mergePolicies,
     ccConfig,
     enableCrashRecovery,
+    devMode,
+    tls: tls as IGatewayTlsConfig | undefined,
     localRepository,
     remoteRepository,
     auditRepository,
@@ -441,7 +487,28 @@ export async function launchGateway(
   };
 
   logger.info("SATPGatewayConfig created successfully");
-  logger.debug(`SATPGatewayConfig: ${JSON.stringify(gatewayConfig, null, 2)}`);
+  // Redact private key material before dumping the config: the debug log is
+  // also written in production, so the ENVELOPE signature JWK (whose `d`
+  // parameter is the private key), the key pair's private half, and the TLS
+  // private key PEM must never be serialized into logs.
+  const redactedGatewayConfig = {
+    ...gatewayConfig,
+    envelopeSignaturePrivateKey: envelopeSignaturePrivateKey
+      ? "[REDACTED]"
+      : undefined,
+    keyPair: gatewayConfig.keyPair
+      ? {
+          publicKey: gatewayConfig.keyPair.publicKey.toString("hex"),
+          privateKey: "[REDACTED]",
+        }
+      : undefined,
+    tls: gatewayConfig.tls
+      ? { ...gatewayConfig.tls, key: "[REDACTED]" }
+      : undefined,
+  };
+  logger.debug(
+    `SATPGatewayConfig: ${JSON.stringify(redactedGatewayConfig, null, 2)}`,
+  );
 
   // Provision the local-only ENVELOPE_SIGNATURE private key BEFORE any
   // startup step: startup() eagerly resolves the signing key pair and would

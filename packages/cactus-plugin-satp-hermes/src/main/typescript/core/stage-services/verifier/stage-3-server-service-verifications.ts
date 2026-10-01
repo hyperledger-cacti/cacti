@@ -88,13 +88,19 @@ export function verifyCommitFinalAssertionRequestMessage(
     throw new BurnAssertionClaimError(tag);
   }
 
-  // Durable proof of the client gateway's burn assertion over the receipt,
+  // Durable proof of the client gateway's burn assertion over the canonical
+  // claim payload (receipt + proof + claim type + step + session),
   // independent of the message envelope's JWS. Issued by the client.
   claimSignatureVerifier(
     tag,
     signer,
     request.burnAssertionClaim,
     session!.getServerSessionData().clientGatewayPubkey,
+    {
+      claimType: "BURN",
+      stepTag: "commitFinalAssertion",
+      sessionId: session!.getServerSessionData().id,
+    },
   );
 
   if (request.burnAssertionClaimFormat != undefined) {

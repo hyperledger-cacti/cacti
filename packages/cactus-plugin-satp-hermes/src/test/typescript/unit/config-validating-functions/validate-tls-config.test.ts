@@ -110,3 +110,63 @@ describe("validateTlsConfig — TLS 1.3 enforcement", () => {
     expect(() => validateTlsConfig({ configValue: "tls" })).toThrow(TypeError);
   });
 });
+
+describe("validateTlsConfig — DEV_MODE relaxation", () => {
+  it("accepts enabled TLS without certificate material in devMode", () => {
+    const result = validateTlsConfig({
+      configValue: { enabled: true },
+      devMode: true,
+    })!;
+    expect(result.enabled).toBe(true);
+    expect(result.minVersion).toBe("TLSv1.3");
+    expect(result.cipherSuites).toEqual([DEFAULT_TLS13_CIPHER_SUITE]);
+  });
+
+  it("accepts enabled TLS with partial material in devMode", () => {
+    const result = validateTlsConfig({
+      configValue: { enabled: true, cert: CERT },
+      devMode: true,
+    })!;
+    expect(result.enabled).toBe(true);
+  });
+
+  it("devMode false keeps the strict missing-material rejection", () => {
+    expect(() =>
+      validateTlsConfig({
+        configValue: { enabled: true },
+        devMode: false,
+      }),
+    ).toThrow(/cert and key missing/);
+  });
+
+  it("devMode does NOT relax the minimum-version requirement", () => {
+    expect(() =>
+      validateTlsConfig({
+        configValue: { enabled: true, minVersion: "TLSv1.2" },
+        devMode: true,
+      }),
+    ).toThrow(/TLS 1\.3/);
+  });
+
+  it("devMode does NOT relax the cipher-suite requirement", () => {
+    expect(() =>
+      validateTlsConfig({
+        configValue: {
+          enabled: true,
+          cipherSuites: ["TLS_RSA_WITH_AES_128_CBC_SHA"],
+        },
+        devMode: true,
+      }),
+    ).toThrow(/TLS 1\.3 cipher suites/);
+  });
+
+  it("devMode never rejects a fully valid TLS configuration", () => {
+    const result = validateTlsConfig({
+      configValue: { enabled: true, cert: CERT, key: KEY },
+      devMode: true,
+    })!;
+    expect(result.enabled).toBe(true);
+    expect(result.cert).toBe(CERT);
+    expect(result.key).toBe(KEY);
+  });
+});

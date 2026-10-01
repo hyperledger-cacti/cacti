@@ -10,7 +10,12 @@ import {
   LockAssertionRequest,
   LockAssertionRequestSchema,
 } from "../../../generated/proto/cacti/satp/v13/service/stage_2_pb";
-import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
+import {
+  bufArray2HexStr,
+  getHash,
+  sign,
+  signAssertionClaim,
+} from "../../../utils/gateway-utils";
 import {
   getMessageHash,
   saveHash,
@@ -317,8 +322,14 @@ export class Stage2ClientService extends SATPService {
           sessionData.lockAssertionExpiration =
             BigInt(Date.now()) + sessionData.lockExpirationTime;
 
-          sessionData.lockAssertionClaim.signature = bufArray2HexStr(
-            sign(this.Signer, sessionData.lockAssertionClaim.receipt),
+          sessionData.lockAssertionClaim.signature = signAssertionClaim(
+            this.Signer,
+            sessionData.lockAssertionClaim,
+            {
+              claimType: "LOCK",
+              stepTag: "lockAssertionRequest",
+              sessionId: sessionData.id,
+            },
           );
 
           await this.dbLogger.storeProof({

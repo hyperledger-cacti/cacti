@@ -163,13 +163,19 @@ export function verifyPreSATPTransferResponse(
 
   // The wrap assertion claim rides a Stage 0 message, so it has no JWS
   // envelope fallback, because Stage 0 is still not wired
-  // Its own signature over the receipt is the only
-  // proof of the server gateway's wrap assertion. Issued by the server.
+  // Its own signature over the canonical claim payload (receipt + proof +
+  // claim type + step + session) is the only proof of the server gateway's
+  // wrap assertion. Issued by the server for the pre-SATP transfer response.
   claimSignatureVerifier(
     tag,
     signer,
     response.wrapAssertionClaim,
     sessionData.serverGatewayPubkey,
+    {
+      claimType: "WRAP",
+      stepTag: "preSATPTransferResponse",
+      sessionId: sessionData.id,
+    },
   );
 
   if (response.recipientTokenId == "") {

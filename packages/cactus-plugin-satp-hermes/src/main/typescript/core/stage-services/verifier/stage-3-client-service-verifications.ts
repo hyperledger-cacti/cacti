@@ -96,13 +96,19 @@ export function verifyCommitPreparationResponseMessage(
     throw new MintAssertionClaimError(tag);
   }
 
-  // Durable proof of the server gateway's mint assertion over the receipt,
+  // Durable proof of the server gateway's mint assertion over the canonical
+  // claim payload (receipt + proof + claim type + step + session),
   // independent of the message envelope's JWS. Issued by the server.
   claimSignatureVerifier(
     tag,
     signer,
     response.mintAssertionClaim,
     session!.getClientSessionData().serverGatewayPubkey,
+    {
+      claimType: "MINT",
+      stepTag: "commitReadyResponse",
+      sessionId: session!.getClientSessionData().id,
+    },
   );
 }
 
@@ -141,12 +147,18 @@ export function verifyCommitFinalAssertionResponseMessage(
   }
 
   // Durable proof of the server gateway's assignment assertion over the
-  // receipt, independent of the message envelope's JWS. Issued by the server.
+  // canonical claim payload (receipt + proof + claim type + step + session),
+  // independent of the message envelope's JWS. Issued by the server.
   claimSignatureVerifier(
     tag,
     signer,
     response.assignmentAssertionClaim,
     session!.getClientSessionData().serverGatewayPubkey,
+    {
+      claimType: "ASSIGNMENT",
+      stepTag: "commitFinalAcknowledgementReceiptResponse",
+      sessionId: session!.getClientSessionData().id,
+    },
   );
 
   if (response.assignmentAssertionClaimFormat != undefined) {

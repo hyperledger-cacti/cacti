@@ -18,7 +18,12 @@ import {
   TransferCompleteRequestSchema,
   TransferCompleteResponse,
 } from "../../../generated/proto/cacti/satp/v13/service/stage_3_pb";
-import { bufArray2HexStr, getHash, sign } from "../../../utils/gateway-utils";
+import {
+  bufArray2HexStr,
+  getHash,
+  sign,
+  signAssertionClaim,
+} from "../../../utils/gateway-utils";
 import {
   getMessageHash,
   saveHash,
@@ -710,8 +715,14 @@ export class Stage3ClientService extends SATPService {
             },
           );
 
-          sessionData.burnAssertionClaim.signature = bufArray2HexStr(
-            sign(this.Signer, sessionData.burnAssertionClaim.receipt),
+          sessionData.burnAssertionClaim.signature = signAssertionClaim(
+            this.Signer,
+            sessionData.burnAssertionClaim,
+            {
+              claimType: "BURN",
+              stepTag: "commitFinalAssertion",
+              sessionId: sessionData.id,
+            },
           );
           await this.dbLogger.storeProof({
             sessionId: sessionData.id,

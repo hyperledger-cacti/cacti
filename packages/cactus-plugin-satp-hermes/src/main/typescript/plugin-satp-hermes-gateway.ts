@@ -274,6 +274,19 @@ export interface SATPGatewayConfig extends ICactusPluginOptions {
   tls?: IGatewayTlsConfig;
 
   /**
+   * Development mode for test deployments.
+   * @description
+   * When active, a TLS configuration with `enabled: true` but incomplete
+   * certificate material does not stop the gateway: it serves the GOL
+   * server over plain HTTP with a loud warning instead, to simplify
+   * testing and CI checks. Protocol-version and cipher-suite strictness
+   * are NOT relaxed. Never activate DEV_MODE in production: the
+   * secure-channel requirement of SATP draft-16 Section 5.4.2 is waived
+   * for exactly this one condition.
+   */
+  devMode?: boolean;
+
+  /**
    * JWT + OAuth 2.0 bearer authentication for the Client Application API.
    * @description
    * When enabled, requests to the gateway REST endpoints must carry a valid
@@ -680,8 +693,13 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
     const fnTag = `${this.className}#constructor()`;
     Checks.truthy(options, `${fnTag} arg options`);
     this.config = SATPGateway.ProcessGatewayCoordinatorConfig(options);
-    // Enforce TLS 1.3 secure-channel requirements at startup
-    this.tls = validateTlsConfig({ configValue: options.tls });
+    // Enforce TLS 1.3 secure-channel requirements at startup. DEV_MODE
+    // relaxes only the missing-certificate-material check (test
+    // deployments serving plain HTTP with a warning).
+    this.tls = validateTlsConfig({
+      configValue: options.tls,
+      devMode: options.devMode,
+    });
     this.shutdownHooks = [];
     const level = this.config.logLevel;
     const logOptions: ILoggerOptions = {
@@ -1431,7 +1449,7 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
                 "GOL server TLS enabled (minVersion: TLSv1.3, cipherSuites: " +
                   `${this.tls.cipherSuites?.join(":")})`,
               );
-            } else if (this.tls?.enabled) {
+            } else if (this.tls?.enabled && !this.options.devMode) {
               // TLS was explicitly requested but the certificate material is
               // incomplete: fail closed instead of silently serving plain
               // HTTP, which would violate the v13 secure-channel requirement.
@@ -1447,11 +1465,28 @@ export class SATPGateway implements IPluginWebService, ICactusPlugin {
                 new Error(
                   `TLS enabled but ${missing.join(" and ")} missing: ` +
                     "cannot start the gateway server without a complete TLS " +
-                    "configuration (SATP draft-16 Section 5.4.2)",
+                    "configuration (SATP draft-16 Section 5.4.2). " +
+                    "Set DEV_MODE for test deployments that use HTTP",
                 ),
               );
               return;
             } else {
+              if (this.tls?.enabled && this.options.devMode) {
+                // DEV_MODE: TLS was requested but the material is incomplete.
+                // Serve plain HTTP with a loud warning instead of refusing,
+                // to simplify testing and CI checks. Never for production.
+                const missing = [
+                  !this.tls.cert && "cert",
+                  !this.tls.key && "key",
+                ].filter(Boolean);
+                this.logger.warn(
+                  `DEV_MODE active: TLS is enabled but ${missing.join(" and ")} ` +
+                    "missing; serving the GOL server over plain HTTP. " +
+                    "DEV_MODE waives the SATP draft-16 Section 5.4.2 " +
+                    "secure-channel requirement for testing ONLY — never " +
+                    "enable it in production",
+                );
+              }
               // Plain-HTTP development mode: same transfer-spanning keep-alive
               // window as the TLS server (see the comment above).
               this.GOLServer = http.createServer(this.GOLApplication);

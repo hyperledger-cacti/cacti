@@ -330,8 +330,8 @@
     },
     "satp-draft-versions": {
       "core": {
-        "specVersion": "draft-ietf-satp-core-13",
-        "specUrl": "https://www.ietf.org/archive/id/draft-ietf-satp-core-13.txt"
+        "specVersion": "draft-ietf-satp-core-16",
+        "specUrl": "https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt"
       }
     },
     "cacti-version": "3.0.1"

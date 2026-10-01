@@ -40,6 +40,11 @@ import {
   TransferCommenceResponseSchema,
 } from "../../../main/typescript/generated/proto/cacti/satp/v13/service/stage_1_pb";
 import { SATP_CORE_VERSION } from "../../../main/typescript/core/constants";
+import {
+  AssertionClaimType,
+  signAssertionClaim,
+} from "../../../main/typescript/utils/gateway-utils";
+import type { SatpStepTag } from "../../../main/typescript/core/satp-protocol-map";
 import { verifyLockAssertionRequestMessage } from "../../../main/typescript/core/stage-services/verifier/stage-2-server-service-verifications";
 import { verifyTransferCommenceResponseMessage } from "../../../main/typescript/core/stage-services/verifier/stage-2-client-service-verifications";
 import {
@@ -66,14 +71,38 @@ const signer = new JsObjectSigner({
   privateKey: new Uint8Array(keyPairs.privateKey),
 });
 
-// A claim signed like the gateway does it: sign(signer, receipt), hex-encoded.
+// Session ID shared by the fixtures' messages and session data, so claim
+// signatures bind to the same session the verifier will reconstruct.
+const SESSION_ID = "session-001";
+
+// A claim signed like the gateway does it: the signature covers the
+// canonical payload binding receipt and proof to the claim type, protocol
+// step, and session ID (see signAssertionClaim), hex-encoded.
+const CLAIM_PROOF = "0x" + Buffer.from(`proof-${Date.now()}`).toString("hex");
+function makeSignedClaimSignature(
+  claimType: AssertionClaimType,
+  stepTag: SatpStepTag,
+  receipt: string,
+  proof: string = CLAIM_PROOF,
+): string {
+  return signAssertionClaim(
+    signer,
+    { receipt, proof },
+    {
+      claimType,
+      stepTag,
+      sessionId: SESSION_ID,
+    },
+  );
+}
+
 function makeSignedClaimReceipt(): string {
   return "0x" + Buffer.from(`receipt-${Date.now()}`).toString("hex");
 }
 
 function makeSessionData(overrides?: Record<string, unknown>): SessionData {
   return create(SessionDataSchema, {
-    id: "session-001",
+    id: SESSION_ID,
     transferContextId: "ctx-001",
     version: SATP_CORE_VERSION,
     lockExpirationTime: LOCK_EXPIRATION_TIME,
@@ -118,13 +147,18 @@ function makeLockAssertionRequest(
     common: create(CommonSatpSchema, {
       version: SATP_CORE_VERSION,
       messageType: MessageType.LOCK_ASSERT,
-      sessionId: "session-001",
+      sessionId: SESSION_ID,
       transferContextId: "ctx-001",
     }),
     hashPrevMessage: PREV_HASH,
     lockAssertionClaim: create(LockAssertionClaimSchema, {
       receipt,
-      signature: Buffer.from(signer.sign(receipt)).toString("hex"),
+      proof: CLAIM_PROOF,
+      signature: makeSignedClaimSignature(
+        "LOCK",
+        "lockAssertionRequest",
+        receipt,
+      ),
     }),
     lockAssertionClaimFormat: create(LockAssertionClaimFormatSchema, {}),
     lockAssertionExpiration,

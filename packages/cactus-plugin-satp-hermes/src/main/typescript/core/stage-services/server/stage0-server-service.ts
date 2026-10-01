@@ -50,6 +50,7 @@ import {
   bufArray2HexStr,
   getHash,
   sign,
+  signAssertionClaim,
   verifySignature,
 } from "../../../utils/gateway-utils";
 import {
@@ -801,8 +802,14 @@ export class Stage0ServerService extends SATPService {
 
           sessionData.receiverWrapAssertionClaim.proof = res.proof;
 
-          sessionData.receiverWrapAssertionClaim.signature = bufArray2HexStr(
-            sign(this.Signer, sessionData.receiverWrapAssertionClaim.receipt),
+          sessionData.receiverWrapAssertionClaim.signature = signAssertionClaim(
+            this.Signer,
+            sessionData.receiverWrapAssertionClaim,
+            {
+              claimType: "WRAP",
+              stepTag: "preSATPTransferResponse",
+              sessionId: sessionData.id,
+            },
           );
 
           await this.dbLogger.storeProof({

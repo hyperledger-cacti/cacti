@@ -542,11 +542,14 @@ contract SATPWrapperContract is Ownable, ITraceableContract, IERC721Receiver{
         TokenType tt = tokens[tokenId].tokenType;
         ERCTokenStandard descriptor = tokens[tokenId].ercTokenStandard;
 
+        // The strict-standard API contract applies to every returned token,
+        // so the expected standard is checked before branching on token type.
+        require(descriptor == ercTokenStandard, "token standard mismatch");
+
         if (tt == TokenType.NONSTANDARD_FUNGIBLE) {
             return tokens[tokenId];
         }
         else if (tt == TokenType.NONSTANDARD_NONFUNGIBLE) {
-            require(descriptor == ercTokenStandard, "token standard mismatch");
             if(NFT_IDs[tokenId][assetAttribute]) {
                 return Token(tokens[tokenId].contractName, tokens[tokenId].contractAddress, tokens[tokenId].tokenType, tokenId, tokens[tokenId].referenceId, tokens[tokenId].owner, assetAttribute, descriptor);
             }

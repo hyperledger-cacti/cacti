@@ -72,8 +72,14 @@ export const HTTP_SERVER_HEADERS_TIMEOUT_MS =
  */
 export const HTTP_AGENT_KEEP_ALIVE_MSECS = 15 * 1000;
 
-/** Ledger types with bridge implementations available to SATP. */
-export const SATP_IMPLEMENTED_LEDGERS = new Set<LedgerType>([
+/**
+ * Ledger types with bridge implementations available to SATP.
+ *
+ * Typed as `ReadonlySet` so the exported capability surface cannot be
+ * mutated (`add`/`delete`/`clear`) by consumers — gateway capability checks
+ * read this set process-wide.
+ */
+export const SATP_IMPLEMENTED_LEDGERS: ReadonlySet<LedgerType> = new Set([
   LedgerType.Besu1X,
   LedgerType.Besu2X,
   LedgerType.Ethereum,

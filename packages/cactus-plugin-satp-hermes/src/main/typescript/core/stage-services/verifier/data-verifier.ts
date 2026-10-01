@@ -74,7 +74,11 @@
  */
 
 import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
-import { verifySignature } from "../../../utils/gateway-utils";
+import {
+  AssertionClaimBindingContext,
+  canonicalAssertionPayload,
+  verifySignature,
+} from "../../../utils/gateway-utils";
 import {
   CommonSatp,
   MessageType,
@@ -441,20 +445,27 @@ export function signatureVerifier(
 
 /**
  * Verifies the signature of an assertion claim (wrap/lock/mint/burn/
- * assignment) against the claim's receipt.
+ * assignment) against the claim's canonical payload.
  *
  * Claim signatures are produced by the claim-issuing gateway with
- * `sign(signer, claim.receipt)` (hex-encoded) and are independent of the
- * JWS envelope signing: claims outlive transport and must stay verifiable
- * for dispute resolution and audit. The receipt is opaque to this
- * verifier — only the signature over it is checked here — but it MUST be
- * non-empty: an empty receipt has no verifiable claim content, so it is
- * rejected before the signature check.
+ * `signAssertionClaim(signer, claim, context)` (hex-encoded) and are
+ * independent of the JWS envelope signing: claims outlive transport and must
+ * stay verifiable for dispute resolution and audit. The signature covers the
+ * canonical payload binding the receipt and the proof to the claim type, the
+ * protocol step tag, and the session ID, so neither the claim content nor its
+ * audit association can be altered without invalidating the signature. The
+ * receipt is opaque to this verifier — only the signature over the payload is
+ * checked here — but it MUST be non-empty: an empty receipt has no verifiable
+ * claim content, so it is rejected before the signature check.
  *
  * @param tag - Context tag for error reporting
  * @param signer - Signer used for the cryptographic verification
- * @param claim - The assertion claim carrying `receipt` and `signature`
+ * @param claim - The assertion claim carrying `receipt`, `proof`, and
+ *   `signature`
  * @param pubKey - Hex public key of the claim-issuing gateway
+ * @param context - Binding context the signature must cover: the claim type,
+ *   the step tag of the protocol message carrying the claim, and the session
+ *   ID the claim was issued in
  * @throws {ClaimSignatureError} When the receipt or signature is missing or
  *   empty, the public key is missing, or the signature fails verification
  *
@@ -463,8 +474,9 @@ export function signatureVerifier(
 export function claimSignatureVerifier(
   tag: string,
   signer: JsObjectSigner,
-  claim: { receipt: string; signature: string } | undefined,
+  claim: { receipt: string; proof: string; signature: string } | undefined,
   pubKey: string | undefined,
+  context: AssertionClaimBindingContext,
 ): void {
   if (
     claim == undefined ||
@@ -478,7 +490,7 @@ export function claimSignatureVerifier(
   let valid: boolean;
   try {
     valid = signer.verify(
-      claim.receipt,
+      canonicalAssertionPayload(claim, context),
       new Uint8Array(Buffer.from(claim.signature, "hex")),
       new Uint8Array(Buffer.from(pubKey, "hex")),
     );
