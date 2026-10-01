@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790584067727,
+  "lastUpdate": 1790842549835,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -390,6 +390,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.54%",
             "unit": "ops/sec",
             "extra": "182 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Agrim",
+            "username": "AgrimTawani",
+            "email": "agrimtawani139@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "ba5c8750545bc7e57c25c40354e9c6f0522870ba",
+          "message": "test(test-tooling): add Canton LocalNet test ledger\n\nAddresses #4700\n\nSigned-off-by: Agrim <agrimtawani139@gmail.com>",
+          "timestamp": "2026-09-22T16:56:33Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/ba5c8750545bc7e57c25c40354e9c6f0522870ba"
+        },
+        "date": 1790842544999,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 612,
+            "range": "±4.16%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 623,
+            "range": "±1.92%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
