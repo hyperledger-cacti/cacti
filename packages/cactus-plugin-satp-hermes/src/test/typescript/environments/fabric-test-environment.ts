@@ -10,7 +10,6 @@ import {
 } from "../../../main/typescript/generated/gateway-client/typescript-axios";
 import {
   FABRIC_25_LTS_AIO_FABRIC_VERSION,
-  FABRIC_25_LTS_AIO_IMAGE_VERSION,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_1,
   FABRIC_25_LTS_FABRIC_SAMPLES_ENV_INFO_ORG_2,
   FabricTestLedgerV1,
@@ -49,7 +48,8 @@ import {
   FabricConfigJSON,
   TargetOrganization,
 } from "../../../main/typescript/services/validation/config-validating-functions/bridges-config-validating-functions/validate-fabric-config";
-// Test environment for Fabric ledger operations
+
+const SATP_FABRIC_AIO_IMAGE_VERSION = "v3.0.1-fixed";
 
 export interface IFabricTestEnvironment {
   contractName: string;
@@ -201,7 +201,7 @@ export class FabricTestEnvironment {
       emitContainerLogs: true,
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      imageVersion: SATP_FABRIC_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       networkName: this.dockerNetwork,
       logLevel: this.level,
@@ -444,6 +444,7 @@ export class FabricTestEnvironment {
       },
       claimFormats: [this.claimFormat],
       coreYamlFile: this.coreFile,
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
     } as INetworkOptions;
   }
 
@@ -573,6 +574,7 @@ export class FabricTestEnvironment {
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
       mspId: this.bridgeMSPID,
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       connectorOptions: {
         connectionProfile: await this.ledger.getConnectionProfileOrgX(
           "org2",
@@ -625,6 +627,7 @@ export class FabricTestEnvironment {
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
       mspId: this.bridgeMSPID,
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       connectorOptions: {
         instanceId: uuidv4(),
         pluginRegistry: this.pluginRegistryBridge,
@@ -806,6 +809,7 @@ export class FabricTestEnvironment {
       ccVersion: "1.0.0",
       sourceFiles: satpSourceFiles,
       ccName: this.satpContractName,
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       targetOrganizations: [
         {
           CORE_PEER_LOCALMSPID:
@@ -978,6 +982,9 @@ export class FabricTestEnvironment {
       ccVersion: "1.0.0",
       sourceFiles: oracleSourceFiles,
       ccName: this.satpContractName,
+      // See deployAndSetupContracts(): single-org endorsement policy to avoid
+      // ENDORSEMENT_POLICY_FAILURE flakiness (cacti issue #3978).
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       targetOrganizations: [
         {
           CORE_PEER_LOCALMSPID:

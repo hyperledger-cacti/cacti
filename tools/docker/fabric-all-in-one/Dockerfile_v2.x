@@ -135,7 +135,11 @@ RUN apk add --no-cache jq
 # The reason to jump trough these hoops is to speed up the boot time of the
 # container which won't have to download the images at container startup since
 # they'll have been cached already at build time.
-RUN curl -sSL https://raw.githubusercontent.com/moby/moby/dedf8528a51c6db40686ed6676e9486d1ed5f9c0/contrib/download-frozen-image-v2.sh > /download-frozen-image-v2.sh
+# The script is vendored (not curled from the moby repo) because the upstream
+# version's redirect detection predates HTTP/2 and silently freezes 0-byte
+# layers - see the header comment in the vendored file for the full story of
+# how that broke the v3.0.1 image.
+COPY download-frozen-image-v2.sh /download-frozen-image-v2.sh
 RUN chmod +x /download-frozen-image-v2.sh
 
 RUN mkdir -p /etc/hyperledger/fabric/fabric-peer/
@@ -157,6 +161,13 @@ RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-baseos/ hyperled
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-ca/ hyperledger/fabric-ca:${CA_VERSION}
 RUN /download-frozen-image-v2.sh /etc/hyperledger/fabric/fabric-couchdb/ hyperledger/fabric-couchdb:${COUCH_VERSION_FABRIC}
 RUN /download-frozen-image-v2.sh /etc/couchdb/ couchdb:${COUCH_VERSION}
+
+# Fail the build if any frozen image came out hollow (0-byte layers): the
+# boot script pipes these directories into `docker load`, which fails with
+# "unexpected end of JSON input" on empty layer archives - better to catch
+# that here than ship another unusable image (as happened with v3.0.1).
+RUN [ -z "$(find /etc/hyperledger/fabric /etc/couchdb -name layer.tar -size 0)" ] || \
+        (echo "ERROR: frozen image layers are empty; freezer script broken?" >&2; exit 1)
 
 # Download and execute the Fabric installation script, but instruct it with the -d
 # flag to avoid pulling docker images because during the build phase of this image
@@ -195,6 +206,23 @@ RUN yq '.services."peer0.org2.example.com".volumes += "../..:/opt/gopath/src/git
     --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
 RUN yq '.services."peer0.org2.example.com".volumes += "../../config/core.yaml:/etc/hyperledger/fabric/core.yaml"' \
     --inplace /fabric-samples/test-network/compose/docker/docker-compose-test-net.yaml
+
+# Pin the floating :latest image tags in the test-network compose files (and
+# the version checks in network.sh) to the exact Fabric versions pre-loaded
+# into this image via download-frozen-image-v2.sh. Without this, the embedded
+# docker compose pulls hyperledger/fabric-{peer,orderer,ca}:latest at container
+# start, which silently drifts with Docker Hub (Fabric 3.x as of 2026) instead
+# of using the frozen, binary-matching images — a version skew that breaks the
+# AIO boot under load and causes ENDORSEMENT_POLICY_FAILURE flakiness
+# (cacti issue #3978).
+RUN sed -i "s|hyperledger/fabric-peer:latest|hyperledger/fabric-peer:${FABRIC_VERSION}|g; \
+    s|hyperledger/fabric-orderer:latest|hyperledger/fabric-orderer:${FABRIC_VERSION}|g; \
+    s|hyperledger/fabric-ca:latest|hyperledger/fabric-ca:${CA_VERSION}|g; \
+    s|couchdb:3.3.3|couchdb:${COUCH_VERSION}|g" \
+    /fabric-samples/test-network/compose/*.yaml \
+    /fabric-samples/test-network/compose/docker/*.yaml \
+    /fabric-samples/test-network/network.sh
+RUN grep -rn ":latest" /fabric-samples/test-network/compose/ /fabric-samples/test-network/network.sh || true
 
 
 # Install supervisord because we need to run the docker daemon and also the fabric network

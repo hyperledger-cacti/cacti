@@ -1,4 +1,3 @@
-// SKIPPED: Fabric AIO channel-join timeout — see docs/fabric-tests-to-fix.md
 import "jest-extended";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import {
@@ -129,7 +128,22 @@ afterEach(async () => {
 });
 
 beforeAll(async () => {
-  // Fabric setup skipped — all Fabric describe blocks are describe.skip
+  try {
+    const satpContractName = "satp-contract";
+    fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
+      contractName: satpContractName,
+      claimFormat: ClaimFormat.BUNGEE,
+      logLevel,
+    });
+    log.info("Fabric Ledger started successfully");
+    await fabricEnv.deployAndSetupContracts();
+  } catch (err) {
+    log.warn(
+      "Fabric ledger failed to start, non-Fabric tests will proceed.",
+      err,
+    );
+    fabricEnv = undefined as unknown as FabricTestEnvironment;
+  }
 
   {
     const erc20TokenContract = "SATPContract";
@@ -176,7 +190,7 @@ beforeAll(async () => {
   }
 }, TIMEOUT);
 
-describe.skip("2 SATPGateways sending a token from Besu to Fabric", () => {
+describe("2 SATPGateways sending a token from Besu to Fabric", () => {
   jest.setTimeout(TIMEOUT);
   it("should mint 100 tokens to the owner account", async () => {
     await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
@@ -412,7 +426,7 @@ describe.skip("2 SATPGateways sending a token from Besu to Fabric", () => {
   });
 });
 
-describe.skip("2 SATPGateways sending a token from Fabric to Besu", () => {
+describe("2 SATPGateways sending a token from Fabric to Besu", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     //setup satp gateway

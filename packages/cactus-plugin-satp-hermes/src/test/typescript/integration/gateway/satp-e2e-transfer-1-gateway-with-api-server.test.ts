@@ -1,4 +1,3 @@
-// SKIPPED: Fabric AIO channel-join timeout — see docs/fabric-tests-to-fix.md
 import "jest-extended";
 import { LogLevelDesc, LoggerProvider } from "@hyperledger-cacti/cactus-common";
 import { v4 as uuidv4 } from "uuid";
@@ -199,7 +198,7 @@ beforeEach(() => {
 }, TIMEOUT);
 
 beforeAll(async () => {
-  /*   try {
+  try {
     const satpContractName = "satp-contract";
     fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
       contractName: satpContractName,
@@ -214,7 +213,7 @@ beforeAll(async () => {
       err,
     );
     fabricEnv = undefined as unknown as FabricTestEnvironment;
-  } */
+  }
 
   {
     const erc20TokenContract = "SATPContract";
@@ -261,7 +260,7 @@ beforeAll(async () => {
   }
 }, TIMEOUT);
 
-describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
+describe("SATPGateway sending a token from Besu to Fabric", () => {
   jest.setTimeout(TIMEOUT);
   it("should mint 100 tokens to the owner account", async () => {
     await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
@@ -444,7 +443,7 @@ describe.skip("SATPGateway sending a token from Besu to Fabric", () => {
     await gateway.shutdown();
   });
 });
-describe.skip("SATPGateway sending a token from Fabric to Besu", () => {
+describe("SATPGateway sending a token from Fabric to Besu", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     //setup satp gateway

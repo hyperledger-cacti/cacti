@@ -404,6 +404,7 @@ export class FabricLeaf
           this.orderer = options.orderer;
           this.ordererTLSHostnameOverride = options.ordererTLSHostnameOverride;
           this.mspId = options.mspId;
+          this.signaturePolicy = options.signaturePolicy;
         } else {
           throw new InvalidWrapperContract(
             `${FabricLeaf.CLASS_NAME}#constructor, Missing variables necessary to deploy the Wrapper Contract, given: ${safeStableStringify(options)}`,
