@@ -294,6 +294,13 @@ export function populateClientSessionData(
   }
   sessionData.version = version;
   sessionData.digitalAssetId = uuidv4();
+  // draft-16: assetProfileId, verifiedOriginatorEntityId and
+  // verifiedBeneficiaryEntityId are required TransferInitClaims fields; the
+  // gateway acts as its own verification authority here, deriving the
+  // originator/beneficiary identities from the transact request asset owners.
+  sessionData.assetProfileId = uuidv4();
+  sessionData.verifiedOriginatorEntityId = sourceOwner;
+  sessionData.verifiedBeneficiaryEntityId = receiverOwner;
   sessionData.clientGatewayPubkey = clientGatewayPubkey;
   sessionData.serverGatewayPubkey = serverGatewayPubkey;
   sessionData.receiverGatewayOwnerId = receiverGatewayOwnerId;

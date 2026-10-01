@@ -49,7 +49,15 @@ import {
   FabricConfigJSON,
   TargetOrganization,
 } from "../../../main/typescript/services/validation/config-validating-functions/bridges-config-validating-functions/validate-fabric-config";
-// Test environment for Fabric ledger operations
+
+// The SATP suites share the fabric2 AIO image version that every other
+// fabric test in the monorepo runs against. The v3.0.1 image was published
+// with hollow "frozen" image directories (the image-freezer script produced
+// layer stubs without blobs), so its `tar | docker load` boot step fails
+// with "unexpected end of JSON input" and the fabric network can never
+// start; v2.1.0 freezes the same Fabric 2.5.6 images with full layer
+// content and boots reliably.
+const SATP_FABRIC_AIO_IMAGE_VERSION = FABRIC_25_LTS_AIO_IMAGE_VERSION;
 
 export interface IFabricTestEnvironment {
   contractName: string;
@@ -201,7 +209,7 @@ export class FabricTestEnvironment {
       emitContainerLogs: true,
       publishAllPorts: true,
       imageName: DEFAULT_FABRIC_2_AIO_IMAGE_NAME,
-      imageVersion: FABRIC_25_LTS_AIO_IMAGE_VERSION,
+      imageVersion: SATP_FABRIC_AIO_IMAGE_VERSION,
       envVars: new Map([["FABRIC_VERSION", FABRIC_25_LTS_AIO_FABRIC_VERSION]]),
       networkName: this.dockerNetwork,
       logLevel: this.level,
@@ -444,6 +452,9 @@ export class FabricTestEnvironment {
       },
       claimFormats: [this.claimFormat],
       coreYamlFile: this.coreFile,
+      // Single-org endorsement policy for the leaf-deployed contracts (the
+      // SATP wrapper); see createFabricDockerConfig() for the rationale.
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
     } as INetworkOptions;
   }
 
@@ -573,6 +584,11 @@ export class FabricTestEnvironment {
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
       mspId: this.bridgeMSPID,
+      // Single-org endorsement policy for the leaf-deployed contracts (the
+      // SATP wrapper); the default MAJORITY policy requires both orgs to
+      // endorse every transaction and intermittently fails with
+      // ENDORSEMENT_POLICY_FAILURE under CI load (cacti issue #3978).
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       connectorOptions: {
         connectionProfile: await this.ledger.getConnectionProfileOrgX(
           "org2",
@@ -625,6 +641,9 @@ export class FabricTestEnvironment {
       ordererTLSHostnameOverride: "orderer.example.com",
       connTimeout: 60,
       mspId: this.bridgeMSPID,
+      // Single-org endorsement policy for the wrapper contract this leaf
+      // deploys (see createFabricDockerConfig above for the rationale).
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       connectorOptions: {
         instanceId: uuidv4(),
         pluginRegistry: this.pluginRegistryBridge,
@@ -806,6 +825,13 @@ export class FabricTestEnvironment {
       ccVersion: "1.0.0",
       sourceFiles: satpSourceFiles,
       ccName: this.satpContractName,
+      // Deploy with a loose endorsement policy (a single org endorsement is
+      // enough) instead of the default MAJORITY policy, which requires BOTH
+      // orgs to endorse every transaction and intermittently fails with
+      // ENDORSEMENT_POLICY_FAILURE when one peer is slow under CI load
+      // (cacti issue #3978). The AIO image does the same for its own sample
+      // chaincode (CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP).
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       targetOrganizations: [
         {
           CORE_PEER_LOCALMSPID:
@@ -978,6 +1004,9 @@ export class FabricTestEnvironment {
       ccVersion: "1.0.0",
       sourceFiles: oracleSourceFiles,
       ccName: this.satpContractName,
+      // See deployAndSetupContracts(): single-org endorsement policy to avoid
+      // ENDORSEMENT_POLICY_FAILURE flakiness (cacti issue #3978).
+      signaturePolicy: "OR('Org1MSP.member','Org2MSP.member')",
       targetOrganizations: [
         {
           CORE_PEER_LOCALMSPID:

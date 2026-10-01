@@ -731,6 +731,12 @@ export class BesuTestEnvironment {
     amount: string,
     signingCredential: Web3SigningCredential,
   ): Promise<void> {
+    // Attribution log: on failure this identifies exactly which token
+    // contract and which account (e.g. which bridge wrapper) was queried,
+    // so the balance can be correlated with the lock/burn transactions.
+    this.log.info(
+      `checkBalance: token=${contract_address} account=${account} expected=${amount}`,
+    );
     const responseBalanceBridge = await this.connector.invokeContract({
       contractName: contract_name,
       contractAddress: contract_address,

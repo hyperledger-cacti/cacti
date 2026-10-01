@@ -129,7 +129,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -179,7 +179,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -224,7 +224,7 @@ jobs:
         
         - uses: ./.github/actions/docker-pull/
           with:
-            image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+            image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
         
         - uses: ./.github/actions/docker-pull/
           with:
@@ -254,7 +254,10 @@ jobs:
   run-satp-tests-integration-gateway:
     runs-on: ubuntu-22.04
     continue-on-error: true
-    timeout-minutes: 60
+    # The re-enabled fabric suites add several multi-minute fabric AIO boots
+    # per test file; 60 minutes no longer covers the full gateway matrix and
+    # the job was being killed (a timed-out job reports as "cancelled").
+    timeout-minutes: 120
     permissions:
       actions: read
       checks: write
@@ -274,7 +277,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -310,7 +313,9 @@ jobs:
   run-satp-tests-integration-docker:
     runs-on: ubuntu-22.04
     continue-on-error: true
-    timeout-minutes: 60
+    # See run-satp-tests-integration-gateway: the fabric suites push the
+    # docker job past the previous 60-minute ceiling.
+    timeout-minutes: 120
     permissions:
       actions: read
       checks: write
@@ -330,7 +335,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -432,7 +437,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
       
       - uses: ./.github/actions/docker-pull/
         with:
@@ -482,7 +487,7 @@ jobs:
       
       - uses: ./.github/actions/docker-pull/
         with:
-          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v3.0.0
+          image: ghcr.io/hyperledger-cacti/cactus-fabric2-all-in-one:v2.1.0
       
       - uses: ./.github/actions/docker-pull/
         with:
