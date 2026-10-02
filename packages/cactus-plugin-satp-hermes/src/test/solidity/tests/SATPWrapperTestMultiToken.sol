@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.21;
 
 import { SATPWrapperContract, InteractionSignature, InteractionType, AssetParameterIdentifier, TokenType, Token, ERCTokenStandard } from "../../../main/solidity/contracts/SATPWrapperContract.sol";
 import { SATMultiTokenContract } from "../contracts/SATMultiTokenContract.sol";

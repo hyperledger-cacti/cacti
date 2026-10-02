@@ -225,8 +225,7 @@ OpenAPI source: `src/main/yml/bol/oapi-api1.yml` (not `openapi.json`).
 | `jest.config-integration-bridge.ts` | Bridge tests | `test:integration:bridge` |
 | `jest.config-integration-docker.ts` | Docker-based tests | `test:integration:docker` |
 
-Additional scoped scripts: `test:integration:adapter`,
-`test:integration:recovery`, `test:integration:rollback`.
+Additional scoped scripts: `test:integration:adapter`.
 
 ### Running Tests
 

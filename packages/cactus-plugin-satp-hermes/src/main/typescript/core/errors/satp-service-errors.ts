@@ -48,7 +48,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} SATP Core Specification
  * @see {@link SATPInternalError} for base error functionality
  * @see {@link SATPErrorType} for protocol error type enumeration
  *
@@ -58,7 +58,8 @@
  */
 
 import { SATPInternalError } from "./satp-errors";
-import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType } from "./satp-error-type";
+import { MessageType } from "../../generated/proto/cacti/satp/v13/common/message_pb";
 
 /**
  * Error thrown when SATP message common body is missing or malformed.
@@ -914,6 +915,36 @@ export class SequenceNumberError extends SATPInternalError {
 }
 
 /**
+ * Error thrown when a message replayed from the session's past is received:
+ * the session has already progressed beyond the message's position in the
+ * protocol sequence, so processing it again would violate the one-message-
+ * per-exchange invariant and could re-trigger ledger operations.
+ *
+ * **SATP Error Type:** MESSAGE_OUT_OF_SEQUENCE - Protocol sequence violation
+ * **HTTP Status:** 400 Bad Request - Protocol flow error
+ *
+ * @class ReplayedMessageError
+ * @extends SATPInternalError
+ * @since 3.1.0
+ */
+export class ReplayedMessageError extends SATPInternalError {
+  constructor(
+    tag: string,
+    received: MessageType,
+    laterMessageType: MessageType,
+    cause?: string | Error | null,
+  ) {
+    super(
+      `${tag}, replayed message: ${MessageType[received]} was already superseded ` +
+        `by ${MessageType[laterMessageType]}, which this session has already processed`,
+      cause ?? null,
+      400,
+    );
+    this.errorType = SATPErrorType.MESSAGE_OUT_OF_SEQUENCE;
+  }
+}
+
+/**
  * Error thrown when cryptographic hashes don't match expected values.
  *
  * @description
@@ -1301,6 +1332,28 @@ export class WrapAssertionClaimError extends SATPInternalError {
 }
 
 /**
+ * Error thrown when an assertion-claim signature is missing or invalid.
+ *
+ * @description
+ * Assertion claims (wrap/lock/mint/burn/assignment) carry a signature
+ * produced by the claim-issuing gateway over the claim's receipt. This
+ * durable, message-independent signature exists so the claim remains
+ * provable after transport, for dispute resolution and audit. This error
+ * is raised when that signature is absent or fails verification against
+ * the issuing gateway's public key stored in the session.
+ *
+ * @class ClaimSignatureError
+ * @extends SATPInternalError
+ * @since 3.1.0
+ */
+export class ClaimSignatureError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(`${tag}, claim signature missing or invalid`, cause ?? null, 400);
+    this.errorType = SATPErrorType.SIGNATURE_VERIFICATION_FAILED;
+  }
+}
+
+/**
  * Error thrown when token ID is missing.
  *
  * @description
@@ -1407,5 +1460,55 @@ export class PubKeyError extends SATPInternalError {
   constructor(tag: string, cause?: string | Error | null) {
     super(`${tag}, PubKey is missing`, cause ?? null, 400);
     this.errorType = SATPErrorType.PUBLIC_KEY_NOT_FOUND;
+  }
+}
+
+/**
+ * Error thrown when per-message hashPrevMessage does not match expected value.
+ *
+ * In v13, `hashPrevMessage` is a per-message field (not in CommonSatp).
+ * Each incoming message must carry the SHA-256 hash of the previous
+ * message in the session to ensure chain integrity.
+ *
+ * @class HashPrevMessageError
+ * @extends SATPInternalError
+ * @since 2.1.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} Sections 8–10
+ */
+export class HashPrevMessageError extends SATPInternalError {
+  constructor(
+    tag: string,
+    received: string,
+    expected: string,
+    cause?: string | Error | null,
+  ) {
+    super(
+      `${tag}, hashPrevMessage mismatch\n received: ${received}\n expected: ${expected}`,
+      cause ?? null,
+      400,
+    );
+    this.errorType = SATPErrorType.BADLY_FORMATED_MESSAGE_MISMATCH_HASH_VALUES;
+  }
+}
+
+/**
+ * Error thrown when a required transferContextId is missing from a v13 message.
+ *
+ * In v13, `transferContextId` is REQUIRED in CommonSatp and is validated
+ * as a mandatory field — an empty or missing value is a protocol violation.
+ *
+ * @class MissingTransferContextIdError
+ * @extends SATPInternalError
+ * @since 2.1.0
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} Section 7
+ */
+export class MissingTransferContextIdError extends SATPInternalError {
+  constructor(tag: string, cause?: string | Error | null) {
+    super(
+      `${tag}, transferContextId is REQUIRED but missing or empty`,
+      cause ?? null,
+      400,
+    );
+    this.errorType = SATPErrorType.CONTEXT_ID_MISS_MATCH;
   }
 }

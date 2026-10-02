@@ -1,0 +1,58 @@
+syntax = "proto3";
+package cacti.satp.v13.service;
+
+import "cacti/satp/v13/common/message.proto";
+
+// ── Commit Preparation Request (v13 Section 10.1) ──────
+
+message CommitPreparationRequest {
+  cacti.satp.v13.common.CommonSatp common = 1;
+  string hash_prev_message = 2;             
+}
+
+// ── Commit Ready Response (v13 Section 10.2) ───────────
+
+message CommitPreparationResponse {
+  cacti.satp.v13.common.CommonSatp common = 1;
+  cacti.satp.v13.common.MintAssertionClaim mint_assertion_claim = 2;
+  cacti.satp.v13.common.MintAssertionClaimFormat mint_assertion_claim_format = 3;
+  string hash_prev_message = 4;             
+}
+
+// ── Commit Final Assertion Request (v13 Section 10.3) ──
+
+message CommitFinalAssertionRequest {
+  cacti.satp.v13.common.CommonSatp common = 1;
+  cacti.satp.v13.common.BurnAssertionClaim burn_assertion_claim = 2;
+  cacti.satp.v13.common.BurnAssertionClaimFormat burn_assertion_claim_format = 3;
+  string hash_prev_message = 4;             
+}
+
+// ── Commit Final Acknowledgement Receipt (v13 Section 10.4) ──
+
+message CommitFinalAssertionResponse {
+  cacti.satp.v13.common.CommonSatp common = 1;
+  cacti.satp.v13.common.AssignmentAssertionClaim assignment_assertion_claim = 2;
+  cacti.satp.v13.common.AssignmentAssertionClaimFormat assignment_assertion_claim_format = 3;
+  string hash_prev_message = 4;             
+}
+
+// ── Transfer Complete Request (v13 Section 10.5) ────────
+
+message TransferCompleteRequest {
+  cacti.satp.v13.common.CommonSatp common = 1;
+  string hash_transfer_commence = 2;        // hashTransferCommence — REQUIRED
+  string hash_prev_message = 3;             
+}
+
+// ── Transfer Complete Response ──────────────────────────
+
+message TransferCompleteResponse {
+  cacti.satp.v13.common.CommonSatp common = 1;
+}
+
+service SatpStage3Service {
+  rpc CommitPreparation(CommitPreparationRequest) returns (CommitPreparationResponse) {}
+  rpc CommitFinalAssertion(CommitFinalAssertionRequest) returns (CommitFinalAssertionResponse) {}
+  rpc TransferComplete(TransferCompleteRequest) returns (TransferCompleteResponse) {}
+}

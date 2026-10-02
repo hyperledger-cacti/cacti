@@ -31,4 +31,5 @@ typedoc/** */
 docs/assets/diagrams
 tmp/
 out/**/*
-
+**/*.sqlite
+reports/test-*.out

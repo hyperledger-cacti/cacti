@@ -19,7 +19,7 @@ import {
 } from "@hyperledger-cacti/cactus-core";
 import { SATPInternalError } from "../../core/errors/satp-errors";
 import { getEnumKeyByValue } from "../../services/utils";
-import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType } from "../../core/errors/satp-error-type";
 import { GetApproveAddressRequestTokenTypeEnum } from "../../public-api";
 
 export class GetApproveAddressEndpointV1 implements IWebServiceEndpoint {

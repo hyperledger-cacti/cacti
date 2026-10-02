@@ -1,4 +1,4 @@
-import { AuditEntry, LocalLog, RemoteLog } from "../core/types";
+import { AuditEntry, LocalLog, RemoteLog, SessionProof } from "../core/types";
 import {
   IAuditEntryRepository,
   ILocalLogRepository,
@@ -107,6 +107,7 @@ export class GatewayPersistence {
           auditEntryId: uuidv4(),
           session: localLog,
           timestamp: Date.now(),
+          proofs: [],
         };
 
         await this.storeInDatabase(localLog, auditEntry);
@@ -156,6 +157,7 @@ export class GatewayPersistence {
           auditEntryId: `audit-${Date.now()}-${logEntry.sessionId}`,
           session: localLog,
           timestamp: Date.now(),
+          proofs: [],
         };
         await this.storeInDatabase(localLog, auditEntry);
 
@@ -163,6 +165,58 @@ export class GatewayPersistence {
 
         this.log.debug(`${fnTag} - generated hash: ${hash}`);
         await this.storeRemoteLog(localLog.key, hash);
+      } catch (err) {
+        span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
+        span.recordException(err);
+        throw err;
+      } finally {
+        span.end();
+      }
+    });
+  }
+
+  /**
+   * Persist a signature-verified session proof (signed protocol claim) in
+   * the audit database so it stays provable for dispute resolution and audit
+   * after transport ends.
+   *
+   * Defensively validates the proof before persisting: a proof without a
+   * session ID, step tag or signature would be unusable as evidence, so it
+   * is rejected instead of silently written. Persisting the same proof more
+   * than once (e.g. after a retry) does not create duplicate rows.
+   *
+   * @param proof - The SessionProof to persist (sessionId, step, claim, signedClaim)
+   * @throws Error if the proof is missing required fields
+   */
+  public async persistSessionProof(proof: SessionProof): Promise<void> {
+    const fnTag = `${GatewayPersistence.CLASS_NAME}#persistSessionProof()`;
+    const { span, context: ctx } = this.monitorService.startSpan(fnTag);
+    await context.with(ctx, async () => {
+      try {
+        if (!proof || !proof.sessionId) {
+          throw new Error(`${fnTag} - rejecting proof: sessionId is required`);
+        }
+        if (!proof.step || !proof.step.tag) {
+          throw new Error(
+            `${fnTag} - rejecting proof for session ${proof.sessionId}: step tag is required`,
+          );
+        }
+        if (!proof.claim) {
+          throw new Error(
+            `${fnTag} - rejecting proof for session ${proof.sessionId} at step ${proof.step.tag}: claim is required`,
+          );
+        }
+        if (!proof.signedClaim) {
+          throw new Error(
+            `${fnTag} - rejecting proof for session ${proof.sessionId} at step ${proof.step.tag}: signature (signedClaim) is required`,
+          );
+        }
+
+        this.log.info(
+          `${fnTag} - Persisting session proof for sessionId: ${proof.sessionId}, step: ${proof.step.tag}`,
+        );
+
+        await this.auditRepository.createProof(proof);
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
