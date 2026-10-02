@@ -1,0 +1,75 @@
+{
+  "name": "@hyperledger-cacti/cacti-plugin-ledger-connector-canton",
+  "version": "3.0.1",
+  "description": "Allows Cacti nodes to connect to a Canton ledger.",
+  "keywords": [
+    "Hyperledger",
+    "Cacti",
+    "Canton",
+    "Daml",
+    "Distributed Ledger Technology"
+  ],
+  "homepage": "https://github.com/hyperledger-cacti/cacti#readme",
+  "bugs": {
+    "url": "https://github.com/hyperledger-cacti/cacti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyperledger-cacti/cacti.git"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "Hyperledger Cacti Contributors",
+    "email": "cacti@lists.lfdecentralizedtrust.org",
+    "url": "https://www.lfdecentralizedtrust.org/projects/cacti"
+  },
+  "main": "dist/lib/main/typescript/index.js",
+  "module": "dist/lib/main/typescript/index.js",
+  "browser": "dist/cacti-plugin-ledger-connector-canton.web.umd.js",
+  "types": "dist/lib/main/typescript/index.d.ts",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "codegen": "yarn run --top-level run-s 'codegen:*'",
+    "codegen:openapi": "npm run generate-sdk",
+    "generate-sdk": "run-s 'generate-sdk:*'",
+    "generate-sdk:typescript-axios": "openapi-generator-cli generate -i ./src/main/json/openapi.json -g typescript-axios -o ./src/main/typescript/generated/openapi/typescript-axios/ --reserved-words-mappings protected=protected --ignore-file-override ../../openapi-generator-ignore",
+    "watch": "npm-watch",
+    "webpack": "npm-run-all webpack:dev",
+    "webpack:dev": "npm-run-all webpack:dev:node webpack:dev:web",
+    "webpack:dev:node": "webpack --env=dev --target=node --config ../../webpack.config.js",
+    "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
+  },
+  "dependencies": {
+    "@canton-network/wallet-sdk": "1.5.1",
+    "@hyperledger-cacti/cactus-common": "3.0.1",
+    "@hyperledger-cacti/cactus-core": "3.0.1",
+    "@hyperledger-cacti/cactus-core-api": "3.0.1",
+    "axios": "1.18.1",
+    "express": "5.1.0",
+    "http-errors-enhanced-cjs": "2.0.1"
+  },
+  "devDependencies": {
+    "@hyperledger-cacti/cactus-test-tooling": "3.0.1",
+    "@types/express": "5.0.1",
+    "jest-extended": "7.0.0",
+    "npm-run-all2": "6.1.2"
+  },
+  "engines": {
+    "node": ">=18",
+    "npm": ">=8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "browserMinified": "dist/cacti-plugin-ledger-connector-canton.web.umd.min.js",
+  "mainMinified": "dist/cacti-plugin-ledger-connector-canton.node.umd.min.js",
+  "watch": {
+    "codegen:openapi": {
+      "patterns": [
+        "./src/main/json/openapi.json"
+      ]
+    }
+  }
+}

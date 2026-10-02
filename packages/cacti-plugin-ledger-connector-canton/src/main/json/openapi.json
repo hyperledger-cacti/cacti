@@ -1,0 +1,616 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cacti Plugin - Connector Canton",
+    "description": "Submits Daml commands and queries active contracts on Canton through the Wallet SDK.",
+    "version": "3.0.1",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerTokenAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JSON Web Token"
+      }
+    },
+    "schemas": {
+      "DamlValue": {
+        "nullable": true,
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DamlValue"
+                }
+              ],
+              "nullable": true
+            }
+          },
+          {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/DamlValue"
+                }
+              ],
+              "nullable": true
+            }
+          },
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      },
+      "DamlRecord": {
+        "type": "object",
+        "additionalProperties": {
+          "allOf": [
+            {
+              "$ref": "#/components/schemas/DamlValue"
+            }
+          ],
+          "nullable": true
+        }
+      },
+      "CantonCreateCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["CreateCommand"],
+        "properties": {
+          "CreateCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["templateId", "createArguments"],
+            "properties": {
+              "templateId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "createArguments": {
+                "$ref": "#/components/schemas/DamlRecord"
+              }
+            }
+          }
+        }
+      },
+      "CantonExerciseCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ExerciseCommand"],
+        "properties": {
+          "ExerciseCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "templateId",
+              "contractId",
+              "choice",
+              "choiceArgument"
+            ],
+            "properties": {
+              "templateId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "contractId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "choice": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "choiceArgument": {
+                "$ref": "#/components/schemas/DamlValue"
+              }
+            }
+          }
+        }
+      },
+      "CantonCreateAndExerciseCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["CreateAndExerciseCommand"],
+        "properties": {
+          "CreateAndExerciseCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "templateId",
+              "createArguments",
+              "choice",
+              "choiceArgument"
+            ],
+            "properties": {
+              "templateId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "createArguments": {
+                "$ref": "#/components/schemas/DamlRecord"
+              },
+              "choice": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "choiceArgument": {
+                "$ref": "#/components/schemas/DamlValue"
+              }
+            }
+          }
+        }
+      },
+      "CantonCommand": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CantonCreateCommand"
+          },
+          {
+            "$ref": "#/components/schemas/CantonExerciseCommand"
+          },
+          {
+            "$ref": "#/components/schemas/CantonCreateAndExerciseCommand"
+          }
+        ]
+      },
+      "RunTransactionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["partyId", "commands"],
+        "properties": {
+          "partyId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "commands": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "description": "The serialized command payload is limited to 1 MiB and 64 nesting levels by the connector.",
+            "items": {
+              "$ref": "#/components/schemas/CantonCommand"
+            }
+          },
+          "commandId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "synchronizerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "readAs": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          }
+        }
+      },
+      "RunTransactionResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["updateId", "completionOffset"],
+        "properties": {
+          "updateId": {
+            "type": "string"
+          },
+          "completionOffset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "GetActiveContractsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["parties"],
+        "not": {
+          "required": ["templateIds", "interfaceIds"]
+        },
+        "properties": {
+          "parties": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "templateIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "interfaceIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100
+          }
+        }
+      },
+      "ActiveContract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contractId",
+          "templateId",
+          "createArgument",
+          "witnessParties",
+          "signatories",
+          "createdAt",
+          "synchronizerId"
+        ],
+        "properties": {
+          "contractId": {
+            "type": "string"
+          },
+          "templateId": {
+            "type": "string"
+          },
+          "createArgument": {
+            "$ref": "#/components/schemas/DamlRecord"
+          },
+          "witnessParties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "signatories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "observers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "synchronizerId": {
+            "type": "string"
+          }
+        }
+      },
+      "GetActiveContractsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contracts"],
+        "properties": {
+          "contracts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActiveContract"
+            }
+          }
+        }
+      },
+      "ListPartiesResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["parties"],
+        "properties": {
+          "parties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction": {
+      "post": {
+        "security": [
+          {
+            "bearerTokenAuth": ["write:canton-transactions"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction"
+          }
+        },
+        "operationId": "runTransactionV1",
+        "summary": "Submits Daml commands for a Canton-hosted party.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The commands were committed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunTransactionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transaction request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller or connector is not authorized for the requested Canton party.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The transaction payload exceeds the connector limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton transaction operation timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton transaction submission failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts": {
+      "post": {
+        "security": [
+          {
+            "bearerTokenAuth": ["read:canton-contracts"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts"
+          }
+        },
+        "operationId": "getActiveContractsV1",
+        "summary": "Returns active Canton contracts visible to the requested parties.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetActiveContractsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matching active contracts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetActiveContractsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid contract query.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller or connector is not authorized for the requested Canton party.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton contract query timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton contract query failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties": {
+      "get": {
+        "security": [
+          {
+            "bearerTokenAuth": ["read:canton-parties"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties"
+          }
+        },
+        "operationId": "listPartiesV1",
+        "summary": "Lists Canton parties available to the authenticated user.",
+        "responses": {
+          "200": {
+            "description": "Available Canton parties.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListPartiesResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton party query timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton party lookup failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec": {
+      "get": {
+        "security": [
+          {
+            "bearerTokenAuth": ["read:canton-spec"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec"
+          }
+        },
+        "operationId": "getOpenApiSpecV1",
+        "summary": "Returns the connector OpenAPI specification.",
+        "responses": {
+          "200": {
+            "description": "The connector OpenAPI specification.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
