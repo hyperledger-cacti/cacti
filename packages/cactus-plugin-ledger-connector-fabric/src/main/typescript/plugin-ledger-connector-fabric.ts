@@ -55,6 +55,7 @@ import {
   Checks,
   LogLevelDesc,
   LoggerProvider,
+  safeStringifyException,
 } from "@hyperledger-cacti/cactus-common";
 
 import OAS from "../json/openapi.json";
@@ -829,22 +830,41 @@ export class PluginLedgerConnectorFabric
           logLevel: this.opts.logLevel,
         });
         this.runningWatchBlocksMonitors.add(monitor);
-        await monitor.subscribe(
-          options,
-          await this.createGatewayWithOptions(options.gatewayOptions),
-        );
-        this.log.debug(
-          "Running monitors count:",
-          this.runningWatchBlocksMonitors.size,
-        );
 
-        socket.on("disconnect", () => {
+        const onDisconnect = () => {
           this.runningWatchBlocksMonitors.delete(monitor);
           this.log.debug(
             "Running monitors count:",
             this.runningWatchBlocksMonitors.size,
           );
-        });
+        };
+        socket.on("disconnect", onDisconnect);
+
+        let gateway: Gateway | undefined;
+        try {
+          gateway = await this.createGatewayWithOptions(options.gatewayOptions);
+          await monitor.subscribe(options, gateway);
+        } catch (error) {
+          this.runningWatchBlocksMonitors.delete(monitor);
+          socket.off("disconnect", onDisconnect);
+          if (gateway) {
+            try {
+              gateway.disconnect();
+            } catch (gwErr) {
+              this.log.warn("Failed to disconnect gateway after error:", gwErr);
+            }
+          }
+          const errorMessage = safeStringifyException(error);
+          this.log.warn(errorMessage);
+          socket.emit(WatchBlocksV1.Error, {
+            code: 500,
+            errorMessage,
+          });
+        }
+        this.log.debug(
+          "Running monitors count:",
+          this.runningWatchBlocksMonitors.size,
+        );
       },
     );
 
@@ -867,31 +887,57 @@ export class PluginLedgerConnectorFabric
         });
         this.runningWatchBlocksMonitors.add(monitor);
 
-        const { channel, userIdCtx } = await this.getFabricClientWithoutSigner(
-          options.channelName,
-          options.signerCertificate,
-          options.signerMspID,
-          options.uniqueTransactionData,
-        );
-
-        await monitor.SubscribeDelegatedSign(
-          options,
-          channel,
-          userIdCtx,
-          this.signCallback.bind(this),
-        );
-        this.log.debug(
-          "Running monitors count:",
-          this.runningWatchBlocksMonitors.size,
-        );
-
-        socket.on("disconnect", () => {
+        const onDisconnect = () => {
           this.runningWatchBlocksMonitors.delete(monitor);
           this.log.debug(
             "Running monitors count:",
             this.runningWatchBlocksMonitors.size,
           );
-        });
+        };
+        socket.on("disconnect", onDisconnect);
+
+        let channel: Channel | undefined;
+        try {
+          const clientData = await this.getFabricClientWithoutSigner(
+            options.channelName,
+            options.signerCertificate,
+            options.signerMspID,
+            options.uniqueTransactionData,
+          );
+          channel = clientData.channel;
+
+          await monitor.SubscribeDelegatedSign(
+            options,
+            channel,
+            clientData.userIdCtx,
+            this.signCallback.bind(this),
+          );
+        } catch (error) {
+          this.runningWatchBlocksMonitors.delete(monitor);
+          socket.off("disconnect", onDisconnect);
+          if (channel) {
+            try {
+              channel.close();
+            } catch (err) {
+              this.log.warn("Failed to close channel after error:", err);
+            }
+            try {
+              channel.client?.close();
+            } catch (err) {
+              this.log.warn("Failed to close channel client after error:", err);
+            }
+          }
+          const errorMessage = safeStringifyException(error);
+          this.log.error(errorMessage);
+          socket.emit(WatchBlocksV1.Error, {
+            code: 500,
+            errorMessage,
+          });
+        }
+        this.log.debug(
+          "Running monitors count:",
+          this.runningWatchBlocksMonitors.size,
+        );
       },
     );
 
