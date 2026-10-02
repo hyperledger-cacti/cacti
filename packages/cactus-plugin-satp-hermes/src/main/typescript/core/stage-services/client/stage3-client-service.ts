@@ -810,6 +810,16 @@ export class Stage3ClientService extends SATPService {
             this.claimFormat,
           );
 
+          // Attribution log: see Stage2ClientService#lockAsset — names the
+          // network whose leaf executes the on-chain burn.
+          this.Log.info(
+            `${fnTag}, burnAsset executing for network ` +
+              `${safeStableStringify(tokenBuildData.networkId)} ` +
+              `(session sender network: ${safeStableStringify(
+                sessionData.senderAsset?.networkId,
+              )}, session id: ${sessionData.id})`,
+          );
+
           sessionData.burnAssertionClaim = create(BurnAssertionClaimSchema, {});
 
           const res = await bridge.burnAsset(tokenBuildData.token);

@@ -1529,6 +1529,49 @@ export class FabricTestLedgerV1 implements ITestLedger {
 
     const createOptions: ContainerCreateOptions = {
       name: this.testLedgerId,
+      // Two defects of the AIO image are patched at container start, because
+      // they cannot be fixed without rebuilding the published image:
+      //
+      // 1. Startup race: the image's /run-fabric-network.sh starts piping
+      //    image tarballs into `docker load` the instant supervisord spawns
+      //    it, but the embedded docker daemon has not necessarily created
+      //    /var/run/docker.sock yet (on loaded CI runners it regularly is
+      //    not). With `set -e` the failed pipe aborts the script, and after
+      //    supervisord exhausts its start retries the program goes fatal -
+      //    the fabric network never boots and the test times out. The
+      //    entrypoint injects a wait-for-daemon loop right after `set -e`.
+      // 2. Floating image tags: the fabric-samples compose files bundled in
+      //    the image reference hyperledger/fabric-{peer,orderer,ca}:latest.
+      //    The image pre-loads the pinned Fabric images (e.g. 2.5.6) via
+      //    `docker load`, but because compose asks for `:latest` it ignores
+      //    them and pulls the current latest (Fabric 3.x as of 2026), which
+      //    does not match the 2.x CLI binaries baked into the image. This
+      //    mismatch breaks the AIO boot (channel-join retries) and produces
+      //    ENDORSEMENT_POLICY_FAILURE flakiness (cacti issue #3978). A
+      //    background watchdog retags the pre-loaded pinned images as
+      //    `:latest` the moment `docker load` finishes, so the embedded
+      //    docker compose reuses them instead of pulling drifted ones. It
+      //    wins the race with `./network.sh up` comfortably because
+      //    install-fabric.sh re-downloads the CLI binaries from GitHub
+      //    between the image loads and the first `docker compose up`.
+      Entrypoint: [
+        "sh",
+        "-c",
+        [
+          "sed -i 's|^set -e$|set -e\\nuntil docker info >/dev/null 2>\\&1; do sleep 0.2; done|'",
+          "/run-fabric-network.sh;",
+          "grep -q 'until docker info' /run-fabric-network.sh",
+          "|| echo 'WARN(FabricTestLedgerV1): failed to inject docker-socket wait into /run-fabric-network.sh';",
+          "(until docker image inspect hyperledger/fabric-peer:${FABRIC_VERSION} >/dev/null 2>&1",
+          "&& docker image inspect hyperledger/fabric-orderer:${FABRIC_VERSION} >/dev/null 2>&1",
+          "&& docker image inspect hyperledger/fabric-ca:${CA_VERSION} >/dev/null 2>&1;",
+          "do sleep 0.2; done;",
+          "docker tag hyperledger/fabric-peer:${FABRIC_VERSION} hyperledger/fabric-peer:latest;",
+          "docker tag hyperledger/fabric-orderer:${FABRIC_VERSION} hyperledger/fabric-orderer:latest;",
+          "docker tag hyperledger/fabric-ca:${CA_VERSION} hyperledger/fabric-ca:latest) &",
+          "exec /usr/bin/supervisord --configuration /etc/supervisord.conf --nodaemon",
+        ].join(" "),
+      ],
       ExposedPorts: {
         "22/tcp": {}, // OpenSSH Server - TCP
         "5984/tcp": {}, // couchdb0

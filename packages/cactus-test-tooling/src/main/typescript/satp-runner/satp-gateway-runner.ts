@@ -291,6 +291,16 @@ export class SATPGatewayRunner implements ITestLedger {
           });
         }
         try {
+          // The gateway image is DinD-based: the fabric leaf deploys its
+          // chaincode through a compiler sidecar container created by the
+          // gateway's embedded docker daemon. That daemon starts empty, and
+          // the compiler container creation fails with "No such image"
+          // before the gateway can pull it, crash-looping the gateway and
+          // hanging the docker-based suites on their healthcheck waits.
+          // Pre-pull the sidecar image inside the container (retrying until
+          // the inner dockerd is up) so the next supervisord restart of the
+          // gateway process succeeds and the healthcheck passes.
+          await this.prePullSidecarImages();
           await this.waitForHealthCheck();
           this.log.debug(`Healthcheck passing OK.`);
           resolve(container);
@@ -299,6 +309,61 @@ export class SATPGatewayRunner implements ITestLedger {
         }
       });
     });
+  }
+
+  /**
+   * Images the gateway's inner docker daemon needs at boot. Mirrors
+   * CC_COMPILER_DEFAULT_OPTIONS in
+   * @hyperledger-cacti/cactus-plugin-ledger-connector-fabric — kept as a
+   * literal because test-tooling cannot import the connector package
+   * without creating a dependency cycle.
+   */
+  public static readonly SIDECAR_IMAGES: ReadonlyArray<string> = [
+    "ghcr.io/hyperledger-cacti/cactus-connector-fabric-cli:2025-08-12-d5365bf",
+  ];
+
+  private async prePullSidecarImages(timeoutMs = 5 * 60 * 1000): Promise<void> {
+    const fnTag = "SATPGatewayRunner#prePullSidecarImages()";
+    const container = this.getContainer();
+    const startedAt = Date.now();
+    for (const image of SATPGatewayRunner.SIDECAR_IMAGES) {
+      // Retry: the inner dockerd itself takes a few seconds to accept
+      // connections after the container starts.
+      for (;;) {
+        try {
+          const exec = await container.exec({
+            Cmd: ["docker", "pull", image],
+            AttachStdout: true,
+            AttachStderr: true,
+          });
+          const stream = await exec.start({ hijack: true, stdin: true });
+          await new Promise<void>((resolve, reject) => {
+            stream.on("data", () => undefined);
+            stream.on("end", () => resolve());
+            stream.on("error", reject);
+            // Decoding the output stream is unnecessary: only the exit status matters.
+          });
+          const inspectResult = await exec.inspect();
+          if (inspectResult.ExitCode === 0) {
+            this.log.debug(`${fnTag}, pulled ${image} inside container OK`);
+            break;
+          }
+          throw new Error(
+            `${fnTag}, docker pull ${image} exited with ${inspectResult.ExitCode}`,
+          );
+        } catch (ex) {
+          if (Date.now() - startedAt > timeoutMs) {
+            this.log.warn(
+              `${fnTag}, could not pre-pull ${image} within ` +
+                `${timeoutMs}ms (${String(ex)}); continuing — the gateway ` +
+                "may still crash-loop if it needs this sidecar image",
+            );
+            break;
+          }
+          await new Promise((r) => setTimeout(r, 3000));
+        }
+      }
+    }
   }
 
   public async waitForHealthCheck(

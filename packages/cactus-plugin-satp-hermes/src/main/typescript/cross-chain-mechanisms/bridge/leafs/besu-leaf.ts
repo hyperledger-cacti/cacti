@@ -409,6 +409,14 @@ export class BesuLeaf
                 `${fnTag}, Wrapper Contract Address not available for approving address`,
               );
             }
+            // Attribution log: identifies which wrapper instance answers
+            // the approve-address query so it can be correlated with the
+            // wrapper the transfer's lock/burn actually transact against.
+            this.log.info(
+              `${fnTag}, returning wrapper address ` +
+                `${this.wrapperContractAddress} for network ` +
+                `${safeStableStringify(this.networkIdentification)}`,
+            );
             return this.wrapperContractAddress;
           default:
             throw new ApproveAddressError(

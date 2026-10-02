@@ -324,6 +324,18 @@ export class Stage2ClientService extends SATPService {
             this.claimFormat,
           );
 
+          // Attribution log: names the network whose leaf will execute the
+          // on-chain lock, next to the session's sender network, so a
+          // wrongly-routed asset operation (source-side lock running against the
+          // receiver network's leaf) is directly attributable in test logs.
+          this.Log.info(
+            `${fnTag}, lockAsset executing for network ` +
+              `${safeStableStringify(tokenBuildData.networkId)} ` +
+              `(session sender network: ${safeStableStringify(
+                sessionData.senderAsset?.networkId,
+              )}, session id: ${sessionData.id})`,
+          );
+
           sessionData.lockAssertionClaim = create(LockAssertionClaimSchema, {});
 
           const res = await bridge.lockAsset(tokenBuildData.token);

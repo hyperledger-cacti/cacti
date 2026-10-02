@@ -840,6 +840,16 @@ export class Stage3ServerService extends SATPService {
             this.claimFormat,
           );
 
+          // Attribution log: see Stage2ClientService#lockAsset — names the
+          // network whose leaf executes the on-chain mint.
+          this.Log.info(
+            `${fnTag}, mintAsset executing for network ` +
+              `${safeStableStringify(tokenBuildData.networkId)} ` +
+              `(session receiver network: ${safeStableStringify(
+                sessionData.receiverAsset?.networkId,
+              )}, session id: ${sessionData.id})`,
+          );
+
           sessionData.mintAssertionClaim = create(MintAssertionClaimSchema, {});
 
           const res = await bridge.mintAsset(tokenBuildData.token);
