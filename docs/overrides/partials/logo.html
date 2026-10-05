@@ -1,0 +1,15 @@
+{#-
+  Overrides Material's partials/logo.html. The Cacti design system puts the
+  header on a light surface in the light scheme, so a full-color logo
+  (extra.logo_light) is shown there and theme.logo is kept for the dark scheme.
+  cacti-mkdocs.css toggles the two images per color scheme.
+-#}
+{% if config.theme.logo and config.extra.logo_light %}
+  <img class="cacti-logo--light" src="{{ config.extra.logo_light | url }}" alt="logo">
+  <img class="cacti-logo--dark" src="{{ config.theme.logo | url }}" alt="logo">
+{% elif config.theme.logo %}
+  <img src="{{ config.theme.logo | url }}" alt="logo">
+{% else %}
+  {% set icon = config.theme.icon.logo or "material/library" %}
+  {% include ".icons/" ~ icon ~ ".svg" %}
+{% endif %}
