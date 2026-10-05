@@ -9,6 +9,7 @@ RUN gradle clean build
 WORKDIR /
 
 FROM openjdk:26-ea-slim-bookworm
+LABEL org.opencontainers.image.description="Corda connector server for Hyperledger Cacti, exposing REST APIs for interacting with Corda nodes."
 
 ARG APP=/usr/src/app
 ENV APP=/usr/src/app
