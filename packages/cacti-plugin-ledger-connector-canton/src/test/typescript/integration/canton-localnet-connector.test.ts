@@ -131,8 +131,12 @@ describe("Canton connector with LocalNet", () => {
         (contract.createArgument as { id?: string } | undefined)?.id === pingId,
     );
 
+    // The ledger reports the resolved package ID, not the package-name
+    // reference used to submit the command.
     expect(ping).toMatchObject({
-      templateId: PING_TEMPLATE_ID,
+      templateId: expect.stringMatching(
+        /^[0-9a-f]{64}:Canton\.Internal\.Ping:Ping$/,
+      ),
       signatories: expect.arrayContaining([partyId]),
       createArgument: {
         id: pingId,

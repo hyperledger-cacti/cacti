@@ -76,6 +76,10 @@ const { contracts } = await connector.getActiveContracts({
 });
 ```
 
+Commands may reference templates by package name (`#package-name:Module:Template`).
+Active contracts are returned with the ledger's resolved template ID, which
+uses the package ID (`<package-id>:Module:Template`).
+
 `listParties()` reports parties visible or otherwise accessible to the
 authenticated ledger user. Depending on that user's Canton rights, the result
 can include read-only parties. A party used by `transact()` must have
