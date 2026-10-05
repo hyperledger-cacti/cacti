@@ -67,7 +67,7 @@
     "@hyperledger-cacti/cactus-core-api": "3.0.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "3.0.1",
     "async-mutex": "0.4.0",
-    "axios": "1.18.1",
+    "axios": "1.20.0",
     "pg": "8.8.0",
     "run-time-error-cjs": "1.4.0",
     "uuid": "11.1.1"
