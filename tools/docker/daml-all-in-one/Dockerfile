@@ -1,6 +1,7 @@
 FROM ubuntu:22.04
 
 LABEL org.opencontainers.image.source = "https://github.com/hyperledger/cacti"
+LABEL org.opencontainers.image.description="DAML development ledger with sample contracts and a JSON API for Cacti integration testing."
 RUN apt update && \
     apt install --no-install-recommends curl openjdk-21-jdk supervisor openssl xxd -y
 

@@ -1,4 +1,5 @@
 FROM ethereum/client-go:v1.12.0
+LABEL org.opencontainers.image.description="Go Ethereum development ledger with test accounts for Cacti integration testing."
 
 # Init
 COPY ./src/genesis.json /root/data/
