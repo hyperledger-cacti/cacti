@@ -1,16 +1,9 @@
-import {
-  IAsyncProvider,
-  LogLevelDesc,
-  Checks,
-} from "@hyperledger-cacti/cactus-common";
+import { LogLevelDesc, Checks } from "@hyperledger-cacti/cactus-common";
 import {
   GetOpenApiSpecV1EndpointBase,
   IGetOpenApiSpecV1EndpointBaseOptions,
 } from "@hyperledger-cacti/cactus-core";
-import {
-  IEndpointAuthzOptions,
-  IWebServiceEndpoint,
-} from "@hyperledger-cacti/cactus-core-api";
+import { IWebServiceEndpoint } from "@hyperledger-cacti/cactus-core-api";
 
 import OAS from "../../json/openapi.json";
 
@@ -42,14 +35,5 @@ export class GetOpenApiSpecV1Endpoint
 
   public get className(): string {
     return GetOpenApiSpecV1Endpoint.CLASS_NAME;
-  }
-
-  public getAuthorizationOptionsProvider(): IAsyncProvider<IEndpointAuthzOptions> {
-    return {
-      get: async () => ({
-        isProtected: true,
-        requiredRoles: OasPathGetOpenApiSpecV1.get.security[0].bearerTokenAuth,
-      }),
-    };
   }
 }

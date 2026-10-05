@@ -1543,7 +1543,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@canton-network/core-ledger-client@npm:1.12.2, @canton-network/core-ledger-client@npm:^1.12.2":
+"@canton-network/core-ledger-client@npm:^1.12.2":
   version: 1.12.2
   resolution: "@canton-network/core-ledger-client@npm:1.12.2"
   dependencies:
@@ -1736,7 +1736,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@canton-network/core-wallet-auth@npm:1.12.1, @canton-network/core-wallet-auth@npm:^1.12.0, @canton-network/core-wallet-auth@npm:^1.12.1":
+"@canton-network/core-wallet-auth@npm:^1.12.0, @canton-network/core-wallet-auth@npm:^1.12.1":
   version: 1.12.1
   resolution: "@canton-network/core-wallet-auth@npm:1.12.1"
   dependencies:
@@ -4716,8 +4716,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cacti-plugin-ledger-connector-canton@workspace:packages/cacti-plugin-ledger-connector-canton"
   dependencies:
-    "@canton-network/core-ledger-client": "npm:1.12.2"
-    "@canton-network/core-wallet-auth": "npm:1.12.1"
     "@canton-network/wallet-sdk": "npm:1.5.1"
     "@hyperledger-cacti/cactus-common": "npm:3.0.1"
     "@hyperledger-cacti/cactus-core": "npm:3.0.1"

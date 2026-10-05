@@ -5,6 +5,9 @@
     "outDir": "./dist/lib/",
     "declarationDir": "dist/lib",
     "resolveJsonModule": true,
+    "allowJs": true,
+    "module": "node16",
+    "moduleResolution": "node16",
     "rootDir": "./src",
     "tsBuildInfoFile": "../../.build-cache/cacti-plugin-ledger-connector-canton.tsbuildinfo"
   },

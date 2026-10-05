@@ -1,0 +1,690 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Hyperledger Cacti Plugin - Connector Canton</title>
+    <style type="text/css">
+      body {
+	font-family: Trebuchet MS, sans-serif;
+	font-size: 15px;
+	color: #444;
+	margin-right: 24px;
+}
+
+h1	{
+	font-size: 25px;
+}
+h2	{
+	font-size: 20px;
+}
+h3	{
+	font-size: 16px;
+	font-weight: bold;
+}
+hr	{
+	height: 1px;
+	border: 0;
+	color: #ddd;
+	background-color: #ddd;
+}
+
+.app-desc {
+  clear: both;
+  margin-left: 20px;
+}
+.param-name {
+  width: 100%;
+}
+.license-info {
+  margin-left: 20px;
+}
+
+.license-url {
+  margin-left: 20px;
+}
+
+.model {
+  margin: 0 0 0px 20px;
+}
+
+.method {
+  margin-left: 20px;
+}
+
+.method-notes	{
+	margin: 10px 0 20px 0;
+	font-size: 90%;
+	color: #555;
+}
+
+pre {
+  padding: 10px;
+  margin-bottom: 2px;
+}
+
+.http-method {
+ text-transform: uppercase;
+}
+
+pre.get {
+  background-color: #0f6ab4;
+}
+
+pre.post {
+  background-color: #10a54a;
+}
+
+pre.put {
+  background-color: #c5862b;
+}
+
+pre.delete {
+  background-color: #a41e22;
+}
+
+.huge	{
+	color: #fff;
+}
+
+pre.example {
+  background-color: #f3f3f3;
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+code {
+  white-space: pre;
+}
+
+.nickname {
+  font-weight: bold;
+}
+
+.method-path {
+  font-size: 1.5em;
+  background-color: #0f6ab4;
+}
+
+.up {
+  float:right;
+}
+
+.parameter {
+  width: 500px;
+}
+
+.param {
+  width: 500px;
+  padding: 10px 0 0 20px;
+  font-weight: bold;
+}
+
+.param-desc {
+  width: 700px;
+  padding: 0 0 0 20px;
+  color: #777;
+}
+
+.param-type {
+  font-style: italic;
+}
+
+.param-enum-header {
+width: 700px;
+padding: 0 0 0 60px;
+color: #777;
+font-weight: bold;
+}
+
+.param-enum {
+width: 700px;
+padding: 0 0 0 80px;
+color: #777;
+font-style: italic;
+}
+
+.field-label {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+
+.field-items	{
+	padding: 0 0 15px 0;
+	margin-bottom: 15px;
+}
+
+.return-type {
+  clear: both;
+  padding-bottom: 10px;
+}
+
+.param-header {
+  font-weight: bold;
+}
+
+.method-tags {
+  text-align: right;
+}
+
+.method-tag {
+  background: none repeat scroll 0% 0% #24A600;
+  border-radius: 3px;
+  padding: 2px 10px;
+  margin: 2px;
+  color: #FFF;
+  display: inline-block;
+  text-decoration: none;
+}
+
+    </style>
+  </head>
+  <body>
+  <h1>Hyperledger Cacti Plugin - Connector Canton</h1>
+    <div class="app-desc">Submits Daml commands and queries active contracts on Canton through the Wallet SDK.</div>
+    <div class="app-desc">More information: <a href="https://openapi-generator.tech">https://openapi-generator.tech</a></div>
+    <div class="app-desc">Contact Info: <a href="team@openapitools.org">team@openapitools.org</a></div>
+    <div class="app-desc">Version: 3.0.1</div>
+    <div class="app-desc">BasePath:</div>
+    <div class="license-info">Apache-2.0</div>
+    <div class="license-url">https://www.apache.org/licenses/LICENSE-2.0.html</div>
+  <h2>Access</h2>
+    <ol>
+      <li>HTTP Basic Authentication</li>
+    </ol>
+
+  <h2><a name="__Methods">Methods</a></h2>
+  [ Jump to <a href="#__Models">Models</a> ]
+
+  <h3>Table of Contents </h3>
+  <div class="method-summary"></div>
+  <h4><a href="#Default">Default</a></h4>
+  <ul>
+  <li><a href="#getActiveContractsV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts</code></a></li>
+  <li><a href="#getOpenApiSpecV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec</code></a></li>
+  <li><a href="#listPartiesV1"><code><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties</code></a></li>
+  <li><a href="#runTransactionV1"><code><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction</code></a></li>
+  </ul>
+
+  <h1><a name="Default">Default</a></h1>
+  <div class="method"><a name="getActiveContractsV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts</code></pre></div>
+    <div class="method-summary">Returns active Canton contracts visible to the requested parties. (<span class="nickname">getActiveContractsV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">GetActiveContractsRequest <a href="#GetActiveContractsRequest">GetActiveContractsRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#GetActiveContractsResponse">GetActiveContractsResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "activeAtOffset" : 0,
+  "limitReached" : true,
+  "contracts" : [ {
+    "signatories" : [ "signatories", "signatories" ],
+    "createdAt" : "createdAt",
+    "createArgument" : { },
+    "witnessParties" : [ "witnessParties", "witnessParties" ],
+    "synchronizerId" : "synchronizerId",
+    "contractId" : "contractId",
+    "templateId" : "templateId",
+    "interfaceViews" : [ {
+      "viewValue" : "",
+      "interfaceId" : "interfaceId",
+      "viewStatus" : {
+        "code" : 0,
+        "message" : "message"
+      }
+    }, {
+      "viewValue" : "",
+      "interfaceId" : "interfaceId",
+      "viewStatus" : {
+        "code" : 0,
+        "message" : "message"
+      }
+    } ],
+    "observers" : [ "observers", "observers" ]
+  }, {
+    "signatories" : [ "signatories", "signatories" ],
+    "createdAt" : "createdAt",
+    "createArgument" : { },
+    "witnessParties" : [ "witnessParties", "witnessParties" ],
+    "synchronizerId" : "synchronizerId",
+    "contractId" : "contractId",
+    "templateId" : "templateId",
+    "interfaceViews" : [ {
+      "viewValue" : "",
+      "interfaceId" : "interfaceId",
+      "viewStatus" : {
+        "code" : 0,
+        "message" : "message"
+      }
+    }, {
+      "viewValue" : "",
+      "interfaceId" : "interfaceId",
+      "viewStatus" : {
+        "code" : 0,
+        "message" : "message"
+      }
+    } ],
+    "observers" : [ "observers", "observers" ]
+  } ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Matching active contracts.
+        <a href="#GetActiveContractsResponse">GetActiveContractsResponse</a>
+    <h4 class="field-label">400</h4>
+    Invalid contract query, or an out-of-range offset.
+        <a href="#BadRequestResponse">BadRequestResponse</a>
+    <h4 class="field-label">401</h4>
+    The request has no valid bearer token.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">403</h4>
+    The caller, the connector, or the ledger does not allow the requested party.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">413</h4>
+    More contracts match than the participant returns in one response.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">502</h4>
+    Canton contract query failed upstream.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">503</h4>
+    The connector is shut down or busy, or the ledger is temporarily unavailable.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">504</h4>
+    The Canton contract query timed out.
+        <a href="#ErrorResponse">ErrorResponse</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="getOpenApiSpecV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec</code></pre></div>
+    <div class="method-summary">Returns the connector OpenAPI specification. (<span class="nickname">getOpenApiSpecV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      
+      map[String, oas_any_type_not_mapped]
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    The connector OpenAPI specification.
+        
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="listPartiesV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="get"><code class="huge"><span class="http-method">get</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties</code></pre></div>
+    <div class="method-summary">Lists Canton parties available to the authenticated user. (<span class="nickname">listPartiesV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#ListPartiesResponse">ListPartiesResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "parties" : [ "parties", "parties" ]
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    Available Canton parties.
+        <a href="#ListPartiesResponse">ListPartiesResponse</a>
+    <h4 class="field-label">401</h4>
+    The request has no valid bearer token.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">403</h4>
+    The caller is not authorized to list parties.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">502</h4>
+    Canton party lookup failed upstream.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">503</h4>
+    The connector is shut down or busy, or the ledger is temporarily unavailable.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">504</h4>
+    The Canton party query timed out.
+        <a href="#ErrorResponse">ErrorResponse</a>
+  </div> <!-- method -->
+  <hr/>
+  <div class="method"><a name="runTransactionV1"/>
+    <div class="method-path">
+    <a class="up" href="#__Methods">Up</a>
+    <pre class="post"><code class="huge"><span class="http-method">post</span> /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction</code></pre></div>
+    <div class="method-summary">Submits Daml commands for a Canton-hosted party. (<span class="nickname">runTransactionV1</span>)</div>
+    <div class="method-notes"></div>
+
+
+    <h3 class="field-label">Consumes</h3>
+    This API call consumes the following media types via the <span class="header">Content-Type</span> request header:
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Request body</h3>
+    <div class="field-items">
+      <div class="param">RunTransactionRequest <a href="#RunTransactionRequest">RunTransactionRequest</a> (required)</div>
+
+      <div class="param-desc"><span class="param-type">Body Parameter</span> &mdash;  </div>
+
+    </div>  <!-- field-items -->
+
+
+
+
+    <h3 class="field-label">Return type</h3>
+    <div class="return-type">
+      <a href="#RunTransactionResponse">RunTransactionResponse</a>
+      
+    </div>
+
+    <!--Todo: process Response Object and its headers, schema, examples -->
+
+    <h3 class="field-label">Example data</h3>
+    <div class="example-data-content-type">Content-Type: application/json</div>
+    <pre class="example"><code>{
+  "updateId" : "updateId",
+  "completionOffset" : 0
+}</code></pre>
+
+    <h3 class="field-label">Produces</h3>
+    This API call produces the following media types according to the <span class="header">Accept</span> request header;
+    the media type will be conveyed by the <span class="header">Content-Type</span> response header.
+    <ul>
+      <li><code>application/json</code></li>
+    </ul>
+
+    <h3 class="field-label">Responses</h3>
+    <h4 class="field-label">200</h4>
+    The commands were committed.
+        <a href="#RunTransactionResponse">RunTransactionResponse</a>
+    <h4 class="field-label">400</h4>
+    Invalid transaction request, or the ledger rejected it as invalid.
+        <a href="#BadRequestResponse">BadRequestResponse</a>
+    <h4 class="field-label">401</h4>
+    The request has no valid bearer token.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">403</h4>
+    The caller, the connector, or the ledger does not allow the requested party.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">404</h4>
+    A contract or other resource referenced by a command was not found.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">409</h4>
+    The ledger already has a command with this commandId, or the commands conflict with the ledger state.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">413</h4>
+    The transaction payload exceeds the connector limit.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">502</h4>
+    Canton transaction submission failed upstream.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">503</h4>
+    The connector is shut down or busy, or the ledger is temporarily unavailable. Retry with the same commandId.
+        <a href="#ErrorResponse">ErrorResponse</a>
+    <h4 class="field-label">504</h4>
+    The Canton transaction operation timed out; the outcome is unknown. Retry with the same commandId.
+        <a href="#ErrorResponse">ErrorResponse</a>
+  </div> <!-- method -->
+  <hr/>
+
+  <h2><a name="__Models">Models</a></h2>
+  [ Jump to <a href="#__Methods">Methods</a> ]
+
+  <h3>Table of Contents</h3>
+  <ol>
+    <li><a href="#ActiveContract"><code>ActiveContract</code> - </a></li>
+    <li><a href="#ActiveContractInterfaceView"><code>ActiveContractInterfaceView</code> - </a></li>
+    <li><a href="#ActiveContractInterfaceView_viewStatus"><code>ActiveContractInterfaceView_viewStatus</code> - </a></li>
+    <li><a href="#BadRequestResponse"><code>BadRequestResponse</code> - </a></li>
+    <li><a href="#CantonCommand"><code>CantonCommand</code> - </a></li>
+    <li><a href="#CantonCreateAndExerciseCommand"><code>CantonCreateAndExerciseCommand</code> - </a></li>
+    <li><a href="#CantonCreateAndExerciseCommand_CreateAndExerciseCommand"><code>CantonCreateAndExerciseCommand_CreateAndExerciseCommand</code> - </a></li>
+    <li><a href="#CantonCreateCommand"><code>CantonCreateCommand</code> - </a></li>
+    <li><a href="#CantonCreateCommand_CreateCommand"><code>CantonCreateCommand_CreateCommand</code> - </a></li>
+    <li><a href="#CantonExerciseCommand"><code>CantonExerciseCommand</code> - </a></li>
+    <li><a href="#CantonExerciseCommand_ExerciseCommand"><code>CantonExerciseCommand_ExerciseCommand</code> - </a></li>
+    <li><a href="#ErrorResponse"><code>ErrorResponse</code> - </a></li>
+    <li><a href="#GetActiveContractsRequest"><code>GetActiveContractsRequest</code> - </a></li>
+    <li><a href="#GetActiveContractsResponse"><code>GetActiveContractsResponse</code> - </a></li>
+    <li><a href="#ListPartiesResponse"><code>ListPartiesResponse</code> - </a></li>
+    <li><a href="#RequestValidationError"><code>RequestValidationError</code> - </a></li>
+    <li><a href="#RunTransactionRequest"><code>RunTransactionRequest</code> - </a></li>
+    <li><a href="#RunTransactionResponse"><code>RunTransactionResponse</code> - </a></li>
+  </ol>
+
+  <div class="model">
+    <h3><a name="ActiveContract"><code>ActiveContract</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contractId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">templateId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> The template ID as reported by the ledger, using the package ID (<code>&lt;package-id&gt;:Module:Template</code>). </div>
+<div class="param">createArgument </div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span> A Daml record encoded as a JSON object of field names to Daml values. </div>
+<div class="param">witnessParties </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">signatories </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">observers (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">createdAt </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">synchronizerId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">interfaceViews (optional)</div><div class="param-desc"><span class="param-type"><a href="#ActiveContractInterfaceView">array[ActiveContractInterfaceView]</a></span> Interface views, present when the query used interfaceIds. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ActiveContractInterfaceView"><code>ActiveContractInterfaceView</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>The view of an active contract through one of the queried interfaces.</div>
+    <div class="field-items">
+      <div class="param">interfaceId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">viewStatus </div><div class="param-desc"><span class="param-type"><a href="#ActiveContractInterfaceView_viewStatus">ActiveContractInterfaceView_viewStatus</a></span>  </div>
+<div class="param">viewValue (optional)</div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ActiveContractInterfaceView_viewStatus"><code>ActiveContractInterfaceView_viewStatus</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>gRPC status of the view computation. Code 0 means the view was computed.</div>
+    <div class="field-items">
+      <div class="param">code </div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span>  format: int32</div>
+<div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="BadRequestResponse"><code>BadRequestResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'>A connector validation error, or the OpenAPI validator's list of request errors.</div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">cantonErrorCode (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Canton's error code, for example DUPLICATE_COMMAND, when the ledger rejected the request. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CantonCommand"><code>CantonCommand</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">CreateCommand </div><div class="param-desc"><span class="param-type"><a href="#CantonCreateCommand_CreateCommand">CantonCreateCommand_CreateCommand</a></span>  </div>
+<div class="param">ExerciseCommand </div><div class="param-desc"><span class="param-type"><a href="#CantonExerciseCommand_ExerciseCommand">CantonExerciseCommand_ExerciseCommand</a></span>  </div>
+<div class="param">CreateAndExerciseCommand </div><div class="param-desc"><span class="param-type"><a href="#CantonCreateAndExerciseCommand_CreateAndExerciseCommand">CantonCreateAndExerciseCommand_CreateAndExerciseCommand</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CantonCreateAndExerciseCommand"><code>CantonCreateAndExerciseCommand</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">CreateAndExerciseCommand </div><div class="param-desc"><span class="param-type"><a href="#CantonCreateAndExerciseCommand_CreateAndExerciseCommand">CantonCreateAndExerciseCommand_CreateAndExerciseCommand</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CantonCreateAndExerciseCommand_CreateAndExerciseCommand"><code>CantonCreateAndExerciseCommand_CreateAndExerciseCommand</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">templateId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">createArguments </div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span> A Daml record encoded as a JSON object of field names to Daml values. </div>
+<div class="param">choice </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">choiceArgument </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CantonCreateCommand"><code>CantonCreateCommand</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">CreateCommand </div><div class="param-desc"><span class="param-type"><a href="#CantonCreateCommand_CreateCommand">CantonCreateCommand_CreateCommand</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CantonCreateCommand_CreateCommand"><code>CantonCreateCommand_CreateCommand</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">templateId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">createArguments </div><div class="param-desc"><span class="param-type"><a href="#AnyType">map[String, oas_any_type_not_mapped]</a></span> A Daml record encoded as a JSON object of field names to Daml values. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CantonExerciseCommand"><code>CantonExerciseCommand</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">ExerciseCommand </div><div class="param-desc"><span class="param-type"><a href="#CantonExerciseCommand_ExerciseCommand">CantonExerciseCommand_ExerciseCommand</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="CantonExerciseCommand_ExerciseCommand"><code>CantonExerciseCommand_ExerciseCommand</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">templateId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">contractId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">choice </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">choiceArgument </div><div class="param-desc"><span class="param-type"><a href="#">oas_any_type_not_mapped</a></span> A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ErrorResponse"><code>ErrorResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">cantonErrorCode (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Canton's error code, for example DUPLICATE_COMMAND, when the ledger rejected the request. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetActiveContractsRequest"><code>GetActiveContractsRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">parties </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">templateIds (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">interfaceIds (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+<div class="param">offset (optional)</div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
+<div class="param">limit (optional)</div><div class="param-desc"><span class="param-type"><a href="#integer">Integer</a></span> Maximum number of entries to return. The connector rejects values above its configured maxActiveContractLimit (default 200, Canton's default http-list-max-elements-limit). </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="GetActiveContractsResponse"><code>GetActiveContractsResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">contracts </div><div class="param-desc"><span class="param-type"><a href="#ActiveContract">array[ActiveContract]</a></span>  </div>
+<div class="param">activeAtOffset </div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span> The ledger offset of the snapshot. Continue from it with the ledger's update stream. format: int64</div>
+<div class="param">limitReached </div><div class="param-desc"><span class="param-type"><a href="#boolean">Boolean</a></span> True when the ledger returned <code>limit</code> entries, so more active contracts may match. </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="ListPartiesResponse"><code>ListPartiesResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">parties </div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RequestValidationError"><code>RequestValidationError</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">path (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">message </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">errorCode (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionRequest"><code>RunTransactionRequest</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">partyId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">commands </div><div class="param-desc"><span class="param-type"><a href="#CantonCommand">array[CantonCommand]</a></span> The serialized command payload is limited to 1 MiB and 64 nesting levels by the connector. </div>
+<div class="param">commandId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span> Caller-chosen, stable identifier for this submission. Reuse the same value when retrying a submission whose outcome is unknown (for example after HTTP 504) so that Canton command deduplication rejects a duplicate instead of committing it twice. </div>
+<div class="param">synchronizerId (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">readAs (optional)</div><div class="param-desc"><span class="param-type"><a href="#string">array[String]</a></span>  </div>
+    </div>  <!-- field-items -->
+  </div>
+  <div class="model">
+    <h3><a name="RunTransactionResponse"><code>RunTransactionResponse</code> - </a> <a class="up" href="#__Models">Up</a></h3>
+    <div class='model-description'></div>
+    <div class="field-items">
+      <div class="param">updateId </div><div class="param-desc"><span class="param-type"><a href="#string">String</a></span>  </div>
+<div class="param">completionOffset </div><div class="param-desc"><span class="param-type"><a href="#long">Long</a></span>  format: int64</div>
+    </div>  <!-- field-items -->
+  </div>
+  </body>
+</html>

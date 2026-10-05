@@ -23,36 +23,47 @@ describe("Canton connector HTTP API", () => {
     "write:canton-transactions",
     "read:canton-contracts",
     "read:canton-parties",
-    "read:canton-spec",
   ];
-  const sdk: ICantonWalletSdk = {
-    ledger: {
-      internal: {
-        submit: jest.fn().mockResolvedValue({
-          updateId: "update-1",
-          completionOffset: 42,
-        }),
-      },
-      acsReader: {
-        raw: {
-          readJsContracts: jest.fn().mockResolvedValue([
-            {
-              contractId: "contract-1",
-              templateId: "package:Module:Asset",
-              createArgument: { owner: "Alice::1220" },
-              witnessParties: ["Alice::1220"],
-              signatories: ["Alice::1220"],
-              createdAt: "2026-10-02T00:00:00Z",
-              synchronizerId: "synchronizer-1",
-            },
-          ]),
+  const activeContractEntry = {
+    contractEntry: {
+      JsActiveContract: {
+        createdEvent: {
+          contractId: "contract-1",
+          templateId: "package:Module:Asset",
+          createArgument: { owner: "Alice::1220" },
+          witnessParties: ["Alice::1220"],
+          signatories: ["Alice::1220"],
+          createdAt: "2026-10-02T00:00:00Z",
         },
+        synchronizerId: "synchronizer-1",
       },
-    },
-    party: {
-      list: jest.fn().mockResolvedValue(["Alice::1220"]),
     },
   };
+  const sdk: ICantonWalletSdk = {
+    ledger: {
+      ledgerEnd: jest.fn(),
+      internal: { submit: jest.fn() },
+      acsReader: { raw: { read: jest.fn() } },
+    },
+    party: { list: jest.fn() },
+  };
+  // The connector caches the SDK, so its mocks are re-armed before each test
+  // instead of being replaced; one-shot overrides cannot leak between tests.
+  beforeEach(() => {
+    jest.mocked(sdk.ledger.ledgerEnd).mockReset().mockResolvedValue(10);
+    jest.mocked(sdk.ledger.internal.submit).mockReset().mockResolvedValue({
+      updateId: "update-1",
+      completionOffset: 42,
+    });
+    jest
+      .mocked(sdk.ledger.acsReader.raw.read)
+      .mockReset()
+      .mockResolvedValue([activeContractEntry]);
+    jest
+      .mocked(sdk.party.list)
+      .mockReset()
+      .mockResolvedValue(["Alice::1220", "Mallory::1220"]);
+  });
   const createWalletSdk = jest.fn().mockResolvedValue(sdk);
   const connector = new PluginLedgerConnectorCanton({
     instanceId: randomUUID(),
@@ -62,6 +73,8 @@ describe("Canton connector HTTP API", () => {
     pluginRegistry: new PluginRegistry({ plugins: [] }),
     logLevel: "SILENT",
     walletSdkFactory: { create: createWalletSdk },
+    allowedPartyIds: ["Alice::1220"],
+    operationTimeoutMs: 1000,
   });
   const app = express();
   const server = http.createServer(app);
@@ -141,7 +154,11 @@ describe("Canton connector HTTP API", () => {
       updateId: "update-1",
       completionOffset: 42,
     });
-    expect(contracts.data.contracts).toHaveLength(1);
+    expect(contracts.data).toMatchObject({
+      contracts: [{ contractId: "contract-1" }],
+      activeAtOffset: 10,
+      limitReached: false,
+    });
     expect(parties.data).toEqual({ parties: ["Alice::1220"] });
     expect(openApi.data).toMatchObject({
       info: { title: "Hyperledger Cacti Plugin - Connector Canton" },
@@ -261,8 +278,8 @@ describe("Canton connector HTTP API", () => {
   });
 
   test("rejects combined template and interface filters", async () => {
-    const callsBefore = jest.mocked(sdk.ledger.acsReader.raw.readJsContracts)
-      .mock.calls.length;
+    const callsBefore = jest.mocked(sdk.ledger.acsReader.raw.read).mock.calls
+      .length;
 
     await expect(
       apiClient.getActiveContractsV1({
@@ -271,9 +288,7 @@ describe("Canton connector HTTP API", () => {
         interfaceIds: ["package:Module:AssetInterface"],
       }),
     ).rejects.toMatchObject({ response: { status: 400 } });
-    expect(sdk.ledger.acsReader.raw.readJsContracts).toHaveBeenCalledTimes(
-      callsBefore,
-    );
+    expect(sdk.ledger.acsReader.raw.read).toHaveBeenCalledTimes(callsBefore);
   });
 
   test.each([
@@ -311,16 +326,112 @@ describe("Canton connector HTTP API", () => {
           headers: { "x-test-scopes": "read:canton-contracts" },
         }),
     },
-    {
-      name: "OpenAPI query",
-      call: () =>
-        apiClient.getOpenApiSpecV1({
-          headers: { "x-test-scopes": "read:canton-parties" },
-        }),
-    },
   ])("rejects an insufficient scope for the $name", async ({ call }) => {
     await expect(call()).rejects.toMatchObject({ response: { status: 403 } });
   });
+
+  test("serves the OpenAPI specification without scopes or a bearer token", async () => {
+    const response = await apiClient.getOpenApiSpecV1({
+      headers: { "x-test-scopes": "", Authorization: "" },
+    });
+
+    expect(response.status).toBe(200);
+  });
+
+  test.each([
+    {
+      name: "a party outside the allowlist (403)",
+      call: () =>
+        apiClient.runTransactionV1({
+          partyId: "Mallory::1220",
+          commandId: "command-1",
+          commands: [
+            {
+              CreateCommand: {
+                templateId: "package:Module:Asset",
+                createArguments: {},
+              },
+            },
+          ],
+        }),
+      arrange: () => undefined,
+      status: 403,
+      data: {
+        message: "The requested Canton party is not allowed by this connector.",
+      },
+    },
+    {
+      name: "a duplicate command reported by Canton (409)",
+      call: () =>
+        apiClient.runTransactionV1({
+          partyId: "Alice::1220",
+          commandId: "command-1",
+          commands: [
+            {
+              CreateCommand: {
+                templateId: "package:Module:Asset",
+                createArguments: {},
+              },
+            },
+          ],
+        }),
+      arrange: () =>
+        jest.mocked(sdk.ledger.internal.submit).mockRejectedValueOnce({
+          code: "DUPLICATE_COMMAND",
+          cause:
+            "A command with the given command id has already been successfully processed for Alice::1220",
+          context: { party: "Alice::1220", token: "must-not-leak" },
+          errorCategory: 10,
+          grpcCodeValue: 6,
+        }),
+      status: 409,
+      data: { cantonErrorCode: "DUPLICATE_COMMAND" },
+    },
+    {
+      name: "the participant list limit (413)",
+      call: () => apiClient.getActiveContractsV1({ parties: ["Alice::1220"] }),
+      arrange: () =>
+        jest.mocked(sdk.ledger.acsReader.raw.read).mockRejectedValueOnce({
+          code: "JSON_API_MAXIMUM_LIST_ELEMENTS_NUMBER_REACHED",
+          cause: "Exceeded the configured limit",
+          context: {},
+          errorCategory: 8,
+        }),
+      status: 413,
+      data: {
+        cantonErrorCode: "JSON_API_MAXIMUM_LIST_ELEMENTS_NUMBER_REACHED",
+      },
+    },
+    {
+      name: "an upstream timeout (504)",
+      call: () => apiClient.listPartiesV1(),
+      arrange: () =>
+        jest
+          .mocked(sdk.party.list)
+          .mockImplementationOnce(
+            () => new Promise((resolve) => setTimeout(() => resolve([]), 1500)),
+          ),
+      status: 504,
+      data: { message: "Canton party query exceeded 1000 ms" },
+    },
+  ])(
+    "maps $name to its HTTP status without leaking ledger details",
+    async ({ call, arrange, status, data }) => {
+      arrange();
+
+      const error = await call().then(
+        () => undefined,
+        (rejection: { response?: { status: number; data: unknown } }) =>
+          rejection.response,
+      );
+
+      expect(error?.status).toBe(status);
+      expect(error?.data).toMatchObject(data);
+      expect(JSON.stringify(error?.data)).not.toContain("must-not-leak");
+      expect(JSON.stringify(error?.data)).not.toContain("successfully");
+    },
+    10_000,
+  );
 
   test("rejects a protected operation when the caller has no scopes", async () => {
     await expect(
@@ -360,5 +471,17 @@ describe("Canton connector HTTP API", () => {
       },
     });
     expect(toJSON).not.toHaveBeenCalled();
+  });
+
+  // Runs last: shutdown is terminal for the shared connector.
+  test("answers 503 after the connector has been shut down", async () => {
+    await connector.shutdown();
+
+    await expect(apiClient.listPartiesV1()).rejects.toMatchObject({
+      response: {
+        status: 503,
+        data: { message: "The Canton connector has been shut down." },
+      },
+    });
   });
 });

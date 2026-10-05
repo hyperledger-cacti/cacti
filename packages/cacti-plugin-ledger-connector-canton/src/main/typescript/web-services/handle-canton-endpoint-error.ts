@@ -9,6 +9,8 @@ import {
 
 import type { Logger } from "@hyperledger-cacti/cactus-common";
 
+import { CantonLedgerError } from "../canton-ledger-error";
+
 export interface IHandleCantonEndpointErrorOptions {
   readonly error: unknown;
   readonly errorMsg: string;
@@ -41,6 +43,19 @@ function isSafeConnectorError(error: unknown): error is SafeConnectorError {
 export function handleCantonEndpointError(
   options: Readonly<IHandleCantonEndpointErrorOptions>,
 ): void {
+  if (options.error instanceof CantonLedgerError) {
+    // Only the status, a fixed message, and Canton's constant error code are
+    // returned; the ledger's cause and context are never serialized.
+    options.log.debug(
+      options.errorMsg,
+      `Canton ledger rejected the request with ${options.error.cantonErrorCode} (HTTP ${options.error.statusCode}).`,
+    );
+    options.res.status(options.error.statusCode).json({
+      message: options.error.message,
+      cantonErrorCode: options.error.cantonErrorCode,
+    });
+    return;
+  }
   if (isSafeConnectorError(options.error)) {
     options.log.debug(
       options.errorMsg,

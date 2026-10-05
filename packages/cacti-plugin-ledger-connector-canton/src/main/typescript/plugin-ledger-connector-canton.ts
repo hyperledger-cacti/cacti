@@ -1,4 +1,3 @@
-import type { TokenProviderConfig } from "@canton-network/wallet-sdk" with { "resolution-mode": "import" };
 import type { Express } from "express";
 import {
   BadRequestError,
@@ -26,14 +25,18 @@ import {
 import OAS from "../json/openapi.json";
 import {
   ActiveContract,
+  ActiveContractInterfaceView,
   GetActiveContractsRequest,
   GetActiveContractsResponse,
   ListPartiesResponse,
   RunTransactionRequest,
   RunTransactionResponse,
 } from "./generated/openapi/typescript-axios";
+import { toCantonLedgerError } from "./canton-ledger-error";
 import {
+  CantonAuthConfig,
   CantonWalletSdkFactory,
+  ICantonActiveContractEntry,
   ICantonWalletSdk,
   ICantonWalletSdkFactory,
 } from "./canton-wallet-sdk";
@@ -45,8 +48,14 @@ import {
 import { ListPartiesV1Endpoint } from "./web-services/list-parties-v1-endpoint";
 import { RunTransactionV1Endpoint } from "./web-services/run-transaction-v1-endpoint";
 
-const DEFAULT_ACTIVE_CONTRACT_LIMIT = 100;
-const MAX_ACTIVE_CONTRACT_LIMIT = 1000;
+export const DEFAULT_ACTIVE_CONTRACT_LIMIT = 100;
+/**
+ * Canton's default `http-list-max-elements-limit`. The Ledger API ignores a
+ * larger `limit` and fails the whole query with HTTP 413 when more contracts
+ * match, so the connector caps requests at this value unless configured.
+ */
+export const DEFAULT_MAX_ACTIVE_CONTRACT_LIMIT = 200;
+export const MAX_ACTIVE_CONTRACT_LIMIT = 1000;
 export const DEFAULT_OPERATION_TIMEOUT_MS = 60_000;
 export const MAX_OPERATION_TIMEOUT_MS = 300_000;
 export const MAX_COMMANDS_PER_TRANSACTION = 100;
@@ -71,16 +80,33 @@ export interface IPluginLedgerConnectorCantonOptions
    * always rejected.
    */
   allowInsecureLoopbackHttp?: boolean;
-  auth: TokenProviderConfig;
+  /**
+   * Ledger API authentication. For `client_credentials`, `configUrl` must
+   * satisfy the same HTTPS rule as `ledgerClientUrl` because the client
+   * secret is sent to the token endpoint it describes.
+   */
+  auth: CantonAuthConfig;
   pluginRegistry: PluginRegistry;
   logLevel?: LogLevelDesc;
   walletSdkFactory?: ICantonWalletSdkFactory;
   /**
-   * Optional connector-level party allowlist. When supplied, transactions and
-   * reads are rejected for every party not listed, and listParties() is
-   * filtered to the configured parties. An empty array denies every party.
+   * Parties this connector may act and read as. Transactions and reads for
+   * any other party are rejected, and listParties() is filtered to these
+   * parties. Exactly one of `allowedPartyIds` and `allowAllParties` must be
+   * set. An empty array denies every party.
    */
   allowedPartyIds?: readonly string[];
+  /**
+   * Explicitly allows every party the configured Canton user has rights for.
+   * Every caller with the relevant REST scope can then act or read as any of
+   * those parties.
+   */
+  allowAllParties?: boolean;
+  /**
+   * Largest `limit` accepted by getActiveContracts(). Set it to at most the
+   * participant's `http-list-max-elements-limit` (Canton default 200).
+   */
+  maxActiveContractLimit?: number;
   /** Timeout applied to each Wallet SDK initialization and ledger operation. */
   operationTimeoutMs?: number;
   /**
@@ -109,7 +135,10 @@ export class PluginLedgerConnectorCanton
   private readonly log: Logger;
   private readonly walletSdkFactory: ICantonWalletSdkFactory;
   private readonly allowedPartyIds?: ReadonlySet<string>;
+  private readonly ledgerClientUrl: string;
+  private readonly auth: CantonAuthConfig;
   private readonly operationTimeoutMs: number;
+  private readonly maxActiveContractLimit: number;
   private readonly maxInFlightOperations: number;
   private readonly inFlightOperations = new Set<Promise<void>>();
   private isShutDown = false;
@@ -122,48 +151,66 @@ export class PluginLedgerConnectorCanton
     const fnTag = `${PluginLedgerConnectorCanton.CLASS_NAME}#constructor()`;
     Checks.truthy(options, `${fnTag} options`);
     Checks.nonBlankString(options.instanceId, `${fnTag} options.instanceId`);
-    if (typeof options.ledgerClientUrl === "string") {
-      Checks.nonBlankString(
-        options.ledgerClientUrl,
-        `${fnTag} options.ledgerClientUrl`,
-      );
-    } else {
-      Checks.truthy(
-        options.ledgerClientUrl,
-        `${fnTag} options.ledgerClientUrl`,
-      );
-    }
-    PluginLedgerConnectorCanton.validateLedgerClientUrl(
+    Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
+    const allowInsecureLoopbackHttp =
+      options.allowInsecureLoopbackHttp === true;
+    // The validated, normalized values are kept so that later mutation of the
+    // caller's options cannot redirect the service credential.
+    this.ledgerClientUrl = PluginLedgerConnectorCanton.validateServiceUrl(
       options.ledgerClientUrl,
-      options.allowInsecureLoopbackHttp === true,
+      allowInsecureLoopbackHttp,
       `${fnTag} options.ledgerClientUrl`,
     );
-    Checks.truthy(options.auth, `${fnTag} options.auth`);
-    Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
+    this.auth = PluginLedgerConnectorCanton.validateAuth(
+      options.auth,
+      allowInsecureLoopbackHttp,
+      `${fnTag} options.auth`,
+    );
 
     this.operationTimeoutMs =
       options.operationTimeoutMs ?? DEFAULT_OPERATION_TIMEOUT_MS;
-    this.validateRequest(
-      Number.isSafeInteger(this.operationTimeoutMs) &&
-        this.operationTimeoutMs > 0 &&
-        this.operationTimeoutMs <= MAX_OPERATION_TIMEOUT_MS,
-      `${fnTag} options.operationTimeoutMs must be an integer between 1 and ${MAX_OPERATION_TIMEOUT_MS}`,
+    PluginLedgerConnectorCanton.validateIntegerOption(
+      this.operationTimeoutMs,
+      MAX_OPERATION_TIMEOUT_MS,
+      `${fnTag} options.operationTimeoutMs`,
     );
     this.maxInFlightOperations =
       options.maxInFlightOperations ?? DEFAULT_MAX_IN_FLIGHT_OPERATIONS;
-    this.validateRequest(
-      Number.isSafeInteger(this.maxInFlightOperations) &&
-        this.maxInFlightOperations > 0 &&
-        this.maxInFlightOperations <= MAX_IN_FLIGHT_OPERATIONS,
-      `${fnTag} options.maxInFlightOperations must be an integer between 1 and ${MAX_IN_FLIGHT_OPERATIONS}`,
+    PluginLedgerConnectorCanton.validateIntegerOption(
+      this.maxInFlightOperations,
+      MAX_IN_FLIGHT_OPERATIONS,
+      `${fnTag} options.maxInFlightOperations`,
     );
-    if (options.allowedPartyIds !== undefined) {
-      this.validateNonBlankStringArray(
-        options.allowedPartyIds,
-        `${fnTag} options.allowedPartyIds`,
-        false,
+    this.maxActiveContractLimit =
+      options.maxActiveContractLimit ?? DEFAULT_MAX_ACTIVE_CONTRACT_LIMIT;
+    PluginLedgerConnectorCanton.validateIntegerOption(
+      this.maxActiveContractLimit,
+      MAX_ACTIVE_CONTRACT_LIMIT,
+      `${fnTag} options.maxActiveContractLimit`,
+    );
+
+    const allowAllParties = options.allowAllParties === true;
+    if (allowAllParties === (options.allowedPartyIds !== undefined)) {
+      throw new Error(
+        `${fnTag} set exactly one of options.allowedPartyIds and options.allowAllParties: true`,
       );
-      this.allowedPartyIds = new Set(options.allowedPartyIds);
+    }
+    if (options.allowedPartyIds !== undefined) {
+      const partyIds = options.allowedPartyIds as unknown;
+      if (
+        !Array.isArray(partyIds) ||
+        !partyIds.every(
+          (partyId) =>
+            typeof partyId === "string" &&
+            partyId.trim().length > 0 &&
+            partyId.length <= MAX_IDENTIFIER_LENGTH,
+        )
+      ) {
+        throw new Error(
+          `${fnTag} options.allowedPartyIds must be an array of non-blank party IDs`,
+        );
+      }
+      this.allowedPartyIds = new Set(partyIds as string[]);
     }
 
     this.log = LoggerProvider.getOrCreate({
@@ -274,62 +321,46 @@ export class PluginLedgerConnectorCanton
   public async transact(
     request: RunTransactionRequest,
   ): Promise<RunTransactionResponse> {
+    const fnTag = `${this.className}#transact()`;
     this.validateRequest(
-      request !== undefined && request !== null,
-      `${this.className}#transact() request is required`,
+      this.isPlainObject(request),
+      `${fnTag} request must be an object`,
     );
-    this.validateRequest(
-      this.isNonBlankString(request.partyId),
-      `${this.className}#transact() request.partyId must not be blank`,
-    );
-    this.validateStringLength(
-      request.partyId,
-      `${this.className}#transact() request.partyId`,
-    );
-    this.validateRequest(
-      Array.isArray(request.commands) && request.commands.length > 0,
-      `${this.className}#transact() request.commands must not be empty`,
-    );
-    this.validateRequest(
-      request.commands.length <= MAX_COMMANDS_PER_TRANSACTION,
-      `${this.className}#transact() request.commands must not contain more than ${MAX_COMMANDS_PER_TRANSACTION} items`,
-    );
-    for (const command of request.commands) {
-      this.validateRequest(
-        command && typeof command === "object",
-        `${this.className}#transact() request.commands[] must be an object`,
-      );
-      this.validateCommandIdentifiers(command);
-    }
+    this.validateRequiredString(request.partyId, `${fnTag} request.partyId`);
     // A caller-supplied, stable command ID is what lets Canton's command
     // deduplication reject a retry of a submission whose outcome is unknown
     // (for example after a timeout) instead of committing it twice.
-    this.validateRequest(
-      this.isNonBlankString(request.commandId),
-      `${this.className}#transact() request.commandId must not be blank`,
-    );
-    this.validateStringLength(
+    this.validateRequiredString(
       request.commandId,
-      `${this.className}#transact() request.commandId`,
+      `${fnTag} request.commandId`,
     );
-    this.validateOptionalNonBlankString(
-      request.synchronizerId,
-      `${this.className}#transact() request.synchronizerId`,
-    );
-    if (request.readAs) {
+    if (request.synchronizerId !== undefined) {
+      this.validateRequiredString(
+        request.synchronizerId,
+        `${fnTag} request.synchronizerId`,
+      );
+    }
+    if (request.readAs !== undefined) {
       this.validateNonBlankStringArray(
         request.readAs,
-        `${this.className}#transact() request.readAs`,
+        `${fnTag} request.readAs`,
         false,
       );
     }
-
-    this.validateJsonPayload(
-      request.commands,
-      `${this.className}#transact() request.commands`,
-    );
+    // Authorize before inspecting the potentially large command payload.
     this.assertPartyAllowed(request.partyId);
     request.readAs?.forEach((partyId) => this.assertPartyAllowed(partyId));
+
+    this.validateRequest(
+      Array.isArray(request.commands) && request.commands.length > 0,
+      `${fnTag} request.commands must not be empty`,
+    );
+    this.validateRequest(
+      request.commands.length <= MAX_COMMANDS_PER_TRANSACTION,
+      `${fnTag} request.commands must not contain more than ${MAX_COMMANDS_PER_TRANSACTION} items`,
+    );
+    this.validateJsonPayload(request.commands, `${fnTag} request.commands`);
+    request.commands.forEach((command) => this.validateCommand(command));
 
     const sdk = await this.getOrCreateWalletSdk();
     return this.withOperationTimeout(
@@ -392,28 +423,41 @@ export class PluginLedgerConnectorCanton
       `${this.className}#getActiveContracts() request.limit must be a positive integer`,
     );
     this.validateRequest(
-      requestedLimit <= MAX_ACTIVE_CONTRACT_LIMIT,
-      `${this.className}#getActiveContracts() request.limit must not exceed ${MAX_ACTIVE_CONTRACT_LIMIT}`,
+      requestedLimit <= this.maxActiveContractLimit,
+      `${this.className}#getActiveContracts() request.limit must not exceed ${this.maxActiveContractLimit}`,
     );
 
     const sdk = await this.getOrCreateWalletSdk();
-    const contracts = await this.withOperationTimeout(async () => {
-      return sdk.ledger.acsReader.raw.readJsContracts({
+    // Resolving the offset here, rather than inside the SDK, lets the response
+    // report the snapshot it reflects so callers can continue from it.
+    const activeAtOffset =
+      request.offset ??
+      (await this.withOperationTimeout(
+        () => sdk.ledger.ledgerEnd(),
+        "Canton ledger-end query",
+      ));
+    const entries = await this.withOperationTimeout(async () => {
+      return sdk.ledger.acsReader.raw.read({
         parties: request.parties,
         filterByParty: true,
         templateIds: request.templateIds,
         interfaceIds: request.interfaceIds,
-        offset: request.offset,
+        offset: activeAtOffset,
         limit: requestedLimit,
       });
     }, "Canton active-contract query");
 
     // The ledger applies the limit; slicing keeps the response bounded even
-    // if an upstream version ignores it.
+    // if an upstream version ignores it. Incomplete reassignment entries count
+    // towards the ledger's limit but are not active contracts.
+    const boundedEntries = entries.slice(0, requestedLimit);
     return {
-      contracts: contracts
-        .slice(0, requestedLimit)
-        .map((contract) => this.toDto(contract)),
+      contracts: boundedEntries.flatMap((entry) => {
+        const contract = this.toDto(entry);
+        return contract ? [contract] : [];
+      }),
+      activeAtOffset,
+      limitReached: boundedEntries.length >= requestedLimit,
     };
   }
 
@@ -437,28 +481,47 @@ export class PluginLedgerConnectorCanton
     return true;
   }
 
-  private toDto(contract: ActiveContract): ActiveContract {
+  private toDto(entry: ICantonActiveContractEntry): ActiveContract | undefined {
+    const activeContract = entry?.contractEntry?.JsActiveContract;
+    if (!activeContract) {
+      return undefined;
+    }
+    const event = activeContract.createdEvent;
+    const interfaceViews = event.interfaceViews?.map(
+      (view): ActiveContractInterfaceView => ({
+        interfaceId: view.interfaceId,
+        viewStatus: {
+          code: view.viewStatus.code,
+          message: view.viewStatus.message,
+        },
+        viewValue: view.viewValue,
+      }),
+    );
     return {
-      contractId: contract.contractId,
-      templateId: contract.templateId,
-      createArgument: contract.createArgument,
-      witnessParties: [...contract.witnessParties],
-      signatories: [...contract.signatories],
-      observers: contract.observers ? [...contract.observers] : undefined,
-      createdAt: contract.createdAt,
-      synchronizerId: contract.synchronizerId,
+      contractId: event.contractId,
+      templateId: event.templateId,
+      createArgument: event.createArgument as ActiveContract["createArgument"],
+      witnessParties: [...event.witnessParties],
+      signatories: [...event.signatories],
+      observers: event.observers ? [...event.observers] : undefined,
+      createdAt: event.createdAt,
+      synchronizerId: activeContract.synchronizerId,
+      interfaceViews,
     };
   }
 
   private validateNonBlankStringArray(
-    values: readonly string[],
+    values: unknown,
     fieldName: string,
     requireValue = true,
-  ): void {
+  ): asserts values is string[] {
     this.validateRequest(
       Array.isArray(values),
       `${fieldName} must be an array`,
     );
+    if (!Array.isArray(values)) {
+      return;
+    }
     if (requireValue) {
       this.validateRequest(values.length > 0, `${fieldName} must not be empty`);
     }
@@ -475,17 +538,20 @@ export class PluginLedgerConnectorCanton
     }
   }
 
-  private validateOptionalNonBlankString(
-    value: string | undefined,
-    fieldName: string,
-  ): void {
-    if (value !== undefined) {
-      this.validateRequest(
-        this.isNonBlankString(value),
-        `${fieldName} must not be blank`,
-      );
-      this.validateStringLength(value, fieldName);
+  private validateRequiredString(value: unknown, fieldName: string): void {
+    this.validateRequest(
+      this.isNonBlankString(value),
+      `${fieldName} must not be blank`,
+    );
+    this.validateStringLength(value as string, fieldName);
+  }
+
+  private isPlainObject(value: unknown): value is Record<string, unknown> {
+    if (typeof value !== "object" || value === null || Array.isArray(value)) {
+      return false;
     }
+    const prototype = Object.getPrototypeOf(value) as unknown;
+    return prototype === Object.prototype || prototype === null;
   }
 
   private isNonBlankString(value: unknown): value is string {
@@ -505,31 +571,82 @@ export class PluginLedgerConnectorCanton
     );
   }
 
-  private validateCommandIdentifiers(command: object): void {
-    const commandRecord = command as Record<string, unknown>;
-    for (const variant of [
-      "CreateCommand",
-      "ExerciseCommand",
-      "CreateAndExerciseCommand",
-    ]) {
-      const body = commandRecord[variant];
-      if (!body || typeof body !== "object" || Array.isArray(body)) {
-        continue;
-      }
-      const bodyRecord = body as Record<string, unknown>;
-      for (const field of ["templateId", "contractId", "choice"]) {
-        const value = bodyRecord[field];
-        if (typeof value === "string") {
-          this.validateStringLength(
-            value,
-            `${this.className}#transact() request.commands[].${variant}.${field}`,
-          );
-        }
-      }
+  /**
+   * Checks the command envelope that the OpenAPI schema describes, so that
+   * direct library callers get the same 400 responses as REST callers.
+   */
+  private validateCommand(command: unknown): void {
+    const fieldName = `${this.className}#transact() request.commands[]`;
+    this.validateRequest(
+      this.isPlainObject(command),
+      `${fieldName} must be an object`,
+    );
+    const variants = Object.keys(command as object);
+    const variant = variants[0];
+    this.validateRequest(
+      variants.length === 1 &&
+        (variant === "CreateCommand" ||
+          variant === "ExerciseCommand" ||
+          variant === "CreateAndExerciseCommand"),
+      `${fieldName} must contain exactly one of CreateCommand, ExerciseCommand, or CreateAndExerciseCommand`,
+    );
+    const body = (command as Record<string, unknown>)[variant];
+    this.validateRequest(
+      this.isPlainObject(body),
+      `${fieldName}.${variant} must be an object`,
+    );
+    const fields = body as Record<string, unknown>;
+    this.validateRequiredString(
+      fields.templateId,
+      `${fieldName}.${variant}.templateId`,
+    );
+    if (variant === "ExerciseCommand") {
+      this.validateRequiredString(
+        fields.contractId,
+        `${fieldName}.${variant}.contractId`,
+      );
+    }
+    if (variant !== "CreateCommand") {
+      this.validateRequiredString(
+        fields.choice,
+        `${fieldName}.${variant}.choice`,
+      );
+      this.validateRequest(
+        "choiceArgument" in fields,
+        `${fieldName}.${variant}.choiceArgument is required`,
+      );
+    }
+    if (variant !== "ExerciseCommand") {
+      this.validateRequest(
+        this.isPlainObject(fields.createArguments),
+        `${fieldName}.${variant}.createArguments must be an object`,
+      );
     }
   }
 
+  /**
+   * Validates that a payload is finite, acyclic, plain JSON within the size
+   * and depth limits. The walk keeps a lower bound of the serialized size and
+   * stops as soon as it exceeds the limit, so oversized payloads are rejected
+   * without traversing or serializing all of them.
+   */
   private validateJsonPayload(value: unknown, fieldName: string): void {
+    const tooLarge = () =>
+      new PayloadTooLargeError(
+        `${fieldName} must not exceed ${MAX_TRANSACTION_PAYLOAD_BYTES} bytes`,
+      );
+    const notJson = () =>
+      new BadRequestError(`${fieldName} must be finite, acyclic JSON data`);
+    // A lower bound of the UTF-8 JSON size: every UTF-16 code unit of a
+    // string is at least one UTF-8 byte, and each value is at least one byte.
+    let minimumBytes = 0;
+    const account = (bytes: number) => {
+      minimumBytes += bytes;
+      if (minimumBytes > MAX_TRANSACTION_PAYLOAD_BYTES) {
+        throw tooLarge();
+      }
+    };
+
     const activeObjects = new WeakSet<object>();
     const stack: Array<{
       readonly depth: number;
@@ -550,42 +667,56 @@ export class PluginLedgerConnectorCanton
         `${fieldName} must not exceed ${MAX_TRANSACTION_PAYLOAD_DEPTH} nesting levels`,
       );
 
-      const valueType = typeof current.value;
-      if (
-        valueType === "bigint" ||
-        valueType === "function" ||
-        valueType === "symbol" ||
-        valueType === "undefined" ||
-        (valueType === "number" && !Number.isFinite(current.value))
-      ) {
-        throw new BadRequestError(
-          `${fieldName} must be finite, acyclic JSON data`,
-        );
+      const item = current.value;
+      switch (typeof item) {
+        case "string":
+          account(item.length + 2);
+          continue;
+        case "number":
+          if (!Number.isFinite(item)) {
+            throw notJson();
+          }
+          account(1);
+          continue;
+        case "boolean":
+          account(4);
+          continue;
+        case "object":
+          break;
+        default:
+          throw notJson();
       }
-      if (!current.value || valueType !== "object") {
+      if (item === null) {
+        account(4);
         continue;
       }
 
-      const objectValue = current.value as object;
-      const prototype = Object.getPrototypeOf(objectValue) as unknown;
       this.validateRequest(
-        Array.isArray(objectValue) ||
-          prototype === Object.prototype ||
-          prototype === null,
+        Array.isArray(item) || this.isPlainObject(item),
         `${fieldName} must contain only JSON objects and arrays`,
       );
-      this.validateRequest(
-        !activeObjects.has(objectValue),
-        `${fieldName} must be finite, acyclic JSON data`,
-      );
-      activeObjects.add(objectValue);
-      stack.push({
-        depth: current.depth,
-        exiting: true,
-        value: objectValue,
-      });
-      for (const item of Object.values(objectValue)) {
-        stack.push({ depth: current.depth + 1, value: item });
+      if (activeObjects.has(item)) {
+        throw notJson();
+      }
+      activeObjects.add(item);
+      stack.push({ depth: current.depth, exiting: true, value: item });
+      if (Array.isArray(item)) {
+        // Brackets plus one separator between elements.
+        account(2 + Math.max(item.length - 1, 0));
+        for (let index = item.length - 1; index >= 0; index--) {
+          stack.push({ depth: current.depth + 1, value: item[index] });
+        }
+      } else {
+        const keys = Object.keys(item);
+        // Braces, separators, and each quoted key with its colon.
+        account(2 + Math.max(keys.length - 1, 0));
+        for (const key of keys) {
+          account(key.length + 3);
+          stack.push({
+            depth: current.depth + 1,
+            value: (item as Record<string, unknown>)[key],
+          });
+        }
       }
     }
 
@@ -593,19 +724,14 @@ export class PluginLedgerConnectorCanton
     try {
       serialized = JSON.stringify(value);
     } catch (_error: unknown) {
-      throw new BadRequestError(
-        `${fieldName} must be finite, acyclic JSON data`,
-      );
+      throw notJson();
     }
-
     this.validateRequest(
       serialized !== undefined,
       `${fieldName} must be JSON serializable`,
     );
     if (Buffer.byteLength(serialized, "utf8") > MAX_TRANSACTION_PAYLOAD_BYTES) {
-      throw new PayloadTooLargeError(
-        `${fieldName} must not exceed ${MAX_TRANSACTION_PAYLOAD_BYTES} bytes`,
-      );
+      throw tooLarge();
     }
   }
 
@@ -641,6 +767,8 @@ export class PluginLedgerConnectorCanton
     });
     try {
       return await Promise.race([pendingOperation, timeoutPromise]);
+    } catch (error: unknown) {
+      throw toCantonLedgerError(error, outcomeMayBeUnknown);
     } finally {
       if (timeout) {
         clearTimeout(timeout);
@@ -674,35 +802,123 @@ export class PluginLedgerConnectorCanton
     return pendingOperation;
   }
 
-  private static validateLedgerClientUrl(
-    ledgerClientUrl: URL | string,
-    allowInsecureLoopbackHttp: boolean,
+  private static validateIntegerOption(
+    value: number,
+    maximum: number,
     fieldName: string,
   ): void {
+    if (!Number.isSafeInteger(value) || value < 1 || value > maximum) {
+      throw new Error(
+        `${fieldName} must be an integer between 1 and ${maximum}`,
+      );
+    }
+  }
+
+  /**
+   * Validates a URL that receives credentials and returns its normalized
+   * form. HTTPS is required; plain HTTP is accepted only for a loopback host
+   * with the explicit development exception.
+   */
+  private static validateServiceUrl(
+    value: unknown,
+    allowInsecureLoopbackHttp: boolean,
+    fieldName: string,
+  ): string {
+    if (
+      !(value instanceof URL) &&
+      (typeof value !== "string" || value.trim().length === 0)
+    ) {
+      throw new Error(`${fieldName} must be a non-blank URL`);
+    }
     let url: URL;
     try {
-      url = new URL(ledgerClientUrl.toString());
+      url = new URL(value instanceof URL ? value.href : value);
     } catch (_error: unknown) {
-      throw new BadRequestError(`${fieldName} must be an absolute URL`);
+      throw new Error(`${fieldName} must be an absolute URL`);
     }
     if (url.username || url.password) {
-      throw new BadRequestError(
+      throw new Error(
         `${fieldName} must not embed credentials; configure options.auth instead`,
       );
     }
     if (url.protocol === "https:") {
-      return;
-    }
-    if (url.protocol !== "http:") {
-      throw new BadRequestError(`${fieldName} must use https:`);
+      return url.href;
     }
     if (
+      url.protocol !== "http:" ||
       !allowInsecureLoopbackHttp ||
       !PluginLedgerConnectorCanton.isLoopbackHostname(url.hostname)
     ) {
-      throw new BadRequestError(
+      throw new Error(
         `${fieldName} must use https:; plain http: is only allowed for a loopback host with options.allowInsecureLoopbackHttp`,
       );
+    }
+    return url.href;
+  }
+
+  /** Validates the authentication options and returns a private copy. */
+  private static validateAuth(
+    auth: unknown,
+    allowInsecureLoopbackHttp: boolean,
+    fieldName: string,
+  ): CantonAuthConfig {
+    const isNonBlank = (value: unknown): value is string =>
+      typeof value === "string" && value.trim().length > 0;
+    if (typeof auth !== "object" || auth === null) {
+      throw new Error(`${fieldName} must be an object`);
+    }
+    const config = auth as Record<string, unknown>;
+    const copyCredentials = () => {
+      const credentials = config.credentials as
+        | Record<string, unknown>
+        | undefined;
+      if (
+        typeof credentials !== "object" ||
+        credentials === null ||
+        !isNonBlank(credentials.clientId) ||
+        typeof credentials.clientSecret !== "string"
+      ) {
+        throw new Error(
+          `${fieldName}.credentials must contain clientId and clientSecret`,
+        );
+      }
+      return {
+        clientId: credentials.clientId,
+        clientSecret: credentials.clientSecret,
+        scope: credentials.scope as string | undefined,
+        audience: credentials.audience as string | undefined,
+      };
+    };
+    switch (config.method) {
+      case "static":
+        if (!isNonBlank(config.token)) {
+          throw new Error(`${fieldName}.token must not be blank`);
+        }
+        return { method: "static", token: config.token };
+      case "self_signed":
+        if (!isNonBlank(config.issuer)) {
+          throw new Error(`${fieldName}.issuer must not be blank`);
+        }
+        return {
+          method: "self_signed",
+          issuer: config.issuer,
+          credentials: copyCredentials(),
+          keyId: config.keyId as string | undefined,
+        };
+      case "client_credentials":
+        return {
+          method: "client_credentials",
+          configUrl: PluginLedgerConnectorCanton.validateServiceUrl(
+            config.configUrl,
+            allowInsecureLoopbackHttp,
+            `${fieldName}.configUrl`,
+          ),
+          credentials: copyCredentials(),
+        };
+      default:
+        throw new Error(
+          `${fieldName}.method must be static, self_signed, or client_credentials`,
+        );
     }
   }
 
@@ -721,8 +937,8 @@ export class PluginLedgerConnectorCanton
       const sdkPromise = this.withOperationTimeout(
         () =>
           this.walletSdkFactory.create({
-            auth: this.options.auth,
-            ledgerClientUrl: this.options.ledgerClientUrl,
+            auth: this.auth,
+            ledgerClientUrl: this.ledgerClientUrl,
           }),
         "Canton Wallet SDK initialization",
       ).catch((error: unknown) => {

@@ -260,6 +260,9 @@ nav:
         - cacti-plugin-ledger-connector-stellar:
           - README: cactus/packages/cacti-plugin-ledger-connector-stellar.md
           - OAPI spec: cactus/packages/cacti-plugin-ledger-connector-stellar/oapi.md
+        - cacti-plugin-ledger-connector-canton:
+          - README: cactus/packages/cacti-plugin-ledger-connector-canton.md
+          - OAPI spec: cactus/packages/cacti-plugin-ledger-connector-canton/oapi.md
         - cactus-plugin-keychain-memory:
           - README: cactus/packages/cactus-plugin-keychain-memory.md
           - OAPI spec: cactus/packages/cactus-plugin-keychain-memory/oapi.md

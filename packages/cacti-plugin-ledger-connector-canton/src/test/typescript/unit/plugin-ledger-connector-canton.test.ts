@@ -1,4 +1,6 @@
 import {
+  DEFAULT_MAX_ACTIVE_CONTRACT_LIMIT,
+  MAX_ACTIVE_CONTRACT_LIMIT,
   MAX_COMMANDS_PER_TRANSACTION,
   MAX_IN_FLIGHT_OPERATIONS,
   MAX_FILTER_VALUES,
@@ -8,10 +10,12 @@ import {
   PluginLedgerConnectorCanton,
 } from "../../../main/typescript/plugin-ledger-connector-canton";
 import type {
+  ICantonActiveContractEntry,
   ICantonWalletSdk,
   ICantonWalletSdkFactory,
 } from "../../../main/typescript/canton-wallet-sdk";
 import { CantonWalletSdkFactory } from "../../../main/typescript/canton-wallet-sdk";
+import { CantonLedgerError } from "../../../main/typescript/canton-ledger-error";
 import { ConsensusAlgorithmFamily } from "@hyperledger-cacti/cactus-core-api";
 import type { CantonCommand } from "../../../main/typescript/generated/openapi/typescript-axios";
 
@@ -26,9 +30,32 @@ const auth = {
   },
 };
 
+const VALID_COMMAND: CantonCommand = {
+  CreateCommand: {
+    templateId: "package:Module:Asset",
+    createArguments: {},
+  },
+};
+
+function toAcsEntry(contract: {
+  readonly synchronizerId: string;
+  readonly [field: string]: unknown;
+}): ICantonActiveContractEntry {
+  const { synchronizerId, ...createdEvent } = contract;
+  return {
+    contractEntry: {
+      JsActiveContract: {
+        createdEvent: createdEvent as never,
+        synchronizerId,
+      },
+    },
+  };
+}
+
 function createSdkMock(): ICantonWalletSdk {
   return {
     ledger: {
+      ledgerEnd: jest.fn().mockResolvedValue(10),
       internal: {
         submit: jest.fn().mockResolvedValue({
           updateId: "update-1",
@@ -37,7 +64,7 @@ function createSdkMock(): ICantonWalletSdk {
       },
       acsReader: {
         raw: {
-          readJsContracts: jest.fn().mockResolvedValue([]),
+          read: jest.fn().mockResolvedValue([]),
         },
       },
     },
@@ -53,6 +80,7 @@ function createConnector(
     readonly allowedPartyIds?: readonly string[];
     readonly operationTimeoutMs?: number;
     readonly maxInFlightOperations?: number;
+    readonly maxActiveContractLimit?: number;
   } = {},
 ): PluginLedgerConnectorCanton {
   return new PluginLedgerConnectorCanton({
@@ -62,6 +90,7 @@ function createConnector(
     auth,
     pluginRegistry: {} as never,
     walletSdkFactory,
+    ...(options.allowedPartyIds === undefined ? { allowAllParties: true } : {}),
     ...options,
   });
 }
@@ -91,6 +120,11 @@ function createCommandWithPayloadNesting(levels: number): CantonCommand {
     },
   } as CantonCommand;
 }
+
+// Several tests use fake timers with never-settling upstream promises. A
+// regression there should fail quickly instead of hitting the repository-wide
+// one-hour Jest timeout.
+jest.setTimeout(30_000);
 
 describe("PluginLedgerConnectorCanton", () => {
   test("initializes lazily and does not create the Wallet SDK on plugin init", async () => {
@@ -161,7 +195,7 @@ describe("PluginLedgerConnectorCanton", () => {
     await expect(operation).resolves.toEqual({ parties: ["Alice::1220"] });
   });
 
-  test("shutdown stops waiting for an upstream operation after the operation timeout", async () => {
+  test("shutdown waits up to the operation timeout for abandoned work, then warns", async () => {
     jest.useFakeTimers();
     try {
       const sdk = createSdkMock();
@@ -172,6 +206,10 @@ describe("PluginLedgerConnectorCanton", () => {
         { create: jest.fn().mockResolvedValue(sdk) },
         { operationTimeoutMs: 25 },
       );
+      const warn = jest.spyOn(
+        (connector as unknown as { log: { warn: () => void } }).log,
+        "warn",
+      );
       const operation = connector.listParties();
       const rejection = expect(operation).rejects.toMatchObject({
         statusCode: 504,
@@ -179,15 +217,27 @@ describe("PluginLedgerConnectorCanton", () => {
       await jest.advanceTimersByTimeAsync(25);
       await rejection;
 
-      const shutdown = connector.shutdown();
-      await jest.advanceTimersByTimeAsync(25);
-      await expect(shutdown).resolves.toBeUndefined();
+      let settled = false;
+      const shutdown = connector.shutdown().then(() => {
+        settled = true;
+      });
+      await jest.advanceTimersByTimeAsync(24);
+      expect(settled).toBe(false);
+      await jest.advanceTimersByTimeAsync(1);
+      await shutdown;
+
+      expect(settled).toBe(true);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringMatching(
+          /1 Canton Wallet SDK operation\(s\) were still pending/,
+        ),
+      );
     } finally {
       jest.useRealTimers();
     }
-  });
+  }, 10_000);
 
-  test("an SDK initialization still pending at shutdown cannot revive the connector", async () => {
+  test("an operation waiting for SDK initialization at shutdown is rejected with 503", async () => {
     const sdk = createSdkMock();
     let resolveFirst: ((value: ICantonWalletSdk) => void) | undefined;
     const create = jest.fn().mockImplementationOnce(
@@ -204,13 +254,12 @@ describe("PluginLedgerConnectorCanton", () => {
     resolveFirst?.(sdk);
     await shutdown;
 
-    // The operation that was already waiting for the SDK may complete, but
-    // nothing new is accepted afterwards.
-    await firstOperation.catch(() => undefined);
+    await expect(firstOperation).rejects.toMatchObject({ statusCode: 503 });
     await expect(connector.listParties()).rejects.toMatchObject({
       statusCode: 503,
     });
     expect(create).toHaveBeenCalledTimes(1);
+    expect(sdk.party.list).not.toHaveBeenCalled();
   });
 
   test("forwards a transaction to the Wallet SDK submit operation", async () => {
@@ -557,7 +606,7 @@ describe("PluginLedgerConnectorCanton", () => {
       offset: 7,
     });
 
-    expect(sdk.ledger.acsReader.raw.readJsContracts).toHaveBeenCalledWith({
+    expect(sdk.ledger.acsReader.raw.read).toHaveBeenCalledWith({
       parties: ["Alice::1220"],
       filterByParty: true,
       templateIds: ["package:Module:Asset"],
@@ -565,6 +614,8 @@ describe("PluginLedgerConnectorCanton", () => {
       offset: 7,
       limit: 100,
     });
+    // An explicit offset is used as-is, without a ledger-end query.
+    expect(sdk.ledger.ledgerEnd).not.toHaveBeenCalled();
   });
 
   test("forwards an interface-only ACS filter", async () => {
@@ -578,7 +629,7 @@ describe("PluginLedgerConnectorCanton", () => {
       interfaceIds: ["package:Module:AssetInterface"],
     });
 
-    expect(sdk.ledger.acsReader.raw.readJsContracts).toHaveBeenCalledWith(
+    expect(sdk.ledger.acsReader.raw.read).toHaveBeenCalledWith(
       expect.objectContaining({
         templateIds: undefined,
         interfaceIds: ["package:Module:AssetInterface"],
@@ -586,17 +637,36 @@ describe("PluginLedgerConnectorCanton", () => {
     );
   });
 
-  test("rejects ACS queries above the 1000-contract limit", async () => {
+  test("caps ACS limits at Canton's default list limit unless configured", async () => {
     const create = jest.fn();
     const connector = createConnector({ create });
 
     await expect(
       connector.getActiveContracts({
         parties: ["Alice::1220"],
-        limit: 10_000,
+        limit: DEFAULT_MAX_ACTIVE_CONTRACT_LIMIT + 1,
       }),
-    ).rejects.toThrow(/limit must not exceed 1000/i);
+    ).rejects.toThrow(/limit must not exceed 200/i);
     expect(create).not.toHaveBeenCalled();
+
+    const sdk = createSdkMock();
+    const configured = createConnector(
+      { create: jest.fn().mockResolvedValue(sdk) },
+      { maxActiveContractLimit: 500 },
+    );
+    await configured.getActiveContracts({
+      parties: ["Alice::1220"],
+      limit: 500,
+    });
+    await expect(
+      configured.getActiveContracts({ parties: ["Alice::1220"], limit: 501 }),
+    ).rejects.toThrow(/limit must not exceed 500/i);
+    expect(() =>
+      createConnector(
+        { create: jest.fn() },
+        { maxActiveContractLimit: MAX_ACTIVE_CONTRACT_LIMIT + 1 },
+      ),
+    ).toThrow(/maxActiveContractLimit must be an integer between 1 and 1000/);
   });
 
   test("rejects an ACS query without parties before creating the SDK", async () => {
@@ -644,7 +714,7 @@ describe("PluginLedgerConnectorCanton", () => {
         ),
       }),
     ).rejects.toThrow(/interfaceIds must not contain more than 100 items/i);
-    expect(sdk.ledger.acsReader.raw.readJsContracts).toHaveBeenCalledTimes(1);
+    expect(sdk.ledger.acsReader.raw.read).toHaveBeenCalledTimes(1);
   });
 
   test.each([
@@ -687,8 +757,8 @@ describe("PluginLedgerConnectorCanton", () => {
 
   test("maps ACS results to connector-owned API objects", async () => {
     const sdk = createSdkMock();
-    jest.mocked(sdk.ledger.acsReader.raw.readJsContracts).mockResolvedValue([
-      {
+    jest.mocked(sdk.ledger.acsReader.raw.read).mockResolvedValue([
+      toAcsEntry({
         contractId: "contract-1",
         templateId: "package:Module:Asset",
         createArgument: { owner: "Alice::1220" },
@@ -699,7 +769,10 @@ describe("PluginLedgerConnectorCanton", () => {
         synchronizerId: "synchronizer-1",
         offset: 9,
         packageName: "must-not-leak",
-      },
+        createdEventBlob: "must-not-leak",
+      }),
+      // Incomplete reassignments are not active contracts.
+      { contractEntry: { JsIncompleteUnassigned: {} } } as never,
     ]);
     const connector = createConnector({
       create: jest.fn().mockResolvedValue(sdk),
@@ -720,8 +793,11 @@ describe("PluginLedgerConnectorCanton", () => {
           observers: ["Observer::1220"],
           createdAt: "2026-10-02T00:00:00Z",
           synchronizerId: "synchronizer-1",
+          interfaceViews: undefined,
         },
       ],
+      activeAtOffset: 10,
+      limitReached: false,
     });
   });
 
@@ -736,7 +812,7 @@ describe("PluginLedgerConnectorCanton", () => {
       connector.transact({
         commandId: "command-1",
         partyId: "Mallory::1220",
-        commands: [{}] as CantonCommand[],
+        commands: [VALID_COMMAND],
       }),
     ).rejects.toThrow(/party is not allowed/i);
     await expect(
@@ -744,14 +820,14 @@ describe("PluginLedgerConnectorCanton", () => {
         commandId: "command-1",
         partyId: "Alice::1220",
         readAs: ["Mallory::1220"],
-        commands: [{}] as CantonCommand[],
+        commands: [VALID_COMMAND],
       }),
     ).rejects.toThrow(/party is not allowed/i);
     await expect(
       connector.getActiveContracts({ parties: ["Mallory::1220"] }),
     ).rejects.toThrow(/party is not allowed/i);
     expect(sdk.ledger.internal.submit).not.toHaveBeenCalled();
-    expect(sdk.ledger.acsReader.raw.readJsContracts).not.toHaveBeenCalled();
+    expect(sdk.ledger.acsReader.raw.read).not.toHaveBeenCalled();
   });
 
   test("filters listed parties through the optional party allowlist", async () => {
@@ -783,7 +859,7 @@ describe("PluginLedgerConnectorCanton", () => {
       const result = connector.transact({
         commandId: "command-1",
         partyId: "Alice::1220",
-        commands: [{}] as CantonCommand[],
+        commands: [VALID_COMMAND],
       });
       const rejection = expect(result).rejects.toThrow(
         /exceeded 25 ms; the final transaction outcome is unknown/i,
@@ -1031,6 +1107,48 @@ describe("PluginLedgerConnectorCanton", () => {
       {},
       { headers: { "Content-Type": "application/json" } },
     );
+    client.patchWithRetry.mockResolvedValue({ ok: true });
+    await provider.request({
+      method: "ledgerApi",
+      params: {
+        requestMethod: "patch",
+        resource: "/v2/users/u",
+        path: { "user-id": "u" },
+      },
+    });
+    expect(client.patchWithRetry).toHaveBeenCalledWith(
+      "/v2/users/u",
+      {},
+      undefined,
+      { path: { "user-id": "u" } },
+    );
+
+    const dar = Buffer.from([1, 2, 3]);
+    await provider.request({
+      method: "ledgerApi",
+      params: {
+        requestMethod: "post",
+        resource: "/v2/packages",
+        body: dar,
+        headers: { "Content-Type": "application/octet-stream" },
+      },
+    });
+    const [, body, , , additionalOptions] =
+      client.postWithRetry.mock.calls[
+        client.postWithRetry.mock.calls.length - 1
+      ];
+    expect(body).toBe(dar);
+    expect(additionalOptions.headers).toEqual({
+      "Content-Type": "application/octet-stream",
+    });
+    expect(additionalOptions.bodySerializer(dar)).toBe(dar);
+
+    await expect(
+      provider.request({
+        method: "ledgerApi",
+        params: { requestMethod: "delete", resource: "/v2/users/u" },
+      }),
+    ).rejects.toThrow(/Unsupported request method: delete/);
     await expect(provider.request({ method: "unknown" })).rejects.toThrow(
       /Unsupported method/,
     );
@@ -1063,6 +1181,12 @@ describe("PluginLedgerConnectorCanton", () => {
     await expect(provider.request(authenticatedUserRequest)).resolves.toEqual({
       user: { id: "ledger-api-user" },
     });
+    captured.tokenProvider?.getAuthContext.mockRejectedValueOnce(
+      new Error("no user in token"),
+    );
+    await expect(
+      provider.request(authenticatedUserRequest),
+    ).resolves.toBeUndefined();
     await expect(
       provider.request({
         ...authenticatedUserRequest,
@@ -1137,6 +1261,7 @@ describe("PluginLedgerConnectorCanton", () => {
           ledgerClientUrl,
           auth,
           pluginRegistry: {} as never,
+          allowAllParties: true,
         }),
     ).not.toThrow();
   });
@@ -1154,6 +1279,7 @@ describe("PluginLedgerConnectorCanton", () => {
         ledgerClientUrl,
         auth,
         pluginRegistry: {} as never,
+        allowAllParties: true,
       };
 
       expect(() => new PluginLedgerConnectorCanton(options)).toThrow(
@@ -1204,6 +1330,7 @@ describe("PluginLedgerConnectorCanton", () => {
           allowInsecureLoopbackHttp: true,
           auth,
           pluginRegistry: {} as never,
+          allowAllParties: true,
         }),
     ).toThrow(error);
   });
@@ -1216,6 +1343,7 @@ describe("PluginLedgerConnectorCanton", () => {
         ledgerClientUrl: "https://user:must-not-leak@ledger.example.com",
         auth,
         pluginRegistry: {} as never,
+        allowAllParties: true,
       });
     } catch (error: unknown) {
       message = String((error as Error).message);
@@ -1235,13 +1363,14 @@ describe("PluginLedgerConnectorCanton", () => {
       parties: ["Alice::1220", "Bob::1220"],
     });
 
-    expect(sdk.ledger.acsReader.raw.readJsContracts).toHaveBeenCalledTimes(1);
-    expect(sdk.ledger.acsReader.raw.readJsContracts).toHaveBeenCalledWith({
+    expect(sdk.ledger.ledgerEnd).toHaveBeenCalledTimes(1);
+    expect(sdk.ledger.acsReader.raw.read).toHaveBeenCalledTimes(1);
+    expect(sdk.ledger.acsReader.raw.read).toHaveBeenCalledWith({
       parties: ["Alice::1220", "Bob::1220"],
       filterByParty: true,
       templateIds: undefined,
       interfaceIds: undefined,
-      offset: undefined,
+      offset: 10,
       limit: 100,
     });
   });
@@ -1257,12 +1386,13 @@ describe("PluginLedgerConnectorCanton", () => {
       createdAt: "2026-10-02T00:00:00Z",
       synchronizerId: "synchronizer-1",
     };
-    jest.mocked(sdk.ledger.acsReader.raw.readJsContracts).mockResolvedValue(
-      Array.from({ length: 5 }, (_value, index) => ({
-        ...contract,
-        contractId: `contract-${index}`,
-      })),
-    );
+    jest
+      .mocked(sdk.ledger.acsReader.raw.read)
+      .mockResolvedValue(
+        Array.from({ length: 5 }, (_value, index) =>
+          toAcsEntry({ ...contract, contractId: `contract-${index}` }),
+        ),
+      );
     const connector = createConnector({
       create: jest.fn().mockResolvedValue(sdk),
     });
@@ -1277,10 +1407,12 @@ describe("PluginLedgerConnectorCanton", () => {
     });
 
     expect(first.contracts).toHaveLength(1);
+    expect(first.limitReached).toBe(true);
     expect(second.contracts).toHaveLength(3);
+    expect(second.limitReached).toBe(true);
     expect(
       jest
-        .mocked(sdk.ledger.acsReader.raw.readJsContracts)
+        .mocked(sdk.ledger.acsReader.raw.read)
         .mock.calls.map(([request]) => request.limit),
     ).toEqual([1, 3]);
   });
@@ -1364,5 +1496,461 @@ describe("PluginLedgerConnectorCanton", () => {
         createConnector({ create: jest.fn() }, { maxInFlightOperations }),
       ).toThrow(/maxInFlightOperations must be an integer between/i);
     }
+  });
+
+  describe("party policy", () => {
+    const baseOptions = {
+      instanceId: "canton-connector-test",
+      ledgerClientUrl: "https://ledger.example.com",
+      auth,
+      pluginRegistry: {} as never,
+    };
+
+    test("requires an explicit party policy", () => {
+      expect(() => new PluginLedgerConnectorCanton(baseOptions)).toThrow(
+        /set exactly one of options.allowedPartyIds and options.allowAllParties/,
+      );
+      expect(
+        () =>
+          new PluginLedgerConnectorCanton({
+            ...baseOptions,
+            allowAllParties: true,
+            allowedPartyIds: ["Alice::1220"],
+          }),
+      ).toThrow(/set exactly one of/);
+      expect(
+        () =>
+          new PluginLedgerConnectorCanton({
+            ...baseOptions,
+            allowedPartyIds: [" "],
+          }),
+      ).toThrow(/allowedPartyIds must be an array of non-blank party IDs/);
+    });
+
+    test("an empty allowlist denies every party", async () => {
+      const sdk = createSdkMock();
+      const connector = createConnector(
+        { create: jest.fn().mockResolvedValue(sdk) },
+        { allowedPartyIds: [] },
+      );
+
+      await expect(
+        connector.getActiveContracts({ parties: ["Alice::1220"] }),
+      ).rejects.toMatchObject({ statusCode: 403 });
+      await expect(connector.listParties()).resolves.toEqual({ parties: [] });
+    });
+
+    test("reports configuration mistakes as plain errors, not HTTP 400", () => {
+      let thrown: unknown;
+      try {
+        createConnector({ create: jest.fn() }, { operationTimeoutMs: 0 });
+      } catch (error: unknown) {
+        thrown = error;
+      }
+      expect(thrown).toBeInstanceOf(Error);
+      expect(thrown).not.toHaveProperty("statusCode");
+    });
+  });
+
+  describe("service URLs and credentials", () => {
+    function createWithAuth(
+      authConfig: unknown,
+      create: jest.Mock = jest.fn(),
+      allowInsecureLoopbackHttp = false,
+    ) {
+      return new PluginLedgerConnectorCanton({
+        instanceId: "canton-connector-test",
+        ledgerClientUrl: "https://ledger.example.com",
+        auth: authConfig as never,
+        pluginRegistry: {} as never,
+        allowAllParties: true,
+        allowInsecureLoopbackHttp,
+        walletSdkFactory: { create },
+      });
+    }
+
+    const clientCredentials = {
+      clientId: "connector",
+      clientSecret: "test-only-secret",
+      scope: undefined,
+      audience: undefined,
+    };
+
+    test("requires HTTPS for the OAuth configuration URL that receives the client secret", () => {
+      expect(() =>
+        createWithAuth({
+          method: "client_credentials",
+          configUrl: "http://idp.example.com/.well-known/openid-configuration",
+          credentials: clientCredentials,
+        }),
+      ).toThrow(/options.auth.configUrl must use https:/);
+      expect(() =>
+        createWithAuth(
+          {
+            method: "client_credentials",
+            configUrl: "http://127.0.0.1:8082/.well-known/openid-configuration",
+            credentials: clientCredentials,
+          },
+          jest.fn(),
+          true,
+        ),
+      ).not.toThrow();
+      expect(() =>
+        createWithAuth({
+          method: "client_credentials",
+          configUrl: "https://idp.example.com/.well-known/openid-configuration",
+          credentials: clientCredentials,
+        }),
+      ).not.toThrow();
+    });
+
+    test.each([
+      { name: "a missing method", config: { token: "t" } },
+      {
+        name: "a blank static token",
+        config: { method: "static", token: " " },
+      },
+      {
+        name: "self-signed credentials without a client ID",
+        config: {
+          method: "self_signed",
+          issuer: "issuer",
+          credentials: { clientSecret: "s" },
+        },
+      },
+    ])("rejects authentication options with $name", ({ config }) => {
+      expect(() => createWithAuth(config)).toThrow(/options.auth/);
+    });
+
+    test("uses the validated URL and credentials even if the caller mutates its options later", async () => {
+      const sdk = createSdkMock();
+      const create = jest.fn().mockResolvedValue(sdk);
+      const ledgerClientUrl = new URL("https://ledger.example.com/api/");
+      const authConfig = { method: "static" as const, token: "original-token" };
+      const connector = new PluginLedgerConnectorCanton({
+        instanceId: "canton-connector-test",
+        ledgerClientUrl,
+        auth: authConfig,
+        pluginRegistry: {} as never,
+        allowAllParties: true,
+        walletSdkFactory: { create },
+      });
+
+      ledgerClientUrl.protocol = "http:";
+      ledgerClientUrl.hostname = "attacker.example";
+      (authConfig as { token: string }).token = "replaced-token";
+      await connector.listParties();
+
+      expect(create).toHaveBeenCalledWith({
+        ledgerClientUrl: "https://ledger.example.com/api/",
+        auth: { method: "static", token: "original-token" },
+      });
+    });
+  });
+
+  describe("transaction request hardening", () => {
+    test("checks the party allowlist before inspecting the command payload", async () => {
+      const sdk = createSdkMock();
+      const connector = createConnector(
+        { create: jest.fn().mockResolvedValue(sdk) },
+        { allowedPartyIds: ["Alice::1220"] },
+      );
+      const hugePayload = new Array(5_000_000).fill(0);
+      const started = Date.now();
+
+      await expect(
+        connector.transact({
+          partyId: "Mallory::1220",
+          commandId: "command-1",
+          commands: [
+            {
+              CreateCommand: {
+                templateId: "package:Module:Asset",
+                createArguments: { hugePayload },
+              },
+            },
+          ],
+        }),
+      ).rejects.toMatchObject({ statusCode: 403 });
+      expect(Date.now() - started).toBeLessThan(1000);
+    });
+
+    test("rejects an oversized payload without walking all of it", async () => {
+      const sdk = createSdkMock();
+      const connector = createConnector({
+        create: jest.fn().mockResolvedValue(sdk),
+      });
+      const hugePayload = new Array(5_000_000).fill(0);
+      const started = Date.now();
+
+      await expect(
+        connector.transact({
+          partyId: "Alice::1220",
+          commandId: "command-1",
+          commands: [
+            {
+              CreateCommand: {
+                templateId: "package:Module:Asset",
+                createArguments: { hugePayload },
+              },
+            },
+          ],
+        }),
+      ).rejects.toMatchObject({ statusCode: 413 });
+      expect(Date.now() - started).toBeLessThan(1000);
+      expect(sdk.ledger.internal.submit).not.toHaveBeenCalled();
+    });
+
+    test.each([null, "", false, 0, "Alice::1220"])(
+      "rejects readAs=%p with a 400",
+      async (readAs) => {
+        const create = jest.fn();
+        const connector = createConnector({ create });
+
+        await expect(
+          connector.transact({
+            partyId: "Alice::1220",
+            commandId: "command-1",
+            readAs,
+            commands: [VALID_COMMAND],
+          } as never),
+        ).rejects.toMatchObject({ statusCode: 400 });
+        expect(create).not.toHaveBeenCalled();
+      },
+    );
+
+    test.each([
+      { name: "an array command", command: [1], error: /must be an object/ },
+      { name: "an empty command", command: {}, error: /exactly one of/ },
+      {
+        name: "two command variants",
+        command: {
+          CreateCommand: (VALID_COMMAND as { CreateCommand: unknown })
+            .CreateCommand,
+          ExerciseCommand: {},
+        },
+        error: /exactly one of/,
+      },
+      {
+        name: "an unknown command variant",
+        command: { ArchiveCommand: {} },
+        error: /exactly one of/,
+      },
+      {
+        name: "an exercise without a contract ID",
+        command: {
+          ExerciseCommand: {
+            templateId: "package:Module:Asset",
+            choice: "Archive",
+            choiceArgument: {},
+          },
+        },
+        error: /ExerciseCommand.contractId must not be blank/,
+      },
+      {
+        name: "an exercise without a choice argument",
+        command: {
+          ExerciseCommand: {
+            templateId: "package:Module:Asset",
+            contractId: "contract-1",
+            choice: "Archive",
+          },
+        },
+        error: /choiceArgument is required/,
+      },
+      {
+        name: "a create without create arguments",
+        command: { CreateCommand: { templateId: "package:Module:Asset" } },
+        error: /createArguments must be an object/,
+      },
+    ])(
+      "rejects $name before calling the ledger",
+      async ({ command, error }) => {
+        const create = jest.fn();
+        const connector = createConnector({ create });
+
+        await expect(
+          connector.transact({
+            partyId: "Alice::1220",
+            commandId: "command-1",
+            commands: [command],
+          } as never),
+        ).rejects.toThrow(error);
+        expect(create).not.toHaveBeenCalled();
+      },
+    );
+
+    test("accepts null Daml values such as an empty Optional", async () => {
+      const sdk = createSdkMock();
+      const connector = createConnector({
+        create: jest.fn().mockResolvedValue(sdk),
+      });
+
+      await connector.transact({
+        partyId: "Alice::1220",
+        commandId: "command-1",
+        commands: [
+          {
+            ExerciseCommand: {
+              templateId: "package:Module:Asset",
+              contractId: "contract-1",
+              choice: "Update",
+              choiceArgument: { note: null, tags: [null] },
+            },
+          },
+        ],
+      });
+
+      expect(sdk.ledger.internal.submit).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("active-contract results", () => {
+    test("returns interface views and drops the created-event blob", async () => {
+      const sdk = createSdkMock();
+      jest.mocked(sdk.ledger.acsReader.raw.read).mockResolvedValue([
+        toAcsEntry({
+          contractId: "contract-1",
+          templateId: "package:Module:Asset",
+          createArgument: { owner: "Alice::1220" },
+          witnessParties: ["Alice::1220"],
+          signatories: ["Alice::1220"],
+          createdAt: "2026-10-02T00:00:00Z",
+          synchronizerId: "synchronizer-1",
+          createdEventBlob: "must-not-leak",
+          interfaceViews: [
+            {
+              interfaceId: "package:Module:Holding",
+              viewStatus: { code: 0, message: "", details: ["must-not-leak"] },
+              viewValue: { amount: "10.0" },
+              implementationPackageId: "must-not-leak",
+            },
+          ],
+        }),
+      ]);
+      const connector = createConnector({
+        create: jest.fn().mockResolvedValue(sdk),
+      });
+
+      const response = await connector.getActiveContracts({
+        parties: ["Alice::1220"],
+        interfaceIds: ["package:Module:Holding"],
+      });
+
+      expect(response.contracts[0].interfaceViews).toEqual([
+        {
+          interfaceId: "package:Module:Holding",
+          viewStatus: { code: 0, message: "" },
+          viewValue: { amount: "10.0" },
+        },
+      ]);
+      expect(JSON.stringify(response)).not.toContain("must-not-leak");
+    });
+
+    test("reports a reached limit even when incomplete reassignments fill it", async () => {
+      const sdk = createSdkMock();
+      jest
+        .mocked(sdk.ledger.acsReader.raw.read)
+        .mockResolvedValue([
+          { contractEntry: { JsIncompleteAssigned: {} } } as never,
+          { contractEntry: { JsIncompleteUnassigned: {} } } as never,
+        ]);
+      const connector = createConnector({
+        create: jest.fn().mockResolvedValue(sdk),
+      });
+
+      const response = await connector.getActiveContracts({
+        parties: ["Alice::1220"],
+        limit: 2,
+      });
+
+      expect(response).toEqual({
+        contracts: [],
+        activeAtOffset: 10,
+        limitReached: true,
+      });
+    });
+  });
+
+  describe("Canton ledger errors", () => {
+    test.each([
+      { grpcCodeValue: 3, code: "INVALID_ARGUMENT", status: 400 },
+      { grpcCodeValue: 7, code: "PERMISSION_DENIED", status: 403 },
+      { grpcCodeValue: 5, code: "CONTRACT_NOT_FOUND", status: 404 },
+      { grpcCodeValue: 6, code: "DUPLICATE_COMMAND", status: 409 },
+      { grpcCodeValue: 9, code: "INCONSISTENT", status: 409 },
+      { grpcCodeValue: 11, code: "OFFSET_AFTER_LEDGER_END", status: 400 },
+      { grpcCodeValue: 10, code: "SUBMISSION_ALREADY_IN_FLIGHT", status: 503 },
+      { grpcCodeValue: 14, code: "SERVICE_NOT_RUNNING", status: 503 },
+      { grpcCodeValue: 16, code: "UNAUTHENTICATED", status: 502 },
+      { grpcCodeValue: undefined, code: "SOMETHING_ELSE", status: 502 },
+    ])(
+      "maps $code (gRPC $grpcCodeValue) to HTTP $status",
+      async ({ grpcCodeValue, code, status }) => {
+        const sdk = createSdkMock();
+        jest.mocked(sdk.ledger.internal.submit).mockRejectedValue({
+          code,
+          cause: "Alice::1220 must-not-leak",
+          context: { secret: "must-not-leak" },
+          errorCategory: 1,
+          grpcCodeValue,
+        });
+        const connector = createConnector({
+          create: jest.fn().mockResolvedValue(sdk),
+        });
+
+        const error = await connector
+          .transact({
+            partyId: "Alice::1220",
+            commandId: "command-1",
+            commands: [VALID_COMMAND],
+          })
+          .catch((rejection: unknown) => rejection);
+
+        expect(error).toBeInstanceOf(CantonLedgerError);
+        expect(error).toMatchObject({
+          statusCode: status,
+          cantonErrorCode: code,
+        });
+        expect(JSON.stringify(error)).not.toContain("must-not-leak");
+        expect((error as Error).message).not.toContain("must-not-leak");
+      },
+    );
+
+    test("marks a ledger deadline on a transaction as an unknown outcome", async () => {
+      const sdk = createSdkMock();
+      jest.mocked(sdk.ledger.internal.submit).mockRejectedValue({
+        code: "REQUEST_TIME_OUT",
+        cause: "deadline",
+        context: {},
+        errorCategory: 3,
+        grpcCodeValue: 4,
+      });
+      const connector = createConnector({
+        create: jest.fn().mockResolvedValue(sdk),
+      });
+
+      await expect(
+        connector.transact({
+          partyId: "Alice::1220",
+          commandId: "command-1",
+          commands: [VALID_COMMAND],
+        }),
+      ).rejects.toMatchObject({
+        statusCode: 504,
+        message: expect.stringMatching(/outcome is unknown/),
+      });
+    });
+
+    test("leaves non-Canton failures for the opaque 502 handler", async () => {
+      const sdk = createSdkMock();
+      const failure = new Error("socket hang up");
+      jest.mocked(sdk.party.list).mockRejectedValue(failure);
+      const connector = createConnector({
+        create: jest.fn().mockResolvedValue(sdk),
+      });
+
+      await expect(connector.listParties()).rejects.toBe(failure);
+    });
   });
 });

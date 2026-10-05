@@ -238,7 +238,8 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 1000,
-            "default": 100
+            "default": 100,
+            "description": "Maximum number of entries to return. The connector rejects values above its configured maxActiveContractLimit (default 200, Canton's default http-list-max-elements-limit)."
           }
         }
       },
@@ -259,7 +260,8 @@
             "type": "string"
           },
           "templateId": {
-            "type": "string"
+            "type": "string",
+            "description": "The template ID as reported by the ledger, using the package ID (`<package-id>:Module:Template`)."
           },
           "createArgument": {
             "$ref": "#/components/schemas/DamlRecord"
@@ -287,19 +289,36 @@
           },
           "synchronizerId": {
             "type": "string"
+          },
+          "interfaceViews": {
+            "type": "array",
+            "description": "Interface views, present when the query used interfaceIds.",
+            "items": {
+              "$ref": "#/components/schemas/ActiveContractInterfaceView"
+            }
           }
         }
       },
       "GetActiveContractsResponse": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["contracts"],
+        "required": ["contracts", "activeAtOffset", "limitReached"],
         "properties": {
           "contracts": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ActiveContract"
             }
+          },
+          "activeAtOffset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "The ledger offset of the snapshot. Continue from it with the ledger's update stream."
+          },
+          "limitReached": {
+            "type": "boolean",
+            "description": "True when the ledger returned `limit` entries, so more active contracts may match."
           }
         }
       },
@@ -323,8 +342,76 @@
         "properties": {
           "message": {
             "type": "string"
+          },
+          "cantonErrorCode": {
+            "type": "string",
+            "description": "Canton's error code, for example DUPLICATE_COMMAND, when the ledger rejected the request."
           }
         }
+      },
+      "ActiveContractInterfaceView": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "The view of an active contract through one of the queried interfaces.",
+        "required": ["interfaceId", "viewStatus"],
+        "properties": {
+          "interfaceId": {
+            "type": "string"
+          },
+          "viewStatus": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "message"],
+            "description": "gRPC status of the view computation. Code 0 means the view was computed.",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          },
+          "viewValue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DamlValue"
+              }
+            ],
+            "description": "The computed interface view, present when the view status code is 0."
+          }
+        }
+      },
+      "RequestValidationError": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["message"],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          }
+        }
+      },
+      "BadRequestResponse": {
+        "description": "A connector validation error, or the OpenAPI validator's list of request errors.",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestValidationError"
+            }
+          }
+        ]
       }
     }
   },
@@ -366,7 +453,17 @@
             }
           },
           "400": {
-            "description": "Invalid transaction request.",
+            "description": "Invalid transaction request, or the ledger rejected it as invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request has no valid bearer token.",
             "content": {
               "application/json": {
                 "schema": {
@@ -376,7 +473,27 @@
             }
           },
           "403": {
-            "description": "The caller or connector is not authorized for the requested Canton party.",
+            "description": "The caller, the connector, or the ledger does not allow the requested party.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A contract or other resource referenced by a command was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The ledger already has a command with this commandId, or the commands conflict with the ledger state.",
             "content": {
               "application/json": {
                 "schema": {
@@ -387,16 +504,6 @@
           },
           "413": {
             "description": "The transaction payload exceeds the connector limit.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "504": {
-            "description": "The Canton transaction operation timed out.",
             "content": {
               "application/json": {
                 "schema": {
@@ -416,7 +523,17 @@
             }
           },
           "503": {
-            "description": "The connector is shut down or has too many pending ledger operations.",
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable. Retry with the same commandId.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton transaction operation timed out; the outcome is unknown. Retry with the same commandId.",
             "content": {
               "application/json": {
                 "schema": {
@@ -465,7 +582,17 @@
             }
           },
           "400": {
-            "description": "Invalid contract query.",
+            "description": "Invalid contract query, or an out-of-range offset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request has no valid bearer token.",
             "content": {
               "application/json": {
                 "schema": {
@@ -475,7 +602,7 @@
             }
           },
           "403": {
-            "description": "The caller or connector is not authorized for the requested Canton party.",
+            "description": "The caller, the connector, or the ledger does not allow the requested party.",
             "content": {
               "application/json": {
                 "schema": {
@@ -484,8 +611,8 @@
               }
             }
           },
-          "504": {
-            "description": "The Canton contract query timed out.",
+          "413": {
+            "description": "More contracts match than the participant returns in one response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -505,7 +632,17 @@
             }
           },
           "503": {
-            "description": "The connector is shut down or has too many pending ledger operations.",
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton contract query timed out.",
             "content": {
               "application/json": {
                 "schema": {
@@ -543,8 +680,18 @@
               }
             }
           },
-          "504": {
-            "description": "The Canton party query timed out.",
+          "401": {
+            "description": "The request has no valid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller is not authorized to list parties.",
             "content": {
               "application/json": {
                 "schema": {
@@ -564,7 +711,17 @@
             }
           },
           "503": {
-            "description": "The connector is shut down or has too many pending ledger operations.",
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton party query timed out.",
             "content": {
               "application/json": {
                 "schema": {
@@ -578,11 +735,6 @@
     },
     "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec": {
       "get": {
-        "security": [
-          {
-            "bearerTokenAuth": ["read:canton-spec"]
-          }
-        ],
         "x-hyperledger-cacti": {
           "http": {
             "verbLowerCase": "get",

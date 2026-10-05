@@ -1,4 +1,6 @@
+import { readFileSync } from "fs";
 import http from "http";
+import { join } from "path";
 import { AddressInfo } from "net";
 
 import { Servers } from "@hyperledger-cacti/cactus-common";
@@ -31,7 +33,7 @@ describe("Canton connector with the real Wallet SDK", () => {
         method: req.method,
         path: url.pathname,
         query: url.searchParams,
-        body: rawBody ? JSON.parse(rawBody) : undefined,
+        body: parseBody(rawBody),
         authorization: req.headers.authorization,
       });
       res.setHeader("content-type", "application/json");
@@ -44,6 +46,17 @@ describe("Canton connector with the real Wallet SDK", () => {
       res.end(JSON.stringify(response));
     });
   });
+
+  function parseBody(rawBody: string): unknown {
+    if (!rawBody) {
+      return undefined;
+    }
+    try {
+      return JSON.parse(rawBody);
+    } catch (_error: unknown) {
+      return rawBody;
+    }
+  }
 
   function respond(url: URL): unknown {
     const user = {
@@ -139,6 +152,7 @@ describe("Canton connector with the real Wallet SDK", () => {
       auth: { method: "static", token },
       pluginRegistry: {} as never,
       logLevel: "SILENT",
+      allowAllParties: true,
     });
   });
 
@@ -155,6 +169,7 @@ describe("Canton connector with the real Wallet SDK", () => {
     await expect(connector.listParties()).resolves.toEqual({
       parties: ["Alice::1220"],
     });
+    expect(requests.length).toBeGreaterThan(0);
     expect(
       requests.every((request) => request.authorization === `Bearer ${token}`),
     ).toBe(true);
@@ -168,6 +183,8 @@ describe("Canton connector with the real Wallet SDK", () => {
     expect(response.contracts.map((contract) => contract.contractId)).toEqual(
       contractIds,
     );
+    expect(response.activeAtOffset).toBe(10);
+    expect(response.limitReached).toBe(false);
     expect(response.contracts[0].createArgument).toEqual({
       owner: "Alice::1220",
       note: null,
@@ -236,5 +253,21 @@ describe("Canton connector with the real Wallet SDK", () => {
         },
       ],
     });
+  });
+
+  // Jest runs the TypeScript sources with the repository's CommonJS settings,
+  // so this checks the compiled package that consumers load: its import()
+  // must stay native for the ESM-only Canton packages to load.
+  test("keeps a native import() in the compiled module loader", () => {
+    const compiledLoader = readFileSync(
+      join(
+        __dirname,
+        "../../../../dist/lib/main/typescript/import-esm-module.js",
+      ),
+      "utf8",
+    );
+
+    expect(compiledLoader).toMatch(/return import\(specifier\)/);
+    expect(compiledLoader).not.toMatch(/require\(specifier\)/);
   });
 });

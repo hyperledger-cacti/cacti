@@ -1,11 +1,39 @@
-import type { TokenProviderConfig } from "@canton-network/wallet-sdk" with { "resolution-mode": "import" };
+import { readFileSync } from "fs";
+import { createRequire } from "module";
+import { dirname, join } from "path";
+import { fileURLToPath, pathToFileURL } from "url";
 
 import type { Logger } from "@hyperledger-cacti/cactus-common";
 
-import type {
-  ActiveContract,
-  CantonCommand,
-} from "./generated/openapi/typescript-axios";
+import type { CantonCommand } from "./generated/openapi/typescript-axios";
+import { importEsmModule } from "./import-esm-module";
+
+/** OAuth client credentials used by the Wallet SDK token providers. */
+export interface ICantonClientCredentials {
+  readonly clientId: string;
+  readonly clientSecret: string;
+  readonly scope: string | undefined;
+  readonly audience: string | undefined;
+}
+
+/**
+ * Ledger API authentication, mirroring the Wallet SDK's TokenProviderConfig.
+ * It is declared here so that this package's type declarations do not depend
+ * on importing ESM-only types from the SDK.
+ */
+export type CantonAuthConfig =
+  | { readonly method: "static"; readonly token: string }
+  | {
+      readonly method: "self_signed";
+      readonly issuer: string;
+      readonly credentials: ICantonClientCredentials;
+      readonly keyId?: string;
+    }
+  | {
+      readonly method: "client_credentials";
+      readonly configUrl: string;
+      readonly credentials: ICantonClientCredentials;
+    };
 
 export interface ICantonSubmitRequest {
   actAs: string[];
@@ -20,12 +48,39 @@ export interface ICantonActiveContractsRequest {
   filterByParty: true;
   templateIds?: string[];
   interfaceIds?: string[];
-  offset?: number;
+  offset: number;
   limit: number;
+}
+
+/** A Canton created event, as returned by the JSON Ledger API. */
+export interface ICantonCreatedEvent {
+  readonly contractId: string;
+  readonly templateId: string;
+  readonly createArgument: unknown;
+  readonly witnessParties: readonly string[];
+  readonly signatories: readonly string[];
+  readonly observers?: readonly string[];
+  readonly createdAt: string;
+  readonly interfaceViews?: ReadonlyArray<{
+    readonly interfaceId: string;
+    readonly viewStatus: { readonly code: number; readonly message: string };
+    readonly viewValue?: unknown;
+  }>;
+}
+
+/** One entry of a JSON Ledger API active-contract response. */
+export interface ICantonActiveContractEntry {
+  readonly contractEntry?: {
+    readonly JsActiveContract?: {
+      readonly createdEvent: ICantonCreatedEvent;
+      readonly synchronizerId: string;
+    };
+  };
 }
 
 export interface ICantonWalletSdk {
   readonly ledger: {
+    ledgerEnd(): Promise<number>;
     readonly internal: {
       submit(request: ICantonSubmitRequest): Promise<{
         updateId: string;
@@ -42,9 +97,9 @@ export interface ICantonWalletSdk {
        * Node.js 20 does not provide.
        */
       readonly raw: {
-        readJsContracts(
+        read(
           request: ICantonActiveContractsRequest,
-        ): Promise<Array<ActiveContract & Record<string, unknown>>>;
+        ): Promise<ICantonActiveContractEntry[]>;
       };
     };
   };
@@ -54,8 +109,9 @@ export interface ICantonWalletSdk {
 }
 
 export interface ICantonWalletSdkFactoryCreateOptions {
-  auth: TokenProviderConfig;
-  ledgerClientUrl: URL | string;
+  auth: CantonAuthConfig;
+  /** An absolute, already validated JSON Ledger API URL. */
+  ledgerClientUrl: string;
 }
 
 export interface ICantonWalletSdkFactory {
@@ -87,20 +143,20 @@ interface ICantonAccessTokenProvider {
 interface ICantonLedgerClient {
   getWithRetry(
     resource: string,
-    version: undefined,
+    retryOptions: undefined,
     params: Record<string, unknown>,
   ): Promise<unknown>;
   postWithRetry(
     resource: string,
     body: unknown,
-    version: undefined,
+    retryOptions: undefined,
     params: Record<string, unknown>,
     additionalOptions: Record<string, unknown>,
   ): Promise<unknown>;
   patchWithRetry(
     resource: string,
     body: unknown,
-    version: undefined,
+    retryOptions: undefined,
     params: Record<string, unknown>,
   ): Promise<unknown>;
 }
@@ -108,7 +164,7 @@ interface ICantonLedgerClient {
 interface ICantonLedgerApiRequest {
   readonly method: string;
   readonly params?: {
-    readonly requestMethod: "get" | "post" | "patch" | "delete";
+    readonly requestMethod: string;
     readonly resource: string;
     readonly path?: unknown;
     readonly query?: unknown;
@@ -137,7 +193,7 @@ export interface ICantonWalletSdkModules {
     accessTokenProvider: ICantonAccessTokenProvider;
   }) => ICantonLedgerClient;
   readonly AuthTokenProvider: new (
-    config: TokenProviderConfig,
+    config: CantonAuthConfig,
     logger: ICantonInternalLogger,
   ) => ICantonAccessTokenProvider;
 }
@@ -146,41 +202,71 @@ export type CantonWalletSdkModuleLoader =
   () => Promise<ICantonWalletSdkModules>;
 
 /**
- * With "module": "CommonJS", TypeScript rewrites import() to require(), so a
- * native dynamic import has to be hidden from the compiler. A direct eval is
- * used rather than the Function constructor: eval'd code keeps this module as
- * its referrer, so import() resolves relative to this package and through the
- * loader that evaluated this module. Function-constructor code has no
- * referrer, and under Jest it resolved through an earlier, torn-down test
- * environment.
+ * Resolves the ES module entry point of `packageName` as seen from
+ * `fromFile`, using Node's resolution rules. Resolving relative to the SDK's
+ * own files guarantees the connector uses exactly the package copies the
+ * Wallet SDK uses, even when an installation contains several versions.
  */
-function importEsmModule(specifier: string): Promise<unknown> {
-  // The evaluated source is a constant.
-  // eslint-disable-next-line no-eval
-  const nativeImport = eval("(id) => import(id)") as (
-    id: string,
-  ) => Promise<unknown>;
-  return nativeImport(specifier);
+function resolveEsmEntry(packageName: string, fromFile: string): string {
+  const commonJsEntry = createRequire(fromFile).resolve(packageName);
+  let directory = dirname(commonJsEntry);
+  for (;;) {
+    const manifestPath = join(directory, "package.json");
+    let manifest: { name?: unknown; exports?: unknown } | undefined;
+    try {
+      manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+    } catch (_error: unknown) {
+      manifest = undefined;
+    }
+    if (manifest?.name === packageName) {
+      const rootExport = (manifest.exports as Record<string, unknown>)?.["."];
+      const importEntry =
+        rootExport && typeof rootExport === "object"
+          ? (rootExport as Record<string, unknown>).import
+          : undefined;
+      if (typeof importEntry !== "string") {
+        throw new Error(`${packageName} does not declare an ESM entry point.`);
+      }
+      return pathToFileURL(join(directory, importEntry)).href;
+    }
+    const parent = dirname(directory);
+    if (parent === directory) {
+      throw new Error(`Cannot locate the package root of ${packageName}.`);
+    }
+    directory = parent;
+  }
 }
 
 async function loadCantonWalletSdk(): Promise<ICantonWalletSdkModules> {
-  // The Canton packages must be loaded through their ESM entry points. The
-  // CommonJS build is unusable: @canton-network/core-ledger-client 1.12.x
+  // The Canton packages must be loaded through their ESM entry points. Their
+  // CommonJS builds are unusable: @canton-network/core-ledger-client 1.12.x
   // wraps require("openapi-fetch") with Node-mode ESM interop, so the client
   // factory resolves to the module namespace instead of a function and
   // SDK.create() throws on every Node.js version. Loading lazily also avoids
   // initializing SDK dependencies until the first ledger operation.
-  //
+  const walletSdkUrl = resolveEsmEntry(
+    "@canton-network/wallet-sdk",
+    __filename,
+  );
+  const walletSdkPath = fileURLToPath(walletSdkUrl);
+  const providerUrl = resolveEsmEntry(
+    "@canton-network/core-provider-ledger",
+    walletSdkPath,
+  );
   // The imports share a module graph and run one after another: concurrent
   // imports of overlapping graphs fail under Jest's VM module loader.
-  const walletSdk = (await importEsmModule(
-    "@canton-network/wallet-sdk",
-  )) as Pick<ICantonWalletSdkModules, "SDK" | "CustomLogAdapter">;
+  const walletSdk = (await importEsmModule(walletSdkUrl)) as Pick<
+    ICantonWalletSdkModules,
+    "SDK" | "CustomLogAdapter"
+  >;
   const ledgerClient = (await importEsmModule(
-    "@canton-network/core-ledger-client",
+    resolveEsmEntry(
+      "@canton-network/core-ledger-client",
+      fileURLToPath(providerUrl),
+    ),
   )) as Pick<ICantonWalletSdkModules, "LedgerClient">;
   const walletAuth = (await importEsmModule(
-    "@canton-network/core-wallet-auth",
+    resolveEsmEntry("@canton-network/core-wallet-auth", walletSdkPath),
   )) as Pick<ICantonWalletSdkModules, "AuthTokenProvider">;
   return {
     SDK: walletSdk.SDK,
@@ -211,10 +297,10 @@ function createSeverityOnlyLogger(log: Logger): ICantonInternalLogger {
 const MISSING_USER_ID_CAUSE = "The submitted request is missing a user-id";
 
 /**
- * Equivalent of the Wallet SDK's LedgerProvider, which hardcodes a pino
- * logger that writes request paths and, at debug level, request bodies
- * straight to stdout. This provider gives the ledger client the connector's
- * severity-only logger instead.
+ * Implements the Wallet SDK's ledger provider contract (`request()`), which
+ * SDK.create() accepts as `ledgerProvider`. It is used instead of the SDK's
+ * own LedgerProvider, which hardcodes a pino logger that writes request paths
+ * and, at debug level, request bodies straight to stdout.
  */
 export class CantonLedgerProvider {
   public constructor(
@@ -261,6 +347,7 @@ export class CantonLedgerProvider {
           ledgerParams,
         );
       default:
+        // The SDK's own provider does not support other methods either.
         throw new Error(
           `Unsupported request method: ${String(params.requestMethod)}`,
         );
@@ -316,7 +403,7 @@ export class CantonWalletSdkFactory implements ICantonWalletSdkFactory {
       internalLogger,
     );
     const ledgerClient = new LedgerClient({
-      baseUrl: new URL(options.ledgerClientUrl.toString()),
+      baseUrl: new URL(options.ledgerClientUrl),
       logger: internalLogger,
       accessTokenProvider,
     });

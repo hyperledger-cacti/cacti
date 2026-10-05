@@ -36,7 +36,7 @@ export interface ActiveContract {
      */
     'contractId': string;
     /**
-     * 
+     * The template ID as reported by the ledger, using the package ID (`<package-id>:Module:Template`).
      * @type {string}
      * @memberof ActiveContract
      */
@@ -77,7 +77,64 @@ export interface ActiveContract {
      * @memberof ActiveContract
      */
     'synchronizerId': string;
+    /**
+     * Interface views, present when the query used interfaceIds.
+     * @type {Array<ActiveContractInterfaceView>}
+     * @memberof ActiveContract
+     */
+    'interfaceViews'?: Array<ActiveContractInterfaceView>;
 }
+/**
+ * The view of an active contract through one of the queried interfaces.
+ * @export
+ * @interface ActiveContractInterfaceView
+ */
+export interface ActiveContractInterfaceView {
+    /**
+     * 
+     * @type {string}
+     * @memberof ActiveContractInterfaceView
+     */
+    'interfaceId': string;
+    /**
+     * 
+     * @type {ActiveContractInterfaceViewViewStatus}
+     * @memberof ActiveContractInterfaceView
+     */
+    'viewStatus': ActiveContractInterfaceViewViewStatus;
+    /**
+     * A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type.
+     * @type {any}
+     * @memberof ActiveContractInterfaceView
+     */
+    'viewValue'?: any;
+}
+/**
+ * gRPC status of the view computation. Code 0 means the view was computed.
+ * @export
+ * @interface ActiveContractInterfaceViewViewStatus
+ */
+export interface ActiveContractInterfaceViewViewStatus {
+    /**
+     * 
+     * @type {number}
+     * @memberof ActiveContractInterfaceViewViewStatus
+     */
+    'code': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof ActiveContractInterfaceViewViewStatus
+     */
+    'message': string;
+}
+/**
+ * @type BadRequestResponse
+ * A connector validation error, or the OpenAPI validator\'s list of request errors.
+ * @export
+ */
+export type BadRequestResponse = Array<RequestValidationError> | ErrorResponse;
+
 /**
  * @type CantonCommand
  * @export
@@ -218,6 +275,12 @@ export interface ErrorResponse {
      * @memberof ErrorResponse
      */
     'message': string;
+    /**
+     * Canton\'s error code, for example DUPLICATE_COMMAND, when the ledger rejected the request.
+     * @type {string}
+     * @memberof ErrorResponse
+     */
+    'cantonErrorCode'?: string;
 }
 /**
  * 
@@ -250,7 +313,7 @@ export interface GetActiveContractsRequest {
      */
     'offset'?: number;
     /**
-     * 
+     * Maximum number of entries to return. The connector rejects values above its configured maxActiveContractLimit (default 200, Canton\'s default http-list-max-elements-limit).
      * @type {number}
      * @memberof GetActiveContractsRequest
      */
@@ -268,6 +331,18 @@ export interface GetActiveContractsResponse {
      * @memberof GetActiveContractsResponse
      */
     'contracts': Array<ActiveContract>;
+    /**
+     * The ledger offset of the snapshot. Continue from it with the ledger\'s update stream.
+     * @type {number}
+     * @memberof GetActiveContractsResponse
+     */
+    'activeAtOffset': number;
+    /**
+     * True when the ledger returned `limit` entries, so more active contracts may match.
+     * @type {boolean}
+     * @memberof GetActiveContractsResponse
+     */
+    'limitReached': boolean;
 }
 /**
  * 
@@ -281,6 +356,33 @@ export interface ListPartiesResponse {
      * @memberof ListPartiesResponse
      */
     'parties': Array<string>;
+}
+/**
+ * 
+ * @export
+ * @interface RequestValidationError
+ */
+export interface RequestValidationError {
+    [key: string]: any;
+
+    /**
+     * 
+     * @type {string}
+     * @memberof RequestValidationError
+     */
+    'path'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RequestValidationError
+     */
+    'message': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RequestValidationError
+     */
+    'errorCode'?: string;
 }
 /**
  * 
@@ -403,10 +505,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
-
-            // authentication bearerTokenAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
 
     
