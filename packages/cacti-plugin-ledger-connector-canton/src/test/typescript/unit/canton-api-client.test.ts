@@ -34,17 +34,19 @@ describe("Canton connector HTTP API", () => {
         }),
       },
       acsReader: {
-        readJsContracts: jest.fn().mockResolvedValue([
-          {
-            contractId: "contract-1",
-            templateId: "package:Module:Asset",
-            createArgument: { owner: "Alice::1220" },
-            witnessParties: ["Alice::1220"],
-            signatories: ["Alice::1220"],
-            createdAt: "2026-10-02T00:00:00Z",
-            synchronizerId: "synchronizer-1",
-          },
-        ]),
+        raw: {
+          readJsContracts: jest.fn().mockResolvedValue([
+            {
+              contractId: "contract-1",
+              templateId: "package:Module:Asset",
+              createArgument: { owner: "Alice::1220" },
+              witnessParties: ["Alice::1220"],
+              signatories: ["Alice::1220"],
+              createdAt: "2026-10-02T00:00:00Z",
+              synchronizerId: "synchronizer-1",
+            },
+          ]),
+        },
       },
     },
     party: {
@@ -55,6 +57,7 @@ describe("Canton connector HTTP API", () => {
   const connector = new PluginLedgerConnectorCanton({
     instanceId: randomUUID(),
     ledgerClientUrl: "http://127.0.0.1:7575",
+    allowInsecureLoopbackHttp: true,
     auth: { method: "static", token: "test-only-token" },
     pluginRegistry: new PluginRegistry({ plugins: [] }),
     logLevel: "SILENT",
@@ -89,6 +92,9 @@ describe("Canton connector HTTP API", () => {
     apiClient = new CantonApiClient(
       new CantonApiClientOptions({
         basePath: `http://${address.address}:${address.port}`,
+        // The OpenAPI validator requires a bearer header; the test middleware
+        // above stands in for token verification and supplies the scopes.
+        accessToken: "test-only-token",
         baseOptions: {
           headers: { "x-test-scopes": allScopes.join(",") },
         },
@@ -122,6 +128,7 @@ describe("Canton connector HTTP API", () => {
 
     const transaction = await apiClient.runTransactionV1({
       partyId: "Alice::1220",
+      commandId: "command-1",
       commands: [command],
     });
     const contracts = await apiClient.getActiveContractsV1({
@@ -168,6 +175,7 @@ describe("Canton connector HTTP API", () => {
   ])("accepts a $name command over HTTP", async ({ command }) => {
     await apiClient.runTransactionV1({
       partyId: "Alice::1220",
+      commandId: "command-1",
       commands: [command],
     });
 
@@ -180,14 +188,81 @@ describe("Canton connector HTTP API", () => {
     await expect(
       apiClient.runTransactionV1({
         partyId: "Alice::1220",
+        commandId: "command-1",
         commands: [],
       }),
     ).rejects.toMatchObject({ response: { status: 400 } });
   });
 
+  test("accepts null Daml values at the OpenAPI boundary", async () => {
+    const command: CantonCommand = {
+      CreateCommand: {
+        templateId: "package:Module:Asset",
+        createArguments: {
+          owner: "Alice::1220",
+          note: null,
+          history: [null, { previousOwner: null }],
+        },
+      },
+    };
+
+    await apiClient.runTransactionV1({
+      partyId: "Alice::1220",
+      commandId: "command-with-nulls",
+      commands: [command],
+    });
+
+    expect(sdk.ledger.internal.submit).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        commandId: "command-with-nulls",
+        commands: [command],
+      }),
+    );
+  });
+
+  test("rejects a transaction without a command ID at the OpenAPI boundary", async () => {
+    const callsBefore = jest.mocked(sdk.ledger.internal.submit).mock.calls
+      .length;
+
+    await expect(
+      apiClient.runTransactionV1({
+        partyId: "Alice::1220",
+        commands: [
+          {
+            CreateCommand: {
+              templateId: "package:Module:Asset",
+              createArguments: {},
+            },
+          },
+        ],
+      } as never),
+    ).rejects.toMatchObject({ response: { status: 400 } });
+    expect(sdk.ledger.internal.submit).toHaveBeenCalledTimes(callsBefore);
+  });
+
+  test("rejects a command that matches no command variant at the OpenAPI boundary", async () => {
+    const callsBefore = jest.mocked(sdk.ledger.internal.submit).mock.calls
+      .length;
+
+    await expect(
+      apiClient.runTransactionV1({
+        partyId: "Alice::1220",
+        commandId: "command-1",
+        commands: [{}] as CantonCommand[],
+      }),
+    ).rejects.toMatchObject({ response: { status: 400 } });
+    expect(sdk.ledger.internal.submit).toHaveBeenCalledTimes(callsBefore);
+  });
+
+  test("rejects a request without a bearer token at the OpenAPI boundary", async () => {
+    await expect(
+      apiClient.listPartiesV1({ headers: { Authorization: "" } }),
+    ).rejects.toMatchObject({ response: { status: 401 } });
+  });
+
   test("rejects combined template and interface filters", async () => {
-    const callsBefore = jest.mocked(sdk.ledger.acsReader.readJsContracts).mock
-      .calls.length;
+    const callsBefore = jest.mocked(sdk.ledger.acsReader.raw.readJsContracts)
+      .mock.calls.length;
 
     await expect(
       apiClient.getActiveContractsV1({
@@ -196,7 +271,7 @@ describe("Canton connector HTTP API", () => {
         interfaceIds: ["package:Module:AssetInterface"],
       }),
     ).rejects.toMatchObject({ response: { status: 400 } });
-    expect(sdk.ledger.acsReader.readJsContracts).toHaveBeenCalledTimes(
+    expect(sdk.ledger.acsReader.raw.readJsContracts).toHaveBeenCalledTimes(
       callsBefore,
     );
   });
@@ -206,7 +281,18 @@ describe("Canton connector HTTP API", () => {
       name: "transaction",
       call: () =>
         apiClient.runTransactionV1(
-          { partyId: "Alice::1220", commands: [{}] as CantonCommand[] },
+          {
+            partyId: "Alice::1220",
+            commandId: "command-1",
+            commands: [
+              {
+                CreateCommand: {
+                  templateId: "package:Module:Asset",
+                  createArguments: {},
+                },
+              },
+            ],
+          },
           { headers: { "x-test-scopes": "read:canton-contracts" } },
         ),
     },
@@ -257,7 +343,15 @@ describe("Canton connector HTTP API", () => {
     await expect(
       apiClient.runTransactionV1({
         partyId: "Alice::1220",
-        commands: [{}] as CantonCommand[],
+        commandId: "command-1",
+        commands: [
+          {
+            CreateCommand: {
+              templateId: "package:Module:Asset",
+              createArguments: {},
+            },
+          },
+        ],
       }),
     ).rejects.toMatchObject({
       response: {

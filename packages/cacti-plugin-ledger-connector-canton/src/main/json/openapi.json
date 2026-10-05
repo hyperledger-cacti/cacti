@@ -19,50 +19,13 @@
     },
     "schemas": {
       "DamlValue": {
-        "nullable": true,
-        "oneOf": [
-          {
-            "type": "object",
-            "additionalProperties": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/DamlValue"
-                }
-              ],
-              "nullable": true
-            }
-          },
-          {
-            "type": "array",
-            "items": {
-              "allOf": [
-                {
-                  "$ref": "#/components/schemas/DamlValue"
-                }
-              ],
-              "nullable": true
-            }
-          },
-          {
-            "type": "string"
-          },
-          {
-            "type": "number"
-          },
-          {
-            "type": "boolean"
-          }
-        ]
+        "description": "A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type."
       },
       "DamlRecord": {
         "type": "object",
+        "description": "A Daml record encoded as a JSON object of field names to Daml values.",
         "additionalProperties": {
-          "allOf": [
-            {
-              "$ref": "#/components/schemas/DamlValue"
-            }
-          ],
-          "nullable": true
+          "$ref": "#/components/schemas/DamlValue"
         }
       },
       "CantonCreateCommand": {
@@ -175,7 +138,7 @@
       "RunTransactionRequest": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["partyId", "commands"],
+        "required": ["partyId", "commands", "commandId"],
         "properties": {
           "partyId": {
             "type": "string",
@@ -194,7 +157,8 @@
           "commandId": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 1024
+            "maxLength": 1024,
+            "description": "Caller-chosen, stable identifier for this submission. Reuse the same value when retrying a submission whose outcome is unknown (for example after HTTP 504) so that Canton command deduplication rejects a duplicate instead of committing it twice."
           },
           "synchronizerId": {
             "type": "string",
@@ -450,6 +414,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "The connector is shut down or has too many pending ledger operations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -529,6 +503,16 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "The connector is shut down or has too many pending ledger operations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -571,6 +555,16 @@
           },
           "502": {
             "description": "Canton party lookup failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The connector is shut down or has too many pending ledger operations.",
             "content": {
               "application/json": {
                 "schema": {

@@ -11,11 +11,23 @@ The initial connector supports:
 - querying the active contract set with party, template, and interface
   filters.
 
+## Requirements
+
+Node.js 20 or later. The connector loads the Wallet SDK through its ESM entry
+point; when running the tests with Jest, set
+`NODE_OPTIONS=--experimental-vm-modules`.
+
 ## Configuration
 
 The connector requires a Canton JSON Ledger API URL and Wallet SDK token
 provider configuration. The authentication token is used only to initialize
 the Wallet SDK and must be supplied through secure application configuration.
+
+`ledgerClientUrl` must use `https:` because the Wallet SDK sends the service
+credential to it. URLs with embedded credentials or other protocols are
+rejected. For local development only, such as Canton LocalNet, set
+`allowInsecureLoopbackHttp: true` to allow `http:` to `localhost`,
+`127.0.0.0/8`, or `[::1]`; remote plaintext HTTP is always rejected.
 
 ```typescript
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
@@ -30,7 +42,7 @@ if (!partyId) {
 const connector = new PluginLedgerConnectorCanton({
   instanceId: "canton-connector",
   pluginRegistry: new PluginRegistry(),
-  ledgerClientUrl: "http://127.0.0.1:7575",
+  ledgerClientUrl: "https://canton-participant.example.com",
   auth: {
     method: "static",
     token: process.env.CANTON_LEDGER_API_TOKEN ?? "",
@@ -43,8 +55,11 @@ const connector = new PluginLedgerConnectorCanton({
 const { parties } = await connector.listParties();
 console.log("Parties visible to this ledger user:", parties);
 
+// Derive the command ID from your own business identifier and persist it
+// before submitting, so that a retry reuses the same value.
 await connector.transact({
   partyId,
+  commandId: "asset-order-42-create",
   commands: [
     {
       CreateCommand: {
@@ -86,15 +101,28 @@ list results are filtered. An empty array denies access to all parties.
 Each Wallet SDK operation has a configurable timeout, which defaults to 60
 seconds and can be set up to 300 seconds. The Wallet SDK 1.5.1 methods used by
 this connector do not accept an abort signal, so the timeout bounds the Cacti
-request but cannot cancel an upstream operation already in progress. Command
-batches are limited to 100 commands, identifier/filter lists to 100 entries,
-identifiers to 1024 characters, and serialized command payloads to 1 MiB and
-64 nesting levels.
+request but cannot cancel an upstream operation already in progress. Such
+abandoned operations keep counting against `maxInFlightOperations` (default
+64, maximum 1024) until they actually settle; requests beyond that limit fail
+with HTTP 503 instead of accumulating unbounded sockets and payloads.
+`shutdown()` is terminal: it rejects new ledger work with HTTP 503 and waits up
+to `operationTimeoutMs` for pending operations to settle.
 
-A transaction timeout means that its final ledger outcome is unknown because
-the upstream submission cannot be cancelled. Supply a stable `commandId`,
-check the ledger result, and reuse that same ID instead of blindly submitting
-the command again.
+Command batches are limited to 100 commands, identifier/filter lists to 100
+entries, identifiers to 1024 characters, and serialized command payloads to
+1 MiB and 64 nesting levels. Active-contract queries make one Ledger API
+request and return at most `limit` contracts (default 100, maximum 1000).
+
+## Retries and idempotency
+
+`commandId` is required. A transaction timeout (HTTP 504) means that the
+final ledger outcome is unknown, because the upstream submission cannot be
+cancelled and may still commit. To retry safely, resubmit with the same
+`commandId`: Canton's command deduplication then rejects the retry if the
+original submission committed within the participant's deduplication period,
+instead of committing it twice. Do not generate a new `commandId` for a retry,
+and do not retry after the deduplication period has elapsed without first
+checking the ledger, for example with `getActiveContracts()`.
 
 The first version intentionally uses participant-hosted signing through the
 Wallet SDK. External signing, DAR deployment, and ledger-event streaming are

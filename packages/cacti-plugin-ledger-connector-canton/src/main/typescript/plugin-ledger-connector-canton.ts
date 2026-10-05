@@ -5,6 +5,7 @@ import {
   ForbiddenError,
   GatewayTimeoutError,
   PayloadTooLargeError,
+  ServiceUnavailableError,
 } from "http-errors-enhanced-cjs";
 
 import {
@@ -53,10 +54,23 @@ export const MAX_FILTER_VALUES = 100;
 export const MAX_IDENTIFIER_LENGTH = 1024;
 export const MAX_TRANSACTION_PAYLOAD_BYTES = 1024 * 1024;
 export const MAX_TRANSACTION_PAYLOAD_DEPTH = 64;
+export const DEFAULT_MAX_IN_FLIGHT_OPERATIONS = 64;
+export const MAX_IN_FLIGHT_OPERATIONS = 1024;
 
 export interface IPluginLedgerConnectorCantonOptions
   extends ICactusPluginOptions {
+  /**
+   * Canton JSON Ledger API base URL. It must use HTTPS because the Wallet SDK
+   * sends the service credential to it. Plain HTTP is accepted only for a
+   * loopback host and only when `allowInsecureLoopbackHttp` is true.
+   */
   ledgerClientUrl: URL | string;
+  /**
+   * Development-only exception, for example for Canton LocalNet, that allows
+   * `http:` to localhost, 127.0.0.0/8, or [::1]. Remote plaintext HTTP is
+   * always rejected.
+   */
+  allowInsecureLoopbackHttp?: boolean;
   auth: TokenProviderConfig;
   pluginRegistry: PluginRegistry;
   logLevel?: LogLevelDesc;
@@ -69,6 +83,13 @@ export interface IPluginLedgerConnectorCantonOptions
   allowedPartyIds?: readonly string[];
   /** Timeout applied to each Wallet SDK initialization and ledger operation. */
   operationTimeoutMs?: number;
+  /**
+   * Maximum number of upstream Wallet SDK calls, including SDK
+   * initialization, that may be pending at once. A call that timed out keeps
+   * its slot until the upstream work actually settles, because the Wallet SDK
+   * cannot cancel it. Requests beyond the limit fail with HTTP 503.
+   */
+  maxInFlightOperations?: number;
 }
 
 export class PluginLedgerConnectorCanton
@@ -89,6 +110,9 @@ export class PluginLedgerConnectorCanton
   private readonly walletSdkFactory: ICantonWalletSdkFactory;
   private readonly allowedPartyIds?: ReadonlySet<string>;
   private readonly operationTimeoutMs: number;
+  private readonly maxInFlightOperations: number;
+  private readonly inFlightOperations = new Set<Promise<void>>();
+  private isShutDown = false;
   private endpoints?: IWebServiceEndpoint[];
   private walletSdkPromise?: Promise<ICantonWalletSdk>;
 
@@ -109,6 +133,11 @@ export class PluginLedgerConnectorCanton
         `${fnTag} options.ledgerClientUrl`,
       );
     }
+    PluginLedgerConnectorCanton.validateLedgerClientUrl(
+      options.ledgerClientUrl,
+      options.allowInsecureLoopbackHttp === true,
+      `${fnTag} options.ledgerClientUrl`,
+    );
     Checks.truthy(options.auth, `${fnTag} options.auth`);
     Checks.truthy(options.pluginRegistry, `${fnTag} options.pluginRegistry`);
 
@@ -119,6 +148,14 @@ export class PluginLedgerConnectorCanton
         this.operationTimeoutMs > 0 &&
         this.operationTimeoutMs <= MAX_OPERATION_TIMEOUT_MS,
       `${fnTag} options.operationTimeoutMs must be an integer between 1 and ${MAX_OPERATION_TIMEOUT_MS}`,
+    );
+    this.maxInFlightOperations =
+      options.maxInFlightOperations ?? DEFAULT_MAX_IN_FLIGHT_OPERATIONS;
+    this.validateRequest(
+      Number.isSafeInteger(this.maxInFlightOperations) &&
+        this.maxInFlightOperations > 0 &&
+        this.maxInFlightOperations <= MAX_IN_FLIGHT_OPERATIONS,
+      `${fnTag} options.maxInFlightOperations must be an integer between 1 and ${MAX_IN_FLIGHT_OPERATIONS}`,
     );
     if (options.allowedPartyIds !== undefined) {
       this.validateNonBlankStringArray(
@@ -154,9 +191,32 @@ export class PluginLedgerConnectorCanton
     // does not require the configured Canton ledger to be online.
   }
 
+  /**
+   * Stops accepting new ledger work, then waits up to `operationTimeoutMs`
+   * for pending upstream calls to settle. Shutdown is terminal: later ledger
+   * operations fail with HTTP 503.
+   */
   public async shutdown(): Promise<void> {
+    this.isShutDown = true;
     this.walletSdkPromise = undefined;
     this.endpoints = undefined;
+
+    if (this.inFlightOperations.size === 0) {
+      return;
+    }
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const drained = await Promise.race([
+      Promise.all(this.inFlightOperations).then(() => true),
+      new Promise<false>((resolve) => {
+        timeout = setTimeout(() => resolve(false), this.operationTimeoutMs);
+      }),
+    ]);
+    clearTimeout(timeout);
+    if (!drained) {
+      this.log.warn(
+        `${this.inFlightOperations.size} Canton Wallet SDK operation(s) were still pending after shutdown waited ${this.operationTimeoutMs} ms.`,
+      );
+    }
   }
 
   public getOpenApiSpec(): unknown {
@@ -241,7 +301,14 @@ export class PluginLedgerConnectorCanton
       );
       this.validateCommandIdentifiers(command);
     }
-    this.validateOptionalNonBlankString(
+    // A caller-supplied, stable command ID is what lets Canton's command
+    // deduplication reject a retry of a submission whose outcome is unknown
+    // (for example after a timeout) instead of committing it twice.
+    this.validateRequest(
+      this.isNonBlankString(request.commandId),
+      `${this.className}#transact() request.commandId must not be blank`,
+    );
+    this.validateStringLength(
       request.commandId,
       `${this.className}#transact() request.commandId`,
     );
@@ -331,7 +398,7 @@ export class PluginLedgerConnectorCanton
 
     const sdk = await this.getOrCreateWalletSdk();
     const contracts = await this.withOperationTimeout(async () => {
-      return sdk.ledger.acsReader.readJsContracts({
+      return sdk.ledger.acsReader.raw.readJsContracts({
         parties: request.parties,
         filterByParty: true,
         templateIds: request.templateIds,
@@ -341,7 +408,13 @@ export class PluginLedgerConnectorCanton
       });
     }, "Canton active-contract query");
 
-    return { contracts: contracts.map((contract) => this.toDto(contract)) };
+    // The ledger applies the limit; slicing keeps the response bounded even
+    // if an upstream version ignores it.
+    return {
+      contracts: contracts
+        .slice(0, requestedLimit)
+        .map((contract) => this.toDto(contract)),
+    };
   }
 
   public async listParties(): Promise<ListPartiesResponse> {
@@ -549,6 +622,7 @@ export class PluginLedgerConnectorCanton
     operationName: string,
     outcomeMayBeUnknown = false,
   ): Promise<T> {
+    const pendingOperation = this.startTrackedOperation(operation);
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const timeoutPromise = new Promise<never>((_resolve, reject) => {
       timeout = setTimeout(
@@ -566,12 +640,80 @@ export class PluginLedgerConnectorCanton
       );
     });
     try {
-      return await Promise.race([operation(), timeoutPromise]);
+      return await Promise.race([pendingOperation, timeoutPromise]);
     } finally {
       if (timeout) {
         clearTimeout(timeout);
       }
     }
+  }
+
+  /**
+   * Starts an upstream Wallet SDK call and holds an in-flight slot until that
+   * call settles, even if the caller has already timed out. This bounds the
+   * requests, sockets, and payloads that abandoned operations can retain.
+   */
+  private startTrackedOperation<T>(operation: () => Promise<T>): Promise<T> {
+    if (this.isShutDown) {
+      throw new ServiceUnavailableError(
+        "The Canton connector has been shut down.",
+      );
+    }
+    if (this.inFlightOperations.size >= this.maxInFlightOperations) {
+      throw new ServiceUnavailableError(
+        "The Canton connector has too many pending ledger operations.",
+      );
+    }
+    const pendingOperation = Promise.resolve().then(operation);
+    const settled = pendingOperation.then(
+      () => undefined,
+      () => undefined,
+    );
+    this.inFlightOperations.add(settled);
+    void settled.then(() => this.inFlightOperations.delete(settled));
+    return pendingOperation;
+  }
+
+  private static validateLedgerClientUrl(
+    ledgerClientUrl: URL | string,
+    allowInsecureLoopbackHttp: boolean,
+    fieldName: string,
+  ): void {
+    let url: URL;
+    try {
+      url = new URL(ledgerClientUrl.toString());
+    } catch (_error: unknown) {
+      throw new BadRequestError(`${fieldName} must be an absolute URL`);
+    }
+    if (url.username || url.password) {
+      throw new BadRequestError(
+        `${fieldName} must not embed credentials; configure options.auth instead`,
+      );
+    }
+    if (url.protocol === "https:") {
+      return;
+    }
+    if (url.protocol !== "http:") {
+      throw new BadRequestError(`${fieldName} must use https:`);
+    }
+    if (
+      !allowInsecureLoopbackHttp ||
+      !PluginLedgerConnectorCanton.isLoopbackHostname(url.hostname)
+    ) {
+      throw new BadRequestError(
+        `${fieldName} must use https:; plain http: is only allowed for a loopback host with options.allowInsecureLoopbackHttp`,
+      );
+    }
+  }
+
+  private static isLoopbackHostname(hostname: string): boolean {
+    // The URL parser normalizes IPv4 shorthands such as 127.1 and keeps
+    // IPv6 literals in brackets.
+    return (
+      hostname === "localhost" ||
+      hostname === "[::1]" ||
+      /^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)
+    );
   }
 
   private getOrCreateWalletSdk(): Promise<ICantonWalletSdk> {

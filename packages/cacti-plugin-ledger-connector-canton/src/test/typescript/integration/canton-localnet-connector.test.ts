@@ -40,6 +40,8 @@ describe("Canton connector with LocalNet", () => {
       connector = new PluginLedgerConnectorCanton({
         instanceId: randomUUID(),
         ledgerClientUrl: connectionInfo.jsonLedgerApiHost,
+        // LocalNet publishes its JSON Ledger API on plain HTTP at 127.0.0.1.
+        allowInsecureLoopbackHttp: true,
         auth: {
           method: "static",
           token: connectionInfo.ledgerApiAuthToken,
@@ -138,5 +140,18 @@ describe("Canton connector with LocalNet", () => {
         responder: partyId,
       },
     });
+
+    // A parties-only query uses a party-wide filter and returns contracts.
+    const partyWide = await connector.getActiveContracts({
+      parties: [partyId],
+    });
+    expect(partyWide.contracts.length).toBeGreaterThan(0);
+
+    // Each request's limit is honoured independently.
+    const limited = await connector.getActiveContracts({
+      parties: [partyId],
+      limit: 1,
+    });
+    expect(limited.contracts).toHaveLength(1);
   });
 });

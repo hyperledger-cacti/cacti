@@ -42,11 +42,11 @@ export interface ActiveContract {
      */
     'templateId': string;
     /**
-     * 
-     * @type {{ [key: string]: DamlValue; }}
+     * A Daml record encoded as a JSON object of field names to Daml values.
+     * @type {{ [key: string]: any; }}
      * @memberof ActiveContract
      */
-    'createArgument': { [key: string]: DamlValue; };
+    'createArgument': { [key: string]: any; };
     /**
      * 
      * @type {Array<string>}
@@ -110,11 +110,11 @@ export interface CantonCreateAndExerciseCommandCreateAndExerciseCommand {
      */
     'templateId': string;
     /**
-     * 
-     * @type {{ [key: string]: DamlValue; }}
+     * A Daml record encoded as a JSON object of field names to Daml values.
+     * @type {{ [key: string]: any; }}
      * @memberof CantonCreateAndExerciseCommandCreateAndExerciseCommand
      */
-    'createArguments': { [key: string]: DamlValue; };
+    'createArguments': { [key: string]: any; };
     /**
      * 
      * @type {string}
@@ -122,11 +122,11 @@ export interface CantonCreateAndExerciseCommandCreateAndExerciseCommand {
      */
     'choice': string;
     /**
-     * 
-     * @type {DamlValue}
+     * A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type.
+     * @type {any}
      * @memberof CantonCreateAndExerciseCommandCreateAndExerciseCommand
      */
-    'choiceArgument': DamlValue | null;
+    'choiceArgument': any;
 }
 /**
  * 
@@ -154,11 +154,11 @@ export interface CantonCreateCommandCreateCommand {
      */
     'templateId': string;
     /**
-     * 
-     * @type {{ [key: string]: DamlValue; }}
+     * A Daml record encoded as a JSON object of field names to Daml values.
+     * @type {{ [key: string]: any; }}
      * @memberof CantonCreateCommandCreateCommand
      */
-    'createArguments': { [key: string]: DamlValue; };
+    'createArguments': { [key: string]: any; };
 }
 /**
  * 
@@ -198,18 +198,12 @@ export interface CantonExerciseCommandExerciseCommand {
      */
     'choice': string;
     /**
-     * 
-     * @type {DamlValue}
+     * A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type.
+     * @type {any}
      * @memberof CantonExerciseCommandExerciseCommand
      */
-    'choiceArgument': DamlValue | null;
+    'choiceArgument': any;
 }
-/**
- * @type DamlValue
- * @export
- */
-export type DamlValue = Array<DamlValue> | boolean | number | string | { [key: string]: DamlValue; };
-
 /**
  * 
  * @export
@@ -307,11 +301,11 @@ export interface RunTransactionRequest {
      */
     'commands': Array<CantonCommand>;
     /**
-     * 
+     * Caller-chosen, stable identifier for this submission. Reuse the same value when retrying a submission whose outcome is unknown (for example after HTTP 504) so that Canton command deduplication rejects a duplicate instead of committing it twice.
      * @type {string}
      * @memberof RunTransactionRequest
      */
-    'commandId'?: string;
+    'commandId': string;
     /**
      * 
      * @type {string}

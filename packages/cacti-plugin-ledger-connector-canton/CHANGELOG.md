@@ -10,3 +10,10 @@ guidelines.
   active-contract queries.
 - Added the generated OpenAPI client, operation-specific authorization scopes,
   bounded requests, and Canton LocalNet integration coverage.
+- Requires a caller-supplied `commandId` so retries are deduplicated by Canton.
+- Requires HTTPS for the JSON Ledger API, with an explicit loopback-only HTTP
+  exception for local development.
+- Bounds pending upstream operations and makes `shutdown()` terminal.
+- Reads active contracts with one uncached Ledger API request per query.
+- Loads the Wallet SDK through its ESM entry point and requires Node.js 20 or
+  later.

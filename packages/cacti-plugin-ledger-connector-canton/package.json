@@ -42,6 +42,8 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
+    "@canton-network/core-ledger-client": "1.12.2",
+    "@canton-network/core-wallet-auth": "1.12.1",
     "@canton-network/wallet-sdk": "1.5.1",
     "@hyperledger-cacti/cactus-common": "3.0.1",
     "@hyperledger-cacti/cactus-core": "3.0.1",
@@ -57,7 +59,7 @@
     "npm-run-all2": "6.1.2"
   },
   "engines": {
-    "node": ">=18",
+    "node": ">=20",
     "npm": ">=8"
   },
   "publishConfig": {

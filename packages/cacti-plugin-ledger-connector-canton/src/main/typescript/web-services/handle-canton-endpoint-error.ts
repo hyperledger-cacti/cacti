@@ -4,6 +4,7 @@ import {
   ForbiddenError,
   GatewayTimeoutError,
   PayloadTooLargeError,
+  ServiceUnavailableError,
 } from "http-errors-enhanced-cjs";
 
 import type { Logger } from "@hyperledger-cacti/cactus-common";
@@ -19,14 +20,16 @@ type SafeConnectorError =
   | BadRequestError
   | ForbiddenError
   | GatewayTimeoutError
-  | PayloadTooLargeError;
+  | PayloadTooLargeError
+  | ServiceUnavailableError;
 
 function isSafeConnectorError(error: unknown): error is SafeConnectorError {
   return (
     error instanceof BadRequestError ||
     error instanceof ForbiddenError ||
     error instanceof GatewayTimeoutError ||
-    error instanceof PayloadTooLargeError
+    error instanceof PayloadTooLargeError ||
+    error instanceof ServiceUnavailableError
   );
 }
 
