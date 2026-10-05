@@ -145,12 +145,23 @@ export interface ICantonWalletSdkModules {
 export type CantonWalletSdkModuleLoader =
   () => Promise<ICantonWalletSdkModules>;
 
-// With "module": "CommonJS", TypeScript rewrites import() to require(). The
-// Function constructor keeps a native dynamic import in the emitted code.
-const importEsmModule = new Function(
-  "specifier",
-  "return import(specifier)",
-) as (specifier: string) => Promise<unknown>;
+/**
+ * With "module": "CommonJS", TypeScript rewrites import() to require(), so a
+ * native dynamic import has to be hidden from the compiler. A direct eval is
+ * used rather than the Function constructor: eval'd code keeps this module as
+ * its referrer, so import() resolves relative to this package and through the
+ * loader that evaluated this module. Function-constructor code has no
+ * referrer, and under Jest it resolved through an earlier, torn-down test
+ * environment.
+ */
+function importEsmModule(specifier: string): Promise<unknown> {
+  // The evaluated source is a constant.
+  // eslint-disable-next-line no-eval
+  const nativeImport = eval("(id) => import(id)") as (
+    id: string,
+  ) => Promise<unknown>;
+  return nativeImport(specifier);
+}
 
 async function loadCantonWalletSdk(): Promise<ICantonWalletSdkModules> {
   // The Canton packages must be loaded through their ESM entry points. The
