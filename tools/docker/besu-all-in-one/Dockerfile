@@ -1,6 +1,7 @@
 FROM hyperledger/besu:25.4.0
 
 LABEL org.opencontainers.image.source="https://github.com/hyperledger-cacti/cacti"
+LABEL org.opencontainers.image.description="Hyperledger Besu development ledger for Cacti integration testing."
 
 RUN apt update -y && \
     apt install --no-install-recommends --yes curl && \

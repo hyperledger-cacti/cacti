@@ -51,3 +51,4 @@ USER relay
 
 ARG GIT_URL
 LABEL org.opencontainers.image.source ${GIT_URL}
+LABEL org.opencontainers.image.description="Hyperledger Cacti Weaver Fabric driver for retrieving ledger state on behalf of relays."

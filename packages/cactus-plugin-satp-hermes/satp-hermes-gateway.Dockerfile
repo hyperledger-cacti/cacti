@@ -1,4 +1,5 @@
 FROM node:22.4.0-bookworm-slim
+LABEL org.opencontainers.image.description="Hyperledger Cacti SATP Hermes gateway for cross-chain asset transfers using the Secure Asset Transfer Protocol."
 
 # Install required packages
 RUN apt-get update && apt-get install -y --no-install-recommends \

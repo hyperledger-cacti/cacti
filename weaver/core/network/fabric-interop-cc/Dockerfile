@@ -23,3 +23,4 @@ CMD ./interop
 
 ARG GIT_URL
 LABEL org.opencontainers.image.source ${GIT_URL}
+LABEL org.opencontainers.image.description="Hyperledger Cacti Weaver Fabric interoperability chaincode for servicing external state queries and verifying proofs."

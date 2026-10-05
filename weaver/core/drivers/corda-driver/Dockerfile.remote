@@ -25,3 +25,4 @@ WORKDIR /driver/corda
 
 ARG GIT_URL
 LABEL org.opencontainers.image.source ${GIT_URL}
+LABEL org.opencontainers.image.description="Hyperledger Cacti Weaver Corda driver for retrieving ledger state through interoperation CorDapp flows."
