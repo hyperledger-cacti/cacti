@@ -4,7 +4,10 @@ import {
   LoggerProvider,
   Secp256k1Keys,
 } from "@hyperledger-cacti/cactus-common";
-import { SupportedSigningAlgorithms } from "../../../../main/typescript/core/types";
+import {
+  GatewayCredential,
+  SupportedSigningAlgorithms,
+} from "../../../../main/typescript/core/types";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
@@ -36,7 +39,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
 import { Configuration } from "@hyperledger-cacti/cactus-core-api";
@@ -207,11 +210,14 @@ beforeAll(async () => {
     gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
     gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
     gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-    identificationCredential: {
-      signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-      pubKey: Buffer.from(gatewayKeyPair.publicKey as Uint8Array).toString(
-        "hex",
-      ),
+    credentials: {
+      [GatewayCredential.CLAIM_SIGNATURE]: {
+        purpose: GatewayCredential.CLAIM_SIGNATURE,
+        algorithm: SupportedSigningAlgorithms.SECP256K1,
+        publicKey: Buffer.from(gatewayKeyPair.publicKey as Uint8Array).toString(
+          "hex",
+        ),
+      },
     },
   } as GatewayIdentity;
 

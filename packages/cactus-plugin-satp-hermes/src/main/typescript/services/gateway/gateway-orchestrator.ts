@@ -27,6 +27,7 @@ import {
 import {
   Client as ConnectClient,
   Transport as ConnectTransport,
+  Interceptor,
 } from "@connectrpc/connect";
 
 import { Express } from "express";
@@ -34,11 +35,11 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
 
 import { expressConnectMiddleware } from "@connectrpc/connect-express";
 
-import { SatpStage0Service } from "../../generated/proto/cacti/satp/v02/service/stage_0_pb";
-import { SatpStage1Service } from "../../generated/proto/cacti/satp/v02/service/stage_1_pb";
-import { SatpStage2Service } from "../../generated/proto/cacti/satp/v02/service/stage_2_pb";
-import { SatpStage3Service } from "../../generated/proto/cacti/satp/v02/service/stage_3_pb";
-import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+import { SatpStage0Service } from "../../generated/proto/cacti/satp/v13/service/stage_0_pb";
+import { SatpStage1Service } from "../../generated/proto/cacti/satp/v13/service/stage_1_pb";
+import { SatpStage2Service } from "../../generated/proto/cacti/satp/v13/service/stage_2_pb";
+import { SatpStage3Service } from "../../generated/proto/cacti/satp/v13/service/stage_3_pb";
+import { CrashRecoveryService } from "../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import { SatpStageKey } from "../../generated/gateway-client/typescript-axios";
 
 export interface IGatewayOrchestratorOptions {
@@ -48,11 +49,23 @@ export interface IGatewayOrchestratorOptions {
   signer: JsObjectSigner;
   enableCrashRecovery?: boolean;
   monitorService: MonitorService;
+  /**
+   * Validated local TLS configuration. When TLS is enabled, counterparty
+   * channels over plain `http://` violate the secure-channel requirement
+   * (SATP draft-16 Section 5.4.2): `connectToCounterPartyGateways()` logs a
+   * warning and skips the channel instead of opening an unencrypted one.
+   * TODO(security): enforce fail-closed once startup-time TLS verification
+   * exists.
+   */
+  tls?: IGatewayTlsConfig;
 }
 
 //import { COREDispatcher, COREDispatcherOptions } from "../../core/dispatcher";
 import { createClient } from "@connectrpc/connect";
 import { createGrpcWebTransport } from "@connectrpc/connect-node";
+import http from "node:http";
+import https from "node:https";
+import { HTTP_AGENT_KEEP_ALIVE_MSECS } from "../../core/constants";
 import {
   getGatewaySeeds,
   resolveGatewayID,
@@ -62,6 +75,50 @@ import { BridgeManagerClientInterface } from "../../cross-chain-mechanisms/bridg
 import { NetworkId } from "../../public-api";
 import { MonitorService } from "../monitoring/monitor";
 import { context, SpanStatusCode } from "@opentelemetry/api";
+import {
+  satpProblemDetailsErrorMiddleware,
+  SecureChannelRequiredError,
+} from "../../core/errors/satp-errors";
+import { createGatewaySignatureInterceptors } from "../../core/cryptography/gateway-signature-interceptors";
+import { resolveLocalSigningPrivateKey } from "../../core/cryptography/signing-keys";
+import type { IGatewayTlsConfig } from "../validation/config-validating-functions/validate-tls-config";
+
+/**
+ * Enforce the SATP secure-channel requirement (draft-16 Section 5.4.2) on an
+ * outgoing gateway-to-gateway channel: when the local gateway has TLS enabled,
+ * a counterparty address that is not an `https://` endpoint is a
+ * misconfiguration that would send protocol messages (transfer claims,
+ * commitments) in cleartext. Throws {@link SecureChannelRequiredError};
+ * callers (see `connectToCounterPartyGateways()`) currently downgrade this
+ * to a warning and skip the channel.
+ * TODO(security): verify TLS out-of-band and make callers fail closed.
+ *
+ * The local gateway's own channel is exempt: it is a loopback self-channel
+ * whose address is explicitly localized (see `addGatewayOwnChannels`).
+ *
+ * @param identity - Counterparty gateway identity the channel targets
+ * @param localGatewayId - Id of the local gateway (self channels are exempt)
+ * @param tls - Validated local TLS configuration; enforcement only applies
+ *   when `tls.enabled` is `true`
+ * @throws {SecureChannelRequiredError} When TLS is enabled and the
+ *   counterparty address is not `https://`
+ */
+export function assertCounterpartyTransportSecurity(
+  identity: GatewayIdentity,
+  localGatewayId: string,
+  tls: IGatewayTlsConfig | undefined,
+): void {
+  if (!tls?.enabled) {
+    return;
+  }
+  if (identity.id === localGatewayId) {
+    return; // loopback self-channel
+  }
+  const address = identity.address ?? "";
+  if (!address.startsWith("https://")) {
+    throw new SecureChannelRequiredError(identity.id, address || "(unset)");
+  }
+}
 
 export class GatewayOrchestrator {
   public readonly label = "GatewayOrchestrator";
@@ -72,10 +129,19 @@ export class GatewayOrchestrator {
   private crashEnabled: boolean = false;
   private bridgeManager?: BridgeManagerClientInterface;
   private readonly monitorService: MonitorService;
+  private readonly tls: IGatewayTlsConfig | undefined;
 
   // TODO!: add logic to manage sessions (parallelization, user input, freeze, unfreeze, rollback, recovery)
   private channels: Map<string, GatewayChannel> = new Map();
   private readonly logger: Logger;
+
+  // v13 JWS envelope signing (stages 1-3). Built eagerly; signing keys are
+  // resolved per request so counterparty ENVELOPE_SIGNATURE keys added after startup
+  // are picked up without restarting the gateway.
+  private readonly signingInterceptor: Interceptor;
+  private readonly verificationInterceptor: Interceptor;
+  private readonly responseSigningInterceptor: Interceptor;
+  private readonly responseVerificationFor: (gatewayId: string) => Interceptor;
 
   constructor(options: IGatewayOrchestratorOptions) {
     const fnTag = `${this.label}#constructor()`;
@@ -87,8 +153,20 @@ export class GatewayOrchestrator {
       label: this.label,
     };
     this.monitorService = options.monitorService;
+    this.tls = options.tls;
 
     this.logger = LoggerProvider.getOrCreate(logOptions, this.monitorService);
+
+    const { signing, verification, responseSigning, responseVerificationFor } =
+      createGatewaySignatureInterceptors({
+        localGateway: this.localGateway,
+        getGatewayIdentity: (id) => this.getGatewayIdentity(id),
+        logger: this.logger,
+      });
+    this.signingInterceptor = signing;
+    this.verificationInterceptor = verification;
+    this.responseSigningInterceptor = responseSigning;
+    this.responseVerificationFor = responseVerificationFor;
 
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
 
@@ -188,13 +266,30 @@ export class GatewayOrchestrator {
             );
           }
 
+          // v13 JWS verification for stages 1-3 only.
+          // TODO(stage-0 + crash-recovery): these still use per-message proto
+          // signatures; migrate to JWS envelope signing and verify here too.
+          const stageKey = handler.getStage();
+          const shouldVerifySignature =
+            stageKey !== SatpStageKey.Stage0 && stageKey !== SatpStageKey.Crash;
+
           this.expressServer.use(
             expressConnectMiddleware({
               routes: handler.setupRouter.bind(handler),
               requestPathPrefix: httpPath,
+              // server side: verify the request signature, then sign the
+              // response so the client can authenticate it
+              interceptors: shouldVerifySignature
+                ? [
+                    this.verificationInterceptor,
+                    this.responseSigningInterceptor,
+                  ]
+                : [],
             }),
           );
         }
+
+        this.expressServer.use(satpProblemDetailsErrorMiddleware);
       } catch (error) {
         span.setStatus({
           code: SpanStatusCode.ERROR,
@@ -226,6 +321,30 @@ export class GatewayOrchestrator {
       return this.localGateway;
     } else {
       return this.counterPartyGateways.get(id);
+    }
+  }
+
+  /**
+   * Eagerly resolve (and cache) the local gateway's ENVELOPE_SIGNATURE key
+   * pair before serving or issuing any signed RPC.
+   *
+   * - Fails startup when a configured public JWK does not match the
+   *   configured private key (misconfiguration that would otherwise break
+   *   every signed message at runtime).
+   * - Generates a single ephemeral ES256 key pair (with a warning) when no
+   *   key pair is configured, so dev/test setups keep working.
+   */
+  public async resolveLocalSigningKeys(): Promise<void> {
+    const fnTag = `${this.label}#resolveLocalSigningKeys()`;
+    try {
+      await resolveLocalSigningPrivateKey(this.localGateway, this.logger);
+      this.logger.info(
+        "ENVELOPE_SIGNATURE signing key pair resolved for gateway " +
+          `${this.localGateway.id}`,
+      );
+    } catch (error) {
+      this.logger.error(`${fnTag}, failed to resolve signing key pair`, error);
+      throw error;
     }
   }
 
@@ -313,15 +432,31 @@ export class GatewayOrchestrator {
         );
 
         let connected = 0;
-        try {
-          for (const gateway of gatewaysToAdd) {
+        for (const gateway of gatewaysToAdd) {
+          try {
             const channel = this.createChannel(gateway);
             this.channels.set(gateway.id, channel);
             connected++;
+          } catch (ex) {
+            // TODO(security): verify TLS out-of-band (certificate validation,
+            // endpoint reachability) and restore fail-closed enforcement of
+            // the secure-channel requirement (SATP draft-16 Section 5.4.2)
+            // once startup-time verification is available.
+            if (ex instanceof SecureChannelRequiredError) {
+              // Soft-fail for now: do not throw, so a single misconfigured
+              // counterparty cannot prevent the gateway from starting. The
+              // channel to that counterparty is simply not created.
+              this.logger.warn(
+                `${fnTag}, insecure channel to gateway ${gateway.id} ` +
+                  `(TLS enabled but address is not https://): skipping ` +
+                  `channel. TODO: verify TLS before enforcing.`,
+              );
+              this.logger.warn(ex);
+              continue;
+            }
+            this.logger.error(`${fnTag}, Failed to connect to gateway`);
+            this.logger.error(ex);
           }
-        } catch (ex) {
-          this.logger.error(`${fnTag}, Failed to connect to gateway`);
-          this.logger.error(ex);
         }
         return connected;
       } catch (error) {
@@ -405,10 +540,45 @@ export class GatewayOrchestrator {
     const { span, context: ctx } = this.monitorService.startSpan(fnTag);
     return context.with(ctx, () => {
       try {
+        assertCounterpartyTransportSecurity(
+          identity,
+          this.localGateway.id,
+          this.tls,
+        );
+
+        // One pooled keep-alive agent per counterparty channel, shared by all
+        // five stage transports (same host:port). Without it connect-node's
+        // HTTP/1.1 path falls back to Node's global agent: sockets sit idle
+        // between SATP stages and get torn down by the peer (or an
+        // intermediary) long before the next stage message, so every message
+        // pays a fresh TCP + TLS handshake. The keep-alive probes keep the
+        // pooled sockets alive across stage gaps spanning whole blockchain
+        // transactions (~2 min), matching the server's
+        // DEFAULT_KEEP_ALIVE_TIMEOUT_MS window.
+        const counterpartyUsesTls = (identity.address ?? "").startsWith(
+          "https",
+        );
+        const keepAliveAgent = counterpartyUsesTls
+          ? new https.Agent({
+              keepAlive: true,
+              keepAliveMsecs: HTTP_AGENT_KEEP_ALIVE_MSECS,
+              // A transfer's stages are strictly sequential, so a single
+              // socket per counterparty suffices; extra room avoids queuing
+              // during overlapping recovery flows.
+              maxSockets: 5,
+            })
+          : new http.Agent({
+              keepAlive: true,
+              keepAliveMsecs: HTTP_AGENT_KEEP_ALIVE_MSECS,
+              maxSockets: 5,
+            });
+
         // one function for each client type; aggregate in array
         this.logger.debug(
           `Creating clients for gateway ${safeStableStringify(identity)}`,
         );
+        // TODO(stage-0): stage 0 still uses per-message proto signatures;
+        // migrate to JWS envelope signing and add the signing interceptor.
         const transport0 = createGrpcWebTransport({
           baseUrl:
             identity.address +
@@ -416,6 +586,7 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage0}`,
           httpVersion: "1.1",
+          nodeOptions: { agent: keepAliveAgent },
         });
 
         this.logger.debug(
@@ -426,6 +597,13 @@ export class GatewayOrchestrator {
             `/${SatpStageKey.Stage0}`,
         );
 
+        const signingInterceptor = this.signingInterceptor;
+        // Verifies the JWS the counterparty places on its unary responses,
+        // resolved from this channel's counterparty identity (pinned key).
+        const responseVerificationInterceptor = this.responseVerificationFor(
+          identity.id,
+        );
+
         const transport1 = createGrpcWebTransport({
           baseUrl:
             identity.address +
@@ -433,6 +611,9 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage1}`,
           httpVersion: "1.1",
+          // for every outgoing message
+          interceptors: [signingInterceptor, responseVerificationInterceptor],
+          nodeOptions: { agent: keepAliveAgent },
         });
 
         const transport2 = createGrpcWebTransport({
@@ -442,6 +623,8 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage2}`,
           httpVersion: "1.1",
+          interceptors: [signingInterceptor, responseVerificationInterceptor],
+          nodeOptions: { agent: keepAliveAgent },
         });
 
         const transport3 = createGrpcWebTransport({
@@ -451,12 +634,17 @@ export class GatewayOrchestrator {
             identity.gatewayServerPort +
             `/${SatpStageKey.Stage3}`,
           httpVersion: "1.1",
+          interceptors: [signingInterceptor, responseVerificationInterceptor],
+          nodeOptions: { agent: keepAliveAgent },
         });
 
+        // TODO(crash-recovery): crash-recovery still uses per-message proto
+        // signatures; migrate to JWS envelope signing and add the interceptor.
         const transportCrash = createGrpcWebTransport({
           baseUrl:
             identity.address + ":" + identity.gatewayServerPort + `/${"crash"}`,
           httpVersion: "1.1",
+          nodeOptions: { agent: keepAliveAgent },
         });
 
         const clients: Map<

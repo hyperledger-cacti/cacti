@@ -58,7 +58,7 @@
  * ```
  *
  * @since 0.0.3-beta
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} SATP Core Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
  * @see {@link SATPInternalError} for base error class
  * @see {@link RuntimeError} for underlying error infrastructure
  *
@@ -68,8 +68,14 @@
  */
 
 import { asError } from "@hyperledger-cacti/cactus-common";
+import type { ErrorRequestHandler } from "express";
 import { RuntimeError } from "run-time-error-cjs";
-import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATPErrorType } from "./satp-error-type";
+import {
+  type ErrorCode,
+  satpErrorTypeToV13Code,
+  v13ErrorDescription,
+} from "./iana-error-codes";
 
 /**
  * Base error class for all SATP protocol internal errors and exceptions.
@@ -77,7 +83,7 @@ import { Error as SATPErrorType } from "../../generated/proto/cacti/satp/v02/com
  * @description
  * Serves as the foundational error class for the entire SATP Hermes error hierarchy,
  * providing standardized error reporting, tracing, and debugging capabilities aligned
- * with the IETF SATP Core v2 specification. This class extends RuntimeError to provide
+ * with the IETF SATP Core v13 specification. This class extends RuntimeError to provide
  * enhanced error handling with protocol-specific metadata, distributed tracing support,
  * and HTTP-compatible status codes.
  *
@@ -216,7 +222,7 @@ export class SATPInternalError extends RuntimeError {
    *
    * @description
    * Returns the protocol-specific error type classification as defined in the
-   * IETF SATP Core v2 specification. This enables standardized error handling,
+   * IETF SATP Core v13 specification. This enables standardized error handling,
    * automated error classification, and protocol-compliant error reporting
    * across different SATP implementations.
    *
@@ -257,6 +263,132 @@ export class SATPInternalError extends RuntimeError {
   public getSATPErrorType(): SATPErrorType {
     return this.errorType;
   }
+
+  /**
+   * Returns the SATP registry error code corresponding to this error's
+   * internal SATPErrorType classification.
+   *
+   * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt} Section 11.4
+   */
+  public getSATPErrorCode(): ErrorCode {
+    return satpErrorTypeToV13Code(this.errorType);
+  }
+
+  public toProblemDetails(): {
+    type: string;
+    title: string;
+    status: number;
+    detail: string;
+  } {
+    const errorCode = satpErrorTypeToV13Code(this.errorType);
+    return {
+      // draft-16 Section 11.3: type MUST be a URN of the form
+      // urn:ietf:params:satp:core:error:<code> where <code> is the
+      // registry error code.
+      type: `${SATP_ERROR_URN_PREFIX}${errorCode}`,
+      // RFC 9457 Section 3.1: a short human-readable summary; the draft
+      // says it SHOULD correspond to the registry's Description column.
+      title: v13ErrorDescription(errorCode),
+      status: this.code,
+      detail: this.message,
+    };
+  }
+}
+
+export const satpProblemDetailsErrorMiddleware: ErrorRequestHandler = (
+  error: unknown,
+  _request,
+  response,
+  next,
+) => {
+  if (!(error instanceof SATPInternalError)) {
+    next(error);
+    return;
+  }
+
+  response
+    .status(error.code)
+    .type("application/problem+json")
+    .json(error.toProblemDetails());
+};
+
+/**
+ * Error raised when the gateway receives a protocol reject message from a peer.
+ *
+ * Reject messages are protocol-level session termination signals and should abort
+ * the current stage flow immediately while preserving the session state change.
+ */
+export class ReceivedRejectMessageError extends SATPInternalError {
+  constructor(
+    message: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Received protocol reject message: ${message}`,
+      cause ?? null,
+      400,
+      traceID,
+      trace,
+    );
+    this.errorType = SATPErrorType.UNSPECIFIED;
+  }
+}
+
+/**
+ * Error raised when the gateway receives a protocol error message from a peer.
+ */
+export class ReceivedErrorMessageError extends SATPInternalError {
+  constructor(
+    message: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Received protocol error message: ${message}`,
+      cause ?? null,
+      400,
+      traceID,
+      trace,
+    );
+    this.errorType = SATPErrorType.UNSPECIFIED;
+  }
+}
+
+/**
+ * Error raised when the gateway receives a session-abort protocol message from a peer.
+ */
+export class ReceivedSessionAbortError extends SATPInternalError {
+  constructor(
+    message: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `Received session abort message: ${message}`,
+      cause ?? null,
+      400,
+      traceID,
+      trace,
+    );
+    this.errorType = SATPErrorType.UNSPECIFIED;
+  }
+}
+
+export function isReceivedProtocolTerminationError(
+  error: unknown,
+): error is
+  | ReceivedRejectMessageError
+  | ReceivedErrorMessageError
+  | ReceivedSessionAbortError {
+  return (
+    error instanceof ReceivedRejectMessageError ||
+    error instanceof ReceivedErrorMessageError ||
+    error instanceof ReceivedSessionAbortError
+  );
 }
 
 /**
@@ -315,6 +447,71 @@ export class BootstrapError extends SATPInternalError {
       "Bootstrap already called in this Gateway Manager",
       cause ?? null,
       409,
+      traceID,
+      trace,
+    );
+  }
+}
+
+/**
+ * Error thrown when a gateway with TLS enabled would open a gateway-to-gateway
+ * channel over plain HTTP.
+ *
+ * @description
+ * Enforces the SATP secure-channel requirement (draft-16 Section 5.4.2): a
+ * gateway that enforces TLS on its own server MUST NOT connect to
+ * counterparty gateways over unencrypted HTTP, because protocol messages
+ * (transfer claims, commitments) would transit in cleartext while the local
+ * side advertises a secure channel. This is a fail-closed startup/channel
+ * creation error, not a retryable transport failure.
+ *
+ * **Error Context:**
+ * - Local gateway TLS enabled, counterparty address is `http://`
+ * - Counterparty identity missing TLS-secured endpoint configuration
+ *
+ * **HTTP Status:** 422 Unprocessable Entity - configuration refuses to form
+ * an insecure channel
+ *
+ * @class SecureChannelRequiredError
+ * @extends SATPInternalError
+ *
+ * @example
+ * ```typescript
+ * if (tlsEnabled && !address.startsWith("https://")) {
+ *   throw new SecureChannelRequiredError(gatewayId, address);
+ * }
+ * ```
+ *
+ * @since 3.0.1
+ * @see {@link SATPInternalError} for base error functionality
+ */
+export class SecureChannelRequiredError extends SATPInternalError {
+  /**
+   * Creates a new secure-channel violation error.
+   *
+   * @constructor
+   * @param {string} gatewayId - The counterparty gateway id whose address is
+   *   not TLS-secured
+   * @param {string} address - The offending (non-HTTPS) address
+   * @param {string | Error | null} [cause] - Optional underlying cause or error
+   * @param {string} [traceID] - Optional distributed tracing identifier
+   * @param {string} [trace] - Optional detailed trace information
+   */
+  constructor(
+    gatewayId: string,
+    address: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(
+      `TLS is enabled but gateway '${gatewayId}' address '${address}' is not ` +
+        "an HTTPS endpoint. A gateway enforcing TLS must not open plain-HTTP " +
+        "channels to counterparty gateways (SATP draft-16 Section 5.4.2 " +
+        "secure-channel requirement). Update the counterparty gateway " +
+        "identity address to https:// or disable TLS.",
+      cause ?? null,
+      422,
       traceID,
       trace,
     );
@@ -631,7 +828,7 @@ export class TransactError extends SATPInternalError {
  *
  * @description
  * Indicates a failure in constructing or serializing SATP protocol request messages
- * according to the IETF SATP Core v2 specification. This error occurs during
+ * according to the IETF SATP Core v13 specification. This error occurs during
  * message preparation, validation, or encoding phases of cross-chain operations.
  *
  * **Common Creation Failures:**
@@ -927,22 +1124,30 @@ export class AuditEntryInvalidTimestampError extends SATPInternalError {
  * @see {@link SATPInternalError} for internal error representation
  */
 /**
- * SATP protocol URN prefix for error types per IETF SATP Core spec Section 11.3 & Section 13.1.
- * e.g., urn:ietf:params:satp:error:err_0.1.1
+ * SATP protocol URN prefix for error types per IETF SATP Core spec
+ * (draft-ietf-satp-core-16) Section 11.3: the Problem Details `type` MUST
+ * be a URN of the form urn:ietf:params:satp:core:error:<code> where
+ * <code> is a registry error code (Section 11.4).
  */
-export const SATP_ERROR_URN_PREFIX = "urn:ietf:params:satp:error:";
+export const SATP_ERROR_URN_PREFIX = "urn:ietf:params:satp:core:error:";
 
 /**
- * SATP protocol URN prefix for message types per IETF SATP Core spec Section 13.1 & 13.2.
- * e.g., urn:ietf:satp:msgtype:reject-msg
+ * SATP protocol URN prefix for message types per IETF SATP Core spec
+ * (draft-ietf-satp-core-16) Section 11.2.
+ * e.g., urn:ietf:params:satp:core:msgtype:error-msg
  */
-export const SATP_MSG_TYPE_URN_PREFIX = "urn:ietf:satp:msgtype:";
+export const SATP_MSG_TYPE_URN_PREFIX = "urn:ietf:params:satp:core:msgtype:";
 
 /**
  * Helper to format a SATP error type into an IETF compliant URN.
  *
- * @param errorType - SATPErrorType enum, string code, or number
- * @returns Standardized URN string (e.g. urn:ietf:params:satp:error:err_0.1.1)
+ * Registry error-code strings pass through unchanged; internal
+ * SATPErrorType values are mapped to their closest registry code first
+ * (see `satpErrorTypeToV13Code`), so the returned URN always identifies a
+ * registry error code per draft-16 Section 11.3.
+ *
+ * @param errorType - SATPErrorType enum, registry error code, or number
+ * @returns Standardized URN string (e.g. urn:ietf:params:satp:core:error:err_0.1.1)
  */
 export function formatSATPErrorTypeURN(
   errorType: SATPErrorType | string | number,
@@ -953,11 +1158,8 @@ export function formatSATPErrorTypeURN(
     }
     return `${SATP_ERROR_URN_PREFIX}${errorType.toLowerCase()}`;
   }
-  const enumName = SATPErrorType[errorType as SATPErrorType];
-  if (enumName) {
-    return `${SATP_ERROR_URN_PREFIX}${enumName.toLowerCase()}`;
-  }
-  return `${SATP_ERROR_URN_PREFIX}unspecified`;
+  const code = satpErrorTypeToV13Code(errorType as SATPErrorType);
+  return `${SATP_ERROR_URN_PREFIX}${code}`;
 }
 
 /**
@@ -1011,7 +1213,7 @@ export class SATPError extends Error {
   public readonly traceID?: string;
 
   /**
-   * SATP protocol message type URN (e.g. urn:ietf:satp:msgtype:reject-msg).
+   * SATP protocol message type URN.
    * @public
    * @readonly
    */
@@ -1106,7 +1308,7 @@ export class SATPError extends Error {
 
     this.traceID = opts.traceID;
     this.messageType =
-      opts.messageType ?? `${SATP_MSG_TYPE_URN_PREFIX}reject-msg`;
+      opts.messageType ?? `${SATP_MSG_TYPE_URN_PREFIX}error-msg`;
     this.title =
       opts.title ??
       SATPError.DEFAULT_MESSAGES.get(httpCode) ??

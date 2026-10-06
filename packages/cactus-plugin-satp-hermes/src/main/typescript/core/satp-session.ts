@@ -76,16 +76,13 @@ import {
   Stage3SignaturesSchema,
   Stage3TimestampsSchema,
   State,
-} from "../generated/proto/cacti/satp/v02/session/session_pb";
+} from "../generated/proto/cacti/satp/v13/session/session_pb";
 import {
-  AccessControlProfileError,
   ClientGatewayPubkeyError,
-  CredentialProfileError,
   DigitalAssetIdError,
   GatewayNetworkIdError,
   lockExpirationTimeError,
   LockTypeError,
-  LoggingProfileError,
   SATPVersionError,
   ServerGatewayPubkeyError,
   SessionCompletedError,
@@ -94,11 +91,8 @@ import {
   SignatureAlgorithmError,
   TransferContextIdError,
 } from "./errors/satp-service-errors";
-import { SATP_VERSION } from "./constants";
-import {
-  LockType,
-  SignatureAlgorithm,
-} from "../generated/proto/cacti/satp/v02/common/message_pb";
+import { SATP_CORE_VERSION } from "./constants";
+import { LockType } from "../generated/proto/cacti/satp/v13/common/message_pb";
 import { SessionType } from "./session-utils";
 import { create } from "@bufbuild/protobuf";
 import { MonitorService } from "../services/monitoring/monitor";
@@ -539,9 +533,7 @@ export class SATPSession {
           if (sessionData.receiverGatewayOwnerId == "") {
             throw new GatewayNetworkIdError(tag);
           }
-          if (
-            sessionData.signatureAlgorithm == SignatureAlgorithm.UNSPECIFIED
-          ) {
+          if (sessionData.signatureAlgorithm === "") {
             throw new SignatureAlgorithmError(tag);
           }
           if (sessionData.lockType == LockType.UNSPECIFIED) {
@@ -550,31 +542,15 @@ export class SATPSession {
           if (sessionData.lockExpirationTime == BigInt(0)) {
             throw new lockExpirationTimeError(tag);
           }
-          if (sessionData.credentialProfile == undefined) {
-            throw new CredentialProfileError(tag);
-          }
-          if (sessionData.loggingProfile == "") {
-            throw new LoggingProfileError(tag);
-          }
-          if (sessionData.accessControlProfile == "") {
-            throw new AccessControlProfileError(tag);
-          }
           if (sessionData.transferContextId == "") {
             throw new TransferContextIdError(tag);
           }
-          if (
-            // sessionData.maxRetries == undefined ||
-            // sessionData.maxTimeout == undefined ||
-            // sessionData.lastSequenceNumber == BigInt(0) ||
-            false
-          ) {
-            throw new SessionDataNotLoadedCorrectlyError(
+          if (sessionData.version != SATP_CORE_VERSION) {
+            throw new SATPVersionError(
               tag,
-              safeStableStringify(sessionData)!,
+              sessionData.version,
+              SATP_CORE_VERSION,
             );
-          }
-          if (sessionData.version != SATP_VERSION) {
-            throw new SATPVersionError(tag, sessionData.version, SATP_VERSION);
           }
         } catch (error) {
           console.error(`${tag}, error: ${error}`);

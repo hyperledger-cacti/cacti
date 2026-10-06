@@ -1,5 +1,5 @@
 import { Logger } from "@hyperledger-cacti/cactus-common/";
-import { ClaimFormat } from "../../../../generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../generated/proto/cacti/satp/v13/common/message_pb";
 
 // Type guard for ClaimFormat
 export function isClaimFormat(obj: unknown, log: Logger): obj is ClaimFormat {
