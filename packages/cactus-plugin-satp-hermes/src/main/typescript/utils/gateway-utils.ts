@@ -5,7 +5,7 @@
  * Essential utility functions supporting SATP gateway operations including cryptographic
  * operations, data format conversions, signature verification, and protocol message
  * handling. Provides foundational functionality for secure cross-chain asset transfers
- * following IETF SATP v2 specification requirements.
+ * following IETF SATP v13 specification requirements.
  *
  * **Utility Categories:**
  * - **Cryptographic Operations**: Signing, verification, and key format conversion
@@ -41,7 +41,7 @@
  * const dataHash = getHash({ transferId: 'tx-456', amount: 100 });
  * ```
  *
- * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-02.txt} IETF SATP Core v2 Specification
+ * @see {@link https://www.ietf.org/archive/id/draft-ietf-satp-core-16.txt}
  * @see {@link JsObjectSigner} for cryptographic signing implementation
  * @see {@link GatewayPersistence} for log management using these utilities
  * @see {@link SATPGateway} for main gateway implementation using these utilities
@@ -52,6 +52,8 @@
 import { JsObjectSigner } from "@hyperledger-cacti/cactus-common";
 import { SHA256 } from "crypto-js";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
+
+import type { SatpStepTag } from "../core/satp-protocol-map";
 
 /**
  * Convert buffer array to hexadecimal string for SATP protocol compatibility.
@@ -64,7 +66,7 @@ import { stringify as safeStableStringify } from "safe-stable-stringify";
  *
  * **SATP Protocol Usage:**
  * Used extensively for converting cryptographic keys, digital signatures, and
- * protocol identifiers to the hexadecimal format required by IETF SATP v2
+ * protocol identifiers to the hexadecimal format required by IETF SATP v13
  * specification for gateway-to-gateway communication.
  *
  * @param array - Buffer data in various formats to convert to hex string
@@ -113,7 +115,7 @@ export function bufArray2HexStr(array: Uint8Array | Buffer | string): string {
  * @description
  * Generates digital signature for SATP protocol messages using the gateway's
  * cryptographic signer. Provides non-repudiation and message integrity for
- * cross-chain asset transfer operations following IETF SATP v2 security
+ * cross-chain asset transfer operations following IETF SATP v13 security
  * requirements.
  *
  * **SATP Security Context:**
@@ -159,6 +161,88 @@ export function bufArray2HexStr(array: Uint8Array | Buffer | string): string {
  */
 export function sign(objectSigner: JsObjectSigner, msg: string): Uint8Array {
   return objectSigner.sign(msg);
+}
+
+/**
+ * Assertion-claim types issued by SATP gateways over bridge operation
+ * receipts (wrap/lock/mint/burn/assignment).
+ */
+export type AssertionClaimType =
+  | "WRAP"
+  | "LOCK"
+  | "MINT"
+  | "BURN"
+  | "ASSIGNMENT";
+
+/**
+ * Audit binding context that an assertion-claim signature must cover.
+ *
+ * Binding the claim type, issuing protocol step tag, and session ID into the
+ * signed payload extends non-repudiation to the persisted claim as a whole:
+ * the receipt, the proof, and their audit association (which session and
+ * which protocol step produced them) cannot be altered without invalidating
+ * the signature.
+ */
+export interface AssertionClaimBindingContext {
+  /** Which assertion the claim attests to (wrap/lock/mint/burn/assignment). */
+  claimType: AssertionClaimType;
+  /** Step tag of the protocol step whose message carries the claim. */
+  stepTag: SatpStepTag;
+  /** ID of the SATP session the claim was issued in. */
+  sessionId: string;
+}
+
+/**
+ * Build the canonical payload that an assertion-claim signature covers.
+ *
+ * The payload deterministically binds the claim content (`receipt`, `proof`)
+ * to its audit context (claim type, protocol step tag, session ID) so the
+ * signature attests to the whole record, not just the receipt. Serialization
+ * is key-stable (`safeStableStringify`), so signing and verification sides
+ * produce byte-identical payloads.
+ *
+ * @param claim - The claim fields to bind (`receipt` and `proof`)
+ * @param context - The audit binding context to bind into the payload
+ * @returns Canonical string representation to sign/verify
+ *
+ * @see {@link signAssertionClaim} for producing the hex-encoded signature
+ * @since 3.1.0
+ */
+export function canonicalAssertionPayload(
+  claim: { receipt: string; proof: string },
+  context: AssertionClaimBindingContext,
+): string {
+  return (
+    safeStableStringify({
+      claimType: context.claimType,
+      stepTag: context.stepTag,
+      sessionId: context.sessionId,
+      receipt: claim.receipt,
+      proof: claim.proof,
+    }) ?? ""
+  );
+}
+
+/**
+ * Sign an assertion claim over its canonical payload (receipt + proof +
+ * claim type + step tag + session ID), returning the hex-encoded signature.
+ *
+ * @param objectSigner - Signer of the claim-issuing gateway
+ * @param claim - Claim fields to bind (`receipt` and `proof`)
+ * @param context - Audit binding context bound into the signature
+ * @returns Hex-encoded signature for the claim's `signature` field
+ *
+ * @see {@link canonicalAssertionPayload} for the signed payload structure
+ * @since 3.1.0
+ */
+export function signAssertionClaim(
+  objectSigner: JsObjectSigner,
+  claim: { receipt: string; proof: string },
+  context: AssertionClaimBindingContext,
+): string {
+  return bufArray2HexStr(
+    sign(objectSigner, canonicalAssertionPayload(claim, context)),
+  );
 }
 
 /**

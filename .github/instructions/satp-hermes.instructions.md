@@ -226,8 +226,7 @@ OpenAPI source: `src/main/yml/bol/oapi-api1.yml` (not `openapi.json`).
 | `jest.config-integration-docker-local.ts` | Docker tests against an image built from the current branch (`docker:build:local`) | `test:integration:docker-local` |
 | `jest.config-integration-docker-upstream.ts` | Acceptance smoke test against the pre-published upstream image | `test:integration:docker-upstream` |
 
-Additional scoped scripts: `test:integration:adapter`,
-`test:integration:recovery`, `test:integration:rollback`.
+Additional scoped scripts: `test:integration:adapter`.
 
 ### Running Tests
 

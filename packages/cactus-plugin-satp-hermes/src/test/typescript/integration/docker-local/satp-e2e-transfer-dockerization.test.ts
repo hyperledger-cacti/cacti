@@ -4,6 +4,7 @@ import {
   LoggerProvider,
   Secp256k1Keys,
 } from "@hyperledger-cacti/cactus-common";
+import { generateSigningKeyPair } from "../../../../main/typescript/core/cryptography/jws-utils";
 import {
   pruneDockerContainersIfGithubAction,
   Containers,
@@ -13,6 +14,7 @@ import {
 import {
   Address,
   GatewayIdentity,
+  GatewayCredential,
   SupportedSigningAlgorithms,
 } from "../../../../main/typescript/core/types";
 import {
@@ -35,7 +37,7 @@ import {
   SATP_CORE_VERSION,
   SATP_CRASH_VERSION,
 } from "../../../../main/typescript/core/constants";
-import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { ClaimFormat } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { Container } from "dockerode";
 import { Knex } from "knex";
 import { Configuration, LedgerType } from "@hyperledger-cacti/cactus-core-api";
@@ -49,7 +51,7 @@ import {
   SATP_LOCAL_DOCKER_IMAGE_VERSION,
   SATP_LOCAL_DOCKER_IMAGE_NAME,
 } from "../../constants";
-import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v02/common/message_pb";
+import { TokenType as TokenTypeMain } from "../../../../main/typescript/generated/proto/cacti/satp/v13/common/message_pb";
 import { SupportedContractTypes as SupportedEthereumContractTypes } from "../../environments/ethereum-test-environment";
 import { SupportedContractTypes as SupportedBesuContractTypes } from "../../environments/besu-test-environment";
 
@@ -225,9 +227,12 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      credentials: {
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+        },
       },
     } as GatewayIdentity;
 
@@ -393,6 +398,13 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
     const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
+    // Each gateway runs in its own container, so ephemeral ENVELOPE_SIGNATURE
+    // keys generated at runtime cannot be pinned by the counterparty. Generate
+    // ES256 pairs here, pin the public JWKs in both identities and hand each
+    // gateway its private JWK via the local-only config field.
+    const gateway1EnvelopeKeys = await generateSigningKeyPair();
+    const gateway2EnvelopeKeys = await generateSigningKeyPair();
+
     const gatewayIdentity1 = {
       id: "mockID-1",
       name: "CustomGateway",
@@ -414,9 +426,20 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      credentials: {
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+        },
+        [GatewayCredential.ENVELOPE_SIGNATURE]: {
+          purpose: GatewayCredential.ENVELOPE_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.ES256,
+          publicKey: gateway1EnvelopeKeys.publicKey as unknown as Record<
+            string,
+            unknown
+          >,
+        },
       },
     } as GatewayIdentity;
 
@@ -442,9 +465,20 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      credentials: {
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+        },
+        [GatewayCredential.ENVELOPE_SIGNATURE]: {
+          purpose: GatewayCredential.ENVELOPE_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.ES256,
+          publicKey: gateway2EnvelopeKeys.publicKey as unknown as Record<
+            string,
+            unknown
+          >,
+        },
       },
     } as GatewayIdentity;
 
@@ -467,6 +501,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
         privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
       },
+      envelopeSignaturePrivateKey:
+        gateway1EnvelopeKeys.privateKey as unknown as Record<string, unknown>,
     });
 
     const files2 = setupGatewayDockerFiles({
@@ -482,6 +518,8 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
         privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
       },
+      envelopeSignaturePrivateKey:
+        gateway2EnvelopeKeys.privateKey as unknown as Record<string, unknown>,
     });
 
     // gatewayRunner setup:
@@ -661,6 +699,12 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
     const gateway1KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
     const gateway2KeyPair = Secp256k1Keys.generateKeyPairsBuffer();
 
+    // Separate containers: pre-provision the ES256 envelope key pairs so the
+    // counterparty containers can pin the public JWKs (see Besu->Ethereum
+    // describe above for the rationale).
+    const gateway1EnvelopeKeys = await generateSigningKeyPair();
+    const gateway2EnvelopeKeys = await generateSigningKeyPair();
+
     const gatewayIdentity1 = {
       id: "mockID-1",
       name: "CustomGateway",
@@ -682,9 +726,20 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+      credentials: {
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
+        },
+        [GatewayCredential.ENVELOPE_SIGNATURE]: {
+          purpose: GatewayCredential.ENVELOPE_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.ES256,
+          publicKey: gateway1EnvelopeKeys.publicKey as unknown as Record<
+            string,
+            unknown
+          >,
+        },
       },
     } as GatewayIdentity;
 
@@ -710,9 +765,20 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       gatewayClientPort: DEFAULT_PORT_GATEWAY_CLIENT,
       gatewayServerPort: DEFAULT_PORT_GATEWAY_SERVER,
       gatewayOapiPort: DEFAULT_PORT_GATEWAY_OAPI,
-      identificationCredential: {
-        signingAlgorithm: SupportedSigningAlgorithms.SECP256K1,
-        pubKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+      credentials: {
+        [GatewayCredential.CLAIM_SIGNATURE]: {
+          purpose: GatewayCredential.CLAIM_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.SECP256K1,
+          publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
+        },
+        [GatewayCredential.ENVELOPE_SIGNATURE]: {
+          purpose: GatewayCredential.ENVELOPE_SIGNATURE,
+          algorithm: SupportedSigningAlgorithms.ES256,
+          publicKey: gateway2EnvelopeKeys.publicKey as unknown as Record<
+            string,
+            unknown
+          >,
+        },
       },
     } as GatewayIdentity;
 
@@ -735,6 +801,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
         privateKey: Buffer.from(gateway1KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway1KeyPair.publicKey).toString("hex"),
       },
+      envelopeSignaturePrivateKey:
+        gateway1EnvelopeKeys.privateKey as unknown as Record<string, unknown>,
     });
 
     const files2 = setupGatewayDockerFiles({
@@ -750,6 +818,8 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
         privateKey: Buffer.from(gateway2KeyPair.privateKey).toString("hex"),
         publicKey: Buffer.from(gateway2KeyPair.publicKey).toString("hex"),
       },
+      envelopeSignaturePrivateKey:
+        gateway2EnvelopeKeys.privateKey as unknown as Record<string, unknown>,
     });
 
     // gatewayRunner setup:

@@ -5,14 +5,14 @@ import {
   RollbackLogEntrySchema,
   type RollbackState,
   RollbackStateSchema,
-} from "../../../generated/proto/cacti/satp/v02/service/crash_recovery_pb";
+} from "../../../generated/proto/cacti/satp/v13/service/crash_recovery_pb";
 import { create } from "@bufbuild/protobuf";
 import {
   Type,
   SATPStage,
   type SessionData,
-} from "../../../generated/proto/cacti/satp/v02/session/session_pb";
-import { ClaimFormat } from "../../../generated/proto/cacti/satp/v02/common/message_pb";
+} from "../../../generated/proto/cacti/satp/v13/session/session_pb";
+import { ClaimFormat } from "../../../generated/proto/cacti/satp/v13/common/message_pb";
 import { LedgerType } from "@hyperledger-cacti/cactus-core-api";
 import { BridgeManagerClientInterface } from "../../../cross-chain-mechanisms/bridge/interfaces/bridge-manager-client-interface";
 import { protoToAsset } from "../../stage-services/service-utils";
