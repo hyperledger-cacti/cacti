@@ -1,3 +1,4 @@
 site/
 .python-version
 .venv
+site-whitepaper/
