@@ -1,0 +1,406 @@
+/* ==========================================================================
+   Hyperledger Cacti Design System: MkDocs Material mapping
+   --------------------------------------------------------------------------
+   Maps the tokens from cacti-tokens.css (which must load first) onto
+   Material's --md-* variables and re-skins the Material primitives.
+   Style with tokens only: no raw color, spacing, or radius literals here.
+
+   Material sets a 20px+ root font size, so the rem-based --text-* scale from
+   the tokens is not applied here. Material's own type scale is kept, and
+   only the font families and weights are mapped.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Palette mapping
+   Declared on [data-md-color-scheme] (<body>) so the mapping resolves against
+   the light or dark semantic tokens of the active scheme.
+   -------------------------------------------------------------------------- */
+[data-md-color-scheme] {
+  --md-hue: 195;
+
+  --md-primary-fg-color: var(--primary);
+  --md-primary-fg-color--light: var(--cacti-green-500);
+  --md-primary-fg-color--dark: var(--cacti-green-900);
+  --md-primary-bg-color: var(--primary-foreground);
+  --md-primary-bg-color--light: color-mix(
+    in srgb,
+    var(--primary-foreground) 70%,
+    transparent
+  );
+
+  /* Material's "accent" drives link hover and focus states across the whole
+     UI, so it maps to a green step. The bloom accent stays reserved for a
+     single highlight per view. */
+  --md-accent-fg-color: var(--cacti-green-900);
+  --md-accent-fg-color--transparent: color-mix(
+    in srgb,
+    var(--md-accent-fg-color) 10%,
+    transparent
+  );
+  --md-accent-bg-color: var(--primary-foreground);
+  --md-accent-bg-color--light: color-mix(
+    in srgb,
+    var(--primary-foreground) 70%,
+    transparent
+  );
+
+  --md-default-fg-color: var(--foreground);
+  --md-default-fg-color--light: var(--muted-foreground);
+  --md-default-fg-color--lighter: color-mix(
+    in srgb,
+    var(--foreground) 32%,
+    transparent
+  );
+  --md-default-fg-color--lightest: color-mix(
+    in srgb,
+    var(--foreground) 10%,
+    transparent
+  );
+  --md-default-bg-color: var(--background);
+  --md-default-bg-color--light: color-mix(
+    in srgb,
+    var(--background) 70%,
+    transparent
+  );
+  --md-default-bg-color--lighter: color-mix(
+    in srgb,
+    var(--background) 30%,
+    transparent
+  );
+  --md-default-bg-color--lightest: color-mix(
+    in srgb,
+    var(--background) 12%,
+    transparent
+  );
+
+  --md-typeset-color: var(--foreground);
+  --md-typeset-a-color: var(--primary);
+  --md-typeset-mark-color: color-mix(
+    in srgb,
+    var(--cacti-green-300) 40%,
+    transparent
+  );
+  --md-typeset-table-color: color-mix(in srgb, var(--foreground) 12%, transparent);
+  --md-typeset-table-color--light: color-mix(
+    in srgb,
+    var(--foreground) 4%,
+    transparent
+  );
+
+  --md-admonition-fg-color: var(--foreground);
+  --md-admonition-bg-color: var(--surface);
+
+  /* Inline code; fenced code blocks are re-mapped in section 5 */
+  --md-code-fg-color: var(--foreground);
+  --md-code-bg-color: color-mix(in srgb, var(--border) 50%, var(--surface));
+
+  --md-footer-fg-color: var(--cacti-paper);
+  --md-footer-fg-color--light: color-mix(
+    in srgb,
+    var(--cacti-paper) 70%,
+    transparent
+  );
+  --md-footer-fg-color--lighter: color-mix(
+    in srgb,
+    var(--cacti-paper) 45%,
+    transparent
+  );
+  --md-footer-bg-color: var(--cacti-ink-700);
+  --md-footer-bg-color--dark: var(--cacti-ink-900);
+
+  --md-shadow-z1: var(--shadow-sm);
+  --md-shadow-z2: var(--shadow-md);
+  --md-shadow-z3: var(--shadow-lg);
+
+  --md-text-font: var(--font-body);
+  --md-code-font: var(--font-mono);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color--light: var(--cacti-green-300);
+  --md-primary-fg-color--dark: var(--cacti-green-700);
+  --md-accent-fg-color: var(--cacti-green-300);
+}
+
+/* --------------------------------------------------------------------------
+   2. Typography: Barlow display headings over the system body stack
+   -------------------------------------------------------------------------- */
+.md-typeset :is(h1, h2, h3, h4) {
+  color: var(--foreground);
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+.md-typeset :is(h1, h2) {
+  font-weight: 700;
+}
+.md-typeset :is(h3, h4) {
+  font-weight: 600;
+}
+
+/* Site title in the header carries the wordmark voice */
+.md-header__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+/* --------------------------------------------------------------------------
+   3. Header, tabs, and navigation drawer: surface background,
+   primary active state, focus ring
+   -------------------------------------------------------------------------- */
+.md-header,
+.md-tabs,
+.md-nav--primary .md-nav__title[for="__drawer"] {
+  --md-primary-bg-color: var(--foreground);
+  --md-primary-bg-color--light: var(--muted-foreground);
+  background-color: var(--surface);
+  color: var(--foreground);
+}
+
+.md-tabs {
+  border-bottom: 1px solid var(--border);
+}
+
+.md-tabs__link {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+.md-tabs__link:is(:hover, :focus) {
+  color: var(--foreground);
+}
+.md-tabs__item--active .md-tabs__link {
+  color: var(--primary);
+  font-weight: 600;
+}
+.md-tabs__item--active {
+  box-shadow: inset 0 calc(-1 * var(--space-1) / 2) 0 var(--primary);
+}
+
+@media screen and (min-width: 60em) {
+  .md-search__form {
+    background-color: color-mix(in srgb, var(--foreground) 6%, transparent);
+    border-radius: var(--radius-md);
+  }
+  .md-search__form:hover {
+    background-color: color-mix(in srgb, var(--foreground) 10%, transparent);
+  }
+}
+
+/* The header and drawer now sit on a light surface in the light scheme, so
+   the logo swaps to the full-color variant there (see overrides/partials/
+   logo.html). The color-reverse logo is kept for the dark scheme. */
+.md-logo img.cacti-logo--dark {
+  display: none;
+}
+[data-md-color-scheme="slate"] .md-logo img.cacti-logo--light {
+  display: none;
+}
+[data-md-color-scheme="slate"] .md-logo img.cacti-logo--dark {
+  display: block;
+}
+
+/* Visible focus ring on every interactive element */
+:is(a, button, input, label, summary, [tabindex]):is(
+    :focus-visible,
+    .focus-visible
+  ) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   4. Admonitions: semantic status colors, 4px left border, shared
+   radius and padding
+   -------------------------------------------------------------------------- */
+.md-typeset :is(.admonition, details) {
+  --cacti-admonition-color: var(--muted-foreground);
+}
+.md-typeset :is(.admonition, details):is(.note) {
+  --cacti-admonition-color: var(--primary);
+}
+.md-typeset
+  :is(.admonition, details):is(
+    .tip,
+    .hint,
+    .important,
+    .success,
+    .check,
+    .done
+  ) {
+  --cacti-admonition-color: var(--success);
+}
+.md-typeset :is(.admonition, details):is(.warning, .caution, .attention) {
+  --cacti-admonition-color: var(--warning);
+}
+.md-typeset
+  :is(.admonition, details):is(
+    .danger,
+    .error,
+    .failure,
+    .fail,
+    .missing,
+    .bug
+  ) {
+  --cacti-admonition-color: var(--danger);
+}
+
+/* [class] lifts specificity above Material's per-type rules */
+.md-typeset :is(.admonition, details)[class] {
+  border: 1px solid var(--border);
+  border-left: var(--space-1) solid var(--cacti-admonition-color);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  padding: 0 var(--space-3);
+}
+.md-typeset :is(.admonition, details)[class] > :is(.admonition-title, summary) {
+  background-color: color-mix(
+    in srgb,
+    var(--cacti-admonition-color) 10%,
+    transparent
+  );
+  border-radius: 0 var(--radius-md) 0 0;
+  margin: 0 calc(-1 * var(--space-3));
+  padding-left: calc(var(--space-3) + var(--space-5));
+  padding-right: var(--space-3);
+}
+.md-typeset details[class]:not([open]) > summary {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.md-typeset
+  :is(.admonition, details)[class]
+  > :is(.admonition-title, summary)::before {
+  background-color: var(--cacti-admonition-color);
+  left: var(--space-3);
+}
+.md-typeset details[class] > summary::after {
+  color: var(--cacti-admonition-color);
+}
+
+/* --------------------------------------------------------------------------
+   5. Code blocks: ink-900 canvas, mono stack, bloom accent on copy
+   -------------------------------------------------------------------------- */
+.md-typeset :is(div.highlight, pre:not(.mermaid)) {
+  --md-code-bg-color: var(--cacti-ink-900);
+  --md-code-fg-color: var(--cacti-ink-100);
+  --md-code-hl-color: var(--cacti-green-500);
+  --md-code-hl-color--light: color-mix(
+    in srgb,
+    var(--cacti-green-500) 15%,
+    transparent
+  );
+  --md-code-hl-keyword-color: var(--cacti-green-500);
+  --md-code-hl-string-color: var(--cacti-green-300);
+  --md-code-hl-number-color: var(--cacti-bloom-300);
+  --md-code-hl-constant-color: var(--cacti-bloom-300);
+  --md-code-hl-special-color: var(--cacti-bloom-300);
+  --md-code-hl-function-color: var(--cacti-green-100);
+  --md-code-hl-name-color: var(--cacti-ink-100);
+  --md-code-hl-operator-color: var(--cacti-ink-300);
+  --md-code-hl-punctuation-color: var(--cacti-ink-300);
+  --md-code-hl-comment-color: var(--cacti-ink-300);
+  --md-code-hl-generic-color: var(--cacti-ink-300);
+  --md-code-hl-variable-color: var(--cacti-ink-300);
+  /* Scrollbars, line numbers, and the copy button read these */
+  --md-default-fg-color--light: var(--cacti-ink-300);
+  --md-default-fg-color--lighter: color-mix(
+    in srgb,
+    var(--cacti-paper) 32%,
+    transparent
+  );
+  --md-default-fg-color--lightest: color-mix(
+    in srgb,
+    var(--cacti-paper) 12%,
+    transparent
+  );
+}
+
+.md-typeset pre:not(.mermaid) > code {
+  border-radius: var(--radius-md);
+}
+
+/* The dark canvas matches the dark page background, so outline it */
+[data-md-color-scheme="slate"] .md-typeset pre:not(.mermaid) > code {
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+/* The bloom accent marks the copy action on hover and focus only, so a page
+   with many code blocks still shows at most one bloom element at a time. */
+.md-typeset .md-clipboard:is(:hover, :focus, .focus-visible) {
+  color: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   6. Badges: Cacti pill style
+   Usage: <span class="cacti-badge cacti-badge--success">Stable</span>
+   or with attr_list: **Stable**{ .cacti-badge .cacti-badge--success }
+   -------------------------------------------------------------------------- */
+.md-typeset .cacti-badge {
+  align-items: center;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  font-family: var(--font-body);
+  /* Relative to the surrounding text, see the note on the type scale above */
+  font-size: 0.75em;
+  font-weight: 700;
+  gap: var(--space-1);
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  padding: 0 var(--space-2);
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+.md-typeset .cacti-badge,
+.md-typeset .cacti-badge--neutral {
+  background-color: var(--surface-muted);
+  color: var(--foreground);
+}
+.md-typeset .cacti-badge--success {
+  background-color: var(--cacti-green-500);
+  color: var(--cacti-ink-900);
+}
+.md-typeset .cacti-badge--warning {
+  background-color: var(--cacti-bloom-300);
+  color: var(--cacti-ink-900);
+}
+.md-typeset .cacti-badge--danger {
+  background-color: var(--danger);
+  color: var(--primary-foreground);
+}
+
+/* --------------------------------------------------------------------------
+   7. Design system page helpers: color swatches for docs/design-system.md
+   -------------------------------------------------------------------------- */
+.md-typeset .cacti-swatch {
+  background-color: var(--cacti-swatch);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  height: 1.25em;
+  vertical-align: middle;
+  width: 2.5em;
+}
+.cacti-swatch--green-100 { --cacti-swatch: var(--cacti-green-100); }
+.cacti-swatch--green-300 { --cacti-swatch: var(--cacti-green-300); }
+.cacti-swatch--green-500 { --cacti-swatch: var(--cacti-green-500); }
+.cacti-swatch--green-700 { --cacti-swatch: var(--cacti-green-700); }
+.cacti-swatch--green-900 { --cacti-swatch: var(--cacti-green-900); }
+.cacti-swatch--bloom-300 { --cacti-swatch: var(--cacti-bloom-300); }
+.cacti-swatch--bloom-500 { --cacti-swatch: var(--cacti-bloom-500); }
+.cacti-swatch--bloom-700 { --cacti-swatch: var(--cacti-bloom-700); }
+.cacti-swatch--ink-900 { --cacti-swatch: var(--cacti-ink-900); }
+.cacti-swatch--ink-700 { --cacti-swatch: var(--cacti-ink-700); }
+.cacti-swatch--ink-500 { --cacti-swatch: var(--cacti-ink-500); }
+.cacti-swatch--ink-300 { --cacti-swatch: var(--cacti-ink-300); }
+.cacti-swatch--ink-100 { --cacti-swatch: var(--cacti-ink-100); }
+.cacti-swatch--paper { --cacti-swatch: var(--cacti-paper); }
+.cacti-swatch--background { --cacti-swatch: var(--background); }
+.cacti-swatch--foreground { --cacti-swatch: var(--foreground); }
+.cacti-swatch--surface { --cacti-swatch: var(--surface); }
+.cacti-swatch--surface-muted { --cacti-swatch: var(--surface-muted); }
+.cacti-swatch--border { --cacti-swatch: var(--border); }
+.cacti-swatch--primary { --cacti-swatch: var(--primary); }
+.cacti-swatch--accent { --cacti-swatch: var(--accent); }
+.cacti-swatch--muted-foreground { --cacti-swatch: var(--muted-foreground); }
+.cacti-swatch--success { --cacti-swatch: var(--success); }
+.cacti-swatch--warning { --cacti-swatch: var(--warning); }
+.cacti-swatch--danger { --cacti-swatch: var(--danger); }
+.cacti-swatch--focus-ring { --cacti-swatch: var(--focus-ring); }

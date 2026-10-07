@@ -18,6 +18,7 @@
   "out": "./public/typedoc",
   "theme": "default",
   "customCss": "./docs/assets/typedoc-cacti.css",
+  "lightHighlightTheme": "dark-plus",
   "favicon": "../../docs/docs/images/HL_Cacti_Logo_Colorreverse.svg",
   "includeVersion": true,
   "exclude": [

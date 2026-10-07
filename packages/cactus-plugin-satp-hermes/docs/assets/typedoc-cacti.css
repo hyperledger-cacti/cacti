@@ -1,14 +1,137 @@
+/* ==========================================================================
+   Hyperledger Cacti Design System: TypeDoc theme for SATP Hermes
+   --------------------------------------------------------------------------
+   TypeDoc accepts a single customCss file, so the tokens below duplicate
+   docs/docs/stylesheets/cacti-tokens.css. Keep the two in sync. See the
+   Design System page of the documentation site for usage rules.
+
+   TypeDoc wraps its own styles in @layer typedoc, so these unlayered rules
+   take precedence. TypeDoc's light/dark switching is kept: only its
+   --light-* and --dark-* inputs are re-mapped.
+   ========================================================================== */
+
+@import url("https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&display=swap");
+
 :root {
-  --light-color-link: #4051b5;
-  --light-color-focus-outline: #4051b5;
-  --dark-color-link: #82aaff;
-  --dark-color-focus-outline: #82aaff;
+  /* Tokens (from cacti-tokens.css) */
+  --cacti-green-100: #e6f2e7;
+  --cacti-green-500: #7fbf8a;
+  --cacti-green-700: #4e8c5e;
+  --cacti-bloom-500: #ef9a4f;
+  --cacti-bloom-700: #c2762f;
+  --cacti-ink-900: #101314;
+  --cacti-ink-700: #1c2224;
+  --cacti-ink-500: #3b4548;
+  --cacti-ink-300: #8d9a9d;
+  --cacti-ink-100: #dfe5e3;
+  --cacti-paper: #f7f9f6;
+  --cacti-danger: #c04a3d;
+  --cacti-dark-surface-muted: #232b2d;
+  --cacti-dark-border: #303a3c;
+
+  --font-display: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --radius-md: 8px;
+
+  /* Light theme: semantic mapping onto TypeDoc's inputs */
+  --light-color-background: var(--cacti-paper);
+  --light-color-background-secondary: #ffffff;
+  --light-color-background-active: var(--cacti-green-100);
+  --light-color-active-menu-item: var(--cacti-green-100);
+  --light-color-accent: var(--cacti-ink-100);
+  --light-color-text: var(--cacti-ink-900);
+  --light-color-contrast-text: var(--cacti-ink-900);
+  --light-color-text-aside: var(--cacti-ink-500);
+  --light-color-link: var(--cacti-green-700);
+  --light-color-focus-outline: var(--cacti-green-500);
+  --light-color-alert-note: var(--cacti-green-700);
+  --light-color-alert-tip: var(--cacti-green-700);
+  --light-color-alert-important: var(--cacti-ink-500);
+  --light-color-alert-warning: var(--cacti-bloom-700);
+  --light-color-alert-caution: var(--cacti-danger);
+  --light-code-background: var(--cacti-ink-100);
+
+  /* Dark theme */
+  --dark-color-background: var(--cacti-ink-900);
+  --dark-color-background-secondary: var(--cacti-ink-700);
+  --dark-color-background-active: var(--cacti-dark-surface-muted);
+  --dark-color-active-menu-item: var(--cacti-dark-surface-muted);
+  --dark-color-accent: var(--cacti-dark-border);
+  --dark-color-text: var(--cacti-paper);
+  --dark-color-contrast-text: var(--cacti-paper);
+  --dark-color-text-aside: var(--cacti-ink-300);
+  --dark-color-link: var(--cacti-green-500);
+  --dark-color-focus-outline: var(--cacti-green-500);
+  --dark-color-alert-note: var(--cacti-green-500);
+  --dark-color-alert-tip: var(--cacti-green-500);
+  --dark-color-alert-important: var(--cacti-ink-300);
+  --dark-color-alert-warning: var(--cacti-bloom-700);
+  --dark-color-alert-caution: var(--cacti-danger);
+  --dark-code-background: var(--cacti-dark-surface-muted);
 }
 
-.tsd-page-toolbar {
-  border-bottom: 3px solid #4051b5;
+/* Typography: Barlow display headings over the system body stack */
+body {
+  font-family: var(--font-body);
 }
-
-.tsd-toolbar-contents .title {
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+}
+h1,
+h2 {
   font-weight: 700;
+}
+h3,
+h4 {
+  font-weight: 600;
+}
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* Toolbar title carries the wordmark voice */
+.tsd-toolbar-contents > .title {
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+/* Code blocks: ink-900 canvas in both themes. Light mode uses a dark
+   highlight theme (lightHighlightTheme in typedoc.json) so tokens stay
+   readable on the dark canvas. */
+pre {
+  background: var(--cacti-ink-900);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  color: var(--cacti-ink-100);
+  padding: var(--space-3);
+}
+pre code {
+  background: transparent;
+}
+
+/* Bloom accent marks the copy button on hover and focus only */
+pre > button:is(:hover, :focus-visible) {
+  color: var(--cacti-bloom-500);
+}
+
+/* Callouts: 4px left border with shared radius and padding */
+.tsd-alert {
+  border-left-width: var(--space-1);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+}
+
+/* Visible focus ring */
+:is(a, button, input, summary):focus-visible {
+  outline: 2px solid var(--color-focus-outline);
+  outline-offset: 2px;
 }
