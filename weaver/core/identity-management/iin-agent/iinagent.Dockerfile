@@ -48,3 +48,4 @@ USER iinagent
 
 ARG GIT_URL
 LABEL org.opencontainers.image.source ${GIT_URL}
+LABEL org.opencontainers.image.description="Hyperledger Cacti Weaver IIN agent for exchanging and synchronizing network identity and membership information."

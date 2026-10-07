@@ -51,6 +51,7 @@ WORKDIR /chaincode
 
 # ========= RUNTIME =========
 FROM debian:bullseye-slim
+LABEL org.opencontainers.image.description="Hyperledger Fabric CLI and chaincode development tools for the Cacti Fabric connector."
 
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \

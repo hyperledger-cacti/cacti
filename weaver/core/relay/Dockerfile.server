@@ -1,4 +1,4 @@
-FROM rust:1.96.0-slim-bullseye AS builder
+FROM rust:1.96.0-slim-bookworm AS builder
 
 RUN apt-get update && apt-get install curl musl-tools perl build-essential ca-certificates libsqlite3-dev -y
 
@@ -85,3 +85,4 @@ ARG PROTOS_VERSION
 ARG GIT_URL
 LABEL COMMIT=${COMMIT} BRANCH=${BRANCH} VERSION=${VERSION} ROTOS_VERSION=${PROTOS_VERSION}
 LABEL org.opencontainers.image.source ${GIT_URL}
+LABEL org.opencontainers.image.description="Hyperledger Cacti Weaver relay server for exchanging interoperability requests and responses between distributed ledger networks."

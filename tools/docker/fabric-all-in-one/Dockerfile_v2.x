@@ -1,4 +1,5 @@
 FROM docker:24.0.5-dind
+LABEL org.opencontainers.image.description="Hyperledger Fabric 2 development network with Fabric samples for Cacti integration testing."
 
 ARG FABRIC_VERSION=2.5.6
 ARG FABRIC_NODEENV_VERSION=2.5.4
