@@ -1,0 +1,762 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hyperledger Cacti Plugin - Connector Canton",
+    "description": "Submits Daml commands and queries active contracts on Canton through the Wallet SDK.",
+    "version": "3.0.1",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerTokenAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JSON Web Token"
+      }
+    },
+    "schemas": {
+      "DamlValue": {
+        "description": "A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type."
+      },
+      "DamlRecord": {
+        "type": "object",
+        "description": "A Daml record encoded as a JSON object of field names to Daml values.",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/DamlValue"
+        }
+      },
+      "CantonCreateCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["CreateCommand"],
+        "properties": {
+          "CreateCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["templateId", "createArguments"],
+            "properties": {
+              "templateId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "createArguments": {
+                "$ref": "#/components/schemas/DamlRecord"
+              }
+            }
+          }
+        }
+      },
+      "CantonExerciseCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["ExerciseCommand"],
+        "properties": {
+          "ExerciseCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "templateId",
+              "contractId",
+              "choice",
+              "choiceArgument"
+            ],
+            "properties": {
+              "templateId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "contractId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "choice": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "choiceArgument": {
+                "$ref": "#/components/schemas/DamlValue"
+              }
+            }
+          }
+        }
+      },
+      "CantonCreateAndExerciseCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["CreateAndExerciseCommand"],
+        "properties": {
+          "CreateAndExerciseCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "templateId",
+              "createArguments",
+              "choice",
+              "choiceArgument"
+            ],
+            "properties": {
+              "templateId": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "createArguments": {
+                "$ref": "#/components/schemas/DamlRecord"
+              },
+              "choice": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1024
+              },
+              "choiceArgument": {
+                "$ref": "#/components/schemas/DamlValue"
+              }
+            }
+          }
+        }
+      },
+      "CantonCommand": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CantonCreateCommand"
+          },
+          {
+            "$ref": "#/components/schemas/CantonExerciseCommand"
+          },
+          {
+            "$ref": "#/components/schemas/CantonCreateAndExerciseCommand"
+          }
+        ]
+      },
+      "RunTransactionRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["partyId", "commands", "commandId"],
+        "properties": {
+          "partyId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "commands": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "description": "The serialized command payload is limited to 1 MiB and 64 nesting levels by the connector.",
+            "items": {
+              "$ref": "#/components/schemas/CantonCommand"
+            }
+          },
+          "commandId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "description": "Caller-chosen, stable identifier for this submission. Reuse the same value when retrying a submission whose outcome is unknown (for example after HTTP 504) so that Canton command deduplication rejects a duplicate instead of committing it twice."
+          },
+          "synchronizerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024
+          },
+          "readAs": {
+            "type": "array",
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          }
+        }
+      },
+      "RunTransactionResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["updateId", "completionOffset"],
+        "properties": {
+          "updateId": {
+            "type": "string"
+          },
+          "completionOffset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "GetActiveContractsRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["parties"],
+        "not": {
+          "required": ["templateIds", "interfaceIds"]
+        },
+        "properties": {
+          "parties": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "templateIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "interfaceIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            }
+          },
+          "offset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100,
+            "description": "Maximum number of entries to return. The connector rejects values above its configured maxActiveContractLimit (default 200, Canton's default http-list-max-elements-limit)."
+          }
+        }
+      },
+      "ActiveContract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contractId",
+          "templateId",
+          "createArgument",
+          "witnessParties",
+          "signatories",
+          "createdAt",
+          "synchronizerId"
+        ],
+        "properties": {
+          "contractId": {
+            "type": "string"
+          },
+          "templateId": {
+            "type": "string",
+            "description": "The template ID as reported by the ledger, using the package ID (`<package-id>:Module:Template`)."
+          },
+          "createArgument": {
+            "$ref": "#/components/schemas/DamlRecord"
+          },
+          "witnessParties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "signatories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "observers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "synchronizerId": {
+            "type": "string"
+          },
+          "interfaceViews": {
+            "type": "array",
+            "description": "Interface views, present when the query used interfaceIds.",
+            "items": {
+              "$ref": "#/components/schemas/ActiveContractInterfaceView"
+            }
+          }
+        }
+      },
+      "GetActiveContractsResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contracts", "activeAtOffset", "limitReached"],
+        "properties": {
+          "contracts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActiveContract"
+            }
+          },
+          "activeAtOffset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "The ledger offset of the snapshot. Continue from it with the ledger's update stream."
+          },
+          "limitReached": {
+            "type": "boolean",
+            "description": "True when the ledger returned `limit` entries, so more active contracts may match."
+          }
+        }
+      },
+      "ListPartiesResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["parties"],
+        "properties": {
+          "parties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["message"],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "cantonErrorCode": {
+            "type": "string",
+            "description": "Canton's error code, for example DUPLICATE_COMMAND, when the ledger rejected the request."
+          }
+        }
+      },
+      "ActiveContractInterfaceView": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "The view of an active contract through one of the queried interfaces.",
+        "required": ["interfaceId", "viewStatus"],
+        "properties": {
+          "interfaceId": {
+            "type": "string"
+          },
+          "viewStatus": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "message"],
+            "description": "gRPC status of the view computation. Code 0 means the view was computed.",
+            "properties": {
+              "code": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          },
+          "viewValue": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DamlValue"
+              }
+            ],
+            "description": "The computed interface view, present when the view status code is 0."
+          }
+        }
+      },
+      "RequestValidationError": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["message"],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          }
+        }
+      },
+      "BadRequestResponse": {
+        "description": "A connector validation error, or the OpenAPI validator's list of request errors.",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestValidationError"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction": {
+      "post": {
+        "security": [
+          {
+            "bearerTokenAuth": ["write:canton-transactions"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction"
+          }
+        },
+        "operationId": "runTransactionV1",
+        "summary": "Submits Daml commands for a Canton-hosted party.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunTransactionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The commands were committed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunTransactionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid transaction request, or the ledger rejected it as invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request has no valid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller, the connector, or the ledger does not allow the requested party.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "A contract or other resource referenced by a command was not found.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The ledger already has a command with this commandId, or the commands conflict with the ledger state.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The transaction payload exceeds the connector limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton transaction submission failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable. Retry with the same commandId.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton transaction operation timed out; the outcome is unknown. Retry with the same commandId.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts": {
+      "post": {
+        "security": [
+          {
+            "bearerTokenAuth": ["read:canton-contracts"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts"
+          }
+        },
+        "operationId": "getActiveContractsV1",
+        "summary": "Returns active Canton contracts visible to the requested parties.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetActiveContractsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matching active contracts.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetActiveContractsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid contract query, or an out-of-range offset.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request has no valid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller, the connector, or the ledger does not allow the requested party.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "More contracts match than the participant returns in one response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton contract query failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton contract query timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties": {
+      "get": {
+        "security": [
+          {
+            "bearerTokenAuth": ["read:canton-parties"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties"
+          }
+        },
+        "operationId": "listPartiesV1",
+        "summary": "Lists Canton parties available to the authenticated user.",
+        "responses": {
+          "200": {
+            "description": "Available Canton parties.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListPartiesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request has no valid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The caller is not authorized to list parties.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton party lookup failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton party query timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec": {
+      "get": {
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "get",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec"
+          }
+        },
+        "operationId": "getOpenApiSpecV1",
+        "summary": "Returns the connector OpenAPI specification.",
+        "responses": {
+          "200": {
+            "description": "The connector OpenAPI specification.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
