@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791188826246,
+  "lastUpdate": 1791447568734,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -520,6 +520,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.53%",
             "unit": "ops/sec",
             "extra": "177 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "rafael.belchior@tecnico.ulisboa.pt"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "aa389d7d8e3e3059482e80fc765f6ae57e23923d",
+          "message": "fix(satp-hermes): re-enable fabric integration suites\n\nThree verified defects kept the fabric suites skipped, caused the\nintermittent ENDORSEMENT_POLICY_FAILURE of #3978, and broke the AIO\nboot on CI:\n\n1. The fabric2 AIO image is not hermetic. It freezes Fabric 2.5.6\n   images at build time, but the fabric-samples compose files inside\n   it reference hyperledger/fabric-{peer,orderer,ca}:latest, so the\n   embedded compose ignores the frozen images and pulls whatever\n   \"latest\" means on Docker Hub that day (Fabric 3.1.5 / CA 1.5.22\n   as of 2026-09-30) and runs it against the 2.5.6 CLI binaries\n   baked into the image. Fabric 3.x becoming latest in mid-2025 is\n   what started breaking CI (#3978, Sep 2025) and later the AIO boot\n   outright (the channel-join retry loop, amplified by supervisord\n   restarting the boot script over surviving child containers).\n   FabricTestLedgerV1's container entrypoint now retags the frozen\n   pinned images as :latest the moment docker load finishes, and\n   the Dockerfile pins the compose tags at build time.\n\n2. The AIO boot races its embedded docker daemon:\n   run-fabric-network.sh pipes image tarballs into \"docker load\"\n   before /var/run/docker.sock exists, so on loaded CI runners the\n   script dies via set -e and supervisord moves it to a fatal state -\n   the network never boots. The entrypoint injects a wait-for-daemon\n   loop into the script, and the copy in tools/docker gains the same\n   wait for future image builds.\n\n3. The SATP and oracle test chaincodes were deployed without an\n   explicit endorsement policy, committing with the Fabric default\n   for a 2-org channel: MAJORITY - both orgs must endorse every\n   transaction. Under CI load one peer's endorsement lags, the\n   transaction is submitted with an incomplete endorsement set and\n   fails with ENDORSEMENT_POLICY_FAILURE, matching the issue's own\n   correlation with container count and load. Deploy them with an\n   explicit OR('Org1MSP.member','Org2MSP.member') signature policy -\n   the same loose policy the AIO itself uses for its sample chaincode\n   (CACTUS_FABRIC_TEST_LOOSE_MEMBERSHIP).\n\nThe SATP fabric environment pins the v3.0.1 fabric2 AIO image\nlocally (the shared FABRIC_25_LTS_AIO_IMAGE_VERSION default used by\nother packages' fabric tests stays at v2.1.0), and the CI pre-pull\nis moved to the same v3.0.1 so it actually warms the image the\ntests instantiate (it previously pre-pulled v3.0.0, which never\nmatched). Fabric ledger setup is restored in the beforeAll blocks\nit had been removed from and all fabric describes/its in the\ngateway, docker, bridge and oracle suites are active again. The\nobsolete docs/fabric-tests-to-fix.md known-limitation tracker is\nremoved.\n\nFixes #3978\n\nAssisted-by: zai:GLM-5.3\nSigned-off-by: Rafael Belchior <rafael.belchior@tecnico.ulisboa.pt>\nSigned by zai:GLM-5.3 on behalf of Rafael Belchior <rafael.belchior@tecnico.ulisboa.pt>",
+          "timestamp": "2026-10-01T05:43:52Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/aa389d7d8e3e3059482e80fc765f6ae57e23923d"
+        },
+        "date": 1791447563506,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 578,
+            "range": "±3.18%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 649,
+            "range": "±2.41%",
+            "unit": "ops/sec",
+            "extra": "184 samples"
           }
         ]
       }
