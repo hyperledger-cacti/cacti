@@ -13,6 +13,7 @@ package cactus-plugin-ledger-connector-fabric
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // WatchBlocksResponseV1 - Response block from WatchBlocks endpoint. Depends on 'type' passed in subscription options.
@@ -79,7 +80,11 @@ func (dst *WatchBlocksResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonCactiBlockFullResponseV1) == "{}" { // empty struct
 			dst.CactiBlockFullResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.CactiBlockFullResponseV1); err != nil {
+				dst.CactiBlockFullResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.CactiBlockFullResponseV1 = nil
@@ -92,7 +97,11 @@ func (dst *WatchBlocksResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonCactiBlockTransactionsResponseV1) == "{}" { // empty struct
 			dst.CactiBlockTransactionsResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.CactiBlockTransactionsResponseV1); err != nil {
+				dst.CactiBlockTransactionsResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.CactiBlockTransactionsResponseV1 = nil
@@ -105,7 +114,11 @@ func (dst *WatchBlocksResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonWatchBlocksCactusErrorResponseV1) == "{}" { // empty struct
 			dst.WatchBlocksCactusErrorResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.WatchBlocksCactusErrorResponseV1); err != nil {
+				dst.WatchBlocksCactusErrorResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.WatchBlocksCactusErrorResponseV1 = nil
@@ -118,7 +131,11 @@ func (dst *WatchBlocksResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonWatchBlocksFilteredResponseV1) == "{}" { // empty struct
 			dst.WatchBlocksFilteredResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.WatchBlocksFilteredResponseV1); err != nil {
+				dst.WatchBlocksFilteredResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.WatchBlocksFilteredResponseV1 = nil
@@ -131,7 +148,11 @@ func (dst *WatchBlocksResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonWatchBlocksFullResponseV1) == "{}" { // empty struct
 			dst.WatchBlocksFullResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.WatchBlocksFullResponseV1); err != nil {
+				dst.WatchBlocksFullResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.WatchBlocksFullResponseV1 = nil
@@ -144,7 +165,11 @@ func (dst *WatchBlocksResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonWatchBlocksPrivateResponseV1) == "{}" { // empty struct
 			dst.WatchBlocksPrivateResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.WatchBlocksPrivateResponseV1); err != nil {
+				dst.WatchBlocksPrivateResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.WatchBlocksPrivateResponseV1 = nil
@@ -163,6 +188,10 @@ func (dst *WatchBlocksResponseV1) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(WatchBlocksResponseV1): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(WatchBlocksResponseV1)")
 	}
 }
@@ -223,6 +252,36 @@ func (obj *WatchBlocksResponseV1) GetActualInstance() (interface{}) {
 
 	if obj.WatchBlocksPrivateResponseV1 != nil {
 		return obj.WatchBlocksPrivateResponseV1
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj WatchBlocksResponseV1) GetActualInstanceValue() (interface{}) {
+	if obj.CactiBlockFullResponseV1 != nil {
+		return *obj.CactiBlockFullResponseV1
+	}
+
+	if obj.CactiBlockTransactionsResponseV1 != nil {
+		return *obj.CactiBlockTransactionsResponseV1
+	}
+
+	if obj.WatchBlocksCactusErrorResponseV1 != nil {
+		return *obj.WatchBlocksCactusErrorResponseV1
+	}
+
+	if obj.WatchBlocksFilteredResponseV1 != nil {
+		return *obj.WatchBlocksFilteredResponseV1
+	}
+
+	if obj.WatchBlocksFullResponseV1 != nil {
+		return *obj.WatchBlocksFullResponseV1
+	}
+
+	if obj.WatchBlocksPrivateResponseV1 != nil {
+		return *obj.WatchBlocksPrivateResponseV1
 	}
 
 	// all schemas are nil

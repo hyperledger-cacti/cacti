@@ -21,16 +21,16 @@ message EvmLogPB {
 
   string data = 3076010;
 
-  string blockHash = 335211324;
+  string block_hash = 212436354;
 
-  string transactionHash = 188901646;
+  string transaction_hash = 508674511;
 
   repeated string topics = 331163357;
 
-  float logIndex = 382599153;
+  float log_index = 398808044;
 
-  float transactionIndex = 488538260;
+  float transaction_index = 335921105;
 
-  float blockNumber = 205598263;
+  float block_number = 206419142;
 
 }

@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -58,7 +66,7 @@ data class RunTransactionRequest (
     val methodName: kotlin.String,
 
     @Json(name = "params")
-    val params: kotlin.collections.List<kotlin.String> = arrayListOf(),
+    val params: kotlin.collections.List<kotlin.String?> = arrayListOf(),
 
     /* An array of endorsing peers (name or url) for the transaction. */
     @Json(name = "endorsingPeers")
@@ -77,5 +85,8 @@ data class RunTransactionRequest (
     @Json(name = "responseType")
     val responseType: RunTransactionResponseType? = null
 
-)
+) {
+
+
+}
 

@@ -71,7 +71,8 @@ describe(testCaseName, () => {
     expect(networkConfig.friendbotUrl).toBeDefined();
 
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     connector = await factory.create({

@@ -131,16 +131,20 @@ func (o SolidityContractJsonArtifactCompiler) ToMap() (map[string]interface{}, e
 	return toSerialize, nil
 }
 
-func (o *SolidityContractJsonArtifactCompiler) UnmarshalJSON(bytes []byte) (err error) {
+func (o *SolidityContractJsonArtifactCompiler) UnmarshalJSON(data []byte) (err error) {
 	varSolidityContractJsonArtifactCompiler := _SolidityContractJsonArtifactCompiler{}
 
-	if err = json.Unmarshal(bytes, &varSolidityContractJsonArtifactCompiler); err == nil {
-		*o = SolidityContractJsonArtifactCompiler(varSolidityContractJsonArtifactCompiler)
+	err = json.Unmarshal(data, &varSolidityContractJsonArtifactCompiler)
+
+	if err != nil {
+		return err
 	}
+
+	*o = SolidityContractJsonArtifactCompiler(varSolidityContractJsonArtifactCompiler)
 
 	additionalProperties := make(map[string]interface{})
 
-	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
+	if err = json.Unmarshal(data, &additionalProperties); err == nil {
 		delete(additionalProperties, "name")
 		delete(additionalProperties, "version")
 		o.AdditionalProperties = additionalProperties

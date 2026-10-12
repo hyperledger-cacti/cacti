@@ -2,4 +2,13 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/DefaultApi.md
+docs/DeployContractV1Request.md
+docs/DeployContractV1Response.md
+docs/RunSorobanTransactionRequest.md
+docs/RunSorobanTransactionResponse.md
+docs/TransactionHeader.md
+docs/TransactionInvocation.md
+docs/WatchBlocksV1.md
+docs/WatchBlocksV1Progress.md
 index.ts

@@ -106,7 +106,8 @@ describe(testCase, () => {
       logLevel,
     });
     factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     connector = await factory.create({
       rpcApiHttpHost,
@@ -143,7 +144,8 @@ describe(testCase, () => {
     };
 
     const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     const pluginHtlc = await factoryHTLC.create(pluginOptions);
     pluginRegistry.add(pluginHtlc);
@@ -244,7 +246,8 @@ describe(testCase, () => {
     };
 
     const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     const pluginHtlc = await factoryHTLC.create(pluginOptions);
     pluginRegistry.add(pluginHtlc);

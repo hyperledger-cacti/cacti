@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the CactiBlockFullResponseV1 type satisfies the MappedNullable interface at compile time
@@ -21,6 +23,8 @@ var _ MappedNullable = &CactiBlockFullResponseV1{}
 type CactiBlockFullResponseV1 struct {
 	CactiFullEvents CactiBlockFullEventV1 `json:"cactiFullEvents"`
 }
+
+type _CactiBlockFullResponseV1 CactiBlockFullResponseV1
 
 // NewCactiBlockFullResponseV1 instantiates a new CactiBlockFullResponseV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -76,6 +80,43 @@ func (o CactiBlockFullResponseV1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["cactiFullEvents"] = o.CactiFullEvents
 	return toSerialize, nil
+}
+
+func (o *CactiBlockFullResponseV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"cactiFullEvents",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varCactiBlockFullResponseV1 := _CactiBlockFullResponseV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varCactiBlockFullResponseV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = CactiBlockFullResponseV1(varCactiBlockFullResponseV1)
+
+	return err
 }
 
 type NullableCactiBlockFullResponseV1 struct {

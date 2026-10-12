@@ -25,19 +25,26 @@ import jakarta.validation.Valid
  */
 data class FlowStatusV1ResponsesFlowStatusResponsesInner(
 
+    @param:JsonProperty("clientRequestId")
     @get:JsonProperty("clientRequestId") val clientRequestId: kotlin.String? = null,
 
     @field:Valid
+    @param:JsonProperty("flowError")
     @get:JsonProperty("flowError") val flowError: FlowV1Error? = null,
 
+    @param:JsonProperty("flowId")
     @get:JsonProperty("flowId") val flowId: kotlin.String? = null,
 
+    @param:JsonProperty("flowResult")
     @get:JsonProperty("flowResult") val flowResult: kotlin.String? = null,
 
+    @param:JsonProperty("flowStatus")
     @get:JsonProperty("flowStatus") val flowStatus: kotlin.String? = null,
 
+    @param:JsonProperty("holdingIDShortHash")
     @get:JsonProperty("holdingIDShortHash") val holdingIDShortHash: kotlin.String? = null,
 
+    @param:JsonProperty("timestamp")
     @get:JsonProperty("timestamp") val timestamp: java.time.OffsetDateTime? = null
 ) {
 

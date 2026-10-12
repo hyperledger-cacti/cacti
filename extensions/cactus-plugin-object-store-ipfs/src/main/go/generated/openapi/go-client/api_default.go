@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiGetObjectV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getObjectRequestV1 *GetObjectRequestV1
 }
 
@@ -44,7 +44,7 @@ GetObjectV1 Retrieves an object from the object store.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetObjectV1Request
 */
-func (a *DefaultApiService) GetObjectV1(ctx context.Context) ApiGetObjectV1Request {
+func (a *DefaultAPIService) GetObjectV1(ctx context.Context) ApiGetObjectV1Request {
 	return ApiGetObjectV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -53,7 +53,7 @@ func (a *DefaultApiService) GetObjectV1(ctx context.Context) ApiGetObjectV1Reque
 
 // Execute executes the request
 //  @return GetObjectResponseV1
-func (a *DefaultApiService) GetObjectV1Execute(r ApiGetObjectV1Request) (*GetObjectResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) GetObjectV1Execute(r ApiGetObjectV1Request) (*GetObjectResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -61,7 +61,7 @@ func (a *DefaultApiService) GetObjectV1Execute(r ApiGetObjectV1Request) (*GetObj
 		localVarReturnValue  *GetObjectResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetObjectV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetObjectV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -133,7 +133,7 @@ func (a *DefaultApiService) GetObjectV1Execute(r ApiGetObjectV1Request) (*GetObj
 
 type ApiHasObjectV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	hasObjectRequestV1 *HasObjectRequestV1
 }
 
@@ -153,7 +153,7 @@ HasObjectV1 Checks the presence of an object in the object store.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiHasObjectV1Request
 */
-func (a *DefaultApiService) HasObjectV1(ctx context.Context) ApiHasObjectV1Request {
+func (a *DefaultAPIService) HasObjectV1(ctx context.Context) ApiHasObjectV1Request {
 	return ApiHasObjectV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -162,7 +162,7 @@ func (a *DefaultApiService) HasObjectV1(ctx context.Context) ApiHasObjectV1Reque
 
 // Execute executes the request
 //  @return HasObjectResponseV1
-func (a *DefaultApiService) HasObjectV1Execute(r ApiHasObjectV1Request) (*HasObjectResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) HasObjectV1Execute(r ApiHasObjectV1Request) (*HasObjectResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -170,7 +170,7 @@ func (a *DefaultApiService) HasObjectV1Execute(r ApiHasObjectV1Request) (*HasObj
 		localVarReturnValue  *HasObjectResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.HasObjectV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.HasObjectV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -242,7 +242,7 @@ func (a *DefaultApiService) HasObjectV1Execute(r ApiHasObjectV1Request) (*HasObj
 
 type ApiSetObjectV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	setObjectRequestV1 *SetObjectRequestV1
 }
 
@@ -262,7 +262,7 @@ SetObjectV1 Sets an object in the object store under the specified key.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiSetObjectV1Request
 */
-func (a *DefaultApiService) SetObjectV1(ctx context.Context) ApiSetObjectV1Request {
+func (a *DefaultAPIService) SetObjectV1(ctx context.Context) ApiSetObjectV1Request {
 	return ApiSetObjectV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -271,7 +271,7 @@ func (a *DefaultApiService) SetObjectV1(ctx context.Context) ApiSetObjectV1Reque
 
 // Execute executes the request
 //  @return SetObjectResponseV1
-func (a *DefaultApiService) SetObjectV1Execute(r ApiSetObjectV1Request) (*SetObjectResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) SetObjectV1Execute(r ApiSetObjectV1Request) (*SetObjectResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -279,7 +279,7 @@ func (a *DefaultApiService) SetObjectV1Execute(r ApiSetObjectV1Request) (*SetObj
 		localVarReturnValue  *SetObjectResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.SetObjectV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.SetObjectV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

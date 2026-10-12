@@ -278,7 +278,8 @@ describe("PluginLedgerConnectorFabric", () => {
         },
         channelName: "mychannel",
         contractName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         methodName: "InitLedger",
         params: [],
       });
@@ -294,7 +295,8 @@ describe("PluginLedgerConnectorFabric", () => {
         },
         channelName: "mychannel",
         contractName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         methodName: "TransferAsset",
         params: ["asset1", "client2"],
       });
@@ -309,7 +311,8 @@ describe("PluginLedgerConnectorFabric", () => {
         },
         channelName: "mychannel",
         contractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "ReadAsset",
         params: ["asset1"],
       });

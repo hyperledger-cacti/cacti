@@ -57,8 +57,9 @@ describe(testcase, () => {
     apiServerOptions.plugins = [
       {
         packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
+        type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+        action:
+          PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
         options: {
           instanceId: uuidv4(),
           keychainId: uuidv4(),
@@ -71,8 +72,9 @@ describe(testcase, () => {
       },
       {
         packageName: "@hyperledger-cacti/cacti-plugin-consortium-static",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
+        type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+        action:
+          PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
         options: {
           instanceId: uuidv4(),
           keyPairPem: keyPairPem,

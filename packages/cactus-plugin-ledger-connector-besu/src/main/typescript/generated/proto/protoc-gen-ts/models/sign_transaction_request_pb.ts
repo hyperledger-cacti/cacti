@@ -9,73 +9,73 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class SignTransactionRequestPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            keychainId?: string;
-            keychainRef?: string;
-            transactionHash?: string;
+            keychain_id?: string;
+            keychain_ref?: string;
+            transaction_hash?: string;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("keychainId" in data && data.keychainId != undefined) {
-                    this.keychainId = data.keychainId;
+                if ("keychain_id" in data && data.keychain_id != undefined) {
+                    this.keychain_id = data.keychain_id;
                 }
-                if ("keychainRef" in data && data.keychainRef != undefined) {
-                    this.keychainRef = data.keychainRef;
+                if ("keychain_ref" in data && data.keychain_ref != undefined) {
+                    this.keychain_ref = data.keychain_ref;
                 }
-                if ("transactionHash" in data && data.transactionHash != undefined) {
-                    this.transactionHash = data.transactionHash;
+                if ("transaction_hash" in data && data.transaction_hash != undefined) {
+                    this.transaction_hash = data.transaction_hash;
                 }
             }
         }
-        get keychainId() {
-            return pb_1.Message.getFieldWithDefault(this, 14058372, "") as string;
+        get keychain_id() {
+            return pb_1.Message.getFieldWithDefault(this, 101082808, "") as string;
         }
-        set keychainId(value: string) {
-            pb_1.Message.setField(this, 14058372, value);
+        set keychain_id(value: string) {
+            pb_1.Message.setField(this, 101082808, value);
         }
-        get keychainRef() {
-            return pb_1.Message.getFieldWithDefault(this, 101070193, "") as string;
+        get keychain_ref() {
+            return pb_1.Message.getFieldWithDefault(this, 87649644, "") as string;
         }
-        set keychainRef(value: string) {
-            pb_1.Message.setField(this, 101070193, value);
+        set keychain_ref(value: string) {
+            pb_1.Message.setField(this, 87649644, value);
         }
-        get transactionHash() {
-            return pb_1.Message.getFieldWithDefault(this, 188901646, "") as string;
+        get transaction_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 508674511, "") as string;
         }
-        set transactionHash(value: string) {
-            pb_1.Message.setField(this, 188901646, value);
+        set transaction_hash(value: string) {
+            pb_1.Message.setField(this, 508674511, value);
         }
         static fromObject(data: {
-            keychainId?: string;
-            keychainRef?: string;
-            transactionHash?: string;
+            keychain_id?: string;
+            keychain_ref?: string;
+            transaction_hash?: string;
         }): SignTransactionRequestPB {
             const message = new SignTransactionRequestPB({});
-            if (data.keychainId != null) {
-                message.keychainId = data.keychainId;
+            if (data.keychain_id != null) {
+                message.keychain_id = data.keychain_id;
             }
-            if (data.keychainRef != null) {
-                message.keychainRef = data.keychainRef;
+            if (data.keychain_ref != null) {
+                message.keychain_ref = data.keychain_ref;
             }
-            if (data.transactionHash != null) {
-                message.transactionHash = data.transactionHash;
+            if (data.transaction_hash != null) {
+                message.transaction_hash = data.transaction_hash;
             }
             return message;
         }
         toObject() {
             const data: {
-                keychainId?: string;
-                keychainRef?: string;
-                transactionHash?: string;
+                keychain_id?: string;
+                keychain_ref?: string;
+                transaction_hash?: string;
             } = {};
-            if (this.keychainId != null) {
-                data.keychainId = this.keychainId;
+            if (this.keychain_id != null) {
+                data.keychain_id = this.keychain_id;
             }
-            if (this.keychainRef != null) {
-                data.keychainRef = this.keychainRef;
+            if (this.keychain_ref != null) {
+                data.keychain_ref = this.keychain_ref;
             }
-            if (this.transactionHash != null) {
-                data.transactionHash = this.transactionHash;
+            if (this.transaction_hash != null) {
+                data.transaction_hash = this.transaction_hash;
             }
             return data;
         }
@@ -83,12 +83,12 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.keychainId.length)
-                writer.writeString(14058372, this.keychainId);
-            if (this.keychainRef.length)
-                writer.writeString(101070193, this.keychainRef);
-            if (this.transactionHash.length)
-                writer.writeString(188901646, this.transactionHash);
+            if (this.keychain_id.length)
+                writer.writeString(101082808, this.keychain_id);
+            if (this.keychain_ref.length)
+                writer.writeString(87649644, this.keychain_ref);
+            if (this.transaction_hash.length)
+                writer.writeString(508674511, this.transaction_hash);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -98,14 +98,14 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 14058372:
-                        message.keychainId = reader.readString();
+                    case 101082808:
+                        message.keychain_id = reader.readString();
                         break;
-                    case 101070193:
-                        message.keychainRef = reader.readString();
+                    case 87649644:
+                        message.keychain_ref = reader.readString();
                         break;
-                    case 188901646:
-                        message.transactionHash = reader.readString();
+                    case 508674511:
+                        message.transaction_hash = reader.readString();
                         break;
                     default: reader.skipField();
                 }

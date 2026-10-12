@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,32 +30,32 @@ import com.squareup.moshi.JsonClass
 /**
  * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
  *
- * Values: bESU1X,bESU2X,bURROW0X,cORDA4X,eTHEREUM,fABRIC2,sAWTOOTH1X
+ * Values: BESU_1X,BESU_2X,BURROW_0X,CORDA_4X,ETHEREUM,FABRIC_2,SAWTOOTH_1X
  */
 
 @JsonClass(generateAdapter = false)
 enum class LedgerType(val value: kotlin.String) {
 
     @Json(name = "BESU_1X")
-    bESU1X("BESU_1X"),
+    BESU_1X("BESU_1X"),
 
     @Json(name = "BESU_2X")
-    bESU2X("BESU_2X"),
+    BESU_2X("BESU_2X"),
 
     @Json(name = "BURROW_0X")
-    bURROW0X("BURROW_0X"),
+    BURROW_0X("BURROW_0X"),
 
     @Json(name = "CORDA_4X")
-    cORDA4X("CORDA_4X"),
+    CORDA_4X("CORDA_4X"),
 
     @Json(name = "ETHEREUM")
-    eTHEREUM("ETHEREUM"),
+    ETHEREUM("ETHEREUM"),
 
     @Json(name = "FABRIC_2")
-    fABRIC2("FABRIC_2"),
+    FABRIC_2("FABRIC_2"),
 
     @Json(name = "SAWTOOTH_1X")
-    sAWTOOTH1X("SAWTOOTH_1X");
+    SAWTOOTH_1X("SAWTOOTH_1X");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -56,7 +64,7 @@ enum class LedgerType(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -69,7 +77,7 @@ enum class LedgerType(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): LedgerType? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

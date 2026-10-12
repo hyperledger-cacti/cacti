@@ -24,17 +24,23 @@ import jakarta.validation.Valid
  */
 data class ListCpiV1ResponseCpisInnerCpksInner(
 
+    @param:JsonProperty("hash")
     @get:JsonProperty("hash") val hash: kotlin.String? = null,
 
     @field:Valid
+    @param:JsonProperty("id")
     @get:JsonProperty("id") val id: CPIIDV1? = null,
 
+    @param:JsonProperty("libraries")
     @get:JsonProperty("libraries") val libraries: kotlin.collections.List<kotlin.String>? = null,
 
+    @param:JsonProperty("mainBundle")
     @get:JsonProperty("mainBundle") val mainBundle: kotlin.String? = null,
 
+    @param:JsonProperty("timestamp")
     @get:JsonProperty("timestamp") val timestamp: java.time.OffsetDateTime? = null,
 
+    @param:JsonProperty("type")
     @get:JsonProperty("type") val type: kotlin.String? = null
 ) {
 

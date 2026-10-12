@@ -25,3 +25,8 @@ src/main/kotlin/org/openapitools/client/models/CmdApiServerEndpointErrorResponse
 src/main/kotlin/org/openapitools/client/models/HealthCheckResponse.kt
 src/main/kotlin/org/openapitools/client/models/MemoryUsage.kt
 src/main/kotlin/org/openapitools/client/models/WatchHealthcheckV1.kt
+src/test/kotlin/org/openapitools/client/apis/DefaultApiTest.kt
+src/test/kotlin/org/openapitools/client/models/CmdApiServerEndpointErrorResponseTest.kt
+src/test/kotlin/org/openapitools/client/models/HealthCheckResponseTest.kt
+src/test/kotlin/org/openapitools/client/models/MemoryUsageTest.kt
+src/test/kotlin/org/openapitools/client/models/WatchHealthcheckV1Test.kt

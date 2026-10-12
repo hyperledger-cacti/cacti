@@ -12,6 +12,8 @@ package cactus-core-api
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the PluginImport type satisfies the MappedNullable interface at compile time
@@ -24,6 +26,8 @@ type PluginImport struct {
 	Action PluginImportAction `json:"action"`
 	Options interface{} `json:"options,omitempty"`
 }
+
+type _PluginImport PluginImport
 
 // NewPluginImport instantiates a new PluginImport object
 // This constructor will assign default values to properties that have it defined,
@@ -138,7 +142,7 @@ func (o *PluginImport) GetOptionsOk() (*interface{}, bool) {
 
 // HasOptions returns a boolean if a field has been set.
 func (o *PluginImport) HasOptions() bool {
-	if o != nil && IsNil(o.Options) {
+	if o != nil && !IsNil(o.Options) {
 		return true
 	}
 
@@ -167,6 +171,45 @@ func (o PluginImport) ToMap() (map[string]interface{}, error) {
 		toSerialize["options"] = o.Options
 	}
 	return toSerialize, nil
+}
+
+func (o *PluginImport) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"packageName",
+		"type",
+		"action",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varPluginImport := _PluginImport{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varPluginImport)
+
+	if err != nil {
+		return err
+	}
+
+	*o = PluginImport(varPluginImport)
+
+	return err
 }
 
 type NullablePluginImport struct {

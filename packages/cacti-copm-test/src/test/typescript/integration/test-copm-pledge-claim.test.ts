@@ -13,6 +13,16 @@ import { CopmTestertMultiNetwork } from "../../../main/typescript/lib/copm-teste
 import * as path from "path";
 import * as dotenv from "dotenv";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function unwrapResponse(res: any): any {
+  if (res?.response?.case === undefined) {
+    throw new Error(
+      `unexpected empty response wrapper: ${JSON.stringify(res)}`,
+    );
+  }
+  return res.response.value;
+}
+
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -82,7 +92,7 @@ describe("Copm Pledge and Claim", () => {
 
       const pledgeNFTResult = await copmTester.clientFor(partyA).pledgeAssetV1(
         new PledgeAssetV1Request({
-          assetPledgeV1PB: {
+          assetPledgeV1Pb: {
             asset: {
               assetType: assetType,
               assetId: pledgeAssetName,
@@ -96,14 +106,14 @@ describe("Copm Pledge and Claim", () => {
       );
 
       expect(pledgeNFTResult).toBeTruthy();
-      expect(pledgeNFTResult.pledgeId).toBeString();
+      expect(unwrapResponse(pledgeNFTResult).pledgeId).toBeString();
 
       const claimNFTResult = await copmTester
         .clientFor(partyB)
         .claimPledgedAssetV1(
           new ClaimPledgedAssetV1Request({
-            assetPledgeClaimV1PB: {
-              pledgeId: pledgeNFTResult.pledgeId,
+            assetPledgeClaimV1Pb: {
+              pledgeId: unwrapResponse(pledgeNFTResult).pledgeId,
               asset: {
                 assetType: assetType,
                 assetId: pledgeAssetName,
@@ -162,7 +172,7 @@ describe("Copm Pledge and Claim", () => {
 
       const pledgeResult = await copmTester.clientFor(partyA).pledgeAssetV1(
         new PledgeAssetV1Request({
-          assetPledgeV1PB: {
+          assetPledgeV1Pb: {
             asset: {
               assetType: assetType,
               assetQuantity: exchangeQuantity,
@@ -176,14 +186,14 @@ describe("Copm Pledge and Claim", () => {
       );
 
       expect(pledgeResult).toBeTruthy();
-      expect(pledgeResult.pledgeId).toBeString();
+      expect(unwrapResponse(pledgeResult).pledgeId).toBeString();
 
       const claimResult = await copmTester
         .clientFor(partyB)
         .claimPledgedAssetV1(
           new ClaimPledgedAssetV1Request({
-            assetPledgeClaimV1PB: {
-              pledgeId: pledgeResult.pledgeId,
+            assetPledgeClaimV1Pb: {
+              pledgeId: unwrapResponse(pledgeResult).pledgeId,
               asset: {
                 assetType: assetType,
                 assetQuantity: exchangeQuantity,

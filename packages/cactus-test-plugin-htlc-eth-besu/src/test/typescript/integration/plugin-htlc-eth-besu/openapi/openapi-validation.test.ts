@@ -128,7 +128,8 @@ describe(testCase, () => {
     );
 
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     const pluginRegistry = new PluginRegistry({});
@@ -148,7 +149,8 @@ describe(testCase, () => {
     };
 
     const factoryHTLC = new PluginFactoryHtlcEthBesu({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     pluginHtlc = await factoryHTLC.create(pluginOptions);

@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -29,7 +37,10 @@ import com.squareup.moshi.JsonClass
 data class DeployContractV1RequestConstructorArgs (
 
     @Json(name = "Args")
-    val args: kotlin.collections.List<kotlin.Any>? = null
+    val args: kotlin.collections.List<kotlin.Any?>? = null
 
-)
+) {
+
+
+}
 

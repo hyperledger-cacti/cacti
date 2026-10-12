@@ -17,11 +17,11 @@ import "google/protobuf/any.proto";
 
 message SignTransactionRequestPB {
 
-  string keychainId = 14058372;
+  string keychain_id = 101082808;
 
-  string keychainRef = 101070193;
+  string keychain_ref = 87649644;
 
   // The transaction hash of ledger will be used to fetch the contain.
-  string transactionHash = 188901646;
+  string transaction_hash = 508674511;
 
 }

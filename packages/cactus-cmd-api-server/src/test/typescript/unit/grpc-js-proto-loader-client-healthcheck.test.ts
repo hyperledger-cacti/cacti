@@ -3,11 +3,7 @@ import path from "path";
 
 import { LogLevelDesc } from "@hyperledger-cacti/cactus-common";
 
-import {
-  ApiServer,
-  ConfigService,
-  HealthCheckResponse,
-} from "../../../main/typescript/public-api";
+import { ApiServer, ConfigService } from "../../../main/typescript/public-api";
 import { AuthorizationProtocol } from "../../../main/typescript/public-api";
 import { ServiceClientConstructor } from "@grpc/grpc-js/build/src/make-client";
 import * as grpc from "@grpc/grpc-js";
@@ -82,25 +78,63 @@ test(testCase, async (t: Test) => {
 
   const request = new Empty();
 
-  const res1 = await new Promise<HealthCheckResponse>((resolve, reject) => {
-    client.getHealthCheckV1(
-      request,
-      (err: grpc.ServiceError | null, value: HealthCheckResponse) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(value);
-        }
-      },
-    );
-  });
+  // GetHealthCheckV1 responds with the GetHealthCheckV1Response oneof
+  // wrapper; proto-loader (keepCase + oneofs) decodes it to the
+  // health_check_response_pb_200 case field plus a virtual "response" tag.
+  interface DecodedHealthCheckResponse {
+    response: string;
+    health_check_response_pb_200: {
+      success: boolean;
+      created_at: string;
+      memory_usage: {
+        rss: number;
+        heap_total: number;
+        heap_used: number;
+      };
+    };
+  }
+
+  const res1 = await new Promise<DecodedHealthCheckResponse>(
+    (resolve, reject) => {
+      client.getHealthCheckV1(
+        request,
+        (err: grpc.ServiceError | null, value: DecodedHealthCheckResponse) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(value);
+          }
+        },
+      );
+    },
+  );
   t.ok(res1, "res1 truthy OK");
-  t.ok(res1.createdAt, "res1.createdAt truthy OK");
-  t.ok(res1.memoryUsage, "res1.memoryUsage truthy OK");
-  t.ok(res1.memoryUsage.heapTotal, "res1.memoryUsage.heapTotal truthy OK");
-  t.ok(res1.memoryUsage.heapUsed, "res1.memoryUsage.heapUsed truthy OK");
-  t.ok(res1.memoryUsage.rss, "res1.memoryUsage.rss truthy OK");
-  t.true(res1.success, "res1.success true OK");
+  const healthCheck = res1.health_check_response_pb_200;
+  t.ok(healthCheck, "res1.health_check_response_pb_200 truthy OK");
+  t.ok(
+    healthCheck.created_at,
+    "res1.health_check_response_pb_200.created_at truthy OK",
+  );
+  t.ok(
+    healthCheck.memory_usage,
+    "res1.health_check_response_pb_200.memory_usage truthy OK",
+  );
+  t.ok(
+    healthCheck.memory_usage.heap_total,
+    "res1.health_check_response_pb_200.memory_usage.heap_total truthy OK",
+  );
+  t.ok(
+    healthCheck.memory_usage.heap_used,
+    "res1.health_check_response_pb_200.memory_usage.heap_used truthy OK",
+  );
+  t.ok(
+    healthCheck.memory_usage.rss,
+    "res1.health_check_response_pb_200.memory_usage.rss truthy OK",
+  );
+  t.true(
+    healthCheck.success,
+    "res1.health_check_response_pb_200.success true OK",
+  );
 
   t.end();
 });

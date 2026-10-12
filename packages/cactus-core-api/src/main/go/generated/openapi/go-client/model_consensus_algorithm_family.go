@@ -20,9 +20,9 @@ type ConsensusAlgorithmFamily string
 
 // List of ConsensusAlgorithmFamily
 const (
-	AUTHORITY ConsensusAlgorithmFamily = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"
-	STAKE ConsensusAlgorithmFamily = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
-	WORK ConsensusAlgorithmFamily = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
+	ORG_HYPERLEDGER_CACTUS_CONSENSUSALGORITHM_PROOF_OF_AUTHORITY ConsensusAlgorithmFamily = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"
+	ORG_HYPERLEDGER_CACTUS_CONSENSUSALGORITHM_PROOF_OF_STAKE ConsensusAlgorithmFamily = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
+	ORG_HYPERLEDGER_CACTUS_CONSENSUSALGORITHM_PROOF_OF_WORK ConsensusAlgorithmFamily = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK"
 )
 
 // All allowed values of ConsensusAlgorithmFamily enum

@@ -2,4 +2,10 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/DefaultApi.md
+docs/ErrorExceptionResponseV1.md
+docs/MonitoredToken.md
+docs/StatusResponseV1.md
+docs/TokenTypeV1.md
+docs/TrackedOperationV1.md
 index.ts

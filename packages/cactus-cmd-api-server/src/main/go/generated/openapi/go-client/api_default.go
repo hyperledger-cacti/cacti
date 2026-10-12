@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiGetHealthCheckV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetHealthCheckV1Request) Execute() (*HealthCheckResponse, *http.Response, error) {
@@ -39,7 +39,7 @@ Returns the current timestamp of the API server as proof of health/liveness
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetHealthCheckV1Request
 */
-func (a *DefaultApiService) GetHealthCheckV1(ctx context.Context) ApiGetHealthCheckV1Request {
+func (a *DefaultAPIService) GetHealthCheckV1(ctx context.Context) ApiGetHealthCheckV1Request {
 	return ApiGetHealthCheckV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -48,7 +48,7 @@ func (a *DefaultApiService) GetHealthCheckV1(ctx context.Context) ApiGetHealthCh
 
 // Execute executes the request
 //  @return HealthCheckResponse
-func (a *DefaultApiService) GetHealthCheckV1Execute(r ApiGetHealthCheckV1Request) (*HealthCheckResponse, *http.Response, error) {
+func (a *DefaultAPIService) GetHealthCheckV1Execute(r ApiGetHealthCheckV1Request) (*HealthCheckResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -56,7 +56,7 @@ func (a *DefaultApiService) GetHealthCheckV1Execute(r ApiGetHealthCheckV1Request
 		localVarReturnValue  *HealthCheckResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetHealthCheckV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetHealthCheckV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -144,7 +144,7 @@ func (a *DefaultApiService) GetHealthCheckV1Execute(r ApiGetHealthCheckV1Request
 
 type ApiGetOpenApiSpecV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetOpenApiSpecV1Request) Execute() (string, *http.Response, error) {
@@ -159,7 +159,7 @@ Returns the openapi.json document of specific plugin.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetOpenApiSpecV1Request
 */
-func (a *DefaultApiService) GetOpenApiSpecV1(ctx context.Context) ApiGetOpenApiSpecV1Request {
+func (a *DefaultAPIService) GetOpenApiSpecV1(ctx context.Context) ApiGetOpenApiSpecV1Request {
 	return ApiGetOpenApiSpecV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -168,7 +168,7 @@ func (a *DefaultApiService) GetOpenApiSpecV1(ctx context.Context) ApiGetOpenApiS
 
 // Execute executes the request
 //  @return string
-func (a *DefaultApiService) GetOpenApiSpecV1Execute(r ApiGetOpenApiSpecV1Request) (string, *http.Response, error) {
+func (a *DefaultAPIService) GetOpenApiSpecV1Execute(r ApiGetOpenApiSpecV1Request) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -176,7 +176,7 @@ func (a *DefaultApiService) GetOpenApiSpecV1Execute(r ApiGetOpenApiSpecV1Request
 		localVarReturnValue  string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetOpenApiSpecV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetOpenApiSpecV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -264,7 +264,7 @@ func (a *DefaultApiService) GetOpenApiSpecV1Execute(r ApiGetOpenApiSpecV1Request
 
 type ApiGetPrometheusMetricsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetPrometheusMetricsV1Request) Execute() (string, *http.Response, error) {
@@ -277,7 +277,7 @@ GetPrometheusMetricsV1 Get the Prometheus Metrics
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetPrometheusMetricsV1Request
 */
-func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
+func (a *DefaultAPIService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
 	return ApiGetPrometheusMetricsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -286,7 +286,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPr
 
 // Execute executes the request
 //  @return string
-func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
+func (a *DefaultAPIService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -294,7 +294,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 		localVarReturnValue  string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetPrometheusMetricsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetPrometheusMetricsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

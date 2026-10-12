@@ -12,6 +12,7 @@ package cactus-plugin-htlc-eth-besu
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 // checks if the Web3TransactionReceipt type satisfies the MappedNullable interface at compile time
@@ -20,9 +21,9 @@ var _ MappedNullable = &Web3TransactionReceipt{}
 // Web3TransactionReceipt struct for Web3TransactionReceipt
 type Web3TransactionReceipt struct {
 	Status bool `json:"status"`
-	TransactionHash string `json:"transactionHash"`
+	TransactionHash string `json:"transactionHash" validate:"regexp=^0x([A-Fa-f0-9]{64})$"`
 	TransactionIndex float32 `json:"transactionIndex"`
-	BlockHash string `json:"blockHash"`
+	BlockHash string `json:"blockHash" validate:"regexp=^0x([A-Fa-f0-9]{64})$"`
 	BlockNumber float32 `json:"blockNumber"`
 	GasUsed float32 `json:"gasUsed"`
 	ContractAddress NullableString `json:"contractAddress,omitempty"`
@@ -321,16 +322,48 @@ func (o Web3TransactionReceipt) ToMap() (map[string]interface{}, error) {
 	return toSerialize, nil
 }
 
-func (o *Web3TransactionReceipt) UnmarshalJSON(bytes []byte) (err error) {
+func (o *Web3TransactionReceipt) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"status",
+		"transactionHash",
+		"transactionIndex",
+		"blockHash",
+		"blockNumber",
+		"gasUsed",
+		"from",
+		"to",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
 	varWeb3TransactionReceipt := _Web3TransactionReceipt{}
 
-	if err = json.Unmarshal(bytes, &varWeb3TransactionReceipt); err == nil {
-		*o = Web3TransactionReceipt(varWeb3TransactionReceipt)
+	err = json.Unmarshal(data, &varWeb3TransactionReceipt)
+
+	if err != nil {
+		return err
 	}
+
+	*o = Web3TransactionReceipt(varWeb3TransactionReceipt)
 
 	additionalProperties := make(map[string]interface{})
 
-	if err = json.Unmarshal(bytes, &additionalProperties); err == nil {
+	if err = json.Unmarshal(data, &additionalProperties); err == nil {
 		delete(additionalProperties, "status")
 		delete(additionalProperties, "transactionHash")
 		delete(additionalProperties, "transactionIndex")

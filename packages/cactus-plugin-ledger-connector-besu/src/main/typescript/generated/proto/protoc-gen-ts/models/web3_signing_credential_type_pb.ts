@@ -7,9 +7,9 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export enum Web3SigningCredentialTypePB {
-        Web3SigningCredentialTypePB_CACTUS_KEYCHAIN_REF = 0,
-        Web3SigningCredentialTypePB_GETH_KEYCHAIN_PASSWORD = 1,
-        Web3SigningCredentialTypePB_PRIVATE_KEY_HEX = 2,
-        Web3SigningCredentialTypePB_NONE = 3
+        WEB3_SIGNING_CREDENTIAL_TYPE_P_B_CACTUS_KEYCHAIN_REF = 0,
+        WEB3_SIGNING_CREDENTIAL_TYPE_P_B_GETH_KEYCHAIN_PASSWORD = 1,
+        WEB3_SIGNING_CREDENTIAL_TYPE_P_B_PRIVATE_KEY_HEX = 2,
+        WEB3_SIGNING_CREDENTIAL_TYPE_P_B_NONE = 3
     }
 }

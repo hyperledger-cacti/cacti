@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,17 +30,17 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * Values: iNSTANTIATE,iNSTALL
+ * Values: orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_actionPeriodINSTANTIATE,orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_actionPeriodINSTALL
  */
 
 @JsonClass(generateAdapter = false)
 enum class PluginImportAction(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.plugin_import_action.INSTANTIATE")
-    iNSTANTIATE("org.hyperledger.cactus.plugin_import_action.INSTANTIATE"),
+    orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_actionPeriodINSTANTIATE("org.hyperledger.cactus.plugin_import_action.INSTANTIATE"),
 
     @Json(name = "org.hyperledger.cactus.plugin_import_action.INSTALL")
-    iNSTALL("org.hyperledger.cactus.plugin_import_action.INSTALL");
+    orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_actionPeriodINSTALL("org.hyperledger.cactus.plugin_import_action.INSTALL");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -41,7 +49,7 @@ enum class PluginImportAction(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -54,7 +62,7 @@ enum class PluginImportAction(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): PluginImportAction? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

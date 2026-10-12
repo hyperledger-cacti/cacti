@@ -13,6 +13,7 @@ package cactus-plugin-ledger-connector-ethereum
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // Web3SigningCredential - struct for Web3SigningCredential
@@ -63,7 +64,11 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 		if string(jsonWeb3SigningCredentialCactiKeychainRef) == "{}" { // empty struct
 			dst.Web3SigningCredentialCactiKeychainRef = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Web3SigningCredentialCactiKeychainRef); err != nil {
+				dst.Web3SigningCredentialCactiKeychainRef = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Web3SigningCredentialCactiKeychainRef = nil
@@ -76,7 +81,11 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 		if string(jsonWeb3SigningCredentialGethKeychainPassword) == "{}" { // empty struct
 			dst.Web3SigningCredentialGethKeychainPassword = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Web3SigningCredentialGethKeychainPassword); err != nil {
+				dst.Web3SigningCredentialGethKeychainPassword = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Web3SigningCredentialGethKeychainPassword = nil
@@ -89,7 +98,11 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 		if string(jsonWeb3SigningCredentialNone) == "{}" { // empty struct
 			dst.Web3SigningCredentialNone = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Web3SigningCredentialNone); err != nil {
+				dst.Web3SigningCredentialNone = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Web3SigningCredentialNone = nil
@@ -102,7 +115,11 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 		if string(jsonWeb3SigningCredentialPrivateKeyHex) == "{}" { // empty struct
 			dst.Web3SigningCredentialPrivateKeyHex = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Web3SigningCredentialPrivateKeyHex); err != nil {
+				dst.Web3SigningCredentialPrivateKeyHex = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Web3SigningCredentialPrivateKeyHex = nil
@@ -119,6 +136,10 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(Web3SigningCredential): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(Web3SigningCredential)")
 	}
 }
@@ -163,6 +184,28 @@ func (obj *Web3SigningCredential) GetActualInstance() (interface{}) {
 
 	if obj.Web3SigningCredentialPrivateKeyHex != nil {
 		return obj.Web3SigningCredentialPrivateKeyHex
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj Web3SigningCredential) GetActualInstanceValue() (interface{}) {
+	if obj.Web3SigningCredentialCactiKeychainRef != nil {
+		return *obj.Web3SigningCredentialCactiKeychainRef
+	}
+
+	if obj.Web3SigningCredentialGethKeychainPassword != nil {
+		return *obj.Web3SigningCredentialGethKeychainPassword
+	}
+
+	if obj.Web3SigningCredentialNone != nil {
+		return *obj.Web3SigningCredentialNone
+	}
+
+	if obj.Web3SigningCredentialPrivateKeyHex != nil {
+		return *obj.Web3SigningCredentialPrivateKeyHex
 	}
 
 	// all schemas are nil

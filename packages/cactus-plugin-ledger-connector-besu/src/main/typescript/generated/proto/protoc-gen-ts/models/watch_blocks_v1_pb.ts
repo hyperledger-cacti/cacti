@@ -7,10 +7,10 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export enum WatchBlocksV1PB {
-        WatchBlocksV1PB_Subscribe = 0,
-        WatchBlocksV1PB_Next = 1,
-        WatchBlocksV1PB_Unsubscribe = 2,
-        WatchBlocksV1PB_Error = 3,
-        WatchBlocksV1PB_Complete = 4
+        WATCH_BLOCKS_V1_P_B_Subscribe = 0,
+        WATCH_BLOCKS_V1_P_B_Next = 1,
+        WATCH_BLOCKS_V1_P_B_Unsubscribe = 2,
+        WATCH_BLOCKS_V1_P_B_Error = 3,
+        WATCH_BLOCKS_V1_P_B_Complete = 4
     }
 }

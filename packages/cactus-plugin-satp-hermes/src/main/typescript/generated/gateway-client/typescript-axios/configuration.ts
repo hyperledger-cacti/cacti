@@ -1,5 +1,4 @@
 /* tslint:disable */
-/* eslint-disable */
 /**
  * SATP Gateway Client (API-Type 1)
  * SATP is a protocol operating between two gateways that conducts the transfer of a digital asset  from one gateway to another. The protocol establishes a secure channel between the endpoints  and implements a 2-phase commit to ensure the properties of transfer atomicity, consistency,  isolation and durability.  This API defines the gateway client facing API (API-Type 1 in the SATP-Core specification).  ## Adapter Layer  The SATP Hermes plugin includes an Adapter Layer that enables external systems to integrate  with and control SATP transfers through webhook-based communication. This enables compliance  systems, business logic, and human-in-the-loop workflows to participate in cross-chain asset  transfers.  ### Webhook Types  | Type | Direction | Purpose | |------|-----------|---------| | **Outbound Webhooks** | Gateway → External System | Notify external systems about SATP events | | **Inbound Webhooks** | External System → Gateway | Allow external systems to approve/reject transfers |  ### Key Concepts  - **Execution Points**: Adapters are triggered at specific points in the SATP protocol (stage + step + order) - **Adapters**: Configuration units that define which webhooks to call and when - **Session Control**: Inbound webhooks can pause transfers pending external approval  ### Inbound Webhook Approval Flow  1. Gateway reaches configured execution point with inbound adapter 2. Gateway pauses SATP execution and waits for external decision 3. External controller evaluates transfer (compliance, business rules, manual review) 4. Controller POSTs decision to `/webhook/inbound/decide` endpoint 5. Gateway validates decision and resumes or aborts transfer  **Additional Resources**: - [Proposed SATP Charter](https://datatracker.ietf.org/doc/charter-ietf-satp/) - [SATP Core draft](https://datatracker.ietf.org/doc/draft-ietf-satp-core) - [SATP Crash Recovery draft](https://datatracker.ietf.org/doc/draft-belchior-satp-gateway-recovery/) - [SATP Architecture draft](https://datatracker.ietf.org/doc/draft-ietf-satp-architecture/) - [SATP Use-Cases draft](https://datatracker.ietf.org/doc/draft-ramakrishna-sat-use-cases/) - [SATP Data sharing draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-data-sharing) - [SATP View Addresses draft](https://datatracker.ietf.org/doc/draft-ramakrishna-satp-views-addresses)
@@ -12,13 +11,26 @@
  * Do not edit the class manually.
  */
 
+interface AWSv4Configuration {
+  options?: {
+    region?: string
+    service?: string
+  }
+  credentials?: {
+    accessKeyId?: string
+    secretAccessKey?: string,
+    sessionToken?: string
+  }
+}
 
 export interface ConfigurationParameters {
     apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
     username?: string;
     password?: string;
     accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string) | ((name?: string, scopes?: string[]) => Promise<string>);
+    awsv4?: AWSv4Configuration;
     basePath?: string;
+    serverIndex?: number;
     baseOptions?: any;
     formDataCtor?: new () => any;
 }
@@ -27,42 +39,43 @@ export class Configuration {
     /**
      * parameter for apiKey security
      * @param name security name
-     * @memberof Configuration
      */
     apiKey?: string | Promise<string> | ((name: string) => string) | ((name: string) => Promise<string>);
     /**
      * parameter for basic security
-     *
-     * @type {string}
-     * @memberof Configuration
      */
     username?: string;
     /**
      * parameter for basic security
-     *
-     * @type {string}
-     * @memberof Configuration
      */
     password?: string;
     /**
      * parameter for oauth2 security
      * @param name security name
      * @param scopes oauth2 scope
-     * @memberof Configuration
      */
     accessToken?: string | Promise<string> | ((name?: string, scopes?: string[]) => string) | ((name?: string, scopes?: string[]) => Promise<string>);
     /**
-     * override base path
-     *
-     * @type {string}
+     * parameter for aws4 signature security
+     * @param {Object} AWS4Signature - AWS4 Signature security
+     * @param {string} options.region - aws region
+     * @param {string} options.service - name of the service.
+     * @param {string} credentials.accessKeyId - aws access key id
+     * @param {string} credentials.secretAccessKey - aws access key
+     * @param {string} credentials.sessionToken - aws session token
      * @memberof Configuration
+     */
+    awsv4?: AWSv4Configuration;
+    /**
+     * override base path
      */
     basePath?: string;
     /**
+     * override server index
+     */
+    serverIndex?: number;
+    /**
      * base options for axios calls
-     *
-     * @type {any}
-     * @memberof Configuration
      */
     baseOptions?: any;
     /**
@@ -79,8 +92,15 @@ export class Configuration {
         this.username = param.username;
         this.password = param.password;
         this.accessToken = param.accessToken;
+        this.awsv4 = param.awsv4;
         this.basePath = param.basePath;
-        this.baseOptions = param.baseOptions;
+        this.serverIndex = param.serverIndex;
+        this.baseOptions = {
+            ...param.baseOptions,
+            headers: {
+                ...param.baseOptions?.headers,
+            },
+        };
         this.formDataCtor = param.formDataCtor;
     }
 
@@ -95,7 +115,7 @@ export class Configuration {
      * @return True if the given MIME is JSON, false otherwise.
      */
     public isJsonMime(mime: string): boolean {
-        const jsonMime: RegExp = new RegExp('^(application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(;.*)?$', 'i');
-        return mime !== null && (jsonMime.test(mime) || mime.toLowerCase() === 'application/json-patch+json');
+        const jsonMime: RegExp = /^(application\/json|[^;/ \t]+\/[^;/ \t]+[+]json)[ \t]*(;.*)?$/i;
+        return mime !== null && jsonMime.test(mime);
     }
 }

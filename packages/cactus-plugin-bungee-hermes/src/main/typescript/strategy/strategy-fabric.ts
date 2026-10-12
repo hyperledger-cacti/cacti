@@ -163,7 +163,8 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       signingCredential: networkDetails.signingCredential,
       channelName: networkDetails.channelName,
       contractName: "qscc",
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       methodName: "GetBlockByTxID",
       params: [networkDetails.channelName, transactionId],
     } as RunTransactionRequest;
@@ -313,7 +314,8 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       channelName: networkDetails.channelName,
       contractName: networkDetails.contractName,
       methodName: "GetAllAssetsKey",
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       params: [],
     } as RunTransactionRequest;
 
@@ -385,7 +387,8 @@ export class StrategyFabric implements ObtainLedgerStrategy {
       channelName: networkDetails.channelName,
       contractName: networkDetails.contractName,
       methodName: "GetAllTxByKey",
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       params: [key],
     } as RunTransactionRequest;
 

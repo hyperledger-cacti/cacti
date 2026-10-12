@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -63,5 +71,8 @@ data class Web3TransactionReceipt (
     @Json(name = "contractAddress")
     val contractAddress: kotlin.String? = null
 
-) : kotlin.collections.HashMap<String, kotlin.Any>()
+) : kotlin.collections.HashMap<String, kotlin.Any>() {
+
+
+}
 

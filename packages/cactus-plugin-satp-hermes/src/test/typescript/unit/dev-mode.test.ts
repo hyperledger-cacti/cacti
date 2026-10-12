@@ -5,7 +5,7 @@
  * deployments can serve plain HTTP with a warning; an explicit config
  * value always wins over the environment variable.
  */
-import { resolveDevMode } from "../../../main/typescript/plugin-satp-hermes-gateway-cli";
+import { resolveDevMode } from "../../../main/typescript/services/validation/config-validating-functions/resolve-dev-mode";
 
 describe("resolveDevMode", () => {
   it("is inactive when neither config nor env are set", () => {

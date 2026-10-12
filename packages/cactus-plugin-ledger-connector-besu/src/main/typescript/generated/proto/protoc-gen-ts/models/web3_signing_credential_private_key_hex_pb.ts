@@ -11,7 +11,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
             type?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
-            ethAccount?: string;
+            eth_account?: string;
             secret?: string;
         }) {
             super();
@@ -20,8 +20,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if ("type" in data && data.type != undefined) {
                     this.type = data.type;
                 }
-                if ("ethAccount" in data && data.ethAccount != undefined) {
-                    this.ethAccount = data.ethAccount;
+                if ("eth_account" in data && data.eth_account != undefined) {
+                    this.eth_account = data.eth_account;
                 }
                 if ("secret" in data && data.secret != undefined) {
                     this.secret = data.secret;
@@ -29,16 +29,16 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             }
         }
         get type() {
-            return pb_1.Message.getFieldWithDefault(this, 3575610, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.Web3SigningCredentialTypePB_CACTUS_KEYCHAIN_REF) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
+            return pb_1.Message.getFieldWithDefault(this, 3575610, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.WEB3_SIGNING_CREDENTIAL_TYPE_P_B_CACTUS_KEYCHAIN_REF) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
         }
         set type(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB) {
             pb_1.Message.setField(this, 3575610, value);
         }
-        get ethAccount() {
-            return pb_1.Message.getFieldWithDefault(this, 528332204, "") as string;
+        get eth_account() {
+            return pb_1.Message.getFieldWithDefault(this, 239988345, "") as string;
         }
-        set ethAccount(value: string) {
-            pb_1.Message.setField(this, 528332204, value);
+        set eth_account(value: string) {
+            pb_1.Message.setField(this, 239988345, value);
         }
         get secret() {
             return pb_1.Message.getFieldWithDefault(this, 369406289, "") as string;
@@ -48,15 +48,15 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         }
         static fromObject(data: {
             type?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
-            ethAccount?: string;
+            eth_account?: string;
             secret?: string;
         }): Web3SigningCredentialPrivateKeyHexPB {
             const message = new Web3SigningCredentialPrivateKeyHexPB({});
             if (data.type != null) {
                 message.type = data.type;
             }
-            if (data.ethAccount != null) {
-                message.ethAccount = data.ethAccount;
+            if (data.eth_account != null) {
+                message.eth_account = data.eth_account;
             }
             if (data.secret != null) {
                 message.secret = data.secret;
@@ -66,14 +66,14 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         toObject() {
             const data: {
                 type?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
-                ethAccount?: string;
+                eth_account?: string;
                 secret?: string;
             } = {};
             if (this.type != null) {
                 data.type = this.type;
             }
-            if (this.ethAccount != null) {
-                data.ethAccount = this.ethAccount;
+            if (this.eth_account != null) {
+                data.eth_account = this.eth_account;
             }
             if (this.secret != null) {
                 data.secret = this.secret;
@@ -84,10 +84,10 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.type != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.Web3SigningCredentialTypePB_CACTUS_KEYCHAIN_REF)
+            if (this.type != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.WEB3_SIGNING_CREDENTIAL_TYPE_P_B_CACTUS_KEYCHAIN_REF)
                 writer.writeEnum(3575610, this.type);
-            if (this.ethAccount.length)
-                writer.writeString(528332204, this.ethAccount);
+            if (this.eth_account.length)
+                writer.writeString(239988345, this.eth_account);
             if (this.secret.length)
                 writer.writeString(369406289, this.secret);
             if (!w)
@@ -102,8 +102,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                     case 3575610:
                         message.type = reader.readEnum();
                         break;
-                    case 528332204:
-                        message.ethAccount = reader.readString();
+                    case 239988345:
+                        message.eth_account = reader.readString();
                         break;
                     case 369406289:
                         message.secret = reader.readString();

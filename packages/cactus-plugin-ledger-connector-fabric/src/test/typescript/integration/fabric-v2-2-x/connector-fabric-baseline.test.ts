@@ -652,7 +652,8 @@ describe("PluginLedgerConnectorFabric", () => {
       //objectType, assetID, color, size, appraisedvalue
       params: [],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Sendprivate,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSendprivate,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -665,7 +666,8 @@ describe("PluginLedgerConnectorFabric", () => {
       channelName,
       params: [assetId],
       methodName: "ReadAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -701,7 +703,8 @@ describe("PluginLedgerConnectorFabric", () => {
       channelName,
       params: [assetId, assetId + "1"],
       methodName: "GetAssetByRange",
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -854,7 +857,8 @@ describe("PluginLedgerConnectorFabric", () => {
       channelName,
       params: [assetId, "19"],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -869,7 +873,8 @@ describe("PluginLedgerConnectorFabric", () => {
       channelName,
       params: [assetId],
       methodName: "ReadAsset",
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -892,7 +897,8 @@ describe("PluginLedgerConnectorFabric", () => {
       channelName,
       params: [assetId],
       methodName: "LockAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,

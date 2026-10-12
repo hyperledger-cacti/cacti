@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the FileBase64 type satisfies the MappedNullable interface at compile time
@@ -26,6 +28,8 @@ type FileBase64 struct {
 	// The relative path of the file, if it should be placed in a sub-directory
 	Filepath *string `json:"filepath,omitempty"`
 }
+
+type _FileBase64 FileBase64
 
 // NewFileBase64 instantiates a new FileBase64 object
 // This constructor will assign default values to properties that have it defined,
@@ -142,6 +146,44 @@ func (o FileBase64) ToMap() (map[string]interface{}, error) {
 		toSerialize["filepath"] = o.Filepath
 	}
 	return toSerialize, nil
+}
+
+func (o *FileBase64) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"body",
+		"filename",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varFileBase64 := _FileBase64{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varFileBase64)
+
+	if err != nil {
+		return err
+	}
+
+	*o = FileBase64(varFileBase64)
+
+	return err
 }
 
 type NullableFileBase64 struct {

@@ -21,11 +21,14 @@ import jakarta.validation.Valid
 data class ClearMonitorTransactionsV1Request(
 
     @get:Size(min=1,max=1024)
+    @param:JsonProperty("clientAppId", required = true)
     @get:JsonProperty("clientAppId", required = true) val clientAppId: kotlin.String,
 
     @get:Size(min=1,max=1024)
+    @param:JsonProperty("stateFullClassName", required = true)
     @get:JsonProperty("stateFullClassName", required = true) val stateFullClassName: kotlin.String,
 
+    @param:JsonProperty("txIndexes", required = true)
     @get:JsonProperty("txIndexes", required = true) val txIndexes: kotlin.collections.List<kotlin.String> = arrayListOf()
 ) {
 

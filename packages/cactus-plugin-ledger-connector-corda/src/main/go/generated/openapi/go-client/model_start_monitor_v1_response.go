@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the StartMonitorV1Response type satisfies the MappedNullable interface at compile time
@@ -24,6 +26,8 @@ type StartMonitorV1Response struct {
 	// Message describing operation status or any errors that occurred.
 	Msg string `json:"msg"`
 }
+
+type _StartMonitorV1Response StartMonitorV1Response
 
 // NewStartMonitorV1Response instantiates a new StartMonitorV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -105,6 +109,44 @@ func (o StartMonitorV1Response) ToMap() (map[string]interface{}, error) {
 	toSerialize["success"] = o.Success
 	toSerialize["msg"] = o.Msg
 	return toSerialize, nil
+}
+
+func (o *StartMonitorV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"success",
+		"msg",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varStartMonitorV1Response := _StartMonitorV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varStartMonitorV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = StartMonitorV1Response(varStartMonitorV1Response)
+
+	return err
 }
 
 type NullableStartMonitorV1Response struct {

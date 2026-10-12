@@ -14,121 +14,70 @@
 
 
 import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from './common';
 import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
-/**
- * 
- * @export
- * @interface GetObjectRequestV1
- */
 export interface GetObjectRequestV1 {
     /**
      * The key for the entry to get from the object store.
-     * @type {string}
-     * @memberof GetObjectRequestV1
      */
     'key': string;
 }
-/**
- * 
- * @export
- * @interface GetObjectResponseV1
- */
 export interface GetObjectResponseV1 {
     /**
      * The key that was used to retrieve the value from the object store.
-     * @type {string}
-     * @memberof GetObjectResponseV1
      */
     'key': string;
     /**
      * The value associated with the requested key in the object store as a string.
-     * @type {string}
-     * @memberof GetObjectResponseV1
      */
     'value': string;
 }
-/**
- * 
- * @export
- * @interface HasObjectRequestV1
- */
 export interface HasObjectRequestV1 {
     /**
      * The key to check for presence in the object store.
-     * @type {string}
-     * @memberof HasObjectRequestV1
      */
     'key': string;
 }
-/**
- * 
- * @export
- * @interface HasObjectResponseV1
- */
 export interface HasObjectResponseV1 {
     /**
      * The key that was used to check the presence of the value in the object store.
-     * @type {string}
-     * @memberof HasObjectResponseV1
      */
     'key': string;
     /**
      * Date and time encoded as JSON when the presence check was performed by the plugin backend.
-     * @type {string}
-     * @memberof HasObjectResponseV1
      */
     'checkedAt': string;
     /**
      * The boolean true or false indicating the presence or absence of an object under \'key\'.
-     * @type {boolean}
-     * @memberof HasObjectResponseV1
      */
     'isPresent': boolean;
 }
-/**
- * 
- * @export
- * @interface SetObjectRequestV1
- */
 export interface SetObjectRequestV1 {
     /**
      * The key for the entry to set in the object store.
-     * @type {string}
-     * @memberof SetObjectRequestV1
      */
     'key': string;
     /**
      * The value that will be associated with the key in the object store.
-     * @type {string}
-     * @memberof SetObjectRequestV1
      */
     'value': string;
 }
-/**
- * 
- * @export
- * @interface SetObjectResponseV1
- */
 export interface SetObjectResponseV1 {
     /**
      * The key that was used to set the value in the object store.
-     * @type {string}
-     * @memberof SetObjectResponseV1
      */
     'key': string;
 }
 
 /**
  * DefaultApi - axios parameter creator
- * @export
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -139,7 +88,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getObjectV1: async (getObjectRequestV1: GetObjectRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getObjectV1: async (getObjectRequestV1: GetObjectRequestV1, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'getObjectRequestV1' is not null or undefined
             assertParamExists('getObjectV1', 'getObjectRequestV1', getObjectRequestV1)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object`;
@@ -154,9 +103,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -175,7 +123,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        hasObjectV1: async (hasObjectRequestV1: HasObjectRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        hasObjectV1: async (hasObjectRequestV1: HasObjectRequestV1, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'hasObjectRequestV1' is not null or undefined
             assertParamExists('hasObjectV1', 'hasObjectRequestV1', hasObjectRequestV1)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object`;
@@ -190,9 +138,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -211,7 +158,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setObjectV1: async (setObjectRequestV1: SetObjectRequestV1, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        setObjectV1: async (setObjectRequestV1: SetObjectRequestV1, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'setObjectRequestV1' is not null or undefined
             assertParamExists('setObjectV1', 'setObjectRequestV1', setObjectRequestV1)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object`;
@@ -226,9 +173,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -245,7 +191,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 /**
  * DefaultApi - functional programming interface
- * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
@@ -257,9 +202,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getObjectV1(getObjectRequestV1: GetObjectRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetObjectResponseV1>> {
+        async getObjectV1(getObjectRequestV1: GetObjectRequestV1, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetObjectResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getObjectV1(getObjectRequestV1, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getObjectV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -268,9 +215,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HasObjectResponseV1>> {
+        async hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<HasObjectResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.hasObjectV1(hasObjectRequestV1, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.hasObjectV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -279,16 +228,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async setObjectV1(setObjectRequestV1: SetObjectRequestV1, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SetObjectResponseV1>> {
+        async setObjectV1(setObjectRequestV1: SetObjectRequestV1, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SetObjectResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.setObjectV1(setObjectRequestV1, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.setObjectV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * DefaultApi - factory interface
- * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
@@ -300,7 +250,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getObjectV1(getObjectRequestV1: GetObjectRequestV1, options?: any): AxiosPromise<GetObjectResponseV1> {
+        getObjectV1(getObjectRequestV1: GetObjectRequestV1, options?: RawAxiosRequestConfig): AxiosPromise<GetObjectResponseV1> {
             return localVarFp.getObjectV1(getObjectRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
@@ -310,7 +260,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: any): AxiosPromise<HasObjectResponseV1> {
+        hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: RawAxiosRequestConfig): AxiosPromise<HasObjectResponseV1> {
             return localVarFp.hasObjectV1(hasObjectRequestV1, options).then((request) => request(axios, basePath));
         },
         /**
@@ -320,7 +270,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        setObjectV1(setObjectRequestV1: SetObjectRequestV1, options?: any): AxiosPromise<SetObjectResponseV1> {
+        setObjectV1(setObjectRequestV1: SetObjectRequestV1, options?: RawAxiosRequestConfig): AxiosPromise<SetObjectResponseV1> {
             return localVarFp.setObjectV1(setObjectRequestV1, options).then((request) => request(axios, basePath));
         },
     };
@@ -328,9 +278,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 
 /**
  * DefaultApi - object-oriented interface
- * @export
- * @class DefaultApi
- * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
     /**
@@ -339,9 +286,8 @@ export class DefaultApi extends BaseAPI {
      * @param {GetObjectRequestV1} getObjectRequestV1 Request body to obtain an object via its key.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public getObjectV1(getObjectRequestV1: GetObjectRequestV1, options?: AxiosRequestConfig) {
+    public getObjectV1(getObjectRequestV1: GetObjectRequestV1, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getObjectV1(getObjectRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -351,9 +297,8 @@ export class DefaultApi extends BaseAPI {
      * @param {HasObjectRequestV1} hasObjectRequestV1 Request body to check presence of an object under a key.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: AxiosRequestConfig) {
+    public hasObjectV1(hasObjectRequestV1: HasObjectRequestV1, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).hasObjectV1(hasObjectRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -363,11 +308,11 @@ export class DefaultApi extends BaseAPI {
      * @param {SetObjectRequestV1} setObjectRequestV1 Request body to set an object under a key.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public setObjectV1(setObjectRequestV1: SetObjectRequestV1, options?: AxiosRequestConfig) {
+    public setObjectV1(setObjectRequestV1: SetObjectRequestV1, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).setObjectV1(setObjectRequestV1, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
 
 

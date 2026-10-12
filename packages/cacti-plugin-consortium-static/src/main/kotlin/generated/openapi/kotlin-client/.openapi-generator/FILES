@@ -25,7 +25,6 @@ src/main/kotlin/org/openapitools/client/models/BroadcastRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/BroadcastRequestV1Message.kt
 src/main/kotlin/org/openapitools/client/models/BroadcastResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/CactusNode.kt
-src/main/kotlin/org/openapitools/client/models/CactusNodeAllOf.kt
 src/main/kotlin/org/openapitools/client/models/CactusNodeMeta.kt
 src/main/kotlin/org/openapitools/client/models/GetConsortiumJwsResponse.kt
 src/main/kotlin/org/openapitools/client/models/GetNodeJwsResponse.kt
@@ -36,3 +35,18 @@ src/main/kotlin/org/openapitools/client/models/Ledger.kt
 src/main/kotlin/org/openapitools/client/models/LedgerType.kt
 src/main/kotlin/org/openapitools/client/models/NewNodeRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/PluginInstance.kt
+src/test/kotlin/org/openapitools/client/apis/DefaultApiTest.kt
+src/test/kotlin/org/openapitools/client/models/BroadcastRequestV1MessageTest.kt
+src/test/kotlin/org/openapitools/client/models/BroadcastRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/BroadcastResponseV1Test.kt
+src/test/kotlin/org/openapitools/client/models/CactusNodeMetaTest.kt
+src/test/kotlin/org/openapitools/client/models/CactusNodeTest.kt
+src/test/kotlin/org/openapitools/client/models/GetConsortiumJwsResponseTest.kt
+src/test/kotlin/org/openapitools/client/models/GetNodeJwsResponseTest.kt
+src/test/kotlin/org/openapitools/client/models/IdentityTest.kt
+src/test/kotlin/org/openapitools/client/models/JWSGeneralTest.kt
+src/test/kotlin/org/openapitools/client/models/JWSRecipientTest.kt
+src/test/kotlin/org/openapitools/client/models/LedgerTest.kt
+src/test/kotlin/org/openapitools/client/models/LedgerTypeTest.kt
+src/test/kotlin/org/openapitools/client/models/NewNodeRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/PluginInstanceTest.kt

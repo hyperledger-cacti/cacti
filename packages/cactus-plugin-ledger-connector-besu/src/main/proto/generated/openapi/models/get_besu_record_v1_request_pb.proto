@@ -18,8 +18,8 @@ import "models/invoke_contract_v1_request_pb.proto";
 
 message GetBesuRecordV1RequestPB {
 
-  InvokeContractV1RequestPB invokeCall = 359347961;
+  InvokeContractV1RequestPB invoke_call = 428276166;
 
-  string transactionHash = 188901646;
+  string transaction_hash = 508674511;
 
 }

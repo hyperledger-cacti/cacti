@@ -276,7 +276,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -343,7 +344,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -375,7 +376,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
       fabricNetworkId,
       fabricLedgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
     expect(reqApproveFabricAddress?.data.approveAddress).toBeDefined();
 
@@ -448,7 +449,8 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
     const {
@@ -519,7 +521,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     const reqApproveFabricAddress = await approveAddressApi.getApproveAddress(
       fabricNetwork.id,
       fabricNetwork.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     if (!reqApproveFabricAddress?.data.approveAddress) {
@@ -542,7 +544,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();
@@ -619,7 +621,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -695,7 +698,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -719,7 +722,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
       ethereumEnv.network.id,
       ethereumEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
@@ -814,7 +817,8 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -890,7 +894,7 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
-      TokenType.Nonfungible,
+      TokenType.NonstandardNonfungible,
     );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -916,7 +920,7 @@ describe("SATPGateway sending a Non Fungible token from Besu to Ethereum", () =>
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
       ethereumEnv.network.id,
       ethereumEnv.network.ledgerType,
-      TokenType.Nonfungible,
+      TokenType.NonstandardNonfungible,
     );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();

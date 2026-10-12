@@ -13,6 +13,8 @@ package cactus-plugin-ledger-connector-corda
 import (
 	"encoding/json"
 	"time"
+	"bytes"
+	"fmt"
 )
 
 // checks if the StartFlowV1Response type satisfies the MappedNullable interface at compile time
@@ -28,6 +30,8 @@ type StartFlowV1Response struct {
 	HoldingIDShortHash string `json:"holdingIDShortHash"`
 	Timestamp time.Time `json:"timestamp"`
 }
+
+type _StartFlowV1Response StartFlowV1Response
 
 // NewStartFlowV1Response instantiates a new StartFlowV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -305,6 +309,45 @@ func (o StartFlowV1Response) ToMap() (map[string]interface{}, error) {
 	toSerialize["holdingIDShortHash"] = o.HoldingIDShortHash
 	toSerialize["timestamp"] = o.Timestamp
 	return toSerialize, nil
+}
+
+func (o *StartFlowV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"flowStatus",
+		"holdingIDShortHash",
+		"timestamp",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varStartFlowV1Response := _StartFlowV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varStartFlowV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = StartFlowV1Response(varStartFlowV1Response)
+
+	return err
 }
 
 type NullableStartFlowV1Response struct {

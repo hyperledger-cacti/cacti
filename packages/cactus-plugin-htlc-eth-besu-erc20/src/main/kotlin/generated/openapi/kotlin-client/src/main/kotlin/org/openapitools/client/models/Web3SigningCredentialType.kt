@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,23 +30,23 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * Values: cACTUSKEYCHAINREF,gETHKEYCHAINPASSWORD,pRIVATEKEYHEX,nONE
+ * Values: CACTUS_KEYCHAIN_REF,GETH_KEYCHAIN_PASSWORD,PRIVATE_KEY_HEX,NONE
  */
 
 @JsonClass(generateAdapter = false)
 enum class Web3SigningCredentialType(val value: kotlin.String) {
 
     @Json(name = "CACTUS_KEYCHAIN_REF")
-    cACTUSKEYCHAINREF("CACTUS_KEYCHAIN_REF"),
+    CACTUS_KEYCHAIN_REF("CACTUS_KEYCHAIN_REF"),
 
     @Json(name = "GETH_KEYCHAIN_PASSWORD")
-    gETHKEYCHAINPASSWORD("GETH_KEYCHAIN_PASSWORD"),
+    GETH_KEYCHAIN_PASSWORD("GETH_KEYCHAIN_PASSWORD"),
 
     @Json(name = "PRIVATE_KEY_HEX")
-    pRIVATEKEYHEX("PRIVATE_KEY_HEX"),
+    PRIVATE_KEY_HEX("PRIVATE_KEY_HEX"),
 
     @Json(name = "NONE")
-    nONE("NONE");
+    NONE("NONE");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -47,7 +55,7 @@ enum class Web3SigningCredentialType(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -60,7 +68,7 @@ enum class Web3SigningCredentialType(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): Web3SigningCredentialType? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

@@ -9,10 +9,10 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
             rss?: number;
-            heapTotal?: number;
-            heapUsed?: number;
+            heap_total?: number;
+            heap_used?: number;
             external?: number;
-            arrayBuffers?: number;
+            array_buffers?: number;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
@@ -20,17 +20,17 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                 if ("rss" in data && data.rss != undefined) {
                     this.rss = data.rss;
                 }
-                if ("heapTotal" in data && data.heapTotal != undefined) {
-                    this.heapTotal = data.heapTotal;
+                if ("heap_total" in data && data.heap_total != undefined) {
+                    this.heap_total = data.heap_total;
                 }
-                if ("heapUsed" in data && data.heapUsed != undefined) {
-                    this.heapUsed = data.heapUsed;
+                if ("heap_used" in data && data.heap_used != undefined) {
+                    this.heap_used = data.heap_used;
                 }
                 if ("external" in data && data.external != undefined) {
                     this.external = data.external;
                 }
-                if ("arrayBuffers" in data && data.arrayBuffers != undefined) {
-                    this.arrayBuffers = data.arrayBuffers;
+                if ("array_buffers" in data && data.array_buffers != undefined) {
+                    this.array_buffers = data.array_buffers;
                 }
             }
         }
@@ -40,17 +40,17 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         set rss(value: number) {
             pb_1.Message.setField(this, 113234, value);
         }
-        get heapTotal() {
-            return pb_1.Message.getFieldWithDefault(this, 114487480, 0) as number;
+        get heap_total() {
+            return pb_1.Message.getFieldWithDefault(this, 426448079, 0) as number;
         }
-        set heapTotal(value: number) {
-            pb_1.Message.setField(this, 114487480, value);
+        set heap_total(value: number) {
+            pb_1.Message.setField(this, 426448079, value);
         }
-        get heapUsed() {
-            return pb_1.Message.getFieldWithDefault(this, 30910521, 0) as number;
+        get heap_used() {
+            return pb_1.Message.getFieldWithDefault(this, 124824112, 0) as number;
         }
-        set heapUsed(value: number) {
-            pb_1.Message.setField(this, 30910521, value);
+        set heap_used(value: number) {
+            pb_1.Message.setField(this, 124824112, value);
         }
         get external() {
             return pb_1.Message.getFieldWithDefault(this, 210148408, 0) as number;
@@ -58,59 +58,59 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         set external(value: number) {
             pb_1.Message.setField(this, 210148408, value);
         }
-        get arrayBuffers() {
-            return pb_1.Message.getFieldWithDefault(this, 116952168, 0) as number;
+        get array_buffers() {
+            return pb_1.Message.getFieldWithDefault(this, 418096207, 0) as number;
         }
-        set arrayBuffers(value: number) {
-            pb_1.Message.setField(this, 116952168, value);
+        set array_buffers(value: number) {
+            pb_1.Message.setField(this, 418096207, value);
         }
         static fromObject(data: {
             rss?: number;
-            heapTotal?: number;
-            heapUsed?: number;
+            heap_total?: number;
+            heap_used?: number;
             external?: number;
-            arrayBuffers?: number;
+            array_buffers?: number;
         }): MemoryUsagePB {
             const message = new MemoryUsagePB({});
             if (data.rss != null) {
                 message.rss = data.rss;
             }
-            if (data.heapTotal != null) {
-                message.heapTotal = data.heapTotal;
+            if (data.heap_total != null) {
+                message.heap_total = data.heap_total;
             }
-            if (data.heapUsed != null) {
-                message.heapUsed = data.heapUsed;
+            if (data.heap_used != null) {
+                message.heap_used = data.heap_used;
             }
             if (data.external != null) {
                 message.external = data.external;
             }
-            if (data.arrayBuffers != null) {
-                message.arrayBuffers = data.arrayBuffers;
+            if (data.array_buffers != null) {
+                message.array_buffers = data.array_buffers;
             }
             return message;
         }
         toObject() {
             const data: {
                 rss?: number;
-                heapTotal?: number;
-                heapUsed?: number;
+                heap_total?: number;
+                heap_used?: number;
                 external?: number;
-                arrayBuffers?: number;
+                array_buffers?: number;
             } = {};
             if (this.rss != null) {
                 data.rss = this.rss;
             }
-            if (this.heapTotal != null) {
-                data.heapTotal = this.heapTotal;
+            if (this.heap_total != null) {
+                data.heap_total = this.heap_total;
             }
-            if (this.heapUsed != null) {
-                data.heapUsed = this.heapUsed;
+            if (this.heap_used != null) {
+                data.heap_used = this.heap_used;
             }
             if (this.external != null) {
                 data.external = this.external;
             }
-            if (this.arrayBuffers != null) {
-                data.arrayBuffers = this.arrayBuffers;
+            if (this.array_buffers != null) {
+                data.array_buffers = this.array_buffers;
             }
             return data;
         }
@@ -120,14 +120,14 @@ export namespace org.hyperledger.cactus.cmd_api_server {
             const writer = w || new pb_1.BinaryWriter();
             if (this.rss != 0)
                 writer.writeFloat(113234, this.rss);
-            if (this.heapTotal != 0)
-                writer.writeFloat(114487480, this.heapTotal);
-            if (this.heapUsed != 0)
-                writer.writeFloat(30910521, this.heapUsed);
+            if (this.heap_total != 0)
+                writer.writeFloat(426448079, this.heap_total);
+            if (this.heap_used != 0)
+                writer.writeFloat(124824112, this.heap_used);
             if (this.external != 0)
                 writer.writeFloat(210148408, this.external);
-            if (this.arrayBuffers != 0)
-                writer.writeFloat(116952168, this.arrayBuffers);
+            if (this.array_buffers != 0)
+                writer.writeFloat(418096207, this.array_buffers);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -140,17 +140,17 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                     case 113234:
                         message.rss = reader.readFloat();
                         break;
-                    case 114487480:
-                        message.heapTotal = reader.readFloat();
+                    case 426448079:
+                        message.heap_total = reader.readFloat();
                         break;
-                    case 30910521:
-                        message.heapUsed = reader.readFloat();
+                    case 124824112:
+                        message.heap_used = reader.readFloat();
                         break;
                     case 210148408:
                         message.external = reader.readFloat();
                         break;
-                    case 116952168:
-                        message.arrayBuffers = reader.readFloat();
+                    case 418096207:
+                        message.array_buffers = reader.readFloat();
                         break;
                     default: reader.skipField();
                 }

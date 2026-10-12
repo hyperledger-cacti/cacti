@@ -19,24 +19,24 @@ import "models/solidity_contract_json_artifact_gas_estimates_pb.proto";
 
 message SolidityContractJsonArtifactPB {
 
-  string contractName = 328784197;
+  string contract_name = 512557672;
 
   string metadata = 450004177;
 
   string bytecode = 256554254;
 
-  string deployedBytecode = 146904872;
+  string deployed_bytecode = 381486258;
 
-  string sourceMap = 87815362;
+  string source_map = 37374154;
 
-  string deployedSourceMap = 90090014;
+  string deployed_source_map = 162051410;
 
-  string sourcePath = 37831970;
+  string source_path = 84767287;
 
   SolidityContractJsonArtifactCompilerPB compiler = 62657378;
 
-  map<string, google.protobuf.Any> functionHashes = 363274190;
+  map<string, google.protobuf.Any> function_hashes = 208390278;
 
-  SolidityContractJsonArtifactGasEstimatesPB gasEstimates = 228215441;
+  SolidityContractJsonArtifactGasEstimatesPB gas_estimates = 98111079;
 
 }

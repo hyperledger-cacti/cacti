@@ -13,11 +13,15 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Empty, Message, proto3 } from "@bufbuild/protobuf";
 import { DeleteKeychainEntryRequestV1PB } from "../models/delete_keychain_entry_request_v1_pb_pb.js";
+import { DeleteKeychainEntryResponseV1PB } from "../models/delete_keychain_entry_response_v1_pb_pb.js";
 import { GetKeychainEntryRequestV1PB } from "../models/get_keychain_entry_request_v1_pb_pb.js";
+import { GetKeychainEntryResponseV1PB } from "../models/get_keychain_entry_response_v1_pb_pb.js";
 import { HasKeychainEntryRequestV1PB } from "../models/has_keychain_entry_request_v1_pb_pb.js";
+import { HasKeychainEntryResponseV1PB } from "../models/has_keychain_entry_response_v1_pb_pb.js";
 import { SetKeychainEntryRequestV1PB } from "../models/set_keychain_entry_request_v1_pb_pb.js";
+import { SetKeychainEntryResponseV1PB } from "../models/set_keychain_entry_response_v1_pb_pb.js";
 
 /**
  * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.DeleteKeychainEntryV1Request
@@ -26,9 +30,9 @@ export class DeleteKeychainEntryV1Request extends Message<DeleteKeychainEntryV1R
   /**
    * Request body to delete a keychain entry via its key
    *
-   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.DeleteKeychainEntryRequestV1PB deleteKeychainEntryRequestV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.DeleteKeychainEntryRequestV1PB delete_keychain_entry_request_v1_pb = 1;
    */
-  deleteKeychainEntryRequestV1PB?: DeleteKeychainEntryRequestV1PB;
+  deleteKeychainEntryRequestV1Pb?: DeleteKeychainEntryRequestV1PB;
 
   constructor(data?: PartialMessage<DeleteKeychainEntryV1Request>) {
     super();
@@ -38,7 +42,7 @@ export class DeleteKeychainEntryV1Request extends Message<DeleteKeychainEntryV1R
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.DeleteKeychainEntryV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "deleteKeychainEntryRequestV1PB", kind: "message", T: DeleteKeychainEntryRequestV1PB },
+    { no: 1, name: "delete_keychain_entry_request_v1_pb", kind: "message", T: DeleteKeychainEntryRequestV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteKeychainEntryV1Request {
@@ -59,15 +63,79 @@ export class DeleteKeychainEntryV1Request extends Message<DeleteKeychainEntryV1R
 }
 
 /**
+ * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.DeleteKeychainEntryV1Response
+ */
+export class DeleteKeychainEntryV1Response extends Message<DeleteKeychainEntryV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.DeleteKeychainEntryV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.DeleteKeychainEntryResponseV1PB delete_keychain_entry_response_v1_pb_200 = 1;
+     */
+    value: DeleteKeychainEntryResponseV1PB;
+    case: "deleteKeychainEntryResponseV1Pb200";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_400 = 2;
+     */
+    value: Empty;
+    case: "empty400";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_401 = 3;
+     */
+    value: Empty;
+    case: "empty401";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_500 = 4;
+     */
+    value: Empty;
+    case: "empty500";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<DeleteKeychainEntryV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.DeleteKeychainEntryV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "delete_keychain_entry_response_v1_pb_200", kind: "message", T: DeleteKeychainEntryResponseV1PB, oneof: "response" },
+    { no: 2, name: "empty_400", kind: "message", T: Empty, oneof: "response" },
+    { no: 3, name: "empty_401", kind: "message", T: Empty, oneof: "response" },
+    { no: 4, name: "empty_500", kind: "message", T: Empty, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteKeychainEntryV1Response {
+    return new DeleteKeychainEntryV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteKeychainEntryV1Response {
+    return new DeleteKeychainEntryV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteKeychainEntryV1Response {
+    return new DeleteKeychainEntryV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteKeychainEntryV1Response | PlainMessage<DeleteKeychainEntryV1Response> | undefined, b: DeleteKeychainEntryV1Response | PlainMessage<DeleteKeychainEntryV1Response> | undefined): boolean {
+    return proto3.util.equals(DeleteKeychainEntryV1Response, a, b);
+  }
+}
+
+/**
  * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetKeychainEntryV1Request
  */
 export class GetKeychainEntryV1Request extends Message<GetKeychainEntryV1Request> {
   /**
    * Request body to obtain a keychain entry via its key
    *
-   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.GetKeychainEntryRequestV1PB getKeychainEntryRequestV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.GetKeychainEntryRequestV1PB get_keychain_entry_request_v1_pb = 1;
    */
-  getKeychainEntryRequestV1PB?: GetKeychainEntryRequestV1PB;
+  getKeychainEntryRequestV1Pb?: GetKeychainEntryRequestV1PB;
 
   constructor(data?: PartialMessage<GetKeychainEntryV1Request>) {
     super();
@@ -77,7 +145,7 @@ export class GetKeychainEntryV1Request extends Message<GetKeychainEntryV1Request
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetKeychainEntryV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "getKeychainEntryRequestV1PB", kind: "message", T: GetKeychainEntryRequestV1PB },
+    { no: 1, name: "get_keychain_entry_request_v1_pb", kind: "message", T: GetKeychainEntryRequestV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetKeychainEntryV1Request {
@@ -98,13 +166,90 @@ export class GetKeychainEntryV1Request extends Message<GetKeychainEntryV1Request
 }
 
 /**
+ * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetKeychainEntryV1Response
+ */
+export class GetKeychainEntryV1Response extends Message<GetKeychainEntryV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetKeychainEntryV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.GetKeychainEntryResponseV1PB get_keychain_entry_response_v1_pb_200 = 1;
+     */
+    value: GetKeychainEntryResponseV1PB;
+    case: "getKeychainEntryResponseV1Pb200";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_400 = 2;
+     */
+    value: Empty;
+    case: "empty400";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_401 = 3;
+     */
+    value: Empty;
+    case: "empty401";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_404 = 4;
+     */
+    value: Empty;
+    case: "empty404";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_500 = 5;
+     */
+    value: Empty;
+    case: "empty500";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<GetKeychainEntryV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetKeychainEntryV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "get_keychain_entry_response_v1_pb_200", kind: "message", T: GetKeychainEntryResponseV1PB, oneof: "response" },
+    { no: 2, name: "empty_400", kind: "message", T: Empty, oneof: "response" },
+    { no: 3, name: "empty_401", kind: "message", T: Empty, oneof: "response" },
+    { no: 4, name: "empty_404", kind: "message", T: Empty, oneof: "response" },
+    { no: 5, name: "empty_500", kind: "message", T: Empty, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetKeychainEntryV1Response {
+    return new GetKeychainEntryV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetKeychainEntryV1Response {
+    return new GetKeychainEntryV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetKeychainEntryV1Response {
+    return new GetKeychainEntryV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetKeychainEntryV1Response | PlainMessage<GetKeychainEntryV1Response> | undefined, b: GetKeychainEntryV1Response | PlainMessage<GetKeychainEntryV1Response> | undefined): boolean {
+    return proto3.util.equals(GetKeychainEntryV1Response, a, b);
+  }
+}
+
+/**
  * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetPrometheusMetricsV1Response
  */
 export class GetPrometheusMetricsV1Response extends Message<GetPrometheusMetricsV1Response> {
   /**
-   * @generated from field: string data = 1;
+   * @generated from oneof org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetPrometheusMetricsV1Response.response
    */
-  data = "";
+  response: {
+    /**
+     * @generated from field: string string_200 = 1;
+     */
+    value: string;
+    case: "string200";
+  } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<GetPrometheusMetricsV1Response>) {
     super();
@@ -114,7 +259,7 @@ export class GetPrometheusMetricsV1Response extends Message<GetPrometheusMetrics
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.GetPrometheusMetricsV1Response";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "data", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "string_200", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "response" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetPrometheusMetricsV1Response {
@@ -141,9 +286,9 @@ export class HasKeychainEntryV1Request extends Message<HasKeychainEntryV1Request
   /**
    * Request body for checking a keychain entry via its key
    *
-   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.HasKeychainEntryRequestV1PB hasKeychainEntryRequestV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.HasKeychainEntryRequestV1PB has_keychain_entry_request_v1_pb = 1;
    */
-  hasKeychainEntryRequestV1PB?: HasKeychainEntryRequestV1PB;
+  hasKeychainEntryRequestV1Pb?: HasKeychainEntryRequestV1PB;
 
   constructor(data?: PartialMessage<HasKeychainEntryV1Request>) {
     super();
@@ -153,7 +298,7 @@ export class HasKeychainEntryV1Request extends Message<HasKeychainEntryV1Request
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.HasKeychainEntryV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "hasKeychainEntryRequestV1PB", kind: "message", T: HasKeychainEntryRequestV1PB },
+    { no: 1, name: "has_keychain_entry_request_v1_pb", kind: "message", T: HasKeychainEntryRequestV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): HasKeychainEntryV1Request {
@@ -174,15 +319,79 @@ export class HasKeychainEntryV1Request extends Message<HasKeychainEntryV1Request
 }
 
 /**
+ * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.HasKeychainEntryV1Response
+ */
+export class HasKeychainEntryV1Response extends Message<HasKeychainEntryV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.HasKeychainEntryV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.HasKeychainEntryResponseV1PB has_keychain_entry_response_v1_pb_200 = 1;
+     */
+    value: HasKeychainEntryResponseV1PB;
+    case: "hasKeychainEntryResponseV1Pb200";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_400 = 2;
+     */
+    value: Empty;
+    case: "empty400";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_401 = 3;
+     */
+    value: Empty;
+    case: "empty401";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_500 = 4;
+     */
+    value: Empty;
+    case: "empty500";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<HasKeychainEntryV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.HasKeychainEntryV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "has_keychain_entry_response_v1_pb_200", kind: "message", T: HasKeychainEntryResponseV1PB, oneof: "response" },
+    { no: 2, name: "empty_400", kind: "message", T: Empty, oneof: "response" },
+    { no: 3, name: "empty_401", kind: "message", T: Empty, oneof: "response" },
+    { no: 4, name: "empty_500", kind: "message", T: Empty, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): HasKeychainEntryV1Response {
+    return new HasKeychainEntryV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): HasKeychainEntryV1Response {
+    return new HasKeychainEntryV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): HasKeychainEntryV1Response {
+    return new HasKeychainEntryV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: HasKeychainEntryV1Response | PlainMessage<HasKeychainEntryV1Response> | undefined, b: HasKeychainEntryV1Response | PlainMessage<HasKeychainEntryV1Response> | undefined): boolean {
+    return proto3.util.equals(HasKeychainEntryV1Response, a, b);
+  }
+}
+
+/**
  * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.SetKeychainEntryV1Request
  */
 export class SetKeychainEntryV1Request extends Message<SetKeychainEntryV1Request> {
   /**
    * Request body to write/update a keychain entry via its key
    *
-   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.SetKeychainEntryRequestV1PB setKeychainEntryRequestV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.SetKeychainEntryRequestV1PB set_keychain_entry_request_v1_pb = 1;
    */
-  setKeychainEntryRequestV1PB?: SetKeychainEntryRequestV1PB;
+  setKeychainEntryRequestV1Pb?: SetKeychainEntryRequestV1PB;
 
   constructor(data?: PartialMessage<SetKeychainEntryV1Request>) {
     super();
@@ -192,7 +401,7 @@ export class SetKeychainEntryV1Request extends Message<SetKeychainEntryV1Request
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.SetKeychainEntryV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "setKeychainEntryRequestV1PB", kind: "message", T: SetKeychainEntryRequestV1PB },
+    { no: 1, name: "set_keychain_entry_request_v1_pb", kind: "message", T: SetKeychainEntryRequestV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetKeychainEntryV1Request {
@@ -209,6 +418,70 @@ export class SetKeychainEntryV1Request extends Message<SetKeychainEntryV1Request
 
   static equals(a: SetKeychainEntryV1Request | PlainMessage<SetKeychainEntryV1Request> | undefined, b: SetKeychainEntryV1Request | PlainMessage<SetKeychainEntryV1Request> | undefined): boolean {
     return proto3.util.equals(SetKeychainEntryV1Request, a, b);
+  }
+}
+
+/**
+ * @generated from message org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.SetKeychainEntryV1Response
+ */
+export class SetKeychainEntryV1Response extends Message<SetKeychainEntryV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.SetKeychainEntryV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.keychain.memory.SetKeychainEntryResponseV1PB set_keychain_entry_response_v1_pb_200 = 1;
+     */
+    value: SetKeychainEntryResponseV1PB;
+    case: "setKeychainEntryResponseV1Pb200";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_400 = 2;
+     */
+    value: Empty;
+    case: "empty400";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_401 = 3;
+     */
+    value: Empty;
+    case: "empty401";
+  } | {
+    /**
+     * @generated from field: google.protobuf.Empty empty_500 = 4;
+     */
+    value: Empty;
+    case: "empty500";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<SetKeychainEntryV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.SetKeychainEntryV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "set_keychain_entry_response_v1_pb_200", kind: "message", T: SetKeychainEntryResponseV1PB, oneof: "response" },
+    { no: 2, name: "empty_400", kind: "message", T: Empty, oneof: "response" },
+    { no: 3, name: "empty_401", kind: "message", T: Empty, oneof: "response" },
+    { no: 4, name: "empty_500", kind: "message", T: Empty, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SetKeychainEntryV1Response {
+    return new SetKeychainEntryV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SetKeychainEntryV1Response {
+    return new SetKeychainEntryV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SetKeychainEntryV1Response {
+    return new SetKeychainEntryV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: SetKeychainEntryV1Response | PlainMessage<SetKeychainEntryV1Response> | undefined, b: SetKeychainEntryV1Response | PlainMessage<SetKeychainEntryV1Response> | undefined): boolean {
+    return proto3.util.equals(SetKeychainEntryV1Response, a, b);
   }
 }
 

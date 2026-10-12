@@ -30,40 +30,40 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
     export class DeployContractSolBytecodeNoKeychainV1Request extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            deployContractSolidityBytecodeNoKeychainV1RequestPB?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB;
+            deploy_contract_solidity_bytecode_no_keychain_v1_request_pb?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("deployContractSolidityBytecodeNoKeychainV1RequestPB" in data && data.deployContractSolidityBytecodeNoKeychainV1RequestPB != undefined) {
-                    this.deployContractSolidityBytecodeNoKeychainV1RequestPB = data.deployContractSolidityBytecodeNoKeychainV1RequestPB;
+                if ("deploy_contract_solidity_bytecode_no_keychain_v1_request_pb" in data && data.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb != undefined) {
+                    this.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb = data.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb;
                 }
             }
         }
-        get deployContractSolidityBytecodeNoKeychainV1RequestPB() {
+        get deploy_contract_solidity_bytecode_no_keychain_v1_request_pb() {
             return pb_1.Message.getWrapperField(this, dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB, 1) as dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB;
         }
-        set deployContractSolidityBytecodeNoKeychainV1RequestPB(value: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB) {
+        set deploy_contract_solidity_bytecode_no_keychain_v1_request_pb(value: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB) {
             pb_1.Message.setWrapperField(this, 1, value);
         }
-        get has_deployContractSolidityBytecodeNoKeychainV1RequestPB() {
+        get has_deploy_contract_solidity_bytecode_no_keychain_v1_request_pb() {
             return pb_1.Message.getField(this, 1) != null;
         }
         static fromObject(data: {
-            deployContractSolidityBytecodeNoKeychainV1RequestPB?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.prototype.toObject>;
+            deploy_contract_solidity_bytecode_no_keychain_v1_request_pb?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.prototype.toObject>;
         }): DeployContractSolBytecodeNoKeychainV1Request {
             const message = new DeployContractSolBytecodeNoKeychainV1Request({});
-            if (data.deployContractSolidityBytecodeNoKeychainV1RequestPB != null) {
-                message.deployContractSolidityBytecodeNoKeychainV1RequestPB = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.fromObject(data.deployContractSolidityBytecodeNoKeychainV1RequestPB);
+            if (data.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb != null) {
+                message.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.fromObject(data.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb);
             }
             return message;
         }
         toObject() {
             const data: {
-                deployContractSolidityBytecodeNoKeychainV1RequestPB?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.prototype.toObject>;
+                deploy_contract_solidity_bytecode_no_keychain_v1_request_pb?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.prototype.toObject>;
             } = {};
-            if (this.deployContractSolidityBytecodeNoKeychainV1RequestPB != null) {
-                data.deployContractSolidityBytecodeNoKeychainV1RequestPB = this.deployContractSolidityBytecodeNoKeychainV1RequestPB.toObject();
+            if (this.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb != null) {
+                data.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb = this.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb.toObject();
             }
             return data;
         }
@@ -71,8 +71,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_deployContractSolidityBytecodeNoKeychainV1RequestPB)
-                writer.writeMessage(1, this.deployContractSolidityBytecodeNoKeychainV1RequestPB, () => this.deployContractSolidityBytecodeNoKeychainV1RequestPB.serialize(writer));
+            if (this.has_deploy_contract_solidity_bytecode_no_keychain_v1_request_pb)
+                writer.writeMessage(1, this.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb, () => this.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -83,7 +83,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.deployContractSolidityBytecodeNoKeychainV1RequestPB, () => message.deployContractSolidityBytecodeNoKeychainV1RequestPB = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb, () => message.deploy_contract_solidity_bytecode_no_keychain_v1_request_pb = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeNoKeychainV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -97,43 +97,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return DeployContractSolBytecodeNoKeychainV1Request.deserialize(bytes);
         }
     }
-    export class DeployContractSolBytecodeV1Request extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            deployContractSolidityBytecodeV1RequestPB?: dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB;
-        }) {
+    export class DeployContractSolBytecodeNoKeychainV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            deploy_contract_solidity_bytecode_v1_response_pb_200?: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            deploy_contract_solidity_bytecode_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("deployContractSolidityBytecodeV1RequestPB" in data && data.deployContractSolidityBytecodeV1RequestPB != undefined) {
-                    this.deployContractSolidityBytecodeV1RequestPB = data.deployContractSolidityBytecodeV1RequestPB;
+                if ("deploy_contract_solidity_bytecode_v1_response_pb_200" in data && data.deploy_contract_solidity_bytecode_v1_response_pb_200 != undefined) {
+                    this.deploy_contract_solidity_bytecode_v1_response_pb_200 = data.deploy_contract_solidity_bytecode_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get deployContractSolidityBytecodeV1RequestPB() {
-            return pb_1.Message.getWrapperField(this, dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB, 1) as dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB;
+        get deploy_contract_solidity_bytecode_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB, 1) as dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB;
         }
-        set deployContractSolidityBytecodeV1RequestPB(value: dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB) {
-            pb_1.Message.setWrapperField(this, 1, value);
+        set deploy_contract_solidity_bytecode_v1_response_pb_200(value: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
         }
-        get has_deployContractSolidityBytecodeV1RequestPB() {
+        get has_deploy_contract_solidity_bytecode_v1_response_pb_200() {
             return pb_1.Message.getField(this, 1) != null;
         }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "deploy_contract_solidity_bytecode_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "deploy_contract_solidity_bytecode_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
         static fromObject(data: {
-            deployContractSolidityBytecodeV1RequestPB?: ReturnType<typeof dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.prototype.toObject>;
-        }): DeployContractSolBytecodeV1Request {
-            const message = new DeployContractSolBytecodeV1Request({});
-            if (data.deployContractSolidityBytecodeV1RequestPB != null) {
-                message.deployContractSolidityBytecodeV1RequestPB = dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.fromObject(data.deployContractSolidityBytecodeV1RequestPB);
+            deploy_contract_solidity_bytecode_v1_response_pb_200?: ReturnType<typeof dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): DeployContractSolBytecodeNoKeychainV1Response {
+            const message = new DeployContractSolBytecodeNoKeychainV1Response({});
+            if (data.deploy_contract_solidity_bytecode_v1_response_pb_200 != null) {
+                message.deploy_contract_solidity_bytecode_v1_response_pb_200 = dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.fromObject(data.deploy_contract_solidity_bytecode_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                deployContractSolidityBytecodeV1RequestPB?: ReturnType<typeof dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.prototype.toObject>;
+                deploy_contract_solidity_bytecode_v1_response_pb_200?: ReturnType<typeof dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.deployContractSolidityBytecodeV1RequestPB != null) {
-                data.deployContractSolidityBytecodeV1RequestPB = this.deployContractSolidityBytecodeV1RequestPB.toObject();
+            if (this.deploy_contract_solidity_bytecode_v1_response_pb_200 != null) {
+                data.deploy_contract_solidity_bytecode_v1_response_pb_200 = this.deploy_contract_solidity_bytecode_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -141,8 +175,83 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_deployContractSolidityBytecodeV1RequestPB)
-                writer.writeMessage(1, this.deployContractSolidityBytecodeV1RequestPB, () => this.deployContractSolidityBytecodeV1RequestPB.serialize(writer));
+            if (this.has_deploy_contract_solidity_bytecode_v1_response_pb_200)
+                writer.writeMessage(1, this.deploy_contract_solidity_bytecode_v1_response_pb_200, () => this.deploy_contract_solidity_bytecode_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DeployContractSolBytecodeNoKeychainV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DeployContractSolBytecodeNoKeychainV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.deploy_contract_solidity_bytecode_v1_response_pb_200, () => message.deploy_contract_solidity_bytecode_v1_response_pb_200 = dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DeployContractSolBytecodeNoKeychainV1Response {
+            return DeployContractSolBytecodeNoKeychainV1Response.deserialize(bytes);
+        }
+    }
+    export class DeployContractSolBytecodeV1Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            deploy_contract_solidity_bytecode_v1_request_pb?: dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("deploy_contract_solidity_bytecode_v1_request_pb" in data && data.deploy_contract_solidity_bytecode_v1_request_pb != undefined) {
+                    this.deploy_contract_solidity_bytecode_v1_request_pb = data.deploy_contract_solidity_bytecode_v1_request_pb;
+                }
+            }
+        }
+        get deploy_contract_solidity_bytecode_v1_request_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB, 1) as dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB;
+        }
+        set deploy_contract_solidity_bytecode_v1_request_pb(value: dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_deploy_contract_solidity_bytecode_v1_request_pb() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            deploy_contract_solidity_bytecode_v1_request_pb?: ReturnType<typeof dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.prototype.toObject>;
+        }): DeployContractSolBytecodeV1Request {
+            const message = new DeployContractSolBytecodeV1Request({});
+            if (data.deploy_contract_solidity_bytecode_v1_request_pb != null) {
+                message.deploy_contract_solidity_bytecode_v1_request_pb = dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.fromObject(data.deploy_contract_solidity_bytecode_v1_request_pb);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                deploy_contract_solidity_bytecode_v1_request_pb?: ReturnType<typeof dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.prototype.toObject>;
+            } = {};
+            if (this.deploy_contract_solidity_bytecode_v1_request_pb != null) {
+                data.deploy_contract_solidity_bytecode_v1_request_pb = this.deploy_contract_solidity_bytecode_v1_request_pb.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_deploy_contract_solidity_bytecode_v1_request_pb)
+                writer.writeMessage(1, this.deploy_contract_solidity_bytecode_v1_request_pb, () => this.deploy_contract_solidity_bytecode_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -153,7 +262,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.deployContractSolidityBytecodeV1RequestPB, () => message.deployContractSolidityBytecodeV1RequestPB = dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.deploy_contract_solidity_bytecode_v1_request_pb, () => message.deploy_contract_solidity_bytecode_v1_request_pb = dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -167,43 +276,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return DeployContractSolBytecodeV1Request.deserialize(bytes);
         }
     }
-    export class GetBalanceV1Request extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            getBalanceV1RequestPB?: dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB;
-        }) {
+    export class DeployContractSolBytecodeV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            deploy_contract_solidity_bytecode_v1_response_pb_200?: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            deploy_contract_solidity_bytecode_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("getBalanceV1RequestPB" in data && data.getBalanceV1RequestPB != undefined) {
-                    this.getBalanceV1RequestPB = data.getBalanceV1RequestPB;
+                if ("deploy_contract_solidity_bytecode_v1_response_pb_200" in data && data.deploy_contract_solidity_bytecode_v1_response_pb_200 != undefined) {
+                    this.deploy_contract_solidity_bytecode_v1_response_pb_200 = data.deploy_contract_solidity_bytecode_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get getBalanceV1RequestPB() {
-            return pb_1.Message.getWrapperField(this, dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB, 1) as dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB;
+        get deploy_contract_solidity_bytecode_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB, 1) as dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB;
         }
-        set getBalanceV1RequestPB(value: dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB) {
-            pb_1.Message.setWrapperField(this, 1, value);
+        set deploy_contract_solidity_bytecode_v1_response_pb_200(value: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
         }
-        get has_getBalanceV1RequestPB() {
+        get has_deploy_contract_solidity_bytecode_v1_response_pb_200() {
             return pb_1.Message.getField(this, 1) != null;
         }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "deploy_contract_solidity_bytecode_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "deploy_contract_solidity_bytecode_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
         static fromObject(data: {
-            getBalanceV1RequestPB?: ReturnType<typeof dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.prototype.toObject>;
-        }): GetBalanceV1Request {
-            const message = new GetBalanceV1Request({});
-            if (data.getBalanceV1RequestPB != null) {
-                message.getBalanceV1RequestPB = dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.fromObject(data.getBalanceV1RequestPB);
+            deploy_contract_solidity_bytecode_v1_response_pb_200?: ReturnType<typeof dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): DeployContractSolBytecodeV1Response {
+            const message = new DeployContractSolBytecodeV1Response({});
+            if (data.deploy_contract_solidity_bytecode_v1_response_pb_200 != null) {
+                message.deploy_contract_solidity_bytecode_v1_response_pb_200 = dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.fromObject(data.deploy_contract_solidity_bytecode_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                getBalanceV1RequestPB?: ReturnType<typeof dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.prototype.toObject>;
+                deploy_contract_solidity_bytecode_v1_response_pb_200?: ReturnType<typeof dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.getBalanceV1RequestPB != null) {
-                data.getBalanceV1RequestPB = this.getBalanceV1RequestPB.toObject();
+            if (this.deploy_contract_solidity_bytecode_v1_response_pb_200 != null) {
+                data.deploy_contract_solidity_bytecode_v1_response_pb_200 = this.deploy_contract_solidity_bytecode_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -211,8 +354,83 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_getBalanceV1RequestPB)
-                writer.writeMessage(1, this.getBalanceV1RequestPB, () => this.getBalanceV1RequestPB.serialize(writer));
+            if (this.has_deploy_contract_solidity_bytecode_v1_response_pb_200)
+                writer.writeMessage(1, this.deploy_contract_solidity_bytecode_v1_response_pb_200, () => this.deploy_contract_solidity_bytecode_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): DeployContractSolBytecodeV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new DeployContractSolBytecodeV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.deploy_contract_solidity_bytecode_v1_response_pb_200, () => message.deploy_contract_solidity_bytecode_v1_response_pb_200 = dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): DeployContractSolBytecodeV1Response {
+            return DeployContractSolBytecodeV1Response.deserialize(bytes);
+        }
+    }
+    export class GetBalanceV1Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            get_balance_v1_request_pb?: dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("get_balance_v1_request_pb" in data && data.get_balance_v1_request_pb != undefined) {
+                    this.get_balance_v1_request_pb = data.get_balance_v1_request_pb;
+                }
+            }
+        }
+        get get_balance_v1_request_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB, 1) as dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB;
+        }
+        set get_balance_v1_request_pb(value: dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_get_balance_v1_request_pb() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            get_balance_v1_request_pb?: ReturnType<typeof dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.prototype.toObject>;
+        }): GetBalanceV1Request {
+            const message = new GetBalanceV1Request({});
+            if (data.get_balance_v1_request_pb != null) {
+                message.get_balance_v1_request_pb = dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.fromObject(data.get_balance_v1_request_pb);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                get_balance_v1_request_pb?: ReturnType<typeof dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.prototype.toObject>;
+            } = {};
+            if (this.get_balance_v1_request_pb != null) {
+                data.get_balance_v1_request_pb = this.get_balance_v1_request_pb.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_get_balance_v1_request_pb)
+                writer.writeMessage(1, this.get_balance_v1_request_pb, () => this.get_balance_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -223,7 +441,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.getBalanceV1RequestPB, () => message.getBalanceV1RequestPB = dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.get_balance_v1_request_pb, () => message.get_balance_v1_request_pb = dependency_6.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -237,43 +455,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return GetBalanceV1Request.deserialize(bytes);
         }
     }
-    export class GetBesuRecordV1Request extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            getBesuRecordV1RequestPB?: dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB;
-        }) {
+    export class GetBalanceV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            get_balance_v1_response_pb_200?: dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            get_balance_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("getBesuRecordV1RequestPB" in data && data.getBesuRecordV1RequestPB != undefined) {
-                    this.getBesuRecordV1RequestPB = data.getBesuRecordV1RequestPB;
+                if ("get_balance_v1_response_pb_200" in data && data.get_balance_v1_response_pb_200 != undefined) {
+                    this.get_balance_v1_response_pb_200 = data.get_balance_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get getBesuRecordV1RequestPB() {
-            return pb_1.Message.getWrapperField(this, dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB, 1) as dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB;
+        get get_balance_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB, 1) as dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB;
         }
-        set getBesuRecordV1RequestPB(value: dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB) {
-            pb_1.Message.setWrapperField(this, 1, value);
+        set get_balance_v1_response_pb_200(value: dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
         }
-        get has_getBesuRecordV1RequestPB() {
+        get has_get_balance_v1_response_pb_200() {
             return pb_1.Message.getField(this, 1) != null;
         }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "get_balance_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "get_balance_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
         static fromObject(data: {
-            getBesuRecordV1RequestPB?: ReturnType<typeof dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.prototype.toObject>;
-        }): GetBesuRecordV1Request {
-            const message = new GetBesuRecordV1Request({});
-            if (data.getBesuRecordV1RequestPB != null) {
-                message.getBesuRecordV1RequestPB = dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.fromObject(data.getBesuRecordV1RequestPB);
+            get_balance_v1_response_pb_200?: ReturnType<typeof dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): GetBalanceV1Response {
+            const message = new GetBalanceV1Response({});
+            if (data.get_balance_v1_response_pb_200 != null) {
+                message.get_balance_v1_response_pb_200 = dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB.fromObject(data.get_balance_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                getBesuRecordV1RequestPB?: ReturnType<typeof dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.prototype.toObject>;
+                get_balance_v1_response_pb_200?: ReturnType<typeof dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.getBesuRecordV1RequestPB != null) {
-                data.getBesuRecordV1RequestPB = this.getBesuRecordV1RequestPB.toObject();
+            if (this.get_balance_v1_response_pb_200 != null) {
+                data.get_balance_v1_response_pb_200 = this.get_balance_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -281,8 +533,83 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_getBesuRecordV1RequestPB)
-                writer.writeMessage(1, this.getBesuRecordV1RequestPB, () => this.getBesuRecordV1RequestPB.serialize(writer));
+            if (this.has_get_balance_v1_response_pb_200)
+                writer.writeMessage(1, this.get_balance_v1_response_pb_200, () => this.get_balance_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetBalanceV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetBalanceV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.get_balance_v1_response_pb_200, () => message.get_balance_v1_response_pb_200 = dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetBalanceV1Response {
+            return GetBalanceV1Response.deserialize(bytes);
+        }
+    }
+    export class GetBesuRecordV1Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            get_besu_record_v1_request_pb?: dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("get_besu_record_v1_request_pb" in data && data.get_besu_record_v1_request_pb != undefined) {
+                    this.get_besu_record_v1_request_pb = data.get_besu_record_v1_request_pb;
+                }
+            }
+        }
+        get get_besu_record_v1_request_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB, 1) as dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB;
+        }
+        set get_besu_record_v1_request_pb(value: dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_get_besu_record_v1_request_pb() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            get_besu_record_v1_request_pb?: ReturnType<typeof dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.prototype.toObject>;
+        }): GetBesuRecordV1Request {
+            const message = new GetBesuRecordV1Request({});
+            if (data.get_besu_record_v1_request_pb != null) {
+                message.get_besu_record_v1_request_pb = dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.fromObject(data.get_besu_record_v1_request_pb);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                get_besu_record_v1_request_pb?: ReturnType<typeof dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.prototype.toObject>;
+            } = {};
+            if (this.get_besu_record_v1_request_pb != null) {
+                data.get_besu_record_v1_request_pb = this.get_besu_record_v1_request_pb.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_get_besu_record_v1_request_pb)
+                writer.writeMessage(1, this.get_besu_record_v1_request_pb, () => this.get_besu_record_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -293,7 +620,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.getBesuRecordV1RequestPB, () => message.getBesuRecordV1RequestPB = dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.get_besu_record_v1_request_pb, () => message.get_besu_record_v1_request_pb = dependency_8.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -307,43 +634,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return GetBesuRecordV1Request.deserialize(bytes);
         }
     }
-    export class GetBlockV1Request extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            getBlockV1RequestPB?: dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB;
-        }) {
+    export class GetBesuRecordV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            get_besu_record_v1_response_pb_200?: dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            get_besu_record_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("getBlockV1RequestPB" in data && data.getBlockV1RequestPB != undefined) {
-                    this.getBlockV1RequestPB = data.getBlockV1RequestPB;
+                if ("get_besu_record_v1_response_pb_200" in data && data.get_besu_record_v1_response_pb_200 != undefined) {
+                    this.get_besu_record_v1_response_pb_200 = data.get_besu_record_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get getBlockV1RequestPB() {
-            return pb_1.Message.getWrapperField(this, dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB, 1) as dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB;
+        get get_besu_record_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB, 1) as dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB;
         }
-        set getBlockV1RequestPB(value: dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB) {
-            pb_1.Message.setWrapperField(this, 1, value);
+        set get_besu_record_v1_response_pb_200(value: dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
         }
-        get has_getBlockV1RequestPB() {
+        get has_get_besu_record_v1_response_pb_200() {
             return pb_1.Message.getField(this, 1) != null;
         }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "get_besu_record_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "get_besu_record_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
         static fromObject(data: {
-            getBlockV1RequestPB?: ReturnType<typeof dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.prototype.toObject>;
-        }): GetBlockV1Request {
-            const message = new GetBlockV1Request({});
-            if (data.getBlockV1RequestPB != null) {
-                message.getBlockV1RequestPB = dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.fromObject(data.getBlockV1RequestPB);
+            get_besu_record_v1_response_pb_200?: ReturnType<typeof dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): GetBesuRecordV1Response {
+            const message = new GetBesuRecordV1Response({});
+            if (data.get_besu_record_v1_response_pb_200 != null) {
+                message.get_besu_record_v1_response_pb_200 = dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB.fromObject(data.get_besu_record_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                getBlockV1RequestPB?: ReturnType<typeof dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.prototype.toObject>;
+                get_besu_record_v1_response_pb_200?: ReturnType<typeof dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.getBlockV1RequestPB != null) {
-                data.getBlockV1RequestPB = this.getBlockV1RequestPB.toObject();
+            if (this.get_besu_record_v1_response_pb_200 != null) {
+                data.get_besu_record_v1_response_pb_200 = this.get_besu_record_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -351,8 +712,83 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_getBlockV1RequestPB)
-                writer.writeMessage(1, this.getBlockV1RequestPB, () => this.getBlockV1RequestPB.serialize(writer));
+            if (this.has_get_besu_record_v1_response_pb_200)
+                writer.writeMessage(1, this.get_besu_record_v1_response_pb_200, () => this.get_besu_record_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetBesuRecordV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetBesuRecordV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.get_besu_record_v1_response_pb_200, () => message.get_besu_record_v1_response_pb_200 = dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetBesuRecordV1Response {
+            return GetBesuRecordV1Response.deserialize(bytes);
+        }
+    }
+    export class GetBlockV1Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            get_block_v1_request_pb?: dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("get_block_v1_request_pb" in data && data.get_block_v1_request_pb != undefined) {
+                    this.get_block_v1_request_pb = data.get_block_v1_request_pb;
+                }
+            }
+        }
+        get get_block_v1_request_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB, 1) as dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB;
+        }
+        set get_block_v1_request_pb(value: dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_get_block_v1_request_pb() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            get_block_v1_request_pb?: ReturnType<typeof dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.prototype.toObject>;
+        }): GetBlockV1Request {
+            const message = new GetBlockV1Request({});
+            if (data.get_block_v1_request_pb != null) {
+                message.get_block_v1_request_pb = dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.fromObject(data.get_block_v1_request_pb);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                get_block_v1_request_pb?: ReturnType<typeof dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.prototype.toObject>;
+            } = {};
+            if (this.get_block_v1_request_pb != null) {
+                data.get_block_v1_request_pb = this.get_block_v1_request_pb.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_get_block_v1_request_pb)
+                writer.writeMessage(1, this.get_block_v1_request_pb, () => this.get_block_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -363,7 +799,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.getBlockV1RequestPB, () => message.getBlockV1RequestPB = dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.get_block_v1_request_pb, () => message.get_block_v1_request_pb = dependency_10.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -377,40 +813,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return GetBlockV1Request.deserialize(bytes);
         }
     }
-    export class GetOpenApiSpecV1Response extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            data?: string;
-        }) {
+    export class GetBlockV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            get_block_v1_response_pb_200?: dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            get_block_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("data" in data && data.data != undefined) {
-                    this.data = data.data;
+                if ("get_block_v1_response_pb_200" in data && data.get_block_v1_response_pb_200 != undefined) {
+                    this.get_block_v1_response_pb_200 = data.get_block_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get data() {
-            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        get get_block_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB, 1) as dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB;
         }
-        set data(value: string) {
-            pb_1.Message.setField(this, 1, value);
+        set get_block_v1_response_pb_200(value: dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_get_block_v1_response_pb_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "get_block_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "get_block_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
         }
         static fromObject(data: {
-            data?: string;
-        }): GetOpenApiSpecV1Response {
-            const message = new GetOpenApiSpecV1Response({});
-            if (data.data != null) {
-                message.data = data.data;
+            get_block_v1_response_pb_200?: ReturnType<typeof dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): GetBlockV1Response {
+            const message = new GetBlockV1Response({});
+            if (data.get_block_v1_response_pb_200 != null) {
+                message.get_block_v1_response_pb_200 = dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB.fromObject(data.get_block_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                data?: string;
+                get_block_v1_response_pb_200?: ReturnType<typeof dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.data != null) {
-                data.data = this.data;
+            if (this.get_block_v1_response_pb_200 != null) {
+                data.get_block_v1_response_pb_200 = this.get_block_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -418,8 +891,119 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.data.length)
-                writer.writeString(1, this.data);
+            if (this.has_get_block_v1_response_pb_200)
+                writer.writeMessage(1, this.get_block_v1_response_pb_200, () => this.get_block_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetBlockV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetBlockV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.get_block_v1_response_pb_200, () => message.get_block_v1_response_pb_200 = dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetBlockV1Response {
+            return GetBlockV1Response.deserialize(bytes);
+        }
+    }
+    export class GetOpenApiSpecV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            string_200?: string;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            string_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("string_200" in data && data.string_200 != undefined) {
+                    this.string_200 = data.string_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
+                }
+            }
+        }
+        get string_200() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set string_200(value: string) {
+            pb_1.Message.setOneofField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_string_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "string_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "string_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            string_200?: string;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): GetOpenApiSpecV1Response {
+            const message = new GetOpenApiSpecV1Response({});
+            if (data.string_200 != null) {
+                message.string_200 = data.string_200;
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                string_200?: string;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+            } = {};
+            if (this.string_200 != null) {
+                data.string_200 = this.string_200;
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_string_200)
+                writer.writeString(1, this.string_200);
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -430,7 +1014,10 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        message.data = reader.readString();
+                        message.string_200 = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -447,40 +1034,40 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
     export class GetPastLogsV1Request extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            getPastLogsV1RequestPB?: dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB;
+            get_past_logs_v1_request_pb?: dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("getPastLogsV1RequestPB" in data && data.getPastLogsV1RequestPB != undefined) {
-                    this.getPastLogsV1RequestPB = data.getPastLogsV1RequestPB;
+                if ("get_past_logs_v1_request_pb" in data && data.get_past_logs_v1_request_pb != undefined) {
+                    this.get_past_logs_v1_request_pb = data.get_past_logs_v1_request_pb;
                 }
             }
         }
-        get getPastLogsV1RequestPB() {
+        get get_past_logs_v1_request_pb() {
             return pb_1.Message.getWrapperField(this, dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB, 1) as dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB;
         }
-        set getPastLogsV1RequestPB(value: dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB) {
+        set get_past_logs_v1_request_pb(value: dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB) {
             pb_1.Message.setWrapperField(this, 1, value);
         }
-        get has_getPastLogsV1RequestPB() {
+        get has_get_past_logs_v1_request_pb() {
             return pb_1.Message.getField(this, 1) != null;
         }
         static fromObject(data: {
-            getPastLogsV1RequestPB?: ReturnType<typeof dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.prototype.toObject>;
+            get_past_logs_v1_request_pb?: ReturnType<typeof dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.prototype.toObject>;
         }): GetPastLogsV1Request {
             const message = new GetPastLogsV1Request({});
-            if (data.getPastLogsV1RequestPB != null) {
-                message.getPastLogsV1RequestPB = dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.fromObject(data.getPastLogsV1RequestPB);
+            if (data.get_past_logs_v1_request_pb != null) {
+                message.get_past_logs_v1_request_pb = dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.fromObject(data.get_past_logs_v1_request_pb);
             }
             return message;
         }
         toObject() {
             const data: {
-                getPastLogsV1RequestPB?: ReturnType<typeof dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.prototype.toObject>;
+                get_past_logs_v1_request_pb?: ReturnType<typeof dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.prototype.toObject>;
             } = {};
-            if (this.getPastLogsV1RequestPB != null) {
-                data.getPastLogsV1RequestPB = this.getPastLogsV1RequestPB.toObject();
+            if (this.get_past_logs_v1_request_pb != null) {
+                data.get_past_logs_v1_request_pb = this.get_past_logs_v1_request_pb.toObject();
             }
             return data;
         }
@@ -488,8 +1075,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_getPastLogsV1RequestPB)
-                writer.writeMessage(1, this.getPastLogsV1RequestPB, () => this.getPastLogsV1RequestPB.serialize(writer));
+            if (this.has_get_past_logs_v1_request_pb)
+                writer.writeMessage(1, this.get_past_logs_v1_request_pb, () => this.get_past_logs_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -500,7 +1087,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.getPastLogsV1RequestPB, () => message.getPastLogsV1RequestPB = dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.get_past_logs_v1_request_pb, () => message.get_past_logs_v1_request_pb = dependency_12.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -514,40 +1101,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return GetPastLogsV1Request.deserialize(bytes);
         }
     }
-    export class GetPrometheusMetricsV1Response extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            data?: string;
-        }) {
+    export class GetPastLogsV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            get_past_logs_v1_response_pb_200?: dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            get_past_logs_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("data" in data && data.data != undefined) {
-                    this.data = data.data;
+                if ("get_past_logs_v1_response_pb_200" in data && data.get_past_logs_v1_response_pb_200 != undefined) {
+                    this.get_past_logs_v1_response_pb_200 = data.get_past_logs_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get data() {
-            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        get get_past_logs_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB, 1) as dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB;
         }
-        set data(value: string) {
-            pb_1.Message.setField(this, 1, value);
+        set get_past_logs_v1_response_pb_200(value: dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_get_past_logs_v1_response_pb_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "get_past_logs_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "get_past_logs_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
         }
         static fromObject(data: {
-            data?: string;
-        }): GetPrometheusMetricsV1Response {
-            const message = new GetPrometheusMetricsV1Response({});
-            if (data.data != null) {
-                message.data = data.data;
+            get_past_logs_v1_response_pb_200?: ReturnType<typeof dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): GetPastLogsV1Response {
+            const message = new GetPastLogsV1Response({});
+            if (data.get_past_logs_v1_response_pb_200 != null) {
+                message.get_past_logs_v1_response_pb_200 = dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB.fromObject(data.get_past_logs_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                data?: string;
+                get_past_logs_v1_response_pb_200?: ReturnType<typeof dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.data != null) {
-                data.data = this.data;
+            if (this.get_past_logs_v1_response_pb_200 != null) {
+                data.get_past_logs_v1_response_pb_200 = this.get_past_logs_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -555,8 +1179,119 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.data.length)
-                writer.writeString(1, this.data);
+            if (this.has_get_past_logs_v1_response_pb_200)
+                writer.writeMessage(1, this.get_past_logs_v1_response_pb_200, () => this.get_past_logs_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetPastLogsV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetPastLogsV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.get_past_logs_v1_response_pb_200, () => message.get_past_logs_v1_response_pb_200 = dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetPastLogsV1Response {
+            return GetPastLogsV1Response.deserialize(bytes);
+        }
+    }
+    export class GetPrometheusMetricsV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            string_200?: string;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            string_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("string_200" in data && data.string_200 != undefined) {
+                    this.string_200 = data.string_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
+                }
+            }
+        }
+        get string_200() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set string_200(value: string) {
+            pb_1.Message.setOneofField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_string_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "string_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "string_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
+        static fromObject(data: {
+            string_200?: string;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): GetPrometheusMetricsV1Response {
+            const message = new GetPrometheusMetricsV1Response({});
+            if (data.string_200 != null) {
+                message.string_200 = data.string_200;
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                string_200?: string;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+            } = {};
+            if (this.string_200 != null) {
+                data.string_200 = this.string_200;
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_string_200)
+                writer.writeString(1, this.string_200);
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -567,7 +1302,10 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        message.data = reader.readString();
+                        message.string_200 = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -584,40 +1322,40 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
     export class GetTransactionV1Request extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            getTransactionV1RequestPB?: dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB;
+            get_transaction_v1_request_pb?: dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("getTransactionV1RequestPB" in data && data.getTransactionV1RequestPB != undefined) {
-                    this.getTransactionV1RequestPB = data.getTransactionV1RequestPB;
+                if ("get_transaction_v1_request_pb" in data && data.get_transaction_v1_request_pb != undefined) {
+                    this.get_transaction_v1_request_pb = data.get_transaction_v1_request_pb;
                 }
             }
         }
-        get getTransactionV1RequestPB() {
+        get get_transaction_v1_request_pb() {
             return pb_1.Message.getWrapperField(this, dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB, 1) as dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB;
         }
-        set getTransactionV1RequestPB(value: dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB) {
+        set get_transaction_v1_request_pb(value: dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB) {
             pb_1.Message.setWrapperField(this, 1, value);
         }
-        get has_getTransactionV1RequestPB() {
+        get has_get_transaction_v1_request_pb() {
             return pb_1.Message.getField(this, 1) != null;
         }
         static fromObject(data: {
-            getTransactionV1RequestPB?: ReturnType<typeof dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.prototype.toObject>;
+            get_transaction_v1_request_pb?: ReturnType<typeof dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.prototype.toObject>;
         }): GetTransactionV1Request {
             const message = new GetTransactionV1Request({});
-            if (data.getTransactionV1RequestPB != null) {
-                message.getTransactionV1RequestPB = dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.fromObject(data.getTransactionV1RequestPB);
+            if (data.get_transaction_v1_request_pb != null) {
+                message.get_transaction_v1_request_pb = dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.fromObject(data.get_transaction_v1_request_pb);
             }
             return message;
         }
         toObject() {
             const data: {
-                getTransactionV1RequestPB?: ReturnType<typeof dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.prototype.toObject>;
+                get_transaction_v1_request_pb?: ReturnType<typeof dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.prototype.toObject>;
             } = {};
-            if (this.getTransactionV1RequestPB != null) {
-                data.getTransactionV1RequestPB = this.getTransactionV1RequestPB.toObject();
+            if (this.get_transaction_v1_request_pb != null) {
+                data.get_transaction_v1_request_pb = this.get_transaction_v1_request_pb.toObject();
             }
             return data;
         }
@@ -625,8 +1363,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_getTransactionV1RequestPB)
-                writer.writeMessage(1, this.getTransactionV1RequestPB, () => this.getTransactionV1RequestPB.serialize(writer));
+            if (this.has_get_transaction_v1_request_pb)
+                writer.writeMessage(1, this.get_transaction_v1_request_pb, () => this.get_transaction_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -637,7 +1375,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.getTransactionV1RequestPB, () => message.getTransactionV1RequestPB = dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.get_transaction_v1_request_pb, () => message.get_transaction_v1_request_pb = dependency_14.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -651,43 +1389,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return GetTransactionV1Request.deserialize(bytes);
         }
     }
-    export class InvokeContractV1Request extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            invokeContractV1RequestPB?: dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
-        }) {
+    export class GetTransactionV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            get_transaction_v1_response_pb_200?: dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            get_transaction_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("invokeContractV1RequestPB" in data && data.invokeContractV1RequestPB != undefined) {
-                    this.invokeContractV1RequestPB = data.invokeContractV1RequestPB;
+                if ("get_transaction_v1_response_pb_200" in data && data.get_transaction_v1_response_pb_200 != undefined) {
+                    this.get_transaction_v1_response_pb_200 = data.get_transaction_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get invokeContractV1RequestPB() {
-            return pb_1.Message.getWrapperField(this, dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB, 1) as dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
+        get get_transaction_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB, 1) as dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB;
         }
-        set invokeContractV1RequestPB(value: dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB) {
-            pb_1.Message.setWrapperField(this, 1, value);
+        set get_transaction_v1_response_pb_200(value: dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
         }
-        get has_invokeContractV1RequestPB() {
+        get has_get_transaction_v1_response_pb_200() {
             return pb_1.Message.getField(this, 1) != null;
         }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "get_transaction_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "get_transaction_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
         static fromObject(data: {
-            invokeContractV1RequestPB?: ReturnType<typeof dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
-        }): InvokeContractV1Request {
-            const message = new InvokeContractV1Request({});
-            if (data.invokeContractV1RequestPB != null) {
-                message.invokeContractV1RequestPB = dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.fromObject(data.invokeContractV1RequestPB);
+            get_transaction_v1_response_pb_200?: ReturnType<typeof dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): GetTransactionV1Response {
+            const message = new GetTransactionV1Response({});
+            if (data.get_transaction_v1_response_pb_200 != null) {
+                message.get_transaction_v1_response_pb_200 = dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB.fromObject(data.get_transaction_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                invokeContractV1RequestPB?: ReturnType<typeof dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
+                get_transaction_v1_response_pb_200?: ReturnType<typeof dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.invokeContractV1RequestPB != null) {
-                data.invokeContractV1RequestPB = this.invokeContractV1RequestPB.toObject();
+            if (this.get_transaction_v1_response_pb_200 != null) {
+                data.get_transaction_v1_response_pb_200 = this.get_transaction_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -695,8 +1467,83 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_invokeContractV1RequestPB)
-                writer.writeMessage(1, this.invokeContractV1RequestPB, () => this.invokeContractV1RequestPB.serialize(writer));
+            if (this.has_get_transaction_v1_response_pb_200)
+                writer.writeMessage(1, this.get_transaction_v1_response_pb_200, () => this.get_transaction_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetTransactionV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetTransactionV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.get_transaction_v1_response_pb_200, () => message.get_transaction_v1_response_pb_200 = dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetTransactionV1Response {
+            return GetTransactionV1Response.deserialize(bytes);
+        }
+    }
+    export class InvokeContractV1Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            invoke_contract_v1_request_pb?: dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("invoke_contract_v1_request_pb" in data && data.invoke_contract_v1_request_pb != undefined) {
+                    this.invoke_contract_v1_request_pb = data.invoke_contract_v1_request_pb;
+                }
+            }
+        }
+        get invoke_contract_v1_request_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB, 1) as dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
+        }
+        set invoke_contract_v1_request_pb(value: dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_invoke_contract_v1_request_pb() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            invoke_contract_v1_request_pb?: ReturnType<typeof dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
+        }): InvokeContractV1Request {
+            const message = new InvokeContractV1Request({});
+            if (data.invoke_contract_v1_request_pb != null) {
+                message.invoke_contract_v1_request_pb = dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.fromObject(data.invoke_contract_v1_request_pb);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                invoke_contract_v1_request_pb?: ReturnType<typeof dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
+            } = {};
+            if (this.invoke_contract_v1_request_pb != null) {
+                data.invoke_contract_v1_request_pb = this.invoke_contract_v1_request_pb.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_invoke_contract_v1_request_pb)
+                writer.writeMessage(1, this.invoke_contract_v1_request_pb, () => this.invoke_contract_v1_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -707,7 +1554,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.invokeContractV1RequestPB, () => message.invokeContractV1RequestPB = dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.deserialize(reader));
+                        reader.readMessage(message.invoke_contract_v1_request_pb, () => message.invoke_contract_v1_request_pb = dependency_16.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -721,43 +1568,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return InvokeContractV1Request.deserialize(bytes);
         }
     }
-    export class RunTransactionV1Request extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            runTransactionRequestPB?: dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB;
-        }) {
+    export class InvokeContractV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            invoke_contract_v1_response_pb_200?: dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            invoke_contract_v1_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("runTransactionRequestPB" in data && data.runTransactionRequestPB != undefined) {
-                    this.runTransactionRequestPB = data.runTransactionRequestPB;
+                if ("invoke_contract_v1_response_pb_200" in data && data.invoke_contract_v1_response_pb_200 != undefined) {
+                    this.invoke_contract_v1_response_pb_200 = data.invoke_contract_v1_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get runTransactionRequestPB() {
-            return pb_1.Message.getWrapperField(this, dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB, 1) as dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB;
+        get invoke_contract_v1_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB, 1) as dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB;
         }
-        set runTransactionRequestPB(value: dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB) {
-            pb_1.Message.setWrapperField(this, 1, value);
+        set invoke_contract_v1_response_pb_200(value: dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
         }
-        get has_runTransactionRequestPB() {
+        get has_invoke_contract_v1_response_pb_200() {
             return pb_1.Message.getField(this, 1) != null;
         }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "invoke_contract_v1_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "invoke_contract_v1_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
         static fromObject(data: {
-            runTransactionRequestPB?: ReturnType<typeof dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.prototype.toObject>;
-        }): RunTransactionV1Request {
-            const message = new RunTransactionV1Request({});
-            if (data.runTransactionRequestPB != null) {
-                message.runTransactionRequestPB = dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.fromObject(data.runTransactionRequestPB);
+            invoke_contract_v1_response_pb_200?: ReturnType<typeof dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): InvokeContractV1Response {
+            const message = new InvokeContractV1Response({});
+            if (data.invoke_contract_v1_response_pb_200 != null) {
+                message.invoke_contract_v1_response_pb_200 = dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB.fromObject(data.invoke_contract_v1_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                runTransactionRequestPB?: ReturnType<typeof dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.prototype.toObject>;
+                invoke_contract_v1_response_pb_200?: ReturnType<typeof dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.runTransactionRequestPB != null) {
-                data.runTransactionRequestPB = this.runTransactionRequestPB.toObject();
+            if (this.invoke_contract_v1_response_pb_200 != null) {
+                data.invoke_contract_v1_response_pb_200 = this.invoke_contract_v1_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -765,8 +1646,83 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_runTransactionRequestPB)
-                writer.writeMessage(1, this.runTransactionRequestPB, () => this.runTransactionRequestPB.serialize(writer));
+            if (this.has_invoke_contract_v1_response_pb_200)
+                writer.writeMessage(1, this.invoke_contract_v1_response_pb_200, () => this.invoke_contract_v1_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): InvokeContractV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new InvokeContractV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.invoke_contract_v1_response_pb_200, () => message.invoke_contract_v1_response_pb_200 = dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): InvokeContractV1Response {
+            return InvokeContractV1Response.deserialize(bytes);
+        }
+    }
+    export class RunTransactionV1Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            run_transaction_request_pb?: dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("run_transaction_request_pb" in data && data.run_transaction_request_pb != undefined) {
+                    this.run_transaction_request_pb = data.run_transaction_request_pb;
+                }
+            }
+        }
+        get run_transaction_request_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB, 1) as dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB;
+        }
+        set run_transaction_request_pb(value: dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_run_transaction_request_pb() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            run_transaction_request_pb?: ReturnType<typeof dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.prototype.toObject>;
+        }): RunTransactionV1Request {
+            const message = new RunTransactionV1Request({});
+            if (data.run_transaction_request_pb != null) {
+                message.run_transaction_request_pb = dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.fromObject(data.run_transaction_request_pb);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                run_transaction_request_pb?: ReturnType<typeof dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.prototype.toObject>;
+            } = {};
+            if (this.run_transaction_request_pb != null) {
+                data.run_transaction_request_pb = this.run_transaction_request_pb.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_run_transaction_request_pb)
+                writer.writeMessage(1, this.run_transaction_request_pb, () => this.run_transaction_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -777,7 +1733,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.runTransactionRequestPB, () => message.runTransactionRequestPB = dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.deserialize(reader));
+                        reader.readMessage(message.run_transaction_request_pb, () => message.run_transaction_request_pb = dependency_18.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionRequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -791,43 +1747,77 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
             return RunTransactionV1Request.deserialize(bytes);
         }
     }
-    export class SignTransactionV1Request extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            signTransactionRequestPB?: dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB;
-        }) {
+    export class RunTransactionV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2]];
+        constructor(data?: any[] | ({} & (({
+            run_transaction_response_pb_200?: dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            run_transaction_response_pb_200?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("signTransactionRequestPB" in data && data.signTransactionRequestPB != undefined) {
-                    this.signTransactionRequestPB = data.signTransactionRequestPB;
+                if ("run_transaction_response_pb_200" in data && data.run_transaction_response_pb_200 != undefined) {
+                    this.run_transaction_response_pb_200 = data.run_transaction_response_pb_200;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
                 }
             }
         }
-        get signTransactionRequestPB() {
-            return pb_1.Message.getWrapperField(this, dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB, 1) as dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB;
+        get run_transaction_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB, 1) as dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB;
         }
-        set signTransactionRequestPB(value: dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB) {
-            pb_1.Message.setWrapperField(this, 1, value);
+        set run_transaction_response_pb_200(value: dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
         }
-        get has_signTransactionRequestPB() {
+        get has_run_transaction_response_pb_200() {
             return pb_1.Message.getField(this, 1) != null;
         }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 2) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "run_transaction_response_pb_200" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "run_transaction_response_pb_200",
+                2: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2])];
+        }
         static fromObject(data: {
-            signTransactionRequestPB?: ReturnType<typeof dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.prototype.toObject>;
-        }): SignTransactionV1Request {
-            const message = new SignTransactionV1Request({});
-            if (data.signTransactionRequestPB != null) {
-                message.signTransactionRequestPB = dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.fromObject(data.signTransactionRequestPB);
+            run_transaction_response_pb_200?: ReturnType<typeof dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): RunTransactionV1Response {
+            const message = new RunTransactionV1Response({});
+            if (data.run_transaction_response_pb_200 != null) {
+                message.run_transaction_response_pb_200 = dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB.fromObject(data.run_transaction_response_pb_200);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
             }
             return message;
         }
         toObject() {
             const data: {
-                signTransactionRequestPB?: ReturnType<typeof dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.prototype.toObject>;
+                run_transaction_response_pb_200?: ReturnType<typeof dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
             } = {};
-            if (this.signTransactionRequestPB != null) {
-                data.signTransactionRequestPB = this.signTransactionRequestPB.toObject();
+            if (this.run_transaction_response_pb_200 != null) {
+                data.run_transaction_response_pb_200 = this.run_transaction_response_pb_200.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
             }
             return data;
         }
@@ -835,8 +1825,83 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_signTransactionRequestPB)
-                writer.writeMessage(1, this.signTransactionRequestPB, () => this.signTransactionRequestPB.serialize(writer));
+            if (this.has_run_transaction_response_pb_200)
+                writer.writeMessage(1, this.run_transaction_response_pb_200, () => this.run_transaction_response_pb_200.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(2, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): RunTransactionV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new RunTransactionV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.run_transaction_response_pb_200, () => message.run_transaction_response_pb_200 = dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): RunTransactionV1Response {
+            return RunTransactionV1Response.deserialize(bytes);
+        }
+    }
+    export class SignTransactionV1Request extends pb_1.Message {
+        #one_of_decls: number[][] = [];
+        constructor(data?: any[] | {
+            sign_transaction_request_pb?: dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB;
+        }) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("sign_transaction_request_pb" in data && data.sign_transaction_request_pb != undefined) {
+                    this.sign_transaction_request_pb = data.sign_transaction_request_pb;
+                }
+            }
+        }
+        get sign_transaction_request_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB, 1) as dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB;
+        }
+        set sign_transaction_request_pb(value: dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB) {
+            pb_1.Message.setWrapperField(this, 1, value);
+        }
+        get has_sign_transaction_request_pb() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        static fromObject(data: {
+            sign_transaction_request_pb?: ReturnType<typeof dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.prototype.toObject>;
+        }): SignTransactionV1Request {
+            const message = new SignTransactionV1Request({});
+            if (data.sign_transaction_request_pb != null) {
+                message.sign_transaction_request_pb = dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.fromObject(data.sign_transaction_request_pb);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                sign_transaction_request_pb?: ReturnType<typeof dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.prototype.toObject>;
+            } = {};
+            if (this.sign_transaction_request_pb != null) {
+                data.sign_transaction_request_pb = this.sign_transaction_request_pb.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_sign_transaction_request_pb)
+                writer.writeMessage(1, this.sign_transaction_request_pb, () => this.sign_transaction_request_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -847,7 +1912,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        reader.readMessage(message.signTransactionRequestPB, () => message.signTransactionRequestPB = dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.deserialize(reader));
+                        reader.readMessage(message.sign_transaction_request_pb, () => message.sign_transaction_request_pb = dependency_20.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionRequestPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -859,6 +1924,147 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
         }
         static deserializeBinary(bytes: Uint8Array): SignTransactionV1Request {
             return SignTransactionV1Request.deserialize(bytes);
+        }
+    }
+    export class SignTransactionV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3]];
+        constructor(data?: any[] | ({} & (({
+            sign_transaction_response_pb_200?: dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB;
+            empty_404?: never;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            sign_transaction_response_pb_200?: never;
+            empty_404?: dependency_1.google.protobuf.Empty;
+            backing_ledger_unavailable_error_pb_503?: never;
+        } | {
+            sign_transaction_response_pb_200?: never;
+            empty_404?: never;
+            backing_ledger_unavailable_error_pb_503?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("sign_transaction_response_pb_200" in data && data.sign_transaction_response_pb_200 != undefined) {
+                    this.sign_transaction_response_pb_200 = data.sign_transaction_response_pb_200;
+                }
+                if ("empty_404" in data && data.empty_404 != undefined) {
+                    this.empty_404 = data.empty_404;
+                }
+                if ("backing_ledger_unavailable_error_pb_503" in data && data.backing_ledger_unavailable_error_pb_503 != undefined) {
+                    this.backing_ledger_unavailable_error_pb_503 = data.backing_ledger_unavailable_error_pb_503;
+                }
+            }
+        }
+        get sign_transaction_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB, 1) as dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB;
+        }
+        set sign_transaction_response_pb_200(value: dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_sign_transaction_response_pb_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get empty_404() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Empty, 2) as dependency_1.google.protobuf.Empty;
+        }
+        set empty_404(value: dependency_1.google.protobuf.Empty) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_empty_404() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB, 3) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB;
+        }
+        set backing_ledger_unavailable_error_pb_503(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_backing_ledger_unavailable_error_pb_503() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "sign_transaction_response_pb_200" | "empty_404" | "backing_ledger_unavailable_error_pb_503";
+            } = {
+                0: "none",
+                1: "sign_transaction_response_pb_200",
+                2: "empty_404",
+                3: "backing_ledger_unavailable_error_pb_503"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3])];
+        }
+        static fromObject(data: {
+            sign_transaction_response_pb_200?: ReturnType<typeof dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB.prototype.toObject>;
+            empty_404?: ReturnType<typeof dependency_1.google.protobuf.Empty.prototype.toObject>;
+            backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+        }): SignTransactionV1Response {
+            const message = new SignTransactionV1Response({});
+            if (data.sign_transaction_response_pb_200 != null) {
+                message.sign_transaction_response_pb_200 = dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB.fromObject(data.sign_transaction_response_pb_200);
+            }
+            if (data.empty_404 != null) {
+                message.empty_404 = dependency_1.google.protobuf.Empty.fromObject(data.empty_404);
+            }
+            if (data.backing_ledger_unavailable_error_pb_503 != null) {
+                message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.fromObject(data.backing_ledger_unavailable_error_pb_503);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                sign_transaction_response_pb_200?: ReturnType<typeof dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB.prototype.toObject>;
+                empty_404?: ReturnType<typeof dependency_1.google.protobuf.Empty.prototype.toObject>;
+                backing_ledger_unavailable_error_pb_503?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.prototype.toObject>;
+            } = {};
+            if (this.sign_transaction_response_pb_200 != null) {
+                data.sign_transaction_response_pb_200 = this.sign_transaction_response_pb_200.toObject();
+            }
+            if (this.empty_404 != null) {
+                data.empty_404 = this.empty_404.toObject();
+            }
+            if (this.backing_ledger_unavailable_error_pb_503 != null) {
+                data.backing_ledger_unavailable_error_pb_503 = this.backing_ledger_unavailable_error_pb_503.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_sign_transaction_response_pb_200)
+                writer.writeMessage(1, this.sign_transaction_response_pb_200, () => this.sign_transaction_response_pb_200.serialize(writer));
+            if (this.has_empty_404)
+                writer.writeMessage(2, this.empty_404, () => this.empty_404.serialize(writer));
+            if (this.has_backing_ledger_unavailable_error_pb_503)
+                writer.writeMessage(3, this.backing_ledger_unavailable_error_pb_503, () => this.backing_ledger_unavailable_error_pb_503.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): SignTransactionV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new SignTransactionV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.sign_transaction_response_pb_200, () => message.sign_transaction_response_pb_200 = dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.empty_404, () => message.empty_404 = dependency_1.google.protobuf.Empty.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.backing_ledger_unavailable_error_pb_503, () => message.backing_ledger_unavailable_error_pb_503 = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BackingLedgerUnavailableErrorPB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): SignTransactionV1Response {
+            return SignTransactionV1Response.deserialize(bytes);
         }
     }
     interface GrpcUnaryServiceInterface<P, R> {
@@ -893,8 +2099,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: DeployContractSolBytecodeNoKeychainV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => DeployContractSolBytecodeNoKeychainV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: DeployContractSolBytecodeNoKeychainV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => DeployContractSolBytecodeNoKeychainV1Response.deserialize(new Uint8Array(bytes))
             },
             DeployContractSolBytecodeV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/DeployContractSolBytecodeV1",
@@ -902,8 +2108,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: DeployContractSolBytecodeV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => DeployContractSolBytecodeV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: DeployContractSolBytecodeV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => DeployContractSolBytecodeV1Response.deserialize(new Uint8Array(bytes))
             },
             GetBalanceV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/GetBalanceV1",
@@ -911,8 +2117,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: GetBalanceV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => GetBalanceV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: GetBalanceV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => GetBalanceV1Response.deserialize(new Uint8Array(bytes))
             },
             GetBesuRecordV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/GetBesuRecordV1",
@@ -920,8 +2126,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: GetBesuRecordV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => GetBesuRecordV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: GetBesuRecordV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => GetBesuRecordV1Response.deserialize(new Uint8Array(bytes))
             },
             GetBlockV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/GetBlockV1",
@@ -929,8 +2135,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: GetBlockV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => GetBlockV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: GetBlockV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => GetBlockV1Response.deserialize(new Uint8Array(bytes))
             },
             GetOpenApiSpecV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/GetOpenApiSpecV1",
@@ -947,8 +2153,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: GetPastLogsV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => GetPastLogsV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: GetPastLogsV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => GetPastLogsV1Response.deserialize(new Uint8Array(bytes))
             },
             GetPrometheusMetricsV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/GetPrometheusMetricsV1",
@@ -965,8 +2171,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: GetTransactionV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => GetTransactionV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: GetTransactionV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => GetTransactionV1Response.deserialize(new Uint8Array(bytes))
             },
             InvokeContractV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/InvokeContractV1",
@@ -974,8 +2180,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: InvokeContractV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => InvokeContractV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: InvokeContractV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => InvokeContractV1Response.deserialize(new Uint8Array(bytes))
             },
             RunTransactionV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/RunTransactionV1",
@@ -983,8 +2189,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: RunTransactionV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => RunTransactionV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: RunTransactionV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => RunTransactionV1Response.deserialize(new Uint8Array(bytes))
             },
             SignTransactionV1: {
                 path: "/org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DefaultService/SignTransactionV1",
@@ -992,62 +2198,62 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu.services.def
                 responseStream: false,
                 requestSerialize: (message: SignTransactionV1Request) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => SignTransactionV1Request.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: SignTransactionV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => SignTransactionV1Response.deserialize(new Uint8Array(bytes))
             }
         };
         [method: string]: grpc_1.UntypedHandleCall;
-        abstract DeployContractSolBytecodeNoKeychainV1(call: grpc_1.ServerUnaryCall<DeployContractSolBytecodeNoKeychainV1Request, dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>): void;
-        abstract DeployContractSolBytecodeV1(call: grpc_1.ServerUnaryCall<DeployContractSolBytecodeV1Request, dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>): void;
-        abstract GetBalanceV1(call: grpc_1.ServerUnaryCall<GetBalanceV1Request, dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB>): void;
-        abstract GetBesuRecordV1(call: grpc_1.ServerUnaryCall<GetBesuRecordV1Request, dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB>): void;
-        abstract GetBlockV1(call: grpc_1.ServerUnaryCall<GetBlockV1Request, dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB>): void;
+        abstract DeployContractSolBytecodeNoKeychainV1(call: grpc_1.ServerUnaryCall<DeployContractSolBytecodeNoKeychainV1Request, DeployContractSolBytecodeNoKeychainV1Response>, callback: grpc_1.sendUnaryData<DeployContractSolBytecodeNoKeychainV1Response>): void;
+        abstract DeployContractSolBytecodeV1(call: grpc_1.ServerUnaryCall<DeployContractSolBytecodeV1Request, DeployContractSolBytecodeV1Response>, callback: grpc_1.sendUnaryData<DeployContractSolBytecodeV1Response>): void;
+        abstract GetBalanceV1(call: grpc_1.ServerUnaryCall<GetBalanceV1Request, GetBalanceV1Response>, callback: grpc_1.sendUnaryData<GetBalanceV1Response>): void;
+        abstract GetBesuRecordV1(call: grpc_1.ServerUnaryCall<GetBesuRecordV1Request, GetBesuRecordV1Response>, callback: grpc_1.sendUnaryData<GetBesuRecordV1Response>): void;
+        abstract GetBlockV1(call: grpc_1.ServerUnaryCall<GetBlockV1Request, GetBlockV1Response>, callback: grpc_1.sendUnaryData<GetBlockV1Response>): void;
         abstract GetOpenApiSpecV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, GetOpenApiSpecV1Response>, callback: grpc_1.sendUnaryData<GetOpenApiSpecV1Response>): void;
-        abstract GetPastLogsV1(call: grpc_1.ServerUnaryCall<GetPastLogsV1Request, dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB>): void;
+        abstract GetPastLogsV1(call: grpc_1.ServerUnaryCall<GetPastLogsV1Request, GetPastLogsV1Response>, callback: grpc_1.sendUnaryData<GetPastLogsV1Response>): void;
         abstract GetPrometheusMetricsV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, GetPrometheusMetricsV1Response>, callback: grpc_1.sendUnaryData<GetPrometheusMetricsV1Response>): void;
-        abstract GetTransactionV1(call: grpc_1.ServerUnaryCall<GetTransactionV1Request, dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB>): void;
-        abstract InvokeContractV1(call: grpc_1.ServerUnaryCall<InvokeContractV1Request, dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB>, callback: grpc_1.sendUnaryData<dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB>): void;
-        abstract RunTransactionV1(call: grpc_1.ServerUnaryCall<RunTransactionV1Request, dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB>, callback: grpc_1.sendUnaryData<dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB>): void;
-        abstract SignTransactionV1(call: grpc_1.ServerUnaryCall<SignTransactionV1Request, dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB>, callback: grpc_1.sendUnaryData<dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB>): void;
+        abstract GetTransactionV1(call: grpc_1.ServerUnaryCall<GetTransactionV1Request, GetTransactionV1Response>, callback: grpc_1.sendUnaryData<GetTransactionV1Response>): void;
+        abstract InvokeContractV1(call: grpc_1.ServerUnaryCall<InvokeContractV1Request, InvokeContractV1Response>, callback: grpc_1.sendUnaryData<InvokeContractV1Response>): void;
+        abstract RunTransactionV1(call: grpc_1.ServerUnaryCall<RunTransactionV1Request, RunTransactionV1Response>, callback: grpc_1.sendUnaryData<RunTransactionV1Response>): void;
+        abstract SignTransactionV1(call: grpc_1.ServerUnaryCall<SignTransactionV1Request, SignTransactionV1Response>, callback: grpc_1.sendUnaryData<SignTransactionV1Response>): void;
     }
     export class DefaultServiceClient extends grpc_1.makeGenericClientConstructor(UnimplementedDefaultServiceService.definition, "DefaultService", {}) {
         constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
             super(address, credentials, options);
         }
-        DeployContractSolBytecodeNoKeychainV1: GrpcUnaryServiceInterface<DeployContractSolBytecodeNoKeychainV1Request, dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB> = (message: DeployContractSolBytecodeNoKeychainV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        DeployContractSolBytecodeNoKeychainV1: GrpcUnaryServiceInterface<DeployContractSolBytecodeNoKeychainV1Request, DeployContractSolBytecodeNoKeychainV1Response> = (message: DeployContractSolBytecodeNoKeychainV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<DeployContractSolBytecodeNoKeychainV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<DeployContractSolBytecodeNoKeychainV1Response>, callback?: grpc_1.requestCallback<DeployContractSolBytecodeNoKeychainV1Response>): grpc_1.ClientUnaryCall => {
             return super.DeployContractSolBytecodeNoKeychainV1(message, metadata, options, callback);
         };
-        DeployContractSolBytecodeV1: GrpcUnaryServiceInterface<DeployContractSolBytecodeV1Request, dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB> = (message: DeployContractSolBytecodeV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        DeployContractSolBytecodeV1: GrpcUnaryServiceInterface<DeployContractSolBytecodeV1Request, DeployContractSolBytecodeV1Response> = (message: DeployContractSolBytecodeV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<DeployContractSolBytecodeV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<DeployContractSolBytecodeV1Response>, callback?: grpc_1.requestCallback<DeployContractSolBytecodeV1Response>): grpc_1.ClientUnaryCall => {
             return super.DeployContractSolBytecodeV1(message, metadata, options, callback);
         };
-        GetBalanceV1: GrpcUnaryServiceInterface<GetBalanceV1Request, dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB> = (message: GetBalanceV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_7.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        GetBalanceV1: GrpcUnaryServiceInterface<GetBalanceV1Request, GetBalanceV1Response> = (message: GetBalanceV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetBalanceV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetBalanceV1Response>, callback?: grpc_1.requestCallback<GetBalanceV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetBalanceV1(message, metadata, options, callback);
         };
-        GetBesuRecordV1: GrpcUnaryServiceInterface<GetBesuRecordV1Request, dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB> = (message: GetBesuRecordV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_9.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        GetBesuRecordV1: GrpcUnaryServiceInterface<GetBesuRecordV1Request, GetBesuRecordV1Response> = (message: GetBesuRecordV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetBesuRecordV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetBesuRecordV1Response>, callback?: grpc_1.requestCallback<GetBesuRecordV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetBesuRecordV1(message, metadata, options, callback);
         };
-        GetBlockV1: GrpcUnaryServiceInterface<GetBlockV1Request, dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB> = (message: GetBlockV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_11.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        GetBlockV1: GrpcUnaryServiceInterface<GetBlockV1Request, GetBlockV1Response> = (message: GetBlockV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetBlockV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetBlockV1Response>, callback?: grpc_1.requestCallback<GetBlockV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetBlockV1(message, metadata, options, callback);
         };
         GetOpenApiSpecV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, GetOpenApiSpecV1Response> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetOpenApiSpecV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetOpenApiSpecV1Response>, callback?: grpc_1.requestCallback<GetOpenApiSpecV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetOpenApiSpecV1(message, metadata, options, callback);
         };
-        GetPastLogsV1: GrpcUnaryServiceInterface<GetPastLogsV1Request, dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB> = (message: GetPastLogsV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_13.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        GetPastLogsV1: GrpcUnaryServiceInterface<GetPastLogsV1Request, GetPastLogsV1Response> = (message: GetPastLogsV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetPastLogsV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetPastLogsV1Response>, callback?: grpc_1.requestCallback<GetPastLogsV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetPastLogsV1(message, metadata, options, callback);
         };
         GetPrometheusMetricsV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, GetPrometheusMetricsV1Response> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetPrometheusMetricsV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetPrometheusMetricsV1Response>, callback?: grpc_1.requestCallback<GetPrometheusMetricsV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetPrometheusMetricsV1(message, metadata, options, callback);
         };
-        GetTransactionV1: GrpcUnaryServiceInterface<GetTransactionV1Request, dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB> = (message: GetTransactionV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_15.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        GetTransactionV1: GrpcUnaryServiceInterface<GetTransactionV1Request, GetTransactionV1Response> = (message: GetTransactionV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetTransactionV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetTransactionV1Response>, callback?: grpc_1.requestCallback<GetTransactionV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetTransactionV1(message, metadata, options, callback);
         };
-        InvokeContractV1: GrpcUnaryServiceInterface<InvokeContractV1Request, dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB> = (message: InvokeContractV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB>, callback?: grpc_1.requestCallback<dependency_17.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB>): grpc_1.ClientUnaryCall => {
+        InvokeContractV1: GrpcUnaryServiceInterface<InvokeContractV1Request, InvokeContractV1Response> = (message: InvokeContractV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<InvokeContractV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<InvokeContractV1Response>, callback?: grpc_1.requestCallback<InvokeContractV1Response>): grpc_1.ClientUnaryCall => {
             return super.InvokeContractV1(message, metadata, options, callback);
         };
-        RunTransactionV1: GrpcUnaryServiceInterface<RunTransactionV1Request, dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB> = (message: RunTransactionV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB>, callback?: grpc_1.requestCallback<dependency_19.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB>): grpc_1.ClientUnaryCall => {
+        RunTransactionV1: GrpcUnaryServiceInterface<RunTransactionV1Request, RunTransactionV1Response> = (message: RunTransactionV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<RunTransactionV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<RunTransactionV1Response>, callback?: grpc_1.requestCallback<RunTransactionV1Response>): grpc_1.ClientUnaryCall => {
             return super.RunTransactionV1(message, metadata, options, callback);
         };
-        SignTransactionV1: GrpcUnaryServiceInterface<SignTransactionV1Request, dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB> = (message: SignTransactionV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB>, callback?: grpc_1.requestCallback<dependency_21.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB>): grpc_1.ClientUnaryCall => {
+        SignTransactionV1: GrpcUnaryServiceInterface<SignTransactionV1Request, SignTransactionV1Response> = (message: SignTransactionV1Request, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<SignTransactionV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<SignTransactionV1Response>, callback?: grpc_1.requestCallback<SignTransactionV1Response>): grpc_1.ClientUnaryCall => {
             return super.SignTransactionV1(message, metadata, options, callback);
         };
     }

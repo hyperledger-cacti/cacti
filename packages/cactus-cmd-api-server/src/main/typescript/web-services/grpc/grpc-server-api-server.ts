@@ -13,24 +13,34 @@ export class GrpcServerApiServer extends default_service.org.hyperledger.cactus
   GetHealthCheckV1(
     call: ServerUnaryCall<
       Empty,
-      health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB
+      default_service.org.hyperledger.cactus.cmd_api_server.GetHealthCheckV1Response
     >,
-    callback: requestCallback<health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>,
+    callback: requestCallback<default_service.org.hyperledger.cactus.cmd_api_server.GetHealthCheckV1Response>,
   ): void {
+    const { rss, heapTotal, heapUsed, external, arrayBuffers } =
+      process.memoryUsage();
+
     const memoryUsage =
-      new memory_usage_pb.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB(
-        process.memoryUsage(),
-      );
+      new memory_usage_pb.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB({
+        rss,
+        heap_total: heapTotal,
+        heap_used: heapUsed,
+        external,
+        array_buffers: arrayBuffers,
+      });
 
     const healthCheckResponse =
       new health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB(
         {
           success: true,
-          createdAt: new Date().toJSON(),
-          memoryUsage,
+          created_at: new Date().toJSON(),
+          memory_usage: memoryUsage,
         },
       );
-    callback(null, healthCheckResponse);
+    const response =
+      new default_service.org.hyperledger.cactus.cmd_api_server.GetHealthCheckV1Response();
+    response.health_check_response_pb_200 = healthCheckResponse;
+    callback(null, response);
   }
 
   GetPrometheusMetricsV1(
@@ -55,7 +65,7 @@ export class GrpcServerApiServer extends default_service.org.hyperledger.cactus
     const res =
       new default_service.org.hyperledger.cactus.cmd_api_server.GetOpenApiSpecV1Response();
     const specAsJson = stringify(OAS);
-    res.data = specAsJson;
+    res.string_200 = specAsJson;
     callback(null, res);
   }
 }

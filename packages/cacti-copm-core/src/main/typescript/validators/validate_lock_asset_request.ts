@@ -17,28 +17,28 @@ export function validateLockAssetRequest(request: LockAssetV1Request): {
   asset: TransferrableAsset;
   expirySecs: number;
 } {
-  if (!request.assetLockV1PB) {
+  if (!request.assetLockV1Pb) {
     throw new ConnectError("data required", Code.InvalidArgument);
   }
-  if (!request.assetLockV1PB.destinationCertificate) {
+  if (!request.assetLockV1Pb.destinationCertificate) {
     throw new ConnectError(
       "destinationCertificate required",
       Code.InvalidArgument,
     );
   }
-  if (!request.assetLockV1PB.sourceCertificate) {
+  if (!request.assetLockV1Pb.sourceCertificate) {
     throw new ConnectError("sourceCertificate required", Code.InvalidArgument);
   }
 
   // destination account is required only in CORDA implementation
   return {
-    sourceAccount: validateAssetAccount(request.assetLockV1PB.source, "source"),
-    hashInfo: validateHashInfo(request.assetLockV1PB.hashInfo, "hashInfo"),
-    asset: validateTransferrableAsset(request.assetLockV1PB.asset, "asset"),
-    sourceCertificate: request.assetLockV1PB.sourceCertificate,
-    destinationCertificate: request.assetLockV1PB.destinationCertificate,
-    expirySecs: request.assetLockV1PB.expirySecs
-      ? Number(request.assetLockV1PB.expirySecs)
+    sourceAccount: validateAssetAccount(request.assetLockV1Pb.source, "source"),
+    hashInfo: validateHashInfo(request.assetLockV1Pb.hashInfo, "hashInfo"),
+    asset: validateTransferrableAsset(request.assetLockV1Pb.asset, "asset"),
+    sourceCertificate: request.assetLockV1Pb.sourceCertificate,
+    destinationCertificate: request.assetLockV1Pb.destinationCertificate,
+    expirySecs: request.assetLockV1Pb.expirySecs
+      ? Number(request.assetLockV1Pb.expirySecs)
       : 60,
   };
 }

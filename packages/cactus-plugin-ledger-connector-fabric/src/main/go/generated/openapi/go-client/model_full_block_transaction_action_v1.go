@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the FullBlockTransactionActionV1 type satisfies the MappedNullable interface at compile time
@@ -25,6 +27,8 @@ type FullBlockTransactionActionV1 struct {
 	Creator FabricCertificateIdentityV1 `json:"creator"`
 	Endorsements []FullBlockTransactionEndorsementV1 `json:"endorsements"`
 }
+
+type _FullBlockTransactionActionV1 FullBlockTransactionActionV1
 
 // NewFullBlockTransactionActionV1 instantiates a new FullBlockTransactionActionV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -184,6 +188,47 @@ func (o FullBlockTransactionActionV1) ToMap() (map[string]interface{}, error) {
 	toSerialize["creator"] = o.Creator
 	toSerialize["endorsements"] = o.Endorsements
 	return toSerialize, nil
+}
+
+func (o *FullBlockTransactionActionV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"functionName",
+		"functionArgs",
+		"chaincodeId",
+		"creator",
+		"endorsements",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varFullBlockTransactionActionV1 := _FullBlockTransactionActionV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varFullBlockTransactionActionV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = FullBlockTransactionActionV1(varFullBlockTransactionActionV1)
+
+	return err
 }
 
 type NullableFullBlockTransactionActionV1 struct {

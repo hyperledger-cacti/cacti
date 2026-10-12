@@ -296,7 +296,8 @@ describe("watchBlocksV1 of fabric connector tests", () => {
       const createAssetResponse = await apiClient.runTransactionV1({
         signingCredential,
         channelName: ledgerChannelName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         contractName: ledgerContractName,
         methodName: "CreateAsset",
         params: [monitorName, "green", "111", "someOwner", "299"],

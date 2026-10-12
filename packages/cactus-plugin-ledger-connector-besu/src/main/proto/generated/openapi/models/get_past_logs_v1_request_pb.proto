@@ -17,9 +17,9 @@ import "google/protobuf/any.proto";
 
 message GetPastLogsV1RequestPB {
 
-  optional google.protobuf.Any toBlock = 107898160;
+  optional google.protobuf.Any to_block = 376427065;
 
-  optional google.protobuf.Any fromBlock = 53671683;
+  optional google.protobuf.Any from_block = 199600203;
 
   optional google.protobuf.Any address = 73950222;
 

@@ -2,15 +2,6 @@ import { ServerUnaryCall, sendUnaryData } from "@grpc/grpc-js";
 import { status } from "@grpc/grpc-js";
 
 import { google } from "../generated/proto/protoc-gen-ts/google/protobuf/empty";
-import * as deploy_contract_solidity_bytecode_v1_response_pb from "../generated/proto/protoc-gen-ts/models/deploy_contract_solidity_bytecode_v1_response_pb";
-import * as get_balance_v1_response_pb from "../generated/proto/protoc-gen-ts/models/get_balance_v1_response_pb";
-import * as get_besu_record_v1_response_pb from "../generated/proto/protoc-gen-ts/models/get_besu_record_v1_response_pb";
-import * as get_block_v1_response_pb from "../generated/proto/protoc-gen-ts/models/get_block_v1_response_pb";
-import * as get_past_logs_v1_response_pb from "../generated/proto/protoc-gen-ts/models/get_past_logs_v1_response_pb";
-import * as get_transaction_v1_response_pb from "../generated/proto/protoc-gen-ts/models/get_transaction_v1_response_pb";
-import * as invoke_contract_v1_response_pb from "../generated/proto/protoc-gen-ts/models/invoke_contract_v1_response_pb";
-import * as run_transaction_response_pb from "../generated/proto/protoc-gen-ts/models/run_transaction_response_pb";
-import * as sign_transaction_response_pb from "../generated/proto/protoc-gen-ts/models/sign_transaction_response_pb";
 import * as default_service from "../generated/proto/protoc-gen-ts/services/default_service";
 import { getBlockV1Grpc } from "../impl/get-block-v1/get-block-v1-grpc";
 import {
@@ -62,9 +53,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public DeployContractSolBytecodeV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DeployContractSolBytecodeV1Request,
-      deploy_contract_solidity_bytecode_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DeployContractSolBytecodeV1Response
     >,
-    callback: sendUnaryData<deploy_contract_solidity_bytecode_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DeployContractSolBytecodeV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -76,9 +67,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public DeployContractSolBytecodeNoKeychainV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DeployContractSolBytecodeNoKeychainV1Request,
-      deploy_contract_solidity_bytecode_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DeployContractSolBytecodeNoKeychainV1Response
     >,
-    callback: sendUnaryData<deploy_contract_solidity_bytecode_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.DeployContractSolidityBytecodeV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.DeployContractSolBytecodeNoKeychainV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -90,9 +81,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public GetBalanceV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBalanceV1Request,
-      get_balance_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBalanceV1Response
     >,
-    callback: sendUnaryData<get_balance_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBalanceV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBalanceV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -104,9 +95,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public GetBesuRecordV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBesuRecordV1Request,
-      get_besu_record_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBesuRecordV1Response
     >,
-    callback: sendUnaryData<get_besu_record_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBesuRecordV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBesuRecordV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -118,13 +109,16 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public GetBlockV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBlockV1Request,
-      get_block_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBlockV1Response
     >,
-    callback: sendUnaryData<get_block_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBlockV1Response>,
   ): void {
     getBlockV1Grpc({ web3: this.web3, logLevel: this.logLevel }, call.request)
       .then((res) => {
-        callback(null, res);
+        const response =
+          new default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBlockV1Response();
+        response.get_block_v1_response_pb_200 = res;
+        callback(null, response);
       })
       .catch((cause: unknown) => {
         const ex = createRuntimeErrorWithCause("getBlockGrpc() crashed", cause);
@@ -157,9 +151,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public GetPastLogsV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetPastLogsV1Request,
-      get_past_logs_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetPastLogsV1Response
     >,
-    callback: sendUnaryData<get_past_logs_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetPastLogsV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetPastLogsV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -185,9 +179,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public GetTransactionV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetTransactionV1Request,
-      get_transaction_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetTransactionV1Response
     >,
-    callback: sendUnaryData<get_transaction_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetTransactionV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetTransactionV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -199,9 +193,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public InvokeContractV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.InvokeContractV1Request,
-      invoke_contract_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.InvokeContractV1Response
     >,
-    callback: sendUnaryData<invoke_contract_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1ResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.InvokeContractV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -213,9 +207,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public RunTransactionV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.RunTransactionV1Request,
-      run_transaction_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.RunTransactionV1Response
     >,
-    callback: sendUnaryData<run_transaction_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.RunTransactionResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.RunTransactionV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",
@@ -227,9 +221,9 @@ export class BesuGrpcSvcOpenApi extends default_service.org.hyperledger.cacti
   public SignTransactionV1(
     call: ServerUnaryCall<
       default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.SignTransactionV1Request,
-      sign_transaction_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB
+      default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.SignTransactionV1Response
     >,
-    callback: sendUnaryData<sign_transaction_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.SignTransactionResponsePB>,
+    callback: sendUnaryData<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.SignTransactionV1Response>,
   ): void {
     return callback({
       message: "Status.UNIMPLEMENTED",

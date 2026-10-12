@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the GetBlockResponseEncodedV1 type satisfies the MappedNullable interface at compile time
@@ -21,6 +23,8 @@ var _ MappedNullable = &GetBlockResponseEncodedV1{}
 type GetBlockResponseEncodedV1 struct {
 	EncodedBlock string `json:"encodedBlock"`
 }
+
+type _GetBlockResponseEncodedV1 GetBlockResponseEncodedV1
 
 // NewGetBlockResponseEncodedV1 instantiates a new GetBlockResponseEncodedV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -76,6 +80,43 @@ func (o GetBlockResponseEncodedV1) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["encodedBlock"] = o.EncodedBlock
 	return toSerialize, nil
+}
+
+func (o *GetBlockResponseEncodedV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"encodedBlock",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varGetBlockResponseEncodedV1 := _GetBlockResponseEncodedV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varGetBlockResponseEncodedV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = GetBlockResponseEncodedV1(varGetBlockResponseEncodedV1)
+
+	return err
 }
 
 type NullableGetBlockResponseEncodedV1 struct {

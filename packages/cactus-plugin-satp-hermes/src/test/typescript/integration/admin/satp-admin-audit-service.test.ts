@@ -58,7 +58,8 @@ describe("Admin Audit Service Integration Tests", () => {
     await repository.database.migrate.latest();
 
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 

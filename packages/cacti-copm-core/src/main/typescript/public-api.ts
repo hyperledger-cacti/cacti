@@ -1,10 +1,15 @@
 export * from "./generated/services/default_service_connect";
 export {
   ClaimLockedAssetV1Request,
+  ClaimLockedAssetV1Response,
   ClaimPledgedAssetV1Request,
+  ClaimPledgedAssetV1Response,
   LockAssetV1Request,
+  LockAssetV1Response,
   PledgeAssetV1Request,
+  PledgeAssetV1Response,
   GetVerifiedViewV1Request,
+  GetVerifiedViewV1Response,
 } from "./generated/services/default_service_pb";
 export { GetVerifiedViewV1200ResponsePB } from "./generated/models/get_verified_view_v1200_response_pb_pb";
 export { ClaimPledgedAssetV1200ResponsePB } from "./generated/models/claim_pledged_asset_v1200_response_pb_pb.js";

@@ -18,17 +18,17 @@ export function validateClaimLockedAssetRequest(
   hashInfo: HashFunctions.Hash;
   lockId: string;
 } {
-  if (!req.assetLockClaimV1PB) {
+  if (!req.assetLockClaimV1Pb) {
     throw new ConnectError(`request data is required`, Code.InvalidArgument);
   }
 
   return {
-    asset: validateTransferrableAsset(req.assetLockClaimV1PB.asset, "asset"),
-    hashInfo: validateHashInfo(req.assetLockClaimV1PB.hashInfo, "hashInfo"),
+    asset: validateTransferrableAsset(req.assetLockClaimV1Pb.asset, "asset"),
+    hashInfo: validateHashInfo(req.assetLockClaimV1Pb.hashInfo, "hashInfo"),
     destination: validateAssetAccount(
-      req.assetLockClaimV1PB.destination,
+      req.assetLockClaimV1Pb.destination,
       "destination",
     ),
-    lockId: validateRequiredString(req.assetLockClaimV1PB.lockId, "lockId"),
+    lockId: validateRequiredString(req.assetLockClaimV1Pb.lockId, "lockId"),
   };
 }

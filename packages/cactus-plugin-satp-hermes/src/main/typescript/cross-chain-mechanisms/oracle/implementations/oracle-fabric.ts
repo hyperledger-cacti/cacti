@@ -193,7 +193,8 @@ export class OracleFabric extends OracleAbstract {
           ...args,
           channelName: this.channelName,
           signingCredential: this.signingCredential,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (!response || !response.transactionId) {
@@ -230,7 +231,8 @@ export class OracleFabric extends OracleAbstract {
         const response = await this.connector.transact({
           ...args,
           signingCredential: this.signingCredential,
-          invocationType: FabricContractInvocationType.Call,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeCall,
         });
 
         if (!response) {

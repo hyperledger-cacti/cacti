@@ -13,109 +13,82 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class Web3SigningCredentialPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            type?: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
-            ethAccount?: string;
-            keychainEntryKey?: string;
-            keychainId?: string;
-            secret?: string;
+            web3_signing_credential_cactus_keychain_ref_pb?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB;
+            web3_signing_credential_private_key_hex_pb?: dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB;
+            web3_signing_credential_none_pb?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("type" in data && data.type != undefined) {
-                    this.type = data.type;
+                if ("web3_signing_credential_cactus_keychain_ref_pb" in data && data.web3_signing_credential_cactus_keychain_ref_pb != undefined) {
+                    this.web3_signing_credential_cactus_keychain_ref_pb = data.web3_signing_credential_cactus_keychain_ref_pb;
                 }
-                if ("ethAccount" in data && data.ethAccount != undefined) {
-                    this.ethAccount = data.ethAccount;
+                if ("web3_signing_credential_private_key_hex_pb" in data && data.web3_signing_credential_private_key_hex_pb != undefined) {
+                    this.web3_signing_credential_private_key_hex_pb = data.web3_signing_credential_private_key_hex_pb;
                 }
-                if ("keychainEntryKey" in data && data.keychainEntryKey != undefined) {
-                    this.keychainEntryKey = data.keychainEntryKey;
-                }
-                if ("keychainId" in data && data.keychainId != undefined) {
-                    this.keychainId = data.keychainId;
-                }
-                if ("secret" in data && data.secret != undefined) {
-                    this.secret = data.secret;
+                if ("web3_signing_credential_none_pb" in data && data.web3_signing_credential_none_pb != undefined) {
+                    this.web3_signing_credential_none_pb = data.web3_signing_credential_none_pb;
                 }
             }
         }
-        get type() {
-            return pb_1.Message.getFieldWithDefault(this, 3575610, dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.Web3SigningCredentialTypePB_CACTUS_KEYCHAIN_REF) as dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
+        get web3_signing_credential_cactus_keychain_ref_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB, 223634570) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB;
         }
-        set type(value: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB) {
-            pb_1.Message.setField(this, 3575610, value);
+        set web3_signing_credential_cactus_keychain_ref_pb(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB) {
+            pb_1.Message.setWrapperField(this, 223634570, value);
         }
-        get ethAccount() {
-            return pb_1.Message.getFieldWithDefault(this, 528332204, "") as string;
+        get has_web3_signing_credential_cactus_keychain_ref_pb() {
+            return pb_1.Message.getField(this, 223634570) != null;
         }
-        set ethAccount(value: string) {
-            pb_1.Message.setField(this, 528332204, value);
+        get web3_signing_credential_private_key_hex_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB, 223997441) as dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB;
         }
-        get keychainEntryKey() {
-            return pb_1.Message.getFieldWithDefault(this, 210645395, "") as string;
+        set web3_signing_credential_private_key_hex_pb(value: dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB) {
+            pb_1.Message.setWrapperField(this, 223997441, value);
         }
-        set keychainEntryKey(value: string) {
-            pb_1.Message.setField(this, 210645395, value);
+        get has_web3_signing_credential_private_key_hex_pb() {
+            return pb_1.Message.getField(this, 223997441) != null;
         }
-        get keychainId() {
-            return pb_1.Message.getFieldWithDefault(this, 14058372, "") as string;
+        get web3_signing_credential_none_pb() {
+            return pb_1.Message.getWrapperField(this, dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB, 265230646) as dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB;
         }
-        set keychainId(value: string) {
-            pb_1.Message.setField(this, 14058372, value);
+        set web3_signing_credential_none_pb(value: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB) {
+            pb_1.Message.setWrapperField(this, 265230646, value);
         }
-        get secret() {
-            return pb_1.Message.getFieldWithDefault(this, 369406289, "") as string;
-        }
-        set secret(value: string) {
-            pb_1.Message.setField(this, 369406289, value);
+        get has_web3_signing_credential_none_pb() {
+            return pb_1.Message.getField(this, 265230646) != null;
         }
         static fromObject(data: {
-            type?: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
-            ethAccount?: string;
-            keychainEntryKey?: string;
-            keychainId?: string;
-            secret?: string;
+            web3_signing_credential_cactus_keychain_ref_pb?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB.prototype.toObject>;
+            web3_signing_credential_private_key_hex_pb?: ReturnType<typeof dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB.prototype.toObject>;
+            web3_signing_credential_none_pb?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB.prototype.toObject>;
         }): Web3SigningCredentialPB {
             const message = new Web3SigningCredentialPB({});
-            if (data.type != null) {
-                message.type = data.type;
+            if (data.web3_signing_credential_cactus_keychain_ref_pb != null) {
+                message.web3_signing_credential_cactus_keychain_ref_pb = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB.fromObject(data.web3_signing_credential_cactus_keychain_ref_pb);
             }
-            if (data.ethAccount != null) {
-                message.ethAccount = data.ethAccount;
+            if (data.web3_signing_credential_private_key_hex_pb != null) {
+                message.web3_signing_credential_private_key_hex_pb = dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB.fromObject(data.web3_signing_credential_private_key_hex_pb);
             }
-            if (data.keychainEntryKey != null) {
-                message.keychainEntryKey = data.keychainEntryKey;
-            }
-            if (data.keychainId != null) {
-                message.keychainId = data.keychainId;
-            }
-            if (data.secret != null) {
-                message.secret = data.secret;
+            if (data.web3_signing_credential_none_pb != null) {
+                message.web3_signing_credential_none_pb = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB.fromObject(data.web3_signing_credential_none_pb);
             }
             return message;
         }
         toObject() {
             const data: {
-                type?: dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
-                ethAccount?: string;
-                keychainEntryKey?: string;
-                keychainId?: string;
-                secret?: string;
+                web3_signing_credential_cactus_keychain_ref_pb?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB.prototype.toObject>;
+                web3_signing_credential_private_key_hex_pb?: ReturnType<typeof dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB.prototype.toObject>;
+                web3_signing_credential_none_pb?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB.prototype.toObject>;
             } = {};
-            if (this.type != null) {
-                data.type = this.type;
+            if (this.web3_signing_credential_cactus_keychain_ref_pb != null) {
+                data.web3_signing_credential_cactus_keychain_ref_pb = this.web3_signing_credential_cactus_keychain_ref_pb.toObject();
             }
-            if (this.ethAccount != null) {
-                data.ethAccount = this.ethAccount;
+            if (this.web3_signing_credential_private_key_hex_pb != null) {
+                data.web3_signing_credential_private_key_hex_pb = this.web3_signing_credential_private_key_hex_pb.toObject();
             }
-            if (this.keychainEntryKey != null) {
-                data.keychainEntryKey = this.keychainEntryKey;
-            }
-            if (this.keychainId != null) {
-                data.keychainId = this.keychainId;
-            }
-            if (this.secret != null) {
-                data.secret = this.secret;
+            if (this.web3_signing_credential_none_pb != null) {
+                data.web3_signing_credential_none_pb = this.web3_signing_credential_none_pb.toObject();
             }
             return data;
         }
@@ -123,16 +96,12 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.type != dependency_5.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.Web3SigningCredentialTypePB_CACTUS_KEYCHAIN_REF)
-                writer.writeEnum(3575610, this.type);
-            if (this.ethAccount.length)
-                writer.writeString(528332204, this.ethAccount);
-            if (this.keychainEntryKey.length)
-                writer.writeString(210645395, this.keychainEntryKey);
-            if (this.keychainId.length)
-                writer.writeString(14058372, this.keychainId);
-            if (this.secret.length)
-                writer.writeString(369406289, this.secret);
+            if (this.has_web3_signing_credential_cactus_keychain_ref_pb)
+                writer.writeMessage(223634570, this.web3_signing_credential_cactus_keychain_ref_pb, () => this.web3_signing_credential_cactus_keychain_ref_pb.serialize(writer));
+            if (this.has_web3_signing_credential_private_key_hex_pb)
+                writer.writeMessage(223997441, this.web3_signing_credential_private_key_hex_pb, () => this.web3_signing_credential_private_key_hex_pb.serialize(writer));
+            if (this.has_web3_signing_credential_none_pb)
+                writer.writeMessage(265230646, this.web3_signing_credential_none_pb, () => this.web3_signing_credential_none_pb.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -142,20 +111,14 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 3575610:
-                        message.type = reader.readEnum();
+                    case 223634570:
+                        reader.readMessage(message.web3_signing_credential_cactus_keychain_ref_pb, () => message.web3_signing_credential_cactus_keychain_ref_pb = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialCactusKeychainRefPB.deserialize(reader));
                         break;
-                    case 528332204:
-                        message.ethAccount = reader.readString();
+                    case 223997441:
+                        reader.readMessage(message.web3_signing_credential_private_key_hex_pb, () => message.web3_signing_credential_private_key_hex_pb = dependency_4.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialPrivateKeyHexPB.deserialize(reader));
                         break;
-                    case 210645395:
-                        message.keychainEntryKey = reader.readString();
-                        break;
-                    case 14058372:
-                        message.keychainId = reader.readString();
-                        break;
-                    case 369406289:
-                        message.secret = reader.readString();
+                    case 265230646:
+                        reader.readMessage(message.web3_signing_credential_none_pb, () => message.web3_signing_credential_none_pb = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialNonePB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }

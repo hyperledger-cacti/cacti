@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -40,5 +48,8 @@ data class JarFile (
     @Json(name = "contentBase64")
     val contentBase64: kotlin.String
 
-) : kotlin.collections.HashMap<String, kotlin.Any>()
+) : kotlin.collections.HashMap<String, kotlin.Any>() {
+
+
+}
 

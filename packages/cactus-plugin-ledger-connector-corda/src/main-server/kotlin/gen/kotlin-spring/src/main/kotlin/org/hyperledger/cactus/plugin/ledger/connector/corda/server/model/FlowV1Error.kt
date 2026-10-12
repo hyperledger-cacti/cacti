@@ -19,8 +19,10 @@ import jakarta.validation.Valid
  */
 data class FlowV1Error(
 
+    @param:JsonProperty("message", required = true)
     @get:JsonProperty("message", required = true) val message: kotlin.String,
 
+    @param:JsonProperty("type", required = true)
     @get:JsonProperty("type", required = true) val type: kotlin.String
 ) {
 

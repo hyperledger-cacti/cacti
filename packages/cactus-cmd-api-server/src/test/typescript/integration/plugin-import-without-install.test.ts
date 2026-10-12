@@ -22,7 +22,7 @@ describe("ApiServer", () => {
   const instanceId = randomUUID();
   const keychainId = randomUUID();
 
-  it("checks for invalid case of PluginImportAction.Instantiate and PluginImportType.Local", async () => {
+  it("checks for invalid case of PluginImportAction.OrgHyperledgerCactusPluginImportActionInstantiate and PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal", async () => {
     const pluginsPath = path.join(
       __dirname,
       "../../../../../../", // walk back up to the project root
@@ -46,8 +46,9 @@ describe("ApiServer", () => {
 
     const plugin = {
       packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
-      type: PluginImportType.Local,
-      action: PluginImportAction.Instantiate,
+      type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+      action:
+        PluginImportAction.OrgHyperledgerCactusPluginImportActionInstantiate,
       options: {
         instanceId,
         keychainId,
@@ -107,8 +108,9 @@ describe("ApiServer", () => {
     const keychainId = randomUUID();
     const plugin = {
       packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
-      type: PluginImportType.Local,
-      action: PluginImportAction.Instantiate,
+      type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+      action:
+        PluginImportAction.OrgHyperledgerCactusPluginImportActionInstantiate,
       options: {
         instanceId,
         keychainId,
@@ -196,8 +198,9 @@ describe("ApiServer", () => {
     apiSrvOpts.plugins = [
       {
         packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
+        type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+        action:
+          PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
         options: {
           instanceId: randomUUID(),
           keychainId: randomUUID(),

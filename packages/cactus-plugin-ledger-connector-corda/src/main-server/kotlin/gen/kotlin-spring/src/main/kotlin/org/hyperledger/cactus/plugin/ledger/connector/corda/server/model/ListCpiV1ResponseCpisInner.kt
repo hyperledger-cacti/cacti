@@ -25,18 +25,24 @@ import jakarta.validation.Valid
  */
 data class ListCpiV1ResponseCpisInner(
 
+    @param:JsonProperty("cpiFileChecksum")
     @get:JsonProperty("cpiFileChecksum") val cpiFileChecksum: kotlin.String? = null,
 
+    @param:JsonProperty("cpiFileFullChecksum")
     @get:JsonProperty("cpiFileFullChecksum") val cpiFileFullChecksum: kotlin.String? = null,
 
     @field:Valid
+    @param:JsonProperty("cpks")
     @get:JsonProperty("cpks") val cpks: kotlin.collections.List<ListCpiV1ResponseCpisInnerCpksInner>? = null,
 
+    @param:JsonProperty("groupPolicy")
     @get:JsonProperty("groupPolicy") val groupPolicy: kotlin.String? = null,
 
     @field:Valid
+    @param:JsonProperty("id")
     @get:JsonProperty("id") val id: CPIIDV1? = null,
 
+    @param:JsonProperty("timestamp")
     @get:JsonProperty("timestamp") val timestamp: java.time.OffsetDateTime? = null
 ) {
 

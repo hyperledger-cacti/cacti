@@ -9,40 +9,104 @@ import * as dependency_3 from "./../models/health_check_response_pb";
 import * as pb_1 from "google-protobuf";
 import * as grpc_1 from "@grpc/grpc-js";
 export namespace org.hyperledger.cactus.cmd_api_server {
-    export class GetOpenApiSpecV1Response extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            data?: string;
-        }) {
+    export class GetHealthCheckV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3]];
+        constructor(data?: any[] | ({} & (({
+            health_check_response_pb_200?: dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB;
+            cmd_api_server_endpoint_error_response_pb_401?: never;
+            cmd_api_server_endpoint_error_response_pb_403?: never;
+        } | {
+            health_check_response_pb_200?: never;
+            cmd_api_server_endpoint_error_response_pb_401?: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+            cmd_api_server_endpoint_error_response_pb_403?: never;
+        } | {
+            health_check_response_pb_200?: never;
+            cmd_api_server_endpoint_error_response_pb_401?: never;
+            cmd_api_server_endpoint_error_response_pb_403?: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("data" in data && data.data != undefined) {
-                    this.data = data.data;
+                if ("health_check_response_pb_200" in data && data.health_check_response_pb_200 != undefined) {
+                    this.health_check_response_pb_200 = data.health_check_response_pb_200;
+                }
+                if ("cmd_api_server_endpoint_error_response_pb_401" in data && data.cmd_api_server_endpoint_error_response_pb_401 != undefined) {
+                    this.cmd_api_server_endpoint_error_response_pb_401 = data.cmd_api_server_endpoint_error_response_pb_401;
+                }
+                if ("cmd_api_server_endpoint_error_response_pb_403" in data && data.cmd_api_server_endpoint_error_response_pb_403 != undefined) {
+                    this.cmd_api_server_endpoint_error_response_pb_403 = data.cmd_api_server_endpoint_error_response_pb_403;
                 }
             }
         }
-        get data() {
-            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        get health_check_response_pb_200() {
+            return pb_1.Message.getWrapperField(this, dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB, 1) as dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB;
         }
-        set data(value: string) {
-            pb_1.Message.setField(this, 1, value);
+        set health_check_response_pb_200(value: dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_health_check_response_pb_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get cmd_api_server_endpoint_error_response_pb_401() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB, 2) as dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        }
+        set cmd_api_server_endpoint_error_response_pb_401(value: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_cmd_api_server_endpoint_error_response_pb_401() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get cmd_api_server_endpoint_error_response_pb_403() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB, 3) as dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        }
+        set cmd_api_server_endpoint_error_response_pb_403(value: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_cmd_api_server_endpoint_error_response_pb_403() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "health_check_response_pb_200" | "cmd_api_server_endpoint_error_response_pb_401" | "cmd_api_server_endpoint_error_response_pb_403";
+            } = {
+                0: "none",
+                1: "health_check_response_pb_200",
+                2: "cmd_api_server_endpoint_error_response_pb_401",
+                3: "cmd_api_server_endpoint_error_response_pb_403"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3])];
         }
         static fromObject(data: {
-            data?: string;
-        }): GetOpenApiSpecV1Response {
-            const message = new GetOpenApiSpecV1Response({});
-            if (data.data != null) {
-                message.data = data.data;
+            health_check_response_pb_200?: ReturnType<typeof dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB.prototype.toObject>;
+            cmd_api_server_endpoint_error_response_pb_401?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+            cmd_api_server_endpoint_error_response_pb_403?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+        }): GetHealthCheckV1Response {
+            const message = new GetHealthCheckV1Response({});
+            if (data.health_check_response_pb_200 != null) {
+                message.health_check_response_pb_200 = dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB.fromObject(data.health_check_response_pb_200);
+            }
+            if (data.cmd_api_server_endpoint_error_response_pb_401 != null) {
+                message.cmd_api_server_endpoint_error_response_pb_401 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.fromObject(data.cmd_api_server_endpoint_error_response_pb_401);
+            }
+            if (data.cmd_api_server_endpoint_error_response_pb_403 != null) {
+                message.cmd_api_server_endpoint_error_response_pb_403 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.fromObject(data.cmd_api_server_endpoint_error_response_pb_403);
             }
             return message;
         }
         toObject() {
             const data: {
-                data?: string;
+                health_check_response_pb_200?: ReturnType<typeof dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB.prototype.toObject>;
+                cmd_api_server_endpoint_error_response_pb_401?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+                cmd_api_server_endpoint_error_response_pb_403?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
             } = {};
-            if (this.data != null) {
-                data.data = this.data;
+            if (this.health_check_response_pb_200 != null) {
+                data.health_check_response_pb_200 = this.health_check_response_pb_200.toObject();
+            }
+            if (this.cmd_api_server_endpoint_error_response_pb_401 != null) {
+                data.cmd_api_server_endpoint_error_response_pb_401 = this.cmd_api_server_endpoint_error_response_pb_401.toObject();
+            }
+            if (this.cmd_api_server_endpoint_error_response_pb_403 != null) {
+                data.cmd_api_server_endpoint_error_response_pb_403 = this.cmd_api_server_endpoint_error_response_pb_403.toObject();
             }
             return data;
         }
@@ -50,8 +114,153 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.data.length)
-                writer.writeString(1, this.data);
+            if (this.has_health_check_response_pb_200)
+                writer.writeMessage(1, this.health_check_response_pb_200, () => this.health_check_response_pb_200.serialize(writer));
+            if (this.has_cmd_api_server_endpoint_error_response_pb_401)
+                writer.writeMessage(2, this.cmd_api_server_endpoint_error_response_pb_401, () => this.cmd_api_server_endpoint_error_response_pb_401.serialize(writer));
+            if (this.has_cmd_api_server_endpoint_error_response_pb_403)
+                writer.writeMessage(3, this.cmd_api_server_endpoint_error_response_pb_403, () => this.cmd_api_server_endpoint_error_response_pb_403.serialize(writer));
+            if (!w)
+                return writer.getResultBuffer();
+        }
+        static deserialize(bytes: Uint8Array | pb_1.BinaryReader): GetHealthCheckV1Response {
+            const reader = bytes instanceof pb_1.BinaryReader ? bytes : new pb_1.BinaryReader(bytes), message = new GetHealthCheckV1Response();
+            while (reader.nextField()) {
+                if (reader.isEndGroup())
+                    break;
+                switch (reader.getFieldNumber()) {
+                    case 1:
+                        reader.readMessage(message.health_check_response_pb_200, () => message.health_check_response_pb_200 = dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB.deserialize(reader));
+                        break;
+                    case 2:
+                        reader.readMessage(message.cmd_api_server_endpoint_error_response_pb_401, () => message.cmd_api_server_endpoint_error_response_pb_401 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.cmd_api_server_endpoint_error_response_pb_403, () => message.cmd_api_server_endpoint_error_response_pb_403 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.deserialize(reader));
+                        break;
+                    default: reader.skipField();
+                }
+            }
+            return message;
+        }
+        serializeBinary(): Uint8Array {
+            return this.serialize();
+        }
+        static deserializeBinary(bytes: Uint8Array): GetHealthCheckV1Response {
+            return GetHealthCheckV1Response.deserialize(bytes);
+        }
+    }
+    export class GetOpenApiSpecV1Response extends pb_1.Message {
+        #one_of_decls: number[][] = [[1, 2, 3]];
+        constructor(data?: any[] | ({} & (({
+            string_200?: string;
+            cmd_api_server_endpoint_error_response_pb_401?: never;
+            cmd_api_server_endpoint_error_response_pb_403?: never;
+        } | {
+            string_200?: never;
+            cmd_api_server_endpoint_error_response_pb_401?: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+            cmd_api_server_endpoint_error_response_pb_403?: never;
+        } | {
+            string_200?: never;
+            cmd_api_server_endpoint_error_response_pb_401?: never;
+            cmd_api_server_endpoint_error_response_pb_403?: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        })))) {
+            super();
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("string_200" in data && data.string_200 != undefined) {
+                    this.string_200 = data.string_200;
+                }
+                if ("cmd_api_server_endpoint_error_response_pb_401" in data && data.cmd_api_server_endpoint_error_response_pb_401 != undefined) {
+                    this.cmd_api_server_endpoint_error_response_pb_401 = data.cmd_api_server_endpoint_error_response_pb_401;
+                }
+                if ("cmd_api_server_endpoint_error_response_pb_403" in data && data.cmd_api_server_endpoint_error_response_pb_403 != undefined) {
+                    this.cmd_api_server_endpoint_error_response_pb_403 = data.cmd_api_server_endpoint_error_response_pb_403;
+                }
+            }
+        }
+        get string_200() {
+            return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
+        }
+        set string_200(value: string) {
+            pb_1.Message.setOneofField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_string_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get cmd_api_server_endpoint_error_response_pb_401() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB, 2) as dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        }
+        set cmd_api_server_endpoint_error_response_pb_401(value: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_cmd_api_server_endpoint_error_response_pb_401() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get cmd_api_server_endpoint_error_response_pb_403() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB, 3) as dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        }
+        set cmd_api_server_endpoint_error_response_pb_403(value: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_cmd_api_server_endpoint_error_response_pb_403() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "string_200" | "cmd_api_server_endpoint_error_response_pb_401" | "cmd_api_server_endpoint_error_response_pb_403";
+            } = {
+                0: "none",
+                1: "string_200",
+                2: "cmd_api_server_endpoint_error_response_pb_401",
+                3: "cmd_api_server_endpoint_error_response_pb_403"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3])];
+        }
+        static fromObject(data: {
+            string_200?: string;
+            cmd_api_server_endpoint_error_response_pb_401?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+            cmd_api_server_endpoint_error_response_pb_403?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+        }): GetOpenApiSpecV1Response {
+            const message = new GetOpenApiSpecV1Response({});
+            if (data.string_200 != null) {
+                message.string_200 = data.string_200;
+            }
+            if (data.cmd_api_server_endpoint_error_response_pb_401 != null) {
+                message.cmd_api_server_endpoint_error_response_pb_401 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.fromObject(data.cmd_api_server_endpoint_error_response_pb_401);
+            }
+            if (data.cmd_api_server_endpoint_error_response_pb_403 != null) {
+                message.cmd_api_server_endpoint_error_response_pb_403 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.fromObject(data.cmd_api_server_endpoint_error_response_pb_403);
+            }
+            return message;
+        }
+        toObject() {
+            const data: {
+                string_200?: string;
+                cmd_api_server_endpoint_error_response_pb_401?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+                cmd_api_server_endpoint_error_response_pb_403?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+            } = {};
+            if (this.string_200 != null) {
+                data.string_200 = this.string_200;
+            }
+            if (this.cmd_api_server_endpoint_error_response_pb_401 != null) {
+                data.cmd_api_server_endpoint_error_response_pb_401 = this.cmd_api_server_endpoint_error_response_pb_401.toObject();
+            }
+            if (this.cmd_api_server_endpoint_error_response_pb_403 != null) {
+                data.cmd_api_server_endpoint_error_response_pb_403 = this.cmd_api_server_endpoint_error_response_pb_403.toObject();
+            }
+            return data;
+        }
+        serialize(): Uint8Array;
+        serialize(w: pb_1.BinaryWriter): void;
+        serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
+            const writer = w || new pb_1.BinaryWriter();
+            if (this.has_string_200)
+                writer.writeString(1, this.string_200);
+            if (this.has_cmd_api_server_endpoint_error_response_pb_401)
+                writer.writeMessage(2, this.cmd_api_server_endpoint_error_response_pb_401, () => this.cmd_api_server_endpoint_error_response_pb_401.serialize(writer));
+            if (this.has_cmd_api_server_endpoint_error_response_pb_403)
+                writer.writeMessage(3, this.cmd_api_server_endpoint_error_response_pb_403, () => this.cmd_api_server_endpoint_error_response_pb_403.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -62,7 +271,13 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        message.data = reader.readString();
+                        message.string_200 = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.cmd_api_server_endpoint_error_response_pb_401, () => message.cmd_api_server_endpoint_error_response_pb_401 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.cmd_api_server_endpoint_error_response_pb_403, () => message.cmd_api_server_endpoint_error_response_pb_403 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -77,39 +292,103 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         }
     }
     export class GetPrometheusMetricsV1Response extends pb_1.Message {
-        #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {
-            data?: string;
-        }) {
+        #one_of_decls: number[][] = [[1, 2, 3]];
+        constructor(data?: any[] | ({} & (({
+            string_200?: string;
+            cmd_api_server_endpoint_error_response_pb_401?: never;
+            cmd_api_server_endpoint_error_response_pb_403?: never;
+        } | {
+            string_200?: never;
+            cmd_api_server_endpoint_error_response_pb_401?: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+            cmd_api_server_endpoint_error_response_pb_403?: never;
+        } | {
+            string_200?: never;
+            cmd_api_server_endpoint_error_response_pb_401?: never;
+            cmd_api_server_endpoint_error_response_pb_403?: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("data" in data && data.data != undefined) {
-                    this.data = data.data;
+                if ("string_200" in data && data.string_200 != undefined) {
+                    this.string_200 = data.string_200;
+                }
+                if ("cmd_api_server_endpoint_error_response_pb_401" in data && data.cmd_api_server_endpoint_error_response_pb_401 != undefined) {
+                    this.cmd_api_server_endpoint_error_response_pb_401 = data.cmd_api_server_endpoint_error_response_pb_401;
+                }
+                if ("cmd_api_server_endpoint_error_response_pb_403" in data && data.cmd_api_server_endpoint_error_response_pb_403 != undefined) {
+                    this.cmd_api_server_endpoint_error_response_pb_403 = data.cmd_api_server_endpoint_error_response_pb_403;
                 }
             }
         }
-        get data() {
+        get string_200() {
             return pb_1.Message.getFieldWithDefault(this, 1, "") as string;
         }
-        set data(value: string) {
-            pb_1.Message.setField(this, 1, value);
+        set string_200(value: string) {
+            pb_1.Message.setOneofField(this, 1, this.#one_of_decls[0], value);
+        }
+        get has_string_200() {
+            return pb_1.Message.getField(this, 1) != null;
+        }
+        get cmd_api_server_endpoint_error_response_pb_401() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB, 2) as dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        }
+        set cmd_api_server_endpoint_error_response_pb_401(value: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 2, this.#one_of_decls[0], value);
+        }
+        get has_cmd_api_server_endpoint_error_response_pb_401() {
+            return pb_1.Message.getField(this, 2) != null;
+        }
+        get cmd_api_server_endpoint_error_response_pb_403() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB, 3) as dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB;
+        }
+        set cmd_api_server_endpoint_error_response_pb_403(value: dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB) {
+            pb_1.Message.setOneofWrapperField(this, 3, this.#one_of_decls[0], value);
+        }
+        get has_cmd_api_server_endpoint_error_response_pb_403() {
+            return pb_1.Message.getField(this, 3) != null;
+        }
+        get response() {
+            const cases: {
+                [index: number]: "none" | "string_200" | "cmd_api_server_endpoint_error_response_pb_401" | "cmd_api_server_endpoint_error_response_pb_403";
+            } = {
+                0: "none",
+                1: "string_200",
+                2: "cmd_api_server_endpoint_error_response_pb_401",
+                3: "cmd_api_server_endpoint_error_response_pb_403"
+            };
+            return cases[pb_1.Message.computeOneofCase(this, [1, 2, 3])];
         }
         static fromObject(data: {
-            data?: string;
+            string_200?: string;
+            cmd_api_server_endpoint_error_response_pb_401?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+            cmd_api_server_endpoint_error_response_pb_403?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
         }): GetPrometheusMetricsV1Response {
             const message = new GetPrometheusMetricsV1Response({});
-            if (data.data != null) {
-                message.data = data.data;
+            if (data.string_200 != null) {
+                message.string_200 = data.string_200;
+            }
+            if (data.cmd_api_server_endpoint_error_response_pb_401 != null) {
+                message.cmd_api_server_endpoint_error_response_pb_401 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.fromObject(data.cmd_api_server_endpoint_error_response_pb_401);
+            }
+            if (data.cmd_api_server_endpoint_error_response_pb_403 != null) {
+                message.cmd_api_server_endpoint_error_response_pb_403 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.fromObject(data.cmd_api_server_endpoint_error_response_pb_403);
             }
             return message;
         }
         toObject() {
             const data: {
-                data?: string;
+                string_200?: string;
+                cmd_api_server_endpoint_error_response_pb_401?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
+                cmd_api_server_endpoint_error_response_pb_403?: ReturnType<typeof dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.prototype.toObject>;
             } = {};
-            if (this.data != null) {
-                data.data = this.data;
+            if (this.string_200 != null) {
+                data.string_200 = this.string_200;
+            }
+            if (this.cmd_api_server_endpoint_error_response_pb_401 != null) {
+                data.cmd_api_server_endpoint_error_response_pb_401 = this.cmd_api_server_endpoint_error_response_pb_401.toObject();
+            }
+            if (this.cmd_api_server_endpoint_error_response_pb_403 != null) {
+                data.cmd_api_server_endpoint_error_response_pb_403 = this.cmd_api_server_endpoint_error_response_pb_403.toObject();
             }
             return data;
         }
@@ -117,8 +396,12 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.data.length)
-                writer.writeString(1, this.data);
+            if (this.has_string_200)
+                writer.writeString(1, this.string_200);
+            if (this.has_cmd_api_server_endpoint_error_response_pb_401)
+                writer.writeMessage(2, this.cmd_api_server_endpoint_error_response_pb_401, () => this.cmd_api_server_endpoint_error_response_pb_401.serialize(writer));
+            if (this.has_cmd_api_server_endpoint_error_response_pb_403)
+                writer.writeMessage(3, this.cmd_api_server_endpoint_error_response_pb_403, () => this.cmd_api_server_endpoint_error_response_pb_403.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -129,7 +412,13 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                     break;
                 switch (reader.getFieldNumber()) {
                     case 1:
-                        message.data = reader.readString();
+                        message.string_200 = reader.readString();
+                        break;
+                    case 2:
+                        reader.readMessage(message.cmd_api_server_endpoint_error_response_pb_401, () => message.cmd_api_server_endpoint_error_response_pb_401 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.deserialize(reader));
+                        break;
+                    case 3:
+                        reader.readMessage(message.cmd_api_server_endpoint_error_response_pb_403, () => message.cmd_api_server_endpoint_error_response_pb_403 = dependency_2.org.hyperledger.cactus.cmd_api_server.CmdApiServerEndpointErrorResponsePB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }
@@ -175,8 +464,8 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                 responseStream: false,
                 requestSerialize: (message: dependency_1.google.protobuf.Empty) => Buffer.from(message.serialize()),
                 requestDeserialize: (bytes: Buffer) => dependency_1.google.protobuf.Empty.deserialize(new Uint8Array(bytes)),
-                responseSerialize: (message: dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB) => Buffer.from(message.serialize()),
-                responseDeserialize: (bytes: Buffer) => dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB.deserialize(new Uint8Array(bytes))
+                responseSerialize: (message: GetHealthCheckV1Response) => Buffer.from(message.serialize()),
+                responseDeserialize: (bytes: Buffer) => GetHealthCheckV1Response.deserialize(new Uint8Array(bytes))
             },
             GetOpenApiSpecV1: {
                 path: "/org.hyperledger.cactus.cmd_api_server.DefaultService/GetOpenApiSpecV1",
@@ -198,7 +487,7 @@ export namespace org.hyperledger.cactus.cmd_api_server {
             }
         };
         [method: string]: grpc_1.UntypedHandleCall;
-        abstract GetHealthCheckV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, callback: grpc_1.sendUnaryData<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>): void;
+        abstract GetHealthCheckV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, GetHealthCheckV1Response>, callback: grpc_1.sendUnaryData<GetHealthCheckV1Response>): void;
         abstract GetOpenApiSpecV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, GetOpenApiSpecV1Response>, callback: grpc_1.sendUnaryData<GetOpenApiSpecV1Response>): void;
         abstract GetPrometheusMetricsV1(call: grpc_1.ServerUnaryCall<dependency_1.google.protobuf.Empty, GetPrometheusMetricsV1Response>, callback: grpc_1.sendUnaryData<GetPrometheusMetricsV1Response>): void;
     }
@@ -206,7 +495,7 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         constructor(address: string, credentials: grpc_1.ChannelCredentials, options?: Partial<grpc_1.ChannelOptions>) {
             super(address, credentials, options);
         }
-        GetHealthCheckV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, options?: grpc_1.CallOptions | grpc_1.requestCallback<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>, callback?: grpc_1.requestCallback<dependency_3.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>): grpc_1.ClientUnaryCall => {
+        GetHealthCheckV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, GetHealthCheckV1Response> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetHealthCheckV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetHealthCheckV1Response>, callback?: grpc_1.requestCallback<GetHealthCheckV1Response>): grpc_1.ClientUnaryCall => {
             return super.GetHealthCheckV1(message, metadata, options, callback);
         };
         GetOpenApiSpecV1: GrpcUnaryServiceInterface<dependency_1.google.protobuf.Empty, GetOpenApiSpecV1Response> = (message: dependency_1.google.protobuf.Empty, metadata: grpc_1.Metadata | grpc_1.CallOptions | grpc_1.requestCallback<GetOpenApiSpecV1Response>, options?: grpc_1.CallOptions | grpc_1.requestCallback<GetOpenApiSpecV1Response>, callback?: grpc_1.requestCallback<GetOpenApiSpecV1Response>): grpc_1.ClientUnaryCall => {

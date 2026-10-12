@@ -21,7 +21,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             }
         }
         get type() {
-            return pb_1.Message.getFieldWithDefault(this, 3575610, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.Web3SigningCredentialTypePB_CACTUS_KEYCHAIN_REF) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
+            return pb_1.Message.getFieldWithDefault(this, 3575610, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.WEB3_SIGNING_CREDENTIAL_TYPE_P_B_CACTUS_KEYCHAIN_REF) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB;
         }
         set type(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB) {
             pb_1.Message.setField(this, 3575610, value);
@@ -48,7 +48,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.type != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.Web3SigningCredentialTypePB_CACTUS_KEYCHAIN_REF)
+            if (this.type != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3SigningCredentialTypePB.WEB3_SIGNING_CREDENTIAL_TYPE_P_B_CACTUS_KEYCHAIN_REF)
                 writer.writeEnum(3575610, this.type);
             if (!w)
                 return writer.getResultBuffer();

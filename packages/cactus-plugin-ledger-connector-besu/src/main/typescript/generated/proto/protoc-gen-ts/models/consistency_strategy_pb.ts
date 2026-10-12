@@ -10,73 +10,73 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class ConsistencyStrategyPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            receiptType?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
-            timeoutMs?: number;
-            blockConfirmations?: number;
+            receipt_type?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
+            timeout_ms?: number;
+            block_confirmations?: number;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("receiptType" in data && data.receiptType != undefined) {
-                    this.receiptType = data.receiptType;
+                if ("receipt_type" in data && data.receipt_type != undefined) {
+                    this.receipt_type = data.receipt_type;
                 }
-                if ("timeoutMs" in data && data.timeoutMs != undefined) {
-                    this.timeoutMs = data.timeoutMs;
+                if ("timeout_ms" in data && data.timeout_ms != undefined) {
+                    this.timeout_ms = data.timeout_ms;
                 }
-                if ("blockConfirmations" in data && data.blockConfirmations != undefined) {
-                    this.blockConfirmations = data.blockConfirmations;
+                if ("block_confirmations" in data && data.block_confirmations != undefined) {
+                    this.block_confirmations = data.block_confirmations;
                 }
             }
         }
-        get receiptType() {
-            return pb_1.Message.getFieldWithDefault(this, 423008661, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB.ReceiptTypePB_NODE_TX_POOL_ACK) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
+        get receipt_type() {
+            return pb_1.Message.getFieldWithDefault(this, 298485537, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB.RECEIPT_TYPE_P_B_NODE_TX_POOL_ACK) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
         }
-        set receiptType(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB) {
-            pb_1.Message.setField(this, 423008661, value);
+        set receipt_type(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB) {
+            pb_1.Message.setField(this, 298485537, value);
         }
-        get timeoutMs() {
-            return pb_1.Message.getFieldWithDefault(this, 51479271, 0) as number;
+        get timeout_ms() {
+            return pb_1.Message.getFieldWithDefault(this, 522132806, 0) as number;
         }
-        set timeoutMs(value: number) {
-            pb_1.Message.setField(this, 51479271, value);
+        set timeout_ms(value: number) {
+            pb_1.Message.setField(this, 522132806, value);
         }
-        get blockConfirmations() {
-            return pb_1.Message.getFieldWithDefault(this, 207555762, 0) as number;
+        get block_confirmations() {
+            return pb_1.Message.getFieldWithDefault(this, 76224175, 0) as number;
         }
-        set blockConfirmations(value: number) {
-            pb_1.Message.setField(this, 207555762, value);
+        set block_confirmations(value: number) {
+            pb_1.Message.setField(this, 76224175, value);
         }
         static fromObject(data: {
-            receiptType?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
-            timeoutMs?: number;
-            blockConfirmations?: number;
+            receipt_type?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
+            timeout_ms?: number;
+            block_confirmations?: number;
         }): ConsistencyStrategyPB {
             const message = new ConsistencyStrategyPB({});
-            if (data.receiptType != null) {
-                message.receiptType = data.receiptType;
+            if (data.receipt_type != null) {
+                message.receipt_type = data.receipt_type;
             }
-            if (data.timeoutMs != null) {
-                message.timeoutMs = data.timeoutMs;
+            if (data.timeout_ms != null) {
+                message.timeout_ms = data.timeout_ms;
             }
-            if (data.blockConfirmations != null) {
-                message.blockConfirmations = data.blockConfirmations;
+            if (data.block_confirmations != null) {
+                message.block_confirmations = data.block_confirmations;
             }
             return message;
         }
         toObject() {
             const data: {
-                receiptType?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
-                timeoutMs?: number;
-                blockConfirmations?: number;
+                receipt_type?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB;
+                timeout_ms?: number;
+                block_confirmations?: number;
             } = {};
-            if (this.receiptType != null) {
-                data.receiptType = this.receiptType;
+            if (this.receipt_type != null) {
+                data.receipt_type = this.receipt_type;
             }
-            if (this.timeoutMs != null) {
-                data.timeoutMs = this.timeoutMs;
+            if (this.timeout_ms != null) {
+                data.timeout_ms = this.timeout_ms;
             }
-            if (this.blockConfirmations != null) {
-                data.blockConfirmations = this.blockConfirmations;
+            if (this.block_confirmations != null) {
+                data.block_confirmations = this.block_confirmations;
             }
             return data;
         }
@@ -84,12 +84,12 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.receiptType != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB.ReceiptTypePB_NODE_TX_POOL_ACK)
-                writer.writeEnum(423008661, this.receiptType);
-            if (this.timeoutMs != 0)
-                writer.writeInt32(51479271, this.timeoutMs);
-            if (this.blockConfirmations != 0)
-                writer.writeInt32(207555762, this.blockConfirmations);
+            if (this.receipt_type != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.ReceiptTypePB.RECEIPT_TYPE_P_B_NODE_TX_POOL_ACK)
+                writer.writeEnum(298485537, this.receipt_type);
+            if (this.timeout_ms != 0)
+                writer.writeInt32(522132806, this.timeout_ms);
+            if (this.block_confirmations != 0)
+                writer.writeInt32(76224175, this.block_confirmations);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -99,14 +99,14 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 423008661:
-                        message.receiptType = reader.readEnum();
+                    case 298485537:
+                        message.receipt_type = reader.readEnum();
                         break;
-                    case 51479271:
-                        message.timeoutMs = reader.readInt32();
+                    case 522132806:
+                        message.timeout_ms = reader.readInt32();
                         break;
-                    case 207555762:
-                        message.blockConfirmations = reader.readInt32();
+                    case 76224175:
+                        message.block_confirmations = reader.readInt32();
                         break;
                     default: reader.skipField();
                 }

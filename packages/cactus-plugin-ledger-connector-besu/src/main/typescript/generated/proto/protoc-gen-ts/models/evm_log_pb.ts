@@ -11,12 +11,12 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         constructor(data?: any[] | {
             address?: string;
             data?: string;
-            blockHash?: string;
-            transactionHash?: string;
+            block_hash?: string;
+            transaction_hash?: string;
             topics?: string[];
-            logIndex?: number;
-            transactionIndex?: number;
-            blockNumber?: number;
+            log_index?: number;
+            transaction_index?: number;
+            block_number?: number;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [331163357], this.#one_of_decls);
@@ -27,23 +27,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if ("data" in data && data.data != undefined) {
                     this.data = data.data;
                 }
-                if ("blockHash" in data && data.blockHash != undefined) {
-                    this.blockHash = data.blockHash;
+                if ("block_hash" in data && data.block_hash != undefined) {
+                    this.block_hash = data.block_hash;
                 }
-                if ("transactionHash" in data && data.transactionHash != undefined) {
-                    this.transactionHash = data.transactionHash;
+                if ("transaction_hash" in data && data.transaction_hash != undefined) {
+                    this.transaction_hash = data.transaction_hash;
                 }
                 if ("topics" in data && data.topics != undefined) {
                     this.topics = data.topics;
                 }
-                if ("logIndex" in data && data.logIndex != undefined) {
-                    this.logIndex = data.logIndex;
+                if ("log_index" in data && data.log_index != undefined) {
+                    this.log_index = data.log_index;
                 }
-                if ("transactionIndex" in data && data.transactionIndex != undefined) {
-                    this.transactionIndex = data.transactionIndex;
+                if ("transaction_index" in data && data.transaction_index != undefined) {
+                    this.transaction_index = data.transaction_index;
                 }
-                if ("blockNumber" in data && data.blockNumber != undefined) {
-                    this.blockNumber = data.blockNumber;
+                if ("block_number" in data && data.block_number != undefined) {
+                    this.block_number = data.block_number;
                 }
             }
         }
@@ -59,17 +59,17 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set data(value: string) {
             pb_1.Message.setField(this, 3076010, value);
         }
-        get blockHash() {
-            return pb_1.Message.getFieldWithDefault(this, 335211324, "") as string;
+        get block_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 212436354, "") as string;
         }
-        set blockHash(value: string) {
-            pb_1.Message.setField(this, 335211324, value);
+        set block_hash(value: string) {
+            pb_1.Message.setField(this, 212436354, value);
         }
-        get transactionHash() {
-            return pb_1.Message.getFieldWithDefault(this, 188901646, "") as string;
+        get transaction_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 508674511, "") as string;
         }
-        set transactionHash(value: string) {
-            pb_1.Message.setField(this, 188901646, value);
+        set transaction_hash(value: string) {
+            pb_1.Message.setField(this, 508674511, value);
         }
         get topics() {
             return pb_1.Message.getFieldWithDefault(this, 331163357, []) as string[];
@@ -77,33 +77,33 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set topics(value: string[]) {
             pb_1.Message.setField(this, 331163357, value);
         }
-        get logIndex() {
-            return pb_1.Message.getFieldWithDefault(this, 382599153, 0) as number;
+        get log_index() {
+            return pb_1.Message.getFieldWithDefault(this, 398808044, 0) as number;
         }
-        set logIndex(value: number) {
-            pb_1.Message.setField(this, 382599153, value);
+        set log_index(value: number) {
+            pb_1.Message.setField(this, 398808044, value);
         }
-        get transactionIndex() {
-            return pb_1.Message.getFieldWithDefault(this, 488538260, 0) as number;
+        get transaction_index() {
+            return pb_1.Message.getFieldWithDefault(this, 335921105, 0) as number;
         }
-        set transactionIndex(value: number) {
-            pb_1.Message.setField(this, 488538260, value);
+        set transaction_index(value: number) {
+            pb_1.Message.setField(this, 335921105, value);
         }
-        get blockNumber() {
-            return pb_1.Message.getFieldWithDefault(this, 205598263, 0) as number;
+        get block_number() {
+            return pb_1.Message.getFieldWithDefault(this, 206419142, 0) as number;
         }
-        set blockNumber(value: number) {
-            pb_1.Message.setField(this, 205598263, value);
+        set block_number(value: number) {
+            pb_1.Message.setField(this, 206419142, value);
         }
         static fromObject(data: {
             address?: string;
             data?: string;
-            blockHash?: string;
-            transactionHash?: string;
+            block_hash?: string;
+            transaction_hash?: string;
             topics?: string[];
-            logIndex?: number;
-            transactionIndex?: number;
-            blockNumber?: number;
+            log_index?: number;
+            transaction_index?: number;
+            block_number?: number;
         }): EvmLogPB {
             const message = new EvmLogPB({});
             if (data.address != null) {
@@ -112,23 +112,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (data.data != null) {
                 message.data = data.data;
             }
-            if (data.blockHash != null) {
-                message.blockHash = data.blockHash;
+            if (data.block_hash != null) {
+                message.block_hash = data.block_hash;
             }
-            if (data.transactionHash != null) {
-                message.transactionHash = data.transactionHash;
+            if (data.transaction_hash != null) {
+                message.transaction_hash = data.transaction_hash;
             }
             if (data.topics != null) {
                 message.topics = data.topics;
             }
-            if (data.logIndex != null) {
-                message.logIndex = data.logIndex;
+            if (data.log_index != null) {
+                message.log_index = data.log_index;
             }
-            if (data.transactionIndex != null) {
-                message.transactionIndex = data.transactionIndex;
+            if (data.transaction_index != null) {
+                message.transaction_index = data.transaction_index;
             }
-            if (data.blockNumber != null) {
-                message.blockNumber = data.blockNumber;
+            if (data.block_number != null) {
+                message.block_number = data.block_number;
             }
             return message;
         }
@@ -136,12 +136,12 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             const data: {
                 address?: string;
                 data?: string;
-                blockHash?: string;
-                transactionHash?: string;
+                block_hash?: string;
+                transaction_hash?: string;
                 topics?: string[];
-                logIndex?: number;
-                transactionIndex?: number;
-                blockNumber?: number;
+                log_index?: number;
+                transaction_index?: number;
+                block_number?: number;
             } = {};
             if (this.address != null) {
                 data.address = this.address;
@@ -149,23 +149,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (this.data != null) {
                 data.data = this.data;
             }
-            if (this.blockHash != null) {
-                data.blockHash = this.blockHash;
+            if (this.block_hash != null) {
+                data.block_hash = this.block_hash;
             }
-            if (this.transactionHash != null) {
-                data.transactionHash = this.transactionHash;
+            if (this.transaction_hash != null) {
+                data.transaction_hash = this.transaction_hash;
             }
             if (this.topics != null) {
                 data.topics = this.topics;
             }
-            if (this.logIndex != null) {
-                data.logIndex = this.logIndex;
+            if (this.log_index != null) {
+                data.log_index = this.log_index;
             }
-            if (this.transactionIndex != null) {
-                data.transactionIndex = this.transactionIndex;
+            if (this.transaction_index != null) {
+                data.transaction_index = this.transaction_index;
             }
-            if (this.blockNumber != null) {
-                data.blockNumber = this.blockNumber;
+            if (this.block_number != null) {
+                data.block_number = this.block_number;
             }
             return data;
         }
@@ -177,18 +177,18 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 writer.writeString(73950222, this.address);
             if (this.data.length)
                 writer.writeString(3076010, this.data);
-            if (this.blockHash.length)
-                writer.writeString(335211324, this.blockHash);
-            if (this.transactionHash.length)
-                writer.writeString(188901646, this.transactionHash);
+            if (this.block_hash.length)
+                writer.writeString(212436354, this.block_hash);
+            if (this.transaction_hash.length)
+                writer.writeString(508674511, this.transaction_hash);
             if (this.topics.length)
                 writer.writeRepeatedString(331163357, this.topics);
-            if (this.logIndex != 0)
-                writer.writeFloat(382599153, this.logIndex);
-            if (this.transactionIndex != 0)
-                writer.writeFloat(488538260, this.transactionIndex);
-            if (this.blockNumber != 0)
-                writer.writeFloat(205598263, this.blockNumber);
+            if (this.log_index != 0)
+                writer.writeFloat(398808044, this.log_index);
+            if (this.transaction_index != 0)
+                writer.writeFloat(335921105, this.transaction_index);
+            if (this.block_number != 0)
+                writer.writeFloat(206419142, this.block_number);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -204,23 +204,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                     case 3076010:
                         message.data = reader.readString();
                         break;
-                    case 335211324:
-                        message.blockHash = reader.readString();
+                    case 212436354:
+                        message.block_hash = reader.readString();
                         break;
-                    case 188901646:
-                        message.transactionHash = reader.readString();
+                    case 508674511:
+                        message.transaction_hash = reader.readString();
                         break;
                     case 331163357:
                         pb_1.Message.addToRepeatedField(message, 331163357, reader.readString());
                         break;
-                    case 382599153:
-                        message.logIndex = reader.readFloat();
+                    case 398808044:
+                        message.log_index = reader.readFloat();
                         break;
-                    case 488538260:
-                        message.transactionIndex = reader.readFloat();
+                    case 335921105:
+                        message.transaction_index = reader.readFloat();
                         break;
-                    case 205598263:
-                        message.blockNumber = reader.readFloat();
+                    case 206419142:
+                        message.block_number = reader.readFloat();
                         break;
                     default: reader.skipField();
                 }

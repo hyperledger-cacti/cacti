@@ -12,6 +12,8 @@ package cactus-plugin-htlc-eth-besu
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the Web3SigningCredentialCactusKeychainRef type satisfies the MappedNullable interface at compile time
@@ -27,6 +29,8 @@ type Web3SigningCredentialCactusKeychainRef struct {
 	// The keychain ID to use when looking up the the keychain plugin instance that will be used to retrieve the secret pointed to by the keychainEntryKey parameter.
 	KeychainId string `json:"keychainId"`
 }
+
+type _Web3SigningCredentialCactusKeychainRef Web3SigningCredentialCactusKeychainRef
 
 // NewWeb3SigningCredentialCactusKeychainRef instantiates a new Web3SigningCredentialCactusKeychainRef object
 // This constructor will assign default values to properties that have it defined,
@@ -160,6 +164,46 @@ func (o Web3SigningCredentialCactusKeychainRef) ToMap() (map[string]interface{},
 	toSerialize["keychainEntryKey"] = o.KeychainEntryKey
 	toSerialize["keychainId"] = o.KeychainId
 	return toSerialize, nil
+}
+
+func (o *Web3SigningCredentialCactusKeychainRef) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"type",
+		"ethAccount",
+		"keychainEntryKey",
+		"keychainId",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varWeb3SigningCredentialCactusKeychainRef := _Web3SigningCredentialCactusKeychainRef{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varWeb3SigningCredentialCactusKeychainRef)
+
+	if err != nil {
+		return err
+	}
+
+	*o = Web3SigningCredentialCactusKeychainRef(varWeb3SigningCredentialCactusKeychainRef)
+
+	return err
 }
 
 type NullableWeb3SigningCredentialCactusKeychainRef struct {

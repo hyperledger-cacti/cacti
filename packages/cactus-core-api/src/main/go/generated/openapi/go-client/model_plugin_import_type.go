@@ -20,8 +20,8 @@ type PluginImportType string
 
 // List of PluginImportType
 const (
-	LOCAL PluginImportType = "org.hyperledger.cactus.plugin_import_type.LOCAL"
-	REMOTE PluginImportType = "org.hyperledger.cactus.plugin_import_type.REMOTE"
+	ORG_HYPERLEDGER_CACTUS_PLUGIN_IMPORT_TYPE_LOCAL PluginImportType = "org.hyperledger.cactus.plugin_import_type.LOCAL"
+	ORG_HYPERLEDGER_CACTUS_PLUGIN_IMPORT_TYPE_REMOTE PluginImportType = "org.hyperledger.cactus.plugin_import_type.REMOTE"
 )
 
 // All allowed values of PluginImportType enum

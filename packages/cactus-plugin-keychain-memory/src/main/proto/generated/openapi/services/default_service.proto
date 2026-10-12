@@ -23,43 +23,77 @@ import "models/set_keychain_entry_request_v1_pb.proto";
 import "models/set_keychain_entry_response_v1_pb.proto";
 
 service DefaultService {
-  rpc DeleteKeychainEntryV1 (DeleteKeychainEntryV1Request) returns (DeleteKeychainEntryResponseV1PB);
+  rpc DeleteKeychainEntryV1 (DeleteKeychainEntryV1Request) returns (DeleteKeychainEntryV1Response);
 
-  rpc GetKeychainEntryV1 (GetKeychainEntryV1Request) returns (GetKeychainEntryResponseV1PB);
+  rpc GetKeychainEntryV1 (GetKeychainEntryV1Request) returns (GetKeychainEntryV1Response);
 
   rpc GetPrometheusMetricsV1 (google.protobuf.Empty) returns (GetPrometheusMetricsV1Response);
 
-  rpc HasKeychainEntryV1 (HasKeychainEntryV1Request) returns (HasKeychainEntryResponseV1PB);
+  rpc HasKeychainEntryV1 (HasKeychainEntryV1Request) returns (HasKeychainEntryV1Response);
 
-  rpc SetKeychainEntryV1 (SetKeychainEntryV1Request) returns (SetKeychainEntryResponseV1PB);
+  rpc SetKeychainEntryV1 (SetKeychainEntryV1Request) returns (SetKeychainEntryV1Response);
 
 }
 
 message DeleteKeychainEntryV1Request {
   // Request body to delete a keychain entry via its key
-  DeleteKeychainEntryRequestV1PB deleteKeychainEntryRequestV1PB = 1;
+  DeleteKeychainEntryRequestV1PB delete_keychain_entry_request_v1_pb = 1;
 
 }
 
+message DeleteKeychainEntryV1Response {
+    oneof response {
+        DeleteKeychainEntryResponseV1PB delete_keychain_entry_response_v1_pb_200 = 1;
+        google.protobuf.Empty empty_400 = 2;
+        google.protobuf.Empty empty_401 = 3;
+        google.protobuf.Empty empty_500 = 4;
+    }
+}
 message GetKeychainEntryV1Request {
   // Request body to obtain a keychain entry via its key
-  GetKeychainEntryRequestV1PB getKeychainEntryRequestV1PB = 1;
+  GetKeychainEntryRequestV1PB get_keychain_entry_request_v1_pb = 1;
 
 }
 
+message GetKeychainEntryV1Response {
+    oneof response {
+        GetKeychainEntryResponseV1PB get_keychain_entry_response_v1_pb_200 = 1;
+        google.protobuf.Empty empty_400 = 2;
+        google.protobuf.Empty empty_401 = 3;
+        google.protobuf.Empty empty_404 = 4;
+        google.protobuf.Empty empty_500 = 5;
+    }
+}
 message GetPrometheusMetricsV1Response {
-  string data = 1;
+    oneof response {
+        string string_200 = 1;
+    }
 }
-
 message HasKeychainEntryV1Request {
   // Request body for checking a keychain entry via its key
-  HasKeychainEntryRequestV1PB hasKeychainEntryRequestV1PB = 1;
+  HasKeychainEntryRequestV1PB has_keychain_entry_request_v1_pb = 1;
 
 }
 
+message HasKeychainEntryV1Response {
+    oneof response {
+        HasKeychainEntryResponseV1PB has_keychain_entry_response_v1_pb_200 = 1;
+        google.protobuf.Empty empty_400 = 2;
+        google.protobuf.Empty empty_401 = 3;
+        google.protobuf.Empty empty_500 = 4;
+    }
+}
 message SetKeychainEntryV1Request {
   // Request body to write/update a keychain entry via its key
-  SetKeychainEntryRequestV1PB setKeychainEntryRequestV1PB = 1;
+  SetKeychainEntryRequestV1PB set_keychain_entry_request_v1_pb = 1;
 
 }
 
+message SetKeychainEntryV1Response {
+    oneof response {
+        SetKeychainEntryResponseV1PB set_keychain_entry_response_v1_pb_200 = 1;
+        google.protobuf.Empty empty_400 = 2;
+        google.protobuf.Empty empty_401 = 3;
+        google.protobuf.Empty empty_500 = 4;
+    }
+}

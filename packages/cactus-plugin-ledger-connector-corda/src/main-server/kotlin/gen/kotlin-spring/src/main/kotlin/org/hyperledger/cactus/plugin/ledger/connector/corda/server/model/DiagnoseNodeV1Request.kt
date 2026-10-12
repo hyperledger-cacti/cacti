@@ -19,6 +19,7 @@ import jakarta.validation.Valid
 data class DiagnoseNodeV1Request(
 
     @get:Size(min=0,max=1024) 
+    @param:JsonProperty("nodeIds")
     @get:JsonProperty("nodeIds") val nodeIds: kotlin.collections.List<kotlin.String>? = arrayListOf()
 ) {
 

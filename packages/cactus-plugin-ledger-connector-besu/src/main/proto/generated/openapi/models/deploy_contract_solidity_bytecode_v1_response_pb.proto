@@ -18,6 +18,6 @@ import "models/web3_transaction_receipt_pb.proto";
 
 message DeployContractSolidityBytecodeV1ResponsePB {
 
-  Web3TransactionReceiptPB transactionReceipt = 472834426;
+  Web3TransactionReceiptPB transaction_receipt = 51981786;
 
 }

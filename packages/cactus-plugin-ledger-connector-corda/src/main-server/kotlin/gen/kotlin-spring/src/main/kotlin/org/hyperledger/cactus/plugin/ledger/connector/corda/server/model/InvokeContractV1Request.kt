@@ -1,6 +1,7 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.model
 
 import java.util.Objects
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.FlowInvocationType
@@ -25,15 +26,19 @@ import jakarta.validation.Valid
 data class InvokeContractV1Request(
 
     @get:Size(min=1,max=1024)
+    @param:JsonProperty("flowFullClassName", required = true)
     @get:JsonProperty("flowFullClassName", required = true) val flowFullClassName: kotlin.String,
 
     @field:Valid
+    @param:JsonProperty("flowInvocationType", required = true)
     @get:JsonProperty("flowInvocationType", required = true) val flowInvocationType: FlowInvocationType,
 
     @field:Valid
+    @param:JsonProperty("params", required = true)
     @get:JsonProperty("params", required = true) val params: kotlin.collections.List<JvmObject> = arrayListOf(),
 
-    @get:Min(0)
+    @get:Min(value=0)
+    @param:JsonProperty("timeoutMs")
     @get:JsonProperty("timeoutMs") val timeoutMs: kotlin.Int? = 60000
 ) {
 

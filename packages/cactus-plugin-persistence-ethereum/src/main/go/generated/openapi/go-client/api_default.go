@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiGetStatusV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetStatusV1Request) Execute() (*StatusResponseV1, *http.Response, error) {
@@ -37,7 +37,7 @@ GetStatusV1 Get the status of persistence plugin for ethereum
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetStatusV1Request
 */
-func (a *DefaultApiService) GetStatusV1(ctx context.Context) ApiGetStatusV1Request {
+func (a *DefaultAPIService) GetStatusV1(ctx context.Context) ApiGetStatusV1Request {
 	return ApiGetStatusV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -46,7 +46,7 @@ func (a *DefaultApiService) GetStatusV1(ctx context.Context) ApiGetStatusV1Reque
 
 // Execute executes the request
 //  @return StatusResponseV1
-func (a *DefaultApiService) GetStatusV1Execute(r ApiGetStatusV1Request) (*StatusResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) GetStatusV1Execute(r ApiGetStatusV1Request) (*StatusResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -54,7 +54,7 @@ func (a *DefaultApiService) GetStatusV1Execute(r ApiGetStatusV1Request) (*Status
 		localVarReturnValue  *StatusResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetStatusV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetStatusV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

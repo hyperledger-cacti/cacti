@@ -20,6 +20,7 @@ import jakarta.validation.Valid
 data class FlowStatusV1Responses(
 
     @field:Valid
+    @param:JsonProperty("flowStatusResponses")
     @get:JsonProperty("flowStatusResponses") val flowStatusResponses: kotlin.collections.List<FlowStatusV1ResponsesFlowStatusResponsesInner>? = null
 ) {
 

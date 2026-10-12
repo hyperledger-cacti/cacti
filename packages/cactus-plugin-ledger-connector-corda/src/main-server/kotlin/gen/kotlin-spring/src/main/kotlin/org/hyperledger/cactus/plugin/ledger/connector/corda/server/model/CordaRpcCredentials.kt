@@ -22,16 +22,20 @@ import jakarta.validation.Valid
 data class CordaRpcCredentials(
 
     @get:Size(min=1,max=65535)
+    @param:JsonProperty("hostname", required = true)
     @get:JsonProperty("hostname", required = true) val hostname: kotlin.String,
 
-    @get:Min(1)
-    @get:Max(65535)
+    @get:Min(value=1)
+    @get:Max(value=65535)
+    @param:JsonProperty("port", required = true)
     @get:JsonProperty("port", required = true) val port: kotlin.Int,
 
     @get:Size(min=1,max=1024)
+    @param:JsonProperty("username", required = true)
     @get:JsonProperty("username", required = true) val username: kotlin.String,
 
     @get:Size(min=1,max=65535)
+    @param:JsonProperty("password", required = true)
     @get:JsonProperty("password", required = true) val password: kotlin.String
 ) {
 

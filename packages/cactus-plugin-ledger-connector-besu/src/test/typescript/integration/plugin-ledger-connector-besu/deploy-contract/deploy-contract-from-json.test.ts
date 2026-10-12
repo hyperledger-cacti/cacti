@@ -57,7 +57,8 @@ describe("PluginLedgerConnectorBesu", () => {
   });
 
   const factory = new PluginFactoryLedgerConnector({
-    pluginImportType: PluginImportType.Local,
+    pluginImportType:
+      PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
   });
 
   const expressApp = express();

@@ -1,6 +1,7 @@
 package org.hyperledger.cactus.plugin.ledger.connector.corda.server.model
 
 import java.util.Objects
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonValue
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.JvmType
@@ -25,15 +26,19 @@ import jakarta.validation.Valid
 data class JvmObject(
 
     @field:Valid
+    @param:JsonProperty("jvmTypeKind", required = true)
     @get:JsonProperty("jvmTypeKind", required = true) val jvmTypeKind: JvmTypeKind,
 
     @field:Valid
+    @param:JsonProperty("jvmType", required = true)
     @get:JsonProperty("jvmType", required = true) val jvmType: JvmType,
 
     @field:Valid
+    @param:JsonProperty("primitiveValue")
     @get:JsonProperty("primitiveValue") val primitiveValue: kotlin.Any? = null,
 
     @field:Valid
+    @param:JsonProperty("jvmCtorArgs")
     @get:JsonProperty("jvmCtorArgs") val jvmCtorArgs: kotlin.collections.List<JvmObject>? = arrayListOf()
 ) {
 

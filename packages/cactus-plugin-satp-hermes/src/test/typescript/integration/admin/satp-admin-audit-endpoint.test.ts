@@ -60,7 +60,8 @@ describe("Audit Endpoint Integration Tests", () => {
     await repository.getAuditEntriesTable().del();
 
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 

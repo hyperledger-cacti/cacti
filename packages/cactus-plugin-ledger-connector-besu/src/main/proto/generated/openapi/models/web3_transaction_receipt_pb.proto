@@ -19,17 +19,17 @@ message Web3TransactionReceiptPB {
 
   bool status = 355610639;
 
-  string transactionHash = 188901646;
+  string transaction_hash = 508674511;
 
-  float transactionIndex = 488538260;
+  float transaction_index = 335921105;
 
-  string blockHash = 335211324;
+  string block_hash = 212436354;
 
-  float blockNumber = 205598263;
+  float block_number = 206419142;
 
-  float gasUsed = 190522826;
+  float gas_used = 528190111;
 
-  optional string contractAddress = 214641282;
+  optional string contract_address = 428548551;
 
   string from = 3151786;
 

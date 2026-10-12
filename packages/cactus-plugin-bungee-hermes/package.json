@@ -70,7 +70,7 @@
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "3.0.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum": "3.0.1",
     "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric": "3.0.1",
-    "axios": "1.18.1",
+    "axios": "patch:axios@npm%3A1.20.0#~/.yarn/patches/axios-npm-1.20.0-0de8ee0ccf.patch",
     "body-parser": "1.20.6",
     "dockerode": "3.3.0",
     "fs-extra": "11.2.0",

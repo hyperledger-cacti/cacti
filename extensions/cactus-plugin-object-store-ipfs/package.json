@@ -59,7 +59,7 @@
     "@hyperledger-cacti/cactus-common": "3.0.1",
     "@hyperledger-cacti/cactus-core": "3.0.1",
     "@hyperledger-cacti/cactus-core-api": "3.0.1",
-    "axios": "1.18.1",
+    "axios": "patch:axios@npm%3A1.20.0#~/.yarn/patches/axios-npm-1.20.0-0de8ee0ccf.patch",
     "run-time-error-cjs": "1.4.0",
     "typescript-optional": "2.0.1",
     "uuid": "11.1.1"

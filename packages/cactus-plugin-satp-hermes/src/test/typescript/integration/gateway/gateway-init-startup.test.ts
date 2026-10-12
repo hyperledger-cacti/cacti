@@ -47,7 +47,7 @@ const monitorService = MonitorService.createOrGetMonitorService({
   enabled: false,
 });
 const factoryOptions: IPluginFactoryOptions = {
-  pluginImportType: PluginImportType.Local,
+  pluginImportType: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
 };
 const factory = new PluginFactorySATPGateway(factoryOptions);
 

@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the FullBlockTransactionEndorsementV1 type satisfies the MappedNullable interface at compile time
@@ -22,6 +24,8 @@ type FullBlockTransactionEndorsementV1 struct {
 	Signer FabricCertificateIdentityV1 `json:"signer"`
 	Signature string `json:"signature"`
 }
+
+type _FullBlockTransactionEndorsementV1 FullBlockTransactionEndorsementV1
 
 // NewFullBlockTransactionEndorsementV1 instantiates a new FullBlockTransactionEndorsementV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -103,6 +107,44 @@ func (o FullBlockTransactionEndorsementV1) ToMap() (map[string]interface{}, erro
 	toSerialize["signer"] = o.Signer
 	toSerialize["signature"] = o.Signature
 	return toSerialize, nil
+}
+
+func (o *FullBlockTransactionEndorsementV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"signer",
+		"signature",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varFullBlockTransactionEndorsementV1 := _FullBlockTransactionEndorsementV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varFullBlockTransactionEndorsementV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = FullBlockTransactionEndorsementV1(varFullBlockTransactionEndorsementV1)
+
+	return err
 }
 
 type NullableFullBlockTransactionEndorsementV1 struct {

@@ -53,8 +53,9 @@ describe("ApiServer", () => {
     apiSrvOpts.plugins = [
       {
         packageName: "@hyperledger-cacti/cactus-plugin-ledger-connector-besu",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
+        type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+        action:
+          PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
         options: {
           instanceId: uuidv4(),
           logLevel,

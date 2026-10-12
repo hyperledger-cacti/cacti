@@ -1,0 +1,21 @@
+{{!
+  Top-level enum model (6.6.0-compatible shape).
+
+  openapi-generator 7.x's built-in enum.mustache wraps the enum in a
+  container message ("message X { enum Enum { ... } }") to avoid proto
+  package-scope value-name collisions. This repo's model.mustache emits
+  bare model-name references for enum-typed properties, so a wrapped
+  enum would silently degrade every such field from an enum field to a
+  message field (broken wire format and runtime semantics).
+
+  The x- derived value names in this project are per-model prefixed
+  (e.g. RECEIPT_TYPE_P_B_*), which keeps package-scope values unique,
+  so the plain top-level enum stays safe here.
+}}
+enum {{classname}} {
+  {{#allowableValues}}
+  {{#enumVars}}
+  {{{name}}} = {{{protobuf-enum-index}}};
+  {{/enumVars}}
+  {{/allowableValues}}
+}

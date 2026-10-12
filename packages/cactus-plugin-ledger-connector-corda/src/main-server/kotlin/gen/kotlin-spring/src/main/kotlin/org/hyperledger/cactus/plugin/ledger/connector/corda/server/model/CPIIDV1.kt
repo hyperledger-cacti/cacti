@@ -20,10 +20,13 @@ import jakarta.validation.Valid
  */
 data class CPIIDV1(
 
+    @param:JsonProperty("name", required = true)
     @get:JsonProperty("name", required = true) val name: kotlin.String,
 
+    @param:JsonProperty("version", required = true)
     @get:JsonProperty("version", required = true) val version: kotlin.String,
 
+    @param:JsonProperty("signerSummaryHash")
     @get:JsonProperty("signerSummaryHash") val signerSummaryHash: kotlin.String? = null
 ) {
 

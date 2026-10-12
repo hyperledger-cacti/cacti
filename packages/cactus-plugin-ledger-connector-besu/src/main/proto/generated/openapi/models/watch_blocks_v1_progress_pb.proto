@@ -18,6 +18,6 @@ import "models/web3_block_header_pb.proto";
 
 message WatchBlocksV1ProgressPB {
 
-  Web3BlockHeaderPB blockHeader = 18691451;
+  Web3BlockHeaderPB block_header = 393325954;
 
 }

@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the GetMonitorTransactionsV1Request type satisfies the MappedNullable interface at compile time
@@ -24,6 +26,8 @@ type GetMonitorTransactionsV1Request struct {
 	// The fully qualified name of the Corda state to monitor
 	StateFullClassName string `json:"stateFullClassName"`
 }
+
+type _GetMonitorTransactionsV1Request GetMonitorTransactionsV1Request
 
 // NewGetMonitorTransactionsV1Request instantiates a new GetMonitorTransactionsV1Request object
 // This constructor will assign default values to properties that have it defined,
@@ -105,6 +109,44 @@ func (o GetMonitorTransactionsV1Request) ToMap() (map[string]interface{}, error)
 	toSerialize["clientAppId"] = o.ClientAppId
 	toSerialize["stateFullClassName"] = o.StateFullClassName
 	return toSerialize, nil
+}
+
+func (o *GetMonitorTransactionsV1Request) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"clientAppId",
+		"stateFullClassName",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varGetMonitorTransactionsV1Request := _GetMonitorTransactionsV1Request{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varGetMonitorTransactionsV1Request)
+
+	if err != nil {
+		return err
+	}
+
+	*o = GetMonitorTransactionsV1Request(varGetMonitorTransactionsV1Request)
+
+	return err
 }
 
 type NullableGetMonitorTransactionsV1Request struct {

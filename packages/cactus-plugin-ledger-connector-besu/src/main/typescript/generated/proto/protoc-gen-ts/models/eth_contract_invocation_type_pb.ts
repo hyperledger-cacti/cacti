@@ -7,7 +7,7 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export enum EthContractInvocationTypePB {
-        EthContractInvocationTypePB_SEND = 0,
-        EthContractInvocationTypePB_CALL = 1
+        ETH_CONTRACT_INVOCATION_TYPE_P_B_SEND = 0,
+        ETH_CONTRACT_INVOCATION_TYPE_P_B_CALL = 1
     }
 }

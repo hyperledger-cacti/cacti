@@ -12,6 +12,8 @@ package cactus-plugin-htlc-eth-besu
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the InvokeContractV1Response type satisfies the MappedNullable interface at compile time
@@ -23,6 +25,8 @@ type InvokeContractV1Response struct {
 	CallOutput interface{} `json:"callOutput,omitempty"`
 	Success bool `json:"success"`
 }
+
+type _InvokeContractV1Response InvokeContractV1Response
 
 // NewInvokeContractV1Response instantiates a new InvokeContractV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -95,7 +99,7 @@ func (o *InvokeContractV1Response) GetCallOutputOk() (*interface{}, bool) {
 
 // HasCallOutput returns a boolean if a field has been set.
 func (o *InvokeContractV1Response) HasCallOutput() bool {
-	if o != nil && IsNil(o.CallOutput) {
+	if o != nil && !IsNil(o.CallOutput) {
 		return true
 	}
 
@@ -149,6 +153,43 @@ func (o InvokeContractV1Response) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["success"] = o.Success
 	return toSerialize, nil
+}
+
+func (o *InvokeContractV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"success",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varInvokeContractV1Response := _InvokeContractV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varInvokeContractV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = InvokeContractV1Response(varInvokeContractV1Response)
+
+	return err
 }
 
 type NullableInvokeContractV1Response struct {

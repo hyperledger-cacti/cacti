@@ -13,6 +13,7 @@ package cactus-plugin-ledger-connector-ethereum
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // GasTransactionConfig - Transaction gas settings.
@@ -47,7 +48,11 @@ func (dst *GasTransactionConfig) UnmarshalJSON(data []byte) error {
 		if string(jsonGasTransactionConfigEIP1559) == "{}" { // empty struct
 			dst.GasTransactionConfigEIP1559 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.GasTransactionConfigEIP1559); err != nil {
+				dst.GasTransactionConfigEIP1559 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.GasTransactionConfigEIP1559 = nil
@@ -60,7 +65,11 @@ func (dst *GasTransactionConfig) UnmarshalJSON(data []byte) error {
 		if string(jsonGasTransactionConfigLegacy) == "{}" { // empty struct
 			dst.GasTransactionConfigLegacy = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.GasTransactionConfigLegacy); err != nil {
+				dst.GasTransactionConfigLegacy = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.GasTransactionConfigLegacy = nil
@@ -75,6 +84,10 @@ func (dst *GasTransactionConfig) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(GasTransactionConfig): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(GasTransactionConfig)")
 	}
 }
@@ -103,6 +116,20 @@ func (obj *GasTransactionConfig) GetActualInstance() (interface{}) {
 
 	if obj.GasTransactionConfigLegacy != nil {
 		return obj.GasTransactionConfigLegacy
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj GasTransactionConfig) GetActualInstanceValue() (interface{}) {
+	if obj.GasTransactionConfigEIP1559 != nil {
+		return *obj.GasTransactionConfigEIP1559
+	}
+
+	if obj.GasTransactionConfigLegacy != nil {
+		return *obj.GasTransactionConfigLegacy
 	}
 
 	// all schemas are nil

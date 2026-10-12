@@ -17,8 +17,8 @@ import "models/memory_usage_pb.proto";
 message HealthCheckResponsePB {
   bool success = 256557056;
 
-  string createdAt = 61500732;
+  string created_at = 295938284;
 
-  MemoryUsagePB memoryUsage = 335792418;
+  MemoryUsagePB memory_usage = 497686756;
 
 }
