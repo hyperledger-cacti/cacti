@@ -20,25 +20,25 @@ import "models/web3_signing_credential_pb.proto";
 message DeployContractSolidityBytecodeNoKeychainV1RequestPB {
 
   // The contract name for retrieve the contracts json on the keychain.
-  string contractName = 328784197;
+  string contract_name = 512557672;
 
   // The application binary interface of the solidity contract
-  repeated google.protobuf.Any contractAbi = 512852493;
+  repeated google.protobuf.Any contract_abi = 328278087;
 
-  repeated google.protobuf.Any constructorArgs = 336490508;
+  repeated google.protobuf.Any constructor_args = 203448830;
 
-  Web3SigningCredentialPB web3SigningCredential = 451211679;
+  Web3SigningCredentialPB web3_signing_credential = 337401679;
 
   // See https://ethereum.stackexchange.com/a/47556 regarding the maximum length of the bytecode. 2 + (24576 * 2) = 49154 meaning that hex stores each byte in 2 characters and that there is a 0x prefix (2 characters) which does not count towards the EVM 24576 bytecode limit.
   string bytecode = 256554254;
 
   float gas = 102105;
 
-  string gasPrice = 5271059;
+  string gas_price = 264461414;
 
   // The amount of milliseconds to wait for a transaction receipt with theaddress of the contract(which indicates successful deployment) beforegiving up and crashing.
-  float timeoutMs = 51479271;
+  float timeout_ms = 522132806;
 
-  BesuPrivateTransactionConfigPB privateTransactionConfig = 276796542;
+  BesuPrivateTransactionConfigPB private_transaction_config = 139004930;
 
 }

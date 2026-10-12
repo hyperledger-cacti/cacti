@@ -8,23 +8,67 @@ import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class Web3BlockHeaderTimestampPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
-        constructor(data?: any[] | {}) {
+        constructor(data?: any[] | {
+            string?: string;
+            float?: number;
+        }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
-            if (!Array.isArray(data) && typeof data == "object") { }
+            if (!Array.isArray(data) && typeof data == "object") {
+                if ("string" in data && data.string != undefined) {
+                    this.string = data.string;
+                }
+                if ("float" in data && data.float != undefined) {
+                    this.float = data.float;
+                }
+            }
         }
-        static fromObject(data: {}): Web3BlockHeaderTimestampPB {
+        get string() {
+            return pb_1.Message.getFieldWithDefault(this, 355114992, "") as string;
+        }
+        set string(value: string) {
+            pb_1.Message.setField(this, 355114992, value);
+        }
+        get float() {
+            return pb_1.Message.getFieldWithDefault(this, 97526364, 0) as number;
+        }
+        set float(value: number) {
+            pb_1.Message.setField(this, 97526364, value);
+        }
+        static fromObject(data: {
+            string?: string;
+            float?: number;
+        }): Web3BlockHeaderTimestampPB {
             const message = new Web3BlockHeaderTimestampPB({});
+            if (data.string != null) {
+                message.string = data.string;
+            }
+            if (data.float != null) {
+                message.float = data.float;
+            }
             return message;
         }
         toObject() {
-            const data: {} = {};
+            const data: {
+                string?: string;
+                float?: number;
+            } = {};
+            if (this.string != null) {
+                data.string = this.string;
+            }
+            if (this.float != null) {
+                data.float = this.float;
+            }
             return data;
         }
         serialize(): Uint8Array;
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
+            if (this.string.length)
+                writer.writeString(355114992, this.string);
+            if (this.float != 0)
+                writer.writeFloat(97526364, this.float);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -34,6 +78,12 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
+                    case 355114992:
+                        message.string = reader.readString();
+                        break;
+                    case 97526364:
+                        message.float = reader.readFloat();
+                        break;
                     default: reader.skipField();
                 }
             }

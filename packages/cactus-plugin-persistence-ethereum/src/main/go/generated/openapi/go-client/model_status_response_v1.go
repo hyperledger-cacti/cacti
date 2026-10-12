@@ -12,6 +12,8 @@ package cactus-plugin-persistence-ethereum
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the StatusResponseV1 type satisfies the MappedNullable interface at compile time
@@ -33,6 +35,8 @@ type StatusResponseV1 struct {
 	// Number of the last block seen by the block monitor.
 	LastSeenBlock float32 `json:"lastSeenBlock"`
 }
+
+type _StatusResponseV1 StatusResponseV1
 
 // NewStatusResponseV1 instantiates a new StatusResponseV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -244,6 +248,49 @@ func (o StatusResponseV1) ToMap() (map[string]interface{}, error) {
 	toSerialize["monitorRunning"] = o.MonitorRunning
 	toSerialize["lastSeenBlock"] = o.LastSeenBlock
 	return toSerialize, nil
+}
+
+func (o *StatusResponseV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"instanceId",
+		"connected",
+		"webServicesRegistered",
+		"monitoredTokensCount",
+		"operationsRunning",
+		"monitorRunning",
+		"lastSeenBlock",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varStatusResponseV1 := _StatusResponseV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varStatusResponseV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = StatusResponseV1(varStatusResponseV1)
+
+	return err
 }
 
 type NullableStatusResponseV1 struct {

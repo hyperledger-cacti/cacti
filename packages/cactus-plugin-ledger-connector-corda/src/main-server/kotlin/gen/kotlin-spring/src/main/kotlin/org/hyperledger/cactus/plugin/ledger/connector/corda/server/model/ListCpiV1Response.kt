@@ -20,6 +20,7 @@ import jakarta.validation.Valid
 data class ListCpiV1Response(
 
     @field:Valid
+    @param:JsonProperty("cpis")
     @get:JsonProperty("cpis") val cpis: kotlin.collections.List<ListCpiV1ResponseCpisInner>? = null
 ) {
 

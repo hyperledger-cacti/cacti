@@ -22,16 +22,21 @@ import jakarta.validation.Valid
  */
 data class InvokeContractV1Response(
 
+    @param:JsonProperty("success", required = true)
     @get:JsonProperty("success", required = true) val success: kotlin.Boolean,
 
     @field:Valid
+    @param:JsonProperty("callOutput", required = true)
     @get:JsonProperty("callOutput", required = true) val callOutput: kotlin.Any,
 
+    @param:JsonProperty("flowId", required = true)
     @get:JsonProperty("flowId", required = true) val flowId: kotlin.String,
 
     @get:Size(min=1,max=1024)
+    @param:JsonProperty("transactionId")
     @get:JsonProperty("transactionId") val transactionId: kotlin.String? = null,
 
+    @param:JsonProperty("progress")
     @get:JsonProperty("progress") val progress: kotlin.collections.List<kotlin.String>? = arrayListOf()
 ) {
 

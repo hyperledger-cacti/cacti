@@ -163,7 +163,7 @@ export class PluginLedgerConnectorCorda
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
-    return ConsensusAlgorithmFamily.Authority;
+    return ConsensusAlgorithmFamily.OrgHyperledgerCactusConsensusalgorithmProofOfAuthority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
     const currentConsensusAlgorithmFamily =

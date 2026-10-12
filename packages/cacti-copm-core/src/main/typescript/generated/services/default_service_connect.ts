@@ -12,12 +12,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ClaimLockedAssetV1Request, ClaimPledgedAssetV1Request, GetVerifiedViewV1Request, LockAssetV1Request, PledgeAssetV1Request } from "./default_service_pb.js";
-import { ClaimPledgedAssetV1200ResponsePB } from "../models/claim_pledged_asset_v1200_response_pb_pb.js";
+import { ClaimLockedAssetV1Request, ClaimLockedAssetV1Response, ClaimPledgedAssetV1Request, ClaimPledgedAssetV1Response, GetVerifiedViewV1Request, GetVerifiedViewV1Response, LockAssetV1Request, LockAssetV1Response, NoopV1Response, PledgeAssetV1Request, PledgeAssetV1Response } from "./default_service_pb.js";
 import { Empty, MethodKind } from "@bufbuild/protobuf";
-import { GetVerifiedViewV1200ResponsePB } from "../models/get_verified_view_v1200_response_pb_pb.js";
-import { LockAssetV1200ResponsePB } from "../models/lock_asset_v1200_response_pb_pb.js";
-import { PledgeAssetV1200ResponsePB } from "../models/pledge_asset_v1200_response_pb_pb.js";
 
 /**
  * @generated from service org.hyperledger.cacti.plugin.copm.core.services.defaultservice.DefaultService
@@ -31,7 +27,7 @@ export const DefaultService = {
     claimLockedAssetV1: {
       name: "ClaimLockedAssetV1",
       I: ClaimLockedAssetV1Request,
-      O: ClaimPledgedAssetV1200ResponsePB,
+      O: ClaimLockedAssetV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -40,7 +36,7 @@ export const DefaultService = {
     claimPledgedAssetV1: {
       name: "ClaimPledgedAssetV1",
       I: ClaimPledgedAssetV1Request,
-      O: ClaimPledgedAssetV1200ResponsePB,
+      O: ClaimPledgedAssetV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -49,7 +45,7 @@ export const DefaultService = {
     getVerifiedViewV1: {
       name: "GetVerifiedViewV1",
       I: GetVerifiedViewV1Request,
-      O: GetVerifiedViewV1200ResponsePB,
+      O: GetVerifiedViewV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -58,7 +54,7 @@ export const DefaultService = {
     lockAssetV1: {
       name: "LockAssetV1",
       I: LockAssetV1Request,
-      O: LockAssetV1200ResponsePB,
+      O: LockAssetV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -67,7 +63,7 @@ export const DefaultService = {
     noopV1: {
       name: "NoopV1",
       I: Empty,
-      O: Empty,
+      O: NoopV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -76,7 +72,7 @@ export const DefaultService = {
     pledgeAssetV1: {
       name: "PledgeAssetV1",
       I: PledgeAssetV1Request,
-      O: PledgeAssetV1200ResponsePB,
+      O: PledgeAssetV1Response,
       kind: MethodKind.Unary,
     },
   }

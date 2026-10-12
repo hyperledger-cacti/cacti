@@ -134,7 +134,7 @@ func (o *EvmTransaction) GetBlockHashOk() (*interface{}, bool) {
 
 // HasBlockHash returns a boolean if a field has been set.
 func (o *EvmTransaction) HasBlockHash() bool {
-	if o != nil && IsNil(o.BlockHash) {
+	if o != nil && !IsNil(o.BlockHash) {
 		return true
 	}
 
@@ -167,7 +167,7 @@ func (o *EvmTransaction) GetBlockNumberOk() (*interface{}, bool) {
 
 // HasBlockNumber returns a boolean if a field has been set.
 func (o *EvmTransaction) HasBlockNumber() bool {
-	if o != nil && IsNil(o.BlockNumber) {
+	if o != nil && !IsNil(o.BlockNumber) {
 		return true
 	}
 
@@ -200,7 +200,7 @@ func (o *EvmTransaction) GetTransactionIndexOk() (*interface{}, bool) {
 
 // HasTransactionIndex returns a boolean if a field has been set.
 func (o *EvmTransaction) HasTransactionIndex() bool {
-	if o != nil && IsNil(o.TransactionIndex) {
+	if o != nil && !IsNil(o.TransactionIndex) {
 		return true
 	}
 
@@ -265,7 +265,7 @@ func (o *EvmTransaction) GetToOk() (*interface{}, bool) {
 
 // HasTo returns a boolean if a field has been set.
 func (o *EvmTransaction) HasTo() bool {
-	if o != nil && IsNil(o.To) {
+	if o != nil && !IsNil(o.To) {
 		return true
 	}
 

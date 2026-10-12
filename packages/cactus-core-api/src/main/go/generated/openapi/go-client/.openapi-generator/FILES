@@ -6,7 +6,6 @@ configuration.go
 go.mod
 go.sum
 model_cactus_node.go
-model_cactus_node_all_of.go
 model_cactus_node_meta.go
 model_consensus_algorithm_families_with_out_tx_finality.go
 model_consensus_algorithm_families_with_tx_finality.go

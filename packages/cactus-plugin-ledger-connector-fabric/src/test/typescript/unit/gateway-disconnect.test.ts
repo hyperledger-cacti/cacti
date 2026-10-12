@@ -52,7 +52,8 @@ describe("PluginLedgerConnectorFabric Gateway Disconnection Tests", () => {
       const req: any = {
         channelName: "mychannel",
         contractName: "basic",
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "ReadAsset",
         params: ["asset1"],
       };
@@ -87,7 +88,8 @@ describe("PluginLedgerConnectorFabric Gateway Disconnection Tests", () => {
       const req: any = {
         channelName: "mychannel",
         contractName: "basic",
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "ReadAsset",
         params: ["asset1"],
       };

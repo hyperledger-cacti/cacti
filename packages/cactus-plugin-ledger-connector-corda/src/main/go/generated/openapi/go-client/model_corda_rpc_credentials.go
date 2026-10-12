@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the CordaRpcCredentials type satisfies the MappedNullable interface at compile time
@@ -24,6 +26,8 @@ type CordaRpcCredentials struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+type _CordaRpcCredentials CordaRpcCredentials
 
 // NewCordaRpcCredentials instantiates a new CordaRpcCredentials object
 // This constructor will assign default values to properties that have it defined,
@@ -157,6 +161,46 @@ func (o CordaRpcCredentials) ToMap() (map[string]interface{}, error) {
 	toSerialize["username"] = o.Username
 	toSerialize["password"] = o.Password
 	return toSerialize, nil
+}
+
+func (o *CordaRpcCredentials) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"hostname",
+		"port",
+		"username",
+		"password",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varCordaRpcCredentials := _CordaRpcCredentials{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varCordaRpcCredentials)
+
+	if err != nil {
+		return err
+	}
+
+	*o = CordaRpcCredentials(varCordaRpcCredentials)
+
+	return err
 }
 
 type NullableCordaRpcCredentials struct {

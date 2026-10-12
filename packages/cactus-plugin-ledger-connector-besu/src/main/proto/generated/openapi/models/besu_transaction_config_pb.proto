@@ -14,25 +14,24 @@ package org.hyperledger.cacti.plugin.ledger.connector.besu;
 
 import "google/protobuf/any.proto";
 
-import "models/besu_transaction_config_to_pb.proto";
 import "models/web3_block_header_timestamp_pb.proto";
 
 message BesuTransactionConfigPB {
 
-  string rawTransaction = 185047449;
+  string raw_transaction = 231477946;
 
   Web3BlockHeaderTimestampPB from = 3151786;
 
-  BesuTransactionConfigToPB to = 3707;
+  string to = 3707;
 
   Web3BlockHeaderTimestampPB value = 111972721;
 
   Web3BlockHeaderTimestampPB gas = 102105;
 
-  Web3BlockHeaderTimestampPB gasPrice = 5271059;
+  Web3BlockHeaderTimestampPB gas_price = 264461414;
 
   float nonce = 105002991;
 
-  BesuTransactionConfigToPB data = 3076010;
+  string data = 3076010;
 
 }

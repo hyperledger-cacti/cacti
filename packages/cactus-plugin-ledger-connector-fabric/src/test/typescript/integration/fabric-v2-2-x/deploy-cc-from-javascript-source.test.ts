@@ -268,7 +268,8 @@ describe.skip("Deploy CC from Javascript Source Test", () => {
       channelName,
       params: [assetId, "Green", "19", assetOwner, "9999"],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -285,7 +286,8 @@ describe.skip("Deploy CC from Javascript Source Test", () => {
       channelName,
       params: [assetId],
       methodName: "ReadAsset",
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,

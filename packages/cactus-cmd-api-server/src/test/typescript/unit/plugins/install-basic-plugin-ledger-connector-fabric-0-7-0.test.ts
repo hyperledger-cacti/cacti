@@ -43,8 +43,8 @@ test("can install plugin-ledger-connector-fabric", async (t: Test) => {
   apiServerOptions.plugins = [
     {
       packageName: "@hyperledger-cacti/cactus-plugin-ledger-connector-fabric",
-      type: PluginImportType.Local,
-      action: PluginImportAction.Install,
+      type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+      action: PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
       options: {
         instanceId: randomUUID(),
         logLevel,

@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiDeployContractV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	deployContractV1Request *DeployContractV1Request
 }
 
@@ -43,7 +43,7 @@ DeployContractV1 Deploys a chaincode contract from a set of source files. Note: 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDeployContractV1Request
 */
-func (a *DefaultApiService) DeployContractV1(ctx context.Context) ApiDeployContractV1Request {
+func (a *DefaultAPIService) DeployContractV1(ctx context.Context) ApiDeployContractV1Request {
 	return ApiDeployContractV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -52,7 +52,7 @@ func (a *DefaultApiService) DeployContractV1(ctx context.Context) ApiDeployContr
 
 // Execute executes the request
 //  @return DeployContractV1Response
-func (a *DefaultApiService) DeployContractV1Execute(r ApiDeployContractV1Request) (*DeployContractV1Response, *http.Response, error) {
+func (a *DefaultAPIService) DeployContractV1Execute(r ApiDeployContractV1Request) (*DeployContractV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -60,7 +60,7 @@ func (a *DefaultApiService) DeployContractV1Execute(r ApiDeployContractV1Request
 		localVarReturnValue  *DeployContractV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.DeployContractV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DeployContractV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -139,7 +139,7 @@ func (a *DefaultApiService) DeployContractV1Execute(r ApiDeployContractV1Request
 
 type ApiGetBlockV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getBlockRequestV1 *GetBlockRequestV1
 }
 
@@ -158,7 +158,7 @@ GetBlockV1 Get block from the channel using one of selectors from the input. Wor
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetBlockV1Request
 */
-func (a *DefaultApiService) GetBlockV1(ctx context.Context) ApiGetBlockV1Request {
+func (a *DefaultAPIService) GetBlockV1(ctx context.Context) ApiGetBlockV1Request {
 	return ApiGetBlockV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -167,7 +167,7 @@ func (a *DefaultApiService) GetBlockV1(ctx context.Context) ApiGetBlockV1Request
 
 // Execute executes the request
 //  @return GetBlockResponseV1
-func (a *DefaultApiService) GetBlockV1Execute(r ApiGetBlockV1Request) (*GetBlockResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) GetBlockV1Execute(r ApiGetBlockV1Request) (*GetBlockResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -175,7 +175,7 @@ func (a *DefaultApiService) GetBlockV1Execute(r ApiGetBlockV1Request) (*GetBlock
 		localVarReturnValue  *GetBlockResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetBlockV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetBlockV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -254,7 +254,7 @@ func (a *DefaultApiService) GetBlockV1Execute(r ApiGetBlockV1Request) (*GetBlock
 
 type ApiGetChainInfoV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getChainInfoRequestV1 *GetChainInfoRequestV1
 }
 
@@ -273,7 +273,7 @@ GetChainInfoV1 Get fabric ledger chain info.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetChainInfoV1Request
 */
-func (a *DefaultApiService) GetChainInfoV1(ctx context.Context) ApiGetChainInfoV1Request {
+func (a *DefaultAPIService) GetChainInfoV1(ctx context.Context) ApiGetChainInfoV1Request {
 	return ApiGetChainInfoV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -282,7 +282,7 @@ func (a *DefaultApiService) GetChainInfoV1(ctx context.Context) ApiGetChainInfoV
 
 // Execute executes the request
 //  @return GetChainInfoResponseV1
-func (a *DefaultApiService) GetChainInfoV1Execute(r ApiGetChainInfoV1Request) (*GetChainInfoResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) GetChainInfoV1Execute(r ApiGetChainInfoV1Request) (*GetChainInfoResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -290,7 +290,7 @@ func (a *DefaultApiService) GetChainInfoV1Execute(r ApiGetChainInfoV1Request) (*
 		localVarReturnValue  *GetChainInfoResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetChainInfoV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetChainInfoV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -369,7 +369,7 @@ func (a *DefaultApiService) GetChainInfoV1Execute(r ApiGetChainInfoV1Request) (*
 
 type ApiGetDiscoveryResultsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getDiscoveryResultsRequestV1 *GetDiscoveryResultsRequestV1
 }
 
@@ -388,7 +388,7 @@ GetDiscoveryResultsV1 Get fabric ledger node structure (from the discovery servi
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetDiscoveryResultsV1Request
 */
-func (a *DefaultApiService) GetDiscoveryResultsV1(ctx context.Context) ApiGetDiscoveryResultsV1Request {
+func (a *DefaultAPIService) GetDiscoveryResultsV1(ctx context.Context) ApiGetDiscoveryResultsV1Request {
 	return ApiGetDiscoveryResultsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -397,7 +397,7 @@ func (a *DefaultApiService) GetDiscoveryResultsV1(ctx context.Context) ApiGetDis
 
 // Execute executes the request
 //  @return GetDiscoveryResultsResponseV1
-func (a *DefaultApiService) GetDiscoveryResultsV1Execute(r ApiGetDiscoveryResultsV1Request) (*GetDiscoveryResultsResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) GetDiscoveryResultsV1Execute(r ApiGetDiscoveryResultsV1Request) (*GetDiscoveryResultsResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -405,7 +405,7 @@ func (a *DefaultApiService) GetDiscoveryResultsV1Execute(r ApiGetDiscoveryResult
 		localVarReturnValue  *GetDiscoveryResultsResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetDiscoveryResultsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetDiscoveryResultsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -484,7 +484,7 @@ func (a *DefaultApiService) GetDiscoveryResultsV1Execute(r ApiGetDiscoveryResult
 
 type ApiGetPrometheusMetricsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetPrometheusMetricsV1Request) Execute() (string, *http.Response, error) {
@@ -497,7 +497,7 @@ GetPrometheusMetricsV1 Get the Prometheus Metrics
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetPrometheusMetricsV1Request
 */
-func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
+func (a *DefaultAPIService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
 	return ApiGetPrometheusMetricsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -506,7 +506,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPr
 
 // Execute executes the request
 //  @return string
-func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
+func (a *DefaultAPIService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -514,7 +514,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 		localVarReturnValue  string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetPrometheusMetricsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetPrometheusMetricsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -581,7 +581,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 
 type ApiGetTransactionReceiptByTxIDV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	runTransactionRequest *RunTransactionRequest
 }
 
@@ -602,7 +602,7 @@ GetTransactionReceiptByTxIDV1 get a transaction receipt by tx id on a Fabric led
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetTransactionReceiptByTxIDV1Request
 */
-func (a *DefaultApiService) GetTransactionReceiptByTxIDV1(ctx context.Context) ApiGetTransactionReceiptByTxIDV1Request {
+func (a *DefaultAPIService) GetTransactionReceiptByTxIDV1(ctx context.Context) ApiGetTransactionReceiptByTxIDV1Request {
 	return ApiGetTransactionReceiptByTxIDV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -611,7 +611,7 @@ func (a *DefaultApiService) GetTransactionReceiptByTxIDV1(ctx context.Context) A
 
 // Execute executes the request
 //  @return GetTransactionReceiptResponse
-func (a *DefaultApiService) GetTransactionReceiptByTxIDV1Execute(r ApiGetTransactionReceiptByTxIDV1Request) (*GetTransactionReceiptResponse, *http.Response, error) {
+func (a *DefaultAPIService) GetTransactionReceiptByTxIDV1Execute(r ApiGetTransactionReceiptByTxIDV1Request) (*GetTransactionReceiptResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -619,7 +619,7 @@ func (a *DefaultApiService) GetTransactionReceiptByTxIDV1Execute(r ApiGetTransac
 		localVarReturnValue  *GetTransactionReceiptResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetTransactionReceiptByTxIDV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetTransactionReceiptByTxIDV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -691,7 +691,7 @@ func (a *DefaultApiService) GetTransactionReceiptByTxIDV1Execute(r ApiGetTransac
 
 type ApiRunDelegatedSignTransactionV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	runDelegatedSignTransactionRequest *RunDelegatedSignTransactionRequest
 }
 
@@ -712,7 +712,7 @@ RunDelegatedSignTransactionV1 Runs a transaction on a Fabric ledger using user-p
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiRunDelegatedSignTransactionV1Request
 */
-func (a *DefaultApiService) RunDelegatedSignTransactionV1(ctx context.Context) ApiRunDelegatedSignTransactionV1Request {
+func (a *DefaultAPIService) RunDelegatedSignTransactionV1(ctx context.Context) ApiRunDelegatedSignTransactionV1Request {
 	return ApiRunDelegatedSignTransactionV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -721,7 +721,7 @@ func (a *DefaultApiService) RunDelegatedSignTransactionV1(ctx context.Context) A
 
 // Execute executes the request
 //  @return RunTransactionResponse
-func (a *DefaultApiService) RunDelegatedSignTransactionV1Execute(r ApiRunDelegatedSignTransactionV1Request) (*RunTransactionResponse, *http.Response, error) {
+func (a *DefaultAPIService) RunDelegatedSignTransactionV1Execute(r ApiRunDelegatedSignTransactionV1Request) (*RunTransactionResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -729,7 +729,7 @@ func (a *DefaultApiService) RunDelegatedSignTransactionV1Execute(r ApiRunDelegat
 		localVarReturnValue  *RunTransactionResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.RunDelegatedSignTransactionV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.RunDelegatedSignTransactionV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -811,7 +811,7 @@ func (a *DefaultApiService) RunDelegatedSignTransactionV1Execute(r ApiRunDelegat
 
 type ApiRunTransactionV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	runTransactionRequest *RunTransactionRequest
 }
 
@@ -832,7 +832,7 @@ RunTransactionV1 Runs a transaction on a Fabric ledger.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiRunTransactionV1Request
 */
-func (a *DefaultApiService) RunTransactionV1(ctx context.Context) ApiRunTransactionV1Request {
+func (a *DefaultAPIService) RunTransactionV1(ctx context.Context) ApiRunTransactionV1Request {
 	return ApiRunTransactionV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -841,7 +841,7 @@ func (a *DefaultApiService) RunTransactionV1(ctx context.Context) ApiRunTransact
 
 // Execute executes the request
 //  @return RunTransactionResponse
-func (a *DefaultApiService) RunTransactionV1Execute(r ApiRunTransactionV1Request) (*RunTransactionResponse, *http.Response, error) {
+func (a *DefaultAPIService) RunTransactionV1Execute(r ApiRunTransactionV1Request) (*RunTransactionResponse, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -849,7 +849,7 @@ func (a *DefaultApiService) RunTransactionV1Execute(r ApiRunTransactionV1Request
 		localVarReturnValue  *RunTransactionResponse
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.RunTransactionV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.RunTransactionV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

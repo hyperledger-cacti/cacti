@@ -133,6 +133,7 @@ if (require.main === module) {
 }
 
 import { validateSatpGatewayIdentity } from "./services/validation/config-validating-functions/validate-satp-gateway-identity";
+import { resolveDevMode } from "./services/validation/config-validating-functions/resolve-dev-mode";
 import { validateSatpCounterPartyGateways } from "./services/validation/config-validating-functions/validate-satp-counter-party-gateways";
 import { validateSatpLogLevel } from "./services/validation/config-validating-functions/validate-satp-log-level";
 import { validateSatpEnvironment } from "./services/validation/config-validating-functions/validate-satp-environment";
@@ -270,22 +271,14 @@ export { loadGatewayConfig } from "./services/validation/load-gateway-config";
  * the gateway then serves plain HTTP with a loud warning instead of
  * refusing to start. Never enable it in production.
  *
+ * Implementation lives in `resolve-dev-mode.ts`; re-exported here for the
+ * CLI's launch flow.
+ *
  * @param configValue - The raw `devMode` field from config.json (if present)
  * @param envValue - The raw `DEV_MODE` environment variable value (if set)
  * @returns `true` when DEV_MODE is active
  */
-export function resolveDevMode(
-  configValue: unknown,
-  envValue: string | undefined,
-): boolean {
-  if (configValue !== undefined) {
-    return configValue === true;
-  }
-  if (envValue === undefined) {
-    return false;
-  }
-  return ["1", "true", "yes", "on"].includes(envValue.trim().toLowerCase());
-}
+export { resolveDevMode } from "./services/validation/config-validating-functions/resolve-dev-mode";
 
 /**
  * Options for customizing the gateway launch configuration paths.

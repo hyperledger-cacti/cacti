@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the VaultTransitKey type satisfies the MappedNullable interface at compile time
@@ -24,6 +26,8 @@ type VaultTransitKey struct {
 	// token for accessing private key
 	Token string `json:"token"`
 }
+
+type _VaultTransitKey VaultTransitKey
 
 // NewVaultTransitKey instantiates a new VaultTransitKey object
 // This constructor will assign default values to properties that have it defined,
@@ -105,6 +109,44 @@ func (o VaultTransitKey) ToMap() (map[string]interface{}, error) {
 	toSerialize["keyName"] = o.KeyName
 	toSerialize["token"] = o.Token
 	return toSerialize, nil
+}
+
+func (o *VaultTransitKey) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"keyName",
+		"token",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varVaultTransitKey := _VaultTransitKey{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varVaultTransitKey)
+
+	if err != nil {
+		return err
+	}
+
+	*o = VaultTransitKey(varVaultTransitKey)
+
+	return err
 }
 
 type NullableVaultTransitKey struct {

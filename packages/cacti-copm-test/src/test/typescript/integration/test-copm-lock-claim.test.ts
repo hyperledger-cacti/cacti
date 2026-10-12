@@ -13,6 +13,16 @@ import { CopmTester } from "../../../main/typescript/interfaces/copm-tester";
 import * as path from "path";
 import * as dotenv from "dotenv";
 import { CopmNetworkMode } from "../../../main/typescript/lib/types";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function unwrapResponse(res: any): any {
+  if (res?.response?.case === undefined) {
+    throw new Error(
+      `unexpected empty response wrapper: ${JSON.stringify(res)}`,
+    );
+  }
+  return res.response.value;
+}
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const logLevel: LogLevelDesc = "DEBUG";
@@ -59,7 +69,7 @@ describe("Copm Lock and Claim", () => {
 
     const lockResult = await copmTester.clientFor(partyA).lockAssetV1(
       new LockAssetV1Request({
-        assetLockV1PB: {
+        assetLockV1Pb: {
           asset: {
             assetType: assetType,
             assetId: lockAssetName,
@@ -80,8 +90,8 @@ describe("Copm Lock and Claim", () => {
 
     const claimResult = await copmTester.clientFor(partyB).claimLockedAssetV1(
       new ClaimLockedAssetV1Request({
-        assetLockClaimV1PB: {
-          lockId: lockResult.lockId,
+        assetLockClaimV1Pb: {
+          lockId: unwrapResponse(lockResult).lockId,
           asset: {
             assetType: assetType,
             assetId: lockAssetName,
@@ -126,7 +136,7 @@ describe("Copm Lock and Claim", () => {
 
     const lockResult = await copmTester.clientFor(partyA).lockAssetV1(
       new LockAssetV1Request({
-        assetLockV1PB: {
+        assetLockV1Pb: {
           asset: {
             assetType: assetType,
             assetQuantity: assetQuantity,
@@ -144,13 +154,13 @@ describe("Copm Lock and Claim", () => {
     );
 
     expect(lockResult).toBeTruthy();
-    expect(lockResult.lockId).toBeString();
-    log.debug(lockResult.lockId);
+    expect(unwrapResponse(lockResult).lockId).toBeString();
+    log.debug(unwrapResponse(lockResult).lockId);
 
     const claimResult = await copmTester.clientFor(partyB).claimLockedAssetV1(
       new ClaimLockedAssetV1Request({
-        assetLockClaimV1PB: {
-          lockId: lockResult.lockId,
+        assetLockClaimV1Pb: {
+          lockId: unwrapResponse(lockResult).lockId,
           asset: {
             assetType: assetType,
             assetQuantity: assetQuantity,

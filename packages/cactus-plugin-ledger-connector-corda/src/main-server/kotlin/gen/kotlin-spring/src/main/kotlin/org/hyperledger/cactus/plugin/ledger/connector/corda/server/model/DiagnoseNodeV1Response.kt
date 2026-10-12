@@ -20,6 +20,7 @@ import jakarta.validation.Valid
 data class DiagnoseNodeV1Response(
 
     @field:Valid
+    @param:JsonProperty("nodeDiagnosticInfo", required = true)
     @get:JsonProperty("nodeDiagnosticInfo", required = true) val nodeDiagnosticInfo: NodeDiagnosticInfo
 ) {
 

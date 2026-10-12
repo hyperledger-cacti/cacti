@@ -135,7 +135,8 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
 
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 

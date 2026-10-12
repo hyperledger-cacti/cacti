@@ -2,4 +2,13 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/DefaultApi.md
+docs/DeleteKeychainEntryRequestV1.md
+docs/DeleteKeychainEntryResponseV1.md
+docs/GetKeychainEntryRequestV1.md
+docs/GetKeychainEntryResponseV1.md
+docs/HasKeychainEntryRequestV1.md
+docs/HasKeychainEntryResponseV1.md
+docs/SetKeychainEntryRequestV1.md
+docs/SetKeychainEntryResponseV1.md
 index.ts

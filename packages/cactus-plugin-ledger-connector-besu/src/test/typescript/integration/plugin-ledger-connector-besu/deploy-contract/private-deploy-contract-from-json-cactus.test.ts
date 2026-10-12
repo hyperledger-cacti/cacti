@@ -116,7 +116,8 @@ describe("PluginLedgerConnectorBesu", () => {
     const pluginRegistry3 = new PluginRegistry();
 
     const pluginFactoryLedgerConnector = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     const connectorInstanceId1 = "besu1_" + uuidv4();

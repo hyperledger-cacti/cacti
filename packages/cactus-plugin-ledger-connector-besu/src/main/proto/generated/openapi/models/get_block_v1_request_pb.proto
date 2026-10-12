@@ -17,6 +17,6 @@ import "google/protobuf/any.proto";
 
 message GetBlockV1RequestPB {
 
-  optional google.protobuf.Any blockHashOrBlockNumber = 273815337;
+  optional google.protobuf.Any block_hash_or_block_number = 105409368;
 
 }

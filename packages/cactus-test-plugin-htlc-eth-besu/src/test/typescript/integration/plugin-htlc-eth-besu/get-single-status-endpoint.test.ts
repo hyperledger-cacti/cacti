@@ -86,7 +86,8 @@ test(testCase, async (t: Test) => {
   );
 
   const factory = new PluginFactoryLedgerConnector({
-    pluginImportType: PluginImportType.Local,
+    pluginImportType:
+      PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
   });
 
   const pluginRegistry = new PluginRegistry({});
@@ -106,7 +107,8 @@ test(testCase, async (t: Test) => {
   };
 
   const factoryHTLC = new PluginFactoryHtlcEthBesu({
-    pluginImportType: PluginImportType.Local,
+    pluginImportType:
+      PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
   });
 
   const pluginHtlc = await factoryHTLC.create(pluginOptions);

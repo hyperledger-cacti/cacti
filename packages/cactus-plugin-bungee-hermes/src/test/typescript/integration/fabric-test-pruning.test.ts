@@ -344,7 +344,8 @@ beforeEach(async () => {
       channelName: fabricChannelName,
       params: [FABRIC_ASSET_ID, "19"],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: fabricSigningCredential,
     });
 
@@ -437,7 +438,8 @@ test.skip.each([{ apiPath: true }, { apiPath: false }])(
       channelName: fabricChannelName,
       params: [FABRIC_ASSET_ID, "18"],
       methodName: "UpdateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: fabricSigningCredential,
     });
     expect(modifyResponse).not.toBeUndefined();

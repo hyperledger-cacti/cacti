@@ -18,6 +18,7 @@ import jakarta.validation.Valid
  */
 data class DeployContractJarsSuccessV1Response(
 
+    @param:JsonProperty("deployedJarFiles", required = true)
     @get:JsonProperty("deployedJarFiles", required = true) val deployedJarFiles: kotlin.collections.List<kotlin.String>
 ) {
 

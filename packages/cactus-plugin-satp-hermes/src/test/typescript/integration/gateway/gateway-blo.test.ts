@@ -28,7 +28,7 @@ const logger = LoggerProvider.getOrCreate({
   label: "satp-gateway-orchestrator-init-test",
 });
 const factoryOptions: IPluginFactoryOptions = {
-  pluginImportType: PluginImportType.Local,
+  pluginImportType: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
 };
 const factory = new PluginFactorySATPGateway(factoryOptions);
 const monitorService = MonitorService.createOrGetMonitorService({

@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the RunDelegatedSignTransactionRequest type satisfies the MappedNullable interface at compile time
@@ -35,6 +37,8 @@ type RunDelegatedSignTransactionRequest struct {
 	Params []*string `json:"params"`
 	ResponseType *RunTransactionResponseType `json:"responseType,omitempty"`
 }
+
+type _RunDelegatedSignTransactionRequest RunDelegatedSignTransactionRequest
 
 // NewRunDelegatedSignTransactionRequest instantiates a new RunDelegatedSignTransactionRequest object
 // This constructor will assign default values to properties that have it defined,
@@ -145,7 +149,7 @@ func (o *RunDelegatedSignTransactionRequest) GetTransientDataOk() (map[string]in
 
 // HasTransientData returns a boolean if a field has been set.
 func (o *RunDelegatedSignTransactionRequest) HasTransientData() bool {
-	if o != nil && IsNil(o.TransientData) {
+	if o != nil && !IsNil(o.TransientData) {
 		return true
 	}
 
@@ -226,7 +230,7 @@ func (o *RunDelegatedSignTransactionRequest) GetUniqueTransactionDataOk() (*inte
 
 // HasUniqueTransactionData returns a boolean if a field has been set.
 func (o *RunDelegatedSignTransactionRequest) HasUniqueTransactionData() bool {
-	if o != nil && IsNil(o.UniqueTransactionData) {
+	if o != nil && !IsNil(o.UniqueTransactionData) {
 		return true
 	}
 
@@ -423,6 +427,49 @@ func (o RunDelegatedSignTransactionRequest) ToMap() (map[string]interface{}, err
 		toSerialize["responseType"] = o.ResponseType
 	}
 	return toSerialize, nil
+}
+
+func (o *RunDelegatedSignTransactionRequest) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"signerCertificate",
+		"signerMspID",
+		"channelName",
+		"contractName",
+		"invocationType",
+		"methodName",
+		"params",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varRunDelegatedSignTransactionRequest := _RunDelegatedSignTransactionRequest{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varRunDelegatedSignTransactionRequest)
+
+	if err != nil {
+		return err
+	}
+
+	*o = RunDelegatedSignTransactionRequest(varRunDelegatedSignTransactionRequest)
+
+	return err
 }
 
 type NullableRunDelegatedSignTransactionRequest struct {

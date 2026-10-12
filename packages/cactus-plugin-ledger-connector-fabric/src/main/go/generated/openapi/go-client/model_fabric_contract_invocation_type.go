@@ -20,9 +20,9 @@ type FabricContractInvocationType string
 
 // List of FabricContractInvocationType
 const (
-	SEND FabricContractInvocationType = "FabricContractInvocationType.SEND"
-	CALL FabricContractInvocationType = "FabricContractInvocationType.CALL"
-	SENDPRIVATE FabricContractInvocationType = "FabricContractInvocationType.SENDPRIVATE"
+	FABRIC_CONTRACT_INVOCATION_TYPE_SEND FabricContractInvocationType = "FabricContractInvocationType.SEND"
+	FABRIC_CONTRACT_INVOCATION_TYPE_CALL FabricContractInvocationType = "FabricContractInvocationType.CALL"
+	FABRIC_CONTRACT_INVOCATION_TYPE_SENDPRIVATE FabricContractInvocationType = "FabricContractInvocationType.SENDPRIVATE"
 )
 
 // All allowed values of FabricContractInvocationType enum

@@ -22,14 +22,19 @@ import jakarta.validation.Valid
  */
 data class GetFlowCidV1Request(
 
+    @param:JsonProperty("username", required = true)
     @get:JsonProperty("username", required = true) val username: kotlin.String,
 
+    @param:JsonProperty("password", required = true)
     @get:JsonProperty("password", required = true) val password: kotlin.String,
 
+    @param:JsonProperty("rejectUnauthorized", required = true)
     @get:JsonProperty("rejectUnauthorized", required = true) val rejectUnauthorized: kotlin.Boolean,
 
+    @param:JsonProperty("holdingIDShortHash")
     @get:JsonProperty("holdingIDShortHash") val holdingIDShortHash: kotlin.String? = null,
 
+    @param:JsonProperty("clientRequestId")
     @get:JsonProperty("clientRequestId") val clientRequestId: kotlin.String? = null
 ) {
 

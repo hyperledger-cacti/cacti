@@ -2,4 +2,9 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/DefaultApi.md
+docs/DiscoverNetworkResponseV1.md
+docs/ErrorExceptionResponseV1.md
+docs/StatusResponseV1.md
+docs/TrackedOperationV1.md
 index.ts

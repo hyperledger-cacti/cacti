@@ -411,7 +411,10 @@ export class ApiServer {
     const pluginOptions = { ...options, logLevel, pluginRegistry: registry };
 
     try {
-      if (pluginImport.action == PluginImportAction.Install) {
+      if (
+        pluginImport.action ==
+        PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall
+      ) {
         await this.installPluginPackage(pluginImport);
       } else {
         this.log.info(

@@ -26,7 +26,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/OwnHTLCRequest'
+              $ref: "#/components/schemas/OwnHTLCRequest"
       responses:
         "200":
           content:
@@ -46,7 +46,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CounterpartyHTLCRequest'
+              $ref: "#/components/schemas/CounterpartyHTLCRequest"
       responses:
         "200":
           content:
@@ -66,7 +66,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WithdrawCounterpartyRequest'
+              $ref: "#/components/schemas/WithdrawCounterpartyRequest"
       responses:
         "200":
           content:
@@ -82,26 +82,26 @@ components:
   schemas:
     OwnHTLCRequest:
       example:
-        htlcPackage: null
-        receiver: receiver
+        htlcPackage: BESU
         connectorInstanceId: connectorInstanceId
+        keychainId: keychainId
         constructorArgs:
         - ""
         - ""
-        outputAmount: 6.027456183070403
-        outputNetwork: outputNetwork
-        hashLock: hashLock
-        inputAmount: 0.8008281904610115
-        tokenAddress: tokenAddress
-        outputAddress: outputAddress
-        keychainId: keychainId
-        gas: 5.962133916683182
         web3SigningCredential:
-          type: null
+          type: CACTUS_KEYCHAIN_REF
+        inputAmount: 0.8008281904610115
+        outputAmount: 6.027456183070403
         expiration: 1.4658129805029452
+        hashLock: hashLock
+        tokenAddress: tokenAddress
+        receiver: receiver
+        outputNetwork: outputNetwork
+        outputAddress: outputAddress
+        gas: 5.962133916683182
       properties:
         htlcPackage:
-          $ref: '#/components/schemas/HtlcPackage'
+          $ref: "#/components/schemas/HtlcPackage"
         connectorInstanceId:
           description: connector Instance Id for the connector plugin
           nullable: false
@@ -115,7 +115,7 @@ components:
           items: {}
           type: array
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         inputAmount:
           description: Input amount to lock
           nullable: false
@@ -167,16 +167,16 @@ components:
       type: object
     CounterpartyHTLCRequest:
       example:
-        htlcPackage: null
-        htlcId: htlcId
-        keychainId: keychainId
+        htlcPackage: BESU
         connectorInstanceId: connectorInstanceId
-        gas: 0.8008281904610115
+        keychainId: keychainId
+        htlcId: htlcId
         web3SigningCredential:
-          type: null
+          type: CACTUS_KEYCHAIN_REF
+        gas: 0.8008281904610115
       properties:
         htlcPackage:
-          $ref: '#/components/schemas/HtlcPackage'
+          $ref: "#/components/schemas/HtlcPackage"
         connectorInstanceId:
           description: connector Instance Id for the connector plugin
           nullable: false
@@ -190,7 +190,7 @@ components:
           nullable: false
           type: string
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         gas:
           type: number
       required:
@@ -202,18 +202,18 @@ components:
       type: object
     WithdrawCounterpartyRequest:
       example:
-        htlcPackage: null
-        htlcId: htlcId
-        keychainId: keychainId
+        htlcPackage: BESU
         connectorInstanceId: connectorInstanceId
+        keychainId: keychainId
         contractId: contractId
-        gas: 0.8008281904610115
         web3SigningCredential:
-          type: null
+          type: CACTUS_KEYCHAIN_REF
+        htlcId: htlcId
         secret: secret
+        gas: 0.8008281904610115
       properties:
         htlcPackage:
-          $ref: '#/components/schemas/HtlcPackage'
+          $ref: "#/components/schemas/HtlcPackage"
         connectorInstanceId:
           description: connector Instance Id for the connector plugin
           nullable: false
@@ -227,7 +227,7 @@ components:
           nullable: false
           type: string
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         htlcId:
           description: Id for the HTLC
           nullable: false
@@ -261,7 +261,7 @@ components:
     Web3SigningCredentialCactusKeychainRef:
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
         ethAccount:
           description: The ethereum account (public key) that the credential  belongs
             to. Basically the username in the traditional  terminology of authentication.
@@ -291,7 +291,7 @@ components:
     Web3SigningCredentialPrivateKeyHex:
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
         ethAccount:
           description: The ethereum account (public key) that the credential belongs
             to. Basically the username in the traditional terminology of authentication.
@@ -314,7 +314,7 @@ components:
         transaction is pre-signed.
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
       required:
       - type
       type: object
@@ -322,14 +322,14 @@ components:
       discriminator:
         propertyName: type
       example:
-        type: null
+        type: CACTUS_KEYCHAIN_REF
       oneOf:
-      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
-      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
-      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      - $ref: "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
+      - $ref: "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
+      - $ref: "#/components/schemas/Web3SigningCredentialNone"
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
       required:
       - type
       type: object

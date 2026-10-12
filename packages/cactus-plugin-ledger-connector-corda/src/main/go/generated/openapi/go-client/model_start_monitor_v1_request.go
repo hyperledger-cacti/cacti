@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the StartMonitorV1Request type satisfies the MappedNullable interface at compile time
@@ -24,6 +26,8 @@ type StartMonitorV1Request struct {
 	// The fully qualified name of the Corda state to monitor
 	StateFullClassName string `json:"stateFullClassName"`
 }
+
+type _StartMonitorV1Request StartMonitorV1Request
 
 // NewStartMonitorV1Request instantiates a new StartMonitorV1Request object
 // This constructor will assign default values to properties that have it defined,
@@ -105,6 +109,44 @@ func (o StartMonitorV1Request) ToMap() (map[string]interface{}, error) {
 	toSerialize["clientAppId"] = o.ClientAppId
 	toSerialize["stateFullClassName"] = o.StateFullClassName
 	return toSerialize, nil
+}
+
+func (o *StartMonitorV1Request) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"clientAppId",
+		"stateFullClassName",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varStartMonitorV1Request := _StartMonitorV1Request{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varStartMonitorV1Request)
+
+	if err != nil {
+		return err
+	}
+
+	*o = StartMonitorV1Request(varStartMonitorV1Request)
+
+	return err
 }
 
 type NullableStartMonitorV1Request struct {

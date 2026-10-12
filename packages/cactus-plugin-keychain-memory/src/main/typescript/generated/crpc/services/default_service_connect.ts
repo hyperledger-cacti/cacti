@@ -12,12 +12,8 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { DeleteKeychainEntryV1Request, GetKeychainEntryV1Request, GetPrometheusMetricsV1Response, HasKeychainEntryV1Request, SetKeychainEntryV1Request } from "./default_service_pb.js";
-import { DeleteKeychainEntryResponseV1PB } from "../models/delete_keychain_entry_response_v1_pb_pb.js";
+import { DeleteKeychainEntryV1Request, DeleteKeychainEntryV1Response, GetKeychainEntryV1Request, GetKeychainEntryV1Response, GetPrometheusMetricsV1Response, HasKeychainEntryV1Request, HasKeychainEntryV1Response, SetKeychainEntryV1Request, SetKeychainEntryV1Response } from "./default_service_pb.js";
 import { Empty, MethodKind } from "@bufbuild/protobuf";
-import { GetKeychainEntryResponseV1PB } from "../models/get_keychain_entry_response_v1_pb_pb.js";
-import { HasKeychainEntryResponseV1PB } from "../models/has_keychain_entry_response_v1_pb_pb.js";
-import { SetKeychainEntryResponseV1PB } from "../models/set_keychain_entry_response_v1_pb_pb.js";
 
 /**
  * @generated from service org.hyperledger.cacti.plugin.keychain.memory.services.defaultservice.DefaultService
@@ -31,7 +27,7 @@ export const DefaultService = {
     deleteKeychainEntryV1: {
       name: "DeleteKeychainEntryV1",
       I: DeleteKeychainEntryV1Request,
-      O: DeleteKeychainEntryResponseV1PB,
+      O: DeleteKeychainEntryV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -40,7 +36,7 @@ export const DefaultService = {
     getKeychainEntryV1: {
       name: "GetKeychainEntryV1",
       I: GetKeychainEntryV1Request,
-      O: GetKeychainEntryResponseV1PB,
+      O: GetKeychainEntryV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -58,7 +54,7 @@ export const DefaultService = {
     hasKeychainEntryV1: {
       name: "HasKeychainEntryV1",
       I: HasKeychainEntryV1Request,
-      O: HasKeychainEntryResponseV1PB,
+      O: HasKeychainEntryV1Response,
       kind: MethodKind.Unary,
     },
     /**
@@ -67,7 +63,7 @@ export const DefaultService = {
     setKeychainEntryV1: {
       name: "SetKeychainEntryV1",
       I: SetKeychainEntryV1Request,
-      O: SetKeychainEntryResponseV1PB,
+      O: SetKeychainEntryV1Response,
       kind: MethodKind.Unary,
     },
   }

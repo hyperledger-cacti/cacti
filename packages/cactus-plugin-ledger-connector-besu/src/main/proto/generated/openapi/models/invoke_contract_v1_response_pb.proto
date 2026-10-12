@@ -18,9 +18,9 @@ import "models/web3_transaction_receipt_pb.proto";
 
 message InvokeContractV1ResponsePB {
 
-  Web3TransactionReceiptPB transactionReceipt = 472834426;
+  Web3TransactionReceiptPB transaction_receipt = 51981786;
 
-  optional google.protobuf.Any callOutput = 401260801;
+  optional google.protobuf.Any call_output = 375138814;
 
   bool success = 256557056;
 

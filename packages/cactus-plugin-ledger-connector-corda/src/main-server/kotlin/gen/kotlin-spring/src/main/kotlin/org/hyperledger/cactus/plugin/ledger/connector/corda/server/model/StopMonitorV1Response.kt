@@ -19,8 +19,10 @@ import jakarta.validation.Valid
  */
 data class StopMonitorV1Response(
 
+    @param:JsonProperty("success", required = true)
     @get:JsonProperty("success", required = true) val success: kotlin.Boolean,
 
+    @param:JsonProperty("msg", required = true)
     @get:JsonProperty("msg", required = true) val msg: kotlin.String
 ) {
 

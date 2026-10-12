@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-ethereum
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the ContractJsonDefinition type satisfies the MappedNullable interface at compile time
@@ -21,6 +23,8 @@ var _ MappedNullable = &ContractJsonDefinition{}
 type ContractJsonDefinition struct {
 	ContractJSON ContractJSON `json:"contractJSON"`
 }
+
+type _ContractJsonDefinition ContractJsonDefinition
 
 // NewContractJsonDefinition instantiates a new ContractJsonDefinition object
 // This constructor will assign default values to properties that have it defined,
@@ -76,6 +80,43 @@ func (o ContractJsonDefinition) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["contractJSON"] = o.ContractJSON
 	return toSerialize, nil
+}
+
+func (o *ContractJsonDefinition) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"contractJSON",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varContractJsonDefinition := _ContractJsonDefinition{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varContractJsonDefinition)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ContractJsonDefinition(varContractJsonDefinition)
+
+	return err
 }
 
 type NullableContractJsonDefinition struct {

@@ -12,6 +12,8 @@ package cactus-core-api
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the ConsortiumDatabase type satisfies the MappedNullable interface at compile time
@@ -30,6 +32,8 @@ type ConsortiumDatabase struct {
 	// The complete collection of all plugin instance entities in existence within the consortium.
 	PluginInstance []PluginInstance `json:"pluginInstance"`
 }
+
+type _ConsortiumDatabase ConsortiumDatabase
 
 // NewConsortiumDatabase instantiates a new ConsortiumDatabase object
 // This constructor will assign default values to properties that have it defined,
@@ -189,6 +193,47 @@ func (o ConsortiumDatabase) ToMap() (map[string]interface{}, error) {
 	toSerialize["cactusNode"] = o.CactusNode
 	toSerialize["pluginInstance"] = o.PluginInstance
 	return toSerialize, nil
+}
+
+func (o *ConsortiumDatabase) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"consortium",
+		"ledger",
+		"consortiumMember",
+		"cactusNode",
+		"pluginInstance",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varConsortiumDatabase := _ConsortiumDatabase{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varConsortiumDatabase)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ConsortiumDatabase(varConsortiumDatabase)
+
+	return err
 }
 
 type NullableConsortiumDatabase struct {

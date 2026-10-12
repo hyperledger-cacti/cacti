@@ -26,21 +26,27 @@ import jakarta.validation.Valid
 data class CordappDeploymentConfig(
 
     @field:Valid
+    @param:JsonProperty("sshCredentials", required = true)
     @get:JsonProperty("sshCredentials", required = true) val sshCredentials: CordaNodeSshCredentials,
 
     @field:Valid
+    @param:JsonProperty("rpcCredentials", required = true)
     @get:JsonProperty("rpcCredentials", required = true) val rpcCredentials: CordaRpcCredentials,
 
     @get:Size(min=1,max=65535)
+    @param:JsonProperty("cordaNodeStartCmd", required = true)
     @get:JsonProperty("cordaNodeStartCmd", required = true) val cordaNodeStartCmd: kotlin.String,
 
     @get:Size(min=1,max=2048)
+    @param:JsonProperty("cordappDir", required = true)
     @get:JsonProperty("cordappDir", required = true) val cordappDir: kotlin.String,
 
     @get:Size(min=1,max=2048)
+    @param:JsonProperty("cordaJarPath", required = true)
     @get:JsonProperty("cordaJarPath", required = true) val cordaJarPath: kotlin.String,
 
     @get:Size(min=1,max=2048)
+    @param:JsonProperty("nodeBaseDirPath", required = true)
     @get:JsonProperty("nodeBaseDirPath", required = true) val nodeBaseDirPath: kotlin.String
 ) {
 

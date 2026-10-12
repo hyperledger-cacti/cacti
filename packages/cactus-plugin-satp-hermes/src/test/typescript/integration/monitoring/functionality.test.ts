@@ -150,7 +150,8 @@ async function executeTransfer(
   );
 
   const factoryOptions: IPluginFactoryOptions = {
-    pluginImportType: PluginImportType.Local,
+    pluginImportType:
+      PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
   };
   const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -216,7 +217,7 @@ async function executeTransfer(
   expect(dispatcher).toBeTruthy();
   const reqApproveBesuAddress = await dispatcher?.GetApproveAddress({
     networkId: besuEnv.network,
-    tokenType: TokenType.Fungible,
+    tokenType: TokenType.NonstandardFungible,
   });
 
   if (!reqApproveBesuAddress?.approveAddress) {
@@ -241,7 +242,7 @@ async function executeTransfer(
 
   const reqApproveEthereumAddress = await dispatcher?.GetApproveAddress({
     networkId: ethereumEnv.network,
-    tokenType: TokenType.Fungible,
+    tokenType: TokenType.NonstandardFungible,
   });
 
   expect(reqApproveEthereumAddress?.approveAddress).toBeDefined();

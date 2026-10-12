@@ -13,6 +13,7 @@ package cactus-plugin-htlc-coordinator-besu
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // Web3SigningCredential - struct for Web3SigningCredential
@@ -55,7 +56,11 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 		if string(jsonWeb3SigningCredentialCactusKeychainRef) == "{}" { // empty struct
 			dst.Web3SigningCredentialCactusKeychainRef = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Web3SigningCredentialCactusKeychainRef); err != nil {
+				dst.Web3SigningCredentialCactusKeychainRef = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Web3SigningCredentialCactusKeychainRef = nil
@@ -68,7 +73,11 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 		if string(jsonWeb3SigningCredentialNone) == "{}" { // empty struct
 			dst.Web3SigningCredentialNone = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Web3SigningCredentialNone); err != nil {
+				dst.Web3SigningCredentialNone = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Web3SigningCredentialNone = nil
@@ -81,7 +90,11 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 		if string(jsonWeb3SigningCredentialPrivateKeyHex) == "{}" { // empty struct
 			dst.Web3SigningCredentialPrivateKeyHex = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Web3SigningCredentialPrivateKeyHex); err != nil {
+				dst.Web3SigningCredentialPrivateKeyHex = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Web3SigningCredentialPrivateKeyHex = nil
@@ -97,6 +110,10 @@ func (dst *Web3SigningCredential) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(Web3SigningCredential): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(Web3SigningCredential)")
 	}
 }
@@ -133,6 +150,24 @@ func (obj *Web3SigningCredential) GetActualInstance() (interface{}) {
 
 	if obj.Web3SigningCredentialPrivateKeyHex != nil {
 		return obj.Web3SigningCredentialPrivateKeyHex
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj Web3SigningCredential) GetActualInstanceValue() (interface{}) {
+	if obj.Web3SigningCredentialCactusKeychainRef != nil {
+		return *obj.Web3SigningCredentialCactusKeychainRef
+	}
+
+	if obj.Web3SigningCredentialNone != nil {
+		return *obj.Web3SigningCredentialNone
+	}
+
+	if obj.Web3SigningCredentialPrivateKeyHex != nil {
+		return *obj.Web3SigningCredentialPrivateKeyHex
 	}
 
 	// all schemas are nil

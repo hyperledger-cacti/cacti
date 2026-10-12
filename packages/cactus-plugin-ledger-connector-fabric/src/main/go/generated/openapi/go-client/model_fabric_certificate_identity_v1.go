@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the FabricCertificateIdentityV1 type satisfies the MappedNullable interface at compile time
@@ -22,6 +24,8 @@ type FabricCertificateIdentityV1 struct {
 	Mspid string `json:"mspid"`
 	Cert FabricX509CertificateV1 `json:"cert"`
 }
+
+type _FabricCertificateIdentityV1 FabricCertificateIdentityV1
 
 // NewFabricCertificateIdentityV1 instantiates a new FabricCertificateIdentityV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -103,6 +107,44 @@ func (o FabricCertificateIdentityV1) ToMap() (map[string]interface{}, error) {
 	toSerialize["mspid"] = o.Mspid
 	toSerialize["cert"] = o.Cert
 	return toSerialize, nil
+}
+
+func (o *FabricCertificateIdentityV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"mspid",
+		"cert",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varFabricCertificateIdentityV1 := _FabricCertificateIdentityV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varFabricCertificateIdentityV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = FabricCertificateIdentityV1(varFabricCertificateIdentityV1)
+
+	return err
 }
 
 type NullableFabricCertificateIdentityV1 struct {

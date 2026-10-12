@@ -116,7 +116,8 @@ async function runCreateAssetTransaction(
   const createAssetResponse = await apiClient.runTransactionV1({
     signingCredential,
     channelName: ledgerChannelName,
-    invocationType: FabricContractInvocationType.Send,
+    invocationType:
+      FabricContractInvocationType.FabricContractInvocationTypeSend,
     contractName: ledgerContractName,
     methodName: "CreateAsset",
     params: [newAssetId, "green", "111", "someOwner", "299"],

@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,20 +30,20 @@ import com.squareup.moshi.JsonClass
 /**
  * Enumerates a list of consensus algorithm families in existence. Does not intend to be an exhaustive list, just a practical one, meaning that we only include items here that are relevant to Hyperledger Cactus in fulfilling its own duties. This can be extended later as more sophisticated features of Cactus get implemented. This enum is meant to be first and foremost a useful abstraction for achieving practical tasks, not an encyclopedia and therefore we ask of everyone that this to be extended only in ways that serve a practical purpose for the runtime behavior of Cactus or Cactus plugins in general. The bottom line is that we can accept this enum being not 100% accurate as long as it 100% satisfies what it was designed to do.
  *
- * Values: aUTHORITY,sTAKE,wORK
+ * Values: orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_AUTHORITY,orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_STAKE,orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_WORK
  */
 
 @JsonClass(generateAdapter = false)
 enum class ConsensusAlgorithmFamily(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY")
-    aUTHORITY("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"),
+    orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_AUTHORITY("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"),
 
     @Json(name = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE")
-    sTAKE("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"),
+    orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_STAKE("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"),
 
     @Json(name = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK")
-    wORK("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK");
+    orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_WORK("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_WORK");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -44,7 +52,7 @@ enum class ConsensusAlgorithmFamily(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -57,7 +65,7 @@ enum class ConsensusAlgorithmFamily(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): ConsensusAlgorithmFamily? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

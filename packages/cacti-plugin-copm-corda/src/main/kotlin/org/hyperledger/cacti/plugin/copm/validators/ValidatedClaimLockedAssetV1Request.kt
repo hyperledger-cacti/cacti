@@ -15,10 +15,10 @@ class ValidatedClaimLockedAssetV1Request(val asset: DLAsset,
                                          val hash: HashFunctions.Hash ) {
 
     constructor(request: ClaimLockedAssetV1Request) : this(
-        validateAsset(request.assetLockClaimV1PB.asset, "asset"),
-        validateRequiredString(request.assetLockClaimV1PB.lockId, "lockId"),
-        validateAccount(request.assetLockClaimV1PB.destination, "destination"),
-        validateHash(request.assetLockClaimV1PB.hashInfo, "hashInfo")
+        validateAsset(request.assetLockClaimV1Pb.asset, "asset"),
+        validateRequiredString(request.assetLockClaimV1Pb.lockId, "lockId"),
+        validateAccount(request.assetLockClaimV1Pb.destination, "destination"),
+        validateHash(request.assetLockClaimV1Pb.hashInfo, "hashInfo")
     ) {
     }
 }

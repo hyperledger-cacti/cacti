@@ -19,8 +19,10 @@ import jakarta.validation.Valid
  */
 data class GetMonitorTransactionsV1ResponseTxInner(
 
+    @param:JsonProperty("index")
     @get:JsonProperty("index") val index: kotlin.String? = null,
 
+    @param:JsonProperty("data")
     @get:JsonProperty("data") val `data`: kotlin.String? = null
 ) {
 

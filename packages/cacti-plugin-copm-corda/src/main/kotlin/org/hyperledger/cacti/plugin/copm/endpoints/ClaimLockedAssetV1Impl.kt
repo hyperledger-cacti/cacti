@@ -12,7 +12,7 @@ import org.hyperledger.cacti.weaver.sdk.corda.AssetManager
 suspend fun claimLockedAssetV1Impl(request: DefaultServiceOuterClass.ClaimLockedAssetV1Request,
                                transactionContextFactory: DLTransactionContextFactory,
                                cordaConfig: CordaConfiguration
-): ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB {
+): DefaultServiceOuterClass.ClaimLockedAssetV1Response {
     logger.debug("start claimLockedAssetV1")
     val data = ValidatedClaimLockedAssetV1Request(request)
     val assetContract = cordaConfig.assetContract(data.asset)
@@ -29,7 +29,7 @@ suspend fun claimLockedAssetV1Impl(request: DefaultServiceOuterClass.ClaimLocked
                 cordaConfig.getObservers(data.recipient))
         )
     )
-    return ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB.newBuilder()
-        .setClaimId(claimId.toString())
+    return DefaultServiceOuterClass.ClaimLockedAssetV1Response.newBuilder().setClaimPledgedAssetV1200ResponsePb200(ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB.newBuilder()
+        .setClaimId(claimId.toString()))
         .build()
 }

@@ -45,7 +45,8 @@ describe(__filename, () => {
 
   beforeAll(async () => {
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     const connector: PluginLedgerConnectorBesu = await factory.create({

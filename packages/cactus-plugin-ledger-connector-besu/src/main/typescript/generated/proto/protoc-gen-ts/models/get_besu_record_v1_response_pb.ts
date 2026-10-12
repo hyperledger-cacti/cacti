@@ -7,119 +7,119 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class GetBesuRecordV1ResponsePB extends pb_1.Message {
-        #one_of_decls: number[][] = [[134507862], [401260801]];
+        #one_of_decls: number[][] = [[361974531], [375138814]];
         constructor(data?: any[] | ({
-            ledgerId?: string;
-            stateContract?: string;
+            ledger_id?: string;
+            state_contract?: string;
         } & (({
-            transactionInputData?: dependency_1.google.protobuf.Any;
+            transaction_input_data?: dependency_1.google.protobuf.Any;
         }) | ({
-            callOutput?: dependency_1.google.protobuf.Any;
+            call_output?: dependency_1.google.protobuf.Any;
         })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("ledgerId" in data && data.ledgerId != undefined) {
-                    this.ledgerId = data.ledgerId;
+                if ("ledger_id" in data && data.ledger_id != undefined) {
+                    this.ledger_id = data.ledger_id;
                 }
-                if ("stateContract" in data && data.stateContract != undefined) {
-                    this.stateContract = data.stateContract;
+                if ("state_contract" in data && data.state_contract != undefined) {
+                    this.state_contract = data.state_contract;
                 }
-                if ("transactionInputData" in data && data.transactionInputData != undefined) {
-                    this.transactionInputData = data.transactionInputData;
+                if ("transaction_input_data" in data && data.transaction_input_data != undefined) {
+                    this.transaction_input_data = data.transaction_input_data;
                 }
-                if ("callOutput" in data && data.callOutput != undefined) {
-                    this.callOutput = data.callOutput;
+                if ("call_output" in data && data.call_output != undefined) {
+                    this.call_output = data.call_output;
                 }
             }
         }
-        get ledgerId() {
-            return pb_1.Message.getFieldWithDefault(this, 39059559, "") as string;
+        get ledger_id() {
+            return pb_1.Message.getFieldWithDefault(this, 399745103, "") as string;
         }
-        set ledgerId(value: string) {
-            pb_1.Message.setField(this, 39059559, value);
+        set ledger_id(value: string) {
+            pb_1.Message.setField(this, 399745103, value);
         }
-        get stateContract() {
-            return pb_1.Message.getFieldWithDefault(this, 509155523, "") as string;
+        get state_contract() {
+            return pb_1.Message.getFieldWithDefault(this, 277156097, "") as string;
         }
-        set stateContract(value: string) {
-            pb_1.Message.setField(this, 509155523, value);
+        set state_contract(value: string) {
+            pb_1.Message.setField(this, 277156097, value);
         }
-        get transactionInputData() {
-            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 134507862) as dependency_1.google.protobuf.Any;
+        get transaction_input_data() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 361974531) as dependency_1.google.protobuf.Any;
         }
-        set transactionInputData(value: dependency_1.google.protobuf.Any) {
-            pb_1.Message.setOneofWrapperField(this, 134507862, this.#one_of_decls[0], value);
+        set transaction_input_data(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setOneofWrapperField(this, 361974531, this.#one_of_decls[0], value);
         }
-        get has_transactionInputData() {
-            return pb_1.Message.getField(this, 134507862) != null;
+        get has_transaction_input_data() {
+            return pb_1.Message.getField(this, 361974531) != null;
         }
-        get callOutput() {
-            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 401260801) as dependency_1.google.protobuf.Any;
+        get call_output() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 375138814) as dependency_1.google.protobuf.Any;
         }
-        set callOutput(value: dependency_1.google.protobuf.Any) {
-            pb_1.Message.setOneofWrapperField(this, 401260801, this.#one_of_decls[1], value);
+        set call_output(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setOneofWrapperField(this, 375138814, this.#one_of_decls[1], value);
         }
-        get has_callOutput() {
-            return pb_1.Message.getField(this, 401260801) != null;
+        get has_call_output() {
+            return pb_1.Message.getField(this, 375138814) != null;
         }
-        get _transactionInputData() {
+        get _transaction_input_data() {
             const cases: {
-                [index: number]: "none" | "transactionInputData";
+                [index: number]: "none" | "transaction_input_data";
             } = {
                 0: "none",
-                134507862: "transactionInputData"
+                361974531: "transaction_input_data"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [134507862])];
+            return cases[pb_1.Message.computeOneofCase(this, [361974531])];
         }
-        get _callOutput() {
+        get _call_output() {
             const cases: {
-                [index: number]: "none" | "callOutput";
+                [index: number]: "none" | "call_output";
             } = {
                 0: "none",
-                401260801: "callOutput"
+                375138814: "call_output"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [401260801])];
+            return cases[pb_1.Message.computeOneofCase(this, [375138814])];
         }
         static fromObject(data: {
-            ledgerId?: string;
-            stateContract?: string;
-            transactionInputData?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
-            callOutput?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            ledger_id?: string;
+            state_contract?: string;
+            transaction_input_data?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            call_output?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
         }): GetBesuRecordV1ResponsePB {
             const message = new GetBesuRecordV1ResponsePB({});
-            if (data.ledgerId != null) {
-                message.ledgerId = data.ledgerId;
+            if (data.ledger_id != null) {
+                message.ledger_id = data.ledger_id;
             }
-            if (data.stateContract != null) {
-                message.stateContract = data.stateContract;
+            if (data.state_contract != null) {
+                message.state_contract = data.state_contract;
             }
-            if (data.transactionInputData != null) {
-                message.transactionInputData = dependency_1.google.protobuf.Any.fromObject(data.transactionInputData);
+            if (data.transaction_input_data != null) {
+                message.transaction_input_data = dependency_1.google.protobuf.Any.fromObject(data.transaction_input_data);
             }
-            if (data.callOutput != null) {
-                message.callOutput = dependency_1.google.protobuf.Any.fromObject(data.callOutput);
+            if (data.call_output != null) {
+                message.call_output = dependency_1.google.protobuf.Any.fromObject(data.call_output);
             }
             return message;
         }
         toObject() {
             const data: {
-                ledgerId?: string;
-                stateContract?: string;
-                transactionInputData?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
-                callOutput?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                ledger_id?: string;
+                state_contract?: string;
+                transaction_input_data?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                call_output?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
             } = {};
-            if (this.ledgerId != null) {
-                data.ledgerId = this.ledgerId;
+            if (this.ledger_id != null) {
+                data.ledger_id = this.ledger_id;
             }
-            if (this.stateContract != null) {
-                data.stateContract = this.stateContract;
+            if (this.state_contract != null) {
+                data.state_contract = this.state_contract;
             }
-            if (this.transactionInputData != null) {
-                data.transactionInputData = this.transactionInputData.toObject();
+            if (this.transaction_input_data != null) {
+                data.transaction_input_data = this.transaction_input_data.toObject();
             }
-            if (this.callOutput != null) {
-                data.callOutput = this.callOutput.toObject();
+            if (this.call_output != null) {
+                data.call_output = this.call_output.toObject();
             }
             return data;
         }
@@ -127,14 +127,14 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.ledgerId.length)
-                writer.writeString(39059559, this.ledgerId);
-            if (this.stateContract.length)
-                writer.writeString(509155523, this.stateContract);
-            if (this.has_transactionInputData)
-                writer.writeMessage(134507862, this.transactionInputData, () => this.transactionInputData.serialize(writer));
-            if (this.has_callOutput)
-                writer.writeMessage(401260801, this.callOutput, () => this.callOutput.serialize(writer));
+            if (this.ledger_id.length)
+                writer.writeString(399745103, this.ledger_id);
+            if (this.state_contract.length)
+                writer.writeString(277156097, this.state_contract);
+            if (this.has_transaction_input_data)
+                writer.writeMessage(361974531, this.transaction_input_data, () => this.transaction_input_data.serialize(writer));
+            if (this.has_call_output)
+                writer.writeMessage(375138814, this.call_output, () => this.call_output.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -144,17 +144,17 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 39059559:
-                        message.ledgerId = reader.readString();
+                    case 399745103:
+                        message.ledger_id = reader.readString();
                         break;
-                    case 509155523:
-                        message.stateContract = reader.readString();
+                    case 277156097:
+                        message.state_contract = reader.readString();
                         break;
-                    case 134507862:
-                        reader.readMessage(message.transactionInputData, () => message.transactionInputData = dependency_1.google.protobuf.Any.deserialize(reader));
+                    case 361974531:
+                        reader.readMessage(message.transaction_input_data, () => message.transaction_input_data = dependency_1.google.protobuf.Any.deserialize(reader));
                         break;
-                    case 401260801:
-                        reader.readMessage(message.callOutput, () => message.callOutput = dependency_1.google.protobuf.Any.deserialize(reader));
+                    case 375138814:
+                        reader.readMessage(message.call_output, () => message.call_output = dependency_1.google.protobuf.Any.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }

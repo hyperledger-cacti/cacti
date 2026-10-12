@@ -21,7 +21,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             }
         }
         get event() {
-            return pb_1.Message.getFieldWithDefault(this, 96891546, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB.WatchBlocksV1PB_Subscribe) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB;
+            return pb_1.Message.getFieldWithDefault(this, 96891546, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB.WATCH_BLOCKS_V1_P_B_Subscribe) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB;
         }
         set event(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB) {
             pb_1.Message.setField(this, 96891546, value);
@@ -48,7 +48,7 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.event != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB.WatchBlocksV1PB_Subscribe)
+            if (this.event != dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB.WATCH_BLOCKS_V1_P_B_Subscribe)
                 writer.writeEnum(96891546, this.event);
             if (!w)
                 return writer.getResultBuffer();

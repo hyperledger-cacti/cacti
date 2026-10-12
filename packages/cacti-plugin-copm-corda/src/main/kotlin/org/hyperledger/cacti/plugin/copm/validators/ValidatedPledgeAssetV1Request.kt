@@ -14,11 +14,11 @@ class ValidatedPledgeAssetV1Request(val asset: DLAsset,
                                     val timeout: Long) {
 
     constructor(request: PledgeAssetV1Request) : this(
-        validateAsset(request.assetPledgeV1PB.asset,"asset"),
-        validateAccount(request.assetPledgeV1PB.source, "source"),
-        validateAccount(request.assetPledgeV1PB.destination, "destination"),
-        request.assetPledgeV1PB.destinationCertificate ?: "",
-        (Calendar.getInstance().timeInMillis / 1000) + (request.assetPledgeV1PB.expirySecs)
+        validateAsset(request.assetPledgeV1Pb.asset,"asset"),
+        validateAccount(request.assetPledgeV1Pb.source, "source"),
+        validateAccount(request.assetPledgeV1Pb.destination, "destination"),
+        request.assetPledgeV1Pb.destinationCertificate ?: "",
+        (Calendar.getInstance().timeInMillis / 1000) + (request.assetPledgeV1Pb.expirySecs)
     )
 
 }

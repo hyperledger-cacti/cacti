@@ -23,13 +23,13 @@ paths:
       operationId: getObjectV1
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/object_store_get_object_v1_request_body'
+        $ref: "#/components/requestBodies/object_store_get_object_v1_request_body"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetObjectResponseV1'
+                $ref: "#/components/schemas/GetObjectResponseV1"
           description: OK
       summary: Retrieves an object from the object store.
       x-hyperledger-cacti:
@@ -41,13 +41,13 @@ paths:
       operationId: setObjectV1
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/object_store_set_object_v1_request_body'
+        $ref: "#/components/requestBodies/object_store_set_object_v1_request_body"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SetObjectResponseV1'
+                $ref: "#/components/schemas/SetObjectResponseV1"
           description: OK
       summary: Sets an object in the object store under the specified key.
       x-hyperledger-cacti:
@@ -59,13 +59,13 @@ paths:
       operationId: hasObjectV1
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/object_store_has_object_v1_request_body'
+        $ref: "#/components/requestBodies/object_store_has_object_v1_request_body"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HasObjectResponseV1'
+                $ref: "#/components/schemas/HasObjectResponseV1"
           description: OK
       summary: Checks the presence of an object in the object store.
       x-hyperledger-cacti:
@@ -78,21 +78,21 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetObjectRequestV1'
+            $ref: "#/components/schemas/GetObjectRequestV1"
       description: Request body to obtain an object via its key.
       required: true
     object_store_set_object_v1_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetObjectRequestV1'
+            $ref: "#/components/schemas/SetObjectRequestV1"
       description: Request body to set an object under a key.
       required: true
     object_store_has_object_v1_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasObjectRequestV1'
+            $ref: "#/components/schemas/HasObjectRequestV1"
       description: Request body to check presence of an object under a key.
       required: true
   responses:
@@ -100,19 +100,19 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetObjectResponseV1'
+            $ref: "#/components/schemas/GetObjectResponseV1"
       description: OK
     object_store_set_object_v1_response_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetObjectResponseV1'
+            $ref: "#/components/schemas/SetObjectResponseV1"
       description: OK
     object_store_has_object_v1_response_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasObjectResponseV1'
+            $ref: "#/components/schemas/HasObjectResponseV1"
       description: OK
   schemas:
     GetObjectRequestV1:
@@ -131,8 +131,8 @@ components:
       type: object
     GetObjectResponseV1:
       example:
-        value: value
         key: key
+        value: value
       properties:
         key:
           description: The key that was used to retrieve the value from the object
@@ -155,8 +155,8 @@ components:
     SetObjectRequestV1:
       additionalProperties: false
       example:
-        value: value
         key: key
+        value: value
       properties:
         key:
           description: The key for the entry to set in the object store.
@@ -204,9 +204,9 @@ components:
       type: object
     HasObjectResponseV1:
       example:
+        key: key
         checkedAt: checkedAt
         isPresent: true
-        key: key
       properties:
         key:
           description: The key that was used to check the presence of the value in

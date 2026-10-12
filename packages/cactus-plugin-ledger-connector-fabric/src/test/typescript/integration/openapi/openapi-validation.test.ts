@@ -390,7 +390,8 @@ describe("OpenApi Validation Test", () => {
       channelName,
       params: [assetId, "Green", "19", assetOwner, "9999"],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -410,7 +411,8 @@ describe("OpenApi Validation Test", () => {
       channelName,
       params: [assetId, "Green", "19", assetOwner, "9999"],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,
@@ -438,7 +440,8 @@ describe("OpenApi Validation Test", () => {
       channelName,
       params: [assetId, "Green", "19", assetOwner, "9999"],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,

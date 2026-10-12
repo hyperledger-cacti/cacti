@@ -62,7 +62,8 @@ describe("Session Proofs Endpoint Integration Tests", () => {
     await repository.getSessionProofsTable().del();
 
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 

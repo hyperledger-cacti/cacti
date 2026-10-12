@@ -557,7 +557,7 @@ func (o *EvmBlock) GetTimestampOk() (*interface{}, bool) {
 
 // HasTimestamp returns a boolean if a field has been set.
 func (o *EvmBlock) HasTimestamp() bool {
-	if o != nil && IsNil(o.Timestamp) {
+	if o != nil && !IsNil(o.Timestamp) {
 		return true
 	}
 

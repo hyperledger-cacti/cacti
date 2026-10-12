@@ -316,7 +316,7 @@ export class PluginLedgerConnectorFabric
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
-    return ConsensusAlgorithmFamily.Authority;
+    return ConsensusAlgorithmFamily.OrgHyperledgerCactusConsensusalgorithmProofOfAuthority;
   }
   public async hasTransactionFinality(): Promise<boolean> {
     const currentConsensusAlgorithmFamily =
@@ -1237,7 +1237,7 @@ export class PluginLedgerConnectorFabric
     allEndorsers: Endorser[],
     endorsingPeers?: string[],
     endorsingOrgs?: string[],
-  ) {
+  ): Endorser[] {
     const toEndorserNames = (e: Endorser[]) => e.map((v) => v.name);
     this.log.debug("Endorsing targets:", toEndorserNames(allEndorsers));
 
@@ -1303,10 +1303,13 @@ export class PluginLedgerConnectorFabric
       contractName,
       invocationType,
       methodName: fnName,
-      params,
+      params: nullableParams,
       transientData,
       responseType: responseType,
     } = req;
+    // The OpenAPI spec declares params items as nullable; downstream Fabric
+    // APIs require plain strings, so null entries are filtered out here.
+    const params = nullableParams.filter((p): p is string => p !== null);
 
     let gateway: Gateway | undefined;
     try {
@@ -1338,14 +1341,14 @@ export class PluginLedgerConnectorFabric
       let out: Buffer;
       let transactionId = "";
       switch (invocationType) {
-        case FabricContractInvocationType.Call: {
+        case FabricContractInvocationType.FabricContractInvocationTypeCall: {
           out = await contract
             .createTransaction(fnName)
             .setEndorsingPeers(endorsingTargets)
             .evaluate(...params);
           break;
         }
-        case FabricContractInvocationType.Send: {
+        case FabricContractInvocationType.FabricContractInvocationTypeSend: {
           this.log.debug("%s Creating tx instance on %s", fnTag, contractName);
           this.log.debug("%s Endorsing peers: %o", fnTag, req.endorsingPeers);
           const tx = contract.createTransaction(fnName);
@@ -1357,7 +1360,7 @@ export class PluginLedgerConnectorFabric
           this.log.debug("%s Obtained TX ID OK (%s)", fnTag, transactionId);
           break;
         }
-        case FabricContractInvocationType.Sendprivate: {
+        case FabricContractInvocationType.FabricContractInvocationTypeSendprivate: {
           if (!transientData) {
             const message =
               "Set transaction to send Transient Data but it was not provided";
@@ -1414,7 +1417,7 @@ export class PluginLedgerConnectorFabric
     try {
       const options: IGetTransactionReceiptByTxIDOptions = {
         channelName: req.channelName,
-        params: req.params,
+        params: req.params.filter((p): p is string => p !== null),
         gateway: gateway,
       };
       return await getTransactionReceiptByTxID(options);
@@ -1925,11 +1928,11 @@ export class PluginLedgerConnectorFabric
     );
 
     switch (req.invocationType) {
-      case FabricContractInvocationType.Call: {
+      case FabricContractInvocationType.FabricContractInvocationTypeCall: {
         const query = channel.newQuery(req.contractName);
         const queryRequest = query.build(userIdCtx, {
           fcn: req.methodName,
-          args: req.params,
+          args: req.params.filter((p): p is string => p !== null),
         });
         const signature = await this.signCallback(
           queryRequest,
@@ -1966,11 +1969,12 @@ export class PluginLedgerConnectorFabric
           )}`,
         );
       }
-      case FabricContractInvocationType.Send:
-      case FabricContractInvocationType.Sendprivate: {
+      case FabricContractInvocationType.FabricContractInvocationTypeSend:
+      case FabricContractInvocationType.FabricContractInvocationTypeSendprivate: {
         // Private transactions needs transient data set
         if (
-          req.invocationType === FabricContractInvocationType.Sendprivate &&
+          req.invocationType ===
+            FabricContractInvocationType.FabricContractInvocationTypeSendprivate &&
           !req.transientData
         ) {
           throw new Error(
@@ -1982,7 +1986,7 @@ export class PluginLedgerConnectorFabric
 
         const buildOptions: BuildProposalRequest = {
           fcn: req.methodName,
-          args: req.params,
+          args: req.params.filter((p): p is string => p !== null),
         };
         if (req.transientData) {
           buildOptions.transientMap = this.toTransientMap(req.transientData);

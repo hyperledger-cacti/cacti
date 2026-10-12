@@ -12,6 +12,8 @@ package cactus-core-api
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the HasObjectResponseV1 type satisfies the MappedNullable interface at compile time
@@ -26,6 +28,8 @@ type HasObjectResponseV1 struct {
 	// The boolean true or false indicating the presence or absence of an object under 'key'.
 	IsPresent bool `json:"isPresent"`
 }
+
+type _HasObjectResponseV1 HasObjectResponseV1
 
 // NewHasObjectResponseV1 instantiates a new HasObjectResponseV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -133,6 +137,45 @@ func (o HasObjectResponseV1) ToMap() (map[string]interface{}, error) {
 	toSerialize["checkedAt"] = o.CheckedAt
 	toSerialize["isPresent"] = o.IsPresent
 	return toSerialize, nil
+}
+
+func (o *HasObjectResponseV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"key",
+		"checkedAt",
+		"isPresent",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varHasObjectResponseV1 := _HasObjectResponseV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varHasObjectResponseV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = HasObjectResponseV1(varHasObjectResponseV1)
+
+	return err
 }
 
 type NullableHasObjectResponseV1 struct {

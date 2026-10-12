@@ -20,8 +20,8 @@ type PluginImportAction string
 
 // List of PluginImportAction
 const (
-	INSTANTIATE PluginImportAction = "org.hyperledger.cactus.plugin_import_action.INSTANTIATE"
-	INSTALL PluginImportAction = "org.hyperledger.cactus.plugin_import_action.INSTALL"
+	ORG_HYPERLEDGER_CACTUS_PLUGIN_IMPORT_ACTION_INSTANTIATE PluginImportAction = "org.hyperledger.cactus.plugin_import_action.INSTANTIATE"
+	ORG_HYPERLEDGER_CACTUS_PLUGIN_IMPORT_ACTION_INSTALL PluginImportAction = "org.hyperledger.cactus.plugin_import_action.INSTALL"
 )
 
 // All allowed values of PluginImportAction enum

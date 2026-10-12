@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,17 +30,17 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * Values: lOCAL,rEMOTE
+ * Values: orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_typePeriodLOCAL,orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_typePeriodREMOTE
  */
 
 @JsonClass(generateAdapter = false)
 enum class PluginImportType(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.plugin_import_type.LOCAL")
-    lOCAL("org.hyperledger.cactus.plugin_import_type.LOCAL"),
+    orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_typePeriodLOCAL("org.hyperledger.cactus.plugin_import_type.LOCAL"),
 
     @Json(name = "org.hyperledger.cactus.plugin_import_type.REMOTE")
-    rEMOTE("org.hyperledger.cactus.plugin_import_type.REMOTE");
+    orgPeriodHyperledgerPeriodCactusPeriodPlugin_import_typePeriodREMOTE("org.hyperledger.cactus.plugin_import_type.REMOTE");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -41,7 +49,7 @@ enum class PluginImportType(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -54,7 +62,7 @@ enum class PluginImportType(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): PluginImportType? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

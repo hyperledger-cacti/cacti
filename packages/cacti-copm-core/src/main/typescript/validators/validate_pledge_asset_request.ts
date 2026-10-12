@@ -11,23 +11,23 @@ export function validatePledgeAssetRequest(req: PledgeAssetV1Request): {
   destinationCertificate: string;
   expirySecs: number;
 } {
-  if (!req.assetPledgeV1PB) {
+  if (!req.assetPledgeV1Pb) {
     throw new ConnectError(`request data is required`, Code.InvalidArgument);
   }
-  if (!req.assetPledgeV1PB.destination?.organization) {
+  if (!req.assetPledgeV1Pb.destination?.organization) {
     throw new ConnectError("destination.organization is required");
   }
-  if (!req.assetPledgeV1PB.destinationCertificate) {
+  if (!req.assetPledgeV1Pb.destinationCertificate) {
     throw new ConnectError("destinationCertificate is required");
   }
 
   return {
-    asset: validateTransferrableAsset(req.assetPledgeV1PB.asset, "asset"),
-    source: validateAssetAccount(req.assetPledgeV1PB.source, "source"),
-    destinationOrganization: req.assetPledgeV1PB.destination.organization,
-    destinationCertificate: req.assetPledgeV1PB.destinationCertificate,
-    expirySecs: req.assetPledgeV1PB.expirySecs
-      ? Number(req.assetPledgeV1PB.expirySecs)
+    asset: validateTransferrableAsset(req.assetPledgeV1Pb.asset, "asset"),
+    source: validateAssetAccount(req.assetPledgeV1Pb.source, "source"),
+    destinationOrganization: req.assetPledgeV1Pb.destination.organization,
+    destinationCertificate: req.assetPledgeV1Pb.destinationCertificate,
+    expirySecs: req.assetPledgeV1Pb.expirySecs
+      ? Number(req.assetPledgeV1Pb.expirySecs)
       : 60,
   };
 }

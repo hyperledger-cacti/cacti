@@ -323,7 +323,8 @@ describe("Run transaction with identities", () => {
         },
         channelName: "mychannel",
         contractName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         methodName: "InitLedger",
         params: [],
       });
@@ -342,7 +343,8 @@ describe("Run transaction with identities", () => {
         },
         channelName: "mychannel",
         contractName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         methodName: "TransferAsset",
         params: ["asset1", "client2"],
       });
@@ -361,7 +363,8 @@ describe("Run transaction with identities", () => {
         },
         channelName: "mychannel",
         contractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "ReadAsset",
         params: ["asset1"],
       });

@@ -8,15 +8,23 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.apis
 
 import java.io.IOException
-import okhttp3.OkHttpClient
+import okhttp3.Call
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.GetSingleStatusRequest
@@ -44,15 +52,16 @@ import org.openapitools.client.infrastructure.ResponseType
 import org.openapitools.client.infrastructure.Success
 import org.openapitools.client.infrastructure.toMultiValue
 
-class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient = ApiClient.defaultClient) : ApiClient(basePath, client) {
+open class DefaultApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = ApiClient.defaultClient) : ApiClient(basePath, client) {
     companion object {
         @JvmStatic
         val defaultBasePath: String by lazy {
-            System.getProperties().getProperty(ApiClient.baseUrlKey, "http://localhost")
+            System.getProperties().getProperty(ApiClient.BASE_URL_KEY, "http://localhost")
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status
      * 
      * 
      * @param getSingleStatusRequest  (optional)
@@ -78,12 +87,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-single-status
      * 
      * 
      * @param getSingleStatusRequest  (optional)
@@ -125,6 +135,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status
      * 
      * 
      * @param getStatusRequest  (optional)
@@ -150,12 +161,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/get-status
      * 
      * 
      * @param getStatusRequest  (optional)
@@ -197,6 +209,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize
      * Initialize contract
      * 
      * @param initializeRequest  (optional)
@@ -222,12 +235,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/initialize
      * Initialize contract
      * 
      * @param initializeRequest  (optional)
@@ -269,6 +283,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract
      * Create a new hashtimelock contract
      * 
      * @param newContractRequest  (optional)
@@ -294,12 +309,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/new-contract
      * Create a new hashtimelock contract
      * 
      * @param newContractRequest  (optional)
@@ -341,6 +357,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund
      * Refund a hashtimelock contract
      * 
      * @param refundRequest  (optional)
@@ -366,12 +383,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/refund
      * Refund a hashtimelock contract
      * 
      * @param refundRequest  (optional)
@@ -413,6 +431,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw
      * Withdraw a hashtimelock contract
      * 
      * @param withdrawRequest  (optional)
@@ -438,12 +457,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-htlc-eth-besu-erc20/withdraw
      * Withdraw a hashtimelock contract
      * 
      * @param withdrawRequest  (optional)

@@ -13,7 +13,7 @@ import org.hyperledger.cacti.weaver.sdk.corda.AssetManager
 suspend fun lockAssetV1Impl(request: DefaultServiceOuterClass.LockAssetV1Request,
                             transactionContextFactory: DLTransactionContextFactory,
                             cordaConfig: CordaConfiguration
-): LockAssetV1200ResponsePb.LockAssetV1200ResponsePB {
+): DefaultServiceOuterClass.LockAssetV1Response {
     logger.debug("start lockAssetV1")
     val data = ValidatedLockAssetV1Request(request)
     val contract = cordaConfig.assetContract(data.asset)
@@ -34,8 +34,8 @@ suspend fun lockAssetV1Impl(request: DefaultServiceOuterClass.LockAssetV1Request
                 cordaConfig.getObservers(data.sourceAccount))
         )
     )
-    return LockAssetV1200ResponsePb.LockAssetV1200ResponsePB
+    return DefaultServiceOuterClass.LockAssetV1Response.newBuilder().setLockAssetV1200ResponsePb200(LockAssetV1200ResponsePb.LockAssetV1200ResponsePB
         .newBuilder()
-        .setLockId(result.toString())
+        .setLockId(result.toString()))
         .build()
 }

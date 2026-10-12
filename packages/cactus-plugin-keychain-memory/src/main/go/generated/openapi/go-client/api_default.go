@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiDeleteKeychainEntryV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	deleteKeychainEntryRequestV1 *DeleteKeychainEntryRequestV1
 }
 
@@ -44,7 +44,7 @@ DeleteKeychainEntryV1 Deletes an entry under a key on the keychain backend.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDeleteKeychainEntryV1Request
 */
-func (a *DefaultApiService) DeleteKeychainEntryV1(ctx context.Context) ApiDeleteKeychainEntryV1Request {
+func (a *DefaultAPIService) DeleteKeychainEntryV1(ctx context.Context) ApiDeleteKeychainEntryV1Request {
 	return ApiDeleteKeychainEntryV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -53,7 +53,7 @@ func (a *DefaultApiService) DeleteKeychainEntryV1(ctx context.Context) ApiDelete
 
 // Execute executes the request
 //  @return DeleteKeychainEntryResponseV1
-func (a *DefaultApiService) DeleteKeychainEntryV1Execute(r ApiDeleteKeychainEntryV1Request) (*DeleteKeychainEntryResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) DeleteKeychainEntryV1Execute(r ApiDeleteKeychainEntryV1Request) (*DeleteKeychainEntryResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -61,7 +61,7 @@ func (a *DefaultApiService) DeleteKeychainEntryV1Execute(r ApiDeleteKeychainEntr
 		localVarReturnValue  *DeleteKeychainEntryResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.DeleteKeychainEntryV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DeleteKeychainEntryV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -133,7 +133,7 @@ func (a *DefaultApiService) DeleteKeychainEntryV1Execute(r ApiDeleteKeychainEntr
 
 type ApiGetKeychainEntryV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getKeychainEntryRequestV1 *GetKeychainEntryRequestV1
 }
 
@@ -153,7 +153,7 @@ GetKeychainEntryV1 Retrieves the contents of a keychain entry from the backend.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetKeychainEntryV1Request
 */
-func (a *DefaultApiService) GetKeychainEntryV1(ctx context.Context) ApiGetKeychainEntryV1Request {
+func (a *DefaultAPIService) GetKeychainEntryV1(ctx context.Context) ApiGetKeychainEntryV1Request {
 	return ApiGetKeychainEntryV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -162,7 +162,7 @@ func (a *DefaultApiService) GetKeychainEntryV1(ctx context.Context) ApiGetKeycha
 
 // Execute executes the request
 //  @return GetKeychainEntryResponseV1
-func (a *DefaultApiService) GetKeychainEntryV1Execute(r ApiGetKeychainEntryV1Request) (*GetKeychainEntryResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) GetKeychainEntryV1Execute(r ApiGetKeychainEntryV1Request) (*GetKeychainEntryResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -170,7 +170,7 @@ func (a *DefaultApiService) GetKeychainEntryV1Execute(r ApiGetKeychainEntryV1Req
 		localVarReturnValue  *GetKeychainEntryResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetKeychainEntryV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetKeychainEntryV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -242,7 +242,7 @@ func (a *DefaultApiService) GetKeychainEntryV1Execute(r ApiGetKeychainEntryV1Req
 
 type ApiGetPrometheusMetricsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetPrometheusMetricsV1Request) Execute() (string, *http.Response, error) {
@@ -255,7 +255,7 @@ GetPrometheusMetricsV1 Get the Prometheus Metrics
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetPrometheusMetricsV1Request
 */
-func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
+func (a *DefaultAPIService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
 	return ApiGetPrometheusMetricsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -264,7 +264,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPr
 
 // Execute executes the request
 //  @return string
-func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
+func (a *DefaultAPIService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -272,7 +272,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 		localVarReturnValue  string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetPrometheusMetricsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetPrometheusMetricsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -339,7 +339,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 
 type ApiHasKeychainEntryV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	hasKeychainEntryRequestV1 *HasKeychainEntryRequestV1
 }
 
@@ -359,7 +359,7 @@ HasKeychainEntryV1 Checks that an entry exists under a key on the keychain backe
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiHasKeychainEntryV1Request
 */
-func (a *DefaultApiService) HasKeychainEntryV1(ctx context.Context) ApiHasKeychainEntryV1Request {
+func (a *DefaultAPIService) HasKeychainEntryV1(ctx context.Context) ApiHasKeychainEntryV1Request {
 	return ApiHasKeychainEntryV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -368,7 +368,7 @@ func (a *DefaultApiService) HasKeychainEntryV1(ctx context.Context) ApiHasKeycha
 
 // Execute executes the request
 //  @return HasKeychainEntryResponseV1
-func (a *DefaultApiService) HasKeychainEntryV1Execute(r ApiHasKeychainEntryV1Request) (*HasKeychainEntryResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) HasKeychainEntryV1Execute(r ApiHasKeychainEntryV1Request) (*HasKeychainEntryResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -376,7 +376,7 @@ func (a *DefaultApiService) HasKeychainEntryV1Execute(r ApiHasKeychainEntryV1Req
 		localVarReturnValue  *HasKeychainEntryResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.HasKeychainEntryV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.HasKeychainEntryV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -448,7 +448,7 @@ func (a *DefaultApiService) HasKeychainEntryV1Execute(r ApiHasKeychainEntryV1Req
 
 type ApiSetKeychainEntryV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	setKeychainEntryRequestV1 *SetKeychainEntryRequestV1
 }
 
@@ -468,7 +468,7 @@ SetKeychainEntryV1 Sets a value under a key on the keychain backend.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiSetKeychainEntryV1Request
 */
-func (a *DefaultApiService) SetKeychainEntryV1(ctx context.Context) ApiSetKeychainEntryV1Request {
+func (a *DefaultAPIService) SetKeychainEntryV1(ctx context.Context) ApiSetKeychainEntryV1Request {
 	return ApiSetKeychainEntryV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -477,7 +477,7 @@ func (a *DefaultApiService) SetKeychainEntryV1(ctx context.Context) ApiSetKeycha
 
 // Execute executes the request
 //  @return SetKeychainEntryResponseV1
-func (a *DefaultApiService) SetKeychainEntryV1Execute(r ApiSetKeychainEntryV1Request) (*SetKeychainEntryResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) SetKeychainEntryV1Execute(r ApiSetKeychainEntryV1Request) (*SetKeychainEntryResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -485,7 +485,7 @@ func (a *DefaultApiService) SetKeychainEntryV1Execute(r ApiSetKeychainEntryV1Req
 		localVarReturnValue  *SetKeychainEntryResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.SetKeychainEntryV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.SetKeychainEntryV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the ListFlowsV1Response type satisfies the MappedNullable interface at compile time
@@ -22,6 +24,8 @@ type ListFlowsV1Response struct {
 	// An array of strings storing the names of the flows as returned by the flowList Corda RPC.
 	FlowNames []string `json:"flowNames"`
 }
+
+type _ListFlowsV1Response ListFlowsV1Response
 
 // NewListFlowsV1Response instantiates a new ListFlowsV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -77,6 +81,43 @@ func (o ListFlowsV1Response) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["flowNames"] = o.FlowNames
 	return toSerialize, nil
+}
+
+func (o *ListFlowsV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"flowNames",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varListFlowsV1Response := _ListFlowsV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varListFlowsV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ListFlowsV1Response(varListFlowsV1Response)
+
+	return err
 }
 
 type NullableListFlowsV1Response struct {

@@ -27,3 +27,10 @@ src/main/kotlin/org/openapitools/client/models/HasObjectRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/HasObjectResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/SetObjectRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/SetObjectResponseV1.kt
+src/test/kotlin/org/openapitools/client/apis/DefaultApiTest.kt
+src/test/kotlin/org/openapitools/client/models/GetObjectRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/GetObjectResponseV1Test.kt
+src/test/kotlin/org/openapitools/client/models/HasObjectRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/HasObjectResponseV1Test.kt
+src/test/kotlin/org/openapitools/client/models/SetObjectRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/SetObjectResponseV1Test.kt

@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner type satisfies the MappedNullable interface at compile time
@@ -25,6 +27,8 @@ type GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner struct {
 	LedgerHeight float32 `json:"ledgerHeight"`
 	Chaincodes []GetDiscoveryResultsResponseV1PeersByMSPValuePeersInnerChaincodesInner `json:"chaincodes"`
 }
+
+type _GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner
 
 // NewGetDiscoveryResultsResponseV1PeersByMSPValuePeersInner instantiates a new GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner object
 // This constructor will assign default values to properties that have it defined,
@@ -184,6 +188,47 @@ func (o GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner) ToMap() (map[str
 	toSerialize["ledgerHeight"] = o.LedgerHeight
 	toSerialize["chaincodes"] = o.Chaincodes
 	return toSerialize, nil
+}
+
+func (o *GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"mspid",
+		"endpoint",
+		"name",
+		"ledgerHeight",
+		"chaincodes",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varGetDiscoveryResultsResponseV1PeersByMSPValuePeersInner := _GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varGetDiscoveryResultsResponseV1PeersByMSPValuePeersInner)
+
+	if err != nil {
+		return err
+	}
+
+	*o = GetDiscoveryResultsResponseV1PeersByMSPValuePeersInner(varGetDiscoveryResultsResponseV1PeersByMSPValuePeersInner)
+
+	return err
 }
 
 type NullableGetDiscoveryResultsResponseV1PeersByMSPValuePeersInner struct {

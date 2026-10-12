@@ -8,15 +8,23 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.apis
 
 import java.io.IOException
-import okhttp3.OkHttpClient
+import okhttp3.Call
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.GetObjectRequestV1
@@ -42,15 +50,16 @@ import org.openapitools.client.infrastructure.ResponseType
 import org.openapitools.client.infrastructure.Success
 import org.openapitools.client.infrastructure.toMultiValue
 
-class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient = ApiClient.defaultClient) : ApiClient(basePath, client) {
+open class DefaultApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = ApiClient.defaultClient) : ApiClient(basePath, client) {
     companion object {
         @JvmStatic
         val defaultBasePath: String by lazy {
-            System.getProperties().getProperty(ApiClient.baseUrlKey, "https://www.cactus.stream")
+            System.getProperties().getProperty(ApiClient.BASE_URL_KEY, "https://www.cactus.stream")
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object
      * Retrieves an object from the object store.
      * 
      * @param getObjectRequestV1 Request body to obtain an object via its key.
@@ -76,12 +85,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/get-object
      * Retrieves an object from the object store.
      * 
      * @param getObjectRequestV1 Request body to obtain an object via its key.
@@ -123,6 +133,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object
      * Checks the presence of an object in the object store.
      * 
      * @param hasObjectRequestV1 Request body to check presence of an object under a key.
@@ -148,12 +159,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/has-object
      * Checks the presence of an object in the object store.
      * 
      * @param hasObjectRequestV1 Request body to check presence of an object under a key.
@@ -195,6 +207,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object
      * Sets an object in the object store under the specified key.
      * 
      * @param setObjectRequestV1 Request body to set an object under a key.
@@ -220,12 +233,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-object-store-ipfs/set-object
      * Sets an object in the object store under the specified key.
      * 
      * @param setObjectRequestV1 Request body to set an object under a key.

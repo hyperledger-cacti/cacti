@@ -35,87 +35,152 @@ import "models/sign_transaction_request_pb.proto";
 import "models/sign_transaction_response_pb.proto";
 
 service DefaultService {
-  rpc DeployContractSolBytecodeNoKeychainV1 (DeployContractSolBytecodeNoKeychainV1Request) returns (DeployContractSolidityBytecodeV1ResponsePB);
+  rpc DeployContractSolBytecodeNoKeychainV1 (DeployContractSolBytecodeNoKeychainV1Request) returns (DeployContractSolBytecodeNoKeychainV1Response);
 
-  rpc DeployContractSolBytecodeV1 (DeployContractSolBytecodeV1Request) returns (DeployContractSolidityBytecodeV1ResponsePB);
+  rpc DeployContractSolBytecodeV1 (DeployContractSolBytecodeV1Request) returns (DeployContractSolBytecodeV1Response);
 
-  rpc GetBalanceV1 (GetBalanceV1Request) returns (GetBalanceV1ResponsePB);
+  rpc GetBalanceV1 (GetBalanceV1Request) returns (GetBalanceV1Response);
 
-  rpc GetBesuRecordV1 (GetBesuRecordV1Request) returns (GetBesuRecordV1ResponsePB);
+  rpc GetBesuRecordV1 (GetBesuRecordV1Request) returns (GetBesuRecordV1Response);
 
-  rpc GetBlockV1 (GetBlockV1Request) returns (GetBlockV1ResponsePB);
+  rpc GetBlockV1 (GetBlockV1Request) returns (GetBlockV1Response);
 
   rpc GetOpenApiSpecV1 (google.protobuf.Empty) returns (GetOpenApiSpecV1Response);
 
-  rpc GetPastLogsV1 (GetPastLogsV1Request) returns (GetPastLogsV1ResponsePB);
+  rpc GetPastLogsV1 (GetPastLogsV1Request) returns (GetPastLogsV1Response);
 
   rpc GetPrometheusMetricsV1 (google.protobuf.Empty) returns (GetPrometheusMetricsV1Response);
 
-  rpc GetTransactionV1 (GetTransactionV1Request) returns (GetTransactionV1ResponsePB);
+  rpc GetTransactionV1 (GetTransactionV1Request) returns (GetTransactionV1Response);
 
-  rpc InvokeContractV1 (InvokeContractV1Request) returns (InvokeContractV1ResponsePB);
+  rpc InvokeContractV1 (InvokeContractV1Request) returns (InvokeContractV1Response);
 
-  rpc RunTransactionV1 (RunTransactionV1Request) returns (RunTransactionResponsePB);
+  rpc RunTransactionV1 (RunTransactionV1Request) returns (RunTransactionV1Response);
 
-  rpc SignTransactionV1 (SignTransactionV1Request) returns (SignTransactionResponsePB);
+  rpc SignTransactionV1 (SignTransactionV1Request) returns (SignTransactionV1Response);
 
 }
 
 message DeployContractSolBytecodeNoKeychainV1Request {
-  DeployContractSolidityBytecodeNoKeychainV1RequestPB deployContractSolidityBytecodeNoKeychainV1RequestPB = 1;
+  DeployContractSolidityBytecodeNoKeychainV1RequestPB deploy_contract_solidity_bytecode_no_keychain_v1_request_pb = 1;
 
 }
 
+message DeployContractSolBytecodeNoKeychainV1Response {
+    oneof response {
+        DeployContractSolidityBytecodeV1ResponsePB deploy_contract_solidity_bytecode_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message DeployContractSolBytecodeV1Request {
-  DeployContractSolidityBytecodeV1RequestPB deployContractSolidityBytecodeV1RequestPB = 1;
+  DeployContractSolidityBytecodeV1RequestPB deploy_contract_solidity_bytecode_v1_request_pb = 1;
 
 }
 
+message DeployContractSolBytecodeV1Response {
+    oneof response {
+        DeployContractSolidityBytecodeV1ResponsePB deploy_contract_solidity_bytecode_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message GetBalanceV1Request {
-  GetBalanceV1RequestPB getBalanceV1RequestPB = 1;
+  GetBalanceV1RequestPB get_balance_v1_request_pb = 1;
 
 }
 
+message GetBalanceV1Response {
+    oneof response {
+        GetBalanceV1ResponsePB get_balance_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message GetBesuRecordV1Request {
-  GetBesuRecordV1RequestPB getBesuRecordV1RequestPB = 1;
+  GetBesuRecordV1RequestPB get_besu_record_v1_request_pb = 1;
 
 }
 
+message GetBesuRecordV1Response {
+    oneof response {
+        GetBesuRecordV1ResponsePB get_besu_record_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message GetBlockV1Request {
-  GetBlockV1RequestPB getBlockV1RequestPB = 1;
+  GetBlockV1RequestPB get_block_v1_request_pb = 1;
 
 }
 
+message GetBlockV1Response {
+    oneof response {
+        GetBlockV1ResponsePB get_block_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message GetOpenApiSpecV1Response {
-  string data = 1;
+    oneof response {
+        string string_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
 }
-
 message GetPastLogsV1Request {
-  GetPastLogsV1RequestPB getPastLogsV1RequestPB = 1;
+  GetPastLogsV1RequestPB get_past_logs_v1_request_pb = 1;
 
 }
 
+message GetPastLogsV1Response {
+    oneof response {
+        GetPastLogsV1ResponsePB get_past_logs_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message GetPrometheusMetricsV1Response {
-  string data = 1;
+    oneof response {
+        string string_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
 }
-
 message GetTransactionV1Request {
-  GetTransactionV1RequestPB getTransactionV1RequestPB = 1;
+  GetTransactionV1RequestPB get_transaction_v1_request_pb = 1;
 
 }
 
+message GetTransactionV1Response {
+    oneof response {
+        GetTransactionV1ResponsePB get_transaction_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message InvokeContractV1Request {
-  InvokeContractV1RequestPB invokeContractV1RequestPB = 1;
+  InvokeContractV1RequestPB invoke_contract_v1_request_pb = 1;
 
 }
 
+message InvokeContractV1Response {
+    oneof response {
+        InvokeContractV1ResponsePB invoke_contract_v1_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message RunTransactionV1Request {
-  RunTransactionRequestPB runTransactionRequestPB = 1;
+  RunTransactionRequestPB run_transaction_request_pb = 1;
 
 }
 
+message RunTransactionV1Response {
+    oneof response {
+        RunTransactionResponsePB run_transaction_response_pb_200 = 1;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 2;
+    }
+}
 message SignTransactionV1Request {
-  SignTransactionRequestPB signTransactionRequestPB = 1;
+  SignTransactionRequestPB sign_transaction_request_pb = 1;
 
 }
 
+message SignTransactionV1Response {
+    oneof response {
+        SignTransactionResponsePB sign_transaction_response_pb_200 = 1;
+        google.protobuf.Empty empty_404 = 2;
+        BackingLedgerUnavailableErrorPB backing_ledger_unavailable_error_pb_503 = 3;
+    }
+}

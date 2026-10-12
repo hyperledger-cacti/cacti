@@ -21,12 +21,12 @@ import "models/web3_signing_credential_pb.proto";
 
 message RunTransactionRequestPB {
 
-  Web3SigningCredentialPB web3SigningCredential = 451211679;
+  Web3SigningCredentialPB web3_signing_credential = 337401679;
 
-  BesuTransactionConfigPB transactionConfig = 478618563;
+  BesuTransactionConfigPB transaction_config = 383559742;
 
-  ConsistencyStrategyPB consistencyStrategy = 86789548;
+  ConsistencyStrategyPB consistency_strategy = 243576393;
 
-  BesuPrivateTransactionConfigPB privateTransactionConfig = 276796542;
+  BesuPrivateTransactionConfigPB private_transaction_config = 139004930;
 
 }

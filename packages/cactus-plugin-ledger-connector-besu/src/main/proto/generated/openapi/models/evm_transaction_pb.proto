@@ -21,11 +21,11 @@ message EvmTransactionPB {
 
   float nonce = 105002991;
 
-  optional google.protobuf.Any blockHash = 335211324;
+  optional google.protobuf.Any block_hash = 212436354;
 
-  optional google.protobuf.Any blockNumber = 205598263;
+  optional google.protobuf.Any block_number = 206419142;
 
-  optional google.protobuf.Any transactionIndex = 488538260;
+  optional google.protobuf.Any transaction_index = 335921105;
 
   string from = 3151786;
 
@@ -33,7 +33,7 @@ message EvmTransactionPB {
 
   string value = 111972721;
 
-  string gasPrice = 5271059;
+  string gas_price = 264461414;
 
   float gas = 102105;
 

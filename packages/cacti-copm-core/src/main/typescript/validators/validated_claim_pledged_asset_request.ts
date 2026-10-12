@@ -17,33 +17,33 @@ export class ValidatedClaimPledgedAssetRequest {
   public pledgeId: string;
 
   constructor(req: ClaimPledgedAssetV1Request) {
-    if (!req.assetPledgeClaimV1PB) {
+    if (!req.assetPledgeClaimV1Pb) {
       throw new ConnectError("request data required", Code.InvalidArgument);
     }
 
     this.destCert = validateRequiredString(
-      req.assetPledgeClaimV1PB.destCertificate,
+      req.assetPledgeClaimV1Pb.destCertificate,
       "destCertificate",
     );
     this.sourceCert = validateRequiredString(
-      req.assetPledgeClaimV1PB.sourceCertificate,
+      req.assetPledgeClaimV1Pb.sourceCertificate,
       "sourceCertificate",
     );
     this.pledgeId = validateRequiredString(
-      req.assetPledgeClaimV1PB.pledgeId,
+      req.assetPledgeClaimV1Pb.pledgeId,
       "pledgeId",
     );
 
     this.sourceNetwork = validateRequiredString(
-      req.assetPledgeClaimV1PB.source?.organization,
+      req.assetPledgeClaimV1Pb.source?.organization,
       "source.network",
     );
     (this.destAccount = validateAssetAccount(
-      req.assetPledgeClaimV1PB.destination,
+      req.assetPledgeClaimV1Pb.destination,
       "destination",
     )),
       (this.asset = validateTransferrableAsset(
-        req.assetPledgeClaimV1PB.asset,
+        req.assetPledgeClaimV1Pb.asset,
         "asset",
       ));
   }

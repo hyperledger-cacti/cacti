@@ -103,7 +103,8 @@ describe(testCase, () => {
     });
 
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     const pluginRegistry = new PluginRegistry({});
@@ -123,7 +124,8 @@ describe(testCase, () => {
     };
 
     const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     const pluginHtlc = await factoryHTLC.create(pluginOptions);
     pluginRegistry.add(pluginHtlc);
@@ -164,7 +166,8 @@ describe(testCase, () => {
     });
 
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     const pluginRegistry = new PluginRegistry({});
@@ -184,7 +187,8 @@ describe(testCase, () => {
     };
 
     const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     const pluginHtlc = await factoryHTLC.create(pluginOptions);
     pluginRegistry.add(pluginHtlc);

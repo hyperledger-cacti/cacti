@@ -12,7 +12,7 @@ import org.hyperledger.cacti.plugin.copm.core.services.defaultservice.DefaultSer
 suspend fun pledgeAssetV1Impl(request: DefaultServiceOuterClass.PledgeAssetV1Request,
                               contextFactory: DLTransactionContextFactory,
                               cordaConfig: CordaConfiguration
-): PledgeAssetV1200ResponsePb.PledgeAssetV1200ResponsePB {
+): DefaultServiceOuterClass.PledgeAssetV1Response {
     logger.debug("starting pledge asset")
     val data = ValidatedPledgeAssetV1Request(request)
     val assetContract = cordaConfig.assetContract(data.asset)
@@ -27,8 +27,8 @@ suspend fun pledgeAssetV1Impl(request: DefaultServiceOuterClass.PledgeAssetV1Req
             "AssetTransferPledge",
             listOf( params ))
     )
-    return PledgeAssetV1200ResponsePb.PledgeAssetV1200ResponsePB
+    return DefaultServiceOuterClass.PledgeAssetV1Response.newBuilder().setPledgeAssetV1200ResponsePb200(PledgeAssetV1200ResponsePb.PledgeAssetV1200ResponsePB
         .newBuilder()
-        .setPledgeId(result?.toString())
+        .setPledgeId(result?.toString()))
         .build()
 }

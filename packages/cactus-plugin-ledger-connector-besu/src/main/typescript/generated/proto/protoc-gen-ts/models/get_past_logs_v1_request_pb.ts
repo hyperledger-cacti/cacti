@@ -7,24 +7,24 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class GetPastLogsV1RequestPB extends pb_1.Message {
-        #one_of_decls: number[][] = [[107898160], [53671683], [73950222]];
+        #one_of_decls: number[][] = [[376427065], [199600203], [73950222]];
         constructor(data?: any[] | ({
             topics?: dependency_1.google.protobuf.Any[];
         } & (({
-            toBlock?: dependency_1.google.protobuf.Any;
+            to_block?: dependency_1.google.protobuf.Any;
         }) | ({
-            fromBlock?: dependency_1.google.protobuf.Any;
+            from_block?: dependency_1.google.protobuf.Any;
         }) | ({
             address?: dependency_1.google.protobuf.Any;
         })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [331163357], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("toBlock" in data && data.toBlock != undefined) {
-                    this.toBlock = data.toBlock;
+                if ("to_block" in data && data.to_block != undefined) {
+                    this.to_block = data.to_block;
                 }
-                if ("fromBlock" in data && data.fromBlock != undefined) {
-                    this.fromBlock = data.fromBlock;
+                if ("from_block" in data && data.from_block != undefined) {
+                    this.from_block = data.from_block;
                 }
                 if ("address" in data && data.address != undefined) {
                     this.address = data.address;
@@ -34,23 +34,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 }
             }
         }
-        get toBlock() {
-            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 107898160) as dependency_1.google.protobuf.Any;
+        get to_block() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 376427065) as dependency_1.google.protobuf.Any;
         }
-        set toBlock(value: dependency_1.google.protobuf.Any) {
-            pb_1.Message.setOneofWrapperField(this, 107898160, this.#one_of_decls[0], value);
+        set to_block(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setOneofWrapperField(this, 376427065, this.#one_of_decls[0], value);
         }
-        get has_toBlock() {
-            return pb_1.Message.getField(this, 107898160) != null;
+        get has_to_block() {
+            return pb_1.Message.getField(this, 376427065) != null;
         }
-        get fromBlock() {
-            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 53671683) as dependency_1.google.protobuf.Any;
+        get from_block() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 199600203) as dependency_1.google.protobuf.Any;
         }
-        set fromBlock(value: dependency_1.google.protobuf.Any) {
-            pb_1.Message.setOneofWrapperField(this, 53671683, this.#one_of_decls[1], value);
+        set from_block(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setOneofWrapperField(this, 199600203, this.#one_of_decls[1], value);
         }
-        get has_fromBlock() {
-            return pb_1.Message.getField(this, 53671683) != null;
+        get has_from_block() {
+            return pb_1.Message.getField(this, 199600203) != null;
         }
         get address() {
             return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 73950222) as dependency_1.google.protobuf.Any;
@@ -67,23 +67,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set topics(value: dependency_1.google.protobuf.Any[]) {
             pb_1.Message.setRepeatedWrapperField(this, 331163357, value);
         }
-        get _toBlock() {
+        get _to_block() {
             const cases: {
-                [index: number]: "none" | "toBlock";
+                [index: number]: "none" | "to_block";
             } = {
                 0: "none",
-                107898160: "toBlock"
+                376427065: "to_block"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [107898160])];
+            return cases[pb_1.Message.computeOneofCase(this, [376427065])];
         }
-        get _fromBlock() {
+        get _from_block() {
             const cases: {
-                [index: number]: "none" | "fromBlock";
+                [index: number]: "none" | "from_block";
             } = {
                 0: "none",
-                53671683: "fromBlock"
+                199600203: "from_block"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [53671683])];
+            return cases[pb_1.Message.computeOneofCase(this, [199600203])];
         }
         get _address() {
             const cases: {
@@ -95,17 +95,17 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             return cases[pb_1.Message.computeOneofCase(this, [73950222])];
         }
         static fromObject(data: {
-            toBlock?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
-            fromBlock?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            to_block?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            from_block?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
             address?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
             topics?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
         }): GetPastLogsV1RequestPB {
             const message = new GetPastLogsV1RequestPB({});
-            if (data.toBlock != null) {
-                message.toBlock = dependency_1.google.protobuf.Any.fromObject(data.toBlock);
+            if (data.to_block != null) {
+                message.to_block = dependency_1.google.protobuf.Any.fromObject(data.to_block);
             }
-            if (data.fromBlock != null) {
-                message.fromBlock = dependency_1.google.protobuf.Any.fromObject(data.fromBlock);
+            if (data.from_block != null) {
+                message.from_block = dependency_1.google.protobuf.Any.fromObject(data.from_block);
             }
             if (data.address != null) {
                 message.address = dependency_1.google.protobuf.Any.fromObject(data.address);
@@ -117,16 +117,16 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         }
         toObject() {
             const data: {
-                toBlock?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
-                fromBlock?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                to_block?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                from_block?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
                 address?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
                 topics?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
             } = {};
-            if (this.toBlock != null) {
-                data.toBlock = this.toBlock.toObject();
+            if (this.to_block != null) {
+                data.to_block = this.to_block.toObject();
             }
-            if (this.fromBlock != null) {
-                data.fromBlock = this.fromBlock.toObject();
+            if (this.from_block != null) {
+                data.from_block = this.from_block.toObject();
             }
             if (this.address != null) {
                 data.address = this.address.toObject();
@@ -140,10 +140,10 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_toBlock)
-                writer.writeMessage(107898160, this.toBlock, () => this.toBlock.serialize(writer));
-            if (this.has_fromBlock)
-                writer.writeMessage(53671683, this.fromBlock, () => this.fromBlock.serialize(writer));
+            if (this.has_to_block)
+                writer.writeMessage(376427065, this.to_block, () => this.to_block.serialize(writer));
+            if (this.has_from_block)
+                writer.writeMessage(199600203, this.from_block, () => this.from_block.serialize(writer));
             if (this.has_address)
                 writer.writeMessage(73950222, this.address, () => this.address.serialize(writer));
             if (this.topics.length)
@@ -157,11 +157,11 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 107898160:
-                        reader.readMessage(message.toBlock, () => message.toBlock = dependency_1.google.protobuf.Any.deserialize(reader));
+                    case 376427065:
+                        reader.readMessage(message.to_block, () => message.to_block = dependency_1.google.protobuf.Any.deserialize(reader));
                         break;
-                    case 53671683:
-                        reader.readMessage(message.fromBlock, () => message.fromBlock = dependency_1.google.protobuf.Any.deserialize(reader));
+                    case 199600203:
+                        reader.readMessage(message.from_block, () => message.from_block = dependency_1.google.protobuf.Any.deserialize(reader));
                         break;
                     case 73950222:
                         reader.readMessage(message.address, () => message.address = dependency_1.google.protobuf.Any.deserialize(reader));

@@ -17,6 +17,6 @@ import "google/protobuf/any.proto";
 
 message GetTransactionV1RequestPB {
 
-  string transactionHash = 188901646;
+  string transaction_hash = 508674511;
 
 }

@@ -25,19 +25,26 @@ import jakarta.validation.Valid
  */
 data class StartFlowV1Request(
 
+    @param:JsonProperty("username", required = true)
     @get:JsonProperty("username", required = true) val username: kotlin.String,
 
+    @param:JsonProperty("password", required = true)
     @get:JsonProperty("password", required = true) val password: kotlin.String,
 
+    @param:JsonProperty("rejectUnauthorized", required = true)
     @get:JsonProperty("rejectUnauthorized", required = true) val rejectUnauthorized: kotlin.Boolean,
 
+    @param:JsonProperty("clientRequestId", required = true)
     @get:JsonProperty("clientRequestId", required = true) val clientRequestId: kotlin.String,
 
+    @param:JsonProperty("flowClassName", required = true)
     @get:JsonProperty("flowClassName", required = true) val flowClassName: kotlin.String,
 
     @field:Valid
+    @param:JsonProperty("requestBody", required = true)
     @get:JsonProperty("requestBody", required = true) val requestBody: StartFlowV1RequestRequestBody,
 
+    @param:JsonProperty("holdingIDShortHash")
     @get:JsonProperty("holdingIDShortHash") val holdingIDShortHash: kotlin.String? = null
 ) {
 

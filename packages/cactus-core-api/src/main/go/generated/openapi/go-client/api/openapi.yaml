@@ -19,49 +19,49 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetObjectRequestV1'
+            $ref: "#/components/schemas/GetObjectRequestV1"
       description: Request body to obtain an object via its key.
       required: true
     object_store_set_object_v1_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetObjectRequestV1'
+            $ref: "#/components/schemas/SetObjectRequestV1"
       description: Request body to set an object under a key.
       required: true
     object_store_has_object_v1_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasObjectRequestV1'
+            $ref: "#/components/schemas/HasObjectRequestV1"
       description: Request body to check presence of an object under a key.
       required: true
     keychain_get_entry_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetKeychainEntryRequestV1'
+            $ref: "#/components/schemas/GetKeychainEntryRequestV1"
       description: Request body to obtain a keychain entry via its key
       required: true
     keychain_set_entry_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetKeychainEntryRequestV1'
+            $ref: "#/components/schemas/SetKeychainEntryRequestV1"
       description: Request body to write/update a keychain entry via its key
       required: true
     keychain_has_entry_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasKeychainEntryRequestV1'
+            $ref: "#/components/schemas/HasKeychainEntryRequestV1"
       description: Request body for checking a keychain entry via its key
       required: true
     keychain_delete_entry_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeleteKeychainEntryRequestV1'
+            $ref: "#/components/schemas/DeleteKeychainEntryRequestV1"
       description: Request body to delete a keychain entry via its key
       required: true
   responses:
@@ -69,25 +69,25 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetObjectResponseV1'
+            $ref: "#/components/schemas/GetObjectResponseV1"
       description: OK
     object_store_set_object_v1_response_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetObjectResponseV1'
+            $ref: "#/components/schemas/SetObjectResponseV1"
       description: OK
     object_store_has_object_v1_response_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasObjectResponseV1'
+            $ref: "#/components/schemas/HasObjectResponseV1"
       description: OK
     keychain_get_entry_200:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetKeychainEntryResponseV1'
+            $ref: "#/components/schemas/GetKeychainEntryResponseV1"
       description: OK
     keychain_get_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -102,7 +102,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetKeychainEntryResponseV1'
+            $ref: "#/components/schemas/SetKeychainEntryResponseV1"
       description: OK
     keychain_set_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -115,7 +115,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasKeychainEntryResponseV1'
+            $ref: "#/components/schemas/HasKeychainEntryResponseV1"
       description: OK
     keychain_has_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -128,7 +128,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeleteKeychainEntryResponseV1'
+            $ref: "#/components/schemas/DeleteKeychainEntryResponseV1"
       description: OK
     keychain_delete_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -152,9 +152,9 @@ components:
           nullable: false
           type: string
         type:
-          $ref: '#/components/schemas/PluginImportType'
+          $ref: "#/components/schemas/PluginImportType"
         action:
-          $ref: '#/components/schemas/PluginImportAction'
+          $ref: "#/components/schemas/PluginImportAction"
         options: {}
       required:
       - action
@@ -208,15 +208,15 @@ components:
       nullable: false
       type: string
     ConsortiumMemberId:
-      $ref: '#/components/schemas/PrimaryKey'
+      $ref: "#/components/schemas/PrimaryKey"
     CactusNodeId:
-      $ref: '#/components/schemas/PrimaryKey'
+      $ref: "#/components/schemas/PrimaryKey"
     ConsortiumId:
-      $ref: '#/components/schemas/PrimaryKey'
+      $ref: "#/components/schemas/PrimaryKey"
     LedgerId:
-      $ref: '#/components/schemas/PrimaryKey'
+      $ref: "#/components/schemas/PrimaryKey"
     PluginInstanceId:
-      $ref: '#/components/schemas/PrimaryKey'
+      $ref: "#/components/schemas/PrimaryKey"
     ConsortiumDatabase:
       properties:
         consortium:
@@ -230,7 +230,7 @@ components:
             \ then having this as an array will have proven itself to be an excellent\
             \ long term compatibility/extensibility decision indeed."
           items:
-            $ref: '#/components/schemas/Consortium'
+            $ref: "#/components/schemas/Consortium"
           maxItems: 2048
           minItems: 0
           type: array
@@ -239,7 +239,7 @@ components:
           description: The complete collection of all ledger entities in existence
             within the consortium.
           items:
-            $ref: '#/components/schemas/Ledger'
+            $ref: "#/components/schemas/Ledger"
           maxItems: 2048
           minItems: 0
           type: array
@@ -248,7 +248,7 @@ components:
           description: The complete collection of all consortium member entities in
             existence within the consortium.
           items:
-            $ref: '#/components/schemas/ConsortiumMember'
+            $ref: "#/components/schemas/ConsortiumMember"
           maxItems: 2048
           minItems: 0
           type: array
@@ -257,7 +257,7 @@ components:
           description: The complete collection of all cactus nodes entities in existence
             within the consortium.
           items:
-            $ref: '#/components/schemas/CactusNode'
+            $ref: "#/components/schemas/CactusNode"
           maxItems: 2048
           minItems: 0
           type: array
@@ -266,7 +266,7 @@ components:
           description: The complete collection of all plugin instance entities in
             existence within the consortium.
           items:
-            $ref: '#/components/schemas/PluginInstance'
+            $ref: "#/components/schemas/PluginInstance"
           maxItems: 2048
           minItems: 0
           type: array
@@ -284,7 +284,7 @@ components:
           nullable: false
           type: string
         ledgerType:
-          $ref: '#/components/schemas/LedgerType'
+          $ref: "#/components/schemas/LedgerType"
         consortiumMemberId:
           maxLength: 128
           minLength: 1
@@ -325,7 +325,7 @@ components:
           description: The collection (array) of primary keys of consortium member
             entities that belong to this Consortium.
           items:
-            $ref: '#/components/schemas/ConsortiumMemberId'
+            $ref: "#/components/schemas/ConsortiumMemberId"
           maxItems: 2048
           minItems: 1
           nullable: false
@@ -354,7 +354,7 @@ components:
         nodeIds:
           default: []
           items:
-            $ref: '#/components/schemas/CactusNodeId'
+            $ref: "#/components/schemas/CactusNodeId"
           maxItems: 2048
           minItems: 1
           nullable: false
@@ -387,8 +387,43 @@ components:
       type: object
     CactusNode:
       allOf:
-      - $ref: '#/components/schemas/CactusNodeMeta'
-      - $ref: '#/components/schemas/CactusNode_allOf'
+      - $ref: "#/components/schemas/CactusNodeMeta"
+      - properties:
+          id:
+            $ref: "#/components/schemas/CactusNodeId"
+          consortiumId:
+            $ref: "#/components/schemas/ConsortiumId"
+          memberId:
+            $ref: "#/components/schemas/ConsortiumMemberId"
+          ledgerIds:
+            default: []
+            description: Stores an array of Ledger entity IDs that are reachable (routable)
+              via this Cactus Node. This information is used by the client side SDK
+              API client to figure out at runtime where to send API requests that
+              are specific to a certain ledger such as requests to execute transactions.
+            items:
+              $ref: "#/components/schemas/LedgerId"
+            maxItems: 2048
+            minItems: 0
+            nullable: false
+            type: array
+          pluginInstanceIds:
+            default: []
+            items:
+              $ref: "#/components/schemas/PluginInstanceId"
+            maxItems: 2048
+            minItems: 0
+            nullable: false
+            type: array
+        required:
+        - consortiumId
+        - id
+        - ledgerIds
+        - memberId
+        - nodeApiHost
+        - pluginInstanceIds
+        - publicKeyPem
+        type: object
       description: "A Cactus node can be a single server, or a set of servers behind\
         \ a load balancer acting as one."
       type: object
@@ -438,7 +473,7 @@ components:
           type: string
         signatures:
           items:
-            $ref: '#/components/schemas/JWSRecipient'
+            $ref: "#/components/schemas/JWSRecipient"
           type: array
       required:
       - payload
@@ -662,50 +697,3 @@ components:
       - isPresent
       - key
       type: object
-    CactusNode_allOf:
-      properties:
-        id:
-          maxLength: 128
-          minLength: 1
-          nullable: false
-          type: string
-        consortiumId:
-          maxLength: 128
-          minLength: 1
-          nullable: false
-          type: string
-        memberId:
-          maxLength: 128
-          minLength: 1
-          nullable: false
-          type: string
-        ledgerIds:
-          default: []
-          description: Stores an array of Ledger entity IDs that are reachable (routable)
-            via this Cactus Node. This information is used by the client side SDK
-            API client to figure out at runtime where to send API requests that are
-            specific to a certain ledger such as requests to execute transactions.
-          items:
-            $ref: '#/components/schemas/LedgerId'
-          maxItems: 2048
-          minItems: 0
-          nullable: false
-          type: array
-        pluginInstanceIds:
-          default: []
-          items:
-            $ref: '#/components/schemas/PluginInstanceId'
-          maxItems: 2048
-          minItems: 0
-          nullable: false
-          type: array
-      required:
-      - consortiumId
-      - id
-      - ledgerIds
-      - memberId
-      - nodeApiHost
-      - pluginInstanceIds
-      - publicKeyPem
-      type: object
-      example: null

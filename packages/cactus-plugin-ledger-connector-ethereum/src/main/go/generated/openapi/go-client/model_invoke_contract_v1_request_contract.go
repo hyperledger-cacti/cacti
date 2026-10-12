@@ -13,6 +13,7 @@ package cactus-plugin-ledger-connector-ethereum
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // InvokeContractV1RequestContract - struct for InvokeContractV1RequestContract
@@ -47,7 +48,11 @@ func (dst *InvokeContractV1RequestContract) UnmarshalJSON(data []byte) error {
 		if string(jsonContractKeychainDefinition) == "{}" { // empty struct
 			dst.ContractKeychainDefinition = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.ContractKeychainDefinition); err != nil {
+				dst.ContractKeychainDefinition = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.ContractKeychainDefinition = nil
@@ -60,7 +65,11 @@ func (dst *InvokeContractV1RequestContract) UnmarshalJSON(data []byte) error {
 		if string(jsonDeployedContractJsonDefinition) == "{}" { // empty struct
 			dst.DeployedContractJsonDefinition = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.DeployedContractJsonDefinition); err != nil {
+				dst.DeployedContractJsonDefinition = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.DeployedContractJsonDefinition = nil
@@ -75,6 +84,10 @@ func (dst *InvokeContractV1RequestContract) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(InvokeContractV1RequestContract): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(InvokeContractV1RequestContract)")
 	}
 }
@@ -103,6 +116,20 @@ func (obj *InvokeContractV1RequestContract) GetActualInstance() (interface{}) {
 
 	if obj.DeployedContractJsonDefinition != nil {
 		return obj.DeployedContractJsonDefinition
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj InvokeContractV1RequestContract) GetActualInstanceValue() (interface{}) {
+	if obj.ContractKeychainDefinition != nil {
+		return *obj.ContractKeychainDefinition
+	}
+
+	if obj.DeployedContractJsonDefinition != nil {
+		return *obj.DeployedContractJsonDefinition
 	}
 
 	// all schemas are nil

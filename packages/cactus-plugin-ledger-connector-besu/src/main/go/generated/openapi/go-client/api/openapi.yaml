@@ -24,7 +24,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Retrieves the .json file that contains the OpenAPI specification for
         the plugin.
@@ -40,19 +40,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Request'
+              $ref: "#/components/schemas/DeployContractSolidityBytecodeV1Request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Response'
+                $ref: "#/components/schemas/DeployContractSolidityBytecodeV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Deploys the bytecode of a Solidity contract.
       x-hyperledger-cacti:
@@ -67,19 +67,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeployContractSolidityBytecodeNoKeychainV1Request'
+              $ref: "#/components/schemas/DeployContractSolidityBytecodeNoKeychainV1Request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeployContractSolidityBytecodeV1Response'
+                $ref: "#/components/schemas/DeployContractSolidityBytecodeV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Deploys the bytecode of a Solidity contract without the need of keychain
       x-hyperledger-cacti:
@@ -94,19 +94,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetBalanceV1Request'
+              $ref: "#/components/schemas/GetBalanceV1Request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetBalanceV1Response'
+                $ref: "#/components/schemas/GetBalanceV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Return balance of an address of a given block
       x-hyperledger-cacti:
@@ -121,19 +121,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetBlockV1Request'
+              $ref: "#/components/schemas/GetBlockV1Request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetBlockV1Response'
+                $ref: "#/components/schemas/GetBlockV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Returns a block matching the block
       x-hyperledger-cacti:
@@ -148,19 +148,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RunTransactionRequest'
+              $ref: "#/components/schemas/RunTransactionRequest"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RunTransactionResponse'
+                $ref: "#/components/schemas/RunTransactionResponse"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Executes a transaction on a besu ledger
       x-hyperledger-cacti:
@@ -175,19 +175,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetTransactionV1Request'
+              $ref: "#/components/schemas/GetTransactionV1Request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetTransactionV1Response'
+                $ref: "#/components/schemas/GetTransactionV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Executes a transaction on a besu ledger
       x-hyperledger-cacti:
@@ -202,19 +202,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetPastLogsV1Request'
+              $ref: "#/components/schemas/GetPastLogsV1Request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetPastLogsV1Response'
+                $ref: "#/components/schemas/GetPastLogsV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: "Gets past logs, matching the given options."
       x-hyperledger-cacti:
@@ -229,19 +229,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InvokeContractV1Request'
+              $ref: "#/components/schemas/InvokeContractV1Request"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvokeContractV1Response'
+                $ref: "#/components/schemas/InvokeContractV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Invokes a contract on a besu ledger
       x-hyperledger-cacti:
@@ -258,14 +258,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SignTransactionRequest'
+              $ref: "#/components/schemas/SignTransactionRequest"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignTransactionResponse'
+                $ref: "#/components/schemas/SignTransactionResponse"
           description: OK
         "404":
           description: Not able to find the corresponding tranaction from the transaction
@@ -274,7 +274,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Obtain signatures of ledger from the corresponding transaction hash.
       x-hyperledger-cacti:
@@ -290,13 +290,13 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+                $ref: "#/components/schemas/PrometheusExporterMetricsResponse"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: Get the Prometheus Metrics
       x-hyperledger-cacti:
@@ -311,19 +311,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetBesuRecordV1Request'
+              $ref: "#/components/schemas/GetBesuRecordV1Request"
       responses:
         "200":
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/GetBesuRecordV1Response'
+                $ref: "#/components/schemas/GetBesuRecordV1Response"
           description: OK
         "503":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/BackingLedgerUnavailableError'
+                $ref: "#/components/schemas/BackingLedgerUnavailableError"
           description: API is unable to reach the validator
       summary: "Retrieves an arbitrary record (any piece of information) from the\
         \ ledger. Ledger records can be call outputs, transaction input, etc."
@@ -356,28 +356,28 @@ components:
       type: object
     EvmBlock:
       example:
+        number: 0.8008281904610115
+        hash: hash
+        parentHash: parentHash
+        nonce: nonce
+        sha3Uncles: sha3Uncles
         logsBloom: logsBloom
+        transactionsRoot: transactionsRoot
+        stateRoot: stateRoot
+        miner: miner
+        difficulty: 6.027456183070403
         totalDifficulty: 1.4658129805029452
         extraData: extraData
+        size: 5.962133916683182
+        gasLimit: 5.637376656633329
+        gasUsed: 2.3021358869347655
+        timestamp: ""
         transactions:
         - ""
         - ""
-        nonce: nonce
-        miner: miner
-        difficulty: 6.027456183070403
-        number: 0.8008281904610115
-        gasLimit: 5.637376656633329
-        gasUsed: 2.3021358869347655
         uncles:
         - ""
         - ""
-        sha3Uncles: sha3Uncles
-        size: 5.962133916683182
-        transactionsRoot: transactionsRoot
-        stateRoot: stateRoot
-        parentHash: parentHash
-        hash: hash
-        timestamp: ""
       properties:
         number:
           type: number
@@ -420,47 +420,47 @@ components:
     GetBlockV1Response:
       example:
         block:
+          number: 0.8008281904610115
+          hash: hash
+          parentHash: parentHash
+          nonce: nonce
+          sha3Uncles: sha3Uncles
           logsBloom: logsBloom
+          transactionsRoot: transactionsRoot
+          stateRoot: stateRoot
+          miner: miner
+          difficulty: 6.027456183070403
           totalDifficulty: 1.4658129805029452
           extraData: extraData
+          size: 5.962133916683182
+          gasLimit: 5.637376656633329
+          gasUsed: 2.3021358869347655
+          timestamp: ""
           transactions:
           - ""
           - ""
-          nonce: nonce
-          miner: miner
-          difficulty: 6.027456183070403
-          number: 0.8008281904610115
-          gasLimit: 5.637376656633329
-          gasUsed: 2.3021358869347655
           uncles:
           - ""
           - ""
-          sha3Uncles: sha3Uncles
-          size: 5.962133916683182
-          transactionsRoot: transactionsRoot
-          stateRoot: stateRoot
-          parentHash: parentHash
-          hash: hash
-          timestamp: ""
       properties:
         block:
-          $ref: '#/components/schemas/EvmBlock'
+          $ref: "#/components/schemas/EvmBlock"
       required:
       - block
       type: object
     EvmTransaction:
       example:
+        hash: hash
+        nonce: 0.8008281904610115
         blockHash: ""
-        input: input
         blockNumber: ""
-        gas: 6.027456183070403
         transactionIndex: ""
         from: from
         to: ""
-        nonce: 0.8008281904610115
         value: value
-        hash: hash
         gasPrice: gasPrice
+        gas: 6.027456183070403
+        input: input
       properties:
         hash:
           type: string
@@ -484,20 +484,20 @@ components:
     GetTransactionV1Response:
       example:
         transaction:
+          hash: hash
+          nonce: 0.8008281904610115
           blockHash: ""
-          input: input
           blockNumber: ""
-          gas: 6.027456183070403
           transactionIndex: ""
           from: from
           to: ""
-          nonce: 0.8008281904610115
           value: value
-          hash: hash
           gasPrice: gasPrice
+          gas: 6.027456183070403
+          input: input
       properties:
         transaction:
-          $ref: '#/components/schemas/EvmTransaction'
+          $ref: "#/components/schemas/EvmTransaction"
       required:
       - transaction
       type: object
@@ -514,30 +514,30 @@ components:
     GetPastLogsV1Response:
       example:
         logs:
-        - blockHash: blockHash
-          address: address
-          logIndex: 0.8008281904610115
+        - address: address
           data: data
+          blockHash: blockHash
+          transactionHash: transactionHash
           topics:
           - topics
           - topics
-          blockNumber: 1.4658129805029452
-          transactionIndex: 6.027456183070403
-          transactionHash: transactionHash
-        - blockHash: blockHash
-          address: address
           logIndex: 0.8008281904610115
+          transactionIndex: 6.027456183070403
+          blockNumber: 1.4658129805029452
+        - address: address
           data: data
+          blockHash: blockHash
+          transactionHash: transactionHash
           topics:
           - topics
           - topics
-          blockNumber: 1.4658129805029452
+          logIndex: 0.8008281904610115
           transactionIndex: 6.027456183070403
-          transactionHash: transactionHash
+          blockNumber: 1.4658129805029452
       properties:
         logs:
           items:
-            $ref: '#/components/schemas/EvmLog'
+            $ref: "#/components/schemas/EvmLog"
           type: array
       required:
       - logs
@@ -545,8 +545,8 @@ components:
     GetPastLogsV1Request:
       additionalProperties: false
       example:
-        fromBlock: ""
         toBlock: ""
+        fromBlock: ""
         address: ""
         topics:
         - ""
@@ -561,16 +561,16 @@ components:
       type: object
     EvmLog:
       example:
-        blockHash: blockHash
         address: address
-        logIndex: 0.8008281904610115
         data: data
+        blockHash: blockHash
+        transactionHash: transactionHash
         topics:
         - topics
         - topics
-        blockNumber: 1.4658129805029452
+        logIndex: 0.8008281904610115
         transactionIndex: 6.027456183070403
-        transactionHash: transactionHash
+        blockNumber: 1.4658129805029452
       properties:
         address:
           type: string
@@ -626,7 +626,7 @@ components:
     WatchBlocksV1Request:
       properties:
         event:
-          $ref: '#/components/schemas/WatchBlocksV1'
+          $ref: "#/components/schemas/WatchBlocksV1"
       required:
       - event
       type: object
@@ -659,7 +659,7 @@ components:
         gasUsed:
           type: integer
         timestamp:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
       required:
       - extraData
       - gasLimit
@@ -679,7 +679,7 @@ components:
     WatchBlocksV1Progress:
       properties:
         blockHeader:
-          $ref: '#/components/schemas/Web3BlockHeader'
+          $ref: "#/components/schemas/Web3BlockHeader"
       required:
       - blockHeader
       type: object
@@ -693,12 +693,12 @@ components:
       type: string
     ConsistencyStrategy:
       example:
-        blockConfirmations: 2931
-        receiptType: null
+        receiptType: NODE_TX_POOL_ACK
         timeoutMs: 0
+        blockConfirmations: 2931
       properties:
         receiptType:
-          $ref: '#/components/schemas/ReceiptType'
+          $ref: "#/components/schemas/ReceiptType"
         timeoutMs:
           description: "The amount of milliseconds to wait for the receipt to arrive\
             \ to the connector. Defaults to 0 which means to wait for an unlimited\
@@ -726,21 +726,21 @@ components:
       discriminator:
         propertyName: type
       example:
-        type: null
+        type: CACTUS_KEYCHAIN_REF
       oneOf:
-      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
-      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
-      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      - $ref: "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
+      - $ref: "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
+      - $ref: "#/components/schemas/Web3SigningCredentialNone"
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
       required:
       - type
       type: object
     Web3SigningCredentialCactusKeychainRef:
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
         ethAccount:
           description: The ethereum account (public key) that the credential  belongs
             to. Basically the username in the traditional  terminology of authentication.
@@ -770,7 +770,7 @@ components:
     Web3SigningCredentialPrivateKeyHex:
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
         ethAccount:
           description: The ethereum account (public key) that the credential belongs
             to. Basically the username in the traditional terminology of authentication.
@@ -793,7 +793,7 @@ components:
         transaction is pre-signed.
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
       required:
       - type
       type: object
@@ -832,12 +832,12 @@ components:
         sourcePath:
           type: string
         compiler:
-          $ref: '#/components/schemas/SolidityContractJsonArtifact_compiler'
+          $ref: "#/components/schemas/SolidityContractJsonArtifact_compiler"
         functionHashes:
           additionalProperties: true
           type: object
         gasEstimates:
-          $ref: '#/components/schemas/SolidityContractJsonArtifact_gasEstimates'
+          $ref: "#/components/schemas/SolidityContractJsonArtifact_gasEstimates"
       required:
       - contractName
       type: object
@@ -845,31 +845,31 @@ components:
       additionalProperties: true
       example:
         rawTransaction: rawTransaction
-        data: null
-        gas: null
-        from: null
-        to: null
+        from: Web3BlockHeader_timestamp
+        to: to
         value: null
-        nonce: 0.8008281904610115
+        gas: null
         gasPrice: null
+        nonce: 0.8008281904610115
+        data: data
       properties:
         rawTransaction:
           nullable: false
           type: string
         from:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
         to:
-          $ref: '#/components/schemas/BesuTransactionConfig_to'
+          type: string
         value:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
         gas:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
         gasPrice:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
         nonce:
           type: number
         data:
-          $ref: '#/components/schemas/BesuTransactionConfig_to'
+          type: string
       type: object
     BesuPrivateTransactionConfig:
       example:
@@ -893,15 +893,15 @@ components:
     Web3TransactionReceipt:
       additionalProperties: true
       example:
-        blockHash: blockHash
-        gasUsed: 1.4658129805029452
-        blockNumber: 6.027456183070403
-        contractAddress: contractAddress
+        status: true
+        transactionHash: transactionHash
         transactionIndex: 0.8008281904610115
+        blockHash: blockHash
+        blockNumber: 6.027456183070403
+        gasUsed: 1.4658129805029452
+        contractAddress: contractAddress
         from: from
         to: to
-        transactionHash: transactionHash
-        status: true
       properties:
         status:
           nullable: false
@@ -947,35 +947,35 @@ components:
     RunTransactionRequest:
       additionalProperties: false
       example:
+        web3SigningCredential:
+          type: CACTUS_KEYCHAIN_REF
+        transactionConfig:
+          rawTransaction: rawTransaction
+          from: Web3BlockHeader_timestamp
+          to: to
+          value: null
+          gas: null
+          gasPrice: null
+          nonce: 0.8008281904610115
+          data: data
+        consistencyStrategy:
+          receiptType: NODE_TX_POOL_ACK
+          timeoutMs: 0
+          blockConfirmations: 2931
         privateTransactionConfig:
           privateFrom: privateFrom
           privateFor:
           - ""
           - ""
-        transactionConfig:
-          rawTransaction: rawTransaction
-          data: null
-          gas: null
-          from: null
-          to: null
-          value: null
-          nonce: 0.8008281904610115
-          gasPrice: null
-        consistencyStrategy:
-          blockConfirmations: 2931
-          receiptType: null
-          timeoutMs: 0
-        web3SigningCredential:
-          type: null
       properties:
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         transactionConfig:
-          $ref: '#/components/schemas/BesuTransactionConfig'
+          $ref: "#/components/schemas/BesuTransactionConfig"
         consistencyStrategy:
-          $ref: '#/components/schemas/ConsistencyStrategy'
+          $ref: "#/components/schemas/ConsistencyStrategy"
         privateTransactionConfig:
-          $ref: '#/components/schemas/BesuPrivateTransactionConfig'
+          $ref: "#/components/schemas/BesuPrivateTransactionConfig"
       required:
       - consistencyStrategy
       - transactionConfig
@@ -984,43 +984,43 @@ components:
     RunTransactionResponse:
       example:
         transactionReceipt:
-          blockHash: blockHash
-          gasUsed: 1.4658129805029452
-          blockNumber: 6.027456183070403
-          contractAddress: contractAddress
+          status: true
+          transactionHash: transactionHash
           transactionIndex: 0.8008281904610115
+          blockHash: blockHash
+          blockNumber: 6.027456183070403
+          gasUsed: 1.4658129805029452
+          contractAddress: contractAddress
           from: from
           to: to
-          transactionHash: transactionHash
-          status: true
       properties:
         transactionReceipt:
-          $ref: '#/components/schemas/Web3TransactionReceipt'
+          $ref: "#/components/schemas/Web3TransactionReceipt"
       required:
       - transactionReceipt
       type: object
     DeployContractSolidityBytecodeV1Request:
       additionalProperties: false
       example:
+        contractName: contractName
+        contractAbi:
+        - ""
+        - ""
+        constructorArgs:
+        - ""
+        - ""
+        web3SigningCredential:
+          type: CACTUS_KEYCHAIN_REF
         bytecode: bytecode
+        keychainId: keychainId
+        gas: 0.8008281904610115
+        gasPrice: gasPrice
+        timeoutMs: 0.6027456183070403
         privateTransactionConfig:
           privateFrom: privateFrom
           privateFor:
           - ""
           - ""
-        keychainId: keychainId
-        constructorArgs:
-        - ""
-        - ""
-        timeoutMs: 0.6027456183070403
-        contractAbi:
-        - ""
-        - ""
-        gas: 0.8008281904610115
-        web3SigningCredential:
-          type: null
-        contractName: contractName
-        gasPrice: gasPrice
       properties:
         contractName:
           description: The contract name for retrieve the contracts json on the keychain.
@@ -1038,7 +1038,7 @@ components:
           items: {}
           type: array
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         bytecode:
           description: See https://ethereum.stackexchange.com/a/47556 regarding the
             maximum length of the bytecode. 2 + (24576 * 2) = 49154 meaning that hex
@@ -1069,7 +1069,7 @@ components:
           nullable: false
           type: number
         privateTransactionConfig:
-          $ref: '#/components/schemas/BesuPrivateTransactionConfig'
+          $ref: "#/components/schemas/BesuPrivateTransactionConfig"
       required:
       - bytecode
       - constructorArgs
@@ -1081,24 +1081,24 @@ components:
     DeployContractSolidityBytecodeNoKeychainV1Request:
       additionalProperties: false
       example:
+        contractName: contractName
+        contractAbi:
+        - ""
+        - ""
+        constructorArgs:
+        - ""
+        - ""
+        web3SigningCredential:
+          type: CACTUS_KEYCHAIN_REF
         bytecode: bytecode
+        gas: 0.8008281904610115
+        gasPrice: gasPrice
+        timeoutMs: 0.6027456183070403
         privateTransactionConfig:
           privateFrom: privateFrom
           privateFor:
           - ""
           - ""
-        constructorArgs:
-        - ""
-        - ""
-        timeoutMs: 0.6027456183070403
-        contractAbi:
-        - ""
-        - ""
-        gas: 0.8008281904610115
-        web3SigningCredential:
-          type: null
-        contractName: contractName
-        gasPrice: gasPrice
       properties:
         contractName:
           description: The contract name for retrieve the contracts json on the keychain.
@@ -1116,7 +1116,7 @@ components:
           items: {}
           type: array
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         bytecode:
           description: See https://ethereum.stackexchange.com/a/47556 regarding the
             maximum length of the bytecode. 2 + (24576 * 2) = 49154 meaning that hex
@@ -1141,7 +1141,7 @@ components:
           nullable: false
           type: number
         privateTransactionConfig:
-          $ref: '#/components/schemas/BesuPrivateTransactionConfig'
+          $ref: "#/components/schemas/BesuPrivateTransactionConfig"
       required:
       - bytecode
       - constructorArgs
@@ -1152,55 +1152,55 @@ components:
     DeployContractSolidityBytecodeV1Response:
       example:
         transactionReceipt:
-          blockHash: blockHash
-          gasUsed: 1.4658129805029452
-          blockNumber: 6.027456183070403
-          contractAddress: contractAddress
+          status: true
+          transactionHash: transactionHash
           transactionIndex: 0.8008281904610115
+          blockHash: blockHash
+          blockNumber: 6.027456183070403
+          gasUsed: 1.4658129805029452
+          contractAddress: contractAddress
           from: from
           to: to
-          transactionHash: transactionHash
-          status: true
       properties:
         transactionReceipt:
-          $ref: '#/components/schemas/Web3TransactionReceipt'
+          $ref: "#/components/schemas/Web3TransactionReceipt"
       required:
       - transactionReceipt
       type: object
     InvokeContractV1Request:
       additionalProperties: false
       example:
+        contractName: contractName
+        signingCredential:
+          type: CACTUS_KEYCHAIN_REF
+        invocationType: SEND
+        methodName: methodName
+        params:
+        - ""
+        - ""
+        contractAbi:
+        - ""
+        - ""
+        contractAddress: contractAddress
+        value: Web3BlockHeader_timestamp
+        gas: null
+        gasPrice: null
+        nonce: 0.8008281904610115
+        timeoutMs: 0.6027456183070403
+        keychainId: keychainId
         privateTransactionConfig:
           privateFrom: privateFrom
           privateFor:
           - ""
           - ""
-        methodName: methodName
-        contractAddress: contractAddress
-        params:
-        - ""
-        - ""
-        nonce: 0.8008281904610115
-        invocationType: null
-        keychainId: keychainId
-        timeoutMs: 0.6027456183070403
-        contractAbi:
-        - ""
-        - ""
-        gas: null
-        contractName: contractName
-        value: null
-        signingCredential:
-          type: null
-        gasPrice: null
       properties:
         contractName:
           nullable: false
           type: string
         signingCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         invocationType:
-          $ref: '#/components/schemas/EthContractInvocationType'
+          $ref: "#/components/schemas/EthContractInvocationType"
         methodName:
           description: The name of the contract method to invoke.
           maxLength: 2048
@@ -1224,11 +1224,11 @@ components:
           nullable: false
           type: string
         value:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
         gas:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
         gasPrice:
-          $ref: '#/components/schemas/Web3BlockHeader_timestamp'
+          $ref: "#/components/schemas/Web3BlockHeader_timestamp"
         nonce:
           type: number
         timeoutMs:
@@ -1245,7 +1245,7 @@ components:
           minLength: 1
           type: string
         privateTransactionConfig:
-          $ref: '#/components/schemas/BesuPrivateTransactionConfig'
+          $ref: "#/components/schemas/BesuPrivateTransactionConfig"
       required:
       - contractName
       - invocationType
@@ -1256,20 +1256,20 @@ components:
     InvokeContractV1Response:
       example:
         transactionReceipt:
-          blockHash: blockHash
-          gasUsed: 1.4658129805029452
-          blockNumber: 6.027456183070403
-          contractAddress: contractAddress
+          status: true
+          transactionHash: transactionHash
           transactionIndex: 0.8008281904610115
+          blockHash: blockHash
+          blockNumber: 6.027456183070403
+          gasUsed: 1.4658129805029452
+          contractAddress: contractAddress
           from: from
           to: to
-          transactionHash: transactionHash
-          status: true
         callOutput: ""
         success: true
       properties:
         transactionReceipt:
-          $ref: '#/components/schemas/Web3TransactionReceipt'
+          $ref: "#/components/schemas/Web3TransactionReceipt"
         callOutput: {}
         success:
           nullable: false
@@ -1326,33 +1326,33 @@ components:
       additionalProperties: false
       example:
         invokeCall:
+          contractName: contractName
+          signingCredential:
+            type: CACTUS_KEYCHAIN_REF
+          invocationType: SEND
+          methodName: methodName
+          params:
+          - ""
+          - ""
+          contractAbi:
+          - ""
+          - ""
+          contractAddress: contractAddress
+          value: Web3BlockHeader_timestamp
+          gas: null
+          gasPrice: null
+          nonce: 0.8008281904610115
+          timeoutMs: 0.6027456183070403
+          keychainId: keychainId
           privateTransactionConfig:
             privateFrom: privateFrom
             privateFor:
             - ""
             - ""
-          methodName: methodName
-          contractAddress: contractAddress
-          params:
-          - ""
-          - ""
-          nonce: 0.8008281904610115
-          invocationType: null
-          keychainId: keychainId
-          timeoutMs: 0.6027456183070403
-          contractAbi:
-          - ""
-          - ""
-          gas: null
-          contractName: contractName
-          value: null
-          signingCredential:
-            type: null
-          gasPrice: null
         transactionHash: transactionHash
       properties:
         invokeCall:
-          $ref: '#/components/schemas/InvokeContractV1Request'
+          $ref: "#/components/schemas/InvokeContractV1Request"
         transactionHash:
           maxLength: 66
           minLength: 66
@@ -1360,11 +1360,6 @@ components:
           type: string
       type: object
     GetBesuRecordV1Response:
-      example:
-        ledgerId: ledgerId
-        transactionInputData: ""
-        callOutput: ""
-        stateContract: stateContract
       properties:
         ledgerId:
           type: string
@@ -1374,6 +1369,9 @@ components:
         callOutput: {}
       type: object
     BackingLedgerUnavailableError:
+      example:
+        message: |
+          Backing Ledger Unavailable
       properties:
         message:
           example: |
@@ -1403,10 +1401,7 @@ components:
     SolidityContractJsonArtifact_gasEstimates:
       properties:
         creation:
-          $ref: '#/components/schemas/SolidityContractJsonArtifact_gasEstimates_creation'
+          $ref: "#/components/schemas/SolidityContractJsonArtifact_gasEstimates_creation"
         external:
           additionalProperties: true
           type: object
-    BesuTransactionConfig_to:
-      oneOf:
-      - type: string

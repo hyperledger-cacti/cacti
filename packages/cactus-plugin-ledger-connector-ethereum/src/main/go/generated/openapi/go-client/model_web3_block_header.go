@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-ethereum
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the Web3BlockHeader type satisfies the MappedNullable interface at compile time
@@ -35,6 +37,8 @@ type Web3BlockHeader struct {
 	Nonce *string `json:"nonce,omitempty"`
 	Timestamp *string `json:"timestamp,omitempty"`
 }
+
+type _Web3BlockHeader Web3BlockHeader
 
 // NewWeb3BlockHeader instantiates a new Web3BlockHeader object
 // This constructor will assign default values to properties that have it defined,
@@ -562,6 +566,45 @@ func (o Web3BlockHeader) ToMap() (map[string]interface{}, error) {
 		toSerialize["timestamp"] = o.Timestamp
 	}
 	return toSerialize, nil
+}
+
+func (o *Web3BlockHeader) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"sha3Uncles",
+		"gasLimit",
+		"gasUsed",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varWeb3BlockHeader := _Web3BlockHeader{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varWeb3BlockHeader)
+
+	if err != nil {
+		return err
+	}
+
+	*o = Web3BlockHeader(varWeb3BlockHeader)
+
+	return err
 }
 
 type NullableWeb3BlockHeader struct {

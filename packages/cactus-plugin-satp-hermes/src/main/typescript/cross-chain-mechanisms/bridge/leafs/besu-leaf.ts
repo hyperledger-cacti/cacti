@@ -1246,7 +1246,7 @@ export class BesuLeaf
           throw new ViewError(`${fnTag}, View is undefined`);
         }
 
-        return safeStableStringify(generated);
+        return safeStableStringify(generated) ?? "";
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

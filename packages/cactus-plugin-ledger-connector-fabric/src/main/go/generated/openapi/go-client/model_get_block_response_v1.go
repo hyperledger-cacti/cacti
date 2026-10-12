@@ -13,6 +13,7 @@ package cactus-plugin-ledger-connector-fabric
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // GetBlockResponseV1 - Response from GetBlock endpoint.
@@ -63,7 +64,11 @@ func (dst *GetBlockResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonCactiBlockFullResponseV1) == "{}" { // empty struct
 			dst.CactiBlockFullResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.CactiBlockFullResponseV1); err != nil {
+				dst.CactiBlockFullResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.CactiBlockFullResponseV1 = nil
@@ -76,7 +81,11 @@ func (dst *GetBlockResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonCactiBlockTransactionsResponseV1) == "{}" { // empty struct
 			dst.CactiBlockTransactionsResponseV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.CactiBlockTransactionsResponseV1); err != nil {
+				dst.CactiBlockTransactionsResponseV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.CactiBlockTransactionsResponseV1 = nil
@@ -89,7 +98,11 @@ func (dst *GetBlockResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonGetBlockResponseDecodedV1) == "{}" { // empty struct
 			dst.GetBlockResponseDecodedV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.GetBlockResponseDecodedV1); err != nil {
+				dst.GetBlockResponseDecodedV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.GetBlockResponseDecodedV1 = nil
@@ -102,7 +115,11 @@ func (dst *GetBlockResponseV1) UnmarshalJSON(data []byte) error {
 		if string(jsonGetBlockResponseEncodedV1) == "{}" { // empty struct
 			dst.GetBlockResponseEncodedV1 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.GetBlockResponseEncodedV1); err != nil {
+				dst.GetBlockResponseEncodedV1 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.GetBlockResponseEncodedV1 = nil
@@ -119,6 +136,10 @@ func (dst *GetBlockResponseV1) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(GetBlockResponseV1): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(GetBlockResponseV1)")
 	}
 }
@@ -163,6 +184,28 @@ func (obj *GetBlockResponseV1) GetActualInstance() (interface{}) {
 
 	if obj.GetBlockResponseEncodedV1 != nil {
 		return obj.GetBlockResponseEncodedV1
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj GetBlockResponseV1) GetActualInstanceValue() (interface{}) {
+	if obj.CactiBlockFullResponseV1 != nil {
+		return *obj.CactiBlockFullResponseV1
+	}
+
+	if obj.CactiBlockTransactionsResponseV1 != nil {
+		return *obj.CactiBlockTransactionsResponseV1
+	}
+
+	if obj.GetBlockResponseDecodedV1 != nil {
+		return *obj.GetBlockResponseDecodedV1
+	}
+
+	if obj.GetBlockResponseEncodedV1 != nil {
+		return *obj.GetBlockResponseEncodedV1
 	}
 
 	// all schemas are nil

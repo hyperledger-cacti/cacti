@@ -20,7 +20,7 @@ var _ MappedNullable = &GetBesuRecordV1Request{}
 // GetBesuRecordV1Request struct for GetBesuRecordV1Request
 type GetBesuRecordV1Request struct {
 	InvokeCall *InvokeContractV1Request `json:"invokeCall,omitempty"`
-	TransactionHash *string `json:"transactionHash,omitempty"`
+	TransactionHash *string `json:"transactionHash,omitempty" validate:"regexp=^0x([A-Fa-f0-9]{64})$"`
 }
 
 // NewGetBesuRecordV1Request instantiates a new GetBesuRecordV1Request object

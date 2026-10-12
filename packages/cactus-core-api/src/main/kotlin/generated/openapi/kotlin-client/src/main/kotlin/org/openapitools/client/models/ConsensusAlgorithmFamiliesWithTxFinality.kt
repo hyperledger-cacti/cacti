@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,17 +30,17 @@ import com.squareup.moshi.JsonClass
 /**
  * Enumerates a list of consensus algorithm families that provide immediate finality
  *
- * Values: aUTHORITY,sTAKE
+ * Values: orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_AUTHORITY,orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_STAKE
  */
 
 @JsonClass(generateAdapter = false)
 enum class ConsensusAlgorithmFamiliesWithTxFinality(val value: kotlin.String) {
 
     @Json(name = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY")
-    aUTHORITY("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"),
+    orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_AUTHORITY("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"),
 
     @Json(name = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE")
-    sTAKE("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE");
+    orgPeriodHyperledgerPeriodCactusPeriodConsensusalgorithmPeriodPROOF_OF_STAKE("org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -41,7 +49,7 @@ enum class ConsensusAlgorithmFamiliesWithTxFinality(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -54,7 +62,7 @@ enum class ConsensusAlgorithmFamiliesWithTxFinality(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): ConsensusAlgorithmFamiliesWithTxFinality? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

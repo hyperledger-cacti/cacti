@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-ethereum
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the InvokeRawWeb3EthContractV1Response type satisfies the MappedNullable interface at compile time
@@ -26,6 +28,8 @@ type InvokeRawWeb3EthContractV1Response struct {
 	// Error details
 	ErrorDetail *string `json:"errorDetail,omitempty"`
 }
+
+type _InvokeRawWeb3EthContractV1Response InvokeRawWeb3EthContractV1Response
 
 // NewInvokeRawWeb3EthContractV1Response instantiates a new InvokeRawWeb3EthContractV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -90,7 +94,7 @@ func (o *InvokeRawWeb3EthContractV1Response) GetDataOk() (*interface{}, bool) {
 
 // HasData returns a boolean if a field has been set.
 func (o *InvokeRawWeb3EthContractV1Response) HasData() bool {
-	if o != nil && IsNil(o.Data) {
+	if o != nil && !IsNil(o.Data) {
 		return true
 	}
 
@@ -152,6 +156,43 @@ func (o InvokeRawWeb3EthContractV1Response) ToMap() (map[string]interface{}, err
 		toSerialize["errorDetail"] = o.ErrorDetail
 	}
 	return toSerialize, nil
+}
+
+func (o *InvokeRawWeb3EthContractV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"status",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varInvokeRawWeb3EthContractV1Response := _InvokeRawWeb3EthContractV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varInvokeRawWeb3EthContractV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = InvokeRawWeb3EthContractV1Response(varInvokeRawWeb3EthContractV1Response)
+
+	return err
 }
 
 type NullableInvokeRawWeb3EthContractV1Response struct {

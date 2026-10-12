@@ -8,7 +8,6 @@ import { ApiServer, ConfigService } from "../../../main/typescript/public-api";
 import { SelfSignedPkiGenerator } from "../../../main/typescript/public-api";
 import { AuthorizationProtocol } from "../../../main/typescript/public-api";
 import { default_service } from "../../../main/typescript/public-api";
-import { health_check_response_pb } from "../../../main/typescript/public-api";
 import { empty } from "../../../main/typescript/public-api";
 import { RuntimeError } from "run-time-error-cjs";
 
@@ -67,13 +66,13 @@ test(testCase, async (t: Test) => {
   t.ok(apiClient, "apiClient truthy OK");
 
   const responsePromise =
-    new Promise<health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB>(
+    new Promise<default_service.org.hyperledger.cactus.cmd_api_server.GetHealthCheckV1Response>(
       (resolve, reject) => {
         apiClient.GetHealthCheckV1(
           new empty.google.protobuf.Empty(),
           (
             error: grpc.ServiceError | null,
-            response?: health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB,
+            response?: default_service.org.hyperledger.cactus.cmd_api_server.GetHealthCheckV1Response,
           ) => {
             if (error) {
               reject(error);
@@ -90,12 +89,13 @@ test(testCase, async (t: Test) => {
   await t.doesNotReject(responsePromise, "No error in healthcheck OK");
   const res = await responsePromise;
 
-  const resHc = res.toObject();
+  t.ok(res, `healthcheck response truthy OK`);
+  const resHc = res.health_check_response_pb_200?.toObject();
 
-  t.ok(resHc, `healthcheck response truthy OK`);
-  t.ok(resHc.createdAt, `resHc.createdAt truthy OK`);
-  t.ok(resHc.memoryUsage, `resHc.memoryUsage truthy OK`);
-  t.ok(resHc.memoryUsage?.rss, `resHc.memoryUsage.rss truthy OK`);
-  t.ok(resHc.success, `resHc.success truthy OK`);
+  t.ok(resHc, `resHc truthy OK`);
+  t.ok(resHc?.created_at, `resHc.created_at truthy OK`);
+  t.ok(resHc?.memory_usage, `resHc.memory_usage truthy OK`);
+  t.ok(resHc?.memory_usage?.rss, `resHc.memory_usage.rss truthy OK`);
+  t.ok(resHc?.success, `resHc.success truthy OK`);
   t.end();
 });

@@ -216,6 +216,7 @@
     "notok",
     "npipe",
     "oapi",
+    "oneof",
     "oneofs",
     "onsi",
     "openethereum",

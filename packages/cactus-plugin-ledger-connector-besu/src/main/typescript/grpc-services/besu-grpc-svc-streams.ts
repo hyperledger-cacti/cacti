@@ -80,7 +80,7 @@ export class BesuGrpcSvcStreams extends besu_grpc_svc_streams.org.hyperledger
 
     call.on("data", (chunk: WatchBlocksV1RequestPB) => {
       this.log.debug("WatchBlocksV1::data=%o", chunk);
-      if (chunk.event === WatchBlocksV1PB.WatchBlocksV1PB_Unsubscribe) {
+      if (chunk.event === WatchBlocksV1PB.WATCH_BLOCKS_V1_P_B_Unsubscribe) {
         this.log.debug("WatchBlocksV1::data=WatchBlocksV1PB_Unsubscribe");
         call.end();
       }

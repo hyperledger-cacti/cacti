@@ -60,7 +60,8 @@ beforeAll(async () => {
 
   //setup satp gateway
   const factoryOptions: IPluginFactoryOptions = {
-    pluginImportType: PluginImportType.Local,
+    pluginImportType:
+      PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
   };
   const factory = new PluginFactorySATPGateway(factoryOptions);
 

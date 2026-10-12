@@ -8,15 +8,23 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.apis
 
 import java.io.IOException
-import okhttp3.OkHttpClient
+import okhttp3.Call
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.DeployContractV1501Response
@@ -50,15 +58,16 @@ import org.openapitools.client.infrastructure.ResponseType
 import org.openapitools.client.infrastructure.Success
 import org.openapitools.client.infrastructure.toMultiValue
 
-class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient = ApiClient.defaultClient) : ApiClient(basePath, client) {
+open class DefaultApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = ApiClient.defaultClient) : ApiClient(basePath, client) {
     companion object {
         @JvmStatic
         val defaultBasePath: String by lazy {
-            System.getProperties().getProperty(ApiClient.baseUrlKey, "http://localhost")
+            System.getProperties().getProperty(ApiClient.BASE_URL_KEY, "http://localhost")
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract
      * Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The &#39;v1&#39; suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
      * 
      * @param deployContractV1Request  (optional)
@@ -84,12 +93,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/deploy-contract
      * Deploys a chaincode contract from a set of source files. Note: This endpoint only supports Fabric 2.x. The &#39;v1&#39; suffix in the method name refers to the Cactus API version, not the supported Fabric ledger version.
      * 
      * @param deployContractV1Request  (optional)
@@ -118,7 +128,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        localVariableHeaders["Accept"] = "application/json"
+        localVariableHeaders["Accept"] = "application/json, text/plain"
 
         return RequestConfig(
             method = RequestMethod.POST,
@@ -131,6 +141,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block
      * Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
      * 
      * @param getBlockRequestV1  (optional)
@@ -156,12 +167,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-block
      * Get block from the channel using one of selectors from the input. Works only on Fabric 2.x.
      * 
      * @param getBlockRequestV1  (optional)
@@ -203,6 +215,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info
      * Get fabric ledger chain info.
      * 
      * @param getChainInfoRequestV1  (optional)
@@ -228,12 +241,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-chain-info
      * Get fabric ledger chain info.
      * 
      * @param getChainInfoRequestV1  (optional)
@@ -275,6 +289,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results
      * Get fabric ledger node structure (from the discovery service).
      * 
      * @param getDiscoveryResultsRequestV1  (optional)
@@ -300,12 +315,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-discovery-results
      * Get fabric ledger node structure (from the discovery service).
      * 
      * @param getDiscoveryResultsRequestV1  (optional)
@@ -347,6 +363,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
      * Get the Prometheus Metrics
      * 
      * @return kotlin.String
@@ -371,12 +388,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics
      * Get the Prometheus Metrics
      * 
      * @return ApiResponse<kotlin.String?>
@@ -402,7 +420,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        
+        localVariableHeaders["Accept"] = "text/plain"
+
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-prometheus-exporter-metrics",
@@ -414,6 +433,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
      * get a transaction receipt by tx id on a Fabric ledger.
      * 
      * @param runTransactionRequest 
@@ -439,12 +459,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/get-transaction-receipt-by-txid
      * get a transaction receipt by tx id on a Fabric ledger.
      * 
      * @param runTransactionRequest 
@@ -486,6 +507,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction
      * Runs a transaction on a Fabric ledger using user-provided signing callback.
      * 
      * @param runDelegatedSignTransactionRequest 
@@ -511,12 +533,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-delegated-sign-transaction
      * Runs a transaction on a Fabric ledger using user-provided signing callback.
      * 
      * @param runDelegatedSignTransactionRequest 
@@ -558,6 +581,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction
      * Runs a transaction on a Fabric ledger.
      * 
      * @param runTransactionRequest 
@@ -583,12 +607,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-fabric/run-transaction
      * Runs a transaction on a Fabric ledger.
      * 
      * @param runTransactionRequest 

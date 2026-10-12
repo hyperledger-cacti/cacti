@@ -18,12 +18,12 @@ import "models/receipt_type_pb.proto";
 
 message ConsistencyStrategyPB {
 
-  ReceiptTypePB receiptType = 423008661;
+  ReceiptTypePB receipt_type = 298485537;
 
   // The amount of milliseconds to wait for the receipt to arrive to the connector. Defaults to 0 which means to wait for an unlimited amount of time. Note that this wait may be interrupted still by other parts of the infrastructure such as load balancers cutting of HTTP requests after some time even if they are the type that is supposed to be kept alive. The question of re-entrance is a broader topic not in scope to discuss here, but it is important to mention it.
-  int32 timeoutMs = 51479271;
+  int32 timeout_ms = 522132806;
 
   // The number of blocks to wait to be confirmed in addition to the block containing the transaction in question. Note that if the receipt type is set to only wait for node transaction pool ACK and this parameter is set to anything, but zero then the API will not accept the request due to conflicting parameters.
-  int32 blockConfirmations = 207555762;
+  int32 block_confirmations = 76224175;
 
 }

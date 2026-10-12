@@ -21,12 +21,16 @@ import jakarta.validation.Valid
  */
 data class StartFlowV1RequestRequestBody(
 
+    @param:JsonProperty("chatName")
     @get:JsonProperty("chatName") val chatName: kotlin.String? = null,
 
+    @param:JsonProperty("otherMember")
     @get:JsonProperty("otherMember") val otherMember: kotlin.String? = null,
 
+    @param:JsonProperty("message")
     @get:JsonProperty("message") val message: kotlin.String? = null,
 
+    @param:JsonProperty("numberOfRecords")
     @get:JsonProperty("numberOfRecords") val numberOfRecords: kotlin.String? = null
 ) {
 

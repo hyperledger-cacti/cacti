@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,17 +30,17 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * Values: pRIMITIVE,rEFERENCE
+ * Values: PRIMITIVE,REFERENCE
  */
 
 @JsonClass(generateAdapter = false)
 enum class JvmTypeKind(val value: kotlin.String) {
 
     @Json(name = "PRIMITIVE")
-    pRIMITIVE("PRIMITIVE"),
+    PRIMITIVE("PRIMITIVE"),
 
     @Json(name = "REFERENCE")
-    rEFERENCE("REFERENCE");
+    REFERENCE("REFERENCE");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -41,7 +49,7 @@ enum class JvmTypeKind(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -54,7 +62,7 @@ enum class JvmTypeKind(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): JvmTypeKind? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

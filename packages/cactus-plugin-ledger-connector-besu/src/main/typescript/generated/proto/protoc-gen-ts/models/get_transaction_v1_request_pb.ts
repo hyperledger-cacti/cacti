@@ -9,37 +9,37 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class GetTransactionV1RequestPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            transactionHash?: string;
+            transaction_hash?: string;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("transactionHash" in data && data.transactionHash != undefined) {
-                    this.transactionHash = data.transactionHash;
+                if ("transaction_hash" in data && data.transaction_hash != undefined) {
+                    this.transaction_hash = data.transaction_hash;
                 }
             }
         }
-        get transactionHash() {
-            return pb_1.Message.getFieldWithDefault(this, 188901646, "") as string;
+        get transaction_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 508674511, "") as string;
         }
-        set transactionHash(value: string) {
-            pb_1.Message.setField(this, 188901646, value);
+        set transaction_hash(value: string) {
+            pb_1.Message.setField(this, 508674511, value);
         }
         static fromObject(data: {
-            transactionHash?: string;
+            transaction_hash?: string;
         }): GetTransactionV1RequestPB {
             const message = new GetTransactionV1RequestPB({});
-            if (data.transactionHash != null) {
-                message.transactionHash = data.transactionHash;
+            if (data.transaction_hash != null) {
+                message.transaction_hash = data.transaction_hash;
             }
             return message;
         }
         toObject() {
             const data: {
-                transactionHash?: string;
+                transaction_hash?: string;
             } = {};
-            if (this.transactionHash != null) {
-                data.transactionHash = this.transactionHash;
+            if (this.transaction_hash != null) {
+                data.transaction_hash = this.transaction_hash;
             }
             return data;
         }
@@ -47,8 +47,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.transactionHash.length)
-                writer.writeString(188901646, this.transactionHash);
+            if (this.transaction_hash.length)
+                writer.writeString(508674511, this.transaction_hash);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -58,8 +58,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 188901646:
-                        message.transactionHash = reader.readString();
+                    case 508674511:
+                        message.transaction_hash = reader.readString();
                         break;
                     default: reader.skipField();
                 }

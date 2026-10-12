@@ -8,44 +8,44 @@ import * as dependency_2 from "./web3_transaction_receipt_pb";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class InvokeContractV1ResponsePB extends pb_1.Message {
-        #one_of_decls: number[][] = [[401260801]];
+        #one_of_decls: number[][] = [[375138814]];
         constructor(data?: any[] | ({
-            transactionReceipt?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB;
+            transaction_receipt?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB;
             success?: boolean;
         } & (({
-            callOutput?: dependency_1.google.protobuf.Any;
+            call_output?: dependency_1.google.protobuf.Any;
         })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("transactionReceipt" in data && data.transactionReceipt != undefined) {
-                    this.transactionReceipt = data.transactionReceipt;
+                if ("transaction_receipt" in data && data.transaction_receipt != undefined) {
+                    this.transaction_receipt = data.transaction_receipt;
                 }
-                if ("callOutput" in data && data.callOutput != undefined) {
-                    this.callOutput = data.callOutput;
+                if ("call_output" in data && data.call_output != undefined) {
+                    this.call_output = data.call_output;
                 }
                 if ("success" in data && data.success != undefined) {
                     this.success = data.success;
                 }
             }
         }
-        get transactionReceipt() {
-            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB, 472834426) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB;
+        get transaction_receipt() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB, 51981786) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB;
         }
-        set transactionReceipt(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB) {
-            pb_1.Message.setWrapperField(this, 472834426, value);
+        set transaction_receipt(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB) {
+            pb_1.Message.setWrapperField(this, 51981786, value);
         }
-        get has_transactionReceipt() {
-            return pb_1.Message.getField(this, 472834426) != null;
+        get has_transaction_receipt() {
+            return pb_1.Message.getField(this, 51981786) != null;
         }
-        get callOutput() {
-            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 401260801) as dependency_1.google.protobuf.Any;
+        get call_output() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 375138814) as dependency_1.google.protobuf.Any;
         }
-        set callOutput(value: dependency_1.google.protobuf.Any) {
-            pb_1.Message.setOneofWrapperField(this, 401260801, this.#one_of_decls[0], value);
+        set call_output(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setOneofWrapperField(this, 375138814, this.#one_of_decls[0], value);
         }
-        get has_callOutput() {
-            return pb_1.Message.getField(this, 401260801) != null;
+        get has_call_output() {
+            return pb_1.Message.getField(this, 375138814) != null;
         }
         get success() {
             return pb_1.Message.getFieldWithDefault(this, 256557056, false) as boolean;
@@ -53,26 +53,26 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set success(value: boolean) {
             pb_1.Message.setField(this, 256557056, value);
         }
-        get _callOutput() {
+        get _call_output() {
             const cases: {
-                [index: number]: "none" | "callOutput";
+                [index: number]: "none" | "call_output";
             } = {
                 0: "none",
-                401260801: "callOutput"
+                375138814: "call_output"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [401260801])];
+            return cases[pb_1.Message.computeOneofCase(this, [375138814])];
         }
         static fromObject(data: {
-            transactionReceipt?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.prototype.toObject>;
-            callOutput?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            transaction_receipt?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.prototype.toObject>;
+            call_output?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
             success?: boolean;
         }): InvokeContractV1ResponsePB {
             const message = new InvokeContractV1ResponsePB({});
-            if (data.transactionReceipt != null) {
-                message.transactionReceipt = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.fromObject(data.transactionReceipt);
+            if (data.transaction_receipt != null) {
+                message.transaction_receipt = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.fromObject(data.transaction_receipt);
             }
-            if (data.callOutput != null) {
-                message.callOutput = dependency_1.google.protobuf.Any.fromObject(data.callOutput);
+            if (data.call_output != null) {
+                message.call_output = dependency_1.google.protobuf.Any.fromObject(data.call_output);
             }
             if (data.success != null) {
                 message.success = data.success;
@@ -81,15 +81,15 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         }
         toObject() {
             const data: {
-                transactionReceipt?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.prototype.toObject>;
-                callOutput?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                transaction_receipt?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.prototype.toObject>;
+                call_output?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
                 success?: boolean;
             } = {};
-            if (this.transactionReceipt != null) {
-                data.transactionReceipt = this.transactionReceipt.toObject();
+            if (this.transaction_receipt != null) {
+                data.transaction_receipt = this.transaction_receipt.toObject();
             }
-            if (this.callOutput != null) {
-                data.callOutput = this.callOutput.toObject();
+            if (this.call_output != null) {
+                data.call_output = this.call_output.toObject();
             }
             if (this.success != null) {
                 data.success = this.success;
@@ -100,10 +100,10 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_transactionReceipt)
-                writer.writeMessage(472834426, this.transactionReceipt, () => this.transactionReceipt.serialize(writer));
-            if (this.has_callOutput)
-                writer.writeMessage(401260801, this.callOutput, () => this.callOutput.serialize(writer));
+            if (this.has_transaction_receipt)
+                writer.writeMessage(51981786, this.transaction_receipt, () => this.transaction_receipt.serialize(writer));
+            if (this.has_call_output)
+                writer.writeMessage(375138814, this.call_output, () => this.call_output.serialize(writer));
             if (this.success != false)
                 writer.writeBool(256557056, this.success);
             if (!w)
@@ -115,11 +115,11 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 472834426:
-                        reader.readMessage(message.transactionReceipt, () => message.transactionReceipt = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.deserialize(reader));
+                    case 51981786:
+                        reader.readMessage(message.transaction_receipt, () => message.transaction_receipt = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3TransactionReceiptPB.deserialize(reader));
                         break;
-                    case 401260801:
-                        reader.readMessage(message.callOutput, () => message.callOutput = dependency_1.google.protobuf.Any.deserialize(reader));
+                    case 375138814:
+                        reader.readMessage(message.call_output, () => message.call_output = dependency_1.google.protobuf.Any.deserialize(reader));
                         break;
                     case 256557056:
                         message.success = reader.readBool();

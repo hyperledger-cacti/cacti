@@ -52,7 +52,8 @@ describe("PluginLedgerConnectorBesu", () => {
       JSON.stringify(HelloWorldContractJson),
     );
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     connector = await factory.create({
       rpcApiHttpHost,

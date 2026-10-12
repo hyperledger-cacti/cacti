@@ -14,215 +14,137 @@
 
 
 import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from './common';
 import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
 /**
  * An Error
- * @export
- * @interface APIError
  */
 export interface APIError {
     /**
      * HTTP error type
-     * @type {string}
-     * @memberof APIError
      */
     'type': string;
     /**
      * Numeric error code
-     * @type {number}
-     * @memberof APIError
      */
     'code': number;
     /**
      * HTTP status of the error
-     * @type {number}
-     * @memberof APIError
      */
     'status': number;
     /**
      * Long error description
-     * @type {string}
-     * @memberof APIError
      */
     'message': string;
     /**
      * Timestamp of the error
-     * @type {string}
-     * @memberof APIError
      */
     'timestamp': string;
 }
 /**
  * Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.
- * @export
- * @interface Action
  */
 export interface Action {
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof Action
-     */
     'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The amount of \'fromToken\' to be transferred, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof Action
      */
     'fromAmount'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof Action
-     */
     'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The maximum acceptable difference between the expected price of the \'toToken\' and the price at the time of the transfer.
-     * @type {number}
-     * @memberof Action
      */
     'slippage'?: number;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof Action
      */
     'fromAddress'?: string;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof Action
      */
     'toAddress'?: string;
 }
 /**
  * Common HTTP attributes shared by adapter webhook definitions.
- * @export
- * @interface AdapterBaseWebhookConfig
  */
 export interface AdapterBaseWebhookConfig {
     /**
      * Maximum time the gateway waits for the remote endpoint before aborting.
-     * @type {number}
-     * @memberof AdapterBaseWebhookConfig
      */
     'timeoutMs'?: number;
     /**
      * Optional Mustache/Handlebars-style payload template rendered per invocation.
-     * @type {string}
-     * @memberof AdapterBaseWebhookConfig
      */
     'payloadTemplate'?: string;
     /**
      * Maximum number of attempts (initial + retries).
-     * @type {number}
-     * @memberof AdapterBaseWebhookConfig
      */
     'retryAttempts'?: number;
     /**
      * Backoff delay between attempts in milliseconds.
-     * @type {number}
-     * @memberof AdapterBaseWebhookConfig
      */
     'retryDelayMs'?: number;
 }
 /**
  * Adapter definition - a configuration unit that defines webhooks for specific execution points in the SATP protocol flow.
- * @export
- * @interface AdapterDefinition
  */
 export interface AdapterDefinition {
     /**
      * Stable identifier used for logging and inbound routing.
-     * @type {string}
-     * @memberof AdapterDefinition
      */
     'id': string;
     /**
      * Human-friendly adapter label.
-     * @type {string}
-     * @memberof AdapterDefinition
      */
     'name': string;
     /**
      * Optional textual description for operators.
-     * @type {string}
-     * @memberof AdapterDefinition
      */
     'description'?: string;
     /**
      * Enables/disables adapter without removing its configuration.
-     * @type {boolean}
-     * @memberof AdapterDefinition
      */
     'active': boolean;
     /**
      * Priority ordering when multiple adapters are registered at the same execution point. Lower numbers run earlier.
-     * @type {number}
-     * @memberof AdapterDefinition
      */
     'priority'?: number;
     /**
      * Execution points where this adapter should be invoked.
-     * @type {Array<AdapterDefinitionExecutionPointsInner>}
-     * @memberof AdapterDefinition
      */
     'executionPoints': Array<AdapterDefinitionExecutionPointsInner>;
-    /**
-     * 
-     * @type {AdapterDefinitionOutboundWebhook}
-     * @memberof AdapterDefinition
-     */
     'outboundWebhook'?: AdapterDefinitionOutboundWebhook;
     /**
      * Array of outbound webhooks when multiple notifications are needed.
-     * @type {Array<AdapterDefinitionOutboundWebhook>}
-     * @memberof AdapterDefinition
      */
     'outboundWebhooks'?: Array<AdapterDefinitionOutboundWebhook>;
-    /**
-     * 
-     * @type {AdapterDefinitionInboundWebhook}
-     * @memberof AdapterDefinition
-     */
     'inboundWebhook'?: AdapterDefinitionInboundWebhook;
     /**
      * Array of inbound webhooks when multiple approvals are needed.
-     * @type {Array<AdapterDefinitionInboundWebhook>}
-     * @memberof AdapterDefinition
      */
     'inboundWebhooks'?: Array<AdapterDefinitionInboundWebhook>;
 }
 /**
  * Execution point definition - specifies where an adapter should execute within the SATP protocol flow.
- * @export
- * @interface AdapterDefinitionExecutionPointsInner
  */
 export interface AdapterDefinitionExecutionPointsInner {
     /**
      * Supported SATP stage identifiers that can host adapters. Stage 0-3 represent the four phases of the SATP protocol, while \'crash\' is used for crash recovery scenarios.
-     * @type {string}
-     * @memberof AdapterDefinitionExecutionPointsInner
      */
     'stage': AdapterDefinitionExecutionPointsInnerStageEnum;
     /**
      * Stage-specific step identifier.
-     * @type {string}
-     * @memberof AdapterDefinitionExecutionPointsInner
      */
     'step': string;
     /**
      * Execution steps inside a stage where adapters can hook into.
-     * @type {string}
-     * @memberof AdapterDefinitionExecutionPointsInner
      */
     'point': AdapterDefinitionExecutionPointsInnerPointEnum;
 }
@@ -232,7 +154,7 @@ export const AdapterDefinitionExecutionPointsInnerStageEnum = {
     Stage1: 'stage-1',
     Stage2: 'stage-2',
     Stage3: 'stage-3',
-    Crash: 'crash'
+    Crash: 'crash',
 } as const;
 
 export type AdapterDefinitionExecutionPointsInnerStageEnum = typeof AdapterDefinitionExecutionPointsInnerStageEnum[keyof typeof AdapterDefinitionExecutionPointsInnerStageEnum];
@@ -240,113 +162,79 @@ export const AdapterDefinitionExecutionPointsInnerPointEnum = {
     Before: 'before',
     During: 'during',
     After: 'after',
-    Rollback: 'rollback'
+    Rollback: 'rollback',
 } as const;
 
 export type AdapterDefinitionExecutionPointsInnerPointEnum = typeof AdapterDefinitionExecutionPointsInnerPointEnum[keyof typeof AdapterDefinitionExecutionPointsInnerPointEnum];
 
 /**
  * Inbound webhook configuration for blocking approval workflows during SATP execution.  **Purpose:** Inbound webhooks enable external approval controllers, compliance systems, and human operators to participate in SATP cross-chain transfers. When configured, the gateway pauses protocol execution and waits for an external decision before proceeding.  **Execution Model:** - Blocking: SATP transfer waits for external controller response or timeout - Gateway exposes decision endpoint under API3 adapter base path - Multiple inbound webhooks at the same point serialize for clear approval semantics - Timeout triggers automatic rejection with configurable behavior  **Decision Flow:** 1. Gateway reaches configured execution point and pauses 2. External controller receives notification (via paired outbound webhook or polling) 3. Controller posts decision to `/api/v1/.../webhook/inbound/decide` 4. Gateway validates adapterId/sessionId and resumes or aborts based on `continue` field
- * @export
- * @interface AdapterDefinitionInboundWebhook
  */
 export interface AdapterDefinitionInboundWebhook {
     /**
      * Maximum time the gateway waits for external decision before timing out.
-     * @type {number}
-     * @memberof AdapterDefinitionInboundWebhook
      */
     'timeoutMs'?: number;
     /**
      * Optional payload template for context data.
-     * @type {string}
-     * @memberof AdapterDefinitionInboundWebhook
      */
     'payloadTemplate'?: string;
     /**
      * Maximum number of retry attempts.
-     * @type {number}
-     * @memberof AdapterDefinitionInboundWebhook
      */
     'retryAttempts'?: number;
     /**
      * Backoff delay between attempts in milliseconds.
-     * @type {number}
-     * @memberof AdapterDefinitionInboundWebhook
      */
     'retryDelayMs'?: number;
     /**
      * Priority for ordering multiple inbound webhooks within the same adapter. Lower numbers execute first. Defaults to 1000 if not specified.
-     * @type {number}
-     * @memberof AdapterDefinitionInboundWebhook
      */
     'priority'?: number;
 }
 /**
  * Outbound webhook configuration for notifying external systems about SATP protocol events.  **Purpose:** Outbound webhooks enable fire-and-forget notifications to external monitoring, logging, metrics collection, and audit systems. When SATP lifecycle events occur, the gateway POSTs a standardized JSON payload to the configured URL.  **Execution Model:** - Non-blocking: SATP execution continues regardless of webhook response - Supports retry logic with exponential backoff for reliability - Multiple outbound webhooks at the same execution point run concurrently - Always uses POST method with application/json content-type
- * @export
- * @interface AdapterDefinitionOutboundWebhook
  */
 export interface AdapterDefinitionOutboundWebhook {
     /**
      * Absolute HTTPS endpoint the gateway should call.
-     * @type {string}
-     * @memberof AdapterDefinitionOutboundWebhook
      */
     'url': string;
     /**
      * Maximum time the gateway waits for the remote endpoint before aborting.
-     * @type {number}
-     * @memberof AdapterDefinitionOutboundWebhook
      */
     'timeoutMs'?: number;
     /**
      * Optional payload template rendered per invocation.
-     * @type {string}
-     * @memberof AdapterDefinitionOutboundWebhook
      */
     'payloadTemplate'?: string;
     /**
      * Maximum number of retry attempts.
-     * @type {number}
-     * @memberof AdapterDefinitionOutboundWebhook
      */
     'retryAttempts'?: number;
     /**
      * Backoff delay between attempts in milliseconds.
-     * @type {number}
-     * @memberof AdapterDefinitionOutboundWebhook
      */
     'retryDelayMs'?: number;
     /**
      * Priority for ordering multiple outbound webhooks within the same adapter. Lower numbers execute first. Defaults to 1000 if not specified.
-     * @type {number}
-     * @memberof AdapterDefinitionOutboundWebhook
      */
     'priority'?: number;
 }
 /**
  * Execution point definition - specifies where an adapter should execute within the SATP protocol flow.
- * @export
- * @interface AdapterExecutionPointDefinition
  */
 export interface AdapterExecutionPointDefinition {
     /**
      * Supported SATP stage identifiers that can host adapters. Stage 0-3 represent the four phases of the SATP protocol, while \'crash\' is used for crash recovery scenarios.
-     * @type {string}
-     * @memberof AdapterExecutionPointDefinition
      */
     'stage': AdapterExecutionPointDefinitionStageEnum;
     /**
      * Stage-specific step identifier.
-     * @type {string}
-     * @memberof AdapterExecutionPointDefinition
      */
     'step': string;
     /**
      * Execution steps inside a stage where adapters can hook into.
-     * @type {string}
-     * @memberof AdapterExecutionPointDefinition
      */
     'point': AdapterExecutionPointDefinitionPointEnum;
 }
@@ -356,7 +244,7 @@ export const AdapterExecutionPointDefinitionStageEnum = {
     Stage1: 'stage-1',
     Stage2: 'stage-2',
     Stage3: 'stage-3',
-    Crash: 'crash'
+    Crash: 'crash',
 } as const;
 
 export type AdapterExecutionPointDefinitionStageEnum = typeof AdapterExecutionPointDefinitionStageEnum[keyof typeof AdapterExecutionPointDefinitionStageEnum];
@@ -364,45 +252,33 @@ export const AdapterExecutionPointDefinitionPointEnum = {
     Before: 'before',
     During: 'during',
     After: 'after',
-    Rollback: 'rollback'
+    Rollback: 'rollback',
 } as const;
 
 export type AdapterExecutionPointDefinitionPointEnum = typeof AdapterExecutionPointDefinitionPointEnum[keyof typeof AdapterExecutionPointDefinitionPointEnum];
 
 /**
  * Global defaults for adapter execution. Applied to every adapter unless overridden at the adapter level.
- * @export
- * @interface AdapterGlobalDefaults
  */
 export interface AdapterGlobalDefaults {
     /**
      * Default timeout in milliseconds.
-     * @type {number}
-     * @memberof AdapterGlobalDefaults
      */
     'timeoutMs'?: number;
     /**
      * Default number of retry attempts.
-     * @type {number}
-     * @memberof AdapterGlobalDefaults
      */
     'retryAttempts'?: number;
     /**
      * Default backoff delay in milliseconds.
-     * @type {number}
-     * @memberof AdapterGlobalDefaults
      */
     'retryDelayMs'?: number;
     /**
      * Logging level for adapter operations.
-     * @type {string}
-     * @memberof AdapterGlobalDefaults
      */
     'logLevel'?: AdapterGlobalDefaultsLogLevelEnum;
     /**
      * Default HTTP headers to include in webhook requests.
-     * @type {{ [key: string]: string; }}
-     * @memberof AdapterGlobalDefaults
      */
     'headers'?: { [key: string]: string; };
 }
@@ -412,168 +288,107 @@ export const AdapterGlobalDefaultsLogLevelEnum = {
     Debug: 'debug',
     Info: 'info',
     Warn: 'warn',
-    Error: 'error'
+    Error: 'error',
 } as const;
 
 export type AdapterGlobalDefaultsLogLevelEnum = typeof AdapterGlobalDefaultsLogLevelEnum[keyof typeof AdapterGlobalDefaultsLogLevelEnum];
 
 /**
  * Inbound webhook configuration for blocking approval workflows during SATP execution.  **Purpose:** Inbound webhooks enable external approval controllers, compliance systems, and human operators to participate in SATP cross-chain transfers. When configured, the gateway pauses protocol execution and waits for an external decision before proceeding.  **Execution Model:** - Blocking: SATP transfer waits for external controller response or timeout - Gateway exposes decision endpoint under API3 adapter base path - Multiple inbound webhooks at the same point serialize for clear approval semantics - Timeout triggers automatic rejection with configurable behavior  **Decision Flow:** 1. Gateway reaches configured execution point and pauses 2. External controller receives notification (via paired outbound webhook or polling) 3. Controller posts decision to `/api/v1/.../webhook/inbound/decide` 4. Gateway validates adapterId/sessionId and resumes or aborts based on `continue` field
- * @export
- * @interface AdapterInboundWebhookConfig
  */
 export interface AdapterInboundWebhookConfig {
     /**
      * Maximum time the gateway waits for external decision before timing out.
-     * @type {number}
-     * @memberof AdapterInboundWebhookConfig
      */
     'timeoutMs'?: number;
     /**
      * Optional payload template for context data.
-     * @type {string}
-     * @memberof AdapterInboundWebhookConfig
      */
     'payloadTemplate'?: string;
     /**
      * Maximum number of retry attempts.
-     * @type {number}
-     * @memberof AdapterInboundWebhookConfig
      */
     'retryAttempts'?: number;
     /**
      * Backoff delay between attempts in milliseconds.
-     * @type {number}
-     * @memberof AdapterInboundWebhookConfig
      */
     'retryDelayMs'?: number;
     /**
      * Priority for ordering multiple inbound webhooks within the same adapter. Lower numbers execute first. Defaults to 1000 if not specified.
-     * @type {number}
-     * @memberof AdapterInboundWebhookConfig
      */
     'priority'?: number;
 }
 /**
  * Root configuration structure for the adapter layer. Loaded from YAML configuration files (e.g., adapter-config.yml) and used to configure webhook-based integrations with external systems.
- * @export
- * @interface AdapterLayerConfiguration
  */
 export interface AdapterLayerConfiguration {
     /**
      * Flat list of adapters, each defining their own execution points.
-     * @type {Array<AdapterLayerConfigurationAdaptersInner>}
-     * @memberof AdapterLayerConfiguration
      */
     'adapters': Array<AdapterLayerConfigurationAdaptersInner>;
-    /**
-     * 
-     * @type {AdapterLayerConfigurationGlobal}
-     * @memberof AdapterLayerConfiguration
-     */
     'global'?: AdapterLayerConfigurationGlobal;
 }
 /**
  * Adapter definition - a configuration unit that defines webhooks for specific execution points in the SATP protocol flow.
- * @export
- * @interface AdapterLayerConfigurationAdaptersInner
  */
 export interface AdapterLayerConfigurationAdaptersInner {
     /**
      * Stable identifier used for logging and inbound routing.
-     * @type {string}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'id': string;
     /**
      * Human-friendly adapter label.
-     * @type {string}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'name': string;
     /**
      * Optional textual description for operators.
-     * @type {string}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'description'?: string;
     /**
      * Enables/disables adapter without removing its configuration.
-     * @type {boolean}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'active': boolean;
     /**
      * Priority ordering when multiple adapters are registered at the same execution point. Lower numbers run earlier.
-     * @type {number}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'priority'?: number;
     /**
      * Execution points where this adapter should be invoked.
-     * @type {Array<AdapterDefinitionExecutionPointsInner>}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'executionPoints': Array<AdapterDefinitionExecutionPointsInner>;
-    /**
-     * 
-     * @type {AdapterDefinitionOutboundWebhook}
-     * @memberof AdapterLayerConfigurationAdaptersInner
-     */
     'outboundWebhook'?: AdapterDefinitionOutboundWebhook;
     /**
      * Array of outbound webhooks when multiple notifications are needed.
-     * @type {Array<AdapterDefinitionOutboundWebhook>}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'outboundWebhooks'?: Array<AdapterDefinitionOutboundWebhook>;
-    /**
-     * 
-     * @type {AdapterDefinitionInboundWebhook}
-     * @memberof AdapterLayerConfigurationAdaptersInner
-     */
     'inboundWebhook'?: AdapterDefinitionInboundWebhook;
     /**
      * Array of inbound webhooks when multiple approvals are needed.
-     * @type {Array<AdapterDefinitionInboundWebhook>}
-     * @memberof AdapterLayerConfigurationAdaptersInner
      */
     'inboundWebhooks'?: Array<AdapterDefinitionInboundWebhook>;
 }
 /**
  * Global defaults for adapter execution. Applied to every adapter unless overridden at the adapter level.
- * @export
- * @interface AdapterLayerConfigurationGlobal
  */
 export interface AdapterLayerConfigurationGlobal {
     /**
      * Default timeout in milliseconds.
-     * @type {number}
-     * @memberof AdapterLayerConfigurationGlobal
      */
     'timeoutMs'?: number;
     /**
      * Default number of retry attempts.
-     * @type {number}
-     * @memberof AdapterLayerConfigurationGlobal
      */
     'retryAttempts'?: number;
     /**
      * Default backoff delay in milliseconds.
-     * @type {number}
-     * @memberof AdapterLayerConfigurationGlobal
      */
     'retryDelayMs'?: number;
     /**
      * Logging level for adapter operations.
-     * @type {string}
-     * @memberof AdapterLayerConfigurationGlobal
      */
     'logLevel'?: AdapterLayerConfigurationGlobalLogLevelEnum;
     /**
      * Default HTTP headers to include in webhook requests.
-     * @type {{ [key: string]: string; }}
-     * @memberof AdapterLayerConfigurationGlobal
      */
     'headers'?: { [key: string]: string; };
 }
@@ -583,84 +398,62 @@ export const AdapterLayerConfigurationGlobalLogLevelEnum = {
     Debug: 'debug',
     Info: 'info',
     Warn: 'warn',
-    Error: 'error'
+    Error: 'error',
 } as const;
 
 export type AdapterLayerConfigurationGlobalLogLevelEnum = typeof AdapterLayerConfigurationGlobalLogLevelEnum[keyof typeof AdapterLayerConfigurationGlobalLogLevelEnum];
 
 /**
  * Outbound webhook configuration for notifying external systems about SATP protocol events.  **Purpose:** Outbound webhooks enable fire-and-forget notifications to external monitoring, logging, metrics collection, and audit systems. When SATP lifecycle events occur, the gateway POSTs a standardized JSON payload to the configured URL.  **Execution Model:** - Non-blocking: SATP execution continues regardless of webhook response - Supports retry logic with exponential backoff for reliability - Multiple outbound webhooks at the same execution point run concurrently - Always uses POST method with application/json content-type
- * @export
- * @interface AdapterOutboundWebhookConfig
  */
 export interface AdapterOutboundWebhookConfig {
     /**
      * Absolute HTTPS endpoint the gateway should call.
-     * @type {string}
-     * @memberof AdapterOutboundWebhookConfig
      */
     'url': string;
     /**
      * Maximum time the gateway waits for the remote endpoint before aborting.
-     * @type {number}
-     * @memberof AdapterOutboundWebhookConfig
      */
     'timeoutMs'?: number;
     /**
      * Optional payload template rendered per invocation.
-     * @type {string}
-     * @memberof AdapterOutboundWebhookConfig
      */
     'payloadTemplate'?: string;
     /**
      * Maximum number of retry attempts.
-     * @type {number}
-     * @memberof AdapterOutboundWebhookConfig
      */
     'retryAttempts'?: number;
     /**
      * Backoff delay between attempts in milliseconds.
-     * @type {number}
-     * @memberof AdapterOutboundWebhookConfig
      */
     'retryDelayMs'?: number;
     /**
      * Priority for ordering multiple outbound webhooks within the same adapter. Lower numbers execute first. Defaults to 1000 if not specified.
-     * @type {number}
-     * @memberof AdapterOutboundWebhookConfig
      */
     'priority'?: number;
 }
 /**
  * Common retry policy applied to outbound/inbound webhook invocations.
- * @export
- * @interface AdapterRetryPolicy
  */
 export interface AdapterRetryPolicy {
     /**
      * Maximum number of attempts (initial + retries).
-     * @type {number}
-     * @memberof AdapterRetryPolicy
      */
     'retryAttempts'?: number;
     /**
      * Backoff delay between attempts in milliseconds.
-     * @type {number}
-     * @memberof AdapterRetryPolicy
      */
     'retryDelayMs'?: number;
 }
 /**
  * Execution steps inside a stage where adapters can hook into.
- * @export
- * @enum {string}
  */
 
 export const AdapterStageExecutionStep = {
     Before: 'before',
     During: 'during',
     After: 'after',
-    Rollback: 'rollback'
+    Rollback: 'rollback',
 } as const;
 
 export type AdapterStageExecutionStep = typeof AdapterStageExecutionStep[keyof typeof AdapterStageExecutionStep];
@@ -668,237 +461,130 @@ export type AdapterStageExecutionStep = typeof AdapterStageExecutionStep[keyof t
 
 /**
  * Response schema for adding a counterparty.
- * @export
- * @interface AddCounterparty200Response
  */
 export interface AddCounterparty200Response {
     /**
      * The status of the request.
-     * @type {boolean}
-     * @memberof AddCounterparty200Response
      */
     'status'?: boolean;
 }
 /**
  * Request schema for adding a counterparty.
- * @export
- * @interface AddCounterpartyGatewayRequest
  */
 export interface AddCounterpartyGatewayRequest {
-    /**
-     * 
-     * @type {AddCounterpartyRequestCounterparty}
-     * @memberof AddCounterpartyGatewayRequest
-     */
     'counterparty': AddCounterpartyRequestCounterparty;
 }
 /**
  * Response schema for adding a counterparty.
- * @export
- * @interface AddCounterpartyGatewayResponse
  */
 export interface AddCounterpartyGatewayResponse {
     /**
      * The status of the request.
-     * @type {boolean}
-     * @memberof AddCounterpartyGatewayResponse
      */
     'status'?: boolean;
 }
 /**
  * Request schema for adding a counterparty.
- * @export
- * @interface AddCounterpartyRequest
  */
 export interface AddCounterpartyRequest {
-    /**
-     * 
-     * @type {AddCounterpartyRequestCounterparty}
-     * @memberof AddCounterpartyRequest
-     */
     'counterparty': AddCounterpartyRequestCounterparty;
 }
 /**
  * The identity of the gateway.
- * @export
- * @interface AddCounterpartyRequestCounterparty
  */
 export interface AddCounterpartyRequestCounterparty {
     /**
      * The unique identifier for the gateway.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'id': string;
     /**
      * The public key of the gateway.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'pubKey': string;
     /**
      * The name of the gateway.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'name': string;
     /**
      * The draft versions supported by the gateway.
-     * @type {Array<AddCounterpartyRequestCounterpartyVersionInner>}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'version': Array<AddCounterpartyRequestCounterpartyVersionInner>;
     /**
      * The list of connected DLT networks.
-     * @type {Array<TransactRequestSourceAssetNetworkId>}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'connectedDLTs': Array<TransactRequestSourceAssetNetworkId>;
     /**
      * The proof ID associated with the gateway.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'proofID': string;
     /**
      * The server port of the gateway.
-     * @type {number}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'gatewayServerPort': number;
     /**
      * The client port of the gateway.
-     * @type {number}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'gatewayClientPort': number;
     /**
      * The OpenAPI port of the gateway.
-     * @type {number}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'gatewayOapiPort'?: number;
     /**
      * The UI port of the gateway.
-     * @type {number}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'gatewayUIPort'?: number;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterparty
      */
     'address': string;
 }
 /**
  * The draft versions supported by the gateway.
- * @export
- * @interface AddCounterpartyRequestCounterpartyVersionInner
  */
 export interface AddCounterpartyRequestCounterpartyVersionInner {
     /**
      * Core functionality or component.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterpartyVersionInner
      */
     'Core'?: string;
     /**
      * System architecture or design.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterpartyVersionInner
      */
     'Architecture'?: string;
     /**
      * Crash or failure scenario.
-     * @type {string}
-     * @memberof AddCounterpartyRequestCounterpartyVersionInner
      */
     'Crash'?: string;
 }
 /**
  * An asset
- * @export
- * @interface Asset
  */
 export interface Asset {
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'owner': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'contractName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'contractAddress'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'mspId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'channelName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'amount'?: string;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof Asset
-     */
     'networkId': TransactRequestSourceAssetNetworkId;
     /**
      * The type of token.
-     * @type {string}
-     * @memberof Asset
      */
     'tokenType': AssetTokenTypeEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof Asset
-     */
     'referenceId': string;
     /**
      * The ERC token standard.
-     * @type {string}
-     * @memberof Asset
      */
     'ercTokenStandard': AssetErcTokenStandardEnum;
     /**
      * Token ID or unique descriptor for ERC6909/ERC1155 tokens.
-     * @type {string}
-     * @memberof Asset
      */
     'uniqueDescriptor'?: string;
 }
 
 export const AssetTokenTypeEnum = {
-    Fungible: 'NONSTANDARD_FUNGIBLE',
-    Nonfungible: 'NONSTANDARD_NONFUNGIBLE'
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE',
 } as const;
 
 export type AssetTokenTypeEnum = typeof AssetTokenTypeEnum[keyof typeof AssetTokenTypeEnum];
@@ -907,110 +593,74 @@ export const AssetErcTokenStandardEnum = {
     Erc20: 'ERC20',
     Erc721: 'ERC721',
     Erc1155: 'ERC1155',
-    Erc6909: 'ERC6909'
+    Erc6909: 'ERC6909',
 } as const;
 
 export type AssetErcTokenStandardEnum = typeof AssetErcTokenStandardEnum[keyof typeof AssetErcTokenStandardEnum];
 
 /**
  * Collection of audit entries.
- * @export
- * @interface Audit
  */
 export interface Audit {
     /**
      * List of audit entries.
-     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInner>}
-     * @memberof Audit
      */
     'entries': Array<PerformAudit200ResponseAuditEntriesEntriesInner>;
 }
 /**
  * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
- * @export
- * @interface AuditEntry
  */
 export interface AuditEntry {
     /**
      * The unique identifier for the audit entry.
-     * @type {string}
-     * @memberof AuditEntry
      */
     'auditEntryId'?: string;
-    /**
-     * 
-     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerSession}
-     * @memberof AuditEntry
-     */
     'session': PerformAudit200ResponseAuditEntriesEntriesInnerSession;
     /**
      * The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
-     * @memberof AuditEntry
      */
     'timestamp': number;
     /**
      * Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry. 
-     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
-     * @memberof AuditEntry
      */
     'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
 }
 /**
  * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
- * @export
- * @interface AuditRequest
  */
 export interface AuditRequest {
     /**
      * The start of the audit period, in ISO 8601 format (e.g., \"2026-02-16T10:33:30.639Z\").
-     * @type {string}
-     * @memberof AuditRequest
      */
     'startTimestamp': string;
     /**
      * The end of the audit period, in ISO 8601 format (e.g., \"2026-02-16T11:00:00.000Z\").
-     * @type {string}
-     * @memberof AuditRequest
      */
     'endTimestamp': string;
 }
 /**
  * Response schema for an audit request.
- * @export
- * @interface AuditResponse
  */
 export interface AuditResponse {
-    /**
-     * 
-     * @type {PerformAudit200ResponseAuditEntries}
-     * @memberof AuditResponse
-     */
     'auditEntries': PerformAudit200ResponseAuditEntries;
     /**
      * The start of the audit period, in ISO 8601 format (e.g., \"2026-02-16T10:33:30.639Z\").
-     * @type {string}
-     * @memberof AuditResponse
      */
     'startTimestamp': string;
     /**
      * The end of the audit period, in ISO 8601 format (e.g., \"2026-02-16T11:00:00.000Z\").
-     * @type {string}
-     * @memberof AuditResponse
      */
     'endTimestamp': string;
 }
 /**
  * Stores global constants related to the authorization of the application. Specifically enumerates the claims to validate for as per RFC 7519, section 4.1. See: https://tools.ietf.org/html/rfc7519#section-4.1
- * @export
- * @enum {string}
  */
 
 export const AuthzJwtClaim = {
     /**
     * The &quot;iss&quot; (issuer) claim identifies the principal that issued the JWT. The processing of this claim is generally application specific. The &quot;iss&quot; value is a case-sensitive string containing a StringOrURI value. Use of this claim is OPTIONAL.
     */
-    iss: 'Hyperledger Labs - Carbon Accounting Tool'
+    iss: 'Hyperledger Labs - Carbon Accounting Tool',
 } as const;
 
 export type AuthzJwtClaim = typeof AuthzJwtClaim[keyof typeof AuthzJwtClaim];
@@ -1018,8 +668,6 @@ export type AuthzJwtClaim = typeof AuthzJwtClaim[keyof typeof AuthzJwtClaim];
 
 /**
  * Stores global constants related to the authorization of the application. Specifically enumerates the scopes to validate for.
- * @export
- * @enum {string}
  */
 
 export const AuthzScope = {
@@ -1030,7 +678,7 @@ export const AuthzScope = {
     /**
     * Identities with the group:user scope are end users of the system who only have authorization to perform a limited set of actions.
     */
-    GroupUser: 'group:user'
+    GroupUser: 'group:user',
 } as const;
 
 export type AuthzScope = typeof AuthzScope[keyof typeof AuthzScope];
@@ -1038,166 +686,104 @@ export type AuthzScope = typeof AuthzScope[keyof typeof AuthzScope];
 
 /**
  * Information about the bridge used for the token transfer.
- * @export
- * @interface BridgeInfo
  */
 export interface BridgeInfo {
     /**
      * The address of the token being transferred.
-     * @type {string}
-     * @memberof BridgeInfo
      */
     'tokenAddress'?: string;
 }
 /**
  * Represents a business logic contract with its associated metadata and method details.
- * @export
- * @interface BusinessLogicContract
  */
 export interface BusinessLogicContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof BusinessLogicContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof BusinessLogicContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof BusinessLogicContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof BusinessLogicContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof BusinessLogicContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof BusinessLogicContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * Response for a cancel transaction request. Indicates whether the cancel action was successful and includes the current session status.
- * @export
- * @interface Cancel200Response
  */
 export interface Cancel200Response {
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof Cancel200Response
-     */
     'statusResponse': Transact200ResponseStatusResponse;
     /**
      * Indicates whether the cancel operation was successful.
-     * @type {boolean}
-     * @memberof Cancel200Response
      */
     'cancelSuccessful': boolean;
 }
 /**
  * Request to cancel an ongoing transaction session, identified by the session ID.
- * @export
- * @interface CancelRequest
  */
 export interface CancelRequest {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof CancelRequest
      */
     'sessionID': string;
 }
 /**
  * Response for a cancel transaction request. Indicates whether the cancel action was successful and includes the current session status.
- * @export
- * @interface CancelResponse
  */
 export interface CancelResponse {
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof CancelResponse
-     */
     'statusResponse': Transact200ResponseStatusResponse;
     /**
      * Indicates whether the cancel operation was successful.
-     * @type {boolean}
-     * @memberof CancelResponse
      */
     'cancelSuccessful': boolean;
 }
 /**
  * Response schema for a continue request, returning the status of the SATP session.
- * @export
- * @interface Continue200Response
  */
 export interface Continue200Response {
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof Continue200Response
-     */
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
  * Schema for a request to continue a paused transaction session.
- * @export
- * @interface ContinueRequest
  */
 export interface ContinueRequest {
     /**
      * A unique identifier for the transaction session to be continued.
-     * @type {string}
-     * @memberof ContinueRequest
      */
     'sessionId': string;
     /**
      * A unique identifier for the transaction context.
-     * @type {string}
-     * @memberof ContinueRequest
      */
     'contextId': string;
 }
 /**
  * Response schema for a continue request, returning the status of the SATP session.
- * @export
- * @interface ContinueResponse
  */
 export interface ContinueResponse {
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof ContinueResponse
-     */
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
  * Defines the supported credential profiles for SATP Hermes.
- * @export
- * @enum {string}
  */
 
 export const CredentialProfile = {
     Saml: 'SAML',
     Oauth: 'OAUTH',
-    X509: 'X509'
+    X509: 'X509',
 } as const;
 
 export type CredentialProfile = typeof CredentialProfile[keyof typeof CredentialProfile];
@@ -1205,13 +791,11 @@ export type CredentialProfile = typeof CredentialProfile[keyof typeof Credential
 
 /**
  * Supported DLT protocols.
- * @export
- * @enum {string}
  */
 
 export const DLTProtocol = {
     HyperledgerFabric: 'HyperledgerFabric',
-    HyperledgerBesu: 'HyperledgerBesu'
+    HyperledgerBesu: 'HyperledgerBesu',
 } as const;
 
 export type DLTProtocol = typeof DLTProtocol[keyof typeof DLTProtocol];
@@ -1219,107 +803,73 @@ export type DLTProtocol = typeof DLTProtocol[keyof typeof DLTProtocol];
 
 /**
  * Response returned by the gateway after processing an inbound webhook decision. Indicates whether the decision was accepted and the resulting session state.
- * @export
- * @interface DecideInboundWebhook200Response
  */
 export interface DecideInboundWebhook200Response {
     /**
      * Whether the decision was accepted and applied to the session.
-     * @type {boolean}
-     * @memberof DecideInboundWebhook200Response
      */
     'accepted': boolean;
     /**
      * Session identifier for the affected SATP transfer.
-     * @type {string}
-     * @memberof DecideInboundWebhook200Response
      */
     'sessionId': string;
     /**
      * Human-readable message describing the result.
-     * @type {string}
-     * @memberof DecideInboundWebhook200Response
      */
     'message'?: string;
     /**
      * Timestamp when the decision was processed.
-     * @type {string}
-     * @memberof DecideInboundWebhook200Response
      */
     'timestamp'?: string;
 }
 /**
  * Request payload posted by external approval controllers to approve or reject  a paused SATP transfer. The gateway validates the adapterId matches the waiting  adapter, then uses the continue field to determine whether to proceed or abort.  Inbound Webhook Workflow: 1. SATP gateway reaches a stage/step with configured inbound adapter 2. Gateway pauses execution and waits for external decision POST 3. External controller evaluates business rules, compliance checks, or manual review 4. Controller POSTs decision payload to gateway\'s inbound endpoint 5. Gateway validates decision, logs justification, and resumes or aborts transfer  Decision Semantics: - continue=true: Approve transfer continuation; gateway proceeds to next stage - continue=false: Reject transfer; gateway aborts and may trigger rollback - reason: Human-readable justification stored in audit logs  Security Considerations: - Inbound endpoints should use authentication (API keys, mTLS, JWT validation) - Decision payloads must include adapter ID to match the paused session state - All decisions are logged with timestamps for non-repudiation
- * @export
- * @interface DecideInboundWebhookRequest
  */
 export interface DecideInboundWebhookRequest {
     /**
      * Adapter identifier that originally paused the SATP stage.
-     * @type {string}
-     * @memberof DecideInboundWebhookRequest
      */
     'adapterId': string;
     /**
      * Session identifier for the paused SATP transfer.
-     * @type {string}
-     * @memberof DecideInboundWebhookRequest
      */
     'sessionId': string;
     /**
      * Optional transfer context identifier.
-     * @type {string}
-     * @memberof DecideInboundWebhookRequest
      */
     'contextId'?: string;
     /**
      * When true, the gateway resumes the paused stage. When false, the transfer  is rejected and the provided reason is logged.
-     * @type {boolean}
-     * @memberof DecideInboundWebhookRequest
      */
     'continue': boolean;
     /**
      * Human-readable justification for auditing and operator visibility.
-     * @type {string}
-     * @memberof DecideInboundWebhookRequest
      */
     'reason'?: string;
     /**
      * Optional data payload from external system.
-     * @type {{ [key: string]: any; }}
-     * @memberof DecideInboundWebhookRequest
      */
     'data'?: { [key: string]: any; };
 }
 /**
  * The draft versions supported by the gateway.
- * @export
- * @interface DraftVersions
  */
 export interface DraftVersions {
     /**
      * Core functionality or component.
-     * @type {string}
-     * @memberof DraftVersions
      */
     'Core'?: string;
     /**
      * System architecture or design.
-     * @type {string}
-     * @memberof DraftVersions
      */
     'Architecture'?: string;
     /**
      * Crash or failure scenario.
-     * @type {string}
-     * @memberof DraftVersions
      */
     'Crash'?: string;
 }
 /**
  * The ERC token standard.
- * @export
- * @enum {string}
  */
 
 export const ERCTokenStandard = {
@@ -1327,7 +877,7 @@ export const ERCTokenStandard = {
     Erc20: 'ERC20',
     Erc721: 'ERC721',
     Erc1155: 'ERC1155',
-    Erc6909: 'ERC6909'
+    Erc6909: 'ERC6909',
 } as const;
 
 export type ERCTokenStandard = typeof ERCTokenStandard[keyof typeof ERCTokenStandard];
@@ -1335,141 +885,83 @@ export type ERCTokenStandard = typeof ERCTokenStandard[keyof typeof ERCTokenStan
 
 /**
  * Provides an estimation for a transaction, including costs, amounts, and execution duration.
- * @export
- * @interface Estimate
  */
 export interface Estimate {
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof Estimate
      */
     'approvalAddress'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof Estimate
      */
     'toAmountMin'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof Estimate
      */
     'toAmount'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof Estimate
      */
     'fromAmount'?: string;
     /**
      * A collection of fee costs associated with the transaction.
-     * @type {Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner>}
-     * @memberof Estimate
      */
     'feeCosts'?: Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner>;
     /**
      * A collection of estimated gas costs for executing the transaction.
-     * @type {Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner>}
-     * @memberof Estimate
      */
     'gasCosts'?: Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner>;
     /**
      * The estimated duration for the transaction execution in seconds.
-     * @type {number}
-     * @memberof Estimate
      */
     'executionDuration'?: number;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof Estimate
      */
     'fromAmountUSD'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof Estimate
      */
     'toAmountUSD'?: string;
     /**
      * The tool or service used to generate this estimate.
-     * @type {string}
-     * @memberof Estimate
      */
     'tool'?: string;
 }
 /**
  * Response schema for executing a data transfer task. Includes the task ID and status of the execution.
- * @export
- * @interface ExecuteOracleTask200Response
  */
 export interface ExecuteOracleTask200Response {
     /**
      * The unique identifier of the task.
-     * @type {string}
-     * @memberof ExecuteOracleTask200Response
      */
     'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {string}
-     * @memberof ExecuteOracleTask200Response
      */
     'type': ExecuteOracleTask200ResponseTypeEnum;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof ExecuteOracleTask200Response
-     */
     'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseSrcContract}
-     * @memberof ExecuteOracleTask200Response
-     */
     'srcContract': ExecuteOracleTask200ResponseSrcContract;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof ExecuteOracleTask200Response
-     */
     'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseDstContract}
-     * @memberof ExecuteOracleTask200Response
-     */
     'dstContract': ExecuteOracleTask200ResponseDstContract;
     /**
      * The timestamp when the Oracle task was created or last updated.
-     * @type {number}
-     * @memberof ExecuteOracleTask200Response
      */
     'timestamp': number;
     /**
      * The list of operations performed by the Oracle task.
-     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
-     * @memberof ExecuteOracleTask200Response
      */
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {string}
-     * @memberof ExecuteOracleTask200Response
      */
     'status': ExecuteOracleTask200ResponseStatusEnum;
     /**
      * The mode of operation for registered tasks.
-     * @type {string}
-     * @memberof ExecuteOracleTask200Response
      */
     'mode': ExecuteOracleTask200ResponseModeEnum;
     /**
      * The interval for polling in milliseconds. Only if taskMode is POLLING.
-     * @type {number}
-     * @memberof ExecuteOracleTask200Response
      */
     'pollingInterval'?: number;
 }
@@ -1477,282 +969,181 @@ export interface ExecuteOracleTask200Response {
 export const ExecuteOracleTask200ResponseTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type ExecuteOracleTask200ResponseTypeEnum = typeof ExecuteOracleTask200ResponseTypeEnum[keyof typeof ExecuteOracleTask200ResponseTypeEnum];
 export const ExecuteOracleTask200ResponseStatusEnum = {
     Active: 'ACTIVE',
-    Inactive: 'INACTIVE'
+    Inactive: 'INACTIVE',
 } as const;
 
 export type ExecuteOracleTask200ResponseStatusEnum = typeof ExecuteOracleTask200ResponseStatusEnum[keyof typeof ExecuteOracleTask200ResponseStatusEnum];
 export const ExecuteOracleTask200ResponseModeEnum = {
     Polling: 'POLLING',
     EventListening: 'EVENT_LISTENING',
-    Immediate: 'IMMEDIATE'
+    Immediate: 'IMMEDIATE',
 } as const;
 
 export type ExecuteOracleTask200ResponseModeEnum = typeof ExecuteOracleTask200ResponseModeEnum[keyof typeof ExecuteOracleTask200ResponseModeEnum];
 
 /**
  * The destination contract details for the Oracle task.
- * @export
- * @interface ExecuteOracleTask200ResponseDstContract
  */
 export interface ExecuteOracleTask200ResponseDstContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseDstContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseDstContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof ExecuteOracleTask200ResponseDstContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseDstContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseDstContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof ExecuteOracleTask200ResponseDstContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.
- * @export
- * @interface ExecuteOracleTask200ResponseOperationsInner
  */
 export interface ExecuteOracleTask200ResponseOperationsInner {
     /**
      * A unique identifier for the Oracle operation.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInner
      */
     'id': string;
     /**
      * The type of the Oracle operation.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInner
      */
     'type': ExecuteOracleTask200ResponseOperationsInnerTypeEnum;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof ExecuteOracleTask200ResponseOperationsInner
-     */
     'networkId': TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseOperationsInnerContract}
-     * @memberof ExecuteOracleTask200ResponseOperationsInner
-     */
     'contract': ExecuteOracleTask200ResponseOperationsInnerContract;
     /**
      * The current status of the Oracle operation.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInner
      */
     'status': ExecuteOracleTask200ResponseOperationsInnerStatusEnum;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseOperationsInnerOutput}
-     * @memberof ExecuteOracleTask200ResponseOperationsInner
-     */
     'output'?: ExecuteOracleTask200ResponseOperationsInnerOutput;
     /**
      * The timestamp when the Oracle operation was created or last updated.
-     * @type {number}
-     * @memberof ExecuteOracleTask200ResponseOperationsInner
      */
     'timestamp': number;
 }
 
 export const ExecuteOracleTask200ResponseOperationsInnerTypeEnum = {
     Read: 'READ',
-    Update: 'UPDATE'
+    Update: 'UPDATE',
 } as const;
 
 export type ExecuteOracleTask200ResponseOperationsInnerTypeEnum = typeof ExecuteOracleTask200ResponseOperationsInnerTypeEnum[keyof typeof ExecuteOracleTask200ResponseOperationsInnerTypeEnum];
 export const ExecuteOracleTask200ResponseOperationsInnerStatusEnum = {
     Pending: 'PENDING',
     Success: 'SUCCESS',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type ExecuteOracleTask200ResponseOperationsInnerStatusEnum = typeof ExecuteOracleTask200ResponseOperationsInnerStatusEnum[keyof typeof ExecuteOracleTask200ResponseOperationsInnerStatusEnum];
 
 /**
  * The contract associated with the Oracle operation.
- * @export
- * @interface ExecuteOracleTask200ResponseOperationsInnerContract
  */
 export interface ExecuteOracleTask200ResponseOperationsInnerContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * Optional output generated by the Oracle operation.
- * @export
- * @interface ExecuteOracleTask200ResponseOperationsInnerOutput
  */
 export interface ExecuteOracleTask200ResponseOperationsInnerOutput {
     /**
      * The unique identifier for the transaction.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
      */
     'transactionId'?: string;
     /**
      * The receipt of the transaction, providing proof of execution.
-     * @type {object}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
      */
     'transactionReceipt'?: object;
     /**
      * The output of the Oracle operation execution.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
      */
     'output'?: string;
     /**
      * Proof of the Oracle operation execution.
-     * @type {object}
-     * @memberof ExecuteOracleTask200ResponseOperationsInnerOutput
      */
     'proof'?: object;
 }
 /**
  * The source contract details for the Oracle task.
- * @export
- * @interface ExecuteOracleTask200ResponseSrcContract
  */
 export interface ExecuteOracleTask200ResponseSrcContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseSrcContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseSrcContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof ExecuteOracleTask200ResponseSrcContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseSrcContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTask200ResponseSrcContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof ExecuteOracleTask200ResponseSrcContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.
- * @export
- * @interface ExecuteOracleTaskRequest
  */
 export interface ExecuteOracleTaskRequest {
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof ExecuteOracleTaskRequest
-     */
     'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof ExecuteOracleTaskRequest
-     */
     'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTaskRequestSourceContract}
-     * @memberof ExecuteOracleTaskRequest
-     */
     'sourceContract'?: ExecuteOracleTaskRequestSourceContract;
-    /**
-     * 
-     * @type {ExecuteOracleTaskRequestDestinationContract}
-     * @memberof ExecuteOracleTaskRequest
-     */
     'destinationContract'?: ExecuteOracleTaskRequestDestinationContract;
     /**
      * The type of task to be registered.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequest
      */
     'taskType'?: ExecuteOracleTaskRequestTaskTypeEnum;
 }
@@ -1760,450 +1151,289 @@ export interface ExecuteOracleTaskRequest {
 export const ExecuteOracleTaskRequestTaskTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type ExecuteOracleTaskRequestTaskTypeEnum = typeof ExecuteOracleTaskRequestTaskTypeEnum[keyof typeof ExecuteOracleTaskRequestTaskTypeEnum];
 
 /**
  * The contract data on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
- * @export
- * @interface ExecuteOracleTaskRequestDestinationContract
  */
 export interface ExecuteOracleTaskRequestDestinationContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestDestinationContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestDestinationContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof ExecuteOracleTaskRequestDestinationContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestDestinationContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestDestinationContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof ExecuteOracleTaskRequestDestinationContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * The contract data on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
- * @export
- * @interface ExecuteOracleTaskRequestSourceContract
  */
 export interface ExecuteOracleTaskRequestSourceContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestSourceContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestSourceContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof ExecuteOracleTaskRequestSourceContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestSourceContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof ExecuteOracleTaskRequestSourceContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof ExecuteOracleTaskRequestSourceContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * @type ExecuteOracleTaskRequestSourceContractParamsInner
- * @export
  */
 export type ExecuteOracleTaskRequestSourceContractParamsInner = number | string;
 
 /**
  * Details about a specific fee cost associated with the transaction.
- * @export
- * @interface FeeCost
  */
 export interface FeeCost {
     /**
      * Name of the fee cost.
-     * @type {string}
-     * @memberof FeeCost
      */
     'name'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof FeeCost
      */
     'amount'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof FeeCost
      */
     'amountUSD'?: string;
     /**
      * The symbol of a token
-     * @type {string}
-     * @memberof FeeCost
      */
     'token'?: string;
     /**
      * Indicates if the fee is included in the transaction amount.
-     * @type {boolean}
-     * @memberof FeeCost
      */
     'included'?: boolean;
 }
 /**
  * Details about a specific gas cost associated with the transaction.
- * @export
- * @interface GasCost
  */
 export interface GasCost {
     /**
      * The type of the gas cost.
-     * @type {string}
-     * @memberof GasCost
      */
     'type'?: string;
     /**
      * The gas price, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof GasCost
      */
     'price'?: string;
     /**
      * The estimated gas required, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof GasCost
      */
     'estimate'?: string;
     /**
      * The gas limit for the transaction, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof GasCost
      */
     'limit'?: string;
     /**
      * The amount of gas required in the gas currency.
-     * @type {string}
-     * @memberof GasCost
      */
     'amount'?: string;
     /**
      * The amount of gas required in USD.
-     * @type {string}
-     * @memberof GasCost
      */
     'amountUSD'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof GasCost
-     */
     'token'?: GetRoutes200ResponseRoutesInnerFromToken;
 }
 /**
  * The identity of the gateway.
- * @export
- * @interface GatewayIdentity
  */
 export interface GatewayIdentity {
     /**
      * The unique identifier for the gateway.
-     * @type {string}
-     * @memberof GatewayIdentity
      */
     'id': string;
     /**
      * The public key of the gateway.
-     * @type {string}
-     * @memberof GatewayIdentity
      */
     'pubKey': string;
     /**
      * The name of the gateway.
-     * @type {string}
-     * @memberof GatewayIdentity
      */
     'name': string;
     /**
      * The draft versions supported by the gateway.
-     * @type {Array<AddCounterpartyRequestCounterpartyVersionInner>}
-     * @memberof GatewayIdentity
      */
     'version': Array<AddCounterpartyRequestCounterpartyVersionInner>;
     /**
      * The list of connected DLT networks.
-     * @type {Array<TransactRequestSourceAssetNetworkId>}
-     * @memberof GatewayIdentity
      */
     'connectedDLTs': Array<TransactRequestSourceAssetNetworkId>;
     /**
      * The proof ID associated with the gateway.
-     * @type {string}
-     * @memberof GatewayIdentity
      */
     'proofID': string;
     /**
      * The server port of the gateway.
-     * @type {number}
-     * @memberof GatewayIdentity
      */
     'gatewayServerPort': number;
     /**
      * The client port of the gateway.
-     * @type {number}
-     * @memberof GatewayIdentity
      */
     'gatewayClientPort': number;
     /**
      * The OpenAPI port of the gateway.
-     * @type {number}
-     * @memberof GatewayIdentity
      */
     'gatewayOapiPort'?: number;
     /**
      * The UI port of the gateway.
-     * @type {number}
-     * @memberof GatewayIdentity
      */
     'gatewayUIPort'?: number;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof GatewayIdentity
      */
     'address': string;
 }
 /**
  * Response schema for getting the address to approve the token transfer.
- * @export
- * @interface GetApproveAddress200Response
  */
 export interface GetApproveAddress200Response {
     /**
      * The address to approve the token transfer.
-     * @type {string}
-     * @memberof GetApproveAddress200Response
      */
     'approveAddress': string;
 }
 /**
  * Request schema for getting the address to approve the token transfer.
- * @export
- * @interface GetApproveAddressRequest
  */
 export interface GetApproveAddressRequest {
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof GetApproveAddressRequest
-     */
     'networkId': TransactRequestSourceAssetNetworkId;
     /**
      * The type of token.
-     * @type {string}
-     * @memberof GetApproveAddressRequest
      */
     'tokenType': GetApproveAddressRequestTokenTypeEnum;
 }
 
 export const GetApproveAddressRequestTokenTypeEnum = {
-    Fungible: 'NONSTANDARD_FUNGIBLE',
-    Nonfungible: 'NONSTANDARD_NONFUNGIBLE'
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE',
 } as const;
 
 export type GetApproveAddressRequestTokenTypeEnum = typeof GetApproveAddressRequestTokenTypeEnum[keyof typeof GetApproveAddressRequestTokenTypeEnum];
 
 /**
  * Response schema for getting the address to approve the token transfer.
- * @export
- * @interface GetApproveAddressResponse
  */
 export interface GetApproveAddressResponse {
     /**
      * The address to approve the token transfer.
-     * @type {string}
-     * @memberof GetApproveAddressResponse
      */
     'approveAddress': string;
 }
 /**
  * Response schema for healthcheck endpoint indicating the availability status of the service.
- * @export
- * @interface GetHealthCheck200Response
  */
 export interface GetHealthCheck200Response {
-    /**
-     * 
-     * @type {string}
-     * @memberof GetHealthCheck200Response
-     */
     'status'?: GetHealthCheck200ResponseStatusEnum;
 }
 
 export const GetHealthCheck200ResponseStatusEnum = {
     Available: 'AVAILABLE',
-    Unavailable: 'UNAVAILABLE'
+    Unavailable: 'UNAVAILABLE',
 } as const;
 
 export type GetHealthCheck200ResponseStatusEnum = typeof GetHealthCheck200ResponseStatusEnum[keyof typeof GetHealthCheck200ResponseStatusEnum];
 
 /**
  * List of chains or systems and related metadata
- * @export
- * @interface GetIntegrations200Response
  */
 export interface GetIntegrations200Response {
-    /**
-     * 
-     * @type {Array<GetIntegrations200ResponseIntegrationsInner>}
-     * @memberof GetIntegrations200Response
-     */
     'integrations': Array<GetIntegrations200ResponseIntegrationsInner>;
 }
 /**
  * Details a network or system integration supported by SATP Hermes.
- * @export
- * @interface GetIntegrations200ResponseIntegrationsInner
  */
 export interface GetIntegrations200ResponseIntegrationsInner {
     /**
      * A unique identifier for the blockchain network/system.
-     * @type {string}
-     * @memberof GetIntegrations200ResponseIntegrationsInner
      */
     'id': string;
     /**
      * The name of the blockchain network/system.
-     * @type {string}
-     * @memberof GetIntegrations200ResponseIntegrationsInner
      */
     'name': string;
     /**
      * The type of network (e.g., \'evm\', \'fabric\', \'SQL Database\').
-     * @type {string}
-     * @memberof GetIntegrations200ResponseIntegrationsInner
      */
     'type': string;
     /**
      * The specific network name (e.g., \'mainnet\', \'testnet\').
-     * @type {string}
-     * @memberof GetIntegrations200ResponseIntegrationsInner
      */
     'environment'?: string;
 }
 /**
  * Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
- * @export
- * @interface GetOracleTaskStatus200Response
  */
 export interface GetOracleTaskStatus200Response {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof GetOracleTaskStatus200Response
      */
     'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {string}
-     * @memberof GetOracleTaskStatus200Response
      */
     'type': GetOracleTaskStatus200ResponseTypeEnum;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof GetOracleTaskStatus200Response
-     */
     'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseSrcContract}
-     * @memberof GetOracleTaskStatus200Response
-     */
     'srcContract': ExecuteOracleTask200ResponseSrcContract;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof GetOracleTaskStatus200Response
-     */
     'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseDstContract}
-     * @memberof GetOracleTaskStatus200Response
-     */
     'dstContract': ExecuteOracleTask200ResponseDstContract;
     /**
      * The timestamp when the Oracle task was created or last updated.
-     * @type {number}
-     * @memberof GetOracleTaskStatus200Response
      */
     'timestamp': number;
     /**
      * The list of operations performed by the Oracle task.
-     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
-     * @memberof GetOracleTaskStatus200Response
      */
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {string}
-     * @memberof GetOracleTaskStatus200Response
      */
     'status': GetOracleTaskStatus200ResponseStatusEnum;
     /**
      * The mode of operation for registered tasks.
-     * @type {string}
-     * @memberof GetOracleTaskStatus200Response
      */
     'mode': GetOracleTaskStatus200ResponseModeEnum;
     /**
      * The interval for polling in milliseconds. Only if taskMode is POLLING.
-     * @type {number}
-     * @memberof GetOracleTaskStatus200Response
      */
     'pollingInterval'?: number;
 }
@@ -2211,277 +1441,181 @@ export interface GetOracleTaskStatus200Response {
 export const GetOracleTaskStatus200ResponseTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type GetOracleTaskStatus200ResponseTypeEnum = typeof GetOracleTaskStatus200ResponseTypeEnum[keyof typeof GetOracleTaskStatus200ResponseTypeEnum];
 export const GetOracleTaskStatus200ResponseStatusEnum = {
     Active: 'ACTIVE',
-    Inactive: 'INACTIVE'
+    Inactive: 'INACTIVE',
 } as const;
 
 export type GetOracleTaskStatus200ResponseStatusEnum = typeof GetOracleTaskStatus200ResponseStatusEnum[keyof typeof GetOracleTaskStatus200ResponseStatusEnum];
 export const GetOracleTaskStatus200ResponseModeEnum = {
     Polling: 'POLLING',
     EventListening: 'EVENT_LISTENING',
-    Immediate: 'IMMEDIATE'
+    Immediate: 'IMMEDIATE',
 } as const;
 
 export type GetOracleTaskStatus200ResponseModeEnum = typeof GetOracleTaskStatus200ResponseModeEnum[keyof typeof GetOracleTaskStatus200ResponseModeEnum];
 
 /**
  * A collection of available and unavailable routes
- * @export
- * @interface GetRoutes200Response
  */
 export interface GetRoutes200Response {
     /**
      * A collection of route objects
-     * @type {Array<GetRoutes200ResponseRoutesInner>}
-     * @memberof GetRoutes200Response
      */
     'routes': Array<GetRoutes200ResponseRoutesInner>;
 }
 /**
  * Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.
- * @export
- * @interface GetRoutes200ResponseRoutesInner
  */
 export interface GetRoutes200ResponseRoutesInner {
     /**
      * A unique identifier of the route.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'id': string;
     /**
      * A unique identifier for the gateway.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'gatewayID': string;
     /**
      * The mode of operation for this route - \'data\' for arbitrary payload handling, \'transfer\' for asset transfer.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'mode': GetRoutes200ResponseRoutesInnerModeEnum;
     /**
      * The ID of the DLT Network where the operation will originate.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'fromDLTNetworkID'?: string;
     /**
      * The amount of \'fromToken\' to be transferred in USD, specified as a string to maintain precision.
-     * @type {number}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'fromAmountUSD'?: number;
     /**
      * The amount that should be sent including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'fromAmount'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof GetRoutes200ResponseRoutesInner
-     */
     'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The ID of the DLT Network where the operation will end.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'toDLTNetworkID'?: string;
     /**
      * The expected amount to be received in USD.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'toAmountUSD'?: string;
     /**
      * The expected amount to be received including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'toAmount'?: string;
     /**
      * The minimum expected amount to be received including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'toAmountMin'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof GetRoutes200ResponseRoutesInner
-     */
     'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The expected gas cost in USD.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'gasCostUSD'?: string;
     /**
      * Whether chain switching is enabled or not.
-     * @type {boolean}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'containsSwitchChain'?: boolean;
     /**
      * List of steps involved in this route, adjusted for mode.
-     * @type {Array<GetRoutes200ResponseRoutesInnerStepsInner>}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'steps'?: Array<GetRoutes200ResponseRoutesInnerStepsInner>;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerInsurance}
-     * @memberof GetRoutes200ResponseRoutesInner
-     */
     'insurance'?: GetRoutes200ResponseRoutesInnerInsurance;
     /**
      * List of tags identifiers providing additional context or categorization.
-     * @type {Array<string>}
-     * @memberof GetRoutes200ResponseRoutesInner
      */
     'tags'?: Array<string>;
 }
 
 export const GetRoutes200ResponseRoutesInnerModeEnum = {
     Data: 'data',
-    Transfer: 'transfer'
+    Transfer: 'transfer',
 } as const;
 
 export type GetRoutes200ResponseRoutesInnerModeEnum = typeof GetRoutes200ResponseRoutesInnerModeEnum[keyof typeof GetRoutes200ResponseRoutesInnerModeEnum];
 
 /**
  * Metadata detailing a supported token
- * @export
- * @interface GetRoutes200ResponseRoutesInnerFromToken
  */
 export interface GetRoutes200ResponseRoutesInnerFromToken {
     /**
      * The network of the DLT being interacted with. TODO: implement network identification draft
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'chainID': string;
     /**
      * Supported DLT protocols.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'chainType': GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'address': string;
     /**
      * The name of the token.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'name'?: string;
     /**
      * The symbol of the token.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'symbol': string;
     /**
      * How many decimals the token supports.
-     * @type {number}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'decimals': number;
     /**
      * The logo of a token, chain, dex etc.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'logoURI'?: string;
     /**
      * List of tags identifiers providing additional context or categorization.
-     * @type {Array<string>}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'tags'?: Array<string>;
     /**
      * The current price of the token in USD.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
      */
     'priceUSD'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromTokenExtensions}
-     * @memberof GetRoutes200ResponseRoutesInnerFromToken
-     */
     'extensions'?: GetRoutes200ResponseRoutesInnerFromTokenExtensions;
 }
 
 export const GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum = {
     HyperledgerFabric: 'HyperledgerFabric',
-    HyperledgerBesu: 'HyperledgerBesu'
+    HyperledgerBesu: 'HyperledgerBesu',
 } as const;
 
 export type GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum = typeof GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum[keyof typeof GetRoutes200ResponseRoutesInnerFromTokenChainTypeEnum];
 
-/**
- * 
- * @export
- * @interface GetRoutes200ResponseRoutesInnerFromTokenExtensions
- */
 export interface GetRoutes200ResponseRoutesInnerFromTokenExtensions {
-    /**
-     * 
-     * @type {{ [key: string]: GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue; }}
-     * @memberof GetRoutes200ResponseRoutesInnerFromTokenExtensions
-     */
     'bridgeInfo'?: { [key: string]: GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue; };
     /**
      * Indicates whether the token is verified.
-     * @type {boolean}
-     * @memberof GetRoutes200ResponseRoutesInnerFromTokenExtensions
      */
     'verified'?: boolean;
 }
 /**
  * Information about the bridge used for the token transfer.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue
  */
 export interface GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue {
     /**
      * The address of the token being transferred.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerFromTokenExtensionsBridgeInfoValue
      */
     'tokenAddress'?: string;
 }
 /**
  * Details about the insurance applicability and fee for the transaction.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerInsurance
  */
 export interface GetRoutes200ResponseRoutesInnerInsurance {
     /**
      * The state of insurance applicability for the transaction.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerInsurance
      */
     'state'?: GetRoutes200ResponseRoutesInnerInsuranceStateEnum;
     /**
      * The fee amount for insurance, represented in USD.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerInsurance
      */
     'feeAmountUsd'?: string;
 }
@@ -2489,479 +1623,290 @@ export interface GetRoutes200ResponseRoutesInnerInsurance {
 export const GetRoutes200ResponseRoutesInnerInsuranceStateEnum = {
     NotInsurable: 'NOT_INSURABLE',
     Insurable: 'INSURABLE',
-    Insured: 'INSURED'
+    Insured: 'INSURED',
 } as const;
 
 export type GetRoutes200ResponseRoutesInnerInsuranceStateEnum = typeof GetRoutes200ResponseRoutesInnerInsuranceStateEnum[keyof typeof GetRoutes200ResponseRoutesInnerInsuranceStateEnum];
 
 /**
  * Details a single step within a route including actions and estimates.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerStepsInner
  */
 export interface GetRoutes200ResponseRoutesInnerStepsInner {
     /**
      * Id of the step
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
      */
     'id'?: string;
     /**
      * Type of the step, typically describing the action, e.g., \'swap\'.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
      */
     'type'?: string;
     /**
      * Tool used in the step, e.g., \'stargate\'.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
      */
     'tool'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerAction}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
-     */
     'action'?: GetRoutes200ResponseRoutesInnerStepsInnerAction;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerEstimate}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
-     */
     'estimate'?: GetRoutes200ResponseRoutesInnerStepsInnerEstimate;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerToolDetails}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
-     */
     'toolDetails'?: GetRoutes200ResponseRoutesInnerStepsInnerToolDetails;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerToolDetails}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
-     */
     'integrationDetails'?: GetRoutes200ResponseRoutesInnerStepsInnerToolDetails;
     /**
      * IDs of further steps included within this step, allowing for nested actions without direct recursion.
-     * @type {Array<string>}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInner
      */
     'includedStepIds'?: Array<string>;
 }
 /**
  * Describes the action to be performed in a transaction step, including token details, amounts, slippage, and addresses involved.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerStepsInnerAction
  */
 export interface GetRoutes200ResponseRoutesInnerStepsInnerAction {
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
-     */
     'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The amount of \'fromToken\' to be transferred, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
      */
     'fromAmount'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
-     */
     'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The maximum acceptable difference between the expected price of the \'toToken\' and the price at the time of the transfer.
-     * @type {number}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
      */
     'slippage'?: number;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
      */
     'fromAddress'?: string;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerAction
      */
     'toAddress'?: string;
 }
 /**
  * Provides an estimation for a transaction, including costs, amounts, and execution duration.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerStepsInnerEstimate
  */
 export interface GetRoutes200ResponseRoutesInnerStepsInnerEstimate {
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'approvalAddress'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'toAmountMin'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'toAmount'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'fromAmount'?: string;
     /**
      * A collection of fee costs associated with the transaction.
-     * @type {Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner>}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'feeCosts'?: Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner>;
     /**
      * A collection of estimated gas costs for executing the transaction.
-     * @type {Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner>}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'gasCosts'?: Array<GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner>;
     /**
      * The estimated duration for the transaction execution in seconds.
-     * @type {number}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'executionDuration'?: number;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'fromAmountUSD'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'toAmountUSD'?: string;
     /**
      * The tool or service used to generate this estimate.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimate
      */
     'tool'?: string;
 }
 /**
  * Details about a specific fee cost associated with the transaction.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner
  */
 export interface GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner {
     /**
      * Name of the fee cost.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner
      */
     'name'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner
      */
     'amount'?: string;
     /**
      * The amount in string format including all decimals.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner
      */
     'amountUSD'?: string;
     /**
      * The symbol of a token
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner
      */
     'token'?: string;
     /**
      * Indicates if the fee is included in the transaction amount.
-     * @type {boolean}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateFeeCostsInner
      */
     'included'?: boolean;
 }
 /**
  * Details about a specific gas cost associated with the transaction.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
  */
 export interface GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner {
     /**
      * The type of the gas cost.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
      */
     'type'?: string;
     /**
      * The gas price, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
      */
     'price'?: string;
     /**
      * The estimated gas required, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
      */
     'estimate'?: string;
     /**
      * The gas limit for the transaction, specified as a string to maintain precision.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
      */
     'limit'?: string;
     /**
      * The amount of gas required in the gas currency.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
      */
     'amount'?: string;
     /**
      * The amount of gas required in USD.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
      */
     'amountUSD'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerEstimateGasCostsInner
-     */
     'token'?: GetRoutes200ResponseRoutesInnerFromToken;
 }
 /**
  * Describes integration or tool details such as bridges or exchanges involved in the transaction.
- * @export
- * @interface GetRoutes200ResponseRoutesInnerStepsInnerToolDetails
  */
 export interface GetRoutes200ResponseRoutesInnerStepsInnerToolDetails {
     /**
      * A unique identifier for the integration or tool.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerToolDetails
      */
     'key': string;
     /**
      * The name of the integration or tool.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerToolDetails
      */
     'name': string;
     /**
      * URL to the logo of the integration or tool.
-     * @type {string}
-     * @memberof GetRoutes200ResponseRoutesInnerStepsInnerToolDetails
      */
     'logoURI': string;
 }
 /**
  * Response schema for a session proofs request. Contains the signature-verified SessionProofs persisted in the audit database for the requested sessions.
- * @export
- * @interface GetSessionProofs200Response
  */
 export interface GetSessionProofs200Response {
     /**
      * Signature-verified session proofs for the requested SATP sessions.
-     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
-     * @memberof GetSessionProofs200Response
      */
     'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
 }
 /**
  * List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
- * @export
- * @interface GetSupportedLedgers200Response
  */
 export interface GetSupportedLedgers200Response {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof GetSupportedLedgers200Response
-     */
     'supportedLedgers': Array<string>;
 }
 /**
  * Response schema for healthcheck endpoint indicating the availability status of the service.
- * @export
- * @interface HealthCheckResponse
  */
 export interface HealthCheckResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof HealthCheckResponse
-     */
     'status'?: HealthCheckResponseStatusEnum;
 }
 
 export const HealthCheckResponseStatusEnum = {
     Available: 'AVAILABLE',
-    Unavailable: 'UNAVAILABLE'
+    Unavailable: 'UNAVAILABLE',
 } as const;
 
 export type HealthCheckResponseStatusEnum = typeof HealthCheckResponseStatusEnum[keyof typeof HealthCheckResponseStatusEnum];
 
 /**
  * Request payload posted by external approval controllers to approve or reject  a paused SATP transfer. The gateway validates the adapterId matches the waiting  adapter, then uses the continue field to determine whether to proceed or abort.  Inbound Webhook Workflow: 1. SATP gateway reaches a stage/step with configured inbound adapter 2. Gateway pauses execution and waits for external decision POST 3. External controller evaluates business rules, compliance checks, or manual review 4. Controller POSTs decision payload to gateway\'s inbound endpoint 5. Gateway validates decision, logs justification, and resumes or aborts transfer  Decision Semantics: - continue=true: Approve transfer continuation; gateway proceeds to next stage - continue=false: Reject transfer; gateway aborts and may trigger rollback - reason: Human-readable justification stored in audit logs  Security Considerations: - Inbound endpoints should use authentication (API keys, mTLS, JWT validation) - Decision payloads must include adapter ID to match the paused session state - All decisions are logged with timestamps for non-repudiation
- * @export
- * @interface InboundWebhookDecisionRequest
  */
 export interface InboundWebhookDecisionRequest {
     /**
      * Adapter identifier that originally paused the SATP stage.
-     * @type {string}
-     * @memberof InboundWebhookDecisionRequest
      */
     'adapterId': string;
     /**
      * Session identifier for the paused SATP transfer.
-     * @type {string}
-     * @memberof InboundWebhookDecisionRequest
      */
     'sessionId': string;
     /**
      * Optional transfer context identifier.
-     * @type {string}
-     * @memberof InboundWebhookDecisionRequest
      */
     'contextId'?: string;
     /**
      * When true, the gateway resumes the paused stage. When false, the transfer  is rejected and the provided reason is logged.
-     * @type {boolean}
-     * @memberof InboundWebhookDecisionRequest
      */
     'continue': boolean;
     /**
      * Human-readable justification for auditing and operator visibility.
-     * @type {string}
-     * @memberof InboundWebhookDecisionRequest
      */
     'reason'?: string;
     /**
      * Optional data payload from external system.
-     * @type {{ [key: string]: any; }}
-     * @memberof InboundWebhookDecisionRequest
      */
     'data'?: { [key: string]: any; };
 }
 /**
  * Response returned by the gateway after processing an inbound webhook decision. Indicates whether the decision was accepted and the resulting session state.
- * @export
- * @interface InboundWebhookDecisionResponse
  */
 export interface InboundWebhookDecisionResponse {
     /**
      * Whether the decision was accepted and applied to the session.
-     * @type {boolean}
-     * @memberof InboundWebhookDecisionResponse
      */
     'accepted': boolean;
     /**
      * Session identifier for the affected SATP transfer.
-     * @type {string}
-     * @memberof InboundWebhookDecisionResponse
      */
     'sessionId': string;
     /**
      * Human-readable message describing the result.
-     * @type {string}
-     * @memberof InboundWebhookDecisionResponse
      */
     'message'?: string;
     /**
      * Timestamp when the decision was processed.
-     * @type {string}
-     * @memberof InboundWebhookDecisionResponse
      */
     'timestamp'?: string;
 }
 /**
  * Details a single step within a route including actions and estimates.
- * @export
- * @interface IncludedStep
  */
 export interface IncludedStep {
     /**
      * Id of the step
-     * @type {string}
-     * @memberof IncludedStep
      */
     'id'?: string;
     /**
      * Type of the step, typically describing the action, e.g., \'swap\'.
-     * @type {string}
-     * @memberof IncludedStep
      */
     'type'?: string;
     /**
      * Tool used in the step, e.g., \'stargate\'.
-     * @type {string}
-     * @memberof IncludedStep
      */
     'tool'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerAction}
-     * @memberof IncludedStep
-     */
     'action'?: GetRoutes200ResponseRoutesInnerStepsInnerAction;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerEstimate}
-     * @memberof IncludedStep
-     */
     'estimate'?: GetRoutes200ResponseRoutesInnerStepsInnerEstimate;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerToolDetails}
-     * @memberof IncludedStep
-     */
     'toolDetails'?: GetRoutes200ResponseRoutesInnerStepsInnerToolDetails;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerStepsInnerToolDetails}
-     * @memberof IncludedStep
-     */
     'integrationDetails'?: GetRoutes200ResponseRoutesInnerStepsInnerToolDetails;
     /**
      * IDs of further steps included within this step, allowing for nested actions without direct recursion.
-     * @type {Array<string>}
-     * @memberof IncludedStep
      */
     'includedStepIds'?: Array<string>;
 }
 /**
  * Details about the insurance applicability and fee for the transaction.
- * @export
- * @interface Insurance
  */
 export interface Insurance {
     /**
      * The state of insurance applicability for the transaction.
-     * @type {string}
-     * @memberof Insurance
      */
     'state'?: InsuranceStateEnum;
     /**
      * The fee amount for insurance, represented in USD.
-     * @type {string}
-     * @memberof Insurance
      */
     'feeAmountUsd'?: string;
 }
@@ -2969,145 +1914,98 @@ export interface Insurance {
 export const InsuranceStateEnum = {
     NotInsurable: 'NOT_INSURABLE',
     Insurable: 'INSURABLE',
-    Insured: 'INSURED'
+    Insured: 'INSURED',
 } as const;
 
 export type InsuranceStateEnum = typeof InsuranceStateEnum[keyof typeof InsuranceStateEnum];
 
 /**
  * Details a network or system integration supported by SATP Hermes.
- * @export
- * @interface Integration
  */
 export interface Integration {
     /**
      * A unique identifier for the blockchain network/system.
-     * @type {string}
-     * @memberof Integration
      */
     'id': string;
     /**
      * The name of the blockchain network/system.
-     * @type {string}
-     * @memberof Integration
      */
     'name': string;
     /**
      * The type of network (e.g., \'evm\', \'fabric\', \'SQL Database\').
-     * @type {string}
-     * @memberof Integration
      */
     'type': string;
     /**
      * The specific network name (e.g., \'mainnet\', \'testnet\').
-     * @type {string}
-     * @memberof Integration
      */
     'environment'?: string;
 }
 /**
  * Describes integration or tool details such as bridges or exchanges involved in the transaction.
- * @export
- * @interface IntegrationDetails
  */
 export interface IntegrationDetails {
     /**
      * A unique identifier for the integration or tool.
-     * @type {string}
-     * @memberof IntegrationDetails
      */
     'key': string;
     /**
      * The name of the integration or tool.
-     * @type {string}
-     * @memberof IntegrationDetails
      */
     'name': string;
     /**
      * URL to the logo of the integration or tool.
-     * @type {string}
-     * @memberof IntegrationDetails
      */
     'logoURI': string;
 }
 /**
  * List of chains or systems and related metadata
- * @export
- * @interface IntegrationsResponse
  */
 export interface IntegrationsResponse {
-    /**
-     * 
-     * @type {Array<GetIntegrations200ResponseIntegrationsInner>}
-     * @memberof IntegrationsResponse
-     */
     'integrations': Array<GetIntegrations200ResponseIntegrationsInner>;
 }
 /**
  * Represents a persisted local audit/log record generated during the lifecycle of a SATP transfer session. Each entry captures the operation performed, its contextual identifiers, serialized session state data, and ordering metadata. 
- * @export
- * @interface LocalLog
  */
 export interface LocalLog {
     /**
      * Unique identifier of the SATP session associated with this log entry. Typically composed of the transfer context ID plus additional correlation suffixes used for tracing within the gateway. 
-     * @type {string}
-     * @memberof LocalLog
      */
     'sessionId': string;
     /**
      * High-level classification of the log event corresponding to a SATP protocol stage or message artifact (e.g., INIT_RECEIPT, TRANSFER_PROPOSAL, LOCK_ASSERTION). 
-     * @type {string}
-     * @memberof LocalLog
      */
     'type': string;
     /**
      * Composite storage key uniquely identifying the log entry within the persistence layer. Commonly derived from the session ID, log type, and operation name. 
-     * @type {string}
-     * @memberof LocalLog
      */
     'key': string;
     /**
      * Specific operation that produced the log entry. Represents the action executed within the SATP workflow (e.g., init, propose, lock, commit). 
-     * @type {string}
-     * @memberof LocalLog
      */
     'operation': string;
     /**
      * Unix timestamp in milliseconds (encoded as a string) indicating when the log entry was generated by the gateway. 
-     * @type {string}
-     * @memberof LocalLog
      */
     'timestamp'?: string;
     /**
      * JSON-serialized payload containing the full SATP session state snapshot at the time of logging. This includes transfer metadata, message hashes, signatures, asset details, protocol stage timestamps, and gateway identifiers. 
-     * @type {string}
-     * @memberof LocalLog
      */
     'data': string;
     /**
      * Monotonically increasing sequence number used to preserve the chronological ordering of log entries within a session. 
-     * @type {number}
-     * @memberof LocalLog
      */
     'sequenceNumber': number;
 }
 /**
  * The network of the DLT being interacted with.
- * @export
- * @interface NetworkId
  */
 export interface NetworkId {
     /**
      * The network of the DLT being interacted with.
-     * @type {string}
-     * @memberof NetworkId
      */
     'id': string;
     /**
      * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
-     * @type {string}
-     * @memberof NetworkId
      */
     'ledgerType': NetworkIdLedgerTypeEnum;
 }
@@ -3119,45 +2017,21 @@ export const NetworkIdLedgerTypeEnum = {
     Corda4X: 'CORDA_4X',
     Ethereum: 'ETHEREUM',
     Fabric2: 'FABRIC_2',
-    Sawtooth1X: 'SAWTOOTH_1X'
+    Sawtooth1X: 'SAWTOOTH_1X',
 } as const;
 
 export type NetworkIdLedgerTypeEnum = typeof NetworkIdLedgerTypeEnum[keyof typeof NetworkIdLedgerTypeEnum];
 
 /**
  * Request schema for triggering an immediate transfer task. Includes the task ID, payload, and destination network and contract details.
- * @export
- * @interface OracleExecuteRequest
  */
 export interface OracleExecuteRequest {
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleExecuteRequest
-     */
     'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleExecuteRequest
-     */
     'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTaskRequestSourceContract}
-     * @memberof OracleExecuteRequest
-     */
     'sourceContract'?: ExecuteOracleTaskRequestSourceContract;
-    /**
-     * 
-     * @type {ExecuteOracleTaskRequestDestinationContract}
-     * @memberof OracleExecuteRequest
-     */
     'destinationContract'?: ExecuteOracleTaskRequestDestinationContract;
     /**
      * The type of task to be registered.
-     * @type {string}
-     * @memberof OracleExecuteRequest
      */
     'taskType'?: OracleExecuteRequestTaskTypeEnum;
 }
@@ -3165,81 +2039,45 @@ export interface OracleExecuteRequest {
 export const OracleExecuteRequestTaskTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type OracleExecuteRequestTaskTypeEnum = typeof OracleExecuteRequestTaskTypeEnum[keyof typeof OracleExecuteRequestTaskTypeEnum];
 
 /**
  * Response schema for executing a data transfer task. Includes the task ID and status of the execution.
- * @export
- * @interface OracleExecuteResponse
  */
 export interface OracleExecuteResponse {
     /**
      * The unique identifier of the task.
-     * @type {string}
-     * @memberof OracleExecuteResponse
      */
     'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {string}
-     * @memberof OracleExecuteResponse
      */
     'type': OracleExecuteResponseTypeEnum;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleExecuteResponse
-     */
     'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseSrcContract}
-     * @memberof OracleExecuteResponse
-     */
     'srcContract': ExecuteOracleTask200ResponseSrcContract;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleExecuteResponse
-     */
     'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseDstContract}
-     * @memberof OracleExecuteResponse
-     */
     'dstContract': ExecuteOracleTask200ResponseDstContract;
     /**
      * The timestamp when the Oracle task was created or last updated.
-     * @type {number}
-     * @memberof OracleExecuteResponse
      */
     'timestamp': number;
     /**
      * The list of operations performed by the Oracle task.
-     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
-     * @memberof OracleExecuteResponse
      */
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {string}
-     * @memberof OracleExecuteResponse
      */
     'status': OracleExecuteResponseStatusEnum;
     /**
      * The mode of operation for registered tasks.
-     * @type {string}
-     * @memberof OracleExecuteResponse
      */
     'mode': OracleExecuteResponseModeEnum;
     /**
      * The interval for polling in milliseconds. Only if taskMode is POLLING.
-     * @type {number}
-     * @memberof OracleExecuteResponse
      */
     'pollingInterval'?: number;
 }
@@ -3247,299 +2085,182 @@ export interface OracleExecuteResponse {
 export const OracleExecuteResponseTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type OracleExecuteResponseTypeEnum = typeof OracleExecuteResponseTypeEnum[keyof typeof OracleExecuteResponseTypeEnum];
 export const OracleExecuteResponseStatusEnum = {
     Active: 'ACTIVE',
-    Inactive: 'INACTIVE'
+    Inactive: 'INACTIVE',
 } as const;
 
 export type OracleExecuteResponseStatusEnum = typeof OracleExecuteResponseStatusEnum[keyof typeof OracleExecuteResponseStatusEnum];
 export const OracleExecuteResponseModeEnum = {
     Polling: 'POLLING',
     EventListening: 'EVENT_LISTENING',
-    Immediate: 'IMMEDIATE'
+    Immediate: 'IMMEDIATE',
 } as const;
 
 export type OracleExecuteResponseModeEnum = typeof OracleExecuteResponseModeEnum[keyof typeof OracleExecuteResponseModeEnum];
 
 /**
  * Represents an operation performed by the Oracle, including its type, network, contract, status, and optional output.
- * @export
- * @interface OracleOperation
  */
 export interface OracleOperation {
     /**
      * A unique identifier for the Oracle operation.
-     * @type {string}
-     * @memberof OracleOperation
      */
     'id': string;
     /**
      * The type of the Oracle operation.
-     * @type {string}
-     * @memberof OracleOperation
      */
     'type': OracleOperationTypeEnum;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleOperation
-     */
     'networkId': TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseOperationsInnerContract}
-     * @memberof OracleOperation
-     */
     'contract': ExecuteOracleTask200ResponseOperationsInnerContract;
     /**
      * The current status of the Oracle operation.
-     * @type {string}
-     * @memberof OracleOperation
      */
     'status': OracleOperationStatusEnum;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseOperationsInnerOutput}
-     * @memberof OracleOperation
-     */
     'output'?: ExecuteOracleTask200ResponseOperationsInnerOutput;
     /**
      * The timestamp when the Oracle operation was created or last updated.
-     * @type {number}
-     * @memberof OracleOperation
      */
     'timestamp': number;
 }
 
 export const OracleOperationTypeEnum = {
     Read: 'READ',
-    Update: 'UPDATE'
+    Update: 'UPDATE',
 } as const;
 
 export type OracleOperationTypeEnum = typeof OracleOperationTypeEnum[keyof typeof OracleOperationTypeEnum];
 export const OracleOperationStatusEnum = {
     Pending: 'PENDING',
     Success: 'SUCCESS',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type OracleOperationStatusEnum = typeof OracleOperationStatusEnum[keyof typeof OracleOperationStatusEnum];
 
 /**
  * Request schema for registering a repeatable task.
- * @export
- * @interface OracleRegisterRequest
  */
 export interface OracleRegisterRequest {
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleRegisterRequest
-     */
     'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleRegisterRequest
-     */
     'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {RegisterOracleTaskRequestSourceContract}
-     * @memberof OracleRegisterRequest
-     */
     'sourceContract'?: RegisterOracleTaskRequestSourceContract;
-    /**
-     * 
-     * @type {RegisterOracleTaskRequestDestinationContract}
-     * @memberof OracleRegisterRequest
-     */
     'destinationContract'?: RegisterOracleTaskRequestDestinationContract;
     /**
      * The mode of operation for the repeatable task.
-     * @type {string}
-     * @memberof OracleRegisterRequest
      */
     'taskMode': OracleRegisterRequestTaskModeEnum;
     /**
      * The interval for polling in milliseconds. Only if taskMode is POLLING.
-     * @type {number}
-     * @memberof OracleRegisterRequest
      */
     'pollingInterval'?: number;
-    /**
-     * 
-     * @type {RegisterOracleTaskRequestListeningOptions}
-     * @memberof OracleRegisterRequest
-     */
     'listeningOptions'?: RegisterOracleTaskRequestListeningOptions;
     /**
      * The type of task to be registered.
-     * @type {string}
-     * @memberof OracleRegisterRequest
      */
     'taskType': OracleRegisterRequestTaskTypeEnum;
 }
 
 export const OracleRegisterRequestTaskModeEnum = {
     Polling: 'POLLING',
-    EventListening: 'EVENT_LISTENING'
+    EventListening: 'EVENT_LISTENING',
 } as const;
 
 export type OracleRegisterRequestTaskModeEnum = typeof OracleRegisterRequestTaskModeEnum[keyof typeof OracleRegisterRequestTaskModeEnum];
 export const OracleRegisterRequestTaskTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type OracleRegisterRequestTaskTypeEnum = typeof OracleRegisterRequestTaskTypeEnum[keyof typeof OracleRegisterRequestTaskTypeEnum];
 
 /**
  * Response schema for registering a repeatable task. Includes the task ID and status of the registration.
- * @export
- * @interface OracleRegisterResponse
  */
 export interface OracleRegisterResponse {
     /**
      * The unique identifier of the task.
-     * @type {string}
-     * @memberof OracleRegisterResponse
      */
     'taskID'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OracleRegisterResponse
-     */
     'status'?: OracleRegisterResponseStatusEnum;
 }
 
 export const OracleRegisterResponseStatusEnum = {
     Success: 'SUCCESS',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type OracleRegisterResponseStatusEnum = typeof OracleRegisterResponseStatusEnum[keyof typeof OracleRegisterResponseStatusEnum];
 
 /**
  * Represents the response from an Oracle task execution, including transaction details and outputs.
- * @export
- * @interface OracleResponse
  */
 export interface OracleResponse {
     /**
      * The unique identifier for the transaction.
-     * @type {string}
-     * @memberof OracleResponse
      */
     'transactionId'?: string;
     /**
      * The receipt of the transaction, providing proof of execution.
-     * @type {object}
-     * @memberof OracleResponse
      */
     'transactionReceipt'?: object;
     /**
      * The output of the Oracle operation execution.
-     * @type {string}
-     * @memberof OracleResponse
      */
     'output'?: string;
     /**
      * Proof of the Oracle operation execution.
-     * @type {object}
-     * @memberof OracleResponse
      */
     'proof'?: object;
 }
 /**
  * Request schema for checking the status of a data transfer task.
- * @export
- * @interface OracleStatusRequest
  */
 export interface OracleStatusRequest {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof OracleStatusRequest
      */
     'taskID': string;
 }
 /**
  * Response schema for checking the status of a data transfer task. Includes the task ID and status of the task.
- * @export
- * @interface OracleStatusResponse
  */
 export interface OracleStatusResponse {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof OracleStatusResponse
      */
     'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {string}
-     * @memberof OracleStatusResponse
      */
     'type': OracleStatusResponseTypeEnum;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleStatusResponse
-     */
     'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseSrcContract}
-     * @memberof OracleStatusResponse
-     */
     'srcContract': ExecuteOracleTask200ResponseSrcContract;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleStatusResponse
-     */
     'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseDstContract}
-     * @memberof OracleStatusResponse
-     */
     'dstContract': ExecuteOracleTask200ResponseDstContract;
     /**
      * The timestamp when the Oracle task was created or last updated.
-     * @type {number}
-     * @memberof OracleStatusResponse
      */
     'timestamp': number;
     /**
      * The list of operations performed by the Oracle task.
-     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
-     * @memberof OracleStatusResponse
      */
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {string}
-     * @memberof OracleStatusResponse
      */
     'status': OracleStatusResponseStatusEnum;
     /**
      * The mode of operation for registered tasks.
-     * @type {string}
-     * @memberof OracleStatusResponse
      */
     'mode': OracleStatusResponseModeEnum;
     /**
      * The interval for polling in milliseconds. Only if taskMode is POLLING.
-     * @type {number}
-     * @memberof OracleStatusResponse
      */
     'pollingInterval'?: number;
 }
@@ -3547,169 +2268,113 @@ export interface OracleStatusResponse {
 export const OracleStatusResponseTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type OracleStatusResponseTypeEnum = typeof OracleStatusResponseTypeEnum[keyof typeof OracleStatusResponseTypeEnum];
 export const OracleStatusResponseStatusEnum = {
     Active: 'ACTIVE',
-    Inactive: 'INACTIVE'
+    Inactive: 'INACTIVE',
 } as const;
 
 export type OracleStatusResponseStatusEnum = typeof OracleStatusResponseStatusEnum[keyof typeof OracleStatusResponseStatusEnum];
 export const OracleStatusResponseModeEnum = {
     Polling: 'POLLING',
     EventListening: 'EVENT_LISTENING',
-    Immediate: 'IMMEDIATE'
+    Immediate: 'IMMEDIATE',
 } as const;
 
 export type OracleStatusResponseModeEnum = typeof OracleStatusResponseModeEnum[keyof typeof OracleStatusResponseModeEnum];
 
 /**
  * Represents a repeatable Oracle task with additional properties for mode, polling interval, and source event signature.
- * @export
- * @interface OracleTask
  */
 export interface OracleTask {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof OracleTask
      */
     'taskID': string;
     /**
      * The type of the Oracle task.
-     * @type {string}
-     * @memberof OracleTask
      */
     'type': OracleTaskTypeEnum;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleTask
-     */
     'srcNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseSrcContract}
-     * @memberof OracleTask
-     */
     'srcContract': ExecuteOracleTask200ResponseSrcContract;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof OracleTask
-     */
     'dstNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {ExecuteOracleTask200ResponseDstContract}
-     * @memberof OracleTask
-     */
     'dstContract': ExecuteOracleTask200ResponseDstContract;
     /**
      * The timestamp when the Oracle task was created or last updated.
-     * @type {number}
-     * @memberof OracleTask
      */
     'timestamp': number;
     /**
      * The list of operations performed by the Oracle task.
-     * @type {Array<ExecuteOracleTask200ResponseOperationsInner>}
-     * @memberof OracleTask
      */
     'operations': Array<ExecuteOracleTask200ResponseOperationsInner>;
     /**
      * The current status of the Oracle task.
-     * @type {string}
-     * @memberof OracleTask
      */
     'status': OracleTaskStatusEnum;
     /**
      * The mode of operation for registered tasks.
-     * @type {string}
-     * @memberof OracleTask
      */
     'mode': OracleTaskModeEnum;
     /**
      * The interval for polling in milliseconds. Only if taskMode is POLLING.
-     * @type {number}
-     * @memberof OracleTask
      */
     'pollingInterval'?: number;
-    /**
-     * 
-     * @type {RegisterOracleTaskRequestListeningOptions}
-     * @memberof OracleTask
-     */
     'listeningOptions'?: RegisterOracleTaskRequestListeningOptions;
 }
 
 export const OracleTaskTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type OracleTaskTypeEnum = typeof OracleTaskTypeEnum[keyof typeof OracleTaskTypeEnum];
 export const OracleTaskStatusEnum = {
     Active: 'ACTIVE',
-    Inactive: 'INACTIVE'
+    Inactive: 'INACTIVE',
 } as const;
 
 export type OracleTaskStatusEnum = typeof OracleTaskStatusEnum[keyof typeof OracleTaskStatusEnum];
 export const OracleTaskModeEnum = {
     Polling: 'POLLING',
     EventListening: 'EVENT_LISTENING',
-    Immediate: 'IMMEDIATE'
+    Immediate: 'IMMEDIATE',
 } as const;
 
 export type OracleTaskModeEnum = typeof OracleTaskModeEnum[keyof typeof OracleTaskModeEnum];
 
 /**
  * Request schema for unregistering a data transfer task. Includes the context ID of the task to be unregistered.
- * @export
- * @interface OracleUnregisterRequest
  */
 export interface OracleUnregisterRequest {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof OracleUnregisterRequest
      */
     'taskID': string;
 }
 /**
  * Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
- * @export
- * @interface OracleUnregisterResponse
  */
 export interface OracleUnregisterResponse {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof OracleUnregisterResponse
      */
     'taskID'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof OracleUnregisterResponse
-     */
     'status'?: OracleUnregisterResponseStatusEnum;
 }
 
 export const OracleUnregisterResponseStatusEnum = {
     Success: 'SUCCESS',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type OracleUnregisterResponseStatusEnum = typeof OracleUnregisterResponseStatusEnum[keyof typeof OracleUnregisterResponseStatusEnum];
 
 /**
  * Event type representing a distinct lifecycle moment in SATP protocol execution. External systems can filter and route events based on type.  Event Types: - stage.started: SATP stage has begun execution (outbound hooks at \'before\' step) - stage.completed: SATP stage finished successfully (outbound hooks at \'after\' step) - stage.failed: SATP stage encountered an error and may trigger rollback - adapter.retry: Adapter webhook is retrying after transient failure - adapter.skipped: Adapter was bypassed (inactive or condition not met)
- * @export
- * @enum {string}
  */
 
 export const OutboundWebhookEventType = {
@@ -3717,7 +2382,7 @@ export const OutboundWebhookEventType = {
     StageCompleted: 'stage.completed',
     StageFailed: 'stage.failed',
     AdapterRetry: 'adapter.retry',
-    AdapterSkipped: 'adapter.skipped'
+    AdapterSkipped: 'adapter.skipped',
 } as const;
 
 export type OutboundWebhookEventType = typeof OutboundWebhookEventType[keyof typeof OutboundWebhookEventType];
@@ -3725,32 +2390,22 @@ export type OutboundWebhookEventType = typeof OutboundWebhookEventType[keyof typ
 
 /**
  * Execution point info embedded in outbound webhook payloads. Includes a computed name for logging/display purposes.
- * @export
- * @interface OutboundWebhookExecutionPoint
  */
 export interface OutboundWebhookExecutionPoint {
     /**
      * Computed name for the execution point (stepTag-point format).
-     * @type {string}
-     * @memberof OutboundWebhookExecutionPoint
      */
     'name': string;
     /**
      * SATP stage number (0-3).
-     * @type {number}
-     * @memberof OutboundWebhookExecutionPoint
      */
     'stage': number;
     /**
      * Stage-specific step identifier.
-     * @type {string}
-     * @memberof OutboundWebhookExecutionPoint
      */
     'step': string;
     /**
      * Execution order within the step.
-     * @type {string}
-     * @memberof OutboundWebhookExecutionPoint
      */
     'point': OutboundWebhookExecutionPointPointEnum;
 }
@@ -3759,75 +2414,50 @@ export const OutboundWebhookExecutionPointPointEnum = {
     Before: 'before',
     During: 'during',
     After: 'after',
-    Rollback: 'rollback'
+    Rollback: 'rollback',
 } as const;
 
 export type OutboundWebhookExecutionPointPointEnum = typeof OutboundWebhookExecutionPointPointEnum[keyof typeof OutboundWebhookExecutionPointPointEnum];
 
 /**
  * Outbound webhook payload delivering SATP transfer telemetry to external monitoring or automation systems. All outbound payloads follow a consistent  envelope containing event type, session identifiers, gateway identity, and stage-specific payload data.  Payload Structure: - Event type and schema version for client-side parsing logic - SATP session/context identifiers for correlation across stages - Gateway identity for multi-gateway deployment visibility - ISO 8601 timestamp for precise event ordering - Stage-specific payload with DLT proofs, transaction hashes, or error details  Integration Patterns: - Monitoring Dashboards: Visualize transfer progress and latency metrics - Audit Systems: Record immutable event logs for compliance and forensics - Alerting Platforms: Trigger notifications on transfer failures or anomalies - Analytics Pipelines: Aggregate events for performance analysis and reporting
- * @export
- * @interface OutboundWebhookPayload
  */
 export interface OutboundWebhookPayload {
     /**
      * Event type representing a distinct lifecycle moment in SATP protocol execution. External systems can filter and route events based on type.  Event Types: - stage.started: SATP stage has begun execution (outbound hooks at \'before\' step) - stage.completed: SATP stage finished successfully (outbound hooks at \'after\' step) - stage.failed: SATP stage encountered an error and may trigger rollback - adapter.retry: Adapter webhook is retrying after transient failure - adapter.skipped: Adapter was bypassed (inactive or condition not met)
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'eventType': OutboundWebhookPayloadEventTypeEnum;
     /**
      * Semantic version of the payload contract.
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'schemaVersion': string;
-    /**
-     * 
-     * @type {OutboundWebhookPayloadExecutionPoints}
-     * @memberof OutboundWebhookPayload
-     */
     'executionPoints': OutboundWebhookPayloadExecutionPoints;
     /**
      * Adapter identifier (matches configuration id).
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'adapterId': string;
     /**
      * SATP session identifier for correlation.
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'sessionId': string;
     /**
      * Optional transfer context identifier propagated from API1.
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'contextId'?: string;
     /**
      * Gateway identifier emitting the notification.
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'gatewayId': string;
     /**
      * Stage-specific metadata. For example, Stage 1 includes lock proofs while Stage 3 may contain mint/burn receipts.
-     * @type {{ [key: string]: any; }}
-     * @memberof OutboundWebhookPayload
      */
     'payload'?: { [key: string]: any; };
     /**
      * ISO 8601 timestamp for when the event was emitted.
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'timestamp': string;
     /**
      * Optional human-readable description or error message.
-     * @type {string}
-     * @memberof OutboundWebhookPayload
      */
     'message'?: string;
 }
@@ -3837,39 +2467,29 @@ export const OutboundWebhookPayloadEventTypeEnum = {
     StageCompleted: 'stage.completed',
     StageFailed: 'stage.failed',
     AdapterRetry: 'adapter.retry',
-    AdapterSkipped: 'adapter.skipped'
+    AdapterSkipped: 'adapter.skipped',
 } as const;
 
 export type OutboundWebhookPayloadEventTypeEnum = typeof OutboundWebhookPayloadEventTypeEnum[keyof typeof OutboundWebhookPayloadEventTypeEnum];
 
 /**
  * Execution point info embedded in outbound webhook payloads. Includes a computed name for logging/display purposes.
- * @export
- * @interface OutboundWebhookPayloadExecutionPoints
  */
 export interface OutboundWebhookPayloadExecutionPoints {
     /**
      * Computed name for the execution point (stepTag-point format).
-     * @type {string}
-     * @memberof OutboundWebhookPayloadExecutionPoints
      */
     'name': string;
     /**
      * SATP stage number (0-3).
-     * @type {number}
-     * @memberof OutboundWebhookPayloadExecutionPoints
      */
     'stage': number;
     /**
      * Stage-specific step identifier.
-     * @type {string}
-     * @memberof OutboundWebhookPayloadExecutionPoints
      */
     'step': string;
     /**
      * Execution order within the step.
-     * @type {string}
-     * @memberof OutboundWebhookPayloadExecutionPoints
      */
     'point': OutboundWebhookPayloadExecutionPointsPointEnum;
 }
@@ -3878,39 +2498,29 @@ export const OutboundWebhookPayloadExecutionPointsPointEnum = {
     Before: 'before',
     During: 'during',
     After: 'after',
-    Rollback: 'rollback'
+    Rollback: 'rollback',
 } as const;
 
 export type OutboundWebhookPayloadExecutionPointsPointEnum = typeof OutboundWebhookPayloadExecutionPointsPointEnum[keyof typeof OutboundWebhookPayloadExecutionPointsPointEnum];
 
 /**
  * Expected response from external systems receiving outbound webhook payloads. The gateway uses this response to determine whether to continue or abort.
- * @export
- * @interface OutboundWebhookResponse
  */
 export interface OutboundWebhookResponse {
     /**
      * Whether the webhook was successfully received and processed.
-     * @type {boolean}
-     * @memberof OutboundWebhookResponse
      */
     'received'?: boolean;
     /**
      * Status of the webhook processing.
-     * @type {string}
-     * @memberof OutboundWebhookResponse
      */
     'status'?: OutboundWebhookResponseStatusEnum;
     /**
      * Optional message from the external system.
-     * @type {string}
-     * @memberof OutboundWebhookResponse
      */
     'message'?: string;
     /**
      * Optional response data from the external system.
-     * @type {{ [key: string]: any; }}
-     * @memberof OutboundWebhookResponse
      */
     'data'?: { [key: string]: any; };
 }
@@ -3918,190 +2528,111 @@ export interface OutboundWebhookResponse {
 export const OutboundWebhookResponseStatusEnum = {
     Ok: 'OK',
     Error: 'ERROR',
-    Retry: 'RETRY'
+    Retry: 'RETRY',
 } as const;
 
 export type OutboundWebhookResponseStatusEnum = typeof OutboundWebhookResponseStatusEnum[keyof typeof OutboundWebhookResponseStatusEnum];
 
 /**
  * Response for a pause transaction request. Returns the current status of the SATP session post-pause action.
- * @export
- * @interface Pause200Response
  */
 export interface Pause200Response {
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof Pause200Response
-     */
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
  * Request to temporarily pause an ongoing transaction session, identified by the session and context IDs.
- * @export
- * @interface PauseRequest
  */
 export interface PauseRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof PauseRequest
-     */
     'sessionId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PauseRequest
-     */
     'contextId'?: string;
 }
 /**
  * Response for a pause transaction request. Returns the current status of the SATP session post-pause action.
- * @export
- * @interface PauseResponse
  */
 export interface PauseResponse {
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof PauseResponse
-     */
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
  * Response schema for an audit request.
- * @export
- * @interface PerformAudit200Response
  */
 export interface PerformAudit200Response {
-    /**
-     * 
-     * @type {PerformAudit200ResponseAuditEntries}
-     * @memberof PerformAudit200Response
-     */
     'auditEntries': PerformAudit200ResponseAuditEntries;
     /**
      * The start of the audit period, in ISO 8601 format (e.g., \"2026-02-16T10:33:30.639Z\").
-     * @type {string}
-     * @memberof PerformAudit200Response
      */
     'startTimestamp': string;
     /**
      * The end of the audit period, in ISO 8601 format (e.g., \"2026-02-16T11:00:00.000Z\").
-     * @type {string}
-     * @memberof PerformAudit200Response
      */
     'endTimestamp': string;
 }
 /**
  * Collection of audit entries.
- * @export
- * @interface PerformAudit200ResponseAuditEntries
  */
 export interface PerformAudit200ResponseAuditEntries {
     /**
      * List of audit entries.
-     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInner>}
-     * @memberof PerformAudit200ResponseAuditEntries
      */
     'entries': Array<PerformAudit200ResponseAuditEntriesEntriesInner>;
 }
 /**
  * Response schema for an audit request. Contains the proofs generated during the audit period and the start and end datetimes.
- * @export
- * @interface PerformAudit200ResponseAuditEntriesEntriesInner
  */
 export interface PerformAudit200ResponseAuditEntriesEntriesInner {
     /**
      * The unique identifier for the audit entry.
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
      */
     'auditEntryId'?: string;
-    /**
-     * 
-     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerSession}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
-     */
     'session': PerformAudit200ResponseAuditEntriesEntriesInnerSession;
     /**
      * The start timestamp for the audit entry, as a Unix timestamp (milliseconds since epoch).
-     * @type {number}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
      */
     'timestamp': number;
     /**
      * Signature-verified protocol claims (SessionProofs) recorded in the audit database for the session associated with this audit entry. 
-     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInner
      */
     'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
 }
 /**
  * A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends. 
- * @export
- * @interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
  */
 export interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner {
     /**
      * Unique identifier of the SATP session this proof belongs to.
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
      */
     'sessionId': string;
-    /**
-     * 
-     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
-     */
     'step': PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep;
     /**
      * JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step. 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
      */
     'claim': string;
     /**
      * The signature carried by the claim, produced by the asset/bridge operation over the claim receipt. 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner
      */
     'signedClaim': string;
 }
 /**
  * The SATP protocol step definition (tag, description, role, sequence, message type) at which the claim was verified, from the SATP protocol map. 
- * @export
- * @interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
  */
 export interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep {
     /**
      * Step tag identifier from the SATP protocol map.
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
      */
     'tag': string;
     /**
      * Human-readable description of the protocol step.
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
      */
     'description': string;
     /**
      * Gateway role executing the step (client/server/both).
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
      */
     'role': PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum;
     /**
      * Sequence number of the step within its stage.
-     * @type {number}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
      */
     'sequence': number;
     /**
      * SATP message type associated with the step, if any. 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep
      */
     'messageType'?: string;
 }
@@ -4109,396 +2640,253 @@ export interface PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep 
 export const PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum = {
     Client: 'client',
     Server: 'server',
-    Both: 'both'
+    Both: 'both',
 } as const;
 
 export type PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum = typeof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum[keyof typeof PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStepRoleEnum];
 
 /**
  * Represents a persisted local audit/log record generated during the lifecycle of a SATP transfer session. Each entry captures the operation performed, its contextual identifiers, serialized session state data, and ordering metadata. 
- * @export
- * @interface PerformAudit200ResponseAuditEntriesEntriesInnerSession
  */
 export interface PerformAudit200ResponseAuditEntriesEntriesInnerSession {
     /**
      * Unique identifier of the SATP session associated with this log entry. Typically composed of the transfer context ID plus additional correlation suffixes used for tracing within the gateway. 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
      */
     'sessionId': string;
     /**
      * High-level classification of the log event corresponding to a SATP protocol stage or message artifact (e.g., INIT_RECEIPT, TRANSFER_PROPOSAL, LOCK_ASSERTION). 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
      */
     'type': string;
     /**
      * Composite storage key uniquely identifying the log entry within the persistence layer. Commonly derived from the session ID, log type, and operation name. 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
      */
     'key': string;
     /**
      * Specific operation that produced the log entry. Represents the action executed within the SATP workflow (e.g., init, propose, lock, commit). 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
      */
     'operation': string;
     /**
      * Unix timestamp in milliseconds (encoded as a string) indicating when the log entry was generated by the gateway. 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
      */
     'timestamp'?: string;
     /**
      * JSON-serialized payload containing the full SATP session state snapshot at the time of logging. This includes transfer metadata, message hashes, signatures, asset details, protocol stage timestamps, and gateway identifiers. 
-     * @type {string}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
      */
     'data': string;
     /**
      * Monotonically increasing sequence number used to preserve the chronological ordering of log entries within a session. 
-     * @type {number}
-     * @memberof PerformAudit200ResponseAuditEntriesEntriesInnerSession
      */
     'sequenceNumber': number;
 }
 /**
  * Response schema for registering a repeatable task. Includes the task ID and status of the registration.
- * @export
- * @interface RegisterOracleTask200Response
  */
 export interface RegisterOracleTask200Response {
     /**
      * The unique identifier of the task.
-     * @type {string}
-     * @memberof RegisterOracleTask200Response
      */
     'taskID'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RegisterOracleTask200Response
-     */
     'status'?: RegisterOracleTask200ResponseStatusEnum;
 }
 
 export const RegisterOracleTask200ResponseStatusEnum = {
     Success: 'SUCCESS',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type RegisterOracleTask200ResponseStatusEnum = typeof RegisterOracleTask200ResponseStatusEnum[keyof typeof RegisterOracleTask200ResponseStatusEnum];
 
 /**
  * Request schema for registering a repeatable task.
- * @export
- * @interface RegisterOracleTaskRequest
  */
 export interface RegisterOracleTaskRequest {
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof RegisterOracleTaskRequest
-     */
     'sourceNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof RegisterOracleTaskRequest
-     */
     'destinationNetworkId'?: TransactRequestSourceAssetNetworkId;
-    /**
-     * 
-     * @type {RegisterOracleTaskRequestSourceContract}
-     * @memberof RegisterOracleTaskRequest
-     */
     'sourceContract'?: RegisterOracleTaskRequestSourceContract;
-    /**
-     * 
-     * @type {RegisterOracleTaskRequestDestinationContract}
-     * @memberof RegisterOracleTaskRequest
-     */
     'destinationContract'?: RegisterOracleTaskRequestDestinationContract;
     /**
      * The mode of operation for the repeatable task.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequest
      */
     'taskMode': RegisterOracleTaskRequestTaskModeEnum;
     /**
      * The interval for polling in milliseconds. Only if taskMode is POLLING.
-     * @type {number}
-     * @memberof RegisterOracleTaskRequest
      */
     'pollingInterval'?: number;
-    /**
-     * 
-     * @type {RegisterOracleTaskRequestListeningOptions}
-     * @memberof RegisterOracleTaskRequest
-     */
     'listeningOptions'?: RegisterOracleTaskRequestListeningOptions;
     /**
      * The type of task to be registered.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequest
      */
     'taskType': RegisterOracleTaskRequestTaskTypeEnum;
 }
 
 export const RegisterOracleTaskRequestTaskModeEnum = {
     Polling: 'POLLING',
-    EventListening: 'EVENT_LISTENING'
+    EventListening: 'EVENT_LISTENING',
 } as const;
 
 export type RegisterOracleTaskRequestTaskModeEnum = typeof RegisterOracleTaskRequestTaskModeEnum[keyof typeof RegisterOracleTaskRequestTaskModeEnum];
 export const RegisterOracleTaskRequestTaskTypeEnum = {
     Read: 'READ',
     Update: 'UPDATE',
-    ReadAndUpdate: 'READ_AND_UPDATE'
+    ReadAndUpdate: 'READ_AND_UPDATE',
 } as const;
 
 export type RegisterOracleTaskRequestTaskTypeEnum = typeof RegisterOracleTaskRequestTaskTypeEnum[keyof typeof RegisterOracleTaskRequestTaskTypeEnum];
 
 /**
  * The contract address on the destination blockchain. Only if taskType is UPDATE or READ_AND_UPDATE.
- * @export
- * @interface RegisterOracleTaskRequestDestinationContract
  */
 export interface RegisterOracleTaskRequestDestinationContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestDestinationContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestDestinationContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof RegisterOracleTaskRequestDestinationContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestDestinationContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestDestinationContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof RegisterOracleTaskRequestDestinationContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * Options for event listening. Only if taskMode is EVENT_LISTENING.
- * @export
- * @interface RegisterOracleTaskRequestListeningOptions
  */
 export interface RegisterOracleTaskRequestListeningOptions {
     /**
      * The event signature to listen for on the source network. Only if taskMode is EVENT_LISTENING.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestListeningOptions
      */
     'eventSignature': string;
     /**
      * The parameters to filter in the captured events.
-     * @type {Array<string>}
-     * @memberof RegisterOracleTaskRequestListeningOptions
      */
     'filterParams'?: Array<string>;
 }
 /**
  * The contract address on the source blockchain. Only if taskType is READ or READ_AND_UPDATE.
- * @export
- * @interface RegisterOracleTaskRequestSourceContract
  */
 export interface RegisterOracleTaskRequestSourceContract {
     /**
      * The name of the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestSourceContract
      */
     'contractName'?: string;
     /**
      * The address of the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestSourceContract
      */
     'contractAddress'?: string | null;
     /**
      * The ABI (Application Binary Interface) of the contract.
-     * @type {Array<object>}
-     * @memberof RegisterOracleTaskRequestSourceContract
      */
     'contractAbi'?: Array<object> | null;
     /**
      * The bytecode of the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestSourceContract
      */
     'contractBytecode'?: string | null;
     /**
      * The name of the method to be invoked on the contract.
-     * @type {string}
-     * @memberof RegisterOracleTaskRequestSourceContract
      */
     'methodName'?: string;
     /**
      * The parameters to be passed to the contract method.
-     * @type {Array<ExecuteOracleTaskRequestSourceContractParamsInner>}
-     * @memberof RegisterOracleTaskRequestSourceContract
      */
     'params'?: Array<ExecuteOracleTaskRequestSourceContractParamsInner>;
 }
 /**
  * Details a specific route for asset transfer or data handling between DLT networks, including parameters such as amounts, tokens, steps involved, and insurance information.
- * @export
- * @interface Route
  */
 export interface Route {
     /**
      * A unique identifier of the route.
-     * @type {string}
-     * @memberof Route
      */
     'id': string;
     /**
      * A unique identifier for the gateway.
-     * @type {string}
-     * @memberof Route
      */
     'gatewayID': string;
     /**
      * The mode of operation for this route - \'data\' for arbitrary payload handling, \'transfer\' for asset transfer.
-     * @type {string}
-     * @memberof Route
      */
     'mode': RouteModeEnum;
     /**
      * The ID of the DLT Network where the operation will originate.
-     * @type {string}
-     * @memberof Route
      */
     'fromDLTNetworkID'?: string;
     /**
      * The amount of \'fromToken\' to be transferred in USD, specified as a string to maintain precision.
-     * @type {number}
-     * @memberof Route
      */
     'fromAmountUSD'?: number;
     /**
      * The amount that should be sent including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
-     * @type {string}
-     * @memberof Route
      */
     'fromAmount'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof Route
-     */
     'fromToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The ID of the DLT Network where the operation will end.
-     * @type {string}
-     * @memberof Route
      */
     'toDLTNetworkID'?: string;
     /**
      * The expected amount to be received in USD.
-     * @type {string}
-     * @memberof Route
      */
     'toAmountUSD'?: string;
     /**
      * The expected amount to be received including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
-     * @type {string}
-     * @memberof Route
      */
     'toAmount'?: string;
     /**
      * The minimum expected amount to be received including all decimals (e.g., 1000000 for 1 USDC (6 decimals)).
-     * @type {string}
-     * @memberof Route
      */
     'toAmountMin'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromToken}
-     * @memberof Route
-     */
     'toToken'?: GetRoutes200ResponseRoutesInnerFromToken;
     /**
      * The expected gas cost in USD.
-     * @type {string}
-     * @memberof Route
      */
     'gasCostUSD'?: string;
     /**
      * Whether chain switching is enabled or not.
-     * @type {boolean}
-     * @memberof Route
      */
     'containsSwitchChain'?: boolean;
     /**
      * List of steps involved in this route, adjusted for mode.
-     * @type {Array<GetRoutes200ResponseRoutesInnerStepsInner>}
-     * @memberof Route
      */
     'steps'?: Array<GetRoutes200ResponseRoutesInnerStepsInner>;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerInsurance}
-     * @memberof Route
-     */
     'insurance'?: GetRoutes200ResponseRoutesInnerInsurance;
     /**
      * List of tags identifiers providing additional context or categorization.
-     * @type {Array<string>}
-     * @memberof Route
      */
     'tags'?: Array<string>;
 }
 
 export const RouteModeEnum = {
     Data: 'data',
-    Transfer: 'transfer'
+    Transfer: 'transfer',
 } as const;
 
 export type RouteModeEnum = typeof RouteModeEnum[keyof typeof RouteModeEnum];
 
 /**
  * A collection of available and unavailable routes
- * @export
- * @interface RoutesResponse
  */
 export interface RoutesResponse {
     /**
      * A collection of route objects
-     * @type {Array<GetRoutes200ResponseRoutesInner>}
-     * @memberof RoutesResponse
      */
     'routes': Array<GetRoutes200ResponseRoutesInner>;
 }
 /**
  * Supported SATP stage identifiers that can host adapters. Stage 0-3 represent the four phases of the SATP protocol, while \'crash\' is used for crash recovery scenarios.
- * @export
- * @enum {string}
  */
 
 export const SatpStageKey = {
@@ -4506,7 +2894,7 @@ export const SatpStageKey = {
     Stage1: 'stage-1',
     Stage2: 'stage-2',
     Stage3: 'stage-3',
-    Crash: 'crash'
+    Crash: 'crash',
 } as const;
 
 export type SatpStageKey = typeof SatpStageKey[keyof typeof SatpStageKey];
@@ -4514,108 +2902,50 @@ export type SatpStageKey = typeof SatpStageKey[keyof typeof SatpStageKey];
 
 /**
  * A signature-verified claim exchanged at a SATP protocol step, persisted in the audit database so it stays provable for dispute resolution and audit after transport ends. 
- * @export
- * @interface SessionProof
  */
 export interface SessionProof {
     /**
      * Unique identifier of the SATP session this proof belongs to.
-     * @type {string}
-     * @memberof SessionProof
      */
     'sessionId': string;
-    /**
-     * 
-     * @type {PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep}
-     * @memberof SessionProof
-     */
     'step': PerformAudit200ResponseAuditEntriesEntriesInnerProofsInnerStep;
     /**
      * JSON-serialized assertion claim (e.g., wrap, lock, mint, burn, or assignment assertion claim) as verified at the protocol step. 
-     * @type {string}
-     * @memberof SessionProof
      */
     'claim': string;
     /**
      * The signature carried by the claim, produced by the asset/bridge operation over the claim receipt. 
-     * @type {string}
-     * @memberof SessionProof
      */
     'signedClaim': string;
 }
 /**
  * Response schema for a session proofs request. Contains the signature-verified SessionProofs persisted in the audit database for the requested sessions.
- * @export
- * @interface SessionProofsResponse
  */
 export interface SessionProofsResponse {
     /**
      * Signature-verified session proofs for the requested SATP sessions.
-     * @type {Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>}
-     * @memberof SessionProofsResponse
      */
     'proofs': Array<PerformAudit200ResponseAuditEntriesEntriesInnerProofsInner>;
 }
 /**
  * Request for retrieving the current status of a session, identified by the session ID.
- * @export
- * @interface StatusRequest
  */
 export interface StatusRequest {
     /**
      * The ID of the session for which the status is being requested.
-     * @type {string}
-     * @memberof StatusRequest
      */
     'sessionID': string;
 }
 /**
  * Provides the current status of the SATP session including detailed information on the progress, such as substatus, stage, and step, along with the session start time and chain information.
- * @export
- * @interface StatusResponse
  */
 export interface StatusResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
     'status': StatusResponseStatusEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
     'substatus': StatusResponseSubstatusEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
     'stage': StatusResponseStageEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
     'step': StatusResponseStepEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
     'startTime': string;
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponseOriginNetwork}
-     * @memberof StatusResponse
-     */
     'originNetwork': Transact200ResponseStatusResponseOriginNetwork;
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponseDestinationNetwork}
-     * @memberof StatusResponse
-     */
     'destinationNetwork': Transact200ResponseStatusResponseDestinationNetwork;
 }
 
@@ -4624,7 +2954,7 @@ export const StatusResponseStatusEnum = {
     Invalid: 'INVALID',
     Pending: 'PENDING',
     Done: 'DONE',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type StatusResponseStatusEnum = typeof StatusResponseStatusEnum[keyof typeof StatusResponseStatusEnum];
@@ -4642,15 +2972,15 @@ export const StatusResponseSubstatusEnum = {
     Recovering: 'RECOVERING',
     Recovered: 'RECOVERED',
     RecoveryFailed: 'RECOVERY_FAILED',
-    Rejected: 'REJECTED'
+    Rejected: 'REJECTED',
 } as const;
 
 export type StatusResponseSubstatusEnum = typeof StatusResponseSubstatusEnum[keyof typeof StatusResponseSubstatusEnum];
 export const StatusResponseStageEnum = {
-    _0: 'STAGE_0',
-    _1: 'STAGE_1',
-    _2: 'STAGE_2',
-    _3: 'STAGE_3'
+    Stage0: 'STAGE_0',
+    Stage1: 'STAGE_1',
+    Stage2: 'STAGE_2',
+    Stage3: 'STAGE_3',
 } as const;
 
 export type StatusResponseStageEnum = typeof StatusResponseStageEnum[keyof typeof StatusResponseStageEnum];
@@ -4682,108 +3012,74 @@ export const StatusResponseStepEnum = {
     RollbackCommitReadyMessage: 'rollback-commit-ready-message',
     RollbackCommitFinalAssertionMessage: 'rollback-commit-final-assertion-message',
     RollbackCommitFinalAcknowledgementReceiptMessage: 'rollback-commit-final-acknowledgement-receipt-message',
-    RollbackTransferCompleteMessage: 'rollback-transfer-complete-message'
+    RollbackTransferCompleteMessage: 'rollback-transfer-complete-message',
 } as const;
 
 export type StatusResponseStepEnum = typeof StatusResponseStepEnum[keyof typeof StatusResponseStepEnum];
 
 /**
  * List of ledger types supported by this SATP gateway (intersection of operator config and implemented ledgers).
- * @export
- * @interface SupportedLedgersResponse
  */
 export interface SupportedLedgersResponse {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof SupportedLedgersResponse
-     */
     'supportedLedgers': Array<string>;
 }
 /**
  * Metadata detailing a supported token
- * @export
- * @interface Token
  */
 export interface Token {
     /**
      * The network of the DLT being interacted with. TODO: implement network identification draft
-     * @type {string}
-     * @memberof Token
      */
     'chainID': string;
     /**
      * Supported DLT protocols.
-     * @type {string}
-     * @memberof Token
      */
     'chainType': TokenChainTypeEnum;
     /**
      * A blockchain address.
-     * @type {string}
-     * @memberof Token
      */
     'address': string;
     /**
      * The name of the token.
-     * @type {string}
-     * @memberof Token
      */
     'name'?: string;
     /**
      * The symbol of the token.
-     * @type {string}
-     * @memberof Token
      */
     'symbol': string;
     /**
      * How many decimals the token supports.
-     * @type {number}
-     * @memberof Token
      */
     'decimals': number;
     /**
      * The logo of a token, chain, dex etc.
-     * @type {string}
-     * @memberof Token
      */
     'logoURI'?: string;
     /**
      * List of tags identifiers providing additional context or categorization.
-     * @type {Array<string>}
-     * @memberof Token
      */
     'tags'?: Array<string>;
     /**
      * The current price of the token in USD.
-     * @type {string}
-     * @memberof Token
      */
     'priceUSD'?: string;
-    /**
-     * 
-     * @type {GetRoutes200ResponseRoutesInnerFromTokenExtensions}
-     * @memberof Token
-     */
     'extensions'?: GetRoutes200ResponseRoutesInnerFromTokenExtensions;
 }
 
 export const TokenChainTypeEnum = {
     HyperledgerFabric: 'HyperledgerFabric',
-    HyperledgerBesu: 'HyperledgerBesu'
+    HyperledgerBesu: 'HyperledgerBesu',
 } as const;
 
 export type TokenChainTypeEnum = typeof TokenChainTypeEnum[keyof typeof TokenChainTypeEnum];
 
 /**
  * The type of token.
- * @export
- * @enum {string}
  */
 
 export const TokenType = {
-    Fungible: 'NONSTANDARD_FUNGIBLE',
-    Nonfungible: 'NONSTANDARD_NONFUNGIBLE'
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE',
 } as const;
 
 export type TokenType = typeof TokenType[keyof typeof TokenType];
@@ -4791,70 +3087,24 @@ export type TokenType = typeof TokenType[keyof typeof TokenType];
 
 /**
  * Response schema for a transaction request. Includes the session ID and the current status of the transaction.
- * @export
- * @interface Transact200Response
  */
 export interface Transact200Response {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof Transact200Response
      */
     'sessionID': string;
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof Transact200Response
-     */
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
  * Provides the current status of the SATP session including detailed information on the progress, such as substatus, stage, and step, along with the session start time and chain information.
- * @export
- * @interface Transact200ResponseStatusResponse
  */
 export interface Transact200ResponseStatusResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof Transact200ResponseStatusResponse
-     */
     'status': Transact200ResponseStatusResponseStatusEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof Transact200ResponseStatusResponse
-     */
     'substatus': Transact200ResponseStatusResponseSubstatusEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof Transact200ResponseStatusResponse
-     */
     'stage': Transact200ResponseStatusResponseStageEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof Transact200ResponseStatusResponse
-     */
     'step': Transact200ResponseStatusResponseStepEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof Transact200ResponseStatusResponse
-     */
     'startTime': string;
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponseOriginNetwork}
-     * @memberof Transact200ResponseStatusResponse
-     */
     'originNetwork': Transact200ResponseStatusResponseOriginNetwork;
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponseDestinationNetwork}
-     * @memberof Transact200ResponseStatusResponse
-     */
     'destinationNetwork': Transact200ResponseStatusResponseDestinationNetwork;
 }
 
@@ -4863,7 +3113,7 @@ export const Transact200ResponseStatusResponseStatusEnum = {
     Invalid: 'INVALID',
     Pending: 'PENDING',
     Done: 'DONE',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type Transact200ResponseStatusResponseStatusEnum = typeof Transact200ResponseStatusResponseStatusEnum[keyof typeof Transact200ResponseStatusResponseStatusEnum];
@@ -4881,15 +3131,15 @@ export const Transact200ResponseStatusResponseSubstatusEnum = {
     Recovering: 'RECOVERING',
     Recovered: 'RECOVERED',
     RecoveryFailed: 'RECOVERY_FAILED',
-    Rejected: 'REJECTED'
+    Rejected: 'REJECTED',
 } as const;
 
 export type Transact200ResponseStatusResponseSubstatusEnum = typeof Transact200ResponseStatusResponseSubstatusEnum[keyof typeof Transact200ResponseStatusResponseSubstatusEnum];
 export const Transact200ResponseStatusResponseStageEnum = {
-    _0: 'STAGE_0',
-    _1: 'STAGE_1',
-    _2: 'STAGE_2',
-    _3: 'STAGE_3'
+    Stage0: 'STAGE_0',
+    Stage1: 'STAGE_1',
+    Stage2: 'STAGE_2',
+    Stage3: 'STAGE_3',
 } as const;
 
 export type Transact200ResponseStatusResponseStageEnum = typeof Transact200ResponseStatusResponseStageEnum[keyof typeof Transact200ResponseStatusResponseStageEnum];
@@ -4921,212 +3171,94 @@ export const Transact200ResponseStatusResponseStepEnum = {
     RollbackCommitReadyMessage: 'rollback-commit-ready-message',
     RollbackCommitFinalAssertionMessage: 'rollback-commit-final-assertion-message',
     RollbackCommitFinalAcknowledgementReceiptMessage: 'rollback-commit-final-acknowledgement-receipt-message',
-    RollbackTransferCompleteMessage: 'rollback-transfer-complete-message'
+    RollbackTransferCompleteMessage: 'rollback-transfer-complete-message',
 } as const;
 
 export type Transact200ResponseStatusResponseStepEnum = typeof Transact200ResponseStatusResponseStepEnum[keyof typeof Transact200ResponseStatusResponseStepEnum];
 
-/**
- * 
- * @export
- * @interface Transact200ResponseStatusResponseDestinationNetwork
- */
 export interface Transact200ResponseStatusResponseDestinationNetwork {
     /**
      * The unique identifier of the origin network.
-     * @type {string}
-     * @memberof Transact200ResponseStatusResponseDestinationNetwork
      */
     'id'?: string;
-    /**
-     * 
-     * @type {any}
-     * @memberof Transact200ResponseStatusResponseDestinationNetwork
-     */
     'dltProtocol'?: any;
-    /**
-     * 
-     * @type {any}
-     * @memberof Transact200ResponseStatusResponseDestinationNetwork
-     */
     'dltSubnetworkID'?: any;
 }
-/**
- * 
- * @export
- * @interface Transact200ResponseStatusResponseOriginNetwork
- */
 export interface Transact200ResponseStatusResponseOriginNetwork {
     /**
      * The unique identifier of the origin network.
-     * @type {string}
-     * @memberof Transact200ResponseStatusResponseOriginNetwork
      */
     'id'?: string;
-    /**
-     * 
-     * @type {any}
-     * @memberof Transact200ResponseStatusResponseOriginNetwork
-     */
     'dltProtocol'?: any;
-    /**
-     * 
-     * @type {any}
-     * @memberof Transact200ResponseStatusResponseOriginNetwork
-     */
     'dltSubnetworkID'?: any;
 }
 /**
  * An Error
- * @export
- * @interface TransactDefaultResponse
  */
 export interface TransactDefaultResponse {
     /**
      * HTTP error type
-     * @type {string}
-     * @memberof TransactDefaultResponse
      */
     'type': string;
     /**
      * Numeric error code
-     * @type {number}
-     * @memberof TransactDefaultResponse
      */
     'code': number;
     /**
      * HTTP status of the error
-     * @type {number}
-     * @memberof TransactDefaultResponse
      */
     'status': number;
     /**
      * Long error description
-     * @type {string}
-     * @memberof TransactDefaultResponse
      */
     'message': string;
     /**
      * Timestamp of the error
-     * @type {string}
-     * @memberof TransactDefaultResponse
      */
     'timestamp': string;
 }
 /**
  * Request schema for initiating a transaction. Includes details such as the transaction context, mode (data or transfer), payload, and information about the source and destination DLT networks.
- * @export
- * @interface TransactRequest
  */
 export interface TransactRequest {
     /**
      * The unique identifier of the task.
-     * @type {string}
-     * @memberof TransactRequest
      */
     'contextID': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequest
-     */
     'payload'?: string;
-    /**
-     * 
-     * @type {TransactRequestSourceAsset}
-     * @memberof TransactRequest
-     */
     'sourceAsset': TransactRequestSourceAsset;
-    /**
-     * 
-     * @type {TransactRequestSourceAsset}
-     * @memberof TransactRequest
-     */
     'receiverAsset': TransactRequestSourceAsset;
 }
 /**
  * An asset
- * @export
- * @interface TransactRequestSourceAsset
  */
 export interface TransactRequestSourceAsset {
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'owner': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'contractName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'contractAddress'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'mspId'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'channelName'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'amount'?: string;
-    /**
-     * 
-     * @type {TransactRequestSourceAssetNetworkId}
-     * @memberof TransactRequestSourceAsset
-     */
     'networkId': TransactRequestSourceAssetNetworkId;
     /**
      * The type of token.
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
      */
     'tokenType': TransactRequestSourceAssetTokenTypeEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
-     */
     'referenceId': string;
     /**
      * The ERC token standard.
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
      */
     'ercTokenStandard': TransactRequestSourceAssetErcTokenStandardEnum;
     /**
      * Token ID or unique descriptor for ERC6909/ERC1155 tokens.
-     * @type {string}
-     * @memberof TransactRequestSourceAsset
      */
     'uniqueDescriptor'?: string;
 }
 
 export const TransactRequestSourceAssetTokenTypeEnum = {
-    Fungible: 'NONSTANDARD_FUNGIBLE',
-    Nonfungible: 'NONSTANDARD_NONFUNGIBLE'
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE',
 } as const;
 
 export type TransactRequestSourceAssetTokenTypeEnum = typeof TransactRequestSourceAssetTokenTypeEnum[keyof typeof TransactRequestSourceAssetTokenTypeEnum];
@@ -5135,27 +3267,21 @@ export const TransactRequestSourceAssetErcTokenStandardEnum = {
     Erc20: 'ERC20',
     Erc721: 'ERC721',
     Erc1155: 'ERC1155',
-    Erc6909: 'ERC6909'
+    Erc6909: 'ERC6909',
 } as const;
 
 export type TransactRequestSourceAssetErcTokenStandardEnum = typeof TransactRequestSourceAssetErcTokenStandardEnum[keyof typeof TransactRequestSourceAssetErcTokenStandardEnum];
 
 /**
  * The network of the DLT being interacted with.
- * @export
- * @interface TransactRequestSourceAssetNetworkId
  */
 export interface TransactRequestSourceAssetNetworkId {
     /**
      * The network of the DLT being interacted with.
-     * @type {string}
-     * @memberof TransactRequestSourceAssetNetworkId
      */
     'id': string;
     /**
      * Enumerates the different ledger vendors and their major versions encoded within the name of the LedgerType. For example \"BESU_1X\" involves all of the [1.0.0;2.0.0) where 1.0.0 is included and anything up until, but not 2.0.0. See: https://stackoverflow.com/a/4396303/698470 for further explanation.
-     * @type {string}
-     * @memberof TransactRequestSourceAssetNetworkId
      */
     'ledgerType': TransactRequestSourceAssetNetworkIdLedgerTypeEnum;
 }
@@ -5167,53 +3293,35 @@ export const TransactRequestSourceAssetNetworkIdLedgerTypeEnum = {
     Corda4X: 'CORDA_4X',
     Ethereum: 'ETHEREUM',
     Fabric2: 'FABRIC_2',
-    Sawtooth1X: 'SAWTOOTH_1X'
+    Sawtooth1X: 'SAWTOOTH_1X',
 } as const;
 
 export type TransactRequestSourceAssetNetworkIdLedgerTypeEnum = typeof TransactRequestSourceAssetNetworkIdLedgerTypeEnum[keyof typeof TransactRequestSourceAssetNetworkIdLedgerTypeEnum];
 
 /**
  * Response schema for a transaction request. Includes the session ID and the current status of the transaction.
- * @export
- * @interface TransactResponse
  */
 export interface TransactResponse {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof TransactResponse
      */
     'sessionID': string;
-    /**
-     * 
-     * @type {Transact200ResponseStatusResponse}
-     * @memberof TransactResponse
-     */
     'statusResponse': Transact200ResponseStatusResponse;
 }
 /**
  * Response schema for unregistering a data transfer task. Includes the task ID and status of the unregistration.
- * @export
- * @interface UnregisterOracleTask200Response
  */
 export interface UnregisterOracleTask200Response {
     /**
      * Unique identifier (UUID) for the session.
-     * @type {string}
-     * @memberof UnregisterOracleTask200Response
      */
     'taskID'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UnregisterOracleTask200Response
-     */
     'status'?: UnregisterOracleTask200ResponseStatusEnum;
 }
 
 export const UnregisterOracleTask200ResponseStatusEnum = {
     Success: 'SUCCESS',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
 } as const;
 
 export type UnregisterOracleTask200ResponseStatusEnum = typeof UnregisterOracleTask200ResponseStatusEnum[keyof typeof UnregisterOracleTask200ResponseStatusEnum];
@@ -5221,7 +3329,6 @@ export type UnregisterOracleTask200ResponseStatusEnum = typeof UnregisterOracleT
 
 /**
  * AddCounterpartyApi - axios parameter creator
- * @export
  */
 export const AddCounterpartyApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -5232,7 +3339,7 @@ export const AddCounterpartyApiAxiosParamCreator = function (configuration?: Con
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addCounterparty: async (addCounterpartyRequest: AddCounterpartyRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        addCounterparty: async (addCounterpartyRequest: AddCounterpartyRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'addCounterpartyRequest' is not null or undefined
             assertParamExists('addCounterparty', 'addCounterpartyRequest', addCounterpartyRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/add-counterparty-gateway`;
@@ -5247,9 +3354,8 @@ export const AddCounterpartyApiAxiosParamCreator = function (configuration?: Con
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -5266,7 +3372,6 @@ export const AddCounterpartyApiAxiosParamCreator = function (configuration?: Con
 
 /**
  * AddCounterpartyApi - functional programming interface
- * @export
  */
 export const AddCounterpartyApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AddCounterpartyApiAxiosParamCreator(configuration)
@@ -5278,16 +3383,17 @@ export const AddCounterpartyApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AddCounterparty200Response>> {
+        async addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AddCounterparty200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.addCounterparty(addCounterpartyRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AddCounterpartyApi.addCounterparty']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * AddCounterpartyApi - factory interface
- * @export
  */
 export const AddCounterpartyApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AddCounterpartyApiFp(configuration)
@@ -5299,7 +3405,7 @@ export const AddCounterpartyApiFactory = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: any): AxiosPromise<AddCounterparty200Response> {
+        addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: RawAxiosRequestConfig): AxiosPromise<AddCounterparty200Response> {
             return localVarFp.addCounterparty(addCounterpartyRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -5307,9 +3413,6 @@ export const AddCounterpartyApiFactory = function (configuration?: Configuration
 
 /**
  * AddCounterpartyApi - object-oriented interface
- * @export
- * @class AddCounterpartyApi
- * @extends {BaseAPI}
  */
 export class AddCounterpartyApi extends BaseAPI {
     /**
@@ -5318,17 +3421,16 @@ export class AddCounterpartyApi extends BaseAPI {
      * @param {AddCounterpartyRequest} addCounterpartyRequest Add counterparty request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AddCounterpartyApi
      */
-    public addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: AxiosRequestConfig) {
+    public addCounterparty(addCounterpartyRequest: AddCounterpartyRequest, options?: RawAxiosRequestConfig) {
         return AddCounterpartyApiFp(this.configuration).addCounterparty(addCounterpartyRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
 
+
 /**
  * AdminApi - axios parameter creator
- * @export
  */
 export const AdminApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -5339,7 +3441,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        _continue: async (continueRequest: ContinueRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        _continue: async (continueRequest: ContinueRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'continueRequest' is not null or undefined
             assertParamExists('_continue', 'continueRequest', continueRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/continue`;
@@ -5354,9 +3456,8 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -5374,7 +3475,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getHealthCheck: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getHealthCheck: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5387,8 +3488,8 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -5405,7 +3506,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSessionIds: async (sessionsRequest?: object, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getSessionIds: async (sessionsRequest?: object, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/get-sessions-ids`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5419,11 +3520,13 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             const localVarQueryParameter = {} as any;
 
             if (sessionsRequest !== undefined) {
-                localVarQueryParameter['SessionsRequest'] = sessionsRequest;
+                for (const [key, value] of Object.entries(sessionsRequest)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -5440,7 +3543,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSessionProofs: async (sessionIds: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getSessionProofs: async (sessionIds: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sessionIds' is not null or undefined
             assertParamExists('getSessionProofs', 'sessionIds', sessionIds)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/proofs`;
@@ -5459,8 +3562,8 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
                 localVarQueryParameter['sessionIds'] = sessionIds;
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -5477,7 +3580,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatus: async (sessionID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getStatus: async (sessionID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'sessionID' is not null or undefined
             assertParamExists('getStatus', 'sessionID', sessionID)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/status`;
@@ -5496,8 +3599,8 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
                 localVarQueryParameter['SessionID'] = sessionID;
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -5513,7 +3616,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSupportedLedgers: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getSupportedLedgers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/supported-ledgers`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5526,8 +3629,8 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -5544,7 +3647,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        pause: async (pauseRequest: PauseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        pause: async (pauseRequest: PauseRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pauseRequest' is not null or undefined
             assertParamExists('pause', 'pauseRequest', pauseRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/pause`;
@@ -5559,9 +3662,8 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -5581,7 +3683,7 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        performAudit: async (startTimestamp: string, endTimestamp?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        performAudit: async (startTimestamp: string, endTimestamp?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'startTimestamp' is not null or undefined
             assertParamExists('performAudit', 'startTimestamp', startTimestamp)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/audit`;
@@ -5608,8 +3710,8 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
                     endTimestamp;
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -5624,7 +3726,6 @@ export const AdminApiAxiosParamCreator = function (configuration?: Configuration
 
 /**
  * AdminApi - functional programming interface
- * @export
  */
 export const AdminApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AdminApiAxiosParamCreator(configuration)
@@ -5636,9 +3737,11 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async _continue(continueRequest: ContinueRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Continue200Response>> {
+        async _continue(continueRequest: ContinueRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Continue200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator._continue(continueRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi._continue']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Responds if SATP Hermes is on
@@ -5646,9 +3749,11 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getHealthCheck(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetHealthCheck200Response>> {
+        async getHealthCheck(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetHealthCheck200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getHealthCheck(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.getHealthCheck']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieve the all SATP session IDs
@@ -5657,9 +3762,11 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSessionIds(sessionsRequest?: object, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+        async getSessionIds(sessionsRequest?: object, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSessionIds(sessionsRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.getSessionIds']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieves the signature-verified SessionProofs (claims recorded at each SATP protocol step) persisted in the audit database for the given session IDs. 
@@ -5668,9 +3775,11 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSessionProofs(sessionIds: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetSessionProofs200Response>> {
+        async getSessionProofs(sessionIds: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetSessionProofs200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSessionProofs(sessionIds, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.getSessionProofs']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieve the status of a SATP session
@@ -5679,9 +3788,11 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getStatus(sessionID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transact200ResponseStatusResponse>> {
+        async getStatus(sessionID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transact200ResponseStatusResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatus(sessionID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.getStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Returns the list of ledger types supported by this gateway, computed as the intersection of operator-configured supported ledgers and the hardcoded set of implemented ledger types.
@@ -5689,9 +3800,11 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getSupportedLedgers(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetSupportedLedgers200Response>> {
+        async getSupportedLedgers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetSupportedLedgers200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getSupportedLedgers(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.getSupportedLedgers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Attempts to pause a previously submitted transaction intent, temporarily halting its execution.
@@ -5700,9 +3813,11 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async pause(pauseRequest: PauseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pause200Response>> {
+        async pause(pauseRequest: PauseRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Pause200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.pause(pauseRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.pause']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Audits transactions based on provided filters such as start and end dates. Optionally includes proofs generated from each gateway transaction.
@@ -5712,16 +3827,17 @@ export const AdminApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async performAudit(startTimestamp: string, endTimestamp?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PerformAudit200Response>> {
+        async performAudit(startTimestamp: string, endTimestamp?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PerformAudit200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.performAudit(startTimestamp, endTimestamp, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['AdminApi.performAudit']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * AdminApi - factory interface
- * @export
  */
 export const AdminApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = AdminApiFp(configuration)
@@ -5733,7 +3849,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        _continue(continueRequest: ContinueRequest, options?: any): AxiosPromise<Continue200Response> {
+        _continue(continueRequest: ContinueRequest, options?: RawAxiosRequestConfig): AxiosPromise<Continue200Response> {
             return localVarFp._continue(continueRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5742,7 +3858,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getHealthCheck(options?: any): AxiosPromise<GetHealthCheck200Response> {
+        getHealthCheck(options?: RawAxiosRequestConfig): AxiosPromise<GetHealthCheck200Response> {
             return localVarFp.getHealthCheck(options).then((request) => request(axios, basePath));
         },
         /**
@@ -5752,7 +3868,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSessionIds(sessionsRequest?: object, options?: any): AxiosPromise<Array<string>> {
+        getSessionIds(sessionsRequest?: object, options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
             return localVarFp.getSessionIds(sessionsRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5762,7 +3878,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSessionProofs(sessionIds: string, options?: any): AxiosPromise<GetSessionProofs200Response> {
+        getSessionProofs(sessionIds: string, options?: RawAxiosRequestConfig): AxiosPromise<GetSessionProofs200Response> {
             return localVarFp.getSessionProofs(sessionIds, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5772,7 +3888,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatus(sessionID: string, options?: any): AxiosPromise<Transact200ResponseStatusResponse> {
+        getStatus(sessionID: string, options?: RawAxiosRequestConfig): AxiosPromise<Transact200ResponseStatusResponse> {
             return localVarFp.getStatus(sessionID, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5781,7 +3897,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getSupportedLedgers(options?: any): AxiosPromise<GetSupportedLedgers200Response> {
+        getSupportedLedgers(options?: RawAxiosRequestConfig): AxiosPromise<GetSupportedLedgers200Response> {
             return localVarFp.getSupportedLedgers(options).then((request) => request(axios, basePath));
         },
         /**
@@ -5791,7 +3907,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        pause(pauseRequest: PauseRequest, options?: any): AxiosPromise<Pause200Response> {
+        pause(pauseRequest: PauseRequest, options?: RawAxiosRequestConfig): AxiosPromise<Pause200Response> {
             return localVarFp.pause(pauseRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -5802,7 +3918,7 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        performAudit(startTimestamp: string, endTimestamp?: string, options?: any): AxiosPromise<PerformAudit200Response> {
+        performAudit(startTimestamp: string, endTimestamp?: string, options?: RawAxiosRequestConfig): AxiosPromise<PerformAudit200Response> {
             return localVarFp.performAudit(startTimestamp, endTimestamp, options).then((request) => request(axios, basePath));
         },
     };
@@ -5810,9 +3926,6 @@ export const AdminApiFactory = function (configuration?: Configuration, basePath
 
 /**
  * AdminApi - object-oriented interface
- * @export
- * @class AdminApi
- * @extends {BaseAPI}
  */
 export class AdminApi extends BaseAPI {
     /**
@@ -5821,9 +3934,8 @@ export class AdminApi extends BaseAPI {
      * @param {ContinueRequest} continueRequest Continue request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public _continue(continueRequest: ContinueRequest, options?: AxiosRequestConfig) {
+    public _continue(continueRequest: ContinueRequest, options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration)._continue(continueRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5832,9 +3944,8 @@ export class AdminApi extends BaseAPI {
      * @summary Health check endpoint
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public getHealthCheck(options?: AxiosRequestConfig) {
+    public getHealthCheck(options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration).getHealthCheck(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5844,9 +3955,8 @@ export class AdminApi extends BaseAPI {
      * @param {object} [sessionsRequest] Request object for fetching session IDs.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public getSessionIds(sessionsRequest?: object, options?: AxiosRequestConfig) {
+    public getSessionIds(sessionsRequest?: object, options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration).getSessionIds(sessionsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5856,9 +3966,8 @@ export class AdminApi extends BaseAPI {
      * @param {string} sessionIds Comma-separated list of SATP session IDs to retrieve proofs for.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public getSessionProofs(sessionIds: string, options?: AxiosRequestConfig) {
+    public getSessionProofs(sessionIds: string, options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration).getSessionProofs(sessionIds, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5868,9 +3977,8 @@ export class AdminApi extends BaseAPI {
      * @param {string} sessionID Unique identifier for the session.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public getStatus(sessionID: string, options?: AxiosRequestConfig) {
+    public getStatus(sessionID: string, options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration).getStatus(sessionID, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5879,9 +3987,8 @@ export class AdminApi extends BaseAPI {
      * @summary Get supported ledgers
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public getSupportedLedgers(options?: AxiosRequestConfig) {
+    public getSupportedLedgers(options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration).getSupportedLedgers(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5891,9 +3998,8 @@ export class AdminApi extends BaseAPI {
      * @param {PauseRequest} pauseRequest Pause request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public pause(pauseRequest: PauseRequest, options?: AxiosRequestConfig) {
+    public pause(pauseRequest: PauseRequest, options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration).pause(pauseRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -5904,17 +4010,16 @@ export class AdminApi extends BaseAPI {
      * @param {string} [endTimestamp] The end timestamp for the audit period (defaults to now if omitted).
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof AdminApi
      */
-    public performAudit(startTimestamp: string, endTimestamp?: string, options?: AxiosRequestConfig) {
+    public performAudit(startTimestamp: string, endTimestamp?: string, options?: RawAxiosRequestConfig) {
         return AdminApiFp(this.configuration).performAudit(startTimestamp, endTimestamp, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
 
+
 /**
  * GetApproveAddressApi - axios parameter creator
- * @export
  */
 export const GetApproveAddressApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -5922,12 +4027,12 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
          * Get approve address for the token transfer
          * @summary Get approve address
          * @param {string} networkIdId The id of the DLT network being interacted with.
-         * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
-         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
+         * @param {GetApproveAddressNetworkIdLedgerTypeEnum} networkIdLedgerType The ledger type of the DLT network being interacted with.
+         * @param {GetApproveAddressTokenTypeEnum} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getApproveAddress: async (networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getApproveAddress: async (networkIdId: string, networkIdLedgerType: GetApproveAddressNetworkIdLedgerTypeEnum, tokenType: GetApproveAddressTokenTypeEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'networkIdId' is not null or undefined
             assertParamExists('getApproveAddress', 'networkIdId', networkIdId)
             // verify required parameter 'networkIdLedgerType' is not null or undefined
@@ -5958,8 +4063,8 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
                 localVarQueryParameter['tokenType'] = tokenType;
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -5974,7 +4079,6 @@ export const GetApproveAddressApiAxiosParamCreator = function (configuration?: C
 
 /**
  * GetApproveAddressApi - functional programming interface
- * @export
  */
 export const GetApproveAddressApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = GetApproveAddressApiAxiosParamCreator(configuration)
@@ -5983,21 +4087,22 @@ export const GetApproveAddressApiFp = function(configuration?: Configuration) {
          * Get approve address for the token transfer
          * @summary Get approve address
          * @param {string} networkIdId The id of the DLT network being interacted with.
-         * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
-         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
+         * @param {GetApproveAddressNetworkIdLedgerTypeEnum} networkIdLedgerType The ledger type of the DLT network being interacted with.
+         * @param {GetApproveAddressTokenTypeEnum} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getApproveAddress(networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetApproveAddress200Response>> {
+        async getApproveAddress(networkIdId: string, networkIdLedgerType: GetApproveAddressNetworkIdLedgerTypeEnum, tokenType: GetApproveAddressTokenTypeEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetApproveAddress200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getApproveAddress(networkIdId, networkIdLedgerType, tokenType, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['GetApproveAddressApi.getApproveAddress']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * GetApproveAddressApi - factory interface
- * @export
  */
 export const GetApproveAddressApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = GetApproveAddressApiFp(configuration)
@@ -6006,12 +4111,12 @@ export const GetApproveAddressApiFactory = function (configuration?: Configurati
          * Get approve address for the token transfer
          * @summary Get approve address
          * @param {string} networkIdId The id of the DLT network being interacted with.
-         * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
-         * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
+         * @param {GetApproveAddressNetworkIdLedgerTypeEnum} networkIdLedgerType The ledger type of the DLT network being interacted with.
+         * @param {GetApproveAddressTokenTypeEnum} tokenType The type of token being transferred.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getApproveAddress(networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: any): AxiosPromise<GetApproveAddress200Response> {
+        getApproveAddress(networkIdId: string, networkIdLedgerType: GetApproveAddressNetworkIdLedgerTypeEnum, tokenType: GetApproveAddressTokenTypeEnum, options?: RawAxiosRequestConfig): AxiosPromise<GetApproveAddress200Response> {
             return localVarFp.getApproveAddress(networkIdId, networkIdLedgerType, tokenType, options).then((request) => request(axios, basePath));
         },
     };
@@ -6019,30 +4124,41 @@ export const GetApproveAddressApiFactory = function (configuration?: Configurati
 
 /**
  * GetApproveAddressApi - object-oriented interface
- * @export
- * @class GetApproveAddressApi
- * @extends {BaseAPI}
  */
 export class GetApproveAddressApi extends BaseAPI {
     /**
      * Get approve address for the token transfer
      * @summary Get approve address
      * @param {string} networkIdId The id of the DLT network being interacted with.
-     * @param {'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X'} networkIdLedgerType The ledger type of the DLT network being interacted with.
-     * @param {'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE'} tokenType The type of token being transferred.
+     * @param {GetApproveAddressNetworkIdLedgerTypeEnum} networkIdLedgerType The ledger type of the DLT network being interacted with.
+     * @param {GetApproveAddressTokenTypeEnum} tokenType The type of token being transferred.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof GetApproveAddressApi
      */
-    public getApproveAddress(networkIdId: string, networkIdLedgerType: 'BESU_1X' | 'BESU_2X' | 'BURROW_0X' | 'CORDA_4X' | 'ETHEREUM' | 'FABRIC_2' | 'SAWTOOTH_1X', tokenType: 'NONSTANDARD_FUNGIBLE' | 'NONSTANDARD_NONFUNGIBLE', options?: AxiosRequestConfig) {
+    public getApproveAddress(networkIdId: string, networkIdLedgerType: GetApproveAddressNetworkIdLedgerTypeEnum, tokenType: GetApproveAddressTokenTypeEnum, options?: RawAxiosRequestConfig) {
         return GetApproveAddressApiFp(this.configuration).getApproveAddress(networkIdId, networkIdLedgerType, tokenType, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
+export const GetApproveAddressNetworkIdLedgerTypeEnum = {
+    Besu1X: 'BESU_1X',
+    Besu2X: 'BESU_2X',
+    Burrow0X: 'BURROW_0X',
+    Corda4X: 'CORDA_4X',
+    Ethereum: 'ETHEREUM',
+    Fabric2: 'FABRIC_2',
+    Sawtooth1X: 'SAWTOOTH_1X',
+} as const;
+export type GetApproveAddressNetworkIdLedgerTypeEnum = typeof GetApproveAddressNetworkIdLedgerTypeEnum[keyof typeof GetApproveAddressNetworkIdLedgerTypeEnum];
+export const GetApproveAddressTokenTypeEnum = {
+    NonstandardFungible: 'NONSTANDARD_FUNGIBLE',
+    NonstandardNonfungible: 'NONSTANDARD_NONFUNGIBLE',
+} as const;
+export type GetApproveAddressTokenTypeEnum = typeof GetApproveAddressTokenTypeEnum[keyof typeof GetApproveAddressTokenTypeEnum];
+
 
 /**
  * OracleApi - axios parameter creator
- * @export
  */
 export const OracleApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -6053,7 +4169,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        executeOracleTask: async (executeOracleTaskRequest: ExecuteOracleTaskRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        executeOracleTask: async (executeOracleTaskRequest: ExecuteOracleTaskRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'executeOracleTaskRequest' is not null or undefined
             assertParamExists('executeOracleTask', 'executeOracleTaskRequest', executeOracleTaskRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/execute`;
@@ -6068,9 +4184,8 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -6089,7 +4204,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOracleTaskStatus: async (taskID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getOracleTaskStatus: async (taskID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskID' is not null or undefined
             assertParamExists('getOracleTaskStatus', 'taskID', taskID)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/status`;
@@ -6108,8 +4223,8 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
                 localVarQueryParameter['taskID'] = taskID;
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -6126,7 +4241,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        registerOracleTask: async (registerOracleTaskRequest: RegisterOracleTaskRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        registerOracleTask: async (registerOracleTaskRequest: RegisterOracleTaskRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'registerOracleTaskRequest' is not null or undefined
             assertParamExists('registerOracleTask', 'registerOracleTaskRequest', registerOracleTaskRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/register`;
@@ -6141,9 +4256,8 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -6162,7 +4276,7 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        unregisterOracleTask: async (taskID: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        unregisterOracleTask: async (taskID: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'taskID' is not null or undefined
             assertParamExists('unregisterOracleTask', 'taskID', taskID)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/oracle/unregister`;
@@ -6181,8 +4295,8 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
                 localVarQueryParameter['taskID'] = taskID;
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -6197,7 +4311,6 @@ export const OracleApiAxiosParamCreator = function (configuration?: Configuratio
 
 /**
  * OracleApi - functional programming interface
- * @export
  */
 export const OracleApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = OracleApiAxiosParamCreator(configuration)
@@ -6209,9 +4322,11 @@ export const OracleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExecuteOracleTask200Response>> {
+        async executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ExecuteOracleTask200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.executeOracleTask(executeOracleTaskRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OracleApi.executeOracleTask']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieve the status of an oracle task
@@ -6220,9 +4335,11 @@ export const OracleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOracleTaskStatus(taskID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetOracleTaskStatus200Response>> {
+        async getOracleTaskStatus(taskID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetOracleTaskStatus200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getOracleTaskStatus(taskID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OracleApi.getOracleTaskStatus']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Register data transfer from source to target blockchain
@@ -6231,9 +4348,11 @@ export const OracleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RegisterOracleTask200Response>> {
+        async registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RegisterOracleTask200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.registerOracleTask(registerOracleTaskRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OracleApi.registerOracleTask']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Unregister data transfer task from source to target blockchain
@@ -6242,16 +4361,17 @@ export const OracleApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async unregisterOracleTask(taskID: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UnregisterOracleTask200Response>> {
+        async unregisterOracleTask(taskID: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UnregisterOracleTask200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.unregisterOracleTask(taskID, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['OracleApi.unregisterOracleTask']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * OracleApi - factory interface
- * @export
  */
 export const OracleApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = OracleApiFp(configuration)
@@ -6263,7 +4383,7 @@ export const OracleApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: any): AxiosPromise<ExecuteOracleTask200Response> {
+        executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: RawAxiosRequestConfig): AxiosPromise<ExecuteOracleTask200Response> {
             return localVarFp.executeOracleTask(executeOracleTaskRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6273,7 +4393,7 @@ export const OracleApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOracleTaskStatus(taskID: string, options?: any): AxiosPromise<GetOracleTaskStatus200Response> {
+        getOracleTaskStatus(taskID: string, options?: RawAxiosRequestConfig): AxiosPromise<GetOracleTaskStatus200Response> {
             return localVarFp.getOracleTaskStatus(taskID, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6283,7 +4403,7 @@ export const OracleApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: any): AxiosPromise<RegisterOracleTask200Response> {
+        registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: RawAxiosRequestConfig): AxiosPromise<RegisterOracleTask200Response> {
             return localVarFp.registerOracleTask(registerOracleTaskRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6293,7 +4413,7 @@ export const OracleApiFactory = function (configuration?: Configuration, basePat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        unregisterOracleTask(taskID: string, options?: any): AxiosPromise<UnregisterOracleTask200Response> {
+        unregisterOracleTask(taskID: string, options?: RawAxiosRequestConfig): AxiosPromise<UnregisterOracleTask200Response> {
             return localVarFp.unregisterOracleTask(taskID, options).then((request) => request(axios, basePath));
         },
     };
@@ -6301,9 +4421,6 @@ export const OracleApiFactory = function (configuration?: Configuration, basePat
 
 /**
  * OracleApi - object-oriented interface
- * @export
- * @class OracleApi
- * @extends {BaseAPI}
  */
 export class OracleApi extends BaseAPI {
     /**
@@ -6312,9 +4429,8 @@ export class OracleApi extends BaseAPI {
      * @param {ExecuteOracleTaskRequest} executeOracleTaskRequest Execute request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof OracleApi
      */
-    public executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: AxiosRequestConfig) {
+    public executeOracleTask(executeOracleTaskRequest: ExecuteOracleTaskRequest, options?: RawAxiosRequestConfig) {
         return OracleApiFp(this.configuration).executeOracleTask(executeOracleTaskRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6324,9 +4440,8 @@ export class OracleApi extends BaseAPI {
      * @param {string} taskID Unique identifier for the task.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof OracleApi
      */
-    public getOracleTaskStatus(taskID: string, options?: AxiosRequestConfig) {
+    public getOracleTaskStatus(taskID: string, options?: RawAxiosRequestConfig) {
         return OracleApiFp(this.configuration).getOracleTaskStatus(taskID, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6336,9 +4451,8 @@ export class OracleApi extends BaseAPI {
      * @param {RegisterOracleTaskRequest} registerOracleTaskRequest Register request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof OracleApi
      */
-    public registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: AxiosRequestConfig) {
+    public registerOracleTask(registerOracleTaskRequest: RegisterOracleTaskRequest, options?: RawAxiosRequestConfig) {
         return OracleApiFp(this.configuration).registerOracleTask(registerOracleTaskRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6348,17 +4462,16 @@ export class OracleApi extends BaseAPI {
      * @param {string} taskID Unique identifier for the task.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof OracleApi
      */
-    public unregisterOracleTask(taskID: string, options?: AxiosRequestConfig) {
+    public unregisterOracleTask(taskID: string, options?: RawAxiosRequestConfig) {
         return OracleApiFp(this.configuration).unregisterOracleTask(taskID, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
 
+
 /**
  * TransactionApi - axios parameter creator
- * @export
  */
 export const TransactionApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -6369,7 +4482,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        cancel: async (cancelRequest: CancelRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        cancel: async (cancelRequest: CancelRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'cancelRequest' is not null or undefined
             assertParamExists('cancel', 'cancelRequest', cancelRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/cancel`;
@@ -6384,9 +4497,8 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -6404,7 +4516,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getIntegrations: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getIntegrations: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/integrations`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6417,8 +4529,8 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -6441,7 +4553,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRoutes: async (fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getRoutes: async (fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'fromNetworkID' is not null or undefined
             assertParamExists('getRoutes', 'fromNetworkID', fromNetworkID)
             // verify required parameter 'fromAmount' is not null or undefined
@@ -6469,7 +4581,9 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
             const localVarQueryParameter = {} as any;
 
             if (fromNetworkID !== undefined) {
-                localVarQueryParameter['fromNetworkID'] = fromNetworkID;
+                for (const [key, value] of Object.entries(fromNetworkID)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
             if (fromAmount !== undefined) {
@@ -6481,7 +4595,9 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
             }
 
             if (toDLTNetwork !== undefined) {
-                localVarQueryParameter['toDLTNetwork'] = toDLTNetwork;
+                for (const [key, value] of Object.entries(toDLTNetwork)) {
+                    localVarQueryParameter[key] = value;
+                }
             }
 
             if (toToken !== undefined) {
@@ -6496,8 +4612,8 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
                 localVarQueryParameter['toAddress'] = toAddress;
             }
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -6514,7 +4630,7 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        transact: async (transactRequest: TransactRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        transact: async (transactRequest: TransactRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'transactRequest' is not null or undefined
             assertParamExists('transact', 'transactRequest', transactRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact`;
@@ -6529,9 +4645,8 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -6548,7 +4663,6 @@ export const TransactionApiAxiosParamCreator = function (configuration?: Configu
 
 /**
  * TransactionApi - functional programming interface
- * @export
  */
 export const TransactionApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = TransactionApiAxiosParamCreator(configuration)
@@ -6560,9 +4674,11 @@ export const TransactionApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async cancel(cancelRequest: CancelRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Cancel200Response>> {
+        async cancel(cancelRequest: CancelRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Cancel200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.cancel(cancelRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.cancel']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Retrieves metadata about each supported blockchain networks, chains, and other systems.
@@ -6570,9 +4686,11 @@ export const TransactionApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getIntegrations(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetIntegrations200Response>> {
+        async getIntegrations(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetIntegrations200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getIntegrations(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.getIntegrations']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Get a list of possible routes for swapping one asset for another across multiple exchanges
@@ -6587,9 +4705,11 @@ export const TransactionApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRoutes200Response>> {
+        async getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetRoutes200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getRoutes(fromNetworkID, fromAmount, fromToken, toDLTNetwork, toToken, fromAddress, toAddress, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.getRoutes']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * Allows users to queue intents for transactions based on specified parameters.
@@ -6598,16 +4718,17 @@ export const TransactionApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async transact(transactRequest: TransactRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transact200Response>> {
+        async transact(transactRequest: TransactRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Transact200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.transact(transactRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransactionApi.transact']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * TransactionApi - factory interface
- * @export
  */
 export const TransactionApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = TransactionApiFp(configuration)
@@ -6619,7 +4740,7 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        cancel(cancelRequest: CancelRequest, options?: any): AxiosPromise<Cancel200Response> {
+        cancel(cancelRequest: CancelRequest, options?: RawAxiosRequestConfig): AxiosPromise<Cancel200Response> {
             return localVarFp.cancel(cancelRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6628,7 +4749,7 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getIntegrations(options?: any): AxiosPromise<GetIntegrations200Response> {
+        getIntegrations(options?: RawAxiosRequestConfig): AxiosPromise<GetIntegrations200Response> {
             return localVarFp.getIntegrations(options).then((request) => request(axios, basePath));
         },
         /**
@@ -6644,7 +4765,7 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: any): AxiosPromise<GetRoutes200Response> {
+        getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: RawAxiosRequestConfig): AxiosPromise<GetRoutes200Response> {
             return localVarFp.getRoutes(fromNetworkID, fromAmount, fromToken, toDLTNetwork, toToken, fromAddress, toAddress, options).then((request) => request(axios, basePath));
         },
         /**
@@ -6654,7 +4775,7 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        transact(transactRequest: TransactRequest, options?: any): AxiosPromise<Transact200Response> {
+        transact(transactRequest: TransactRequest, options?: RawAxiosRequestConfig): AxiosPromise<Transact200Response> {
             return localVarFp.transact(transactRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -6662,9 +4783,6 @@ export const TransactionApiFactory = function (configuration?: Configuration, ba
 
 /**
  * TransactionApi - object-oriented interface
- * @export
- * @class TransactionApi
- * @extends {BaseAPI}
  */
 export class TransactionApi extends BaseAPI {
     /**
@@ -6673,9 +4791,8 @@ export class TransactionApi extends BaseAPI {
      * @param {CancelRequest} cancelRequest Cancel request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TransactionApi
      */
-    public cancel(cancelRequest: CancelRequest, options?: AxiosRequestConfig) {
+    public cancel(cancelRequest: CancelRequest, options?: RawAxiosRequestConfig) {
         return TransactionApiFp(this.configuration).cancel(cancelRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6684,9 +4801,8 @@ export class TransactionApi extends BaseAPI {
      * @summary Get supported integrations
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TransactionApi
      */
-    public getIntegrations(options?: AxiosRequestConfig) {
+    public getIntegrations(options?: RawAxiosRequestConfig) {
         return TransactionApiFp(this.configuration).getIntegrations(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6702,9 +4818,8 @@ export class TransactionApi extends BaseAPI {
      * @param {string} toAddress The receiving wallet address. If none is provided, the fromAddress will be used.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TransactionApi
      */
-    public getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: AxiosRequestConfig) {
+    public getRoutes(fromNetworkID: TransactRequestSourceAssetNetworkId, fromAmount: string, fromToken: string, toDLTNetwork: TransactRequestSourceAssetNetworkId, toToken: string, fromAddress: string, toAddress: string, options?: RawAxiosRequestConfig) {
         return TransactionApiFp(this.configuration).getRoutes(fromNetworkID, fromAmount, fromToken, toDLTNetwork, toToken, fromAddress, toAddress, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -6714,17 +4829,16 @@ export class TransactionApi extends BaseAPI {
      * @param {TransactRequest} transactRequest Transact request object.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof TransactionApi
      */
-    public transact(transactRequest: TransactRequest, options?: AxiosRequestConfig) {
+    public transact(transactRequest: TransactRequest, options?: RawAxiosRequestConfig) {
         return TransactionApiFp(this.configuration).transact(transactRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
 
+
 /**
  * WebhookApi - axios parameter creator
- * @export
  */
 export const WebhookApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -6735,7 +4849,7 @@ export const WebhookApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        decideInboundWebhook: async (decideInboundWebhookRequest: DecideInboundWebhookRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        decideInboundWebhook: async (decideInboundWebhookRequest: DecideInboundWebhookRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'decideInboundWebhookRequest' is not null or undefined
             assertParamExists('decideInboundWebhook', 'decideInboundWebhookRequest', decideInboundWebhookRequest)
             const localVarPath = `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/webhook/inbound/decide`;
@@ -6750,9 +4864,8 @@ export const WebhookApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -6769,7 +4882,6 @@ export const WebhookApiAxiosParamCreator = function (configuration?: Configurati
 
 /**
  * WebhookApi - functional programming interface
- * @export
  */
 export const WebhookApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = WebhookApiAxiosParamCreator(configuration)
@@ -6781,16 +4893,17 @@ export const WebhookApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async decideInboundWebhook(decideInboundWebhookRequest: DecideInboundWebhookRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DecideInboundWebhook200Response>> {
+        async decideInboundWebhook(decideInboundWebhookRequest: DecideInboundWebhookRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DecideInboundWebhook200Response>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.decideInboundWebhook(decideInboundWebhookRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['WebhookApi.decideInboundWebhook']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * WebhookApi - factory interface
- * @export
  */
 export const WebhookApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = WebhookApiFp(configuration)
@@ -6802,7 +4915,7 @@ export const WebhookApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        decideInboundWebhook(decideInboundWebhookRequest: DecideInboundWebhookRequest, options?: any): AxiosPromise<DecideInboundWebhook200Response> {
+        decideInboundWebhook(decideInboundWebhookRequest: DecideInboundWebhookRequest, options?: RawAxiosRequestConfig): AxiosPromise<DecideInboundWebhook200Response> {
             return localVarFp.decideInboundWebhook(decideInboundWebhookRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -6810,9 +4923,6 @@ export const WebhookApiFactory = function (configuration?: Configuration, basePa
 
 /**
  * WebhookApi - object-oriented interface
- * @export
- * @class WebhookApi
- * @extends {BaseAPI}
  */
 export class WebhookApi extends BaseAPI {
     /**
@@ -6821,11 +4931,11 @@ export class WebhookApi extends BaseAPI {
      * @param {DecideInboundWebhookRequest} decideInboundWebhookRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof WebhookApi
      */
-    public decideInboundWebhook(decideInboundWebhookRequest: DecideInboundWebhookRequest, options?: AxiosRequestConfig) {
+    public decideInboundWebhook(decideInboundWebhookRequest: DecideInboundWebhookRequest, options?: RawAxiosRequestConfig) {
         return WebhookApiFp(this.configuration).decideInboundWebhook(decideInboundWebhookRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
 
 

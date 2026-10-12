@@ -63,7 +63,7 @@ func (o *GetPastLogsV1Request) GetToBlockOk() (*interface{}, bool) {
 
 // HasToBlock returns a boolean if a field has been set.
 func (o *GetPastLogsV1Request) HasToBlock() bool {
-	if o != nil && IsNil(o.ToBlock) {
+	if o != nil && !IsNil(o.ToBlock) {
 		return true
 	}
 
@@ -96,7 +96,7 @@ func (o *GetPastLogsV1Request) GetFromBlockOk() (*interface{}, bool) {
 
 // HasFromBlock returns a boolean if a field has been set.
 func (o *GetPastLogsV1Request) HasFromBlock() bool {
-	if o != nil && IsNil(o.FromBlock) {
+	if o != nil && !IsNil(o.FromBlock) {
 		return true
 	}
 
@@ -129,7 +129,7 @@ func (o *GetPastLogsV1Request) GetAddressOk() (*interface{}, bool) {
 
 // HasAddress returns a boolean if a field has been set.
 func (o *GetPastLogsV1Request) HasAddress() bool {
-	if o != nil && IsNil(o.Address) {
+	if o != nil && !IsNil(o.Address) {
 		return true
 	}
 

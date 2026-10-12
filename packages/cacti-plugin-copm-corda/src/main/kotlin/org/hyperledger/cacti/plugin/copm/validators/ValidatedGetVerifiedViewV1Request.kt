@@ -9,9 +9,9 @@ import org.hyperledger.cacti.plugin.copm.core.services.defaultservice.DefaultSer
 
 class ValidatedGetVerifiedViewV1Request(val account : DLAccount, val cmd : DLTransactionParams, val remoteNetwork: String) {
    constructor(request: DefaultServiceOuterClass.GetVerifiedViewV1Request) : this (
-       validateAccount(request.getVerifiedViewV1RequestPB.account, "account"),
-       validateViewRequest(request.getVerifiedViewV1RequestPB.view?.viewAddress, "view.viewAddress"),
-       validateRequiredString(request.getVerifiedViewV1RequestPB.view.organization, "view.organization"))
+       validateAccount(request.getVerifiedViewV1RequestPb.account, "account"),
+       validateViewRequest(request.getVerifiedViewV1RequestPb.view?.viewAddress, "view.viewAddress"),
+       validateRequiredString(request.getVerifiedViewV1RequestPb.view.organization, "view.organization"))
    {
    }
 }

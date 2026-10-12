@@ -28,22 +28,31 @@ import jakarta.validation.Valid
 data class CordappInfo(
 
     @field:Valid
+    @param:JsonProperty("jarHash", required = true)
     @get:JsonProperty("jarHash", required = true) val jarHash: SHA256,
 
+    @param:JsonProperty("licence", required = true)
     @get:JsonProperty("licence", required = true) val licence: kotlin.String,
 
+    @param:JsonProperty("minimumPlatformVersion", required = true)
     @get:JsonProperty("minimumPlatformVersion", required = true) val minimumPlatformVersion: kotlin.Int,
 
+    @param:JsonProperty("name", required = true)
     @get:JsonProperty("name", required = true) val name: kotlin.String,
 
+    @param:JsonProperty("shortName", required = true)
     @get:JsonProperty("shortName", required = true) val shortName: kotlin.String,
 
+    @param:JsonProperty("targetPlatformVersion", required = true)
     @get:JsonProperty("targetPlatformVersion", required = true) val targetPlatformVersion: kotlin.Int,
 
+    @param:JsonProperty("type", required = true)
     @get:JsonProperty("type", required = true) val type: kotlin.String,
 
+    @param:JsonProperty("vendor", required = true)
     @get:JsonProperty("vendor", required = true) val vendor: kotlin.String,
 
+    @param:JsonProperty("version", required = true)
     @get:JsonProperty("version", required = true) val version: kotlin.String
 ) {
 

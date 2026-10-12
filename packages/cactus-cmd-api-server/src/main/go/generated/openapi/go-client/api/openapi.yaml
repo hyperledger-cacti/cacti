@@ -24,19 +24,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HealthCheckResponse'
+                $ref: "#/components/schemas/HealthCheckResponse"
           description: OK
         "401":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CmdApiServerEndpointErrorResponse'
+                $ref: "#/components/schemas/CmdApiServerEndpointErrorResponse"
           description: Unauthorized - Invalid token
         "403":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CmdApiServerEndpointErrorResponse'
+                $ref: "#/components/schemas/CmdApiServerEndpointErrorResponse"
           description: Forbidden - Valid token but missing correct scope
       security:
       - bearerTokenAuth:
@@ -55,19 +55,19 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+                $ref: "#/components/schemas/PrometheusExporterMetricsResponse"
           description: OK
         "401":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CmdApiServerEndpointErrorResponse'
+                $ref: "#/components/schemas/CmdApiServerEndpointErrorResponse"
           description: Unauthorized - Invalid token
         "403":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CmdApiServerEndpointErrorResponse'
+                $ref: "#/components/schemas/CmdApiServerEndpointErrorResponse"
           description: Forbidden - Valid token but missing correct scope
       security:
       - bearerTokenAuth:
@@ -87,19 +87,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetOpenApiSpecV1EndpointResponse'
+                $ref: "#/components/schemas/GetOpenApiSpecV1EndpointResponse"
           description: OK
         "401":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CmdApiServerEndpointErrorResponse'
+                $ref: "#/components/schemas/CmdApiServerEndpointErrorResponse"
           description: Unauthorized - Invalid token
         "403":
           content:
             '*/*':
               schema:
-                $ref: '#/components/schemas/CmdApiServerEndpointErrorResponse'
+                $ref: "#/components/schemas/CmdApiServerEndpointErrorResponse"
           description: Forbidden - Valid token but missing correct scope
       security:
       - bearerTokenAuth:
@@ -126,10 +126,10 @@ components:
       - Complete
     MemoryUsage:
       example:
-        heapUsed: 1.4658129805029452
-        external: 5.962133916683182
         rss: 0.8008281904610115
         heapTotal: 6.027456183070403
+        heapUsed: 1.4658129805029452
+        external: 5.962133916683182
         arrayBuffers: 5.637376656633329
       properties:
         rss:
@@ -152,21 +152,21 @@ components:
       type: object
     HealthCheckResponse:
       example:
+        success: true
         createdAt: createdAt
         memoryUsage:
-          heapUsed: 1.4658129805029452
-          external: 5.962133916683182
           rss: 0.8008281904610115
           heapTotal: 6.027456183070403
+          heapUsed: 1.4658129805029452
+          external: 5.962133916683182
           arrayBuffers: 5.637376656633329
-        success: true
       properties:
         success:
           type: boolean
         createdAt:
           type: string
         memoryUsage:
-          $ref: '#/components/schemas/MemoryUsage'
+          $ref: "#/components/schemas/MemoryUsage"
       required:
       - createdAt
       - memoryUsage
@@ -178,6 +178,9 @@ components:
       nullable: false
       type: string
     CmdApiServerEndpointErrorResponse:
+      example:
+        message: |
+          Forbidden - Valid token but missing correct scope
       properties:
         message:
           example: |

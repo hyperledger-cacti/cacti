@@ -205,7 +205,8 @@ export class PluginHTLCCoordinatorBesu
           pluginRegistry,
         };
         const factoryHTLC = new PluginFactoryHtlcEthBesu({
-          pluginImportType: PluginImportType.Local,
+          pluginImportType:
+            PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
         });
         const pluginHtlc = await factoryHTLC.create(pluginOptions);
         const request: InitializeRequestBesu = {
@@ -280,7 +281,8 @@ export class PluginHTLCCoordinatorBesu
           pluginRegistry,
         };
         const factoryHTLC = new PluginFactoryHtlcEthBesu({
-          pluginImportType: PluginImportType.Local,
+          pluginImportType:
+            PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
         });
         const pluginHtlc = await factoryHTLC.create(pluginOptions);
         const getSingleStatusReq = {
@@ -345,7 +347,8 @@ export class PluginHTLCCoordinatorBesu
           pluginRegistry,
         };
         const factoryHTLC = new PluginFactoryHtlcEthBesu({
-          pluginImportType: PluginImportType.Local,
+          pluginImportType:
+            PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
         });
         const pluginHtlc = await factoryHTLC.create(pluginOptions);
         const withdrawRequest: WithdrawReq = {

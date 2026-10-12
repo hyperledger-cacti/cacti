@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the JvmObject type satisfies the MappedNullable interface at compile time
@@ -24,6 +26,8 @@ type JvmObject struct {
 	JvmCtorArgs []JvmObject `json:"jvmCtorArgs,omitempty"`
 	JvmType JvmType `json:"jvmType"`
 }
+
+type _JvmObject JvmObject
 
 // NewJvmObject instantiates a new JvmObject object
 // This constructor will assign default values to properties that have it defined,
@@ -89,7 +93,7 @@ func (o *JvmObject) GetPrimitiveValueOk() (*interface{}, bool) {
 
 // HasPrimitiveValue returns a boolean if a field has been set.
 func (o *JvmObject) HasPrimitiveValue() bool {
-	if o != nil && IsNil(o.PrimitiveValue) {
+	if o != nil && !IsNil(o.PrimitiveValue) {
 		return true
 	}
 
@@ -176,6 +180,44 @@ func (o JvmObject) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["jvmType"] = o.JvmType
 	return toSerialize, nil
+}
+
+func (o *JvmObject) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"jvmTypeKind",
+		"jvmType",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varJvmObject := _JvmObject{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varJvmObject)
+
+	if err != nil {
+		return err
+	}
+
+	*o = JvmObject(varJvmObject)
+
+	return err
 }
 
 type NullableJvmObject struct {

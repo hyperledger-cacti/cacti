@@ -18,6 +18,7 @@ import jakarta.validation.Valid
  */
 data class ListFlowsV1Request(
 
+    @param:JsonProperty("filter")
     @get:JsonProperty("filter") val filter: kotlin.String? = null
 ) {
 

@@ -661,7 +661,8 @@ export class FabricTestEnvironment {
       channelName: channelName,
       params: [account],
       methodName: "ClientIDAccountBalance",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: signingCredential,
     });
 
@@ -675,7 +676,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: [mspID],
       methodName: "setBridge",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: this.fabricSigningCredential,
     });
 
@@ -695,7 +697,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: [bridgeAddress, amount],
       methodName: "Approve",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: this.fabricSigningCredential,
     });
 
@@ -874,7 +877,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: [this.userIdentity.mspId, FabricTestEnvironment.FABRIC_ASSET_ID],
       methodName: "InitToken",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: this.fabricSigningCredential,
     });
 
@@ -893,7 +897,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: [],
       methodName: "ClientAccountID",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: this.fabricSigningCredential,
     });
 
@@ -1049,7 +1054,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: [],
       methodName: "InitLedger",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: this.fabricSigningCredential,
     });
 
@@ -1074,7 +1080,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: params,
       methodName: methodName,
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: this.fabricSigningCredential,
     });
     expect(readData).not.toBeUndefined();
@@ -1092,7 +1099,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: params,
       methodName: methodName,
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       signingCredential: this.fabricSigningCredential,
     });
     expect(readData).not.toBeUndefined();
@@ -1106,7 +1114,8 @@ export class FabricTestEnvironment {
       channelName: this.fabricChannelName,
       params: [amount],
       methodName: "Mint",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: this.fabricSigningCredential,
     });
     expect(responseMint).not.toBeUndefined();
@@ -1130,7 +1139,7 @@ export class FabricTestEnvironment {
       mspId: this.userIdentity.mspId,
       channelName: this.fabricChannelName,
       networkId: this.network,
-      tokenType: AssetTokenTypeEnum.Fungible,
+      tokenType: AssetTokenTypeEnum.NonstandardFungible,
       ercTokenStandard: AssetErcTokenStandardEnum.Erc20,
     };
   }
@@ -1144,7 +1153,7 @@ export class FabricTestEnvironment {
       mspId: this.userIdentity.mspId,
       channelName: this.fabricChannelName,
       networkId: this.network,
-      tokenType: AssetTokenTypeEnum.Nonfungible,
+      tokenType: AssetTokenTypeEnum.NonstandardNonfungible,
       ercTokenStandard: AssetErcTokenStandardEnum.Erc721,
     };
   }
