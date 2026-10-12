@@ -272,6 +272,14 @@
   ,"NFT"
   ,"Jtis"
   ,"jtis"
+  ,"WHATWG"
+  ,"SUPABSE"
+  ,"inlines"
+  ,"PostgREST"
+  ,"postgrest"
+  ,"oneof"
+  ,"retfas"
+  ,"xaxis"
   ],
   "dictionaries": [
     "typescript,node,npm,go,rust"

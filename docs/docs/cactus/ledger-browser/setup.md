@@ -40,9 +40,27 @@ You can run the following command from either the root of the project or the `ca
 yarn install
 ```
 
-## Setup Supabase
+## Setup the config store
 
-### Create Instance
+The GUI backend is the app-instance config store. Two local profiles exist -
+pick one:
+
+### Zero-config slim profile (recommended for development)
+
+Three small containers (Postgres + PostgREST + a canned example gateway),
+seeded with one SATP Inspector instance so the UI shows data out of the box
+and **no `.env` file is needed** (the built-in default already points at
+`http://localhost:8000` and this profile accepts any API key):
+
+```sh
+docker compose -f tools/docker/ledger-browser-config-postgrest/docker-compose.yml up -d
+```
+
+Skip to [Start the application](#start-the-application) - no schema step
+either (the slim stack initializes and seeds its database on first boot).
+Details: [tools/docker/ledger-browser-config-postgrest](https://github.com/hyperledger-cacti/cacti/tree/main/tools/docker/ledger-browser-config-postgrest).
+
+### Full Supabase (Studio, auth, RLS)
 
 You can start a local instance of Supabase to be used as the GUI backend using our Cacti `supabase-all-in-one` image. Alternatively, follow the [Supabase Self-Hosting guide](https://supabase.com/docs/guides/self-hosting/docker).
 
@@ -105,6 +123,9 @@ psql "__CONNECTION_STRING_TO_DB__" -f packages/cacti-ledger-browser/src/main/sql
 ## Start the application
 
 ### Set the environment variables
+
+Optional with the slim profile above - only needed for a real Supabase
+project (or to override any local default):
 
 1. Copy `packages/cacti-ledger-browser/.env.template` to `packages/cacti-ledger-browser/.env`.
 2. Edit the newly created `.env` file (`vim packages/cacti-ledger-browser/.env` or similar).

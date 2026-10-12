@@ -6,6 +6,18 @@
   <link rel="icon" href="/hyperledgerfavicon.webp" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cacti Ledger Browser</title>
+  <!--
+    Runtime configuration: /config.js (same origin, hence allowed by the
+    CSP's `script-src 'self'`) is a tiny static file that may assign
+    window.__LEDGER_BROWSER_CONFIG__ = { ... } to override the build-time
+    VITE_* values without rebuilding the bundle. It must stay a classic,
+    non-deferred script placed BEFORE the bundle so the global exists when
+    the bundle starts. Deploying without it is fine: the 404 is harmless
+    and the app keeps using its build-time values (see
+    src/main/typescript/common/runtime-config.ts and
+    public/config.example.js).
+  -->
+  <script src="/config.js"></script>
 </head>
 
 <body>
