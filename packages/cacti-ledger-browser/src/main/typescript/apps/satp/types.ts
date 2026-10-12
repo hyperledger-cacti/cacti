@@ -1,107 +1,93 @@
+/**
+ * Hand-written, browser-safe types for the SATP Hermes gateway OAPI
+ * responses used by this app. They mirror the small subset of the
+ * auto-generated gateway client that the app actually consumes (see
+ * `packages/cactus-plugin-satp-hermes/src/main/typescript/generated/
+ * gateway-client/typescript-axios/`, itself generated from the plugin's
+ * OpenAPI spec in `src/main/yml/bol/`).
+ *
+ * Keeping local copies avoids importing the plugin package entirely: that
+ * would add a workspace dependency to the ledger-browser and risk pulling
+ * Node-only plugin code into the browser bundle.
+ */
+
+/**
+ * Options stored per instance of this app in the `gui_app_config` table
+ * (editable through the "Add Application" wizard).
+ */
 export interface SatpAppOptions {
-  gatewayApiUrl: string;
-  refreshIntervalMs?: number;
+  /**
+   * Base URL of the SATP Hermes gateway OAPI (REST) server, e.g.
+   * `http://localhost:4010` (`docker-compose-satp.yml` maps it to host
+   * port 3012).
+   */
+  gatewayUrl: string;
+
+  /**
+   * Optional base URL of a Prometheus server scraping the gateway metrics
+   * (e.g. `http://localhost:9090`). Used by the Overview page. Aggregate
+   * panels are hidden when missing or unreachable.
+   */
+  prometheusUrl?: string;
 }
 
-export interface LocalLog {
-  sessionId: string;
-  type: string;
-  key: string;
-  operation: string;
-  timestamp?: string;
-  data: string;
-  sequenceNumber: number;
+/** `GET /healthcheck` - availability of the gateway OAPI server. */
+export interface SatpHealthcheckResponse {
+  /** `AVAILABLE` or `UNAVAILABLE` (absent when the server is unhealthy). */
+  status?: string;
 }
 
-export interface AuditEntry {
-  auditEntryId: string;
-  session: LocalLog;
-  timestamp: number;
+/** `GET /supported-ledgers` - ledger types handled by the gateway. */
+export interface SatpSupportedLedgersResponse {
+  supportedLedgers: string[];
 }
 
-export interface AuditResponse {
-  auditEntries?: {
-    entries: AuditEntry[];
-  };
+/** `GET /status` - current status of one SATP transfer session. */
+export interface SatpSessionStatusResponse {
+  status: string;
+  substatus: string;
+  stage: string;
+  step: string;
+  /** ISO date-time string. */
+  startTime: string;
+  originNetwork?: SatpNetwork;
+  destinationNetwork?: SatpNetwork;
+}
+
+/** Network descriptor embedded in status responses. */
+export interface SatpNetwork {
+  id?: string;
+  dltProtocol?: unknown;
+  dltSubnetworkID?: unknown;
+}
+
+/** `GET /audit` response - all log entries recorded in a time window. */
+export interface SatpAuditResponse {
+  auditEntries?: { entries?: SatpAuditEntry[] };
+  /** ISO 8601 timestamps echoing the requested window. */
   startTimestamp?: string;
   endTimestamp?: string;
 }
 
-export interface NetworkInfo {
-  networkId?: string;
-  subnetworkId?: string;
-  type?: string;
-}
-
-export interface StatusResponse {
-  status: "NOT_FOUND" | "INVALID" | "PENDING" | "DONE" | "FAILED" | string;
-  substatus: string;
-  stage: "STAGE_0" | "STAGE_1" | "STAGE_2" | "STAGE_3" | string;
-  step: string;
-  startTime: string;
-  originNetwork?: NetworkInfo;
-  destinationNetwork?: NetworkInfo;
-}
-
-export interface HealthCheckResponse {
-  status?: "AVAILABLE" | "UNAVAILABLE" | string;
-}
-
-export interface SupportedLedgersResponse {
-  supportedLedgers?: string[];
-}
-
-export interface ParsedAuditRecord {
-  auditEntryId: string;
-  sequenceNumber: number;
+/** One persisted gateway audit/log record (entry of the audit response). */
+export interface SatpAuditEntry {
+  auditEntryId?: string;
+  /** Epoch milliseconds. */
   timestamp: number;
-  isoTime: string;
-  operation: string;
+  session: SatpLocalLog;
+}
+
+/**
+ * Session log embedded in an audit entry (serialized `LocalLog` of the
+ * gateway). `data` carries a JSON-serialized `SessionData` snapshot.
+ */
+export interface SatpLocalLog {
+  sessionId: string;
   type: string;
   key: string;
-  rawData: string;
-  parsedPayload?: Record<string, unknown> | null;
-  isError: boolean;
-  isRollback: boolean;
-}
-
-export type StageState = "completed" | "in-progress" | "failed" | "pending";
-
-export interface SessionStageStepInfo {
-  stageIndex: number;
-  stageId: string;
-  stageName: string;
-  description: string;
-  status: StageState;
-  activeStep?: string;
+  operation: string;
+  /** Epoch milliseconds encoded as string. */
   timestamp?: string;
-}
-
-export interface ParsedSessionDetails {
-  sessionId: string;
-  status: string;
-  substatus: string;
-  currentStage: string;
-  currentStep: string;
-  originNetwork: string;
-  destinationNetwork: string;
-  assetReference?: string;
-  amount?: string;
-  senderAddress?: string;
-  recipientAddress?: string;
-  startTime?: string;
-  lastUpdate?: string;
-  stages: SessionStageStepInfo[];
-  auditTrail: ParsedAuditRecord[];
-  hasRollback: boolean;
-  hasFailure: boolean;
-  failureReason?: string;
-}
-
-export interface SatpKpiMetrics {
-  totalTransfers: number;
-  completed: number;
-  inProgress: number;
-  failed: number;
-  rollback: number;
+  data: string;
+  sequenceNumber: number;
 }

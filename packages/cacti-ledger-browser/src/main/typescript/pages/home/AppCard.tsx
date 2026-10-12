@@ -13,6 +13,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
 import { AppInstance, AppStatus } from "../../common/types/app";
+import SetupGuideLink from "../../components/ui/SetupGuideLink";
 import ConfigureApp from "../configure-app/ConfigureApp";
 
 type StatusTextProps = {
@@ -171,6 +172,12 @@ export default function AppCard({ appConfig }: AppCardProps) {
           borderColor: theme.palette.primary.main,
         }}
       >
+        {/* Connection-error statuses may carry the app setup guide URL
+            (e.g. unreachable SATP gateway). Kept outside the CardActionArea
+            so it does not nest a button inside a button. */}
+        {!status.isPending && status.status.setupGuideURL && (
+          <SetupGuideLink url={status.status.setupGuideURL} />
+        )}
         <ConfigureDialogButton appInstanceId={appConfig.id} />
         <StatusDialogButton statusComponent={appConfig.StatusComponent} />
       </CardActions>
