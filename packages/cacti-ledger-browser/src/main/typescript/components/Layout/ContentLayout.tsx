@@ -1,11 +1,19 @@
-import { Card } from "@mui/material";
+import React from "react";
+import Box from "@mui/material/Box";
 import { Outlet } from "react-router-dom";
 
 const ContentLayout: React.FC = () => {
   return (
-    <Card elevation={0} sx={{ margin: "1rem", padding: "1rem" }}>
+    <Box
+      sx={{
+        padding: { xs: 2, sm: 3 },
+        width: "100%",
+        maxWidth: 1600,
+        margin: "0 auto",
+      }}
+    >
       <Outlet />
-    </Card>
+    </Box>
   );
 };
 

@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
 import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import {
   QueryClient,
@@ -17,6 +18,7 @@ import {
 import { themeOptions } from "./theme";
 import ContentLayout from "./components/Layout/ContentLayout";
 import HeaderBar from "./components/Layout/HeaderBar";
+import Sidebar from "./components/Layout/Sidebar";
 import HomePage from "./pages/home/HomePage";
 import { AppInstance } from "./common/types/app";
 import { patchAppRoutePath } from "./common/utils";
@@ -39,6 +41,7 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
           path={app.path}
           menuEntries={app.menuEntries}
           appDocumentationURL={app.appDocumentationURL}
+          appName={app.instanceName}
         />
       ),
     };
@@ -47,7 +50,10 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
     key: "home",
     path: `*`,
     element: (
-      <HeaderBar appDocumentationURL="https://github.com/hyperledger/cacti" />
+      <HeaderBar
+        appDocumentationURL="https://github.com/hyperledger/cacti"
+        appName="Overview"
+      />
     ),
   });
   return useRoutes(headerRoutesConfig);
@@ -110,7 +116,13 @@ function App() {
   const contentRoutes = getContentRoutes(appConfig);
 
   return (
-    <div>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: "background.default",
+      }}
+    >
       {isPending && (
         <CircularProgress
           style={{
@@ -121,9 +133,30 @@ function App() {
           }}
         />
       )}
-      {headerRoutes}
-      {contentRoutes}
-    </div>
+      <Sidebar appConfig={appConfig} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          minWidth: 0,
+          minHeight: "100vh",
+        }}
+      >
+        {headerRoutes}
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+          }}
+        >
+          {contentRoutes}
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

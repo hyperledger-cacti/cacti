@@ -38,7 +38,7 @@ export default function SelectAppView({
       <List sx={{ width: "100%", bgcolor: "background.paper" }}>
         {apps.map(([appId, app]) => {
           return (
-            <Box sx={{ display: "flex", flexDirection: "row" }}>
+            <Box key={appId} sx={{ display: "flex", flexDirection: "row" }}>
               <ListItemButton onClick={() => handleAppSelected(appId)}>
                 <ListItemAvatar>
                   <Avatar>{categoryConfig.icon}</Avatar>
