@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 import { AppInstance } from "../../common/types/app";
+import ErrorBoundary from "../../components/ui/ErrorBoundary";
 import AppCard from "./AppCard";
 import AddApplicationPopupCard from "./AddApplicationPopupCard";
 
@@ -24,7 +25,17 @@ export default function HomePage({ appConfig }: HomePageProps) {
       >
         <AddApplicationPopupCard />
         {appConfig.map((a) => {
-          return <AppCard key={a.id} appConfig={a} />;
+          // Crash guard: a throwing app status hook/card must not take the
+          // home page (and the other app cards) down with it.
+          return (
+            <ErrorBoundary
+              key={a.id}
+              contextLabel={a.instanceName}
+              setupGuideURL={a.appSetupGuideURL}
+            >
+              <AppCard appConfig={a} />
+            </ErrorBoundary>
+          );
         })}
       </Box>
     </Box>

@@ -122,6 +122,8 @@ nav:
           - App Patterns: cactus/ledger-browser/plugin-apps/app-patterns.md
           - Ethereum Browser: cactus/ledger-browser/plugin-apps/ethereum-browser.md
           - Hyperledger Fabric Browser: cactus/ledger-browser/plugin-apps/fabric-browser.md
+          - SATP Inspector: cactus/ledger-browser/plugin-apps/satp-inspector.md
+          - SATP Inspector Demo Guide: cactus/ledger-browser/plugin-apps/satp-inspector-demo.md
         - Developer Guide:
           - Overview: cactus/ledger-browser/developer-guide/overview.md
           - Architecture: cactus/ledger-browser/developer-guide/architecture.md
