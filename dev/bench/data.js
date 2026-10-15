@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791793998065,
+  "lastUpdate": 1792052051492,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -650,6 +650,42 @@ window.BENCHMARK_DATA = {
             "range": "±4.95%",
             "unit": "ops/sec",
             "extra": "175 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Parth Singh",
+            "username": "ParthSinghPS",
+            "email": "posiedon.1721@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "10252f1e1f2ac094636269a8c675cefbd0721d0c",
+          "message": "docs(docker): add container image description labels\n\nAddresses #1657\n\nAdd org.opencontainers.image.description to 15 Dockerfiles covering\ndevelopment ledgers, the API server, connectors, SATP Hermes, and Weaver.\n\nPlace descriptions in the final image stage and preserve existing\nbuild instructions, runtime configuration, and metadata.\n\nSigned-off-by: Parth Singh <posiedon.1721@gmail.com>",
+          "timestamp": "2026-10-05T13:06:16Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/10252f1e1f2ac094636269a8c675cefbd0721d0c"
+        },
+        "date": 1792052047662,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 1120,
+            "range": "±3.58%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 1195,
+            "range": "±2.55%",
+            "unit": "ops/sec",
+            "extra": "181 samples"
           }
         ]
       }
