@@ -33,6 +33,7 @@ export default function SelectGroupView({
 
           return (
             <ListItemButton
+              key={category}
               disabled={appCount === 0}
               onClick={() => handleCategorySelected(category)}
             >
