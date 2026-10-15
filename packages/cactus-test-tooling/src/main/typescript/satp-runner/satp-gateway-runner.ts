@@ -291,6 +291,16 @@ export class SATPGatewayRunner implements ITestLedger {
           });
         }
         try {
+          // The gateway image is DinD-based: the fabric leaf deploys its
+          // chaincode through a compiler sidecar container created by the
+          // gateway's embedded docker daemon. That daemon starts empty, and
+          // the compiler container creation fails with "No such image"
+          // before the gateway can pull it, crash-looping the gateway and
+          // hanging the docker-based suites on their healthcheck waits.
+          // Pre-pull the sidecar image inside the container (retrying until
+          // the inner dockerd is up) so the next supervisord restart of the
+          // gateway process succeeds and the healthcheck passes.
+          await this.prePullSidecarImages();
           await this.waitForHealthCheck();
           this.log.debug(`Healthcheck passing OK.`);
           resolve(container);
@@ -299,6 +309,72 @@ export class SATPGatewayRunner implements ITestLedger {
         }
       });
     });
+  }
+
+  /**
+   * Images the gateway's inner docker daemon needs at boot. Mirrors
+   * CC_COMPILER_DEFAULT_OPTIONS in
+   * @hyperledger-cacti/cactus-plugin-ledger-connector-fabric — kept as a
+   * literal because test-tooling cannot import the connector package
+   * without creating a dependency cycle.
+   */
+  public static readonly SIDECAR_IMAGES: ReadonlyArray<string> = [
+    "ghcr.io/hyperledger-cacti/cactus-connector-fabric-cli:2025-08-12-d5365bf",
+  ];
+
+  private async prePullSidecarImages(timeoutMs = 60 * 1000): Promise<void> {
+    const fnTag = "SATPGatewayRunner#prePullSidecarImages()";
+    const container = this.getContainer();
+    const startedAt = Date.now();
+    for (const image of SATPGatewayRunner.SIDECAR_IMAGES) {
+      // The inner dockerd takes a few seconds to accept connections after
+      // the container starts, so retry only while it is not reachable yet.
+      // A pull that actually runs and fails (auth, network, manifest) will
+      // fail again on retry, so bail out immediately and surface the pull
+      // output instead of blocking start() for minutes — callers such as
+      // the gateway instantiation test time out long before a long retry
+      // budget would expire.
+      let daemonReady = false;
+      for (;;) {
+        try {
+          if (!daemonReady) {
+            await Containers.exec(container, ["docker", "info"], 15000);
+            daemonReady = true;
+          }
+          const pullOutput = await Containers.exec(
+            container,
+            ["docker", "pull", image],
+            120000,
+          );
+          this.log.debug(
+            `${fnTag}, pulled ${image} inside container OK: ` +
+              `${pullOutput.slice(-200)}`,
+          );
+          break;
+        } catch (ex) {
+          const message = String(ex);
+          const timedOut = message.includes("timed out");
+          if (daemonReady && !timedOut) {
+            // The pull itself ran and failed; retrying cannot help.
+            this.log.warn(
+              `${fnTag}, could not pre-pull ${image} (${message.slice(0, 400)}); ` +
+                "continuing — the gateway may still crash-loop if it needs " +
+                "this sidecar image",
+            );
+            break;
+          }
+          if (Date.now() - startedAt > timeoutMs) {
+            this.log.warn(
+              `${fnTag}, inner docker daemon not reachable within ` +
+                `${timeoutMs}ms (${message.slice(0, 200)}); skipping ` +
+                `${image} pre-pull`,
+            );
+            break;
+          }
+          await new Promise((r) => setTimeout(r, 3000));
+        }
+      }
+    }
   }
 
   public async waitForHealthCheck(

@@ -95,17 +95,25 @@ jobs:
         run: mkdir -p .tmp/benchmark-results/plugin-ledger-connector-besu/
 
      # Download previous benchmark result from cache (if exists)
+      # Benchmark gating (alert + fail-on-alert + PR comment) is skipped on
+      # fork PRs: their GITHUB_TOKEN is read-only so comment-on-alert always
+      # fails with "Resource not accessible by integration", and the cached
+      # baseline was recorded under different runner conditions, making the
+      # ratio noise-prone (it failed identical, unrelated PRs repeatedly).
       - name: Download previous benchmark data
+        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.fork != true }}
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 #v6.1.0
         with:
           path: .tmp/benchmark-results/plugin-ledger-connector-besu/
           key: ${{ runner.os }}-benchmark
 
       - name: Run Benchmarks
+        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.fork != true }}
         working-directory: ./packages/cactus-plugin-ledger-connector-besu/
         run: yarn run benchmark
 
       - name: Store benchmark result
+        if: ${{ github.event_name == 'push' || github.event.pull_request.head.repo.fork != true }}
         uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba #v1.22.1
         with:
           tool: 'benchmarkjs'

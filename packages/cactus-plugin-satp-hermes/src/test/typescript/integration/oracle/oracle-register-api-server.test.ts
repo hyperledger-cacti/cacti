@@ -61,7 +61,6 @@ const monitorService = MonitorService.createOrGetMonitorService({
 let oracleApi: OracleApi;
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
-// TODO(#3978): never assigned while the Fabric AIO is unstable; only read by the
 let fabricEnv: FabricTestEnvironment;
 let gateway: SATPGateway;
 let dispatcher: BLODispatcher;
@@ -71,11 +70,6 @@ let data_hash: string;
 
 const TIMEOUT = 900000; // 15 minutes
 
-// TODO(#3978): The Fabric AIO container does not start reliably, so the
-// Fabric-only oracle tests below are marked `it.skip` and `beforeAll` does NOT
-// start a Fabric ledger (only Besu + Ethereum). The EVM/Ethereum oracle tests
-// still run. Re-enable the Fabric setup in `beforeAll` (and drop the `it.skip`)
-// together when the Fabric AIO is stable.
 // https://github.com/hyperledger-cacti/cacti/issues/3978
 describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfully", () => {
   jest.setTimeout(TIMEOUT);
@@ -134,6 +128,14 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
         "OracleTestContract",
         OracleTestContract,
       );
+
+      const satpContractName = "oracle-bl-contract";
+      fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
+        contractName: satpContractName,
+        logLevel,
+      });
+      log.info("Fabric Ledger started successfully");
+      await fabricEnv.deployAndSetupOracleContracts();
     }
 
     //setup satp gateway
@@ -176,7 +178,11 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
       logLevel: "DEBUG",
       gid: gatewayIdentity,
       ccConfig: {
-        oracleConfig: [evmNetworkOptions, besuNetworkOptions],
+        oracleConfig: [
+          evmNetworkOptions,
+          besuNetworkOptions,
+          fabricEnv.createFabricConfig(),
+        ],
       },
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       monitorService: monitorService,
@@ -371,10 +377,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
     expect(response3.callOutput).toBe(payload2);
   });
 
-  // TODO(#3978): Fabric oracle path skipped — the Fabric AIO container does not
-  // start reliably. Re-enable together with the Fabric setup in `beforeAll`.
-  // https://github.com/hyperledger-cacti/cacti/issues/3978
-  it.skip("should read and update using an event listener for events in the source contract (Fabric)", async () => {
+  it("should read and update using an event listener for events in the source contract (Fabric)", async () => {
     const payload1 = "Hello World to Emit Event 3!";
     const payload2 = "Hello World to Emit Event 4!";
 
@@ -591,10 +594,7 @@ describe("Oracle registering READ, UPDATE, and READ_AND_UPDATE tasks successfull
     expect(actualNonce).toBe(baselineNonce + task.data.operations.length);
   });
 
-  // TODO(#3978): Fabric oracle path skipped — the Fabric AIO container does not
-  // start reliably. Re-enable together with the Fabric setup in `beforeAll`.
-  // https://github.com/hyperledger-cacti/cacti/issues/3978
-  it.skip("should read data from a fabric contract calling a function with args with polling mode (5 seconds)", async () => {
+  it("should read data from a fabric contract calling a function with args with polling mode (5 seconds)", async () => {
     data_hash = keccak256("Hello World!");
 
     const response = await oracleApi.registerOracleTask({

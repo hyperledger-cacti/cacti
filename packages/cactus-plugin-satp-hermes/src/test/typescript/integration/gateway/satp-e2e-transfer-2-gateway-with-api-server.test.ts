@@ -124,7 +124,22 @@ beforeEach(() => {
 const ERC6909_TOKEN_TYPE_ID = 42n;
 
 beforeAll(async () => {
-  // Fabric setup skipped — all Fabric describe blocks are describe.skip
+  try {
+    const satpContractName = "satp-contract";
+    fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
+      contractName: satpContractName,
+      claimFormat: ClaimFormat.BUNGEE,
+      logLevel,
+    });
+    log.info("Fabric Ledger started successfully");
+    await fabricEnv.deployAndSetupContracts();
+  } catch (err) {
+    log.warn(
+      "Fabric ledger failed to start, non-Fabric tests will proceed.",
+      err,
+    );
+    fabricEnv = undefined as unknown as FabricTestEnvironment;
+  }
 
   {
     const erc20TokenContract = "SATPContract";
@@ -200,9 +215,7 @@ beforeAll(async () => {
   log.info("Minted 100 ERC-6909 multi-tokens on Besu successfully");
 }, TIMEOUT);
 
-// TODO: Skipped — Fabric AIO container fails to start reliably.
-// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
-describe.skip("2 SATPGateways sending a token from Besu to Fabric", () => {
+describe("2 SATPGateways sending a token from Besu to Fabric", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     // Setup SATP gateways
@@ -474,9 +487,7 @@ describe.skip("2 SATPGateways sending a token from Besu to Fabric", () => {
   });
 });
 
-// TODO: Skipped — Fabric AIO container fails to start reliably.
-// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
-describe.skip("2 SATPGateways sending a token from Fabric to Besu", () => {
+describe("2 SATPGateways sending a token from Fabric to Besu", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     //setup satp gateway
@@ -1039,8 +1050,6 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     log.info("Amount was transfer correctly to the Owner account");
   });
 });
-// TODO: Skipped — depends on beforeAll which requires Fabric AIO.
-// See docs/fabric-tests-to-fix.md and https://github.com/hyperledger-cacti/cacti/issues/3978
 describe("2 SATPGateways sending a non fungible token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   const tokenUniqueDescriptor = "1001";

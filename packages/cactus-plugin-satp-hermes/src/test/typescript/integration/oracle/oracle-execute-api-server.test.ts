@@ -58,7 +58,6 @@ const monitorService = MonitorService.createOrGetMonitorService({
 let oracleApi: OracleApi;
 let besuEnv: BesuTestEnvironment;
 let ethereumEnv: EthereumTestEnvironment;
-// TODO(#3978): never assigned while the Fabric AIO is unstable; only read by the
 let fabricEnv: FabricTestEnvironment;
 let gateway: SATPGateway;
 let besuContractAddress: string;
@@ -67,13 +66,6 @@ let data_hash: string;
 
 const TIMEOUT = 900000; // 15 minutes
 
-// TODO(#3978): The Fabric AIO container does not start reliably, so the
-// Fabric-dependent oracle tests below are marked `it.skip` and `beforeAll` does
-// NOT start a Fabric ledger (only Besu + Ethereum). The EVM/Ethereum oracle
-// tests still run. Re-enable the Fabric setup in `beforeAll` (and drop the
-// `it.skip`) together when the Fabric AIO is stable.
-// See docs/fabric-tests-to-fix.md and
-// https://github.com/hyperledger-cacti/cacti/issues/3978
 describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully", () => {
   jest.setTimeout(TIMEOUT);
 
@@ -131,6 +123,14 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
         "OracleTestContract",
         OracleTestContract,
       );
+
+      const satpContractName = "oracle-bl-contract";
+      fabricEnv = await FabricTestEnvironment.setupTestEnvironment({
+        contractName: satpContractName,
+        logLevel,
+      });
+      log.info("Fabric Ledger started successfully");
+      await fabricEnv.deployAndSetupOracleContracts();
     }
 
     //setup satp gateway
@@ -173,7 +173,11 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
       logLevel: "DEBUG",
       gid: gatewayIdentity,
       ccConfig: {
-        oracleConfig: [ethNetworkOptions, besuNetworkOptions],
+        oracleConfig: [
+          ethNetworkOptions,
+          besuNetworkOptions,
+          fabricEnv.createFabricConfig(),
+        ],
       },
       pluginRegistry: new PluginRegistry({ plugins: [] }),
       monitorService: monitorService,
@@ -243,10 +247,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     expect(response.data.status).toBe(OracleTaskStatusEnum.Inactive);
   });
 
-  // TODO(#3978): Fabric oracle path skipped — the Fabric AIO container does not
-  // start reliably. Re-enable together with the Fabric setup in `beforeAll`.
-  // https://github.com/hyperledger-cacti/cacti/issues/3978
-  it.skip("should write data to a contract calling a function with args (EVM and Fabric)", async () => {
+  it("should write data to a contract calling a function with args (EVM and Fabric)", async () => {
     data_hash = keccak256("Hello World!");
 
     let response = await oracleApi.executeOracleTask({
@@ -282,8 +283,11 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
       destinationNetworkId: fabricEnv.network,
       destinationContract: {
         contractName: fabricEnv.getTestContractName(),
-        methodName: "Mint",
-        params: ["500"],
+        // The fabric oracle business-logic contract (oracle-bl-contract)
+        // exposes WriteData(id, payload) / ReadData(id) / ReadNonce — the
+        // same API the register-task tests exercise.
+        methodName: "WriteData",
+        params: [data_hash, "500"],
       },
       taskType: OracleExecuteRequestTaskTypeEnum.Update,
     });
@@ -302,10 +306,7 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     expect(response2.data.status).toBe(OracleTaskStatusEnum.Inactive);
   });
 
-  // TODO(#3978): Fabric oracle path skipped — the Fabric AIO container does not
-  // start reliably. Re-enable together with the Fabric setup in `beforeAll`.
-  // https://github.com/hyperledger-cacti/cacti/issues/3978
-  it.skip("should read the data from the contract calling a function with args (EVM and Fabric)", async () => {
+  it("should read the data from the contract calling a function with args (EVM and Fabric)", async () => {
     let response = await oracleApi.executeOracleTask({
       sourceNetworkId: ethereumEnv.network,
       sourceContract: {
@@ -336,8 +337,10 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
       sourceNetworkId: fabricEnv.network,
       sourceContract: {
         contractName: fabricEnv.getTestContractName(),
-        methodName: "ClientAccountBalance",
-        params: [],
+        // ReadData(id): the argument-taking read on oracle-bl-contract,
+        // reading back what the WriteData update above stored.
+        methodName: "ReadData",
+        params: [data_hash],
       },
       taskType: OracleExecuteRequestTaskTypeEnum.Read,
     });
@@ -348,7 +351,11 @@ describe("Oracle executing READ, UPDATE, and READ_AND_UPDATE tasks successfully"
     expect(response.data.operations?.[0].status).toBe(
       OracleOperationStatusEnum.Success,
     );
-    expect(response.data.operations?.[0]?.output?.output).toBe("500");
+    // ReadData returns the stored Data record as JSON; the payload written
+    // by the WriteData update above is nested inside it.
+    const fabricReadOutput = response.data.operations?.[0]?.output?.output;
+    expect(fabricReadOutput).toBeDefined();
+    expect(JSON.parse(fabricReadOutput as string).payload).toBe("500");
 
     response2 = await oracleApi.getOracleTaskStatus(response.data.taskID ?? "");
 

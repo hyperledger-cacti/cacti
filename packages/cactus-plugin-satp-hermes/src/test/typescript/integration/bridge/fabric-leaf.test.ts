@@ -94,8 +94,7 @@ afterAll(async () => {
     });
 }, TIMEOUT);
 
-// TODO: Re-enable once Fabric AIO port conflict is resolved (#3978)
-describe.skip("Fabric Bridge Test", () => {
+describe("Fabric Bridge Test", () => {
   jest.setTimeout(900000);
   it("Should Initialize the bridge", async () => {
     fabricLeaf = new FabricLeaf(

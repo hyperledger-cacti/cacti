@@ -179,10 +179,11 @@ function KpiCard({
       variant="outlined"
       sx={{
         height: "100%",
-        ...(selected && {
-          borderColor: "primary.main",
-          bgcolor: "action.selected",
-        }),
+        borderRadius: "8px",
+        borderColor: selected ? "primary.main" : "var(--cacti-ink-100, #dfe5e3)",
+        bgcolor: selected ? "var(--cacti-green-100, #e6f2e7)" : "background.paper",
+        boxShadow: selected ? "0 1px 3px rgba(78, 140, 94, 0.2)" : "0 1px 2px rgba(16, 19, 20, 0.08)",
+        transition: "all 0.15s ease-in-out",
       }}
     >
       <CardActionArea
@@ -191,10 +192,24 @@ function KpiCard({
         sx={{ height: "100%", p: 1.5 }}
       >
         <Stack spacing={0.25}>
-          <Typography variant="h5" component="div" sx={{ fontWeight: 700 }}>
+          <Typography
+            variant="h5"
+            component="div"
+            sx={{
+              fontWeight: 700,
+              fontFamily: '"Barlow", Arial, sans-serif',
+              color: selected ? "primary.dark" : "text.primary",
+            }}
+          >
             {value}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            sx={{
+              fontWeight: 600,
+              color: selected ? "primary.dark" : "text.secondary",
+            }}
+          >
             {label}
           </Typography>
         </Stack>

@@ -86,6 +86,7 @@ import {
   TransactionIdUndefinedError,
 } from "../common/errors";
 import { ClaimFormat } from "../../generated/proto/cacti/satp/v13/common/message_pb";
+import { stringify as safeStableStringify } from "safe-stable-stringify";
 import {
   SATPBridgeExecutionLayer,
   TransactionReceipt,
@@ -426,6 +427,15 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
       throw new TransactionIdUndefinedError(fnTag);
     }
 
+    // Fail fast when the operation's transaction reverted on-chain. The
+    // EVM leafs already return the mined receipt with the invocation, but
+    // nothing consumed its status: a reverted lock/burn/mint would flow
+    // through the whole protocol as "success" and only surface much later
+    // as an unexplained balance mismatch. Fabric leafs do not return a
+    // receipt artifact here — their connector already fails the invocation
+    // itself on error — so there is nothing extra to check for them.
+    this.assertMinedReceiptStatus(fnTag, op, asset, response!);
+
     const receipt = await bridgeEndPoint.getReceipt(response!.transactionId!);
 
     this.log.info(`${fnTag}, proof of ${op}: ${receipt}`);
@@ -439,6 +449,55 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
       },
       transactionId: response!.transactionId,
     };
+  }
+
+  /**
+   * Validates the on-chain status of a bridge operation's mined receipt.
+   *
+   * Accepts the receipt formats of the EVM leafs (web3 receipts whose
+   * `status` is a boolean, a number, or a 0x-prefixed hex string, and which
+   * may carry a Besu `revertReason`). Non-JSON artifacts and artifacts
+   * without a `status` field are skipped: fabric responses do not use this
+   * shape, and defensive parsing must not break leafs that legitimately
+   * return something else.
+   *
+   * @throws {Error} When the receipt reports a reverted transaction.
+   */
+  private assertMinedReceiptStatus(
+    fnTag: string,
+    op: SATPStageOperations,
+    asset: Asset,
+    response: TransactionResponse,
+  ): void {
+    const receiptJson = response.transactionReceipt;
+    if (!receiptJson) {
+      return;
+    }
+    let receipt: Record<string, unknown>;
+    try {
+      receipt = JSON.parse(receiptJson) as Record<string, unknown>;
+    } catch {
+      return;
+    }
+    if (!("status" in receipt)) {
+      return;
+    }
+    const status = receipt.status;
+    const succeeded =
+      status === true || status === 1 || status === "1" || status === "0x1";
+    if (!succeeded) {
+      throw new Error(
+        `${fnTag}, ${op} transaction REVERTED on-chain: ` +
+          `referenceId=${asset.referenceId} ` +
+          `assetId=${asset.id} txHash=${response.transactionId} ` +
+          `status=${safeStableStringify(status)} ` +
+          `revertReason=${safeStableStringify(receipt.revertReason ?? null)}`,
+      );
+    }
+    this.log.debug(
+      `${fnTag}, ${op} transaction mined successfully: ` +
+        `txHash=${response.transactionId}`,
+    );
   }
 
   /**

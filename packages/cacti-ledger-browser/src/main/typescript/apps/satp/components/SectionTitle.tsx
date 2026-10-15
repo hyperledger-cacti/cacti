@@ -8,15 +8,16 @@ export interface SectionTitleProps {
 }
 
 /**
- * Consistent section heading used across the SATP inspector pages: brown
- * (theme secondary) h6 with a caption-styled optional action slot.
+ * Consistent section heading used across the SATP inspector pages.
+ * Follows the Cacti Design System: Barlow font with strong typography.
  */
 export default function SectionTitle({ children, action }: SectionTitleProps) {
   return (
     <Typography
       variant="h6"
-      color="secondary.main"
+      color="text.primary"
       sx={{
+        fontFamily: '"Barlow", Arial, sans-serif',
         fontWeight: 600,
         display: "flex",
         alignItems: "center",
