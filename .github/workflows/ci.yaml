@@ -6,7 +6,14 @@ on:
       - dev
 
   workflow_dispatch:
-    
+    inputs:
+      ec2_runner_count:
+        description: Temporary EC2 runners to start (0 = GitHub-hosted only; empty = vars.EC2_RUNNER_COUNT)
+        default: ""
+      ec2_instance_type:
+        description: EC2 instance type for the temporary runners (empty = vars.EC2_INSTANCE_TYPE)
+        default: ""
+
   schedule:
     # Run at 8:00 AM UTC on weekends (Monday and Thursday)
     - cron: "0 8 * * 1,4" 
@@ -44,7 +51,24 @@ jobs:
       - name: Set Run Trivy Scan Output
         id: set-run-trivy-scan
         run: echo "run_trivy_scan=${{ env.RUN_TRIVY_SCAN }}" >> "$GITHUB_OUTPUT"
-      
+
+  # Temporary EC2 runners for the package test workflows, started in
+  # parallel with checks-and-build. See ec2-runners-start.yaml for the
+  # repository variables that enable them; without them runs_on falls back
+  # to ubuntu-22.04 and nothing changes.
+  start-ec2-runners:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/ec2-runners-start.yaml
+    with:
+      # Runners are single-use, so this must cover every job the package and
+      # ghcr workflows dispatch (about 75 when all packages are affected).
+      runner_count: ${{ inputs.ec2_runner_count || vars.EC2_RUNNER_COUNT_CACTI_CI }}
+      instance_type: ${{ inputs.ec2_instance_type }}
+    secrets:
+      EC2_RUNNER_GITHUB_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}
+
   checks-and-build:
     needs: [env-setup]
     uses: ./.github/workflows/checks-and-build.yaml
@@ -58,7 +82,7 @@ jobs:
       node_version: ${{ needs.env-setup.outputs.node_version }}
       
   packages-workflow:
-    needs: [checks-and-build, env-setup]
+    needs: [checks-and-build, env-setup, start-ec2-runners]
     # core-packages/connector-packages push benchmark data to gh-pages on main.
     permissions:
       contents: write
@@ -70,12 +94,28 @@ jobs:
       node_version: ${{ needs.env-setup.outputs.node_version }}
       run_code_coverage: ${{ needs.env-setup.outputs.run_code_coverage }}
       run_trivy_scan: ${{ needs.env-setup.outputs.run_trivy_scan }}
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
 
   ghcr-workflow:
-    needs: [checks-and-build, env-setup]
+    needs: [checks-and-build, env-setup, start-ec2-runners]
     uses: ./.github/workflows/ghcr-workflow.yaml
     with:
       node_version: ${{ needs.env-setup.outputs.node_version }}
       run_trivy_scan: ${{ needs.env-setup.outputs.run_trivy_scan }}
       affected-packages: ${{ needs.checks-and-build.outputs.affected_packages }}
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
+
+  # Terminate the instances whatever happened to the tests.
+  stop-ec2-runners:
+    needs: [start-ec2-runners, packages-workflow, ghcr-workflow]
+    if: ${{ always() }}
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/ec2-runners-stop.yaml
+    with:
+      ec2_enabled: ${{ needs.start-ec2-runners.outputs.ec2_enabled }}
+      ec2_indexes: ${{ needs.start-ec2-runners.outputs.ec2_indexes }}
+    secrets:
+      EC2_RUNNER_GITHUB_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}
 

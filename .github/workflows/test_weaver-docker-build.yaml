@@ -10,6 +10,11 @@ env:
 on:
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       run_all:
         required: true
         type: string
@@ -27,7 +32,7 @@ jobs:
       fabric_driver_changed: ${{ steps.changes.outputs.fabric_driver_changed }}
       corda_driver_changed: ${{ steps.changes.outputs.corda_driver_changed }}
       iin_agent_changed: ${{ steps.changes.outputs.iin_agent_changed }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -65,7 +70,7 @@ jobs:
   build_docker_relay:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.relay_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -77,7 +82,7 @@ jobs:
   build_docker_fabric_driver_local:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.fabric_driver_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -109,7 +114,7 @@ jobs:
   build_docker_fabric_driver_packages:
     needs: check_code_changed
     if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.fabric_driver_changed == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -128,7 +133,7 @@ jobs:
   build_docker_corda_driver_local:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.corda_driver_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -158,7 +163,7 @@ jobs:
   build_docker_corda_driver_packages:
     needs: check_code_changed
     if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.corda_driver_changed == 'true' }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -192,7 +197,7 @@ jobs:
   build_docker_iin_agent_local:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.iin_agent_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -236,7 +241,7 @@ jobs:
       - build_docker_corda_driver_packages
       - build_docker_iin_agent_local
     if: ${{ always() }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Report status of all jobs
         run: |

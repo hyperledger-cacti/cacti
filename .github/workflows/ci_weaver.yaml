@@ -3,6 +3,13 @@ name: Weaver_CI
 # Controls when the workflow will run
 on:
   workflow_dispatch:
+    inputs:
+      ec2_runner_count:
+        description: Temporary EC2 runners to start (0 = GitHub-hosted only; empty = vars.EC2_RUNNER_COUNT)
+        default: ""
+      ec2_instance_type:
+        description: EC2 instance type for the temporary runners (empty = vars.EC2_INSTANCE_TYPE)
+        default: ""
   push:
     branches: [ main ]
   pull_request:
@@ -19,52 +26,104 @@ permissions:
 
 jobs:
 
+  # Temporary EC2 runners, same mechanism as ci.yaml. Falls back to
+  # ubuntu-22.04 when the EC2 repository variables are not set.
+  start-ec2-runners:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/ec2-runners-start.yaml
+    with:
+      # Runners are single-use; the twelve weaver workflows dispatch about
+      # 60 jobs when run_all is set.
+      runner_count: ${{ inputs.ec2_runner_count || vars.EC2_RUNNER_COUNT_WEAVER }}
+      instance_type: ${{ inputs.ec2_instance_type }}
+    secrets:
+      EC2_RUNNER_GITHUB_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}
+
   fabric-fabric-satp:
-    with: 
-      run_all: $RUN_ALL
-    uses: ./.github/workflows/test_weaver-fabric-fabric-satp.yaml
-  asset-exchange-corda:
-    with: 
-      run_all: $RUN_ALL
-    uses: ./.github/workflows/test_weaver-asset-exchange-corda.yaml
-  asset-transfer:
-    with: 
-      run_all: $RUN_ALL
-    uses: ./.github/workflows/test_weaver-asset-transfer.yaml
-  relay:
-    with: 
-      run_all: $RUN_ALL
-    uses: ./.github/workflows/test_weaver-relay.yaml
-  corda-pkgs:
+    needs: [start-ec2-runners]
     with:
       run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
+    uses: ./.github/workflows/test_weaver-fabric-fabric-satp.yaml
+  asset-exchange-corda:
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
+    uses: ./.github/workflows/test_weaver-asset-exchange-corda.yaml
+  asset-transfer:
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
+    uses: ./.github/workflows/test_weaver-asset-transfer.yaml
+  relay:
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
+    uses: ./.github/workflows/test_weaver-relay.yaml
+  corda-pkgs:
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-corda-pkgs.yaml
   pre-release:
-    with: 
-      run_all: $RUN_ALL 
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-pre-release.yaml
   asset-exchange-fabric:
-    with: 
-      run_all: $RUN_ALL 
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-asset-exchange-fabric.yaml
   data-sharing:
-    with: 
+    needs: [start-ec2-runners]
+    with:
       run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-data-sharing.yaml
   node-pkgs:
-    with: 
-      run_all: $RUN_ALL 
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-node-pkgs.yaml
   docker-build:
-    with: 
+    needs: [start-ec2-runners]
+    with:
       run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-docker-build.yaml
   asset-exchange-besu:
-    with: 
-      run_all: $RUN_ALL 
+    needs: [start-ec2-runners]
+    with:
+      run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-asset-exchange-besu.yaml
   go:
-    with: 
+    needs: [start-ec2-runners]
+    with:
       run_all: $RUN_ALL
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
     uses: ./.github/workflows/test_weaver-go.yaml
 
+  # Terminate the instances whatever happened to the tests.
+  stop-ec2-runners:
+    needs: [start-ec2-runners, fabric-fabric-satp, asset-exchange-corda, asset-transfer, relay, corda-pkgs, pre-release, asset-exchange-fabric, data-sharing, node-pkgs, docker-build, asset-exchange-besu, go]
+    if: ${{ always() }}
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/ec2-runners-stop.yaml
+    with:
+      ec2_enabled: ${{ needs.start-ec2-runners.outputs.ec2_enabled }}
+      ec2_indexes: ${{ needs.start-ec2-runners.outputs.ec2_indexes }}
+    secrets:
+      EC2_RUNNER_GITHUB_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}

@@ -5,6 +5,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       node_version:
         required: true
         type: string
@@ -36,7 +41,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-keychain-memory/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpk-memory
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 

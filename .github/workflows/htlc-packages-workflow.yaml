@@ -5,6 +5,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       node_version:
         required: true
         type: string
@@ -29,7 +34,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-coordinator-besu
       TAPE_TEST_PATTERN: >-
         --files={./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/counterparty-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/own-htlc-endpoint.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/refund.test.ts,./extensions/cactus-plugin-htlc-coordinator-besu/src/test/typescript/integration/plugin-htlc-coordinator/withdraw-counterparty-endpoint.test.ts}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -65,7 +70,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -96,7 +101,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-htlc-eth-besu-erc20
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -129,7 +134,7 @@ jobs:
       JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-htlc-eth-besu
       TAPE_TEST_PATTERN: '--files=./packages/cactus-test-plugin-htlc-eth-besu/src/test/typescript/integration/plugin-htlc-eth-besu/get-single-status-endpoint.test.ts'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -171,7 +176,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-test-plugin-htlc-eth-besu-erc20/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-htlc-eth-besu-erc20
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 

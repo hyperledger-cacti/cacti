@@ -5,6 +5,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       node_version:
         required: true
         type: string
@@ -36,6 +41,7 @@ jobs:
     with:
       node_version: ${{ inputs.node_version }}
       run_code_coverage:  ${{ inputs.run_code_coverage }}
+      runs_on: ${{ inputs.runs_on }}
 
   cp-persistent-ethereum:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-persistence-ethereum')
@@ -43,7 +49,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-persistence-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-persistent-ethereum
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -79,7 +85,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-persistence-fabric/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-persistent-fabric
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -119,7 +125,7 @@ jobs:
       JEST_TEST_PATTERN: extensions/cactus-plugin-object-store-ipfs/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-object-store-ipfs
       TAPE_TEST_PATTERN: '--files={./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/integration/plugin-object-store-ipfs.test.ts,./extensions/cactus-plugin-object-store-ipfs/src/test/typescript/unit/plugin-object-store-ipfs.test.ts}'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -156,7 +162,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-bungee-hermes/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-bungee-hermes
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -203,7 +209,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-test-geth-ledger/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ct-geth-ledger
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -235,7 +241,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cacti-plugin-consortium-static/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cp-consortium-static
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 

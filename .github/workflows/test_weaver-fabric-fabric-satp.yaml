@@ -9,6 +9,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       run_all:
         required: true
         type: string
@@ -23,7 +28,7 @@ jobs:
   check_code_changed:
     outputs:
       status: ${{ steps.changes.outputs.weaver_code_changed }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -39,7 +44,7 @@ jobs:
     needs: check_code_changed
     if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && needs.check_code_changed.outputs.status == 'true' }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs_on }}
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -208,7 +213,7 @@ jobs:
       - check_code_changed
       - fabric-fabric-satp-local
     if: ${{ always() }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Report status of all jobs
         run: |

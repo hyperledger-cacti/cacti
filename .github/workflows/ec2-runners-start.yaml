@@ -1,0 +1,270 @@
+name: Start temporary EC2 runners
+
+# Reusable: decide whether temporary EC2 runners are available for this run
+# and, if so, start a pool of them (one instance per matrix leg) with
+# machulav/ec2-github-runner, the pattern pq-code-package/mlkem-native uses.
+# Every runner is single-use (JIT): it takes exactly one job, deregisters,
+# and its instance shuts itself down, so no two jobs ever share a host and
+# no job inherits containers, ports or files from an earlier one. Size the
+# pool to the number of jobs the run will dispatch; a leg that never gets a
+# job shuts down after an idle timeout.
+#
+# Enabled only when the repository variables AWS_ROLE_ARN, EC2_AMI_ID,
+# EC2_SUBNET_IDS (comma separated) and EC2_SECURITY_GROUP_ID are all set and
+# the run is not a pull request from a fork (fork PRs get no OIDC token).
+# Otherwise `runs_on` comes back as `hosted_label` and nothing is started.
+#
+# AWS is reached through GitHub OIDC (role-to-assume); no AWS key is stored.
+# EC2_RUNNER_GITHUB_TOKEN is a PAT with repo scope used to register and
+# remove the runners and to label them. Every instance gets the custom
+# label ci-run-<run_id> after it registers, and `runs_on` is that label, so
+# a run's jobs can only land on its own pool. (`runs-on: self-hosted` would
+# match every pool in the repository: on the first try a Weaver_CI stop job
+# terminated instances that Cacti CI jobs were still using.)
+# Label and instance id go into an artifact per leg because matrix job
+# outputs cannot be collected; ec2-runners-stop.yaml reads them back.
+
+on:
+  workflow_call:
+    inputs:
+      runner_count:
+        description: Number of single-use instances to start, at least the number of jobs; empty uses vars.EC2_RUNNER_COUNT or 4
+        required: false
+        type: string
+        default: ""
+      instance_type:
+        description: EC2 instance type; empty uses vars.EC2_INSTANCE_TYPE or c6i.2xlarge
+        required: false
+        type: string
+        default: ""
+      hosted_label:
+        description: runs-on label to return when EC2 runners are not used
+        required: false
+        type: string
+        default: ubuntu-22.04
+    secrets:
+      EC2_RUNNER_GITHUB_TOKEN:
+        required: false
+    outputs:
+      ec2_enabled:
+        description: "true when instances were requested"
+        value: ${{ jobs.decide.outputs.ec2_enabled }}
+      ec2_indexes:
+        description: JSON array of matrix indexes, for ec2-runners-stop.yaml
+        value: ${{ jobs.decide.outputs.ec2_indexes }}
+      runs_on:
+        description: the run's runner label when EC2 runners are up, else hosted_label
+        value: ${{ jobs.decide.outputs.runs_on }}
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-west-2' }}
+  EC2_RUNNER_COUNT: ${{ inputs.runner_count || vars.EC2_RUNNER_COUNT || '4' }}
+  # 8 vCPU / 16 GB, twice a hosted ubuntu-22.04 runner's CPU at the same
+  # memory; with one instance per job the count is large, and the account's
+  # On-Demand quota is 1920 vCPUs.
+  EC2_INSTANCE_TYPE: ${{ inputs.instance_type || vars.EC2_INSTANCE_TYPE || 'c6i.2xlarge' }}
+  EC2_VOLUME_SIZE: ${{ vars.EC2_VOLUME_SIZE || '150' }}
+
+jobs:
+  decide:
+    runs-on: ubuntu-22.04
+    outputs:
+      ec2_enabled: ${{ steps.set.outputs.ec2_enabled }}
+      ec2_indexes: ${{ steps.set.outputs.ec2_indexes }}
+      ec2_az_config: ${{ steps.set.outputs.ec2_az_config }}
+      runs_on: ${{ steps.set.outputs.runs_on }}
+    steps:
+      - id: set
+        env:
+          AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+          EC2_AMI_ID: ${{ vars.EC2_AMI_ID }}
+          EC2_SUBNET_IDS: ${{ vars.EC2_SUBNET_IDS }}
+          EC2_SECURITY_GROUP_ID: ${{ vars.EC2_SECURITY_GROUP_ID }}
+          IS_FORK_PR: ${{ github.event.pull_request.head.repo.fork == true }}
+          HOSTED_LABEL: ${{ inputs.hosted_label }}
+        run: |
+          enabled=false
+          if [[ -n "$AWS_ROLE_ARN" && -n "$EC2_AMI_ID" && -n "$EC2_SUBNET_IDS" \
+                && -n "$EC2_SECURITY_GROUP_ID" && "$IS_FORK_PR" != "true" \
+                && "$EC2_RUNNER_COUNT" -gt 0 ]]; then
+            enabled=true
+          fi
+          if [[ "$enabled" == "true" ]]; then
+            runs_on="ci-run-$GITHUB_RUN_ID"
+            indexes=$(seq 1 "$EC2_RUNNER_COUNT" | jq -cR . | jq -cs .)
+            # one entry per subnet so the action falls through AZs on capacity errors
+            az_config=$(jq -cn --arg ami "$EC2_AMI_ID" --arg sg "$EC2_SECURITY_GROUP_ID" \
+              --arg subnets "$EC2_SUBNET_IDS" \
+              '[$subnets | split(",")[] | select(length > 0) | {imageId: $ami, subnetId: ., securityGroupId: $sg}]')
+          else
+            runs_on=$HOSTED_LABEL
+            indexes='[]'
+            az_config='[]'
+          fi
+          {
+            echo "ec2_enabled=$enabled"
+            echo "runs_on=$runs_on"
+            echo "ec2_indexes=$indexes"
+            echo "ec2_az_config=$az_config"
+          } >> "$GITHUB_OUTPUT"
+
+  start:
+    needs: [decide]
+    if: ${{ needs.decide.outputs.ec2_enabled == 'true' }}
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-22.04
+    # A leg that fails (capacity, a flaky API call) must not fail the whole
+    # workflow and skip every test job; verify below checks that enough of
+    # the pool came up. The stop workflow terminates whatever was launched.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        index: ${{ fromJSON(needs.decide.outputs.ec2_indexes) }}
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Start EC2 runner
+        id: start
+        uses: machulav/ec2-github-runner@343a1b2ae682e681c3cec9a235d882da17ff04ef # v2.6.1
+        with:
+          mode: start
+          # JIT: the runner is registered for exactly one job and removed
+          # by GitHub when that job ends.
+          use-jit: true
+          github-token: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}
+          ec2-instance-type: ${{ env.EC2_INSTANCE_TYPE }}
+          ec2-volume-size: ${{ env.EC2_VOLUME_SIZE }}
+          ec2-volume-type: gp3
+          availability-zones-config: ${{ needs.decide.outputs.ec2_az_config }}
+          # Required by the IAM policy: it only allows RunInstances and
+          # TerminateInstances on instances tagged ci-runner=true.
+          aws-resource-tags: >-
+            [{"Key":"ci-runner","Value":"true"},
+             {"Key":"Project","Value":"ci-ec2-runner"},
+             {"Key":"GitHubRepository","Value":"${{ github.repository }}"},
+             {"Key":"GitHubRunId","Value":"${{ github.run_id }}"}]
+          # This script is sourced by the action's runner-setup script, which
+          # cloud-init starts with no HOME; exporting it here reaches the
+          # runner and every job (setup-go, actions-rs/toolchain and yarn all
+          # need it). Stock Ubuntu also lacks what the hosted image provides:
+          # Docker CE with the buildx and compose plugins (Ubuntu's docker.io
+          # has no buildx, and the ghcr and core-packages jobs run
+          # DOCKER_BUILDKIT=1 docker build); git, a C toolchain for native
+          # node modules, pkg-config with libssl-dev for the openssl-sys
+          # crate the weaver relay builds, and tmux for the weaver besu
+          # suite; a current Node with a global yarn, because setup-node's
+          # yarn cache and the weaver Makefiles run yarn before any setup
+          # step and the repo's Yarn Berry bundle needs a modern node; a
+          # system Go because the weaver besu suite calls go without
+          # setup-go; and rustup in its default location because the copm
+          # tests call cargo without a toolchain step (actions-rs/toolchain
+          # in the weaver workflows reuses a rustup it finds on PATH). Java
+          # still comes from setup-java.
+          pre-runner-script: |
+            export HOME=/root
+            export DEBIAN_FRONTEND=noninteractive
+            install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" > /etc/apt/sources.list.d/docker.list
+            apt-get update -qq
+            apt-get install -y -qq docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin git jq curl unzip xz-utils build-essential pkg-config libssl-dev python3 tmux
+            systemctl enable --now docker
+            # Node 22 LTS (hosted image level); apt's nodejs is 12 and cannot
+            # run the repo's Yarn Berry bundle.
+            curl -fsSL https://nodejs.org/dist/v22.23.3/node-v22.23.3-linux-x64.tar.xz | tar -C /usr/local --strip-components=1 -xJ
+            npm install -g --silent yarn@1
+            # Go: the version the weaver workflows pin through setup-go.
+            curl -fsSL https://go.dev/dl/go1.26.4.linux-amd64.tar.gz | tar -C /usr/local -xz
+            ln -sf /usr/local/go/bin/go /usr/local/go/bin/gofmt /usr/local/bin/
+            # Rust via rustup in /root/.cargo; PATH is exported here because
+            # the runner inherits this shell's environment.
+            curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --no-modify-path
+            export PATH="/root/.cargo/bin:$PATH"
+            # Single use. This script is sourced by the action's runner-setup
+            # script, which then runs ./run.sh --jitconfig in the foreground
+            # and exits when the one job is done, so an EXIT trap set here
+            # powers the instance off at that moment (and on any setup
+            # failure). A background timer powers it off if no job has
+            # started within 30 minutes. The instance stops rather than
+            # terminates; the run's stop workflow terminates it.
+            trap 'shutdown -h now' EXIT
+            ( sleep 1800; pgrep -f Runner.Worker >/dev/null || shutdown -h now ) >/dev/null 2>&1 &
+      - name: Give the runner this run's label
+        # Not RUNNER_NAME: the runner sets that on every job to its own name
+        # and it wins over step env, so the lookup would use the hosted
+        # runner's "GitHub Actions NNN".
+        env:
+          GH_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          EC2_RUNNER_NAME: ec2-${{ steps.start.outputs.label }}
+          RUN_LABEL: ${{ needs.decide.outputs.runs_on }}
+        run: |
+          id=$(gh api "repos/$REPO/actions/runners?name=$EC2_RUNNER_NAME" --jq '.runners[0].id')
+          if [[ -z "$id" || "$id" == "null" ]]; then
+            echo "runner $EC2_RUNNER_NAME is not registered" >&2
+            exit 1
+          fi
+          # Many legs create the same label at once and GitHub answers some
+          # of them with HTTP 500; retry with backoff.
+          for attempt in 1 2 3 4 5; do
+            if gh api -X POST "repos/$REPO/actions/runners/$id/labels" -f "labels[]=$RUN_LABEL" --jq '[.labels[].name] | join(",")'; then
+              exit 0
+            fi
+            echo "label attempt $attempt failed, retrying" >&2
+            sleep $((attempt * 5))
+          done
+          echo "could not add label $RUN_LABEL to runner $EC2_RUNNER_NAME" >&2
+          exit 1
+      # Save the handle whenever an instance was launched, even if a later
+      # step in this job failed, so ec2-runners-stop.yaml can always
+      # terminate it. On the first labelling bug the handle was never
+      # written and four instances were left running after the stop job.
+      - name: Save runner handle
+        if: ${{ always() && steps.start.outputs.ec2-instance-id != '' }}
+        env:
+          LABEL: ${{ steps.start.outputs.label }}
+          INSTANCE_ID: ${{ steps.start.outputs.ec2-instance-id }}
+        run: |
+          mkdir -p ec2-runner
+          printf '%s\n' "$LABEL" > ec2-runner/label
+          printf '%s\n' "$INSTANCE_ID" > ec2-runner/instance-id
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+        if: ${{ always() && steps.start.outputs.ec2-instance-id != '' }}
+        with:
+          name: ec2-runner-${{ github.job }}-${{ matrix.index }}
+          path: ec2-runner/
+          retention-days: 1
+
+  # Fail the workflow, and so skip the test jobs, only when no runner
+  # carries the run's label; otherwise warn about the legs that are missing
+  # and let the run proceed on the pool that came up.
+  verify:
+    needs: [decide, start]
+    if: ${{ always() && needs.decide.outputs.ec2_enabled == 'true' }}
+    runs-on: ubuntu-22.04
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          RUN_LABEL: ${{ needs.decide.outputs.runs_on }}
+          WANTED: ${{ env.EC2_RUNNER_COUNT }}
+        run: |
+          have=$(gh api --paginate "repos/$REPO/actions/runners?per_page=100" \
+            --jq "[.runners[] | select(.status == \"online\") | select(any(.labels[]; .name == \"$RUN_LABEL\"))] | length")
+          echo "$have of $WANTED runners online with label $RUN_LABEL"
+          if [[ "$have" -eq 0 ]]; then
+            echo "::error::no EC2 runner came up for this run" >&2
+            exit 1
+          fi
+          if [[ "$have" -lt "$WANTED" ]]; then
+            echo "::warning::only $have of $WANTED EC2 runners came up; runners are single-use, so some jobs will wait for the stop job to free nothing and may be cancelled by GitHub"
+          fi

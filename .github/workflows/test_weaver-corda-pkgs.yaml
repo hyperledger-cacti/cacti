@@ -10,6 +10,11 @@ name: Unit Test Corda Packages
 on:
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       run_all:
         required: true
         type: string
@@ -26,7 +31,7 @@ jobs:
     outputs:
       interop_cordapp_changed: ${{ steps.changes.outputs.interop_cordapp_changed }}
       corda_sdk_changed: ${{ steps.changes.outputs.corda_sdk_changed }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -47,7 +52,7 @@ jobs:
   unit_test_interop_cordapp:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.interop_cordapp_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -72,7 +77,7 @@ jobs:
   unit_test_corda_sdk:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.corda_sdk_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -109,7 +114,7 @@ jobs:
       - unit_test_interop_cordapp
       - unit_test_corda_sdk
     if: ${{ always() }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Report status of all jobs
         run: |

@@ -21,11 +21,35 @@ on:
   # Keep manual dispatch so you can trigger an ad-hoc run without waiting
   # for Sunday (useful when debugging a flaky test outside normal PR flow).
   workflow_dispatch:
+    inputs:
+      ec2_runner_count:
+        description: Temporary EC2 runners to start (0 = GitHub-hosted only; empty = vars.EC2_RUNNER_COUNT)
+        default: ""
+      ec2_instance_type:
+        description: EC2 instance type for the temporary runners (empty = vars.EC2_INSTANCE_TYPE)
+        default: ""
 permissions:
   contents: read
 
 jobs:
+  # Temporary EC2 runners, same mechanism as ci.yaml. Falls back to
+  # ubuntu-latest (the label satp-hermes-workflow.yaml always used) when the
+  # EC2 repository variables are not set.
+  start-ec2-runners:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/ec2-runners-start.yaml
+    with:
+      # Runners are single-use; satp-hermes-workflow dispatches about 11 jobs.
+      runner_count: ${{ inputs.ec2_runner_count || vars.EC2_RUNNER_COUNT_SATP }}
+      instance_type: ${{ inputs.ec2_instance_type }}
+      hosted_label: ubuntu-latest
+    secrets:
+      EC2_RUNNER_GITHUB_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}
+
   satp-hermes:
+    needs: [start-ec2-runners]
     permissions:
       # actions: read  — needed to download artifacts (e.g. jest-junit XML)
       #   via the GitHub Actions API inside composite actions.
@@ -42,3 +66,17 @@ jobs:
       # Coverage is expensive; keep it off for the weekly health-check run.
       # Set to "true" if you want a full coverage report on Sundays.
       run_code_coverage: ${{ 'false' }}
+      runs_on: ${{ needs.start-ec2-runners.outputs.runs_on }}
+
+  stop-ec2-runners:
+    needs: [start-ec2-runners, satp-hermes]
+    if: ${{ always() }}
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/ec2-runners-stop.yaml
+    with:
+      ec2_enabled: ${{ needs.start-ec2-runners.outputs.ec2_enabled }}
+      ec2_indexes: ${{ needs.start-ec2-runners.outputs.ec2_indexes }}
+    secrets:
+      EC2_RUNNER_GITHUB_TOKEN: ${{ secrets.EC2_RUNNER_GITHUB_TOKEN }}

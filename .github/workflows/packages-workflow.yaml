@@ -5,6 +5,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       node_version:
         required: true
         type: string
@@ -40,6 +45,7 @@ jobs:
       run_code_coverage:  ${{ inputs.run_code_coverage }}
       run_trivy_scan:  ${{ inputs.run_trivy_scan }}
       affected-packages: ${{ inputs.affected-packages }}
+      runs_on: ${{ inputs.runs_on }}
 
   connector-packages:
     # cpl-connector-besu pushes benchmark data to gh-pages on main.
@@ -53,6 +59,7 @@ jobs:
       run_code_coverage:  ${{ inputs.run_code_coverage }}
       run_trivy_scan:  ${{ inputs.run_trivy_scan }}
       affected-packages: ${{ inputs.affected-packages }}
+      runs_on: ${{ inputs.runs_on }}
 
   keychain-packages:
     # dorny/test-reporter (checks: write) + benchmark cache restore (actions: read).
@@ -66,6 +73,7 @@ jobs:
       run_code_coverage:  ${{ inputs.run_code_coverage }}
       run_trivy_scan:  ${{ inputs.run_trivy_scan }}
       affected-packages: ${{ inputs.affected-packages }}
+      runs_on: ${{ inputs.runs_on }}
 
   other-packages:
     # dorny/test-reporter (checks: write) + benchmark cache restore (actions: read).
@@ -79,6 +87,7 @@ jobs:
       run_code_coverage:  ${{ inputs.run_code_coverage }}
       run_trivy_scan:  ${{ inputs.run_trivy_scan }}
       affected-packages: ${{ inputs.affected-packages }}
+      runs_on: ${{ inputs.runs_on }}
 
   satp-hermes-workflow:
     if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-satp-hermes')
@@ -91,6 +100,7 @@ jobs:
     with:
       node_version: ${{ inputs.node_version }}
       run_code_coverage:  ${{ inputs.run_code_coverage }}
+      runs_on: ${{ inputs.runs_on }}
   
 
 

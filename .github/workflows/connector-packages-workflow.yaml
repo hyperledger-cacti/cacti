@@ -5,6 +5,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       node_version:
         required: true
         type: string
@@ -53,7 +58,7 @@ jobs:
       # Re-enable once the multi-party image starts reliably within ~15 minutes.
       TAPE_TEST_PATTERN: >-
         --files=./packages/cactus-plugin-ledger-connector-besu/src/test/typescript/integration/plugin-ledger-connector-besu/deploy-contract/v21-get-record-locator.test.ts
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -138,7 +143,7 @@ jobs:
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-corda
       TAPE_TEST_PATTERN: >-
         --files={./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/flow-database-access-v4.8.test.ts,./packages/cactus-plugin-ledger-connector-corda/src/test/typescript/integration/openapi/openapi-validation.test.ts}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -213,7 +218,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/(unit/.*|integration/(api-surface|cli/cli|identity-client|openapi/openapi-validation))\.test\.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-fabric
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -286,7 +291,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-fabric/src/test/typescript/integration/fabric-v2-2-x/${{ matrix.suite }}\.test\.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-fabric-v2-2-x
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -330,7 +335,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-ethereum
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -362,7 +367,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-besu/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-besu
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -405,7 +410,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cactus-test-plugin-ledger-connector-ethereum/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/ctp-ledger-connector-ethereum
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -437,7 +442,7 @@ jobs:
     env:
       JEST_TEST_PATTERN: packages/cacti-plugin-ledger-connector-stellar/src/test/typescript/(unit|integration|benchmark)/.*/*.test.ts
       JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/cpl-connector-stellar
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 

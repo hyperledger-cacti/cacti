@@ -14,6 +14,11 @@ env:
 on:
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       run_all:
         required: true
         type: string
@@ -30,7 +35,7 @@ jobs:
       fabric_sdk_changed: ${{ steps.changes.outputs.fabric_sdk_changed }}
       iin_agent_changed: ${{ steps.changes.outputs.iin_agent_changed }}
       docs_changed: ${{ steps.changes.outputs.docs_changed }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -58,7 +63,7 @@ jobs:
   unit_test_weaver_node_sdk_local:
     needs: check_code_changed
     if: inputs.run_all == 'true' || needs.check_code_changed.outputs.fabric_sdk_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
 
     strategy:
       matrix:
@@ -98,7 +103,7 @@ jobs:
   unit_test_iin_agent_local:
     needs: check_code_changed
     if: inputs.run_all == 'true' || needs.check_code_changed.outputs.iin_agent_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
 
     strategy:
       matrix:
@@ -139,7 +144,7 @@ jobs:
   build-docs:
     needs: check_code_changed
     if:  inputs.run_all == 'true' || needs.check_code_changed.outputs.docs_changed == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
@@ -173,7 +178,7 @@ jobs:
       - unit_test_iin_agent_local
       - build-docs
     if: ${{ always() }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Report status of all node-pkgs jobs
         run: |

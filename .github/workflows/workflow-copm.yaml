@@ -4,6 +4,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       node_version:
         required: true
         type: string
@@ -35,7 +40,7 @@ jobs:
         JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/copm-pledge-${{ matrix.net1 }}-${{ matrix.net2}}
         COPM_NET_1: ${{ matrix.net1 }}
         COPM_NET_2: ${{ matrix.net2 }}
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         - uses: ./.github/actions/copm_test/
@@ -84,7 +89,7 @@ jobs:
         JEST_TEST_PATTERN: packages/cacti-copm-test/src/test/typescript/integration/test-copm-lock-claim.test.ts
         JEST_TEST_COVERAGE_PATH: ./code-coverage-ts/copm-lock-${{ matrix.net1 }}
         COPM_NET_1: ${{ matrix.net1 }}
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         - uses: ./.github/actions/copm_test/

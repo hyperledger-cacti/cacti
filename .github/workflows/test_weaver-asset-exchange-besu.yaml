@@ -9,6 +9,11 @@ env:
 on:
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       run_all:
         required: true
         type: string
@@ -25,7 +30,7 @@ jobs:
   check_code_changed:
     outputs:
       status: ${{ steps.changes.outputs.weaver_code_changed }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
@@ -41,7 +46,7 @@ jobs:
     needs: check_code_changed
     if: ${{ vars.ENABLE_PACKAGES_CI == 'true' && (inputs.run_all == 'true' || needs.check_code_changed.outputs.status == 'true') }}
     # The type of runner that the job will run on
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
 
     strategy:
       fail-fast: false
@@ -221,7 +226,7 @@ jobs:
     needs: check_code_changed
     if: inputs.run_all == 'true' || needs.check_code_changed.outputs.status == 'true'
     # The type of runner that the job will run on
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
 
     strategy:
       fail-fast: false
@@ -418,7 +423,7 @@ jobs:
       - asset-exchange-besu
       - asset-exchange-besu-local
     if: ${{ always() }}
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs_on }}
     steps:
       - name: Report status of all besu asset-exchange jobs
         run: |

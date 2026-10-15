@@ -5,6 +5,11 @@ on:
   # Triggers the workflow on push or pull request events but only for the main branch
   workflow_call:
     inputs:
+      runs_on:
+        description: runs-on label for every job (self-hosted when temporary EC2 runners are up)
+        required: false
+        type: string
+        default: ubuntu-22.04
       node_version:
         required: true
         type: string
@@ -26,7 +31,7 @@ permissions:
 
 jobs:
     ghcr-besu-all-in-one:
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
           with:
@@ -48,14 +53,14 @@ jobs:
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/besu-all-in-one/ -f ./tools/docker/besu-all-in-one/Dockerfile
     ghcr-connector-corda-server:
       if: contains(fromJson(inputs.affected-packages), 'packages/cactus-plugin-ledger-connector-corda')
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
         - name: ghcr.io/hyperledger-cacti/cactus-connector-corda-server
           run: DOCKER_BUILDKIT=1 docker build ./packages/cactus-plugin-ledger-connector-corda/src/main-server/ -f ./packages/cactus-plugin-ledger-connector-corda/src/main-server/Dockerfile -t cactus-connector-corda-server
           
     ghcr-corda-all-in-one-flowdb:
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
           with:
@@ -76,7 +81,7 @@ jobs:
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/corda-all-in-one/corda-v4_8-flowdb/
 
     ghcr-dev-container-vscode:
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       env:
         IMAGE_NAME: cacti-dev-container-vscode
       steps:
@@ -107,7 +112,7 @@ jobs:
           run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"
 
     ghcr-fabric2-all-in-one:
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
           with:
@@ -128,7 +133,7 @@ jobs:
           run: DOCKER_BUILDKIT=1 docker build ./tools/docker/fabric-all-in-one/ -f ./tools/docker/fabric-all-in-one/Dockerfile_v2.x
 
     ghcr-daml-all-in-one:
-      runs-on: ubuntu-22.04
+      runs-on: ${{ inputs.runs_on }}
       steps:
         - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
           with:
