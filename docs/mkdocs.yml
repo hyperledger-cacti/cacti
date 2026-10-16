@@ -9,16 +9,23 @@ theme:
   favicon: images/HL_Cacti_Logo_Colorreverse.svg
   icon:
     repo: fontawesome/brands/github
+  # Cacti design system: system font stack for body text, Barlow for
+  # headings (loaded in overrides/main.html). See design-system.md.
+  font: false
   palette:
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Palette toggle for dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -80,7 +87,12 @@ plugins:
   - mike
 hooks:
   - hooks/copy_satp_typedoc.py
+extra_css:
+  - stylesheets/cacti-tokens.css
+  - stylesheets/cacti-mkdocs.css
 extra:
+  # Full-color logo for the light header (see overrides/partials/logo.html)
+  logo_light: images/HL_Cacti_Logo_Color.svg
   analytics:
     provider: google
     property: !ENV GOOGLE_ANALYTICS_KEY
@@ -314,6 +326,7 @@ nav:
     - Project Best Practices: references/best-practices.md
     - GitHub Contributions: references/github.md
     - OpenAPI Specs: references/openapi/index.md
+    - Design System: design-system.md
     - Glossary: glossary.md
   - Contribute:
     - How to Contribute: contributing/how-to-contribute.md
