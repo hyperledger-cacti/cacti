@@ -31,6 +31,7 @@ For detailed documentation, click the package name to view its canonical README 
 | [cactus-plugin-ledger-connector-ethereum](packages/cactus-plugin-ledger-connector-ethereum.md) | Standardized connector for interacting with Ethereum networks. |
 | [cactus-plugin-ledger-connector-fabric](packages/cactus-plugin-ledger-connector-fabric.md) | Standardized connector for interacting with Hyperledger Fabric. |
 | [cacti-plugin-ledger-connector-stellar](packages/cacti-plugin-ledger-connector-stellar.md) | Standardized connector for interacting with the Stellar network. |
+| [cacti-plugin-ledger-connector-canton](packages/cacti-plugin-ledger-connector-canton.md) | Connector for submitting Daml commands to and querying Canton ledgers. |
 | [cactus-plugin-keychain-memory](packages/cactus-plugin-keychain-memory.md) | In-memory keychain plugin for local development and testing environments. |
 | [cactus-plugin-htlc-eth-besu](packages/cactus-plugin-htlc-eth-besu.md) | Hash time-locked contract operations on Besu. |
 | [cactus-plugin-htlc-eth-besu-erc20](packages/cactus-plugin-htlc-eth-besu-erc20.md) | ERC-20 hash time-locked contract operations on Besu. |
