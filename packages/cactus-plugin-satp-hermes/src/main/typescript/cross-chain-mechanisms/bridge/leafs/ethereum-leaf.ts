@@ -101,6 +101,7 @@ import {
   Web3SigningCredentialCactiKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialPrivateKeyHex,
+  Web3StringReturnFormat,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -1560,10 +1561,17 @@ export class EthereumLeaf
   }
 
   /**
-   * Retrieves the receipt of a transaction by its ID.
+   * Retrieves the mined receipt of a transaction by its hash.
    *
-   * @param {string} transactionId - The ID of the transaction to get the receipt for.
-   * @returns {Promise<string>} A promise that resolves to the transaction receipt.
+   * The receipt (status, block hash and number, gas used, logs) is the
+   * on-chain evidence of the transaction's inclusion and outcome, as opposed
+   * to the signed transaction, which only proves that the transaction was
+   * submitted. Numbers and bytes are returned as strings, matching the
+   * receipts the connector returns from invokeContract.
+   *
+   * @param {string} transactionId - The hash of the transaction to get the receipt for.
+   * @returns {Promise<string>} A promise that resolves to the stringified transaction receipt.
+   * @throws {TransactionReceiptError} If the transaction has not been mined yet.
    */
   public async getReceipt(transactionId: string): Promise<string> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#getReceipt`;
@@ -1573,13 +1581,19 @@ export class EthereumLeaf
         this.log.debug(
           `${fnTag}, Getting Receipt: transactionId: ${transactionId}`,
         );
-        //TODO: implement getReceipt instead of transaction
-        const getTransactionReq: InvokeRawWeb3EthMethodV1Request = {
-          methodName: "getTransaction",
-          params: [transactionId],
+        const getTransactionReceiptReq: InvokeRawWeb3EthMethodV1Request = {
+          methodName: "getTransactionReceipt",
+          params: [transactionId, Web3StringReturnFormat],
         };
-        const receipt =
-          await this.connector.invokeRawWeb3EthMethod(getTransactionReq);
+        const receipt = (await this.connector.invokeRawWeb3EthMethod(
+          getTransactionReceiptReq,
+        )) as Web3TransactionReceipt | null | undefined;
+
+        if (!receipt) {
+          throw new TransactionReceiptError(
+            `${fnTag}, transaction ${transactionId} has not been mined`,
+          );
+        }
 
         return safeStableStringify(receipt) ?? "";
       } catch (err) {

@@ -1258,10 +1258,16 @@ export class BesuLeaf
   }
 
   /**
-   * Retrieves the receipt of a transaction by its ID.
+   * Retrieves the mined receipt of a transaction by its hash.
    *
-   * @param {string} transactionId - The ID of the transaction to get the receipt for.
-   * @returns {Promise<string>} A promise that resolves to the transaction receipt.
+   * The receipt (status, block hash and number, gas used, logs) is the
+   * on-chain evidence of the transaction's inclusion and outcome, as opposed
+   * to the signed transaction, which only proves that the transaction was
+   * submitted.
+   *
+   * @param {string} transactionId - The hash of the transaction to get the receipt for.
+   * @returns {Promise<string>} A promise that resolves to the stringified transaction receipt.
+   * @throws {TransactionReceiptError} If the transaction has not been mined yet.
    */
   public async getReceipt(transactionId: string): Promise<string> {
     const fnTag = `${BesuLeaf.CLASS_NAME}}#getReceipt`;
@@ -1271,12 +1277,16 @@ export class BesuLeaf
         this.log.debug(
           `${fnTag}, Getting Receipt: transactionId: ${transactionId}`,
         );
-        //TODO: implement getReceipt instead of transaction
-        const receipt = await this.connector.getTransaction({
-          transactionHash: transactionId,
-        });
+        const receipt =
+          await this.connector.getTransactionReceipt(transactionId);
 
-        return safeStableStringify(receipt.transaction);
+        if (!receipt) {
+          throw new TransactionReceiptError(
+            `${fnTag}, transaction ${transactionId} has not been mined`,
+          );
+        }
+
+        return safeStableStringify(receipt) ?? "";
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);

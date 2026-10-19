@@ -73,6 +73,7 @@ import {
   GetBlockV1Response,
   GetBesuRecordV1Request,
   GetBesuRecordV1Response,
+  Web3TransactionReceipt,
 } from "./generated/openapi/typescript-axios";
 
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
@@ -778,6 +779,20 @@ export class PluginLedgerConnectorBesu
       request.transactionHash,
     );
     return { transaction };
+  }
+
+  /**
+   * Retrieves the mined receipt of a transaction, or null when the
+   * transaction is pending or unknown to the node.
+   *
+   * @param transactionHash hash of the transaction
+   * @returns the transaction receipt (status, block, gas used, logs) or null
+   */
+  public async getTransactionReceipt(
+    transactionHash: string,
+  ): Promise<Web3TransactionReceipt | null> {
+    const receipt = await this.web3.eth.getTransactionReceipt(transactionHash);
+    return (receipt as unknown as Web3TransactionReceipt | null) ?? null;
   }
 
   public async getPastLogs(
