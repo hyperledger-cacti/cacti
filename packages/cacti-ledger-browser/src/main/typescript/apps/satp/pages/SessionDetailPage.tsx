@@ -41,6 +41,8 @@ import PageTitleWithGoBack from "../../../components/ui/PageTitleWithGoBack";
 import CopyableField from "../components/CopyableField";
 import SectionTitle from "../components/SectionTitle";
 import StatusChip from "../components/StatusChip";
+import DualGatewayFlowCard from "../components/DualGatewayFlowCard";
+import { ManageGatewaysDialog } from "../components/SatpGatewayToolbar";
 import { useSatpOptions } from "../hooks";
 import { satpSessionDetailQuery } from "../queries";
 import { formatDuration } from "../format";
@@ -512,11 +514,13 @@ function TimelineEvent({
   isLast,
   expanded,
   onToggle,
+  isOriginGateway,
 }: {
   event: SatpTimelineEvent;
   isLast: boolean;
   expanded: boolean;
   onToggle: () => void;
+  isOriginGateway?: boolean;
 }) {
   const { icon, color } = eventPresentation(event.type);
   const rawSnapshot = event.snapshot
@@ -563,6 +567,15 @@ function TimelineEvent({
                   size="small"
                   variant="outlined"
                   sx={{ fontSize: 11, height: 20 }}
+                />
+              )}
+              {isOriginGateway && (
+                <Chip
+                  label="Origin Gateway"
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ fontSize: 10, height: 20 }}
                 />
               )}
             </Stack>
@@ -622,6 +635,7 @@ export default function SessionDetailPage() {
   const { showNotification } = useNotification();
   const options = useSatpOptions();
   const [expandedSeq, setExpandedSeq] = React.useState<number | null>(null);
+  const [manageGatewaysOpen, setManageGatewaysOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!sessionId) {
@@ -688,6 +702,13 @@ export default function SessionDetailPage() {
                 )
             : undefined
         }
+      />
+
+      <DualGatewayFlowCard
+        sessionId={sessionId}
+        primaryGatewayUrl={options.gatewayUrl}
+        counterpartyGatewayUrl={options.counterpartyGatewayUrl}
+        onOpenManageGateways={() => setManageGatewaysOpen(true)}
       />
 
       <Stack spacing={3}>
@@ -765,6 +786,9 @@ export default function SessionDetailPage() {
                               : event.sequenceNumber,
                           )
                         }
+                        isOriginGateway={Boolean(
+                          options.counterpartyGatewayUrl,
+                        )}
                       />
                     ))}
                   </React.Fragment>
@@ -782,6 +806,11 @@ export default function SessionDetailPage() {
           </Typography>
         </Alert>
       </Stack>
+
+      <ManageGatewaysDialog
+        open={manageGatewaysOpen}
+        onClose={() => setManageGatewaysOpen(false)}
+      />
     </Box>
   );
 }

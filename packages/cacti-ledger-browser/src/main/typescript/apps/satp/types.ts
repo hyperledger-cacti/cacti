@@ -12,16 +12,39 @@
  */
 
 /**
+ * Descriptor for a configured SATP gateway endpoint.
+ * Enables un-hardcoded multi-gateway connections and cross-gateway inspection.
+ */
+export interface SatpGatewayEndpoint {
+  id: string;
+  name: string;
+  url: string;
+  description?: string;
+  isDefault?: boolean;
+}
+
+/**
  * Options stored per instance of this app in the `gui_app_config` table
  * (editable through the "Add Application" wizard).
  */
 export interface SatpAppOptions {
   /**
-   * Base URL of the SATP Hermes gateway OAPI (REST) server, e.g.
+   * Base URL of the primary/active SATP Hermes gateway OAPI (REST) server, e.g.
    * `http://localhost:4010` (`docker-compose-satp.yml` maps it to host
    * port 3012).
    */
   gatewayUrl: string;
+
+  /**
+   * Optional base URL of the counterparty SATP gateway (e.g. `http://localhost:4020`),
+   * allowing end-to-end inspection of real cross-chain flows.
+   */
+  counterpartyGatewayUrl?: string;
+
+  /**
+   * Additional configured gateway endpoints for dynamic switching.
+   */
+  configuredGateways?: SatpGatewayEndpoint[];
 
   /**
    * Optional base URL of a Prometheus server scraping the gateway metrics

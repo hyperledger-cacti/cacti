@@ -11,6 +11,7 @@ import GatewaysPage from "./pages/GatewaysPage";
 import MessagesPage from "./pages/MessagesPage";
 import OverviewPage from "./pages/OverviewPage";
 import GuidePage from "./pages/GuidePage";
+import SatpPageLayout from "./components/SatpPageLayout";
 import {
   DEFAULT_SATP_GATEWAY_URL,
   SATP_APP_SETUP_GUIDE_URL,
@@ -69,6 +70,7 @@ const satpAppDefinition: AppDefinition = {
   defaultPath: "/satp",
   defaultOptions: {
     gatewayUrl: DEFAULT_SATP_GATEWAY_URL,
+    counterpartyGatewayUrl: "",
     prometheusUrl: "http://localhost:9090",
   },
 
@@ -81,12 +83,21 @@ const satpAppDefinition: AppDefinition = {
       );
     }
 
-    // The gateway and Prometheus URLs are user-provided (stored in the
-    // `gui_app_config` table) and the browser will send requests there, so
-    // only accept well-formed absolute http(s) URLs.
+    // The gateway, counterparty gateway, and Prometheus URLs are user-provided
+    // (stored in the `gui_app_config` table) and the browser will send requests
+    // there, so only accept well-formed absolute http(s) URLs.
     if (!isHttpUrl(satpOptions.gatewayUrl)) {
       throw new Error(
         `Invalid SATP inspector gatewayUrl "${satpOptions.gatewayUrl}": must be an absolute http(s) URL`,
+      );
+    }
+    if (
+      satpOptions.counterpartyGatewayUrl !== undefined &&
+      satpOptions.counterpartyGatewayUrl !== "" &&
+      !isHttpUrl(satpOptions.counterpartyGatewayUrl)
+    ) {
+      throw new Error(
+        `Invalid SATP inspector counterpartyGatewayUrl "${satpOptions.counterpartyGatewayUrl}": must be an absolute http(s) URL or empty`,
       );
     }
     if (
@@ -133,7 +144,11 @@ const satpAppDefinition: AppDefinition = {
       ],
       routes: [
         {
-          element: <SessionsPage />,
+          element: (
+            <SatpPageLayout>
+              <SessionsPage />
+            </SatpPageLayout>
+          ),
         },
         {
           path: "session",
@@ -141,25 +156,45 @@ const satpAppDefinition: AppDefinition = {
           children: [
             {
               path: ":sessionId",
-              element: <SessionDetailPage />,
+              element: (
+                <SatpPageLayout>
+                  <SessionDetailPage />
+                </SatpPageLayout>
+              ),
             },
           ],
         },
         {
           path: "gateways",
-          element: <GatewaysPage />,
+          element: (
+            <SatpPageLayout>
+              <GatewaysPage />
+            </SatpPageLayout>
+          ),
         },
         {
           path: "messages",
-          element: <MessagesPage />,
+          element: (
+            <SatpPageLayout>
+              <MessagesPage />
+            </SatpPageLayout>
+          ),
         },
         {
           path: "overview",
-          element: <OverviewPage />,
+          element: (
+            <SatpPageLayout>
+              <OverviewPage />
+            </SatpPageLayout>
+          ),
         },
         {
           path: "guide",
-          element: <GuidePage />,
+          element: (
+            <SatpPageLayout>
+              <GuidePage />
+            </SatpPageLayout>
+          ),
         },
       ],
       useAppStatus: () => useSatpAppStatus(),
