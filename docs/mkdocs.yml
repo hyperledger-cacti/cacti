@@ -112,7 +112,6 @@ nav:
       - Governance: cactus/governance.md
       - Code of Conduct: cactus/code-of-conduct.md
       - Contributing: cactus/contributing.md
-      - Whitepaper: cactus/whitepaper.md
       - Regulatory and Industry Initiatives: cactus/regulatory-and-industry-initiatives-reading-list.md
       - Packages: cactus/packages.md
       - Ledger Browser:
@@ -309,6 +308,7 @@ nav:
     - Use Cases and Applications for Cacti: use-cases.md
     - Technical Specifications: references/specs.md
     - Publications: references/publications.md
+    - Whitepaper (v2): whitepaper/whitepaper.md
     - Events and Podcasts: references/events.md
     - Business Usage: references/business.md
     - Project Best Practices: references/best-practices.md
