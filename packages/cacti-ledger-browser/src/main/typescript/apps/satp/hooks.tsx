@@ -1,12 +1,12 @@
 /**
  * Hooks for the SATP inspector app.
  *
- * App pages read the instance options from the router outlet context. The
- * app status card on the home page lives *outside* the app routes, so there
- * `useOutletContext` returns nothing - in that case the gateway URL falls
- * back to the resolved configuration (runtime `config.js` override over the
- * `VITE_SATP_GATEWAY_URL` build-time env, see `common/runtime-config.ts`)
- * and finally to the local default.
+ * App pages read the instance options from the router outlet context or the
+ * dynamic `SatpGatewayContext`. The app status card on the home page lives
+ * *outside* the app routes, so there `useOutletContext` returns nothing - in
+ * that case the gateway URL falls back to the resolved configuration (runtime
+ * `config.js` override over the `VITE_SATP_GATEWAY_URL` build-time env, see
+ * `common/runtime-config.ts`) and finally to the local default.
  */
 import { useQuery } from "@tanstack/react-query";
 import { useOutletContext } from "react-router-dom";
@@ -15,6 +15,7 @@ import { GetStatusResponse } from "../../common/types/app";
 import { getLedgerBrowserConfig } from "../../common/runtime-config";
 import { satpHealthQuery } from "./queries";
 import type { SatpAppOptions } from "./types";
+import { useSatpGatewayContextSafe } from "./context/GatewayContext";
 
 export const DEFAULT_SATP_GATEWAY_URL = "http://localhost:4010";
 
@@ -30,12 +31,17 @@ export const SATP_APP_SETUP_GUIDE_URL =
 
 export function useSatpOptions(): SatpAppOptions {
   const context = useOutletContext<SatpAppOptions | undefined>();
+  const gatewayCtx = useSatpGatewayContextSafe();
   const fallbacks = getLedgerBrowserConfig();
   return {
     gatewayUrl:
+      gatewayCtx?.activeGatewayUrl ||
       context?.gatewayUrl ||
       fallbacks.satpGatewayUrl ||
       DEFAULT_SATP_GATEWAY_URL,
+    counterpartyGatewayUrl:
+      gatewayCtx?.counterpartyGatewayUrl || context?.counterpartyGatewayUrl,
+    configuredGateways: gatewayCtx?.gateways,
     prometheusUrl: context?.prometheusUrl || fallbacks.satpPrometheusUrl,
   };
 }
