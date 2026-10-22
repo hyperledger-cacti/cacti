@@ -7,11 +7,11 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class GetBalanceV1RequestPB extends pb_1.Message {
-        #one_of_decls: number[][] = [[140394805]];
+        #one_of_decls: number[][] = [[226789649]];
         constructor(data?: any[] | ({
             address?: string;
         } & (({
-            defaultBlock?: dependency_1.google.protobuf.Any;
+            default_block?: dependency_1.google.protobuf.Any;
         })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
@@ -19,8 +19,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if ("address" in data && data.address != undefined) {
                     this.address = data.address;
                 }
-                if ("defaultBlock" in data && data.defaultBlock != undefined) {
-                    this.defaultBlock = data.defaultBlock;
+                if ("default_block" in data && data.default_block != undefined) {
+                    this.default_block = data.default_block;
                 }
             }
         }
@@ -30,47 +30,47 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set address(value: string) {
             pb_1.Message.setField(this, 73950222, value);
         }
-        get defaultBlock() {
-            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 140394805) as dependency_1.google.protobuf.Any;
+        get default_block() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 226789649) as dependency_1.google.protobuf.Any;
         }
-        set defaultBlock(value: dependency_1.google.protobuf.Any) {
-            pb_1.Message.setOneofWrapperField(this, 140394805, this.#one_of_decls[0], value);
+        set default_block(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setOneofWrapperField(this, 226789649, this.#one_of_decls[0], value);
         }
-        get has_defaultBlock() {
-            return pb_1.Message.getField(this, 140394805) != null;
+        get has_default_block() {
+            return pb_1.Message.getField(this, 226789649) != null;
         }
-        get _defaultBlock() {
+        get _default_block() {
             const cases: {
-                [index: number]: "none" | "defaultBlock";
+                [index: number]: "none" | "default_block";
             } = {
                 0: "none",
-                140394805: "defaultBlock"
+                226789649: "default_block"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [140394805])];
+            return cases[pb_1.Message.computeOneofCase(this, [226789649])];
         }
         static fromObject(data: {
             address?: string;
-            defaultBlock?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            default_block?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
         }): GetBalanceV1RequestPB {
             const message = new GetBalanceV1RequestPB({});
             if (data.address != null) {
                 message.address = data.address;
             }
-            if (data.defaultBlock != null) {
-                message.defaultBlock = dependency_1.google.protobuf.Any.fromObject(data.defaultBlock);
+            if (data.default_block != null) {
+                message.default_block = dependency_1.google.protobuf.Any.fromObject(data.default_block);
             }
             return message;
         }
         toObject() {
             const data: {
                 address?: string;
-                defaultBlock?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                default_block?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
             } = {};
             if (this.address != null) {
                 data.address = this.address;
             }
-            if (this.defaultBlock != null) {
-                data.defaultBlock = this.defaultBlock.toObject();
+            if (this.default_block != null) {
+                data.default_block = this.default_block.toObject();
             }
             return data;
         }
@@ -80,8 +80,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             const writer = w || new pb_1.BinaryWriter();
             if (this.address.length)
                 writer.writeString(73950222, this.address);
-            if (this.has_defaultBlock)
-                writer.writeMessage(140394805, this.defaultBlock, () => this.defaultBlock.serialize(writer));
+            if (this.has_default_block)
+                writer.writeMessage(226789649, this.default_block, () => this.default_block.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -94,8 +94,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                     case 73950222:
                         message.address = reader.readString();
                         break;
-                    case 140394805:
-                        reader.readMessage(message.defaultBlock, () => message.defaultBlock = dependency_1.google.protobuf.Any.deserialize(reader));
+                    case 226789649:
+                        reader.readMessage(message.default_block, () => message.default_block = dependency_1.google.protobuf.Any.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }

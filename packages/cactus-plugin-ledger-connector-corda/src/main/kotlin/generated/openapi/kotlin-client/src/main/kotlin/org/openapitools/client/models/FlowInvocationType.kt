@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,17 +30,17 @@ import com.squareup.moshi.JsonClass
 /**
  * Determines which flow starting method will be used on the back-end when invoking the flow. Based on the value here the plugin back-end might invoke the rpc.startFlowDynamic() method or the rpc.startTrackedFlowDynamic() method. Streamed responses are aggregated and returned in a single response to HTTP callers who are not equipped to handle streams like WebSocket/gRPC/etc. do.
  *
- * Values: tRACKEDFLOWDYNAMIC,fLOWDYNAMIC
+ * Values: TRACKED_FLOW_DYNAMIC,FLOW_DYNAMIC
  */
 
 @JsonClass(generateAdapter = false)
 enum class FlowInvocationType(val value: kotlin.String) {
 
     @Json(name = "TRACKED_FLOW_DYNAMIC")
-    tRACKEDFLOWDYNAMIC("TRACKED_FLOW_DYNAMIC"),
+    TRACKED_FLOW_DYNAMIC("TRACKED_FLOW_DYNAMIC"),
 
     @Json(name = "FLOW_DYNAMIC")
-    fLOWDYNAMIC("FLOW_DYNAMIC");
+    FLOW_DYNAMIC("FLOW_DYNAMIC");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -41,7 +49,7 @@ enum class FlowInvocationType(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -54,7 +62,7 @@ enum class FlowInvocationType(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): FlowInvocationType? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

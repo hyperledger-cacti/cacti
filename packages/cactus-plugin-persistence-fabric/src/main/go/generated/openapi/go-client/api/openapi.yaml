@@ -19,13 +19,13 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/StatusResponseV1'
+                $ref: "#/components/schemas/StatusResponseV1"
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+                $ref: "#/components/schemas/ErrorExceptionResponseV1"
           description: Internal Server Error
       summary: Get the status of persistence plugin for fabric
       x-hyperledger-cacti:
@@ -41,13 +41,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiscoverNetworkResponseV1'
+                $ref: "#/components/schemas/DiscoverNetworkResponseV1"
           description: OK
         "500":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorExceptionResponseV1'
+                $ref: "#/components/schemas/ErrorExceptionResponseV1"
           description: Internal Server Error
       summary: Refresh Fabric network structure in the database through discovery.
       x-hyperledger-cacti:
@@ -59,9 +59,6 @@ components:
     TrackedOperationV1:
       description: Persistence plugin operation that is tracked and returned in status
         report.
-      example:
-        operation: operation
-        startAt: startAt
       properties:
         startAt:
           description: Start time of the operation.
@@ -77,17 +74,6 @@ components:
       type: object
     StatusResponseV1:
       description: Response with plugin status report.
-      example:
-        connected: true
-        instanceId: instanceId
-        lastSeenBlock: 0.8008281904610115
-        monitorRunning: true
-        webServicesRegistered: true
-        operationsRunning:
-        - operation: operation
-          startAt: startAt
-        - operation: operation
-          startAt: startAt
       properties:
         instanceId:
           description: Plugin instance id.
@@ -103,7 +89,7 @@ components:
           type: boolean
         operationsRunning:
           items:
-            $ref: '#/components/schemas/TrackedOperationV1'
+            $ref: "#/components/schemas/TrackedOperationV1"
           type: array
         monitorRunning:
           description: "True if block monitoring is running, false otherwise."
@@ -123,8 +109,8 @@ components:
       type: object
     DiscoverNetworkResponseV1:
       example:
-        message: message
         status: true
+        message: message
       properties:
         status:
           nullable: false
@@ -137,6 +123,9 @@ components:
       - status
       type: object
     ErrorExceptionResponseV1:
+      example:
+        message: message
+        error: error
       properties:
         message:
           nullable: false

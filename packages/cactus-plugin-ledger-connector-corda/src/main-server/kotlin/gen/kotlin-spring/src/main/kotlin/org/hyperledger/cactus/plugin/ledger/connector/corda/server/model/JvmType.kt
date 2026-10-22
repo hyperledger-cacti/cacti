@@ -22,12 +22,15 @@ import jakarta.validation.Valid
 data class JvmType(
 
     @get:Size(min=1,max=65535)
+    @param:JsonProperty("fqClassName", required = true)
     @get:JsonProperty("fqClassName", required = true) val fqClassName: kotlin.String,
 
     @get:Size(min=1,max=65535)
+    @param:JsonProperty("constructorName")
     @get:JsonProperty("constructorName") val constructorName: kotlin.String? = null,
 
     @field:Valid
+    @param:JsonProperty("invocationTarget")
     @get:JsonProperty("invocationTarget") val invocationTarget: JvmObject? = null
 ) {
 

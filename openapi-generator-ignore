@@ -12,4 +12,15 @@
 packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/pom.xml
 packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/build.gradle.kts
 packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/main/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/Application.kt
-packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/test/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiPluginLedgerConnectorCordaTest.kt
+
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/src/test/kotlin/org/hyperledger/cactus/plugin/ledger/connector/corda/server/api/ApiApiTest.kt
+
+# The openapi-generator 7.x kotlin-spring templates emit a Gradle 8.1.1
+# wrapper, which is below the minimum supported by the spring boot 3.4
+# gradle plugin this server build uses (builds fail in Gradle's jar cache
+# with "Failed to create Jar file ... spring-core-6.2.2.jar"). Keep the
+# wrapper at 8.12.1 instead of reverting to the generated one on regen.
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/gradlew
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/gradlew.bat
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/gradle/wrapper/gradle-wrapper.jar
+packages/cactus-plugin-ledger-connector-corda/src/main-server/kotlin/gen/kotlin-spring/gradle/wrapper/gradle-wrapper.properties

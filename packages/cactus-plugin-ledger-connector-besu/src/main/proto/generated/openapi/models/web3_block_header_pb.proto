@@ -22,27 +22,27 @@ message Web3BlockHeaderPB {
 
   string hash = 3195150;
 
-  string parentHash = 245049128;
+  string parent_hash = 477973380;
 
   string nonce = 105002991;
 
-  string sha3Uncles = 373514458;
+  string sha3_uncles = 263191339;
 
-  string logsBloom = 399161966;
+  string logs_bloom = 278810768;
 
-  string transactionRoot = 189212898;
+  string transaction_root = 508985763;
 
-  string stateRoot = 475330288;
+  string state_root = 227629104;
 
-  string receiptRoot = 422939453;
+  string receipt_root = 298554745;
 
   string miner = 103900799;
 
-  string extraData = 253792294;
+  string extra_data = 210509434;
 
-  int32 gasLimit = 9229217;
+  int32 gas_limit = 260503256;
 
-  int32 gasUsed = 190522826;
+  int32 gas_used = 528190111;
 
   Web3BlockHeaderTimestampPB timestamp = 55126294;
 

@@ -7,18 +7,18 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class Web3TransactionReceiptPB extends pb_1.Message {
-        #one_of_decls: number[][] = [[214641282]];
+        #one_of_decls: number[][] = [[428548551]];
         constructor(data?: any[] | ({
             status?: boolean;
-            transactionHash?: string;
-            transactionIndex?: number;
-            blockHash?: string;
-            blockNumber?: number;
-            gasUsed?: number;
+            transaction_hash?: string;
+            transaction_index?: number;
+            block_hash?: string;
+            block_number?: number;
+            gas_used?: number;
             from?: string;
             to?: string;
         } & (({
-            contractAddress?: string;
+            contract_address?: string;
         })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
@@ -26,23 +26,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if ("status" in data && data.status != undefined) {
                     this.status = data.status;
                 }
-                if ("transactionHash" in data && data.transactionHash != undefined) {
-                    this.transactionHash = data.transactionHash;
+                if ("transaction_hash" in data && data.transaction_hash != undefined) {
+                    this.transaction_hash = data.transaction_hash;
                 }
-                if ("transactionIndex" in data && data.transactionIndex != undefined) {
-                    this.transactionIndex = data.transactionIndex;
+                if ("transaction_index" in data && data.transaction_index != undefined) {
+                    this.transaction_index = data.transaction_index;
                 }
-                if ("blockHash" in data && data.blockHash != undefined) {
-                    this.blockHash = data.blockHash;
+                if ("block_hash" in data && data.block_hash != undefined) {
+                    this.block_hash = data.block_hash;
                 }
-                if ("blockNumber" in data && data.blockNumber != undefined) {
-                    this.blockNumber = data.blockNumber;
+                if ("block_number" in data && data.block_number != undefined) {
+                    this.block_number = data.block_number;
                 }
-                if ("gasUsed" in data && data.gasUsed != undefined) {
-                    this.gasUsed = data.gasUsed;
+                if ("gas_used" in data && data.gas_used != undefined) {
+                    this.gas_used = data.gas_used;
                 }
-                if ("contractAddress" in data && data.contractAddress != undefined) {
-                    this.contractAddress = data.contractAddress;
+                if ("contract_address" in data && data.contract_address != undefined) {
+                    this.contract_address = data.contract_address;
                 }
                 if ("from" in data && data.from != undefined) {
                     this.from = data.from;
@@ -58,44 +58,44 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set status(value: boolean) {
             pb_1.Message.setField(this, 355610639, value);
         }
-        get transactionHash() {
-            return pb_1.Message.getFieldWithDefault(this, 188901646, "") as string;
+        get transaction_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 508674511, "") as string;
         }
-        set transactionHash(value: string) {
-            pb_1.Message.setField(this, 188901646, value);
+        set transaction_hash(value: string) {
+            pb_1.Message.setField(this, 508674511, value);
         }
-        get transactionIndex() {
-            return pb_1.Message.getFieldWithDefault(this, 488538260, 0) as number;
+        get transaction_index() {
+            return pb_1.Message.getFieldWithDefault(this, 335921105, 0) as number;
         }
-        set transactionIndex(value: number) {
-            pb_1.Message.setField(this, 488538260, value);
+        set transaction_index(value: number) {
+            pb_1.Message.setField(this, 335921105, value);
         }
-        get blockHash() {
-            return pb_1.Message.getFieldWithDefault(this, 335211324, "") as string;
+        get block_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 212436354, "") as string;
         }
-        set blockHash(value: string) {
-            pb_1.Message.setField(this, 335211324, value);
+        set block_hash(value: string) {
+            pb_1.Message.setField(this, 212436354, value);
         }
-        get blockNumber() {
-            return pb_1.Message.getFieldWithDefault(this, 205598263, 0) as number;
+        get block_number() {
+            return pb_1.Message.getFieldWithDefault(this, 206419142, 0) as number;
         }
-        set blockNumber(value: number) {
-            pb_1.Message.setField(this, 205598263, value);
+        set block_number(value: number) {
+            pb_1.Message.setField(this, 206419142, value);
         }
-        get gasUsed() {
-            return pb_1.Message.getFieldWithDefault(this, 190522826, 0) as number;
+        get gas_used() {
+            return pb_1.Message.getFieldWithDefault(this, 528190111, 0) as number;
         }
-        set gasUsed(value: number) {
-            pb_1.Message.setField(this, 190522826, value);
+        set gas_used(value: number) {
+            pb_1.Message.setField(this, 528190111, value);
         }
-        get contractAddress() {
-            return pb_1.Message.getFieldWithDefault(this, 214641282, "") as string;
+        get contract_address() {
+            return pb_1.Message.getFieldWithDefault(this, 428548551, "") as string;
         }
-        set contractAddress(value: string) {
-            pb_1.Message.setOneofField(this, 214641282, this.#one_of_decls[0], value);
+        set contract_address(value: string) {
+            pb_1.Message.setOneofField(this, 428548551, this.#one_of_decls[0], value);
         }
-        get has_contractAddress() {
-            return pb_1.Message.getField(this, 214641282) != null;
+        get has_contract_address() {
+            return pb_1.Message.getField(this, 428548551) != null;
         }
         get from() {
             return pb_1.Message.getFieldWithDefault(this, 3151786, "") as string;
@@ -109,23 +109,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set to(value: string) {
             pb_1.Message.setField(this, 3707, value);
         }
-        get _contractAddress() {
+        get _contract_address() {
             const cases: {
-                [index: number]: "none" | "contractAddress";
+                [index: number]: "none" | "contract_address";
             } = {
                 0: "none",
-                214641282: "contractAddress"
+                428548551: "contract_address"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [214641282])];
+            return cases[pb_1.Message.computeOneofCase(this, [428548551])];
         }
         static fromObject(data: {
             status?: boolean;
-            transactionHash?: string;
-            transactionIndex?: number;
-            blockHash?: string;
-            blockNumber?: number;
-            gasUsed?: number;
-            contractAddress?: string;
+            transaction_hash?: string;
+            transaction_index?: number;
+            block_hash?: string;
+            block_number?: number;
+            gas_used?: number;
+            contract_address?: string;
             from?: string;
             to?: string;
         }): Web3TransactionReceiptPB {
@@ -133,23 +133,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (data.status != null) {
                 message.status = data.status;
             }
-            if (data.transactionHash != null) {
-                message.transactionHash = data.transactionHash;
+            if (data.transaction_hash != null) {
+                message.transaction_hash = data.transaction_hash;
             }
-            if (data.transactionIndex != null) {
-                message.transactionIndex = data.transactionIndex;
+            if (data.transaction_index != null) {
+                message.transaction_index = data.transaction_index;
             }
-            if (data.blockHash != null) {
-                message.blockHash = data.blockHash;
+            if (data.block_hash != null) {
+                message.block_hash = data.block_hash;
             }
-            if (data.blockNumber != null) {
-                message.blockNumber = data.blockNumber;
+            if (data.block_number != null) {
+                message.block_number = data.block_number;
             }
-            if (data.gasUsed != null) {
-                message.gasUsed = data.gasUsed;
+            if (data.gas_used != null) {
+                message.gas_used = data.gas_used;
             }
-            if (data.contractAddress != null) {
-                message.contractAddress = data.contractAddress;
+            if (data.contract_address != null) {
+                message.contract_address = data.contract_address;
             }
             if (data.from != null) {
                 message.from = data.from;
@@ -162,35 +162,35 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         toObject() {
             const data: {
                 status?: boolean;
-                transactionHash?: string;
-                transactionIndex?: number;
-                blockHash?: string;
-                blockNumber?: number;
-                gasUsed?: number;
-                contractAddress?: string;
+                transaction_hash?: string;
+                transaction_index?: number;
+                block_hash?: string;
+                block_number?: number;
+                gas_used?: number;
+                contract_address?: string;
                 from?: string;
                 to?: string;
             } = {};
             if (this.status != null) {
                 data.status = this.status;
             }
-            if (this.transactionHash != null) {
-                data.transactionHash = this.transactionHash;
+            if (this.transaction_hash != null) {
+                data.transaction_hash = this.transaction_hash;
             }
-            if (this.transactionIndex != null) {
-                data.transactionIndex = this.transactionIndex;
+            if (this.transaction_index != null) {
+                data.transaction_index = this.transaction_index;
             }
-            if (this.blockHash != null) {
-                data.blockHash = this.blockHash;
+            if (this.block_hash != null) {
+                data.block_hash = this.block_hash;
             }
-            if (this.blockNumber != null) {
-                data.blockNumber = this.blockNumber;
+            if (this.block_number != null) {
+                data.block_number = this.block_number;
             }
-            if (this.gasUsed != null) {
-                data.gasUsed = this.gasUsed;
+            if (this.gas_used != null) {
+                data.gas_used = this.gas_used;
             }
-            if (this.contractAddress != null) {
-                data.contractAddress = this.contractAddress;
+            if (this.contract_address != null) {
+                data.contract_address = this.contract_address;
             }
             if (this.from != null) {
                 data.from = this.from;
@@ -206,18 +206,18 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             const writer = w || new pb_1.BinaryWriter();
             if (this.status != false)
                 writer.writeBool(355610639, this.status);
-            if (this.transactionHash.length)
-                writer.writeString(188901646, this.transactionHash);
-            if (this.transactionIndex != 0)
-                writer.writeFloat(488538260, this.transactionIndex);
-            if (this.blockHash.length)
-                writer.writeString(335211324, this.blockHash);
-            if (this.blockNumber != 0)
-                writer.writeFloat(205598263, this.blockNumber);
-            if (this.gasUsed != 0)
-                writer.writeFloat(190522826, this.gasUsed);
-            if (this.has_contractAddress)
-                writer.writeString(214641282, this.contractAddress);
+            if (this.transaction_hash.length)
+                writer.writeString(508674511, this.transaction_hash);
+            if (this.transaction_index != 0)
+                writer.writeFloat(335921105, this.transaction_index);
+            if (this.block_hash.length)
+                writer.writeString(212436354, this.block_hash);
+            if (this.block_number != 0)
+                writer.writeFloat(206419142, this.block_number);
+            if (this.gas_used != 0)
+                writer.writeFloat(528190111, this.gas_used);
+            if (this.has_contract_address)
+                writer.writeString(428548551, this.contract_address);
             if (this.from.length)
                 writer.writeString(3151786, this.from);
             if (this.to.length)
@@ -234,23 +234,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                     case 355610639:
                         message.status = reader.readBool();
                         break;
-                    case 188901646:
-                        message.transactionHash = reader.readString();
+                    case 508674511:
+                        message.transaction_hash = reader.readString();
                         break;
-                    case 488538260:
-                        message.transactionIndex = reader.readFloat();
+                    case 335921105:
+                        message.transaction_index = reader.readFloat();
                         break;
-                    case 335211324:
-                        message.blockHash = reader.readString();
+                    case 212436354:
+                        message.block_hash = reader.readString();
                         break;
-                    case 205598263:
-                        message.blockNumber = reader.readFloat();
+                    case 206419142:
+                        message.block_number = reader.readFloat();
                         break;
-                    case 190522826:
-                        message.gasUsed = reader.readFloat();
+                    case 528190111:
+                        message.gas_used = reader.readFloat();
                         break;
-                    case 214641282:
-                        message.contractAddress = reader.readString();
+                    case 428548551:
+                        message.contract_address = reader.readString();
                         break;
                     case 3151786:
                         message.from = reader.readString();

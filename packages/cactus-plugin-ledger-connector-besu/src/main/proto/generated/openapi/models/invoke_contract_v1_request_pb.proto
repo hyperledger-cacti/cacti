@@ -21,38 +21,38 @@ import "models/web3_signing_credential_pb.proto";
 
 message InvokeContractV1RequestPB {
 
-  string contractName = 328784197;
+  string contract_name = 512557672;
 
-  Web3SigningCredentialPB signingCredential = 233015102;
+  Web3SigningCredentialPB signing_credential = 302830545;
 
-  EthContractInvocationTypePB invocationType = 163296237;
+  EthContractInvocationTypePB invocation_type = 296507000;
 
   // The name of the contract method to invoke.
-  string methodName = 186292469;
+  string method_name = 390281432;
 
   // The list of arguments to pass in to the contract method being invoked.
   repeated google.protobuf.Any params = 458557051;
 
   // The application binary interface of the solidity contract, optional parameter
-  repeated google.protobuf.Any contractAbi = 512852493;
+  repeated google.protobuf.Any contract_abi = 328278087;
 
   // Address of the solidity contract, optional parameter
-  string contractAddress = 214641282;
+  string contract_address = 428548551;
 
   Web3BlockHeaderTimestampPB value = 111972721;
 
   Web3BlockHeaderTimestampPB gas = 102105;
 
-  Web3BlockHeaderTimestampPB gasPrice = 5271059;
+  Web3BlockHeaderTimestampPB gas_price = 264461414;
 
   float nonce = 105002991;
 
   // The amount of milliseconds to wait for a transaction receipt beforegiving up and crashing. Only has any effect if the invocation type is SEND
-  float timeoutMs = 51479271;
+  float timeout_ms = 522132806;
 
   // The keychainId for retrieve the contracts json.
-  string keychainId = 14058372;
+  string keychain_id = 101082808;
 
-  BesuPrivateTransactionConfigPB privateTransactionConfig = 276796542;
+  BesuPrivateTransactionConfigPB private_transaction_config = 139004930;
 
 }

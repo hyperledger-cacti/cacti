@@ -1,4 +1,4 @@
-FROM rust:1.96.0-slim-bullseye AS builder
+FROM rust:1.96.0-slim-bookworm AS builder
 
 RUN apt-get update
 

@@ -24,7 +24,6 @@ import {
   besu_grpc_svc_streams,
   default_service,
   get_block_v1_request_pb,
-  get_block_v1_response_pb,
   google_protobuf_any,
   watch_blocks_v1_progress_pb,
   watch_blocks_v1_request_pb,
@@ -170,25 +169,25 @@ describe("BesuGrpcSvcOpenApi", () => {
 
     const getBlockV1RequestPB =
       new get_block_v1_request_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1RequestPB(
-        { blockHashOrBlockNumber },
+        { block_hash_or_block_number: blockHashOrBlockNumber },
       );
 
     const req1 =
       new default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBlockV1Request(
-        { getBlockV1RequestPB },
+        { get_block_v1_request_pb: getBlockV1RequestPB },
       );
 
     const metadata1 = new grpc.Metadata();
 
     const res1Promise =
-      new Promise<get_block_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB>(
+      new Promise<default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBlockV1Response>(
         (resolve, reject) => {
           const call = grpcClientDefaultSvc.GetBlockV1(
             req1,
             metadata1,
             (
               err: grpc.ServiceError | null,
-              value?: get_block_v1_response_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.GetBlockV1ResponsePB,
+              value?: default_service.org.hyperledger.cacti.plugin.ledger.connector.besu.services.defaultservice.GetBlockV1Response,
             ) => {
               log.debug("Received callback from gRPC service: ", err, value);
               if (err) {
@@ -209,8 +208,12 @@ describe("BesuGrpcSvcOpenApi", () => {
     const res1 = await res1Promise;
     expect(res1).toBeTruthy();
     expect(res1).toBeObject();
+    expect(res1.response).toBe("get_block_v1_response_pb_200");
 
-    const block = res1.block.toObject();
+    const block = res1.get_block_v1_response_pb_200?.block.toObject() as Record<
+      string,
+      unknown
+    >;
     expect(block).toBeTruthy();
     expect(block).toBeObject();
     expect(block).not.toBeEmptyObject();
@@ -236,7 +239,7 @@ describe("BesuGrpcSvcOpenApi", () => {
             new watch_blocks_v1_request_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1RequestPB();
 
           reqUnsubscribe.event =
-            watch_blocks_v1_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB.WatchBlocksV1PB_Unsubscribe;
+            watch_blocks_v1_pb.org.hyperledger.cacti.plugin.ledger.connector.besu.WatchBlocksV1PB.WATCH_BLOCKS_V1_P_B_Unsubscribe;
 
           stream.write(reqUnsubscribe);
         }

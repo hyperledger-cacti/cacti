@@ -7,7 +7,7 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export enum ReceiptTypePB {
-        ReceiptTypePB_NODE_TX_POOL_ACK = 0,
-        ReceiptTypePB_LEDGER_BLOCK_ACK = 1
+        RECEIPT_TYPE_P_B_NODE_TX_POOL_ACK = 0,
+        RECEIPT_TYPE_P_B_LEDGER_BLOCK_ACK = 1
     }
 }

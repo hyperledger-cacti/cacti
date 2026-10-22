@@ -18,6 +18,7 @@ import jakarta.validation.Valid
  */
 data class ListFlowsV1Response(
 
+    @param:JsonProperty("flowNames", required = true)
     @get:JsonProperty("flowNames", required = true) val flowNames: kotlin.collections.List<kotlin.String> = arrayListOf()
 ) {
 

@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -68,5 +76,8 @@ data class ConnectionProfile (
     @Json(name = "certificateAuthorities")
     val certificateAuthorities: kotlin.collections.Map<kotlin.String, kotlin.Any>? = null
 
-) : kotlin.collections.HashMap<String, kotlin.Any>()
+) : kotlin.collections.HashMap<String, kotlin.Any>() {
+
+
+}
 

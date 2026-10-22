@@ -21,7 +21,7 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.userauth.method.AuthPassword
 import net.schmizz.sshj.userauth.password.PasswordUtils
 import net.schmizz.sshj.xfer.InMemorySourceFile
-import org.hyperledger.cactus.plugin.ledger.connector.corda.server.api.ApiPluginLedgerConnectorCordaService
+import org.hyperledger.cactus.plugin.ledger.connector.corda.server.api.ApiApiService
 import org.hyperledger.cactus.plugin.ledger.connector.corda.server.model.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
@@ -44,7 +44,7 @@ class ApiPluginLedgerConnectorCordaServiceImpl(
     // Either way, these magic strings gotta go.
     val rpc: NodeRPCConnection,
     val monitorManager: StateMonitorSessionsManager
-) : ApiPluginLedgerConnectorCordaService {
+) : ApiApiService {
 
     companion object {
         val logger = loggerFor<ApiPluginLedgerConnectorCordaServiceImpl>()

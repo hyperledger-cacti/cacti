@@ -19,6 +19,6 @@ message GetBalanceV1RequestPB {
 
   string address = 73950222;
 
-  optional google.protobuf.Any defaultBlock = 140394805;
+  optional google.protobuf.Any default_block = 226789649;
 
 }

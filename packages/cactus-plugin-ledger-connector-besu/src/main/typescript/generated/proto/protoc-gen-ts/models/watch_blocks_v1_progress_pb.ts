@@ -10,40 +10,40 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class WatchBlocksV1ProgressPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            blockHeader?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB;
+            block_header?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("blockHeader" in data && data.blockHeader != undefined) {
-                    this.blockHeader = data.blockHeader;
+                if ("block_header" in data && data.block_header != undefined) {
+                    this.block_header = data.block_header;
                 }
             }
         }
-        get blockHeader() {
-            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB, 18691451) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB;
+        get block_header() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB, 393325954) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB;
         }
-        set blockHeader(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB) {
-            pb_1.Message.setWrapperField(this, 18691451, value);
+        set block_header(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB) {
+            pb_1.Message.setWrapperField(this, 393325954, value);
         }
-        get has_blockHeader() {
-            return pb_1.Message.getField(this, 18691451) != null;
+        get has_block_header() {
+            return pb_1.Message.getField(this, 393325954) != null;
         }
         static fromObject(data: {
-            blockHeader?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.prototype.toObject>;
+            block_header?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.prototype.toObject>;
         }): WatchBlocksV1ProgressPB {
             const message = new WatchBlocksV1ProgressPB({});
-            if (data.blockHeader != null) {
-                message.blockHeader = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.fromObject(data.blockHeader);
+            if (data.block_header != null) {
+                message.block_header = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.fromObject(data.block_header);
             }
             return message;
         }
         toObject() {
             const data: {
-                blockHeader?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.prototype.toObject>;
+                block_header?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.prototype.toObject>;
             } = {};
-            if (this.blockHeader != null) {
-                data.blockHeader = this.blockHeader.toObject();
+            if (this.block_header != null) {
+                data.block_header = this.block_header.toObject();
             }
             return data;
         }
@@ -51,8 +51,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_blockHeader)
-                writer.writeMessage(18691451, this.blockHeader, () => this.blockHeader.serialize(writer));
+            if (this.has_block_header)
+                writer.writeMessage(393325954, this.block_header, () => this.block_header.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -62,8 +62,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 18691451:
-                        reader.readMessage(message.blockHeader, () => message.blockHeader = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.deserialize(reader));
+                    case 393325954:
+                        reader.readMessage(message.block_header, () => message.block_header = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderPB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }

@@ -733,7 +733,8 @@ export class FabricLeaf
           methodName: "Initialize",
           params: [this.mspId],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (
@@ -751,7 +752,8 @@ export class FabricLeaf
           methodName: "ClientAccountID",
           params: [],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Call,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeCall,
         });
 
         if (bridgeIdResponse.functionOutput == undefined) {
@@ -769,7 +771,8 @@ export class FabricLeaf
           methodName: "setBridge",
           params: [this.mspId, this.bridgeId],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (
@@ -881,7 +884,8 @@ export class FabricLeaf
             safeStableStringify(interactions),
           ],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -929,7 +933,8 @@ export class FabricLeaf
           methodName: "unwrap",
           params: [assetId],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -991,7 +996,8 @@ export class FabricLeaf
                 ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -1053,7 +1059,8 @@ export class FabricLeaf
                 ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -1115,7 +1122,8 @@ export class FabricLeaf
                 ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -1177,7 +1185,8 @@ export class FabricLeaf
                 ]
               : [assetId, assetAttribute.toString()],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -1242,7 +1251,8 @@ export class FabricLeaf
                 ]
               : [assetId, to, assetAttribute.toString()],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -1288,7 +1298,8 @@ export class FabricLeaf
           methodName: "GetAsset",
           params: [assetId],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Call,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeCall,
         });
 
         if (response == undefined) {
@@ -1359,7 +1370,8 @@ export class FabricLeaf
           methodName: "GetAssets",
           params: [],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Call,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeCall,
         });
 
         if (response == undefined) {
@@ -1405,7 +1417,8 @@ export class FabricLeaf
           methodName: "ClientAccountID",
           params: [],
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Call,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeCall,
         });
 
         if (response == undefined) {
@@ -1456,7 +1469,8 @@ export class FabricLeaf
           methodName: methodName,
           params: params,
           contractName: this.wrapperContractName,
-          invocationType: FabricContractInvocationType.Send,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeSend,
         });
 
         if (response == undefined || response.transactionId == "") {
@@ -1525,7 +1539,7 @@ export class FabricLeaf
             undefined,
           );
 
-          return safeStableStringify(generated);
+          return safeStableStringify(generated) ?? "";
         } catch (error) {
           console.error(error);
           return "";
@@ -1564,7 +1578,8 @@ export class FabricLeaf
           signingCredential: this.signingCredential,
           channelName: this.contractChannel,
           contractName: "qscc",
-          invocationType: FabricContractInvocationType.Call,
+          invocationType:
+            FabricContractInvocationType.FabricContractInvocationTypeCall,
           methodName: "GetBlockByTxID",
           params: [this.contractChannel, transactionId],
         });

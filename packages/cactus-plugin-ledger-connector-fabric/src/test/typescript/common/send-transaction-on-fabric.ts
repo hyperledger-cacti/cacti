@@ -38,7 +38,8 @@ export async function sendTransactionOnFabric(opts: {
     signingCredential: gatewayOptions.wallet
       .keychain as FabricSigningCredential,
     channelName: ledgerChannelName,
-    invocationType: FabricContractInvocationType.Send,
+    invocationType:
+      FabricContractInvocationType.FabricContractInvocationTypeSend,
     contractName: ledgerContractName,
     methodName: "CreateAsset",
     params: [assetName, "green", "111", "someOwner", "299"],

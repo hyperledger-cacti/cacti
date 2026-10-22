@@ -12,6 +12,8 @@ package cactus-core-api
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the CactusNode type satisfies the MappedNullable interface at compile time
@@ -29,6 +31,8 @@ type CactusNode struct {
 	LedgerIds []string `json:"ledgerIds"`
 	PluginInstanceIds []string `json:"pluginInstanceIds"`
 }
+
+type _CactusNode CactusNode
 
 // NewCactusNode instantiates a new CactusNode object
 // This constructor will assign default values to properties that have it defined,
@@ -240,6 +244,49 @@ func (o CactusNode) ToMap() (map[string]interface{}, error) {
 	toSerialize["ledgerIds"] = o.LedgerIds
 	toSerialize["pluginInstanceIds"] = o.PluginInstanceIds
 	return toSerialize, nil
+}
+
+func (o *CactusNode) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"nodeApiHost",
+		"publicKeyPem",
+		"id",
+		"consortiumId",
+		"memberId",
+		"ledgerIds",
+		"pluginInstanceIds",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varCactusNode := _CactusNode{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varCactusNode)
+
+	if err != nil {
+		return err
+	}
+
+	*o = CactusNode(varCactusNode)
+
+	return err
 }
 
 type NullableCactusNode struct {

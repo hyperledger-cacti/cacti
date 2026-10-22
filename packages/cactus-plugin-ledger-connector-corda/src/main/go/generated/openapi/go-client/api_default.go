@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiClearMonitorTransactionsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	clearMonitorTransactionsV1Request *ClearMonitorTransactionsV1Request
 }
 
@@ -43,7 +43,7 @@ ClearMonitorTransactionsV1 Clear transactions from internal store so they'll not
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiClearMonitorTransactionsV1Request
 */
-func (a *DefaultApiService) ClearMonitorTransactionsV1(ctx context.Context) ApiClearMonitorTransactionsV1Request {
+func (a *DefaultAPIService) ClearMonitorTransactionsV1(ctx context.Context) ApiClearMonitorTransactionsV1Request {
 	return ApiClearMonitorTransactionsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -52,7 +52,7 @@ func (a *DefaultApiService) ClearMonitorTransactionsV1(ctx context.Context) ApiC
 
 // Execute executes the request
 //  @return ClearMonitorTransactionsV1Response
-func (a *DefaultApiService) ClearMonitorTransactionsV1Execute(r ApiClearMonitorTransactionsV1Request) (*ClearMonitorTransactionsV1Response, *http.Response, error) {
+func (a *DefaultAPIService) ClearMonitorTransactionsV1Execute(r ApiClearMonitorTransactionsV1Request) (*ClearMonitorTransactionsV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete
 		localVarPostBody     interface{}
@@ -60,7 +60,7 @@ func (a *DefaultApiService) ClearMonitorTransactionsV1Execute(r ApiClearMonitorT
 		localVarReturnValue  *ClearMonitorTransactionsV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ClearMonitorTransactionsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.ClearMonitorTransactionsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -132,7 +132,7 @@ func (a *DefaultApiService) ClearMonitorTransactionsV1Execute(r ApiClearMonitorT
 
 type ApiDeployContractJarsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	deployContractJarsV1Request *DeployContractJarsV1Request
 }
 
@@ -151,7 +151,7 @@ DeployContractJarsV1 Deploys a set of jar files (Cordapps, e.g. the contracts in
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDeployContractJarsV1Request
 */
-func (a *DefaultApiService) DeployContractJarsV1(ctx context.Context) ApiDeployContractJarsV1Request {
+func (a *DefaultAPIService) DeployContractJarsV1(ctx context.Context) ApiDeployContractJarsV1Request {
 	return ApiDeployContractJarsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -160,7 +160,7 @@ func (a *DefaultApiService) DeployContractJarsV1(ctx context.Context) ApiDeployC
 
 // Execute executes the request
 //  @return DeployContractJarsSuccessV1Response
-func (a *DefaultApiService) DeployContractJarsV1Execute(r ApiDeployContractJarsV1Request) (*DeployContractJarsSuccessV1Response, *http.Response, error) {
+func (a *DefaultAPIService) DeployContractJarsV1Execute(r ApiDeployContractJarsV1Request) (*DeployContractJarsSuccessV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -168,7 +168,7 @@ func (a *DefaultApiService) DeployContractJarsV1Execute(r ApiDeployContractJarsV
 		localVarReturnValue  *DeployContractJarsSuccessV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.DeployContractJarsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DeployContractJarsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -250,7 +250,7 @@ func (a *DefaultApiService) DeployContractJarsV1Execute(r ApiDeployContractJarsV
 
 type ApiDiagnoseNodeV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	diagnoseNodeV1Request *DiagnoseNodeV1Request
 }
 
@@ -271,7 +271,7 @@ Responds with diagnostic information about the Corda node
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDiagnoseNodeV1Request
 */
-func (a *DefaultApiService) DiagnoseNodeV1(ctx context.Context) ApiDiagnoseNodeV1Request {
+func (a *DefaultAPIService) DiagnoseNodeV1(ctx context.Context) ApiDiagnoseNodeV1Request {
 	return ApiDiagnoseNodeV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -280,7 +280,7 @@ func (a *DefaultApiService) DiagnoseNodeV1(ctx context.Context) ApiDiagnoseNodeV
 
 // Execute executes the request
 //  @return DiagnoseNodeV1Response
-func (a *DefaultApiService) DiagnoseNodeV1Execute(r ApiDiagnoseNodeV1Request) (*DiagnoseNodeV1Response, *http.Response, error) {
+func (a *DefaultAPIService) DiagnoseNodeV1Execute(r ApiDiagnoseNodeV1Request) (*DiagnoseNodeV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -288,7 +288,7 @@ func (a *DefaultApiService) DiagnoseNodeV1Execute(r ApiDiagnoseNodeV1Request) (*
 		localVarReturnValue  *DiagnoseNodeV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.DiagnoseNodeV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DiagnoseNodeV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -357,7 +357,7 @@ func (a *DefaultApiService) DiagnoseNodeV1Execute(r ApiDiagnoseNodeV1Request) (*
 
 type ApiGetFlowV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getFlowCidV1Request *GetFlowCidV1Request
 }
 
@@ -377,7 +377,7 @@ GetFlowV1 This method gets the current status of the specified flow instance.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetFlowV1Request
 */
-func (a *DefaultApiService) GetFlowV1(ctx context.Context) ApiGetFlowV1Request {
+func (a *DefaultAPIService) GetFlowV1(ctx context.Context) ApiGetFlowV1Request {
 	return ApiGetFlowV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -386,7 +386,7 @@ func (a *DefaultApiService) GetFlowV1(ctx context.Context) ApiGetFlowV1Request {
 
 // Execute executes the request
 //  @return GetFlowCidV1Response
-func (a *DefaultApiService) GetFlowV1Execute(r ApiGetFlowV1Request) (*GetFlowCidV1Response, *http.Response, error) {
+func (a *DefaultAPIService) GetFlowV1Execute(r ApiGetFlowV1Request) (*GetFlowCidV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -394,7 +394,7 @@ func (a *DefaultApiService) GetFlowV1Execute(r ApiGetFlowV1Request) (*GetFlowCid
 		localVarReturnValue  *GetFlowCidV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetFlowV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetFlowV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -466,7 +466,7 @@ func (a *DefaultApiService) GetFlowV1Execute(r ApiGetFlowV1Request) (*GetFlowCid
 
 type ApiGetMonitorTransactionsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getMonitorTransactionsV1Request *GetMonitorTransactionsV1Request
 }
 
@@ -485,7 +485,7 @@ GetMonitorTransactionsV1 Get transactions for monitored state classes.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetMonitorTransactionsV1Request
 */
-func (a *DefaultApiService) GetMonitorTransactionsV1(ctx context.Context) ApiGetMonitorTransactionsV1Request {
+func (a *DefaultAPIService) GetMonitorTransactionsV1(ctx context.Context) ApiGetMonitorTransactionsV1Request {
 	return ApiGetMonitorTransactionsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -494,7 +494,7 @@ func (a *DefaultApiService) GetMonitorTransactionsV1(ctx context.Context) ApiGet
 
 // Execute executes the request
 //  @return GetMonitorTransactionsV1Response
-func (a *DefaultApiService) GetMonitorTransactionsV1Execute(r ApiGetMonitorTransactionsV1Request) (*GetMonitorTransactionsV1Response, *http.Response, error) {
+func (a *DefaultAPIService) GetMonitorTransactionsV1Execute(r ApiGetMonitorTransactionsV1Request) (*GetMonitorTransactionsV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -502,7 +502,7 @@ func (a *DefaultApiService) GetMonitorTransactionsV1Execute(r ApiGetMonitorTrans
 		localVarReturnValue  *GetMonitorTransactionsV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetMonitorTransactionsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetMonitorTransactionsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -574,7 +574,7 @@ func (a *DefaultApiService) GetMonitorTransactionsV1Execute(r ApiGetMonitorTrans
 
 type ApiGetPrometheusMetricsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetPrometheusMetricsV1Request) Execute() (string, *http.Response, error) {
@@ -587,7 +587,7 @@ GetPrometheusMetricsV1 Get the Prometheus Metrics
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetPrometheusMetricsV1Request
 */
-func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
+func (a *DefaultAPIService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPrometheusMetricsV1Request {
 	return ApiGetPrometheusMetricsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -596,7 +596,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1(ctx context.Context) ApiGetPr
 
 // Execute executes the request
 //  @return string
-func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
+func (a *DefaultAPIService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetricsV1Request) (string, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -604,7 +604,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 		localVarReturnValue  string
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetPrometheusMetricsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetPrometheusMetricsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -671,7 +671,7 @@ func (a *DefaultApiService) GetPrometheusMetricsV1Execute(r ApiGetPrometheusMetr
 
 type ApiInvokeContractV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	invokeContractV1Request *InvokeContractV1Request
 }
 
@@ -690,7 +690,7 @@ InvokeContractV1 Invokes a contract on a Corda ledger (e.g. a flow)
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiInvokeContractV1Request
 */
-func (a *DefaultApiService) InvokeContractV1(ctx context.Context) ApiInvokeContractV1Request {
+func (a *DefaultAPIService) InvokeContractV1(ctx context.Context) ApiInvokeContractV1Request {
 	return ApiInvokeContractV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -699,7 +699,7 @@ func (a *DefaultApiService) InvokeContractV1(ctx context.Context) ApiInvokeContr
 
 // Execute executes the request
 //  @return InvokeContractV1Response
-func (a *DefaultApiService) InvokeContractV1Execute(r ApiInvokeContractV1Request) (*InvokeContractV1Response, *http.Response, error) {
+func (a *DefaultAPIService) InvokeContractV1Execute(r ApiInvokeContractV1Request) (*InvokeContractV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -707,7 +707,7 @@ func (a *DefaultApiService) InvokeContractV1Execute(r ApiInvokeContractV1Request
 		localVarReturnValue  *InvokeContractV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.InvokeContractV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.InvokeContractV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -779,7 +779,7 @@ func (a *DefaultApiService) InvokeContractV1Execute(r ApiInvokeContractV1Request
 
 type ApiListCpiV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	listCpiV1Request *ListCpiV1Request
 }
 
@@ -798,7 +798,7 @@ ListCpiV1 List all CPIs uploaded to the cluster
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiListCpiV1Request
 */
-func (a *DefaultApiService) ListCpiV1(ctx context.Context) ApiListCpiV1Request {
+func (a *DefaultAPIService) ListCpiV1(ctx context.Context) ApiListCpiV1Request {
 	return ApiListCpiV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -807,7 +807,7 @@ func (a *DefaultApiService) ListCpiV1(ctx context.Context) ApiListCpiV1Request {
 
 // Execute executes the request
 //  @return ListCpiV1Response
-func (a *DefaultApiService) ListCpiV1Execute(r ApiListCpiV1Request) (*ListCpiV1Response, *http.Response, error) {
+func (a *DefaultAPIService) ListCpiV1Execute(r ApiListCpiV1Request) (*ListCpiV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -815,7 +815,7 @@ func (a *DefaultApiService) ListCpiV1Execute(r ApiListCpiV1Request) (*ListCpiV1R
 		localVarReturnValue  *ListCpiV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ListCpiV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.ListCpiV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -887,7 +887,7 @@ func (a *DefaultApiService) ListCpiV1Execute(r ApiListCpiV1Request) (*ListCpiV1R
 
 type ApiListFlowV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	getFlowCidV1Request *GetFlowCidV1Request
 }
 
@@ -907,7 +907,7 @@ ListFlowV1 This method returns an array containing the statuses of all flows run
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiListFlowV1Request
 */
-func (a *DefaultApiService) ListFlowV1(ctx context.Context) ApiListFlowV1Request {
+func (a *DefaultAPIService) ListFlowV1(ctx context.Context) ApiListFlowV1Request {
 	return ApiListFlowV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -916,7 +916,7 @@ func (a *DefaultApiService) ListFlowV1(ctx context.Context) ApiListFlowV1Request
 
 // Execute executes the request
 //  @return FlowStatusV1Responses
-func (a *DefaultApiService) ListFlowV1Execute(r ApiListFlowV1Request) (*FlowStatusV1Responses, *http.Response, error) {
+func (a *DefaultAPIService) ListFlowV1Execute(r ApiListFlowV1Request) (*FlowStatusV1Responses, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -924,7 +924,7 @@ func (a *DefaultApiService) ListFlowV1Execute(r ApiListFlowV1Request) (*FlowStat
 		localVarReturnValue  *FlowStatusV1Responses
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ListFlowV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.ListFlowV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -996,7 +996,7 @@ func (a *DefaultApiService) ListFlowV1Execute(r ApiListFlowV1Request) (*FlowStat
 
 type ApiListFlowsV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	listFlowsV1Request *ListFlowsV1Request
 }
 
@@ -1017,7 +1017,7 @@ Responds with a list of the flows on the Corda node.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiListFlowsV1Request
 */
-func (a *DefaultApiService) ListFlowsV1(ctx context.Context) ApiListFlowsV1Request {
+func (a *DefaultAPIService) ListFlowsV1(ctx context.Context) ApiListFlowsV1Request {
 	return ApiListFlowsV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -1026,7 +1026,7 @@ func (a *DefaultApiService) ListFlowsV1(ctx context.Context) ApiListFlowsV1Reque
 
 // Execute executes the request
 //  @return ListFlowsV1Response
-func (a *DefaultApiService) ListFlowsV1Execute(r ApiListFlowsV1Request) (*ListFlowsV1Response, *http.Response, error) {
+func (a *DefaultAPIService) ListFlowsV1Execute(r ApiListFlowsV1Request) (*ListFlowsV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -1034,7 +1034,7 @@ func (a *DefaultApiService) ListFlowsV1Execute(r ApiListFlowsV1Request) (*ListFl
 		localVarReturnValue  *ListFlowsV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.ListFlowsV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.ListFlowsV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1103,7 +1103,7 @@ func (a *DefaultApiService) ListFlowsV1Execute(r ApiListFlowsV1Request) (*ListFl
 
 type ApiNetworkMapV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	body *map[string]interface{}
 }
 
@@ -1124,7 +1124,7 @@ Responds with a snapshot of the network map as provided by the Corda RPC call: n
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiNetworkMapV1Request
 */
-func (a *DefaultApiService) NetworkMapV1(ctx context.Context) ApiNetworkMapV1Request {
+func (a *DefaultAPIService) NetworkMapV1(ctx context.Context) ApiNetworkMapV1Request {
 	return ApiNetworkMapV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -1133,7 +1133,7 @@ func (a *DefaultApiService) NetworkMapV1(ctx context.Context) ApiNetworkMapV1Req
 
 // Execute executes the request
 //  @return []NodeInfo
-func (a *DefaultApiService) NetworkMapV1Execute(r ApiNetworkMapV1Request) ([]NodeInfo, *http.Response, error) {
+func (a *DefaultAPIService) NetworkMapV1Execute(r ApiNetworkMapV1Request) ([]NodeInfo, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -1141,7 +1141,7 @@ func (a *DefaultApiService) NetworkMapV1Execute(r ApiNetworkMapV1Request) ([]Nod
 		localVarReturnValue  []NodeInfo
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.NetworkMapV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.NetworkMapV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1210,7 +1210,7 @@ func (a *DefaultApiService) NetworkMapV1Execute(r ApiNetworkMapV1Request) ([]Nod
 
 type ApiStartFlowV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	startFlowV1Request *StartFlowV1Request
 }
 
@@ -1230,7 +1230,7 @@ StartFlowV1 This method starts a new instance for the specified flow for the spe
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiStartFlowV1Request
 */
-func (a *DefaultApiService) StartFlowV1(ctx context.Context) ApiStartFlowV1Request {
+func (a *DefaultAPIService) StartFlowV1(ctx context.Context) ApiStartFlowV1Request {
 	return ApiStartFlowV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -1239,7 +1239,7 @@ func (a *DefaultApiService) StartFlowV1(ctx context.Context) ApiStartFlowV1Reque
 
 // Execute executes the request
 //  @return StartFlowV1Response
-func (a *DefaultApiService) StartFlowV1Execute(r ApiStartFlowV1Request) (*StartFlowV1Response, *http.Response, error) {
+func (a *DefaultAPIService) StartFlowV1Execute(r ApiStartFlowV1Request) (*StartFlowV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -1247,7 +1247,7 @@ func (a *DefaultApiService) StartFlowV1Execute(r ApiStartFlowV1Request) (*StartF
 		localVarReturnValue  *StartFlowV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.StartFlowV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.StartFlowV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1319,7 +1319,7 @@ func (a *DefaultApiService) StartFlowV1Execute(r ApiStartFlowV1Request) (*StartF
 
 type ApiStartMonitorV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	startMonitorV1Request *StartMonitorV1Request
 }
 
@@ -1338,7 +1338,7 @@ StartMonitorV1 Start monitoring corda changes (transactions) of given state clas
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiStartMonitorV1Request
 */
-func (a *DefaultApiService) StartMonitorV1(ctx context.Context) ApiStartMonitorV1Request {
+func (a *DefaultAPIService) StartMonitorV1(ctx context.Context) ApiStartMonitorV1Request {
 	return ApiStartMonitorV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -1347,7 +1347,7 @@ func (a *DefaultApiService) StartMonitorV1(ctx context.Context) ApiStartMonitorV
 
 // Execute executes the request
 //  @return StartMonitorV1Response
-func (a *DefaultApiService) StartMonitorV1Execute(r ApiStartMonitorV1Request) (*StartMonitorV1Response, *http.Response, error) {
+func (a *DefaultAPIService) StartMonitorV1Execute(r ApiStartMonitorV1Request) (*StartMonitorV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -1355,7 +1355,7 @@ func (a *DefaultApiService) StartMonitorV1Execute(r ApiStartMonitorV1Request) (*
 		localVarReturnValue  *StartMonitorV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.StartMonitorV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.StartMonitorV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1427,7 +1427,7 @@ func (a *DefaultApiService) StartMonitorV1Execute(r ApiStartMonitorV1Request) (*
 
 type ApiStopMonitorV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	stopMonitorV1Request *StopMonitorV1Request
 }
 
@@ -1446,7 +1446,7 @@ StopMonitorV1 Stop monitoring corda changes (transactions) of given state class
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiStopMonitorV1Request
 */
-func (a *DefaultApiService) StopMonitorV1(ctx context.Context) ApiStopMonitorV1Request {
+func (a *DefaultAPIService) StopMonitorV1(ctx context.Context) ApiStopMonitorV1Request {
 	return ApiStopMonitorV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -1455,7 +1455,7 @@ func (a *DefaultApiService) StopMonitorV1(ctx context.Context) ApiStopMonitorV1R
 
 // Execute executes the request
 //  @return StopMonitorV1Response
-func (a *DefaultApiService) StopMonitorV1Execute(r ApiStopMonitorV1Request) (*StopMonitorV1Response, *http.Response, error) {
+func (a *DefaultAPIService) StopMonitorV1Execute(r ApiStopMonitorV1Request) (*StopMonitorV1Response, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodDelete
 		localVarPostBody     interface{}
@@ -1463,7 +1463,7 @@ func (a *DefaultApiService) StopMonitorV1Execute(r ApiStopMonitorV1Request) (*St
 		localVarReturnValue  *StopMonitorV1Response
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.StopMonitorV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.StopMonitorV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -1535,7 +1535,7 @@ func (a *DefaultApiService) StopMonitorV1Execute(r ApiStopMonitorV1Request) (*St
 
 type ApiVaultQueryV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	vaultQueryV1Request *VaultQueryV1Request
 }
 
@@ -1556,7 +1556,7 @@ Queryes the vault service for state references based on JVM class names. Custom 
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiVaultQueryV1Request
 */
-func (a *DefaultApiService) VaultQueryV1(ctx context.Context) ApiVaultQueryV1Request {
+func (a *DefaultAPIService) VaultQueryV1(ctx context.Context) ApiVaultQueryV1Request {
 	return ApiVaultQueryV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -1565,7 +1565,7 @@ func (a *DefaultApiService) VaultQueryV1(ctx context.Context) ApiVaultQueryV1Req
 
 // Execute executes the request
 //  @return map[string]interface{}
-func (a *DefaultApiService) VaultQueryV1Execute(r ApiVaultQueryV1Request) (map[string]interface{}, *http.Response, error) {
+func (a *DefaultAPIService) VaultQueryV1Execute(r ApiVaultQueryV1Request) (map[string]interface{}, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -1573,7 +1573,7 @@ func (a *DefaultApiService) VaultQueryV1Execute(r ApiVaultQueryV1Request) (map[s
 		localVarReturnValue  map[string]interface{}
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.VaultQueryV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.VaultQueryV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

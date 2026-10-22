@@ -17,13 +17,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InitializeRequest'
+              $ref: "#/components/schemas/InitializeRequest"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RunTransactionResponse'
+                $ref: "#/components/schemas/RunTransactionResponse"
           description: OK
       summary: Initialize contract
       x-hyperledger-cacti:
@@ -38,13 +38,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/WithdrawRequest'
+              $ref: "#/components/schemas/WithdrawRequest"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvokeContractV1Response'
+                $ref: "#/components/schemas/InvokeContractV1Response"
           description: OK
       summary: Withdraw a hashtimelock contract
       x-hyperledger-cacti:
@@ -58,7 +58,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetStatusRequest'
+              $ref: "#/components/schemas/GetStatusRequest"
       responses:
         "200":
           content:
@@ -80,7 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetSingleStatusRequest'
+              $ref: "#/components/schemas/GetSingleStatusRequest"
       responses:
         "200":
           content:
@@ -101,13 +101,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RefundRequest'
+              $ref: "#/components/schemas/RefundRequest"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvokeContractV1Response'
+                $ref: "#/components/schemas/InvokeContractV1Response"
           description: OK
       summary: Refund a hashtimelock contract
       x-hyperledger-cacti:
@@ -122,13 +122,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewContractRequest'
+              $ref: "#/components/schemas/NewContractRequest"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvokeContractV1Response'
+                $ref: "#/components/schemas/InvokeContractV1Response"
           description: OK
       summary: Create a new hashtimelock contract
       x-hyperledger-cacti:
@@ -157,20 +157,20 @@ components:
     NewContractRequest:
       additionalProperties: false
       example:
-        receiver: receiver
-        outputAmount: 6.027456183070403
-        outputNetwork: outputNetwork
-        connectorId: connectorId
-        hashLock: hashLock
         contractAddress: contractAddress
         inputAmount: 0.8008281904610115
-        tokenAddress: tokenAddress
-        outputAddress: outputAddress
-        keychainId: keychainId
-        gas: null
-        web3SigningCredential:
-          type: null
+        outputAmount: 6.027456183070403
         expiration: 1.4658129805029452
+        hashLock: hashLock
+        tokenAddress: tokenAddress
+        receiver: receiver
+        outputNetwork: outputNetwork
+        outputAddress: outputAddress
+        web3SigningCredential:
+          type: CACTUS_KEYCHAIN_REF
+        connectorId: connectorId
+        keychainId: keychainId
+        gas: NewContractRequest_gas
       properties:
         contractAddress:
           description: Contract address
@@ -209,7 +209,7 @@ components:
           nullable: false
           type: string
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         connectorId:
           description: connectorId for the connector besu plugin
           nullable: false
@@ -219,7 +219,7 @@ components:
           nullable: false
           type: string
         gas:
-          $ref: '#/components/schemas/NewContractRequest_gas'
+          $ref: "#/components/schemas/NewContractRequest_gas"
       required:
       - connectorId
       - contractAddress
@@ -237,19 +237,19 @@ components:
     RefundRequest:
       additionalProperties: false
       example:
-        keychainId: keychainId
-        connectorId: connectorId
-        gas: null
-        web3SigningCredential:
-          type: null
         id: id
+        web3SigningCredential:
+          type: CACTUS_KEYCHAIN_REF
+        connectorId: connectorId
+        keychainId: keychainId
+        gas: NewContractRequest_gas
       properties:
         id:
           description: Contract htlc id for refund
           nullable: false
           type: string
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         connectorId:
           description: connectorId for the connector besu plugin
           nullable: false
@@ -259,7 +259,7 @@ components:
           nullable: false
           type: string
         gas:
-          $ref: '#/components/schemas/NewContractRequest_gas'
+          $ref: "#/components/schemas/NewContractRequest_gas"
       required:
       - connectorId
       - id
@@ -269,13 +269,13 @@ components:
     WithdrawRequest:
       additionalProperties: false
       example:
-        keychainId: keychainId
-        connectorId: connectorId
-        gas: null
-        web3SigningCredential:
-          type: null
         id: id
         secret: secret
+        web3SigningCredential:
+          type: CACTUS_KEYCHAIN_REF
+        connectorId: connectorId
+        keychainId: keychainId
+        gas: NewContractRequest_gas
       properties:
         id:
           description: Contract locked id
@@ -286,7 +286,7 @@ components:
           nullable: false
           type: string
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         connectorId:
           description: connectorId for the connector besu plugin
           nullable: false
@@ -296,7 +296,7 @@ components:
           nullable: false
           type: string
         gas:
-          $ref: '#/components/schemas/NewContractRequest_gas'
+          $ref: "#/components/schemas/NewContractRequest_gas"
       required:
       - connectorId
       - id
@@ -308,20 +308,20 @@ components:
       additionalProperties: false
       description: Defines the parameters for retrieving the status of the HTLC swap.
       example:
-        keychainId: keychainId
-        connectorId: connectorId
         ids:
         - ids
         - ids
         web3SigningCredential:
-          type: null
+          type: CACTUS_KEYCHAIN_REF
+        connectorId: connectorId
+        keychainId: keychainId
       properties:
         ids:
           items:
             type: string
           type: array
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         connectorId:
           type: string
         keychainId:
@@ -337,16 +337,16 @@ components:
       description: Defines the parameters for retrieving the single status of the
         HTLC swap.
       example:
-        keychainId: keychainId
-        connectorId: connectorId
-        web3SigningCredential:
-          type: null
         id: id
+        web3SigningCredential:
+          type: CACTUS_KEYCHAIN_REF
+        connectorId: connectorId
+        keychainId: keychainId
       properties:
         id:
           type: string
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         connectorId:
           type: string
         keychainId:
@@ -360,14 +360,14 @@ components:
     InitializeRequest:
       additionalProperties: false
       example:
-        keychainId: keychainId
         connectorId: connectorId
+        keychainId: keychainId
         constructorArgs:
         - ""
         - ""
-        gas: 0.8008281904610115
         web3SigningCredential:
-          type: null
+          type: CACTUS_KEYCHAIN_REF
+        gas: 0.8008281904610115
       properties:
         connectorId:
           description: connectorId for the connector besu plugin
@@ -382,7 +382,7 @@ components:
           items: {}
           type: array
         web3SigningCredential:
-          $ref: '#/components/schemas/Web3SigningCredential'
+          $ref: "#/components/schemas/Web3SigningCredential"
         gas:
           type: number
       required:
@@ -401,7 +401,7 @@ components:
     Web3SigningCredentialCactusKeychainRef:
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
         ethAccount:
           description: The ethereum account (public key) that the credential  belongs
             to. Basically the username in the traditional  terminology of authentication.
@@ -431,7 +431,7 @@ components:
     Web3SigningCredentialPrivateKeyHex:
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
         ethAccount:
           description: The ethereum account (public key) that the credential belongs
             to. Basically the username in the traditional terminology of authentication.
@@ -454,7 +454,7 @@ components:
         transaction is pre-signed.
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
       required:
       - type
       type: object
@@ -462,29 +462,29 @@ components:
       discriminator:
         propertyName: type
       example:
-        type: null
+        type: CACTUS_KEYCHAIN_REF
       oneOf:
-      - $ref: '#/components/schemas/Web3SigningCredentialCactusKeychainRef'
-      - $ref: '#/components/schemas/Web3SigningCredentialPrivateKeyHex'
-      - $ref: '#/components/schemas/Web3SigningCredentialNone'
+      - $ref: "#/components/schemas/Web3SigningCredentialCactusKeychainRef"
+      - $ref: "#/components/schemas/Web3SigningCredentialPrivateKeyHex"
+      - $ref: "#/components/schemas/Web3SigningCredentialNone"
       properties:
         type:
-          $ref: '#/components/schemas/Web3SigningCredentialType'
+          $ref: "#/components/schemas/Web3SigningCredentialType"
       required:
       - type
       type: object
     Web3TransactionReceipt:
       additionalProperties: true
       example:
-        blockHash: blockHash
-        gasUsed: 1.4658129805029452
-        blockNumber: 6.027456183070403
-        contractAddress: contractAddress
+        status: true
+        transactionHash: transactionHash
         transactionIndex: 0.8008281904610115
+        blockHash: blockHash
+        blockNumber: 6.027456183070403
+        gasUsed: 1.4658129805029452
+        contractAddress: contractAddress
         from: from
         to: to
-        transactionHash: transactionHash
-        status: true
       properties:
         status:
           nullable: false
@@ -530,38 +530,38 @@ components:
     RunTransactionResponse:
       example:
         transactionReceipt:
-          blockHash: blockHash
-          gasUsed: 1.4658129805029452
-          blockNumber: 6.027456183070403
-          contractAddress: contractAddress
+          status: true
+          transactionHash: transactionHash
           transactionIndex: 0.8008281904610115
+          blockHash: blockHash
+          blockNumber: 6.027456183070403
+          gasUsed: 1.4658129805029452
+          contractAddress: contractAddress
           from: from
           to: to
-          transactionHash: transactionHash
-          status: true
       properties:
         transactionReceipt:
-          $ref: '#/components/schemas/Web3TransactionReceipt'
+          $ref: "#/components/schemas/Web3TransactionReceipt"
       required:
       - transactionReceipt
       type: object
     InvokeContractV1Response:
       example:
         transactionReceipt:
-          blockHash: blockHash
-          gasUsed: 1.4658129805029452
-          blockNumber: 6.027456183070403
-          contractAddress: contractAddress
+          status: true
+          transactionHash: transactionHash
           transactionIndex: 0.8008281904610115
+          blockHash: blockHash
+          blockNumber: 6.027456183070403
+          gasUsed: 1.4658129805029452
+          contractAddress: contractAddress
           from: from
           to: to
-          transactionHash: transactionHash
-          status: true
         callOutput: ""
         success: true
       properties:
         transactionReceipt:
-          $ref: '#/components/schemas/Web3TransactionReceipt'
+          $ref: "#/components/schemas/Web3TransactionReceipt"
         callOutput: {}
         success:
           nullable: false

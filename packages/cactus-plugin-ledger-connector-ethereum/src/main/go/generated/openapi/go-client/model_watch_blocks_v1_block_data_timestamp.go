@@ -13,6 +13,7 @@ package cactus-plugin-ledger-connector-ethereum
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // WatchBlocksV1BlockDataTimestamp - struct for WatchBlocksV1BlockDataTimestamp
@@ -47,7 +48,11 @@ func (dst *WatchBlocksV1BlockDataTimestamp) UnmarshalJSON(data []byte) error {
 		if string(jsonFloat32) == "{}" { // empty struct
 			dst.Float32 = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.Float32); err != nil {
+				dst.Float32 = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.Float32 = nil
@@ -60,7 +65,11 @@ func (dst *WatchBlocksV1BlockDataTimestamp) UnmarshalJSON(data []byte) error {
 		if string(jsonString) == "{}" { // empty struct
 			dst.String = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.String); err != nil {
+				dst.String = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.String = nil
@@ -75,6 +84,10 @@ func (dst *WatchBlocksV1BlockDataTimestamp) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(WatchBlocksV1BlockDataTimestamp): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(WatchBlocksV1BlockDataTimestamp)")
 	}
 }
@@ -103,6 +116,20 @@ func (obj *WatchBlocksV1BlockDataTimestamp) GetActualInstance() (interface{}) {
 
 	if obj.String != nil {
 		return obj.String
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj WatchBlocksV1BlockDataTimestamp) GetActualInstanceValue() (interface{}) {
+	if obj.Float32 != nil {
+		return *obj.Float32
+	}
+
+	if obj.String != nil {
+		return *obj.String
 	}
 
 	// all schemas are nil

@@ -16,6 +16,6 @@ import "google/protobuf/any.proto";
 
 
 enum EthContractInvocationTypePB {
-  EthContractInvocationTypePB_SEND = 0;
-  EthContractInvocationTypePB_CALL = 1;
+  ETH_CONTRACT_INVOCATION_TYPE_P_B_SEND = 0;
+  ETH_CONTRACT_INVOCATION_TYPE_P_B_CALL = 1;
 }

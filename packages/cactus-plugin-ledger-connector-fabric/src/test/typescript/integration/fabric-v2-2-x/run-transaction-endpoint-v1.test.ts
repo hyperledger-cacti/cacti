@@ -169,7 +169,8 @@ describe(testCase, () => {
         signingCredential,
         channelName,
         contractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "GetAllAssets",
         params: [],
       } as RunTransactionRequest);
@@ -182,7 +183,8 @@ describe(testCase, () => {
       const req: RunTransactionRequest = {
         signingCredential,
         channelName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         contractName,
         methodName: "CreateAsset",
         params: [assetId, "yellow", "11", assetOwner, "199"],
@@ -198,7 +200,8 @@ describe(testCase, () => {
         signingCredential,
         channelName,
         contractName: "qscc",
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "GetBlockByTxID",
         params: [channelName, res.data.transactionId],
       } as RunTransactionRequest);
@@ -212,7 +215,8 @@ describe(testCase, () => {
         signingCredential,
         channelName,
         contractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "GetAllAssets",
         params: [],
       } as RunTransactionRequest);
@@ -275,7 +279,8 @@ describe(testCase, () => {
           },
         },
         channelName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         contractName,
         methodName: "CreateAsset",
         params: ["asset388", "green", "111", assetOwner, "299"],
@@ -306,7 +311,8 @@ describe(testCase, () => {
         signingCredential,
         channelName,
         contractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "GetAllAssets",
         params: [],
       } as RunTransactionRequest);

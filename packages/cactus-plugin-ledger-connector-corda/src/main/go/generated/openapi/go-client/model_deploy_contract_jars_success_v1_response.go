@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the DeployContractJarsSuccessV1Response type satisfies the MappedNullable interface at compile time
@@ -21,6 +23,8 @@ var _ MappedNullable = &DeployContractJarsSuccessV1Response{}
 type DeployContractJarsSuccessV1Response struct {
 	DeployedJarFiles []string `json:"deployedJarFiles"`
 }
+
+type _DeployContractJarsSuccessV1Response DeployContractJarsSuccessV1Response
 
 // NewDeployContractJarsSuccessV1Response instantiates a new DeployContractJarsSuccessV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -76,6 +80,43 @@ func (o DeployContractJarsSuccessV1Response) ToMap() (map[string]interface{}, er
 	toSerialize := map[string]interface{}{}
 	toSerialize["deployedJarFiles"] = o.DeployedJarFiles
 	return toSerialize, nil
+}
+
+func (o *DeployContractJarsSuccessV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"deployedJarFiles",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDeployContractJarsSuccessV1Response := _DeployContractJarsSuccessV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDeployContractJarsSuccessV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = DeployContractJarsSuccessV1Response(varDeployContractJarsSuccessV1Response)
+
+	return err
 }
 
 type NullableDeployContractJarsSuccessV1Response struct {

@@ -2,4 +2,9 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/CmdApiServerEndpointErrorResponse.md
+docs/DefaultApi.md
+docs/HealthCheckResponse.md
+docs/MemoryUsage.md
+docs/WatchHealthcheckV1.md
 index.ts

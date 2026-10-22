@@ -10,43 +10,43 @@ export function validateGetVerifiedViewRequest(req: GetVerifiedViewV1Request): {
   args: string[];
   remoteNetwork: string;
 } {
-  if (!req.getVerifiedViewV1RequestPB) {
+  if (!req.getVerifiedViewV1RequestPb) {
     throw new ConnectError("request data required", Code.InvalidArgument);
   }
-  if (!req.getVerifiedViewV1RequestPB.view) {
+  if (!req.getVerifiedViewV1RequestPb.view) {
     throw new ConnectError("view required", Code.InvalidArgument);
   }
-  if (!req.getVerifiedViewV1RequestPB.view.organization) {
+  if (!req.getVerifiedViewV1RequestPb.view.organization) {
     throw new ConnectError("view.organization required", Code.InvalidArgument);
   }
-  if (!req.getVerifiedViewV1RequestPB.view.viewAddress) {
+  if (!req.getVerifiedViewV1RequestPb.view.viewAddress) {
     throw new ConnectError("view.viewAddress required", Code.InvalidArgument);
   }
-  if (!req.getVerifiedViewV1RequestPB.view.viewAddress.contractId) {
+  if (!req.getVerifiedViewV1RequestPb.view.viewAddress.contractId) {
     throw new ConnectError(
       "view.viewAddress.contractId required",
       Code.InvalidArgument,
     );
   }
-  if (!req.getVerifiedViewV1RequestPB.view.viewAddress.function) {
+  if (!req.getVerifiedViewV1RequestPb.view.viewAddress.function) {
     throw new ConnectError(
       "view.viewAddress.function required",
       Code.InvalidArgument,
     );
   }
 
-  const args = req.getVerifiedViewV1RequestPB?.view?.viewAddress?.input
-    ? req.getVerifiedViewV1RequestPB.view.viewAddress.input
+  const args = req.getVerifiedViewV1RequestPb?.view?.viewAddress?.input
+    ? req.getVerifiedViewV1RequestPb.view.viewAddress.input
     : [];
 
   return {
     account: validateAssetAccount(
-      req.getVerifiedViewV1RequestPB.account,
+      req.getVerifiedViewV1RequestPb.account,
       "account",
     ),
-    remoteNetwork: req.getVerifiedViewV1RequestPB.view.organization,
-    contractId: req.getVerifiedViewV1RequestPB.view.viewAddress.contractId,
-    method: req.getVerifiedViewV1RequestPB.view.viewAddress.function,
+    remoteNetwork: req.getVerifiedViewV1RequestPb.view.organization,
+    contractId: req.getVerifiedViewV1RequestPb.view.viewAddress.contractId,
+    method: req.getVerifiedViewV1RequestPb.view.viewAddress.function,
     args: args,
   };
 }

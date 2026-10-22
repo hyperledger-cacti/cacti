@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,20 +30,20 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * Values: sEND,cALL,sENDPRIVATE
+ * Values: FabricContractInvocationTypePeriodSEND,FabricContractInvocationTypePeriodCALL,FabricContractInvocationTypePeriodSENDPRIVATE
  */
 
 @JsonClass(generateAdapter = false)
 enum class FabricContractInvocationType(val value: kotlin.String) {
 
     @Json(name = "FabricContractInvocationType.SEND")
-    sEND("FabricContractInvocationType.SEND"),
+    FabricContractInvocationTypePeriodSEND("FabricContractInvocationType.SEND"),
 
     @Json(name = "FabricContractInvocationType.CALL")
-    cALL("FabricContractInvocationType.CALL"),
+    FabricContractInvocationTypePeriodCALL("FabricContractInvocationType.CALL"),
 
     @Json(name = "FabricContractInvocationType.SENDPRIVATE")
-    sENDPRIVATE("FabricContractInvocationType.SENDPRIVATE");
+    FabricContractInvocationTypePeriodSENDPRIVATE("FabricContractInvocationType.SENDPRIVATE");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -44,7 +52,7 @@ enum class FabricContractInvocationType(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -57,7 +65,7 @@ enum class FabricContractInvocationType(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): FabricContractInvocationType? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

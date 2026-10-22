@@ -213,7 +213,8 @@ describe("Delegated signing tests", () => {
           .keychain as FabricSigningCredential,
         channelName: ledgerChannelName,
         contractName: assetTradeContractName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         methodName: "InitLedger",
         params: [],
       } as RunTransactionRequest);
@@ -329,7 +330,8 @@ describe("Delegated signing tests", () => {
           .keychain as FabricSigningCredential,
         channelName: ledgerChannelName,
         contractName: assetTradeContractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "ReadAsset",
         params: ["asset1"],
       });
@@ -346,7 +348,8 @@ describe("Delegated signing tests", () => {
           .keychain as FabricSigningCredential,
         channelName: ledgerChannelName,
         contractName: assetTradeContractName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         methodName: "TransferAsset",
         params: ["asset1", newAssetOwner],
       });
@@ -360,7 +363,8 @@ describe("Delegated signing tests", () => {
           .keychain as FabricSigningCredential,
         channelName: ledgerChannelName,
         contractName: assetTradeContractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "ReadAsset",
         params: ["asset1"],
       });
@@ -384,7 +388,8 @@ describe("Delegated signing tests", () => {
       signerMspID: adminIdentity.mspId,
       channelName: ledgerChannelName,
       contractName: assetTradeContractName,
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       methodName: "ReadAsset",
       params: ["asset1"],
       uniqueTransactionData: initQueryId,
@@ -404,7 +409,8 @@ describe("Delegated signing tests", () => {
       signerMspID: adminIdentity.mspId,
       channelName: ledgerChannelName,
       contractName: assetTradeContractName,
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       methodName: "TransferAsset",
       params: ["asset1", newAssetOwner],
       uniqueTransactionData: transferQueryId,
@@ -425,7 +431,8 @@ describe("Delegated signing tests", () => {
       signerMspID: adminIdentity.mspId,
       channelName: ledgerChannelName,
       contractName: assetTradeContractName,
-      invocationType: FabricContractInvocationType.Call,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeCall,
       methodName: "ReadAsset",
       params: ["asset1"],
       uniqueTransactionData: finalQueryId,
@@ -457,7 +464,8 @@ describe("Delegated signing tests", () => {
 
       const transferQueryId = `transferPriv-${uuidv4()}`;
       const sendResponse = await apiClient.runDelegatedSignTransactionV1({
-        invocationType: FabricContractInvocationType.Sendprivate,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSendprivate,
         signerCertificate: adminIdentity.credentials.certificate,
         signerMspID: adminIdentity.mspId,
         channelName: ledgerChannelName,
@@ -484,7 +492,8 @@ describe("Delegated signing tests", () => {
         signerMspID: adminIdentity.mspId,
         channelName: ledgerChannelName,
         contractName: privateAssetTradeContractName,
-        invocationType: FabricContractInvocationType.Call,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeCall,
         methodName: "ReadAsset",
         params: [assetID],
         endorsingOrgs: [adminIdentity.mspId],

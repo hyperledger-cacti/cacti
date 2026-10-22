@@ -29,3 +29,12 @@ src/main/kotlin/org/openapitools/client/models/HasKeychainEntryRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/HasKeychainEntryResponseV1.kt
 src/main/kotlin/org/openapitools/client/models/SetKeychainEntryRequestV1.kt
 src/main/kotlin/org/openapitools/client/models/SetKeychainEntryResponseV1.kt
+src/test/kotlin/org/openapitools/client/apis/DefaultApiTest.kt
+src/test/kotlin/org/openapitools/client/models/DeleteKeychainEntryRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/DeleteKeychainEntryResponseV1Test.kt
+src/test/kotlin/org/openapitools/client/models/GetKeychainEntryRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/GetKeychainEntryResponseV1Test.kt
+src/test/kotlin/org/openapitools/client/models/HasKeychainEntryRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/HasKeychainEntryResponseV1Test.kt
+src/test/kotlin/org/openapitools/client/models/SetKeychainEntryRequestV1Test.kt
+src/test/kotlin/org/openapitools/client/models/SetKeychainEntryResponseV1Test.kt

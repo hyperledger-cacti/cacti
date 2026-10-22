@@ -123,7 +123,8 @@ describe("HTLC Coordinator Besu", () => {
     );
 
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     connector = await factory.create({
@@ -142,7 +143,8 @@ describe("HTLC Coordinator Besu", () => {
     };
 
     const factoryHtlc = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     pluginHtlcEthBesuErc20 = await factoryHtlc.create(
@@ -156,7 +158,8 @@ describe("HTLC Coordinator Besu", () => {
       pluginRegistry,
     };
     const factoryHTLC = new PluginFactoryHTLCCoordinatorBesu({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     pluginHTLCCoordinatorBesu = await factoryHTLC.create(pluginOptions);
     pluginRegistry.add(pluginHTLCCoordinatorBesu);

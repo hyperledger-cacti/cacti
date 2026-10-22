@@ -16,13 +16,13 @@ class ValidatedLockAssetV1Request(val asset: DLAsset,
                                   val expiryTimeFmt: Int,
                                   val expiryTime: Long) {
     constructor(req: LockAssetV1Request) : this(
-        validateAsset(req.assetLockV1PB.asset, "asset"),
-        validateAccount(req.assetLockV1PB.source, "source"),
-        validateAccount(req.assetLockV1PB.dest, "dest"),
-        validateHash(req.assetLockV1PB.hashInfo, "hashInfo"),
-        req.assetLockV1PB.sourceCertificate ?: "",
-        req.assetLockV1PB.destinationCertificate ?: "",
+        validateAsset(req.assetLockV1Pb.asset, "asset"),
+        validateAccount(req.assetLockV1Pb.source, "source"),
+        validateAccount(req.assetLockV1Pb.dest, "dest"),
+        validateHash(req.assetLockV1Pb.hashInfo, "hashInfo"),
+        req.assetLockV1Pb.sourceCertificate ?: "",
+        req.assetLockV1Pb.destinationCertificate ?: "",
         1,
-        req.assetLockV1PB.expirySecs)
+        req.assetLockV1Pb.expirySecs)
 
 }

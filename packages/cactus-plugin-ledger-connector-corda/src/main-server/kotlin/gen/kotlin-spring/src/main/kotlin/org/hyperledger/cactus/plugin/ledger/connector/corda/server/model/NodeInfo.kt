@@ -25,16 +25,21 @@ import jakarta.validation.Valid
 data class NodeInfo(
 
     @field:Valid
+    @param:JsonProperty("addresses", required = true)
     @get:JsonProperty("addresses", required = true) val addresses: kotlin.collections.List<NetworkHostAndPort>,
 
+    @param:JsonProperty("platformVersion", required = true)
     @get:JsonProperty("platformVersion", required = true) val platformVersion: kotlin.Int,
 
+    @param:JsonProperty("serial", required = true)
     @get:JsonProperty("serial", required = true) val serial: java.math.BigDecimal,
 
     @field:Valid
+    @param:JsonProperty("legalIdentities", required = true)
     @get:JsonProperty("legalIdentities", required = true) val legalIdentities: kotlin.collections.List<Party>,
 
     @field:Valid
+    @param:JsonProperty("legalIdentitiesAndCerts", required = true)
     @get:JsonProperty("legalIdentitiesAndCerts", required = true) val legalIdentitiesAndCerts: kotlin.collections.List<kotlin.Any>
 ) {
 

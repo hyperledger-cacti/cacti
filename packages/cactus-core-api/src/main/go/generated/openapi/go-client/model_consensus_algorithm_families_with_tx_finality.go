@@ -20,8 +20,8 @@ type ConsensusAlgorithmFamiliesWithTxFinality string
 
 // List of ConsensusAlgorithmFamiliesWithTxFinality
 const (
-	AUTHORITY ConsensusAlgorithmFamiliesWithTxFinality = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"
-	STAKE ConsensusAlgorithmFamiliesWithTxFinality = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
+	ORG_HYPERLEDGER_CACTUS_CONSENSUSALGORITHM_PROOF_OF_AUTHORITY ConsensusAlgorithmFamiliesWithTxFinality = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_AUTHORITY"
+	ORG_HYPERLEDGER_CACTUS_CONSENSUSALGORITHM_PROOF_OF_STAKE ConsensusAlgorithmFamiliesWithTxFinality = "org.hyperledger.cactus.consensusalgorithm.PROOF_OF_STAKE"
 )
 
 // All allowed values of ConsensusAlgorithmFamiliesWithTxFinality enum

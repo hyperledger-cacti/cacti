@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the GetDiscoveryResultsResponseV1MspsValue type satisfies the MappedNullable interface at compile time
@@ -28,6 +30,8 @@ type GetDiscoveryResultsResponseV1MspsValue struct {
 	TlsRootCerts string `json:"tlsRootCerts"`
 	TlsIntermediateCerts string `json:"tlsIntermediateCerts"`
 }
+
+type _GetDiscoveryResultsResponseV1MspsValue GetDiscoveryResultsResponseV1MspsValue
 
 // NewGetDiscoveryResultsResponseV1MspsValue instantiates a new GetDiscoveryResultsResponseV1MspsValue object
 // This constructor will assign default values to properties that have it defined,
@@ -265,6 +269,50 @@ func (o GetDiscoveryResultsResponseV1MspsValue) ToMap() (map[string]interface{},
 	toSerialize["tlsRootCerts"] = o.TlsRootCerts
 	toSerialize["tlsIntermediateCerts"] = o.TlsIntermediateCerts
 	return toSerialize, nil
+}
+
+func (o *GetDiscoveryResultsResponseV1MspsValue) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"name",
+		"organizationalUnitIdentifiers",
+		"rootCerts",
+		"intermediateCerts",
+		"admins",
+		"tlsRootCerts",
+		"tlsIntermediateCerts",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varGetDiscoveryResultsResponseV1MspsValue := _GetDiscoveryResultsResponseV1MspsValue{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varGetDiscoveryResultsResponseV1MspsValue)
+
+	if err != nil {
+		return err
+	}
+
+	*o = GetDiscoveryResultsResponseV1MspsValue(varGetDiscoveryResultsResponseV1MspsValue)
+
+	return err
 }
 
 type NullableGetDiscoveryResultsResponseV1MspsValue struct {

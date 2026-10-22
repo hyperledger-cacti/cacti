@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the WatchBlocksFullResponseV1 type satisfies the MappedNullable interface at compile time
@@ -22,6 +24,8 @@ type WatchBlocksFullResponseV1 struct {
 	// Full commited block.
 	FullBlock interface{} `json:"fullBlock"`
 }
+
+type _WatchBlocksFullResponseV1 WatchBlocksFullResponseV1
 
 // NewWatchBlocksFullResponseV1 instantiates a new WatchBlocksFullResponseV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -81,6 +85,43 @@ func (o WatchBlocksFullResponseV1) ToMap() (map[string]interface{}, error) {
 		toSerialize["fullBlock"] = o.FullBlock
 	}
 	return toSerialize, nil
+}
+
+func (o *WatchBlocksFullResponseV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"fullBlock",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varWatchBlocksFullResponseV1 := _WatchBlocksFullResponseV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varWatchBlocksFullResponseV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = WatchBlocksFullResponseV1(varWatchBlocksFullResponseV1)
+
+	return err
 }
 
 type NullableWatchBlocksFullResponseV1 struct {

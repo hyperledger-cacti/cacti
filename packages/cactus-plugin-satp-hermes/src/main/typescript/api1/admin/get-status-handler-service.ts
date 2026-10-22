@@ -226,7 +226,7 @@ export async function getStatusService(
     return {
       status: StatusResponseStatusEnum.Invalid,
       substatus: StatusResponseSubstatusEnum.UnknownError,
-      stage: StatusResponseStageEnum._0,
+      stage: StatusResponseStageEnum.Stage0,
       step: "transfer-complete-message",
       startTime: startTime || "undefined",
       originNetwork: originNetwork,

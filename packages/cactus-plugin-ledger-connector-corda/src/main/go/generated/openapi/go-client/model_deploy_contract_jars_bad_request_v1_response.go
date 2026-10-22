@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the DeployContractJarsBadRequestV1Response type satisfies the MappedNullable interface at compile time
@@ -21,6 +23,8 @@ var _ MappedNullable = &DeployContractJarsBadRequestV1Response{}
 type DeployContractJarsBadRequestV1Response struct {
 	Errors []string `json:"errors"`
 }
+
+type _DeployContractJarsBadRequestV1Response DeployContractJarsBadRequestV1Response
 
 // NewDeployContractJarsBadRequestV1Response instantiates a new DeployContractJarsBadRequestV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -76,6 +80,43 @@ func (o DeployContractJarsBadRequestV1Response) ToMap() (map[string]interface{},
 	toSerialize := map[string]interface{}{}
 	toSerialize["errors"] = o.Errors
 	return toSerialize, nil
+}
+
+func (o *DeployContractJarsBadRequestV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"errors",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDeployContractJarsBadRequestV1Response := _DeployContractJarsBadRequestV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDeployContractJarsBadRequestV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = DeployContractJarsBadRequestV1Response(varDeployContractJarsBadRequestV1Response)
+
+	return err
 }
 
 type NullableDeployContractJarsBadRequestV1Response struct {

@@ -20,10 +20,13 @@ import jakarta.validation.Valid
  */
 data class PublicKey(
 
+    @param:JsonProperty("algorithm", required = true)
     @get:JsonProperty("algorithm", required = true) val algorithm: kotlin.String,
 
+    @param:JsonProperty("format", required = true)
     @get:JsonProperty("format", required = true) val format: kotlin.String,
 
+    @param:JsonProperty("encoded", required = true)
     @get:JsonProperty("encoded", required = true) val encoded: kotlin.String
 ) {
 

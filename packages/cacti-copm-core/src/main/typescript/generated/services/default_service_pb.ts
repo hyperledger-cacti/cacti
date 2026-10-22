@@ -13,12 +13,16 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3 } from "@bufbuild/protobuf";
+import { Empty, Message, proto3 } from "@bufbuild/protobuf";
 import { AssetLockClaimV1PB } from "../models/asset_lock_claim_v1_pb_pb.js";
+import { ClaimPledgedAssetV1200ResponsePB } from "../models/claim_pledged_asset_v1200_response_pb_pb.js";
 import { AssetPledgeClaimV1PB } from "../models/asset_pledge_claim_v1_pb_pb.js";
 import { GetVerifiedViewV1RequestPB } from "../models/get_verified_view_v1_request_pb_pb.js";
+import { GetVerifiedViewV1200ResponsePB } from "../models/get_verified_view_v1200_response_pb_pb.js";
 import { AssetLockV1PB } from "../models/asset_lock_v1_pb_pb.js";
+import { LockAssetV1200ResponsePB } from "../models/lock_asset_v1200_response_pb_pb.js";
 import { AssetPledgeV1PB } from "../models/asset_pledge_v1_pb_pb.js";
+import { PledgeAssetV1200ResponsePB } from "../models/pledge_asset_v1200_response_pb_pb.js";
 
 /**
  * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimLockedAssetV1Request
@@ -27,9 +31,9 @@ export class ClaimLockedAssetV1Request extends Message<ClaimLockedAssetV1Request
   /**
    *
    *
-   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetLockClaimV1PB assetLockClaimV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetLockClaimV1PB asset_lock_claim_v1_pb = 1;
    */
-  assetLockClaimV1PB?: AssetLockClaimV1PB;
+  assetLockClaimV1Pb?: AssetLockClaimV1PB;
 
   constructor(data?: PartialMessage<ClaimLockedAssetV1Request>) {
     super();
@@ -39,7 +43,7 @@ export class ClaimLockedAssetV1Request extends Message<ClaimLockedAssetV1Request
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimLockedAssetV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "assetLockClaimV1PB", kind: "message", T: AssetLockClaimV1PB },
+    { no: 1, name: "asset_lock_claim_v1_pb", kind: "message", T: AssetLockClaimV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClaimLockedAssetV1Request {
@@ -60,15 +64,58 @@ export class ClaimLockedAssetV1Request extends Message<ClaimLockedAssetV1Request
 }
 
 /**
+ * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimLockedAssetV1Response
+ */
+export class ClaimLockedAssetV1Response extends Message<ClaimLockedAssetV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimLockedAssetV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.copm.core.ClaimPledgedAssetV1200ResponsePB claim_pledged_asset_v1200_response_pb_200 = 1;
+     */
+    value: ClaimPledgedAssetV1200ResponsePB;
+    case: "claimPledgedAssetV1200ResponsePb200";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<ClaimLockedAssetV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimLockedAssetV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "claim_pledged_asset_v1200_response_pb_200", kind: "message", T: ClaimPledgedAssetV1200ResponsePB, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClaimLockedAssetV1Response {
+    return new ClaimLockedAssetV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ClaimLockedAssetV1Response {
+    return new ClaimLockedAssetV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ClaimLockedAssetV1Response {
+    return new ClaimLockedAssetV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ClaimLockedAssetV1Response | PlainMessage<ClaimLockedAssetV1Response> | undefined, b: ClaimLockedAssetV1Response | PlainMessage<ClaimLockedAssetV1Response> | undefined): boolean {
+    return proto3.util.equals(ClaimLockedAssetV1Response, a, b);
+  }
+}
+
+/**
  * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimPledgedAssetV1Request
  */
 export class ClaimPledgedAssetV1Request extends Message<ClaimPledgedAssetV1Request> {
   /**
    *
    *
-   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetPledgeClaimV1PB assetPledgeClaimV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetPledgeClaimV1PB asset_pledge_claim_v1_pb = 1;
    */
-  assetPledgeClaimV1PB?: AssetPledgeClaimV1PB;
+  assetPledgeClaimV1Pb?: AssetPledgeClaimV1PB;
 
   constructor(data?: PartialMessage<ClaimPledgedAssetV1Request>) {
     super();
@@ -78,7 +125,7 @@ export class ClaimPledgedAssetV1Request extends Message<ClaimPledgedAssetV1Reque
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimPledgedAssetV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "assetPledgeClaimV1PB", kind: "message", T: AssetPledgeClaimV1PB },
+    { no: 1, name: "asset_pledge_claim_v1_pb", kind: "message", T: AssetPledgeClaimV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClaimPledgedAssetV1Request {
@@ -99,15 +146,58 @@ export class ClaimPledgedAssetV1Request extends Message<ClaimPledgedAssetV1Reque
 }
 
 /**
+ * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimPledgedAssetV1Response
+ */
+export class ClaimPledgedAssetV1Response extends Message<ClaimPledgedAssetV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimPledgedAssetV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.copm.core.ClaimPledgedAssetV1200ResponsePB claim_pledged_asset_v1200_response_pb_200 = 1;
+     */
+    value: ClaimPledgedAssetV1200ResponsePB;
+    case: "claimPledgedAssetV1200ResponsePb200";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<ClaimPledgedAssetV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.ClaimPledgedAssetV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "claim_pledged_asset_v1200_response_pb_200", kind: "message", T: ClaimPledgedAssetV1200ResponsePB, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClaimPledgedAssetV1Response {
+    return new ClaimPledgedAssetV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ClaimPledgedAssetV1Response {
+    return new ClaimPledgedAssetV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ClaimPledgedAssetV1Response {
+    return new ClaimPledgedAssetV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ClaimPledgedAssetV1Response | PlainMessage<ClaimPledgedAssetV1Response> | undefined, b: ClaimPledgedAssetV1Response | PlainMessage<ClaimPledgedAssetV1Response> | undefined): boolean {
+    return proto3.util.equals(ClaimPledgedAssetV1Response, a, b);
+  }
+}
+
+/**
  * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.GetVerifiedViewV1Request
  */
 export class GetVerifiedViewV1Request extends Message<GetVerifiedViewV1Request> {
   /**
    *
    *
-   * @generated from field: org.hyperledger.cacti.plugin.copm.core.GetVerifiedViewV1RequestPB getVerifiedViewV1RequestPB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.copm.core.GetVerifiedViewV1RequestPB get_verified_view_v1_request_pb = 1;
    */
-  getVerifiedViewV1RequestPB?: GetVerifiedViewV1RequestPB;
+  getVerifiedViewV1RequestPb?: GetVerifiedViewV1RequestPB;
 
   constructor(data?: PartialMessage<GetVerifiedViewV1Request>) {
     super();
@@ -117,7 +207,7 @@ export class GetVerifiedViewV1Request extends Message<GetVerifiedViewV1Request> 
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.GetVerifiedViewV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "getVerifiedViewV1RequestPB", kind: "message", T: GetVerifiedViewV1RequestPB },
+    { no: 1, name: "get_verified_view_v1_request_pb", kind: "message", T: GetVerifiedViewV1RequestPB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetVerifiedViewV1Request {
@@ -138,15 +228,58 @@ export class GetVerifiedViewV1Request extends Message<GetVerifiedViewV1Request> 
 }
 
 /**
+ * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.GetVerifiedViewV1Response
+ */
+export class GetVerifiedViewV1Response extends Message<GetVerifiedViewV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.copm.core.services.defaultservice.GetVerifiedViewV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.copm.core.GetVerifiedViewV1200ResponsePB get_verified_view_v1200_response_pb_200 = 1;
+     */
+    value: GetVerifiedViewV1200ResponsePB;
+    case: "getVerifiedViewV1200ResponsePb200";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<GetVerifiedViewV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.GetVerifiedViewV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "get_verified_view_v1200_response_pb_200", kind: "message", T: GetVerifiedViewV1200ResponsePB, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetVerifiedViewV1Response {
+    return new GetVerifiedViewV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetVerifiedViewV1Response {
+    return new GetVerifiedViewV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetVerifiedViewV1Response {
+    return new GetVerifiedViewV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetVerifiedViewV1Response | PlainMessage<GetVerifiedViewV1Response> | undefined, b: GetVerifiedViewV1Response | PlainMessage<GetVerifiedViewV1Response> | undefined): boolean {
+    return proto3.util.equals(GetVerifiedViewV1Response, a, b);
+  }
+}
+
+/**
  * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.LockAssetV1Request
  */
 export class LockAssetV1Request extends Message<LockAssetV1Request> {
   /**
    *
    *
-   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetLockV1PB assetLockV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetLockV1PB asset_lock_v1_pb = 1;
    */
-  assetLockV1PB?: AssetLockV1PB;
+  assetLockV1Pb?: AssetLockV1PB;
 
   constructor(data?: PartialMessage<LockAssetV1Request>) {
     super();
@@ -156,7 +289,7 @@ export class LockAssetV1Request extends Message<LockAssetV1Request> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.LockAssetV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "assetLockV1PB", kind: "message", T: AssetLockV1PB },
+    { no: 1, name: "asset_lock_v1_pb", kind: "message", T: AssetLockV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssetV1Request {
@@ -177,15 +310,101 @@ export class LockAssetV1Request extends Message<LockAssetV1Request> {
 }
 
 /**
+ * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.LockAssetV1Response
+ */
+export class LockAssetV1Response extends Message<LockAssetV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.copm.core.services.defaultservice.LockAssetV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.copm.core.LockAssetV1200ResponsePB lock_asset_v1200_response_pb_200 = 1;
+     */
+    value: LockAssetV1200ResponsePB;
+    case: "lockAssetV1200ResponsePb200";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<LockAssetV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.LockAssetV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "lock_asset_v1200_response_pb_200", kind: "message", T: LockAssetV1200ResponsePB, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LockAssetV1Response {
+    return new LockAssetV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LockAssetV1Response {
+    return new LockAssetV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LockAssetV1Response {
+    return new LockAssetV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LockAssetV1Response | PlainMessage<LockAssetV1Response> | undefined, b: LockAssetV1Response | PlainMessage<LockAssetV1Response> | undefined): boolean {
+    return proto3.util.equals(LockAssetV1Response, a, b);
+  }
+}
+
+/**
+ * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.NoopV1Response
+ */
+export class NoopV1Response extends Message<NoopV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.copm.core.services.defaultservice.NoopV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: google.protobuf.Empty empty_200 = 1;
+     */
+    value: Empty;
+    case: "empty200";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<NoopV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.NoopV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "empty_200", kind: "message", T: Empty, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NoopV1Response {
+    return new NoopV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): NoopV1Response {
+    return new NoopV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): NoopV1Response {
+    return new NoopV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: NoopV1Response | PlainMessage<NoopV1Response> | undefined, b: NoopV1Response | PlainMessage<NoopV1Response> | undefined): boolean {
+    return proto3.util.equals(NoopV1Response, a, b);
+  }
+}
+
+/**
  * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.PledgeAssetV1Request
  */
 export class PledgeAssetV1Request extends Message<PledgeAssetV1Request> {
   /**
    *
    *
-   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetPledgeV1PB assetPledgeV1PB = 1;
+   * @generated from field: org.hyperledger.cacti.plugin.copm.core.AssetPledgeV1PB asset_pledge_v1_pb = 1;
    */
-  assetPledgeV1PB?: AssetPledgeV1PB;
+  assetPledgeV1Pb?: AssetPledgeV1PB;
 
   constructor(data?: PartialMessage<PledgeAssetV1Request>) {
     super();
@@ -195,7 +414,7 @@ export class PledgeAssetV1Request extends Message<PledgeAssetV1Request> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.PledgeAssetV1Request";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "assetPledgeV1PB", kind: "message", T: AssetPledgeV1PB },
+    { no: 1, name: "asset_pledge_v1_pb", kind: "message", T: AssetPledgeV1PB },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PledgeAssetV1Request {
@@ -212,6 +431,49 @@ export class PledgeAssetV1Request extends Message<PledgeAssetV1Request> {
 
   static equals(a: PledgeAssetV1Request | PlainMessage<PledgeAssetV1Request> | undefined, b: PledgeAssetV1Request | PlainMessage<PledgeAssetV1Request> | undefined): boolean {
     return proto3.util.equals(PledgeAssetV1Request, a, b);
+  }
+}
+
+/**
+ * @generated from message org.hyperledger.cacti.plugin.copm.core.services.defaultservice.PledgeAssetV1Response
+ */
+export class PledgeAssetV1Response extends Message<PledgeAssetV1Response> {
+  /**
+   * @generated from oneof org.hyperledger.cacti.plugin.copm.core.services.defaultservice.PledgeAssetV1Response.response
+   */
+  response: {
+    /**
+     * @generated from field: org.hyperledger.cacti.plugin.copm.core.PledgeAssetV1200ResponsePB pledge_asset_v1200_response_pb_200 = 1;
+     */
+    value: PledgeAssetV1200ResponsePB;
+    case: "pledgeAssetV1200ResponsePb200";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<PledgeAssetV1Response>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "org.hyperledger.cacti.plugin.copm.core.services.defaultservice.PledgeAssetV1Response";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "pledge_asset_v1200_response_pb_200", kind: "message", T: PledgeAssetV1200ResponsePB, oneof: "response" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): PledgeAssetV1Response {
+    return new PledgeAssetV1Response().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): PledgeAssetV1Response {
+    return new PledgeAssetV1Response().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): PledgeAssetV1Response {
+    return new PledgeAssetV1Response().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: PledgeAssetV1Response | PlainMessage<PledgeAssetV1Response> | undefined, b: PledgeAssetV1Response | PlainMessage<PledgeAssetV1Response> | undefined): boolean {
+    return proto3.util.equals(PledgeAssetV1Response, a, b);
   }
 }
 

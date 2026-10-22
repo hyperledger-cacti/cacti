@@ -17,8 +17,8 @@ import "google/protobuf/any.proto";
 
 message BesuPrivateTransactionConfigPB {
 
-  string privateFrom = 360593360;
+  string private_from = 463709415;
 
-  repeated google.protobuf.Any privateFor = 265462717;
+  repeated google.protobuf.Any private_for = 361326608;
 
 }

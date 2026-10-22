@@ -768,7 +768,7 @@ export class EthereumTestEnvironment {
       contractAddress:
         this.assetContractAddresses.get(SupportedContractTypes.FUNGIBLE) ?? "",
       networkId: this.network,
-      tokenType: AssetTokenTypeEnum.Fungible,
+      tokenType: AssetTokenTypeEnum.NonstandardFungible,
       ercTokenStandard: AssetErcTokenStandardEnum.Erc20,
     };
   }
@@ -786,7 +786,7 @@ export class EthereumTestEnvironment {
         this.assetContractAddresses.get(SupportedContractTypes.NONFUNGIBLE) ??
         "",
       networkId: this.network,
-      tokenType: AssetTokenTypeEnum.Nonfungible,
+      tokenType: AssetTokenTypeEnum.NonstandardNonfungible,
       ercTokenStandard: AssetErcTokenStandardEnum.Erc721,
     };
   }
@@ -802,7 +802,7 @@ export class EthereumTestEnvironment {
         this.assetContractAddresses.get(SupportedContractTypes.MULTITOKEN) ??
         "",
       networkId: this.network,
-      tokenType: AssetTokenTypeEnum.Fungible,
+      tokenType: AssetTokenTypeEnum.NonstandardFungible,
       ercTokenStandard: AssetErcTokenStandardEnum.Erc6909,
     };
   }

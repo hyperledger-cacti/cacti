@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the NodeDiagnosticInfo type satisfies the MappedNullable interface at compile time
@@ -30,6 +32,8 @@ type NodeDiagnosticInfo struct {
 	// The current node version string, e.g. 4.3, 4.4-SNAPSHOT. Note that this string is effectively freeform, and so should only be used for providing diagnostic information. It should not be used to make functionality decisions (the platformVersion is a better fit for this).
 	Version string `json:"version"`
 }
+
+type _NodeDiagnosticInfo NodeDiagnosticInfo
 
 // NewNodeDiagnosticInfo instantiates a new NodeDiagnosticInfo object
 // This constructor will assign default values to properties that have it defined,
@@ -189,6 +193,47 @@ func (o NodeDiagnosticInfo) ToMap() (map[string]interface{}, error) {
 	toSerialize["vendor"] = o.Vendor
 	toSerialize["version"] = o.Version
 	return toSerialize, nil
+}
+
+func (o *NodeDiagnosticInfo) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"cordapps",
+		"platformVersion",
+		"revision",
+		"vendor",
+		"version",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varNodeDiagnosticInfo := _NodeDiagnosticInfo{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varNodeDiagnosticInfo)
+
+	if err != nil {
+		return err
+	}
+
+	*o = NodeDiagnosticInfo(varNodeDiagnosticInfo)
+
+	return err
 }
 
 type NullableNodeDiagnosticInfo struct {

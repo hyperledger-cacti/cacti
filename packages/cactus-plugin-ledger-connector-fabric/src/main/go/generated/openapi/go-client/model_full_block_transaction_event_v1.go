@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the FullBlockTransactionEventV1 type satisfies the MappedNullable interface at compile time
@@ -27,6 +29,8 @@ type FullBlockTransactionEventV1 struct {
 	Epoch float32 `json:"epoch"`
 	Actions []FullBlockTransactionActionV1 `json:"actions"`
 }
+
+type _FullBlockTransactionEventV1 FullBlockTransactionEventV1
 
 // NewFullBlockTransactionEventV1 instantiates a new FullBlockTransactionEventV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -238,6 +242,49 @@ func (o FullBlockTransactionEventV1) ToMap() (map[string]interface{}, error) {
 	toSerialize["epoch"] = o.Epoch
 	toSerialize["actions"] = o.Actions
 	return toSerialize, nil
+}
+
+func (o *FullBlockTransactionEventV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"hash",
+		"channelId",
+		"timestamp",
+		"protocolVersion",
+		"transactionType",
+		"epoch",
+		"actions",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varFullBlockTransactionEventV1 := _FullBlockTransactionEventV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varFullBlockTransactionEventV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = FullBlockTransactionEventV1(varFullBlockTransactionEventV1)
+
+	return err
 }
 
 type NullableFullBlockTransactionEventV1 struct {

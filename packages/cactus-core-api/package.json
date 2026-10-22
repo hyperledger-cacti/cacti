@@ -60,12 +60,12 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.14.4",
+    "@grpc/grpc-js": "1.14.5",
     "@hyperledger-cacti/cactus-common": "3.0.1",
     "ajv": "8.20.0",
     "ajv-draft-04": "1.0.0",
     "ajv-formats": "3.0.1",
-    "axios": "1.18.1",
+    "axios": "patch:axios@npm%3A1.20.0#~/.yarn/patches/axios-npm-1.20.0-0de8ee0ccf.patch",
     "express": "5.1.0",
     "google-protobuf": "3.21.4"
   },

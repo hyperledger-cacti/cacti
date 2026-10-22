@@ -25,14 +25,19 @@ data class NodeDiagnosticInfo(
 
     @field:Valid
     @get:Size(min=0,max=4096) 
+    @param:JsonProperty("cordapps", required = true)
     @get:JsonProperty("cordapps", required = true) val cordapps: kotlin.collections.List<CordappInfo>,
 
+    @param:JsonProperty("platformVersion", required = true)
     @get:JsonProperty("platformVersion", required = true) val platformVersion: kotlin.Int,
 
+    @param:JsonProperty("revision", required = true)
     @get:JsonProperty("revision", required = true) val revision: kotlin.String,
 
+    @param:JsonProperty("vendor", required = true)
     @get:JsonProperty("vendor", required = true) val vendor: kotlin.String,
 
+    @param:JsonProperty("version", required = true)
     @get:JsonProperty("version", required = true) val version: kotlin.String
 ) {
 

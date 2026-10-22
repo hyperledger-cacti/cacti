@@ -29,14 +29,14 @@ export class HasKeychainEntryResponseV1PB extends Message<HasKeychainEntryRespon
   /**
    * Date and time encoded as JSON when the presence check was performed by the plugin backend.
    *
-   * @generated from field: string checkedAt = 399084090;
+   * @generated from field: string checked_at = 513266741;
    */
   checkedAt = "";
 
   /**
    * The boolean true or false indicating the presence or absence of an entry under 'key'.
    *
-   * @generated from field: bool isPresent = 361185232;
+   * @generated from field: bool is_present = 108290728;
    */
   isPresent = false;
 
@@ -49,8 +49,8 @@ export class HasKeychainEntryResponseV1PB extends Message<HasKeychainEntryRespon
   static readonly typeName = "org.hyperledger.cacti.plugin.keychain.memory.HasKeychainEntryResponseV1PB";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 106079, name: "key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 399084090, name: "checkedAt", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 361185232, name: "isPresent", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 513266741, name: "checked_at", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 108290728, name: "is_present", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): HasKeychainEntryResponseV1PB {

@@ -370,7 +370,8 @@ describe("PluginLedgerConnectorFabric", () => {
       channelName,
       params: [assetId, "19"],
       methodName: "CreateAsset",
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       signingCredential: {
         keychainId,
         keychainRef: keychainEntryKey,

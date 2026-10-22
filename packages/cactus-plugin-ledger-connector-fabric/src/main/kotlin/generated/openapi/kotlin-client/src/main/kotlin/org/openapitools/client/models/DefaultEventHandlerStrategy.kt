@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,23 +30,23 @@ import com.squareup.moshi.JsonClass
 /**
  * 
  *
- * Values: mSPIDSCOPEALLFORTX,mSPIDSCOPEANYFORTX,nETWORKSCOPEALLFORTX,nETWORKSCOPEANYFORTX
+ * Values: MSPID_SCOPE_ALLFORTX,MSPID_SCOPE_ANYFORTX,NETWORK_SCOPE_ALLFORTX,NETWORK_SCOPE_ANYFORTX
  */
 
 @JsonClass(generateAdapter = false)
 enum class DefaultEventHandlerStrategy(val value: kotlin.String) {
 
     @Json(name = "MSPID_SCOPE_ALLFORTX")
-    mSPIDSCOPEALLFORTX("MSPID_SCOPE_ALLFORTX"),
+    MSPID_SCOPE_ALLFORTX("MSPID_SCOPE_ALLFORTX"),
 
     @Json(name = "MSPID_SCOPE_ANYFORTX")
-    mSPIDSCOPEANYFORTX("MSPID_SCOPE_ANYFORTX"),
+    MSPID_SCOPE_ANYFORTX("MSPID_SCOPE_ANYFORTX"),
 
     @Json(name = "NETWORK_SCOPE_ALLFORTX")
-    nETWORKSCOPEALLFORTX("NETWORK_SCOPE_ALLFORTX"),
+    NETWORK_SCOPE_ALLFORTX("NETWORK_SCOPE_ALLFORTX"),
 
     @Json(name = "NETWORK_SCOPE_ANYFORTX")
-    nETWORKSCOPEANYFORTX("NETWORK_SCOPE_ANYFORTX");
+    NETWORK_SCOPE_ANYFORTX("NETWORK_SCOPE_ANYFORTX");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -47,7 +55,7 @@ enum class DefaultEventHandlerStrategy(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -60,7 +68,7 @@ enum class DefaultEventHandlerStrategy(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): DefaultEventHandlerStrategy? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

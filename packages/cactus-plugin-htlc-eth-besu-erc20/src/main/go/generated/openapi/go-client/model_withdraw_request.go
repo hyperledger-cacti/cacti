@@ -12,6 +12,8 @@ package cactus-plugin-htlc-eth-besu-erc20
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the WithdrawRequest type satisfies the MappedNullable interface at compile time
@@ -30,6 +32,8 @@ type WithdrawRequest struct {
 	KeychainId string `json:"keychainId"`
 	Gas *NewContractRequestGas `json:"gas,omitempty"`
 }
+
+type _WithdrawRequest WithdrawRequest
 
 // NewWithdrawRequest instantiates a new WithdrawRequest object
 // This constructor will assign default values to properties that have it defined,
@@ -224,6 +228,47 @@ func (o WithdrawRequest) ToMap() (map[string]interface{}, error) {
 		toSerialize["gas"] = o.Gas
 	}
 	return toSerialize, nil
+}
+
+func (o *WithdrawRequest) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"id",
+		"secret",
+		"web3SigningCredential",
+		"connectorId",
+		"keychainId",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varWithdrawRequest := _WithdrawRequest{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varWithdrawRequest)
+
+	if err != nil {
+		return err
+	}
+
+	*o = WithdrawRequest(varWithdrawRequest)
+
+	return err
 }
 
 type NullableWithdrawRequest struct {

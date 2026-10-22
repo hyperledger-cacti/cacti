@@ -177,7 +177,8 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -236,7 +237,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     const reqApproveBesuAddress = await dispatcher?.GetApproveAddress({
       networkId: besuEnv.network,
-      tokenType: TokenType.Fungible,
+      tokenType: TokenType.NonstandardFungible,
     });
     expect(reqApproveBesuAddress?.approveAddress).toBeDefined();
 
@@ -259,7 +260,7 @@ describe("SATPGateway sending a token from Besu to Fabric", () => {
 
     const reqApproveFabricAddress = await dispatcher?.GetApproveAddress({
       networkId: fabricEnv.network,
-      tokenType: TokenType.Fungible,
+      tokenType: TokenType.NonstandardFungible,
     });
     expect(reqApproveFabricAddress?.approveAddress).toBeDefined();
 
@@ -327,7 +328,8 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
   it("should realize a transfer", async () => {
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -387,7 +389,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     const reqApproveFabricAddress = await dispatcher?.GetApproveAddress({
       networkId: fabricEnv.network,
-      tokenType: TokenType.Fungible,
+      tokenType: TokenType.NonstandardFungible,
     });
     expect(reqApproveFabricAddress?.approveAddress).toBeDefined();
 
@@ -407,7 +409,7 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 
     const reqApproveBesuAddress = await dispatcher?.GetApproveAddress({
       networkId: besuEnv.network,
-      tokenType: TokenType.Fungible,
+      tokenType: TokenType.NonstandardFungible,
     });
 
     expect(reqApproveBesuAddress?.approveAddress).toBeDefined();
@@ -478,7 +480,8 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -535,7 +538,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
     expect(dispatcher).toBeTruthy();
     const reqApproveBesuAddress = await dispatcher?.GetApproveAddress({
       networkId: besuEnv.network,
-      tokenType: TokenType.Fungible,
+      tokenType: TokenType.NonstandardFungible,
     });
 
     if (!reqApproveBesuAddress?.approveAddress) {
@@ -560,7 +563,7 @@ describe("SATPGateway sending a token from Besu to Ethereum", () => {
 
     const reqApproveEthereumAddress = await dispatcher?.GetApproveAddress({
       networkId: ethereumEnv.network,
-      tokenType: TokenType.Fungible,
+      tokenType: TokenType.NonstandardFungible,
     });
 
     expect(reqApproveEthereumAddress?.approveAddress).toBeDefined();
@@ -643,7 +646,8 @@ describe("SATPGateway sending a non fungible token from Ethereum to Besu", () =>
     );
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -701,7 +705,7 @@ describe("SATPGateway sending a non fungible token from Ethereum to Besu", () =>
 
     const reqApproveBesuAddress = await dispatcher?.GetApproveAddress({
       networkId: besuEnv.network,
-      tokenType: TokenType.Nonfungible,
+      tokenType: TokenType.NonstandardNonfungible,
     });
     expect(reqApproveBesuAddress?.approveAddress).toBeDefined();
     if (!reqApproveBesuAddress?.approveAddress) {
@@ -711,7 +715,7 @@ describe("SATPGateway sending a non fungible token from Ethereum to Besu", () =>
 
     const reqApproveEthereumAddress = await dispatcher?.GetApproveAddress({
       networkId: ethereumEnv.network,
-      tokenType: TokenType.Nonfungible,
+      tokenType: TokenType.NonstandardNonfungible,
     });
     expect(reqApproveEthereumAddress?.approveAddress).toBeDefined();
     if (!reqApproveEthereumAddress?.approveAddress) {
@@ -791,7 +795,8 @@ describe("SATPGateway sending a non fungible token from Besu back to Ethereum", 
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
     const factoryOptions: IPluginFactoryOptions = {
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     };
     const factory = new PluginFactorySATPGateway(factoryOptions);
 
@@ -849,7 +854,7 @@ describe("SATPGateway sending a non fungible token from Besu back to Ethereum", 
 
     const reqApproveBesuAddress = await dispatcher?.GetApproveAddress({
       networkId: besuEnv.network,
-      tokenType: TokenType.Nonfungible,
+      tokenType: TokenType.NonstandardNonfungible,
     });
     expect(reqApproveBesuAddress?.approveAddress).toBeDefined();
     if (!reqApproveBesuAddress?.approveAddress) {
@@ -869,7 +874,7 @@ describe("SATPGateway sending a non fungible token from Besu back to Ethereum", 
 
     const reqApproveEthereumAddress = await dispatcher?.GetApproveAddress({
       networkId: ethereumEnv.network,
-      tokenType: TokenType.Nonfungible,
+      tokenType: TokenType.NonstandardNonfungible,
     });
     expect(reqApproveEthereumAddress?.approveAddress).toBeDefined();
     if (!reqApproveEthereumAddress?.approveAddress) {

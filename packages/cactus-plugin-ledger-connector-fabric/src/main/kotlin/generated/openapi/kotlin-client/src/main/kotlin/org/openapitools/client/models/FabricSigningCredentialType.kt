@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -22,20 +30,20 @@ import com.squareup.moshi.JsonClass
 /**
  * different type of identity provider for singing fabric messages supported by this package
  *
- * Values: xPeriod509,vaultMinusXPeriod509,wSMinusXPeriod509
+ * Values: XPeriod509,VaultMinusXPeriod509,WSMinusXPeriod509
  */
 
 @JsonClass(generateAdapter = false)
 enum class FabricSigningCredentialType(val value: kotlin.String) {
 
     @Json(name = "X.509")
-    xPeriod509("X.509"),
+    XPeriod509("X.509"),
 
     @Json(name = "Vault-X.509")
-    vaultMinusXPeriod509("Vault-X.509"),
+    VaultMinusXPeriod509("Vault-X.509"),
 
     @Json(name = "WS-X.509")
-    wSMinusXPeriod509("WS-X.509");
+    WSMinusXPeriod509("WS-X.509");
 
     /**
      * Override [toString()] to avoid using the enum variable name as the value, and instead use
@@ -44,7 +52,7 @@ enum class FabricSigningCredentialType(val value: kotlin.String) {
      * This solves a problem when the variable name and its value are different, and ensures that
      * the client sends the correct enum values to the server always.
      */
-    override fun toString(): String = value
+    override fun toString(): kotlin.String = value
 
     companion object {
         /**
@@ -57,7 +65,7 @@ enum class FabricSigningCredentialType(val value: kotlin.String) {
          */
         fun decode(data: kotlin.Any?): FabricSigningCredentialType? = data?.let {
           val normalizedData = "$it".lowercase()
-          values().firstOrNull { value ->
+          entries.firstOrNull { value ->
             it == value || normalizedData == "$value".lowercase()
           }
         }

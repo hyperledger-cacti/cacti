@@ -19,8 +19,10 @@ import jakarta.validation.Valid
  */
 data class NetworkHostAndPort(
 
+    @param:JsonProperty("host", required = true)
     @get:JsonProperty("host", required = true) val host: kotlin.String,
 
+    @param:JsonProperty("port", required = true)
     @get:JsonProperty("port", required = true) val port: java.math.BigDecimal
 ) {
 

@@ -20,10 +20,13 @@ import jakarta.validation.Valid
  */
 data class SHA256(
 
+    @param:JsonProperty("bytes", required = true)
     @get:JsonProperty("bytes", required = true) val bytes: kotlin.String,
 
+    @param:JsonProperty("offset", required = true)
     @get:JsonProperty("offset", required = true) val offset: kotlin.Int,
 
+    @param:JsonProperty("size", required = true)
     @get:JsonProperty("size", required = true) val propertySize: kotlin.Int
 ) {
 

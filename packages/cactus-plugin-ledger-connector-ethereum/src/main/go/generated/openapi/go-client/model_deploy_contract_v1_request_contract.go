@@ -13,6 +13,7 @@ package cactus-plugin-ledger-connector-ethereum
 import (
 	"encoding/json"
 	"fmt"
+	"gopkg.in/validator.v2"
 )
 
 // DeployContractV1RequestContract - struct for DeployContractV1RequestContract
@@ -47,7 +48,11 @@ func (dst *DeployContractV1RequestContract) UnmarshalJSON(data []byte) error {
 		if string(jsonContractJsonDefinition) == "{}" { // empty struct
 			dst.ContractJsonDefinition = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.ContractJsonDefinition); err != nil {
+				dst.ContractJsonDefinition = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.ContractJsonDefinition = nil
@@ -60,7 +65,11 @@ func (dst *DeployContractV1RequestContract) UnmarshalJSON(data []byte) error {
 		if string(jsonContractKeychainDefinition) == "{}" { // empty struct
 			dst.ContractKeychainDefinition = nil
 		} else {
-			match++
+			if err = validator.Validate(dst.ContractKeychainDefinition); err != nil {
+				dst.ContractKeychainDefinition = nil
+			} else {
+				match++
+			}
 		}
 	} else {
 		dst.ContractKeychainDefinition = nil
@@ -75,6 +84,10 @@ func (dst *DeployContractV1RequestContract) UnmarshalJSON(data []byte) error {
 	} else if match == 1 {
 		return nil // exactly one match
 	} else { // no match
+		if err != nil {
+			return fmt.Errorf("data failed to match schemas in oneOf(DeployContractV1RequestContract): %v", err)
+		}
+
 		return fmt.Errorf("data failed to match schemas in oneOf(DeployContractV1RequestContract)")
 	}
 }
@@ -103,6 +116,20 @@ func (obj *DeployContractV1RequestContract) GetActualInstance() (interface{}) {
 
 	if obj.ContractKeychainDefinition != nil {
 		return obj.ContractKeychainDefinition
+	}
+
+	// all schemas are nil
+	return nil
+}
+
+// Get the actual instance value
+func (obj DeployContractV1RequestContract) GetActualInstanceValue() (interface{}) {
+	if obj.ContractJsonDefinition != nil {
+		return *obj.ContractJsonDefinition
+	}
+
+	if obj.ContractKeychainDefinition != nil {
+		return *obj.ContractKeychainDefinition
 	}
 
 	// all schemas are nil

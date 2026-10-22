@@ -101,7 +101,8 @@ describe.skip("Fabric persistence plugin tests", () => {
       signingCredential,
       channelName: ledgerChannelName,
       contractName: assetTradeContractName,
-      invocationType: FabricContractInvocationType.Send,
+      invocationType:
+        FabricContractInvocationType.FabricContractInvocationTypeSend,
       methodName: "CreateAsset",
       params: [newAssetId, "yellow", "11", "foo", "199"],
     });
@@ -234,7 +235,8 @@ describe.skip("Fabric persistence plugin tests", () => {
         signingCredential,
         channelName: ledgerChannelName,
         contractName: assetTradeContractName,
-        invocationType: FabricContractInvocationType.Send,
+        invocationType:
+          FabricContractInvocationType.FabricContractInvocationTypeSend,
         methodName: "InitLedger",
         params: [],
       });

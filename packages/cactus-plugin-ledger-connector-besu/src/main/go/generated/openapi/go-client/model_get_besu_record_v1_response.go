@@ -127,7 +127,7 @@ func (o *GetBesuRecordV1Response) GetTransactionInputDataOk() (*interface{}, boo
 
 // HasTransactionInputData returns a boolean if a field has been set.
 func (o *GetBesuRecordV1Response) HasTransactionInputData() bool {
-	if o != nil && IsNil(o.TransactionInputData) {
+	if o != nil && !IsNil(o.TransactionInputData) {
 		return true
 	}
 
@@ -160,7 +160,7 @@ func (o *GetBesuRecordV1Response) GetCallOutputOk() (*interface{}, bool) {
 
 // HasCallOutput returns a boolean if a field has been set.
 func (o *GetBesuRecordV1Response) HasCallOutput() bool {
-	if o != nil && IsNil(o.CallOutput) {
+	if o != nil && !IsNil(o.CallOutput) {
 		return true
 	}
 

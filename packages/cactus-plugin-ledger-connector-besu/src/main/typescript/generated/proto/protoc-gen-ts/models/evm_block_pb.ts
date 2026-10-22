@@ -11,19 +11,19 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         constructor(data?: any[] | ({
             number?: number;
             hash?: string;
-            parentHash?: string;
+            parent_hash?: string;
             nonce?: string;
-            sha3Uncles?: string;
-            logsBloom?: string;
-            transactionsRoot?: string;
-            stateRoot?: string;
+            sha3_uncles?: string;
+            logs_bloom?: string;
+            transactions_root?: string;
+            state_root?: string;
             miner?: string;
             difficulty?: number;
-            totalDifficulty?: number;
-            extraData?: string;
+            total_difficulty?: number;
+            extra_data?: string;
             size?: number;
-            gasLimit?: number;
-            gasUsed?: number;
+            gas_limit?: number;
+            gas_used?: number;
             transactions?: dependency_1.google.protobuf.Any[];
             uncles?: dependency_1.google.protobuf.Any[];
         } & (({
@@ -38,23 +38,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if ("hash" in data && data.hash != undefined) {
                     this.hash = data.hash;
                 }
-                if ("parentHash" in data && data.parentHash != undefined) {
-                    this.parentHash = data.parentHash;
+                if ("parent_hash" in data && data.parent_hash != undefined) {
+                    this.parent_hash = data.parent_hash;
                 }
                 if ("nonce" in data && data.nonce != undefined) {
                     this.nonce = data.nonce;
                 }
-                if ("sha3Uncles" in data && data.sha3Uncles != undefined) {
-                    this.sha3Uncles = data.sha3Uncles;
+                if ("sha3_uncles" in data && data.sha3_uncles != undefined) {
+                    this.sha3_uncles = data.sha3_uncles;
                 }
-                if ("logsBloom" in data && data.logsBloom != undefined) {
-                    this.logsBloom = data.logsBloom;
+                if ("logs_bloom" in data && data.logs_bloom != undefined) {
+                    this.logs_bloom = data.logs_bloom;
                 }
-                if ("transactionsRoot" in data && data.transactionsRoot != undefined) {
-                    this.transactionsRoot = data.transactionsRoot;
+                if ("transactions_root" in data && data.transactions_root != undefined) {
+                    this.transactions_root = data.transactions_root;
                 }
-                if ("stateRoot" in data && data.stateRoot != undefined) {
-                    this.stateRoot = data.stateRoot;
+                if ("state_root" in data && data.state_root != undefined) {
+                    this.state_root = data.state_root;
                 }
                 if ("miner" in data && data.miner != undefined) {
                     this.miner = data.miner;
@@ -62,20 +62,20 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if ("difficulty" in data && data.difficulty != undefined) {
                     this.difficulty = data.difficulty;
                 }
-                if ("totalDifficulty" in data && data.totalDifficulty != undefined) {
-                    this.totalDifficulty = data.totalDifficulty;
+                if ("total_difficulty" in data && data.total_difficulty != undefined) {
+                    this.total_difficulty = data.total_difficulty;
                 }
-                if ("extraData" in data && data.extraData != undefined) {
-                    this.extraData = data.extraData;
+                if ("extra_data" in data && data.extra_data != undefined) {
+                    this.extra_data = data.extra_data;
                 }
                 if ("size" in data && data.size != undefined) {
                     this.size = data.size;
                 }
-                if ("gasLimit" in data && data.gasLimit != undefined) {
-                    this.gasLimit = data.gasLimit;
+                if ("gas_limit" in data && data.gas_limit != undefined) {
+                    this.gas_limit = data.gas_limit;
                 }
-                if ("gasUsed" in data && data.gasUsed != undefined) {
-                    this.gasUsed = data.gasUsed;
+                if ("gas_used" in data && data.gas_used != undefined) {
+                    this.gas_used = data.gas_used;
                 }
                 if ("timestamp" in data && data.timestamp != undefined) {
                     this.timestamp = data.timestamp;
@@ -100,11 +100,11 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set hash(value: string) {
             pb_1.Message.setField(this, 3195150, value);
         }
-        get parentHash() {
-            return pb_1.Message.getFieldWithDefault(this, 245049128, "") as string;
+        get parent_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 477973380, "") as string;
         }
-        set parentHash(value: string) {
-            pb_1.Message.setField(this, 245049128, value);
+        set parent_hash(value: string) {
+            pb_1.Message.setField(this, 477973380, value);
         }
         get nonce() {
             return pb_1.Message.getFieldWithDefault(this, 105002991, "") as string;
@@ -112,29 +112,29 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set nonce(value: string) {
             pb_1.Message.setField(this, 105002991, value);
         }
-        get sha3Uncles() {
-            return pb_1.Message.getFieldWithDefault(this, 373514458, "") as string;
+        get sha3_uncles() {
+            return pb_1.Message.getFieldWithDefault(this, 263191339, "") as string;
         }
-        set sha3Uncles(value: string) {
-            pb_1.Message.setField(this, 373514458, value);
+        set sha3_uncles(value: string) {
+            pb_1.Message.setField(this, 263191339, value);
         }
-        get logsBloom() {
-            return pb_1.Message.getFieldWithDefault(this, 399161966, "") as string;
+        get logs_bloom() {
+            return pb_1.Message.getFieldWithDefault(this, 278810768, "") as string;
         }
-        set logsBloom(value: string) {
-            pb_1.Message.setField(this, 399161966, value);
+        set logs_bloom(value: string) {
+            pb_1.Message.setField(this, 278810768, value);
         }
-        get transactionsRoot() {
-            return pb_1.Message.getFieldWithDefault(this, 526502871, "") as string;
+        get transactions_root() {
+            return pb_1.Message.getFieldWithDefault(this, 309314165, "") as string;
         }
-        set transactionsRoot(value: string) {
-            pb_1.Message.setField(this, 526502871, value);
+        set transactions_root(value: string) {
+            pb_1.Message.setField(this, 309314165, value);
         }
-        get stateRoot() {
-            return pb_1.Message.getFieldWithDefault(this, 475330288, "") as string;
+        get state_root() {
+            return pb_1.Message.getFieldWithDefault(this, 227629104, "") as string;
         }
-        set stateRoot(value: string) {
-            pb_1.Message.setField(this, 475330288, value);
+        set state_root(value: string) {
+            pb_1.Message.setField(this, 227629104, value);
         }
         get miner() {
             return pb_1.Message.getFieldWithDefault(this, 103900799, "") as string;
@@ -148,17 +148,17 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set difficulty(value: number) {
             pb_1.Message.setField(this, 218888126, value);
         }
-        get totalDifficulty() {
-            return pb_1.Message.getFieldWithDefault(this, 413035041, 0) as number;
+        get total_difficulty() {
+            return pb_1.Message.getFieldWithDefault(this, 247693419, 0) as number;
         }
-        set totalDifficulty(value: number) {
-            pb_1.Message.setField(this, 413035041, value);
+        set total_difficulty(value: number) {
+            pb_1.Message.setField(this, 247693419, value);
         }
-        get extraData() {
-            return pb_1.Message.getFieldWithDefault(this, 253792294, "") as string;
+        get extra_data() {
+            return pb_1.Message.getFieldWithDefault(this, 210509434, "") as string;
         }
-        set extraData(value: string) {
-            pb_1.Message.setField(this, 253792294, value);
+        set extra_data(value: string) {
+            pb_1.Message.setField(this, 210509434, value);
         }
         get size() {
             return pb_1.Message.getFieldWithDefault(this, 3530753, 0) as number;
@@ -166,17 +166,17 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         set size(value: number) {
             pb_1.Message.setField(this, 3530753, value);
         }
-        get gasLimit() {
-            return pb_1.Message.getFieldWithDefault(this, 9229217, 0) as number;
+        get gas_limit() {
+            return pb_1.Message.getFieldWithDefault(this, 260503256, 0) as number;
         }
-        set gasLimit(value: number) {
-            pb_1.Message.setField(this, 9229217, value);
+        set gas_limit(value: number) {
+            pb_1.Message.setField(this, 260503256, value);
         }
-        get gasUsed() {
-            return pb_1.Message.getFieldWithDefault(this, 190522826, 0) as number;
+        get gas_used() {
+            return pb_1.Message.getFieldWithDefault(this, 528190111, 0) as number;
         }
-        set gasUsed(value: number) {
-            pb_1.Message.setField(this, 190522826, value);
+        set gas_used(value: number) {
+            pb_1.Message.setField(this, 528190111, value);
         }
         get timestamp() {
             return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 55126294) as dependency_1.google.protobuf.Any;
@@ -211,19 +211,19 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         static fromObject(data: {
             number?: number;
             hash?: string;
-            parentHash?: string;
+            parent_hash?: string;
             nonce?: string;
-            sha3Uncles?: string;
-            logsBloom?: string;
-            transactionsRoot?: string;
-            stateRoot?: string;
+            sha3_uncles?: string;
+            logs_bloom?: string;
+            transactions_root?: string;
+            state_root?: string;
             miner?: string;
             difficulty?: number;
-            totalDifficulty?: number;
-            extraData?: string;
+            total_difficulty?: number;
+            extra_data?: string;
             size?: number;
-            gasLimit?: number;
-            gasUsed?: number;
+            gas_limit?: number;
+            gas_used?: number;
             timestamp?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
             transactions?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
             uncles?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
@@ -235,23 +235,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (data.hash != null) {
                 message.hash = data.hash;
             }
-            if (data.parentHash != null) {
-                message.parentHash = data.parentHash;
+            if (data.parent_hash != null) {
+                message.parent_hash = data.parent_hash;
             }
             if (data.nonce != null) {
                 message.nonce = data.nonce;
             }
-            if (data.sha3Uncles != null) {
-                message.sha3Uncles = data.sha3Uncles;
+            if (data.sha3_uncles != null) {
+                message.sha3_uncles = data.sha3_uncles;
             }
-            if (data.logsBloom != null) {
-                message.logsBloom = data.logsBloom;
+            if (data.logs_bloom != null) {
+                message.logs_bloom = data.logs_bloom;
             }
-            if (data.transactionsRoot != null) {
-                message.transactionsRoot = data.transactionsRoot;
+            if (data.transactions_root != null) {
+                message.transactions_root = data.transactions_root;
             }
-            if (data.stateRoot != null) {
-                message.stateRoot = data.stateRoot;
+            if (data.state_root != null) {
+                message.state_root = data.state_root;
             }
             if (data.miner != null) {
                 message.miner = data.miner;
@@ -259,20 +259,20 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (data.difficulty != null) {
                 message.difficulty = data.difficulty;
             }
-            if (data.totalDifficulty != null) {
-                message.totalDifficulty = data.totalDifficulty;
+            if (data.total_difficulty != null) {
+                message.total_difficulty = data.total_difficulty;
             }
-            if (data.extraData != null) {
-                message.extraData = data.extraData;
+            if (data.extra_data != null) {
+                message.extra_data = data.extra_data;
             }
             if (data.size != null) {
                 message.size = data.size;
             }
-            if (data.gasLimit != null) {
-                message.gasLimit = data.gasLimit;
+            if (data.gas_limit != null) {
+                message.gas_limit = data.gas_limit;
             }
-            if (data.gasUsed != null) {
-                message.gasUsed = data.gasUsed;
+            if (data.gas_used != null) {
+                message.gas_used = data.gas_used;
             }
             if (data.timestamp != null) {
                 message.timestamp = dependency_1.google.protobuf.Any.fromObject(data.timestamp);
@@ -289,19 +289,19 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             const data: {
                 number?: number;
                 hash?: string;
-                parentHash?: string;
+                parent_hash?: string;
                 nonce?: string;
-                sha3Uncles?: string;
-                logsBloom?: string;
-                transactionsRoot?: string;
-                stateRoot?: string;
+                sha3_uncles?: string;
+                logs_bloom?: string;
+                transactions_root?: string;
+                state_root?: string;
                 miner?: string;
                 difficulty?: number;
-                totalDifficulty?: number;
-                extraData?: string;
+                total_difficulty?: number;
+                extra_data?: string;
                 size?: number;
-                gasLimit?: number;
-                gasUsed?: number;
+                gas_limit?: number;
+                gas_used?: number;
                 timestamp?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
                 transactions?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
                 uncles?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
@@ -312,23 +312,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (this.hash != null) {
                 data.hash = this.hash;
             }
-            if (this.parentHash != null) {
-                data.parentHash = this.parentHash;
+            if (this.parent_hash != null) {
+                data.parent_hash = this.parent_hash;
             }
             if (this.nonce != null) {
                 data.nonce = this.nonce;
             }
-            if (this.sha3Uncles != null) {
-                data.sha3Uncles = this.sha3Uncles;
+            if (this.sha3_uncles != null) {
+                data.sha3_uncles = this.sha3_uncles;
             }
-            if (this.logsBloom != null) {
-                data.logsBloom = this.logsBloom;
+            if (this.logs_bloom != null) {
+                data.logs_bloom = this.logs_bloom;
             }
-            if (this.transactionsRoot != null) {
-                data.transactionsRoot = this.transactionsRoot;
+            if (this.transactions_root != null) {
+                data.transactions_root = this.transactions_root;
             }
-            if (this.stateRoot != null) {
-                data.stateRoot = this.stateRoot;
+            if (this.state_root != null) {
+                data.state_root = this.state_root;
             }
             if (this.miner != null) {
                 data.miner = this.miner;
@@ -336,20 +336,20 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (this.difficulty != null) {
                 data.difficulty = this.difficulty;
             }
-            if (this.totalDifficulty != null) {
-                data.totalDifficulty = this.totalDifficulty;
+            if (this.total_difficulty != null) {
+                data.total_difficulty = this.total_difficulty;
             }
-            if (this.extraData != null) {
-                data.extraData = this.extraData;
+            if (this.extra_data != null) {
+                data.extra_data = this.extra_data;
             }
             if (this.size != null) {
                 data.size = this.size;
             }
-            if (this.gasLimit != null) {
-                data.gasLimit = this.gasLimit;
+            if (this.gas_limit != null) {
+                data.gas_limit = this.gas_limit;
             }
-            if (this.gasUsed != null) {
-                data.gasUsed = this.gasUsed;
+            if (this.gas_used != null) {
+                data.gas_used = this.gas_used;
             }
             if (this.timestamp != null) {
                 data.timestamp = this.timestamp.toObject();
@@ -370,32 +370,32 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 writer.writeFloat(497493176, this.number);
             if (this.hash.length)
                 writer.writeString(3195150, this.hash);
-            if (this.parentHash.length)
-                writer.writeString(245049128, this.parentHash);
+            if (this.parent_hash.length)
+                writer.writeString(477973380, this.parent_hash);
             if (this.nonce.length)
                 writer.writeString(105002991, this.nonce);
-            if (this.sha3Uncles.length)
-                writer.writeString(373514458, this.sha3Uncles);
-            if (this.logsBloom.length)
-                writer.writeString(399161966, this.logsBloom);
-            if (this.transactionsRoot.length)
-                writer.writeString(526502871, this.transactionsRoot);
-            if (this.stateRoot.length)
-                writer.writeString(475330288, this.stateRoot);
+            if (this.sha3_uncles.length)
+                writer.writeString(263191339, this.sha3_uncles);
+            if (this.logs_bloom.length)
+                writer.writeString(278810768, this.logs_bloom);
+            if (this.transactions_root.length)
+                writer.writeString(309314165, this.transactions_root);
+            if (this.state_root.length)
+                writer.writeString(227629104, this.state_root);
             if (this.miner.length)
                 writer.writeString(103900799, this.miner);
             if (this.difficulty != 0)
                 writer.writeFloat(218888126, this.difficulty);
-            if (this.totalDifficulty != 0)
-                writer.writeFloat(413035041, this.totalDifficulty);
-            if (this.extraData.length)
-                writer.writeString(253792294, this.extraData);
+            if (this.total_difficulty != 0)
+                writer.writeFloat(247693419, this.total_difficulty);
+            if (this.extra_data.length)
+                writer.writeString(210509434, this.extra_data);
             if (this.size != 0)
                 writer.writeFloat(3530753, this.size);
-            if (this.gasLimit != 0)
-                writer.writeFloat(9229217, this.gasLimit);
-            if (this.gasUsed != 0)
-                writer.writeFloat(190522826, this.gasUsed);
+            if (this.gas_limit != 0)
+                writer.writeFloat(260503256, this.gas_limit);
+            if (this.gas_used != 0)
+                writer.writeFloat(528190111, this.gas_used);
             if (this.has_timestamp)
                 writer.writeMessage(55126294, this.timestamp, () => this.timestamp.serialize(writer));
             if (this.transactions.length)
@@ -417,23 +417,23 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                     case 3195150:
                         message.hash = reader.readString();
                         break;
-                    case 245049128:
-                        message.parentHash = reader.readString();
+                    case 477973380:
+                        message.parent_hash = reader.readString();
                         break;
                     case 105002991:
                         message.nonce = reader.readString();
                         break;
-                    case 373514458:
-                        message.sha3Uncles = reader.readString();
+                    case 263191339:
+                        message.sha3_uncles = reader.readString();
                         break;
-                    case 399161966:
-                        message.logsBloom = reader.readString();
+                    case 278810768:
+                        message.logs_bloom = reader.readString();
                         break;
-                    case 526502871:
-                        message.transactionsRoot = reader.readString();
+                    case 309314165:
+                        message.transactions_root = reader.readString();
                         break;
-                    case 475330288:
-                        message.stateRoot = reader.readString();
+                    case 227629104:
+                        message.state_root = reader.readString();
                         break;
                     case 103900799:
                         message.miner = reader.readString();
@@ -441,20 +441,20 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                     case 218888126:
                         message.difficulty = reader.readFloat();
                         break;
-                    case 413035041:
-                        message.totalDifficulty = reader.readFloat();
+                    case 247693419:
+                        message.total_difficulty = reader.readFloat();
                         break;
-                    case 253792294:
-                        message.extraData = reader.readString();
+                    case 210509434:
+                        message.extra_data = reader.readString();
                         break;
                     case 3530753:
                         message.size = reader.readFloat();
                         break;
-                    case 9229217:
-                        message.gasLimit = reader.readFloat();
+                    case 260503256:
+                        message.gas_limit = reader.readFloat();
                         break;
-                    case 190522826:
-                        message.gasUsed = reader.readFloat();
+                    case 528190111:
+                        message.gas_used = reader.readFloat();
                         break;
                     case 55126294:
                         reader.readMessage(message.timestamp, () => message.timestamp = dependency_1.google.protobuf.Any.deserialize(reader));

@@ -2,4 +2,11 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/DefaultApi.md
+docs/GetObjectRequestV1.md
+docs/GetObjectResponseV1.md
+docs/HasObjectRequestV1.md
+docs/HasObjectResponseV1.md
+docs/SetObjectRequestV1.md
+docs/SetObjectResponseV1.md
 index.ts

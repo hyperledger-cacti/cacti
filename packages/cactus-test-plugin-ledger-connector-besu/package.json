@@ -50,7 +50,7 @@
     "webpack:dev:web": "webpack --env=dev --target=web --config ../../webpack.config.js"
   },
   "dependencies": {
-    "@grpc/grpc-js": "1.14.4",
+    "@grpc/grpc-js": "1.14.5",
     "@hyperledger-cacti/cactus-api-client": "3.0.1",
     "@hyperledger-cacti/cactus-cmd-api-server": "3.0.1",
     "@hyperledger-cacti/cactus-common": "3.0.1",
@@ -67,7 +67,7 @@
   "devDependencies": {
     "@types/express": "5.0.1",
     "@types/uuid": "10.0.0",
-    "axios": "1.18.1",
+    "axios": "patch:axios@npm%3A1.20.0#~/.yarn/patches/axios-npm-1.20.0-0de8ee0ccf.patch",
     "express": "5.1.0",
     "http-status-codes": "2.3.0",
     "jest-extended": "7.0.0",

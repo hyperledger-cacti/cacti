@@ -2,7 +2,6 @@ README.md
 models/backing_ledger_unavailable_error_pb.proto
 models/besu_private_transaction_config_pb.proto
 models/besu_transaction_config_pb.proto
-models/besu_transaction_config_to_pb.proto
 models/consistency_strategy_pb.proto
 models/deploy_contract_solidity_bytecode_no_keychain_v1_request_pb.proto
 models/deploy_contract_solidity_bytecode_v1_request_pb.proto

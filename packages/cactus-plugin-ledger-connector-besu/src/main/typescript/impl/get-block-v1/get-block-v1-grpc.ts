@@ -16,11 +16,11 @@ export async function getBlockV1Grpc(
     level: ctx.logLevel,
   });
   log.debug(
-    "req.getBlockV1RequestPB.blockHashOrBlockNumber=%o",
-    req.getBlockV1RequestPB.blockHashOrBlockNumber,
+    "req.get_block_v1_request_pb.block_hash_or_block_number=%o",
+    req.get_block_v1_request_pb.block_hash_or_block_number,
   );
   const blockHashOrBlockNumber = Buffer.from(
-    req.getBlockV1RequestPB.blockHashOrBlockNumber.value,
+    req.get_block_v1_request_pb.block_hash_or_block_number.value,
   ).toString("utf-8");
 
   log.debug("blockHashOrBlockNumber=%s", blockHashOrBlockNumber);

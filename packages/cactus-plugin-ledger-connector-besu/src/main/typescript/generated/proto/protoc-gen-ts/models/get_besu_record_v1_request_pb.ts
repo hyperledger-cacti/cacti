@@ -10,58 +10,58 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class GetBesuRecordV1RequestPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            invokeCall?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
-            transactionHash?: string;
+            invoke_call?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
+            transaction_hash?: string;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("invokeCall" in data && data.invokeCall != undefined) {
-                    this.invokeCall = data.invokeCall;
+                if ("invoke_call" in data && data.invoke_call != undefined) {
+                    this.invoke_call = data.invoke_call;
                 }
-                if ("transactionHash" in data && data.transactionHash != undefined) {
-                    this.transactionHash = data.transactionHash;
+                if ("transaction_hash" in data && data.transaction_hash != undefined) {
+                    this.transaction_hash = data.transaction_hash;
                 }
             }
         }
-        get invokeCall() {
-            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB, 359347961) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
+        get invoke_call() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB, 428276166) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB;
         }
-        set invokeCall(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB) {
-            pb_1.Message.setWrapperField(this, 359347961, value);
+        set invoke_call(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB) {
+            pb_1.Message.setWrapperField(this, 428276166, value);
         }
-        get has_invokeCall() {
-            return pb_1.Message.getField(this, 359347961) != null;
+        get has_invoke_call() {
+            return pb_1.Message.getField(this, 428276166) != null;
         }
-        get transactionHash() {
-            return pb_1.Message.getFieldWithDefault(this, 188901646, "") as string;
+        get transaction_hash() {
+            return pb_1.Message.getFieldWithDefault(this, 508674511, "") as string;
         }
-        set transactionHash(value: string) {
-            pb_1.Message.setField(this, 188901646, value);
+        set transaction_hash(value: string) {
+            pb_1.Message.setField(this, 508674511, value);
         }
         static fromObject(data: {
-            invokeCall?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
-            transactionHash?: string;
+            invoke_call?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
+            transaction_hash?: string;
         }): GetBesuRecordV1RequestPB {
             const message = new GetBesuRecordV1RequestPB({});
-            if (data.invokeCall != null) {
-                message.invokeCall = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.fromObject(data.invokeCall);
+            if (data.invoke_call != null) {
+                message.invoke_call = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.fromObject(data.invoke_call);
             }
-            if (data.transactionHash != null) {
-                message.transactionHash = data.transactionHash;
+            if (data.transaction_hash != null) {
+                message.transaction_hash = data.transaction_hash;
             }
             return message;
         }
         toObject() {
             const data: {
-                invokeCall?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
-                transactionHash?: string;
+                invoke_call?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.prototype.toObject>;
+                transaction_hash?: string;
             } = {};
-            if (this.invokeCall != null) {
-                data.invokeCall = this.invokeCall.toObject();
+            if (this.invoke_call != null) {
+                data.invoke_call = this.invoke_call.toObject();
             }
-            if (this.transactionHash != null) {
-                data.transactionHash = this.transactionHash;
+            if (this.transaction_hash != null) {
+                data.transaction_hash = this.transaction_hash;
             }
             return data;
         }
@@ -69,10 +69,10 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_invokeCall)
-                writer.writeMessage(359347961, this.invokeCall, () => this.invokeCall.serialize(writer));
-            if (this.transactionHash.length)
-                writer.writeString(188901646, this.transactionHash);
+            if (this.has_invoke_call)
+                writer.writeMessage(428276166, this.invoke_call, () => this.invoke_call.serialize(writer));
+            if (this.transaction_hash.length)
+                writer.writeString(508674511, this.transaction_hash);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -82,11 +82,11 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 359347961:
-                        reader.readMessage(message.invokeCall, () => message.invokeCall = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.deserialize(reader));
+                    case 428276166:
+                        reader.readMessage(message.invoke_call, () => message.invoke_call = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.InvokeContractV1RequestPB.deserialize(reader));
                         break;
-                    case 188901646:
-                        message.transactionHash = reader.readString();
+                    case 508674511:
+                        message.transaction_hash = reader.readString();
                         break;
                     default: reader.skipField();
                 }

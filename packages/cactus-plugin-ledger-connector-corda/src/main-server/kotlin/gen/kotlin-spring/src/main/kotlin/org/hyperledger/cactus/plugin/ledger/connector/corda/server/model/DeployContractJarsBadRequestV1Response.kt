@@ -18,6 +18,7 @@ import jakarta.validation.Valid
  */
 data class DeployContractJarsBadRequestV1Response(
 
+    @param:JsonProperty("errors", required = true)
     @get:JsonProperty("errors", required = true) val errors: kotlin.collections.List<kotlin.String>
 ) {
 

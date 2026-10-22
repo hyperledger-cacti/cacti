@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-besu
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the ConsistencyStrategy type satisfies the MappedNullable interface at compile time
@@ -25,6 +27,8 @@ type ConsistencyStrategy struct {
 	// The number of blocks to wait to be confirmed in addition to the block containing the transaction in question. Note that if the receipt type is set to only wait for node transaction pool ACK and this parameter is set to anything, but zero then the API will not accept the request due to conflicting parameters.
 	BlockConfirmations int32 `json:"blockConfirmations"`
 }
+
+type _ConsistencyStrategy ConsistencyStrategy
 
 // NewConsistencyStrategy instantiates a new ConsistencyStrategy object
 // This constructor will assign default values to properties that have it defined,
@@ -141,6 +145,44 @@ func (o ConsistencyStrategy) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["blockConfirmations"] = o.BlockConfirmations
 	return toSerialize, nil
+}
+
+func (o *ConsistencyStrategy) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"receiptType",
+		"blockConfirmations",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varConsistencyStrategy := _ConsistencyStrategy{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varConsistencyStrategy)
+
+	if err != nil {
+		return err
+	}
+
+	*o = ConsistencyStrategy(varConsistencyStrategy)
+
+	return err
 }
 
 type NullableConsistencyStrategy struct {

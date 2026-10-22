@@ -11,7 +11,6 @@ import {
 } from "../../../main/typescript/public-api";
 import { AuthorizationProtocol } from "../../../main/typescript/public-api";
 import { default_service } from "../../../main/typescript/public-api";
-import { health_check_response_pb } from "../../../main/typescript/public-api";
 import { empty } from "../../../main/typescript/public-api";
 
 const logLevel: LogLevelDesc = "INFO";
@@ -61,13 +60,16 @@ describe("ApiServer", () => {
   });
 
   test("runs gRPC TS-proto web services", async () => {
-    type HealthCheckResponsePB =
-      health_check_response_pb.org.hyperledger.cactus.cmd_api_server.HealthCheckResponsePB;
+    type GetHealthCheckV1Response =
+      default_service.org.hyperledger.cactus.cmd_api_server.GetHealthCheckV1Response;
 
-    const grpcReq = new Promise<HealthCheckResponsePB>((resolve, reject) => {
+    const grpcReq = new Promise<GetHealthCheckV1Response>((resolve, reject) => {
       apiClient.GetHealthCheckV1(
         new empty.google.protobuf.Empty(),
-        (error: grpc.ServiceError | null, response?: HealthCheckResponsePB) => {
+        (
+          error: grpc.ServiceError | null,
+          response?: GetHealthCheckV1Response,
+        ) => {
           if (error) {
             reject(error);
           } else if (response) {
@@ -84,11 +86,12 @@ describe("ApiServer", () => {
     });
 
     const resPb = await grpcReq;
-    const res = resPb.toObject();
+    expect(resPb.response).toBe("health_check_response_pb_200");
+    const res = resPb.health_check_response_pb_200?.toObject();
 
     expect(res).toMatchObject({
-      createdAt: expect.toBeDateString(),
-      memoryUsage: expect.objectContaining({
+      created_at: expect.toBeDateString(),
+      memory_usage: expect.objectContaining({
         rss: expect.toBeNumber(),
       }),
       success: true,

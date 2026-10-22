@@ -15,7 +15,7 @@ suspend fun claimPledgedAssetV1Impl(request: DefaultServiceOuterClass.ClaimPledg
                                     contextFactory: DLTransactionContextFactory,
                                     cordaConfig: CordaConfiguration,
                                     interopConfig: InteropConfig
-): ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB {
+): DefaultServiceOuterClass.ClaimPledgedAssetV1Response {
     logger.debug("start claimPledgedAssetV1")
     val data = ValidatedClaimPledgedAssetV1Request(request)
     val assetContract = cordaConfig.assetContract(data.asset)
@@ -42,6 +42,6 @@ suspend fun claimPledgedAssetV1Impl(request: DefaultServiceOuterClass.ClaimPledg
         )
     )
     logger.debug("done claiming pledge ${res.toString()}")
-    return ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB.newBuilder().setClaimId(res.toString())
+    return DefaultServiceOuterClass.ClaimPledgedAssetV1Response.newBuilder().setClaimPledgedAssetV1200ResponsePb200(ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB.newBuilder().setClaimId(res.toString()))
         .build()
 }

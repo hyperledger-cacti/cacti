@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-corda
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the GetMonitorTransactionsV1Response type satisfies the MappedNullable interface at compile time
@@ -27,6 +29,8 @@ type GetMonitorTransactionsV1Response struct {
 	StateFullClassName *string `json:"stateFullClassName,omitempty"`
 	Tx []GetMonitorTransactionsV1ResponseTxInner `json:"tx,omitempty"`
 }
+
+type _GetMonitorTransactionsV1Response GetMonitorTransactionsV1Response
 
 // NewGetMonitorTransactionsV1Response instantiates a new GetMonitorTransactionsV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -178,6 +182,44 @@ func (o GetMonitorTransactionsV1Response) ToMap() (map[string]interface{}, error
 		toSerialize["tx"] = o.Tx
 	}
 	return toSerialize, nil
+}
+
+func (o *GetMonitorTransactionsV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"success",
+		"msg",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varGetMonitorTransactionsV1Response := _GetMonitorTransactionsV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varGetMonitorTransactionsV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = GetMonitorTransactionsV1Response(varGetMonitorTransactionsV1Response)
+
+	return err
 }
 
 type NullableGetMonitorTransactionsV1Response struct {

@@ -14,119 +14,51 @@
 
 
 import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from './common';
 import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
 /**
  * Request object for createViewV1 endpoint
- * @export
- * @interface CreateViewRequest
  */
 export interface CreateViewRequest {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof CreateViewRequest
-     */
     'stateIds'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewRequest
-     */
     'tI'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewRequest
-     */
     'tF'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewRequest
-     */
     'viewID'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewRequest
-     */
     'strategyId': string;
-    /**
-     * 
-     * @type {CreateViewRequestNetworkDetails}
-     * @memberof CreateViewRequest
-     */
     'networkDetails': CreateViewRequestNetworkDetails;
 }
-/**
- * 
- * @export
- * @interface CreateViewRequestNetworkDetails
- */
 export interface CreateViewRequestNetworkDetails {
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewRequestNetworkDetails
-     */
     'connectorApiPath': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewRequestNetworkDetails
-     */
     'participant': string;
 }
 /**
  * This is the response for a CreateViewRequest or ProcessViewRequest
- * @export
- * @interface CreateViewResponse
  */
 export interface CreateViewResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewResponse
-     */
     'view'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateViewResponse
-     */
     'signature'?: string;
 }
 /**
  * public key from bungee-hermes plugin instance
- * @export
- * @interface GetPublicKeyResponse
  */
 export interface GetPublicKeyResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof GetPublicKeyResponse
-     */
     'pubKey'?: string;
 }
 /**
  * identifier of the policy used to merge views (can be none)
- * @export
- * @enum {string}
  */
 
 export const MergePolicyOpts = {
     PruneState: 'pruneState',
     PruneStateFromView: 'pruneStateFromView',
-    NONE: 'NONE'
+    NONE: 'NONE',
 } as const;
 
 export type MergePolicyOpts = typeof MergePolicyOpts[keyof typeof MergePolicyOpts];
@@ -134,26 +66,15 @@ export type MergePolicyOpts = typeof MergePolicyOpts[keyof typeof MergePolicyOpt
 
 /**
  * This is the input for a mergeViewRequest
- * @export
- * @interface MergeViewsRequest
  */
 export interface MergeViewsRequest {
     /**
      * Array of serialized views
-     * @type {Array<string>}
-     * @memberof MergeViewsRequest
      */
     'serializedViews': Array<string>;
-    /**
-     * 
-     * @type {MergePolicyOpts}
-     * @memberof MergeViewsRequest
-     */
     'mergePolicy': MergePolicyOpts;
     /**
      * Arguments for the privacy policy function. Order is important
-     * @type {Array<string>}
-     * @memberof MergeViewsRequest
      */
     'policyArguments'?: Array<string>;
 }
@@ -161,32 +82,18 @@ export interface MergeViewsRequest {
 
 /**
  * This is the response of a mergeViewRequest
- * @export
- * @interface MergeViewsResponse
  */
 export interface MergeViewsResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof MergeViewsResponse
-     */
     'integratedView'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MergeViewsResponse
-     */
     'signature'?: string;
 }
 /**
  * identifier of the policy used to process a view
- * @export
- * @enum {string}
  */
 
 export const PrivacyPolicyOpts = {
     PruneState: 'pruneState',
-    SingleTransaction: 'singleTransaction'
+    SingleTransaction: 'singleTransaction',
 } as const;
 
 export type PrivacyPolicyOpts = typeof PrivacyPolicyOpts[keyof typeof PrivacyPolicyOpts];
@@ -194,26 +101,12 @@ export type PrivacyPolicyOpts = typeof PrivacyPolicyOpts[keyof typeof PrivacyPol
 
 /**
  * This is the input for a mergeViewRequest
- * @export
- * @interface ProcessViewRequest
  */
 export interface ProcessViewRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof ProcessViewRequest
-     */
     'serializedView': string;
-    /**
-     * 
-     * @type {PrivacyPolicyOpts}
-     * @memberof ProcessViewRequest
-     */
     'policyId': PrivacyPolicyOpts;
     /**
      * Arguments for the privacy policy function. Order is important
-     * @type {Array<string>}
-     * @memberof ProcessViewRequest
      */
     'policyArguments': Array<string>;
 }
@@ -221,40 +114,20 @@ export interface ProcessViewRequest {
 
 /**
  * Set of transaction or state proofs and merkle tree root for verification
- * @export
- * @interface VerifyMerkleRootRequest
  */
 export interface VerifyMerkleRootRequest {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof VerifyMerkleRootRequest
-     */
     'input'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof VerifyMerkleRootRequest
-     */
     'root'?: string;
 }
 /**
  * true or false, wether input matched provided root
- * @export
- * @interface VerifyMerkleRootResponse
  */
 export interface VerifyMerkleRootResponse {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof VerifyMerkleRootResponse
-     */
     'result'?: boolean;
 }
 
 /**
  * DefaultApi - axios parameter creator
- * @export
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -265,7 +138,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createViewV1: async (createViewRequest: CreateViewRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        createViewV1: async (createViewRequest: CreateViewRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createViewRequest' is not null or undefined
             assertParamExists('createViewV1', 'createViewRequest', createViewRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/create-view`;
@@ -280,9 +153,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -300,7 +172,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableStrategies: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAvailableStrategies: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-available-strategies`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -313,8 +185,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -330,7 +202,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPublicKey: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getPublicKey: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/get-public-key`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -343,8 +215,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -361,7 +233,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        mergeViewsV1: async (mergeViewsRequest: MergeViewsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        mergeViewsV1: async (mergeViewsRequest: MergeViewsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'mergeViewsRequest' is not null or undefined
             assertParamExists('mergeViewsV1', 'mergeViewsRequest', mergeViewsRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/merge-views`;
@@ -376,9 +248,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -397,7 +268,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processViewV1: async (processViewRequest: ProcessViewRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        processViewV1: async (processViewRequest: ProcessViewRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'processViewRequest' is not null or undefined
             assertParamExists('processViewV1', 'processViewRequest', processViewRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/process-view`;
@@ -412,9 +283,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -433,7 +303,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        verifyMerkleRoot: async (verifyMerkleRootRequest: VerifyMerkleRootRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        verifyMerkleRoot: async (verifyMerkleRootRequest: VerifyMerkleRootRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'verifyMerkleRootRequest' is not null or undefined
             assertParamExists('verifyMerkleRoot', 'verifyMerkleRootRequest', verifyMerkleRootRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-bungee-hermes/verify-merkle-root`;
@@ -448,9 +318,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -467,7 +336,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 /**
  * DefaultApi - functional programming interface
- * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
@@ -479,9 +347,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async createViewV1(createViewRequest: CreateViewRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateViewResponse>> {
+        async createViewV1(createViewRequest: CreateViewRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateViewResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createViewV1(createViewRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.createViewV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -489,9 +359,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAvailableStrategies(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
+        async getAvailableStrategies(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<string>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getAvailableStrategies(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getAvailableStrategies']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -499,9 +371,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPublicKey(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPublicKeyResponse>> {
+        async getPublicKey(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPublicKeyResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPublicKey(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getPublicKey']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -510,9 +384,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MergeViewsResponse>> {
+        async mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MergeViewsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.mergeViewsV1(mergeViewsRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.mergeViewsV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -521,9 +397,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async processViewV1(processViewRequest: ProcessViewRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateViewResponse>> {
+        async processViewV1(processViewRequest: ProcessViewRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateViewResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.processViewV1(processViewRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.processViewV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -532,16 +410,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VerifyMerkleRootResponse>> {
+        async verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VerifyMerkleRootResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.verifyMerkleRoot(verifyMerkleRootRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.verifyMerkleRoot']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * DefaultApi - factory interface
- * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
@@ -553,7 +432,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        createViewV1(createViewRequest: CreateViewRequest, options?: any): AxiosPromise<CreateViewResponse> {
+        createViewV1(createViewRequest: CreateViewRequest, options?: RawAxiosRequestConfig): AxiosPromise<CreateViewResponse> {
             return localVarFp.createViewV1(createViewRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -562,7 +441,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvailableStrategies(options?: any): AxiosPromise<Array<string>> {
+        getAvailableStrategies(options?: RawAxiosRequestConfig): AxiosPromise<Array<string>> {
             return localVarFp.getAvailableStrategies(options).then((request) => request(axios, basePath));
         },
         /**
@@ -571,7 +450,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPublicKey(options?: any): AxiosPromise<GetPublicKeyResponse> {
+        getPublicKey(options?: RawAxiosRequestConfig): AxiosPromise<GetPublicKeyResponse> {
             return localVarFp.getPublicKey(options).then((request) => request(axios, basePath));
         },
         /**
@@ -581,7 +460,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: any): AxiosPromise<MergeViewsResponse> {
+        mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: RawAxiosRequestConfig): AxiosPromise<MergeViewsResponse> {
             return localVarFp.mergeViewsV1(mergeViewsRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -591,7 +470,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        processViewV1(processViewRequest: ProcessViewRequest, options?: any): AxiosPromise<CreateViewResponse> {
+        processViewV1(processViewRequest: ProcessViewRequest, options?: RawAxiosRequestConfig): AxiosPromise<CreateViewResponse> {
             return localVarFp.processViewV1(processViewRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -601,7 +480,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: any): AxiosPromise<VerifyMerkleRootResponse> {
+        verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: RawAxiosRequestConfig): AxiosPromise<VerifyMerkleRootResponse> {
             return localVarFp.verifyMerkleRoot(verifyMerkleRootRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -609,9 +488,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 
 /**
  * DefaultApi - object-oriented interface
- * @export
- * @class DefaultApi
- * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
     /**
@@ -620,9 +496,8 @@ export class DefaultApi extends BaseAPI {
      * @param {CreateViewRequest} createViewRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public createViewV1(createViewRequest: CreateViewRequest, options?: AxiosRequestConfig) {
+    public createViewV1(createViewRequest: CreateViewRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).createViewV1(createViewRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -631,9 +506,8 @@ export class DefaultApi extends BaseAPI {
      * @summary Queries plugin\'s available strategies for ledger capture
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public getAvailableStrategies(options?: AxiosRequestConfig) {
+    public getAvailableStrategies(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getAvailableStrategies(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -642,9 +516,8 @@ export class DefaultApi extends BaseAPI {
      * @summary Queries plugin\'s public key
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public getPublicKey(options?: AxiosRequestConfig) {
+    public getPublicKey(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getPublicKey(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -654,9 +527,8 @@ export class DefaultApi extends BaseAPI {
      * @param {MergeViewsRequest} mergeViewsRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: AxiosRequestConfig) {
+    public mergeViewsV1(mergeViewsRequest: MergeViewsRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).mergeViewsV1(mergeViewsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -666,9 +538,8 @@ export class DefaultApi extends BaseAPI {
      * @param {ProcessViewRequest} processViewRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public processViewV1(processViewRequest: ProcessViewRequest, options?: AxiosRequestConfig) {
+    public processViewV1(processViewRequest: ProcessViewRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).processViewV1(processViewRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -678,11 +549,11 @@ export class DefaultApi extends BaseAPI {
      * @param {VerifyMerkleRootRequest} verifyMerkleRootRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: AxiosRequestConfig) {
+    public verifyMerkleRoot(verifyMerkleRootRequest: VerifyMerkleRootRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).verifyMerkleRoot(verifyMerkleRootRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
 
 

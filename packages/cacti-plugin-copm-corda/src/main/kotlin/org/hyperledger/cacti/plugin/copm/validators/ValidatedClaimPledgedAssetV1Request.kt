@@ -15,12 +15,12 @@ class ValidatedClaimPledgedAssetV1Request(val asset: DLAsset,
                                           val pledgeId: String) {
 
     constructor(request: ClaimPledgedAssetV1Request) : this(
-        validateAsset(request.assetPledgeClaimV1PB.asset,"asset"),
-        validateAccount(request.assetPledgeClaimV1PB.source, "source"),
-        validateAccount(request.assetPledgeClaimV1PB.destination, "destination"),
-        request.assetPledgeClaimV1PB.sourceCertificate ?: "",
-        request.assetPledgeClaimV1PB.destCertificate ?: "",
-        validateRequiredString( request.assetPledgeClaimV1PB.pledgeId, "pledgeId")
+        validateAsset(request.assetPledgeClaimV1Pb.asset,"asset"),
+        validateAccount(request.assetPledgeClaimV1Pb.source, "source"),
+        validateAccount(request.assetPledgeClaimV1Pb.destination, "destination"),
+        request.assetPledgeClaimV1Pb.sourceCertificate ?: "",
+        request.assetPledgeClaimV1Pb.destCertificate ?: "",
+        validateRequiredString( request.assetPledgeClaimV1Pb.pledgeId, "pledgeId")
     )
 
 }

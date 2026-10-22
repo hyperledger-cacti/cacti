@@ -19,14 +19,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VaultQueryV1Request'
+              $ref: "#/components/schemas/VaultQueryV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VaultQueryV1Response'
+                $ref: "#/components/schemas/VaultQueryV1Response"
           description: OK
       x-hyperledger-cactus:
         http:
@@ -40,20 +40,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DeployContractJarsV1Request'
+              $ref: "#/components/schemas/DeployContractJarsV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeployContractJarsSuccessV1Response'
+                $ref: "#/components/schemas/DeployContractJarsSuccessV1Response"
           description: OK
         "400":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeployContractJarsBadRequestV1Response'
+                $ref: "#/components/schemas/DeployContractJarsBadRequestV1Response"
           description: Bad Request
       summary: "Deploys a set of jar files (Cordapps, e.g. the contracts in Corda\
         \ speak)."
@@ -69,14 +69,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/InvokeContractV1Request'
+              $ref: "#/components/schemas/InvokeContractV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InvokeContractV1Response'
+                $ref: "#/components/schemas/InvokeContractV1Response"
           description: OK
       summary: Invokes a contract on a Corda ledger (e.g. a flow)
       x-hyperledger-cacti:
@@ -91,14 +91,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StartMonitorV1Request'
+              $ref: "#/components/schemas/StartMonitorV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StartMonitorV1Response'
+                $ref: "#/components/schemas/StartMonitorV1Response"
           description: OK
       summary: Start monitoring corda changes (transactions) of given state class
       x-hyperledger-cacti:
@@ -113,14 +113,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetMonitorTransactionsV1Request'
+              $ref: "#/components/schemas/GetMonitorTransactionsV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetMonitorTransactionsV1Response'
+                $ref: "#/components/schemas/GetMonitorTransactionsV1Response"
           description: OK
       summary: Get transactions for monitored state classes.
       x-hyperledger-cacti:
@@ -135,14 +135,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ClearMonitorTransactionsV1Request'
+              $ref: "#/components/schemas/ClearMonitorTransactionsV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ClearMonitorTransactionsV1Response'
+                $ref: "#/components/schemas/ClearMonitorTransactionsV1Response"
           description: OK
       summary: Clear transactions from internal store so they'll not be available
         by GetMonitorTransactionsV1 anymore.
@@ -158,14 +158,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StopMonitorV1Request'
+              $ref: "#/components/schemas/StopMonitorV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StopMonitorV1Response'
+                $ref: "#/components/schemas/StopMonitorV1Response"
           description: OK
       summary: Stop monitoring corda changes (transactions) of given state class
       x-hyperledger-cacti:
@@ -183,14 +183,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NetworkMapV1Request'
+              $ref: "#/components/schemas/NetworkMapV1Request"
         required: false
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NetworkMapV1Response'
+                $ref: "#/components/schemas/NetworkMapV1Response"
           description: OK
       x-hyperledger-cacti:
         http:
@@ -205,14 +205,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ListFlowsV1Request'
+              $ref: "#/components/schemas/ListFlowsV1Request"
         required: false
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListFlowsV1Response'
+                $ref: "#/components/schemas/ListFlowsV1Response"
           description: OK
       x-hyperledger-cacti:
         http:
@@ -227,14 +227,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DiagnoseNodeV1Request'
+              $ref: "#/components/schemas/DiagnoseNodeV1Request"
         required: false
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DiagnoseNodeV1Response'
+                $ref: "#/components/schemas/DiagnoseNodeV1Response"
           description: OK
       x-hyperledger-cacti:
         http:
@@ -249,7 +249,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+                $ref: "#/components/schemas/PrometheusExporterMetricsResponse"
           description: OK
       summary: Get the Prometheus Metrics
       x-hyperledger-cacti:
@@ -263,14 +263,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ListCpiV1Request'
+              $ref: "#/components/schemas/ListCpiV1Request"
         required: true
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListCpiV1Response'
+                $ref: "#/components/schemas/ListCpiV1Response"
           description: OK
       summary: List all CPIs uploaded to the cluster
       x-hyperledger-cactus:
@@ -285,7 +285,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetFlowCidV1Request'
+              $ref: "#/components/schemas/GetFlowCidV1Request"
         description: This method gets the current status of the specified flow instance.
         required: true
       responses:
@@ -293,7 +293,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/FlowStatusV1Responses'
+                $ref: "#/components/schemas/FlowStatusV1Responses"
           description: OK
         "401":
           description: Unauthorized
@@ -314,7 +314,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GetFlowCidV1Request'
+              $ref: "#/components/schemas/GetFlowCidV1Request"
         description: This method gets the current status of the specified flow instance.
         required: true
       responses:
@@ -322,7 +322,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/GetFlowCidV1Response'
+                $ref: "#/components/schemas/GetFlowCidV1Response"
           description: OK
         "401":
           description: Unauthorized
@@ -341,7 +341,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/StartFlowV1Request'
+              $ref: "#/components/schemas/StartFlowV1Request"
         description: Request body for starting a flow
         required: true
       responses:
@@ -349,7 +349,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StartFlowV1Response'
+                $ref: "#/components/schemas/StartFlowV1Response"
           description: OK
       summary: This method starts a new instance for the specified flow for the specified
         holding identity.
@@ -363,9 +363,9 @@ components:
       description: "SHA-256 is part of the SHA-2 hash function family. Generated hash\
         \ is fixed size, 256-bits (32-bytes)."
       example:
+        bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
         offset: 0
         size: 32
-        bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
       externalDocs:
         description: Official Corda documentation of the SHA256 class.
         url: https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.crypto/-secure-hash/-s-h-a256/index.html
@@ -388,24 +388,24 @@ components:
       description: A CordappInfo describes a single CorDapp currently installed on
         the node
       example:
-        licence: licence
-        targetPlatformVersion: 6
-        vendor: vendor
-        name: name
         jarHash:
+          bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
           offset: 0
           size: 32
-          bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-        shortName: shortName
-        type: type
-        version: version
+        licence: licence
         minimumPlatformVersion: 0
+        name: name
+        shortName: shortName
+        targetPlatformVersion: 6
+        type: type
+        vendor: vendor
+        version: version
       externalDocs:
         description: Official Corda Documentation of the class CordappInfo
         url: https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.cordapp/-cordapp-info/index.html
       properties:
         jarHash:
-          $ref: '#/components/schemas/SHA256'
+          $ref: "#/components/schemas/SHA256"
         licence:
           description: The name of the licence this CorDapp is released under
           type: string
@@ -446,71 +446,71 @@ components:
     NodeDiagnosticInfo:
       description: A NodeDiagnosticInfo holds information about the current node version.
       example:
-        vendor: vendor
-        platformVersion: 1
-        version: version
         cordapps:
-        - licence: licence
-          targetPlatformVersion: 6
-          vendor: vendor
-          name: name
-          jarHash:
+        - jarHash:
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
             offset: 0
             size: 32
-            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-          shortName: shortName
-          type: type
-          version: version
+          licence: licence
           minimumPlatformVersion: 0
-        - licence: licence
-          targetPlatformVersion: 6
-          vendor: vendor
           name: name
-          jarHash:
+          shortName: shortName
+          targetPlatformVersion: 6
+          type: type
+          vendor: vendor
+          version: version
+        - jarHash:
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
             offset: 0
             size: 32
-            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-          shortName: shortName
-          type: type
-          version: version
+          licence: licence
           minimumPlatformVersion: 0
-        - licence: licence
-          targetPlatformVersion: 6
-          vendor: vendor
           name: name
-          jarHash:
+          shortName: shortName
+          targetPlatformVersion: 6
+          type: type
+          vendor: vendor
+          version: version
+        - jarHash:
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
             offset: 0
             size: 32
-            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-          shortName: shortName
-          type: type
-          version: version
+          licence: licence
           minimumPlatformVersion: 0
-        - licence: licence
-          targetPlatformVersion: 6
-          vendor: vendor
           name: name
-          jarHash:
+          shortName: shortName
+          targetPlatformVersion: 6
+          type: type
+          vendor: vendor
+          version: version
+        - jarHash:
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
             offset: 0
             size: 32
-            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-          shortName: shortName
-          type: type
-          version: version
+          licence: licence
           minimumPlatformVersion: 0
-        - licence: licence
-          targetPlatformVersion: 6
-          vendor: vendor
           name: name
-          jarHash:
+          shortName: shortName
+          targetPlatformVersion: 6
+          type: type
+          vendor: vendor
+          version: version
+        - jarHash:
+            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
             offset: 0
             size: 32
-            bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-          shortName: shortName
-          type: type
-          version: version
+          licence: licence
           minimumPlatformVersion: 0
+          name: name
+          shortName: shortName
+          targetPlatformVersion: 6
+          type: type
+          vendor: vendor
+          version: version
+        platformVersion: 1
         revision: revision
+        vendor: vendor
+        version: version
       externalDocs:
         description: Official Corda Documentation of the class NodeDiagnosticInfo
         url: https://api.corda.net/api/corda-os/4.6/html/api/kotlin/corda/net.corda.core.node/-node-diagnostic-info/index.html
@@ -518,7 +518,7 @@ components:
         cordapps:
           description: A list of CorDapps currently installed on this node
           items:
-            $ref: '#/components/schemas/CordappInfo'
+            $ref: "#/components/schemas/CordappInfo"
           maxItems: 4096
           minItems: 0
           type: array
@@ -563,8 +563,8 @@ components:
       additionalProperties: true
       example:
         filename: filename
-        contentBase64: contentBase64
         hasDbMigrations: true
+        contentBase64: contentBase64
       properties:
         filename:
           maxLength: 255
@@ -591,9 +591,9 @@ components:
     JvmType:
       description: Represents a reference to a JVM type (such as a Java class)
       example:
+        fqClassName: fqClassName
         constructorName: constructorName
         invocationTarget: null
-        fqClassName: fqClassName
       properties:
         fqClassName:
           maxLength: 65535
@@ -610,7 +610,7 @@ components:
           nullable: false
           type: string
         invocationTarget:
-          $ref: '#/components/schemas/JvmObject'
+          $ref: "#/components/schemas/JvmObject"
       required:
       - fqClassName
       type: object
@@ -628,55 +628,55 @@ components:
         \ is filled with a primitive data type supported by the JSON standard such\
         \ as strings, booleans, numbers, etc."
       example:
+        jvmTypeKind: PRIMITIVE
+        primitiveValue: ""
         jvmCtorArgs:
         - null
         - null
         jvmType:
+          fqClassName: fqClassName
           constructorName: constructorName
           invocationTarget: null
-          fqClassName: fqClassName
-        primitiveValue: ""
-        jvmTypeKind: null
       properties:
         jvmTypeKind:
-          $ref: '#/components/schemas/JvmTypeKind'
+          $ref: "#/components/schemas/JvmTypeKind"
         primitiveValue: {}
         jvmCtorArgs:
           default: []
           items:
-            $ref: '#/components/schemas/JvmObject'
+            $ref: "#/components/schemas/JvmObject"
           maxLength: 1024
           minLength: 0
           nullable: false
           type: array
         jvmType:
-          $ref: '#/components/schemas/JvmType'
+          $ref: "#/components/schemas/JvmType"
       required:
       - jvmType
       - jvmTypeKind
       type: object
     CordappDeploymentConfig:
       example:
-        cordaJarPath: cordaJarPath
-        cordaNodeStartCmd: ./build/nodes/runNodes
-        cordappDir: cordappDir
-        nodeBaseDirPath: nodeBaseDirPath
-        rpcCredentials:
-          hostname: hostname
-          password: password
-          port: 39501
-          username: username
         sshCredentials:
+          hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+          username: username
           password: password
           hostname: hostname
           port: 5249
-          hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+        rpcCredentials:
+          hostname: hostname
+          port: 39501
           username: username
+          password: password
+        cordaNodeStartCmd: ./build/nodes/runNodes
+        cordappDir: cordappDir
+        cordaJarPath: cordaJarPath
+        nodeBaseDirPath: nodeBaseDirPath
       properties:
         sshCredentials:
-          $ref: '#/components/schemas/CordaNodeSshCredentials'
+          $ref: "#/components/schemas/CordaNodeSshCredentials"
         rpcCredentials:
-          $ref: '#/components/schemas/CordaRpcCredentials'
+          $ref: "#/components/schemas/CordaRpcCredentials"
         cordaNodeStartCmd:
           description: The shell command to execute in order to start back up a Corda
             node after having placed new jars in the cordapp directory of said node.
@@ -720,9 +720,9 @@ components:
     CordaRpcCredentials:
       example:
         hostname: hostname
-        password: password
         port: 39501
         username: username
+        password: password
       properties:
         hostname:
           maxLength: 65535
@@ -752,11 +752,11 @@ components:
       type: object
     CordaNodeSshCredentials:
       example:
+        hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+        username: username
         password: password
         hostname: hostname
         port: 5249
-        hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
-        username: username
       properties:
         hostKeyEntry:
           example: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
@@ -794,57 +794,57 @@ components:
     DeployContractJarsV1Request:
       additionalProperties: false
       example:
+        cordappDeploymentConfigs:
+        - sshCredentials:
+            hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+            username: username
+            password: password
+            hostname: hostname
+            port: 5249
+          rpcCredentials:
+            hostname: hostname
+            port: 39501
+            username: username
+            password: password
+          cordaNodeStartCmd: ./build/nodes/runNodes
+          cordappDir: cordappDir
+          cordaJarPath: cordaJarPath
+          nodeBaseDirPath: nodeBaseDirPath
+        - sshCredentials:
+            hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
+            username: username
+            password: password
+            hostname: hostname
+            port: 5249
+          rpcCredentials:
+            hostname: hostname
+            port: 39501
+            username: username
+            password: password
+          cordaNodeStartCmd: ./build/nodes/runNodes
+          cordappDir: cordappDir
+          cordaJarPath: cordaJarPath
+          nodeBaseDirPath: nodeBaseDirPath
         jarFiles:
         - filename: filename
-          contentBase64: contentBase64
           hasDbMigrations: true
+          contentBase64: contentBase64
         - filename: filename
-          contentBase64: contentBase64
           hasDbMigrations: true
-        cordappDeploymentConfigs:
-        - cordaJarPath: cordaJarPath
-          cordaNodeStartCmd: ./build/nodes/runNodes
-          cordappDir: cordappDir
-          nodeBaseDirPath: nodeBaseDirPath
-          rpcCredentials:
-            hostname: hostname
-            password: password
-            port: 39501
-            username: username
-          sshCredentials:
-            password: password
-            hostname: hostname
-            port: 5249
-            hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
-            username: username
-        - cordaJarPath: cordaJarPath
-          cordaNodeStartCmd: ./build/nodes/runNodes
-          cordappDir: cordappDir
-          nodeBaseDirPath: nodeBaseDirPath
-          rpcCredentials:
-            hostname: hostname
-            password: password
-            port: 39501
-            username: username
-          sshCredentials:
-            password: password
-            hostname: hostname
-            port: 5249
-            hostKeyEntry: localhost ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPmhSBtMctNa4hsZt8QGlsYSE5/gMkjeand69Vj4ir13
-            username: username
+          contentBase64: contentBase64
       properties:
         cordappDeploymentConfigs:
           default: []
           description: The list of deployment configurations pointing to the nodes
             where the provided cordapp jar files are to be deployed .
           items:
-            $ref: '#/components/schemas/CordappDeploymentConfig'
+            $ref: "#/components/schemas/CordappDeploymentConfig"
           maxLength: 1024
           minLength: 0
           type: array
         jarFiles:
           items:
-            $ref: '#/components/schemas/JarFile'
+            $ref: "#/components/schemas/JarFile"
           nullable: false
           type: array
       required:
@@ -867,6 +867,10 @@ components:
       - deployedJarFiles
       type: object
     DeployContractJarsBadRequestV1Response:
+      example:
+        errors:
+        - errors
+        - errors
       properties:
         errors:
           items:
@@ -882,28 +886,28 @@ components:
     InvokeContractV1Request:
       additionalProperties: false
       example:
-        flowInvocationType: null
-        timeoutMs: 0
         flowFullClassName: net.corda.samples.obligation.flows.IOUIssueFlow
+        flowInvocationType: TRACKED_FLOW_DYNAMIC
         params:
-        - jvmCtorArgs:
+        - jvmTypeKind: PRIMITIVE
+          primitiveValue: ""
+          jvmCtorArgs:
           - null
           - null
           jvmType:
+            fqClassName: fqClassName
             constructorName: constructorName
             invocationTarget: null
-            fqClassName: fqClassName
+        - jvmTypeKind: PRIMITIVE
           primitiveValue: ""
-          jvmTypeKind: null
-        - jvmCtorArgs:
+          jvmCtorArgs:
           - null
           - null
           jvmType:
+            fqClassName: fqClassName
             constructorName: constructorName
             invocationTarget: null
-            fqClassName: fqClassName
-          primitiveValue: ""
-          jvmTypeKind: null
+        timeoutMs: 0
       properties:
         flowFullClassName:
           description: The fully qualified name of the Corda flow to invoke
@@ -913,13 +917,13 @@ components:
           nullable: false
           type: string
         flowInvocationType:
-          $ref: '#/components/schemas/FlowInvocationType'
+          $ref: "#/components/schemas/FlowInvocationType"
         params:
           default: []
           description: The list of arguments to pass in to the contract method being
             invoked.
           items:
-            $ref: '#/components/schemas/JvmObject'
+            $ref: "#/components/schemas/JvmObject"
           nullable: false
           type: array
         timeoutMs:
@@ -937,13 +941,13 @@ components:
       type: object
     InvokeContractV1Response:
       example:
-        callOutput: "{}"
         success: true
+        callOutput: "{}"
+        transactionId: transactionId
         progress:
         - progress
         - progress
         flowId: flowId
-        transactionId: transactionId
       properties:
         success:
           nullable: false
@@ -979,8 +983,8 @@ components:
     StartMonitorV1Request:
       additionalProperties: false
       example:
-        stateFullClassName: net.corda.samples.example.states.IOUState
         clientAppId: frond_v1_x_7Hdg6s
+        stateFullClassName: net.corda.samples.example.states.IOUState
       properties:
         clientAppId:
           description: ID of a client application that wants to monitor the state
@@ -1003,8 +1007,8 @@ components:
       type: object
     StartMonitorV1Response:
       example:
-        msg: msg
         success: true
+        msg: msg
       properties:
         success:
           description: Flag set to true if monitoring started correctly.
@@ -1021,8 +1025,8 @@ components:
     GetMonitorTransactionsV1Request:
       additionalProperties: false
       example:
-        stateFullClassName: net.corda.samples.example.states.IOUState
         clientAppId: frond_v1_x_7Hdg6s
+        stateFullClassName: net.corda.samples.example.states.IOUState
       properties:
         clientAppId:
           description: ID of a client application that wants to monitor the state
@@ -1045,14 +1049,14 @@ components:
       type: object
     GetMonitorTransactionsV1Response:
       example:
-        msg: msg
-        tx:
-        - data: data
-          index: index
-        - data: data
-          index: index
         success: true
+        msg: msg
         stateFullClassName: net.corda.samples.example.states.IOUState
+        tx:
+        - index: index
+          data: data
+        - index: index
+          data: data
       properties:
         success:
           description: Flag set to true if operation completed correctly.
@@ -1072,7 +1076,7 @@ components:
         tx:
           default: []
           items:
-            $ref: '#/components/schemas/GetMonitorTransactionsV1Response_tx_inner'
+            $ref: "#/components/schemas/GetMonitorTransactionsV1Response_tx_inner"
           type: array
       required:
       - msg
@@ -1081,11 +1085,11 @@ components:
     ClearMonitorTransactionsV1Request:
       additionalProperties: false
       example:
+        clientAppId: frond_v1_x_7Hdg6s
+        stateFullClassName: net.corda.samples.example.states.IOUState
         txIndexes:
         - txIndexes
         - txIndexes
-        stateFullClassName: net.corda.samples.example.states.IOUState
-        clientAppId: frond_v1_x_7Hdg6s
       properties:
         clientAppId:
           description: ID of a client application that wants to monitor the state
@@ -1115,8 +1119,8 @@ components:
     ClearMonitorTransactionsV1Response:
       additionalProperties: false
       example:
-        msg: msg
         success: true
+        msg: msg
       properties:
         success:
           description: Flag set to true if operation completed correctly.
@@ -1133,8 +1137,8 @@ components:
     StopMonitorV1Request:
       additionalProperties: false
       example:
-        stateFullClassName: net.corda.samples.example.states.IOUState
         clientAppId: frond_v1_x_7Hdg6s
+        stateFullClassName: net.corda.samples.example.states.IOUState
       properties:
         clientAppId:
           description: ID of a client application that wants to monitor the state
@@ -1157,8 +1161,8 @@ components:
       type: object
     StopMonitorV1Response:
       example:
-        msg: msg
         success: true
+        msg: msg
       properties:
         success:
           description: Flag set to true if operation completed correctly.
@@ -1217,8 +1221,8 @@ components:
       type: object
     NetworkHostAndPort:
       example:
-        port: 0.8008281904610115
         host: host
+        port: 0.8008281904610115
       properties:
         host:
           type: string
@@ -1234,8 +1238,8 @@ components:
       description: An instance of a java.security.PublicKey (which is an interface)
         implementation such as org.hyperledger.cactus.plugin.ledger.connector.corda.server.impl.PublicKeyImpl
       example:
-        format: X.509
         algorithm: EdDSA
+        format: X.509
         encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
       properties:
         algorithm:
@@ -1271,14 +1275,14 @@ components:
     CordaX500Name:
       example:
         commonName: commonName
-        country: GB
         organisationUnit: organisationUnit
+        organisation: PartyA
         locality: London
+        state: state
+        country: GB
         x500Principal:
           name: "O=PartyA,L=London,C=GB"
           encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
-        organisation: PartyA
-        state: state
       properties:
         commonName:
           type: string
@@ -1296,7 +1300,7 @@ components:
           example: GB
           type: string
         x500Principal:
-          $ref: '#/components/schemas/X500Principal'
+          $ref: "#/components/schemas/X500Principal"
       required:
       - country
       - locality
@@ -1305,74 +1309,74 @@ components:
       type: object
     Party:
       example:
-        owningKey:
-          format: X.509
-          algorithm: EdDSA
-          encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
         name:
           commonName: commonName
-          country: GB
           organisationUnit: organisationUnit
+          organisation: PartyA
           locality: London
+          state: state
+          country: GB
           x500Principal:
             name: "O=PartyA,L=London,C=GB"
             encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
-          organisation: PartyA
-          state: state
+        owningKey:
+          algorithm: EdDSA
+          format: X.509
+          encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
       properties:
         name:
-          $ref: '#/components/schemas/CordaX500Name'
+          $ref: "#/components/schemas/CordaX500Name"
         owningKey:
-          $ref: '#/components/schemas/PublicKey'
+          $ref: "#/components/schemas/PublicKey"
       required:
       - name
       - owningKey
       type: object
     NodeInfo:
       example:
-        legalIdentities:
-        - owningKey:
-            format: X.509
-            algorithm: EdDSA
-            encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
-          name:
-            commonName: commonName
-            country: GB
-            organisationUnit: organisationUnit
-            locality: London
-            x500Principal:
-              name: "O=PartyA,L=London,C=GB"
-              encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
-            organisation: PartyA
-            state: state
-        - owningKey:
-            format: X.509
-            algorithm: EdDSA
-            encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
-          name:
-            commonName: commonName
-            country: GB
-            organisationUnit: organisationUnit
-            locality: London
-            x500Principal:
-              name: "O=PartyA,L=London,C=GB"
-              encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
-            organisation: PartyA
-            state: state
         addresses:
-        - port: 0.8008281904610115
-          host: host
-        - port: 0.8008281904610115
-          host: host
-        serial: 1.4658129805029452
+        - host: host
+          port: 0.8008281904610115
+        - host: host
+          port: 0.8008281904610115
         platformVersion: 6
+        serial: 1.4658129805029452
+        legalIdentities:
+        - name:
+            commonName: commonName
+            organisationUnit: organisationUnit
+            organisation: PartyA
+            locality: London
+            state: state
+            country: GB
+            x500Principal:
+              name: "O=PartyA,L=London,C=GB"
+              encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+          owningKey:
+            algorithm: EdDSA
+            format: X.509
+            encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
+        - name:
+            commonName: commonName
+            organisationUnit: organisationUnit
+            organisation: PartyA
+            locality: London
+            state: state
+            country: GB
+            x500Principal:
+              name: "O=PartyA,L=London,C=GB"
+              encoded: MC8xCzAJBgNVBAYTAkdCMQ8wDQYDVQQHDAZMb25kb24xDzANBgNVBAoMBlBhcnR5QQ==
+          owningKey:
+            algorithm: EdDSA
+            format: X.509
+            encoded: MCowBQYDK2VwAyEAac1p4wLsAh70VJOcudQppu7NnKxyoKxVN0DbfTxF+54=
         legalIdentitiesAndCerts:
         - null
         - null
       properties:
         addresses:
           items:
-            $ref: '#/components/schemas/NetworkHostAndPort'
+            $ref: "#/components/schemas/NetworkHostAndPort"
           type: array
         platformVersion:
           type: integer
@@ -1380,11 +1384,11 @@ components:
           type: number
         legalIdentities:
           items:
-            $ref: '#/components/schemas/Party'
+            $ref: "#/components/schemas/Party"
           type: array
         legalIdentitiesAndCerts:
           items:
-            $ref: '#/components/schemas/PartyAndCertificate'
+            $ref: "#/components/schemas/PartyAndCertificate"
           type: array
       required:
       - addresses
@@ -1397,7 +1401,7 @@ components:
       type: object
     NetworkMapV1Response:
       items:
-        $ref: '#/components/schemas/NodeInfo'
+        $ref: "#/components/schemas/NodeInfo"
       maxItems: 2048
       minItems: 1
       nullable: false
@@ -1428,74 +1432,74 @@ components:
     DiagnoseNodeV1Response:
       example:
         nodeDiagnosticInfo:
-          vendor: vendor
-          platformVersion: 1
-          version: version
           cordapps:
-          - licence: licence
-            targetPlatformVersion: 6
-            vendor: vendor
-            name: name
-            jarHash:
+          - jarHash:
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
               offset: 0
               size: 32
-              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-            shortName: shortName
-            type: type
-            version: version
+            licence: licence
             minimumPlatformVersion: 0
-          - licence: licence
-            targetPlatformVersion: 6
-            vendor: vendor
             name: name
-            jarHash:
+            shortName: shortName
+            targetPlatformVersion: 6
+            type: type
+            vendor: vendor
+            version: version
+          - jarHash:
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
               offset: 0
               size: 32
-              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-            shortName: shortName
-            type: type
-            version: version
+            licence: licence
             minimumPlatformVersion: 0
-          - licence: licence
-            targetPlatformVersion: 6
-            vendor: vendor
             name: name
-            jarHash:
+            shortName: shortName
+            targetPlatformVersion: 6
+            type: type
+            vendor: vendor
+            version: version
+          - jarHash:
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
               offset: 0
               size: 32
-              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-            shortName: shortName
-            type: type
-            version: version
+            licence: licence
             minimumPlatformVersion: 0
-          - licence: licence
-            targetPlatformVersion: 6
-            vendor: vendor
             name: name
-            jarHash:
+            shortName: shortName
+            targetPlatformVersion: 6
+            type: type
+            vendor: vendor
+            version: version
+          - jarHash:
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
               offset: 0
               size: 32
-              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-            shortName: shortName
-            type: type
-            version: version
+            licence: licence
             minimumPlatformVersion: 0
-          - licence: licence
-            targetPlatformVersion: 6
-            vendor: vendor
             name: name
-            jarHash:
+            shortName: shortName
+            targetPlatformVersion: 6
+            type: type
+            vendor: vendor
+            version: version
+          - jarHash:
+              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
               offset: 0
               size: 32
-              bytes: Vf9MllnrC7vrWxrlDE94OzPMZW7At1HhTETL/XjiAmc=
-            shortName: shortName
-            type: type
-            version: version
+            licence: licence
             minimumPlatformVersion: 0
+            name: name
+            shortName: shortName
+            targetPlatformVersion: 6
+            type: type
+            vendor: vendor
+            version: version
+          platformVersion: 1
           revision: revision
+          vendor: vendor
+          version: version
       properties:
         nodeDiagnosticInfo:
-          $ref: '#/components/schemas/NodeDiagnosticInfo'
+          $ref: "#/components/schemas/NodeDiagnosticInfo"
       required:
       - nodeDiagnosticInfo
       type: object
@@ -1518,72 +1522,72 @@ components:
     ListCpiV1Response:
       example:
         cpis:
-        - cpiFileFullChecksum: string
-          cpiFileChecksum: string
+        - cpiFileChecksum: string
+          cpiFileFullChecksum: string
           cpks:
-          - libraries:
-            - string
-            - string
+          - hash: string
             id:
-              signerSummaryHash: string
               name: string
+              signerSummaryHash: string
               version: string
+            libraries:
+            - string
+            - string
             mainBundle: string
-            type: string
-            hash: string
             timestamp: 2022-06-24T10:15:30Z
-          - libraries:
-            - string
-            - string
+            type: string
+          - hash: string
             id:
-              signerSummaryHash: string
               name: string
+              signerSummaryHash: string
               version: string
+            libraries:
+            - string
+            - string
             mainBundle: string
-            type: string
-            hash: string
             timestamp: 2022-06-24T10:15:30Z
+            type: string
           groupPolicy: string
           id:
-            signerSummaryHash: string
             name: string
+            signerSummaryHash: string
             version: string
           timestamp: 2022-06-24T10:15:30Z
-        - cpiFileFullChecksum: string
-          cpiFileChecksum: string
+        - cpiFileChecksum: string
+          cpiFileFullChecksum: string
           cpks:
-          - libraries:
-            - string
-            - string
+          - hash: string
             id:
-              signerSummaryHash: string
               name: string
+              signerSummaryHash: string
               version: string
+            libraries:
+            - string
+            - string
             mainBundle: string
-            type: string
-            hash: string
             timestamp: 2022-06-24T10:15:30Z
-          - libraries:
-            - string
-            - string
+            type: string
+          - hash: string
             id:
-              signerSummaryHash: string
               name: string
+              signerSummaryHash: string
               version: string
+            libraries:
+            - string
+            - string
             mainBundle: string
-            type: string
-            hash: string
             timestamp: 2022-06-24T10:15:30Z
+            type: string
           groupPolicy: string
           id:
-            signerSummaryHash: string
             name: string
+            signerSummaryHash: string
             version: string
           timestamp: 2022-06-24T10:15:30Z
       properties:
         cpis:
           items:
-            $ref: '#/components/schemas/ListCpiV1Response_cpis_inner'
+            $ref: "#/components/schemas/ListCpiV1Response_cpis_inner"
           type: array
       required:
       - hash
@@ -1595,9 +1599,9 @@ components:
       type: object
     ListCpiV1Request:
       example:
-        rejectUnauthorized: true
-        password: password
         username: username
+        password: password
+        rejectUnauthorized: true
       properties:
         username:
           nullable: false
@@ -1616,17 +1620,17 @@ components:
       description: This method starts a new instance for the specified flow for the
         specified holding identity.
       example:
+        username: username
+        password: password
         rejectUnauthorized: true
         holdingIDShortHash: holdingIDShortHash
-        password: password
-        requestBody:
-          numberOfRecords: numberOfRecords
-          otherMember: otherMember
-          chatName: chatName
-          message: message
         clientRequestId: clientRequestId
         flowClassName: flowClassName
-        username: username
+        requestBody:
+          chatName: chatName
+          otherMember: otherMember
+          message: message
+          numberOfRecords: numberOfRecords
       properties:
         username:
           nullable: false
@@ -1647,7 +1651,7 @@ components:
           nullable: false
           type: string
         requestBody:
-          $ref: '#/components/schemas/StartFlowV1Request_requestBody'
+          $ref: "#/components/schemas/StartFlowV1Request_requestBody"
       required:
       - clientRequestId
       - flowClassName
@@ -1659,11 +1663,11 @@ components:
     GetFlowCidV1Request:
       description: This method gets the current status of the specified flow instance.
       example:
+        username: username
+        password: password
         rejectUnauthorized: true
         holdingIDShortHash: holdingIDShortHash
-        password: password
         clientRequestId: clientRequestId
-        username: username
       properties:
         username:
           nullable: false
@@ -1691,7 +1695,7 @@ components:
           nullable: true
           type: string
         flowError:
-          $ref: '#/components/schemas/FlowV1Error'
+          $ref: "#/components/schemas/FlowV1Error"
         flowId:
           example: string
           nullable: true
@@ -1722,7 +1726,7 @@ components:
       properties:
         flowStatusResponses:
           items:
-            $ref: '#/components/schemas/FlowStatusV1Responses_flowStatusResponses_inner'
+            $ref: "#/components/schemas/FlowStatusV1Responses_flowStatusResponses_inner"
           type: array
       required:
       - flowStatus
@@ -1731,14 +1735,14 @@ components:
       type: object
     StartFlowV1Response:
       example:
-        holdingIDShortHash: string
+        clientRequestId: string
         flowError:
           message: string
           type: string
-        clientRequestId: string
+        flowId: string
         flowResult: string
         flowStatus: string
-        flowId: string
+        holdingIDShortHash: string
         timestamp: 2022-06-24T10:15:30Z
       properties:
         clientRequestId:
@@ -1746,7 +1750,7 @@ components:
           nullable: true
           type: string
         flowError:
-          $ref: '#/components/schemas/FlowV1Error'
+          $ref: "#/components/schemas/FlowV1Error"
         flowId:
           example: string
           nullable: true
@@ -1775,8 +1779,8 @@ components:
       type: object
     CPIIDV1:
       example:
-        signerSummaryHash: string
         name: string
+        signerSummaryHash: string
         version: string
       properties:
         name:
@@ -1814,8 +1818,8 @@ components:
       type: object
     GetMonitorTransactionsV1Response_tx_inner:
       example:
-        data: data
         index: index
+        data: data
       properties:
         index:
           type: string
@@ -1826,24 +1830,24 @@ components:
       type: object
     ListCpiV1Response_cpis_inner_cpks_inner:
       example:
+        hash: string
+        id:
+          name: string
+          signerSummaryHash: string
+          version: string
         libraries:
         - string
         - string
-        id:
-          signerSummaryHash: string
-          name: string
-          version: string
         mainBundle: string
-        type: string
-        hash: string
         timestamp: 2022-06-24T10:15:30Z
+        type: string
       properties:
         hash:
           example: string
           nullable: false
           type: string
         id:
-          $ref: '#/components/schemas/CPIIDV1'
+          $ref: "#/components/schemas/CPIIDV1"
         libraries:
           items:
             example: string
@@ -1866,35 +1870,35 @@ components:
       type: object
     ListCpiV1Response_cpis_inner:
       example:
-        cpiFileFullChecksum: string
         cpiFileChecksum: string
+        cpiFileFullChecksum: string
         cpks:
-        - libraries:
-          - string
-          - string
+        - hash: string
           id:
-            signerSummaryHash: string
             name: string
+            signerSummaryHash: string
             version: string
+          libraries:
+          - string
+          - string
           mainBundle: string
-          type: string
-          hash: string
           timestamp: 2022-06-24T10:15:30Z
-        - libraries:
-          - string
-          - string
+          type: string
+        - hash: string
           id:
-            signerSummaryHash: string
             name: string
+            signerSummaryHash: string
             version: string
+          libraries:
+          - string
+          - string
           mainBundle: string
-          type: string
-          hash: string
           timestamp: 2022-06-24T10:15:30Z
+          type: string
         groupPolicy: string
         id:
-          signerSummaryHash: string
           name: string
+          signerSummaryHash: string
           version: string
         timestamp: 2022-06-24T10:15:30Z
       properties:
@@ -1908,14 +1912,14 @@ components:
           type: string
         cpks:
           items:
-            $ref: '#/components/schemas/ListCpiV1Response_cpis_inner_cpks_inner'
+            $ref: "#/components/schemas/ListCpiV1Response_cpis_inner_cpks_inner"
           type: array
         groupPolicy:
           example: string
           nullable: true
           type: string
         id:
-          $ref: '#/components/schemas/CPIIDV1'
+          $ref: "#/components/schemas/CPIIDV1"
         timestamp:
           example: 2022-06-24T10:15:30Z
           format: date-time
@@ -1924,10 +1928,10 @@ components:
       type: object
     StartFlowV1Request_requestBody:
       example:
-        numberOfRecords: numberOfRecords
-        otherMember: otherMember
         chatName: chatName
+        otherMember: otherMember
         message: message
+        numberOfRecords: numberOfRecords
       properties:
         chatName:
           type: string
@@ -1945,7 +1949,7 @@ components:
           nullable: true
           type: string
         flowError:
-          $ref: '#/components/schemas/FlowV1Error'
+          $ref: "#/components/schemas/FlowV1Error"
         flowId:
           example: string
           nullable: true

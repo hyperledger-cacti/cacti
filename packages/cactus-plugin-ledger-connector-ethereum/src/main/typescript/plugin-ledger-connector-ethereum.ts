@@ -434,7 +434,7 @@ export class PluginLedgerConnectorEthereum
   }
 
   public async getConsensusAlgorithmFamily(): Promise<ConsensusAlgorithmFamily> {
-    return ConsensusAlgorithmFamily.Stake;
+    return ConsensusAlgorithmFamily.OrgHyperledgerCactusConsensusalgorithmProofOfStake;
   }
 
   public async hasTransactionFinality(): Promise<boolean> {

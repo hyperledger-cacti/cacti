@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiDiscoverNetworkV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiDiscoverNetworkV1Request) Execute() (*DiscoverNetworkResponseV1, *http.Response, error) {
@@ -37,7 +37,7 @@ DiscoverNetworkV1 Refresh Fabric network structure in the database through disco
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiDiscoverNetworkV1Request
 */
-func (a *DefaultApiService) DiscoverNetworkV1(ctx context.Context) ApiDiscoverNetworkV1Request {
+func (a *DefaultAPIService) DiscoverNetworkV1(ctx context.Context) ApiDiscoverNetworkV1Request {
 	return ApiDiscoverNetworkV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -46,7 +46,7 @@ func (a *DefaultApiService) DiscoverNetworkV1(ctx context.Context) ApiDiscoverNe
 
 // Execute executes the request
 //  @return DiscoverNetworkResponseV1
-func (a *DefaultApiService) DiscoverNetworkV1Execute(r ApiDiscoverNetworkV1Request) (*DiscoverNetworkResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) DiscoverNetworkV1Execute(r ApiDiscoverNetworkV1Request) (*DiscoverNetworkResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -54,7 +54,7 @@ func (a *DefaultApiService) DiscoverNetworkV1Execute(r ApiDiscoverNetworkV1Reque
 		localVarReturnValue  *DiscoverNetworkResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.DiscoverNetworkV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.DiscoverNetworkV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -131,7 +131,7 @@ func (a *DefaultApiService) DiscoverNetworkV1Execute(r ApiDiscoverNetworkV1Reque
 
 type ApiGetStatusV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 }
 
 func (r ApiGetStatusV1Request) Execute() (*StatusResponseV1, *http.Response, error) {
@@ -144,7 +144,7 @@ GetStatusV1 Get the status of persistence plugin for fabric
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiGetStatusV1Request
 */
-func (a *DefaultApiService) GetStatusV1(ctx context.Context) ApiGetStatusV1Request {
+func (a *DefaultAPIService) GetStatusV1(ctx context.Context) ApiGetStatusV1Request {
 	return ApiGetStatusV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -153,7 +153,7 @@ func (a *DefaultApiService) GetStatusV1(ctx context.Context) ApiGetStatusV1Reque
 
 // Execute executes the request
 //  @return StatusResponseV1
-func (a *DefaultApiService) GetStatusV1Execute(r ApiGetStatusV1Request) (*StatusResponseV1, *http.Response, error) {
+func (a *DefaultAPIService) GetStatusV1Execute(r ApiGetStatusV1Request) (*StatusResponseV1, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -161,7 +161,7 @@ func (a *DefaultApiService) GetStatusV1Execute(r ApiGetStatusV1Request) (*Status
 		localVarReturnValue  *StatusResponseV1
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.GetStatusV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.GetStatusV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

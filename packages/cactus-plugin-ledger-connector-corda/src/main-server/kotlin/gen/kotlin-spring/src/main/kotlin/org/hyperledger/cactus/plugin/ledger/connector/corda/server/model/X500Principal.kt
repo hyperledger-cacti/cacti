@@ -19,8 +19,10 @@ import jakarta.validation.Valid
  */
 data class X500Principal(
 
+    @param:JsonProperty("name", required = true)
     @get:JsonProperty("name", required = true) val name: kotlin.String,
 
+    @param:JsonProperty("encoded", required = true)
     @get:JsonProperty("encoded", required = true) val encoded: kotlin.String
 ) {
 

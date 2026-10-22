@@ -123,7 +123,8 @@ describe("HTLC ETH Besu ERC-20 refund-endpoint", () => {
     const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
 
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     const pluginRegistry = new PluginRegistry({});
@@ -143,7 +144,8 @@ describe("HTLC ETH Besu ERC-20 refund-endpoint", () => {
     };
 
     const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     const pluginHtlc = await factoryHTLC.create(pluginOptions);
     pluginRegistry.add(pluginHtlc);
@@ -342,7 +344,8 @@ describe("HTLC ETH Besu ERC-20 refund-endpoint", () => {
     const rpcApiHttpHost = await besuTestLedger.getRpcApiHttpHost();
     const rpcApiWsHost = await besuTestLedger.getRpcApiWsHost();
     const factory = new PluginFactoryLedgerConnector({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
 
     const pluginRegistry = new PluginRegistry({});
@@ -362,7 +365,8 @@ describe("HTLC ETH Besu ERC-20 refund-endpoint", () => {
     };
 
     const factoryHTLC = new PluginFactoryHtlcEthBesuErc20({
-      pluginImportType: PluginImportType.Local,
+      pluginImportType:
+        PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
     });
     const pluginHtlc = await factoryHTLC.create(pluginOptions);
     pluginRegistry.add(pluginHtlc);

@@ -4,27 +4,26 @@
  * source: models/besu_transaction_config_pb.proto
  * git: https://github.com/thesayyn/protoc-gen-ts */
 import * as dependency_1 from "./../google/protobuf/any";
-import * as dependency_2 from "./besu_transaction_config_to_pb";
-import * as dependency_3 from "./web3_block_header_timestamp_pb";
+import * as dependency_2 from "./web3_block_header_timestamp_pb";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class BesuTransactionConfigPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            rawTransaction?: string;
-            from?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
-            to?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB;
-            value?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
-            gas?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
-            gasPrice?: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+            raw_transaction?: string;
+            from?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+            to?: string;
+            value?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+            gas?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+            gas_price?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
             nonce?: number;
-            data?: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB;
+            data?: string;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("rawTransaction" in data && data.rawTransaction != undefined) {
-                    this.rawTransaction = data.rawTransaction;
+                if ("raw_transaction" in data && data.raw_transaction != undefined) {
+                    this.raw_transaction = data.raw_transaction;
                 }
                 if ("from" in data && data.from != undefined) {
                     this.from = data.from;
@@ -38,8 +37,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if ("gas" in data && data.gas != undefined) {
                     this.gas = data.gas;
                 }
-                if ("gasPrice" in data && data.gasPrice != undefined) {
-                    this.gasPrice = data.gasPrice;
+                if ("gas_price" in data && data.gas_price != undefined) {
+                    this.gas_price = data.gas_price;
                 }
                 if ("nonce" in data && data.nonce != undefined) {
                     this.nonce = data.nonce;
@@ -49,56 +48,53 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 }
             }
         }
-        get rawTransaction() {
-            return pb_1.Message.getFieldWithDefault(this, 185047449, "") as string;
+        get raw_transaction() {
+            return pb_1.Message.getFieldWithDefault(this, 231477946, "") as string;
         }
-        set rawTransaction(value: string) {
-            pb_1.Message.setField(this, 185047449, value);
+        set raw_transaction(value: string) {
+            pb_1.Message.setField(this, 231477946, value);
         }
         get from() {
-            return pb_1.Message.getWrapperField(this, dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 3151786) as dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 3151786) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
         }
-        set from(value: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
+        set from(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
             pb_1.Message.setWrapperField(this, 3151786, value);
         }
         get has_from() {
             return pb_1.Message.getField(this, 3151786) != null;
         }
         get to() {
-            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB, 3707) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB;
+            return pb_1.Message.getFieldWithDefault(this, 3707, "") as string;
         }
-        set to(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB) {
-            pb_1.Message.setWrapperField(this, 3707, value);
-        }
-        get has_to() {
-            return pb_1.Message.getField(this, 3707) != null;
+        set to(value: string) {
+            pb_1.Message.setField(this, 3707, value);
         }
         get value() {
-            return pb_1.Message.getWrapperField(this, dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 111972721) as dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 111972721) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
         }
-        set value(value: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
+        set value(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
             pb_1.Message.setWrapperField(this, 111972721, value);
         }
         get has_value() {
             return pb_1.Message.getField(this, 111972721) != null;
         }
         get gas() {
-            return pb_1.Message.getWrapperField(this, dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 102105) as dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 102105) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
         }
-        set gas(value: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
+        set gas(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
             pb_1.Message.setWrapperField(this, 102105, value);
         }
         get has_gas() {
             return pb_1.Message.getField(this, 102105) != null;
         }
-        get gasPrice() {
-            return pb_1.Message.getWrapperField(this, dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 5271059) as dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
+        get gas_price() {
+            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB, 264461414) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB;
         }
-        set gasPrice(value: dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
-            pb_1.Message.setWrapperField(this, 5271059, value);
+        set gas_price(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB) {
+            pb_1.Message.setWrapperField(this, 264461414, value);
         }
-        get has_gasPrice() {
-            return pb_1.Message.getField(this, 5271059) != null;
+        get has_gas_price() {
+            return pb_1.Message.getField(this, 264461414) != null;
         }
         get nonce() {
             return pb_1.Message.getFieldWithDefault(this, 105002991, 0) as number;
@@ -107,70 +103,67 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             pb_1.Message.setField(this, 105002991, value);
         }
         get data() {
-            return pb_1.Message.getWrapperField(this, dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB, 3076010) as dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB;
+            return pb_1.Message.getFieldWithDefault(this, 3076010, "") as string;
         }
-        set data(value: dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB) {
-            pb_1.Message.setWrapperField(this, 3076010, value);
-        }
-        get has_data() {
-            return pb_1.Message.getField(this, 3076010) != null;
+        set data(value: string) {
+            pb_1.Message.setField(this, 3076010, value);
         }
         static fromObject(data: {
-            rawTransaction?: string;
-            from?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
-            to?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.prototype.toObject>;
-            value?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
-            gas?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
-            gasPrice?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+            raw_transaction?: string;
+            from?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+            to?: string;
+            value?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+            gas?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+            gas_price?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
             nonce?: number;
-            data?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.prototype.toObject>;
+            data?: string;
         }): BesuTransactionConfigPB {
             const message = new BesuTransactionConfigPB({});
-            if (data.rawTransaction != null) {
-                message.rawTransaction = data.rawTransaction;
+            if (data.raw_transaction != null) {
+                message.raw_transaction = data.raw_transaction;
             }
             if (data.from != null) {
-                message.from = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.from);
+                message.from = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.from);
             }
             if (data.to != null) {
-                message.to = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.fromObject(data.to);
+                message.to = data.to;
             }
             if (data.value != null) {
-                message.value = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.value);
+                message.value = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.value);
             }
             if (data.gas != null) {
-                message.gas = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.gas);
+                message.gas = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.gas);
             }
-            if (data.gasPrice != null) {
-                message.gasPrice = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.gasPrice);
+            if (data.gas_price != null) {
+                message.gas_price = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.fromObject(data.gas_price);
             }
             if (data.nonce != null) {
                 message.nonce = data.nonce;
             }
             if (data.data != null) {
-                message.data = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.fromObject(data.data);
+                message.data = data.data;
             }
             return message;
         }
         toObject() {
             const data: {
-                rawTransaction?: string;
-                from?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
-                to?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.prototype.toObject>;
-                value?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
-                gas?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
-                gasPrice?: ReturnType<typeof dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+                raw_transaction?: string;
+                from?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+                to?: string;
+                value?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+                gas?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
+                gas_price?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.prototype.toObject>;
                 nonce?: number;
-                data?: ReturnType<typeof dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.prototype.toObject>;
+                data?: string;
             } = {};
-            if (this.rawTransaction != null) {
-                data.rawTransaction = this.rawTransaction;
+            if (this.raw_transaction != null) {
+                data.raw_transaction = this.raw_transaction;
             }
             if (this.from != null) {
                 data.from = this.from.toObject();
             }
             if (this.to != null) {
-                data.to = this.to.toObject();
+                data.to = this.to;
             }
             if (this.value != null) {
                 data.value = this.value.toObject();
@@ -178,14 +171,14 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
             if (this.gas != null) {
                 data.gas = this.gas.toObject();
             }
-            if (this.gasPrice != null) {
-                data.gasPrice = this.gasPrice.toObject();
+            if (this.gas_price != null) {
+                data.gas_price = this.gas_price.toObject();
             }
             if (this.nonce != null) {
                 data.nonce = this.nonce;
             }
             if (this.data != null) {
-                data.data = this.data.toObject();
+                data.data = this.data;
             }
             return data;
         }
@@ -193,22 +186,22 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.rawTransaction.length)
-                writer.writeString(185047449, this.rawTransaction);
+            if (this.raw_transaction.length)
+                writer.writeString(231477946, this.raw_transaction);
             if (this.has_from)
                 writer.writeMessage(3151786, this.from, () => this.from.serialize(writer));
-            if (this.has_to)
-                writer.writeMessage(3707, this.to, () => this.to.serialize(writer));
+            if (this.to.length)
+                writer.writeString(3707, this.to);
             if (this.has_value)
                 writer.writeMessage(111972721, this.value, () => this.value.serialize(writer));
             if (this.has_gas)
                 writer.writeMessage(102105, this.gas, () => this.gas.serialize(writer));
-            if (this.has_gasPrice)
-                writer.writeMessage(5271059, this.gasPrice, () => this.gasPrice.serialize(writer));
+            if (this.has_gas_price)
+                writer.writeMessage(264461414, this.gas_price, () => this.gas_price.serialize(writer));
             if (this.nonce != 0)
                 writer.writeFloat(105002991, this.nonce);
-            if (this.has_data)
-                writer.writeMessage(3076010, this.data, () => this.data.serialize(writer));
+            if (this.data.length)
+                writer.writeString(3076010, this.data);
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -218,29 +211,29 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 185047449:
-                        message.rawTransaction = reader.readString();
+                    case 231477946:
+                        message.raw_transaction = reader.readString();
                         break;
                     case 3151786:
-                        reader.readMessage(message.from, () => message.from = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
+                        reader.readMessage(message.from, () => message.from = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
                         break;
                     case 3707:
-                        reader.readMessage(message.to, () => message.to = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.deserialize(reader));
+                        message.to = reader.readString();
                         break;
                     case 111972721:
-                        reader.readMessage(message.value, () => message.value = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
+                        reader.readMessage(message.value, () => message.value = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
                         break;
                     case 102105:
-                        reader.readMessage(message.gas, () => message.gas = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
+                        reader.readMessage(message.gas, () => message.gas = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
                         break;
-                    case 5271059:
-                        reader.readMessage(message.gasPrice, () => message.gasPrice = dependency_3.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
+                    case 264461414:
+                        reader.readMessage(message.gas_price, () => message.gas_price = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.Web3BlockHeaderTimestampPB.deserialize(reader));
                         break;
                     case 105002991:
                         message.nonce = reader.readFloat();
                         break;
                     case 3076010:
-                        reader.readMessage(message.data, () => message.data = dependency_2.org.hyperledger.cacti.plugin.ledger.connector.besu.BesuTransactionConfigToPB.deserialize(reader));
+                        message.data = reader.readString();
                         break;
                     default: reader.skipField();
                 }

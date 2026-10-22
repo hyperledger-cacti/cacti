@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-besu
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the BesuPrivateTransactionConfig type satisfies the MappedNullable interface at compile time
@@ -22,6 +24,8 @@ type BesuPrivateTransactionConfig struct {
 	PrivateFrom string `json:"privateFrom"`
 	PrivateFor []interface{} `json:"privateFor"`
 }
+
+type _BesuPrivateTransactionConfig BesuPrivateTransactionConfig
 
 // NewBesuPrivateTransactionConfig instantiates a new BesuPrivateTransactionConfig object
 // This constructor will assign default values to properties that have it defined,
@@ -103,6 +107,44 @@ func (o BesuPrivateTransactionConfig) ToMap() (map[string]interface{}, error) {
 	toSerialize["privateFrom"] = o.PrivateFrom
 	toSerialize["privateFor"] = o.PrivateFor
 	return toSerialize, nil
+}
+
+func (o *BesuPrivateTransactionConfig) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"privateFrom",
+		"privateFor",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varBesuPrivateTransactionConfig := _BesuPrivateTransactionConfig{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varBesuPrivateTransactionConfig)
+
+	if err != nil {
+		return err
+	}
+
+	*o = BesuPrivateTransactionConfig(varBesuPrivateTransactionConfig)
+
+	return err
 }
 
 type NullableBesuPrivateTransactionConfig struct {

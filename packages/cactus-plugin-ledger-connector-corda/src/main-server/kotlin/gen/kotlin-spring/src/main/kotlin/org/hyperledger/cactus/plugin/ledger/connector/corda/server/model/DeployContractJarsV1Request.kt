@@ -22,9 +22,11 @@ import jakarta.validation.Valid
 data class DeployContractJarsV1Request(
 
     @field:Valid
+    @param:JsonProperty("cordappDeploymentConfigs", required = true)
     @get:JsonProperty("cordappDeploymentConfigs", required = true) val cordappDeploymentConfigs: kotlin.collections.List<CordappDeploymentConfig> = arrayListOf(),
 
     @field:Valid
+    @param:JsonProperty("jarFiles", required = true)
     @get:JsonProperty("jarFiles", required = true) val jarFiles: kotlin.collections.List<JarFile>
 ) {
 

@@ -22,14 +22,18 @@ import jakarta.validation.Valid
  */
 data class GetMonitorTransactionsV1Response(
 
+    @param:JsonProperty("success", required = true)
     @get:JsonProperty("success", required = true) val success: kotlin.Boolean,
 
+    @param:JsonProperty("msg", required = true)
     @get:JsonProperty("msg", required = true) val msg: kotlin.String,
 
     @get:Size(min=1,max=1024)
+    @param:JsonProperty("stateFullClassName")
     @get:JsonProperty("stateFullClassName") val stateFullClassName: kotlin.String? = null,
 
     @field:Valid
+    @param:JsonProperty("tx")
     @get:JsonProperty("tx") val tx: kotlin.collections.List<GetMonitorTransactionsV1ResponseTxInner>? = arrayListOf()
 ) {
 

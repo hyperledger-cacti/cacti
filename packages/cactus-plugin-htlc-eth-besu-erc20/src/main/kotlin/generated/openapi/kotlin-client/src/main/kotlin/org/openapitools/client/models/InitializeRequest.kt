@@ -8,9 +8,17 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.models
@@ -42,7 +50,7 @@ data class InitializeRequest (
     val keychainId: kotlin.String,
 
     @Json(name = "constructorArgs")
-    val constructorArgs: kotlin.collections.List<kotlin.Any> = arrayListOf(),
+    val constructorArgs: kotlin.collections.List<kotlin.Any?> = arrayListOf(),
 
     @Json(name = "web3SigningCredential")
     val web3SigningCredential: Web3SigningCredential,
@@ -50,5 +58,8 @@ data class InitializeRequest (
     @Json(name = "gas")
     val gas: java.math.BigDecimal? = null
 
-)
+) {
+
+
+}
 

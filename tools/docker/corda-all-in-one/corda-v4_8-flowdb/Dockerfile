@@ -1,4 +1,5 @@
 FROM docker:24.0.2-dind
+LABEL org.opencontainers.image.description="Corda 4.8 development network based on the flow database access sample for Cacti integration testing."
 
 WORKDIR /
 

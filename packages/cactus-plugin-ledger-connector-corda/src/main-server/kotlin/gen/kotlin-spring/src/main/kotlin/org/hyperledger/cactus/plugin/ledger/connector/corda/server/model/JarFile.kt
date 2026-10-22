@@ -21,11 +21,14 @@ import jakarta.validation.Valid
 data class JarFile(
 
     @get:Size(min=1,max=255)
+    @param:JsonProperty("filename", required = true)
     @get:JsonProperty("filename", required = true) val filename: kotlin.String,
 
+    @param:JsonProperty("hasDbMigrations", required = true)
     @get:JsonProperty("hasDbMigrations", required = true) val hasDbMigrations: kotlin.Boolean,
 
     @get:Size(min=1,max=1073741824)
+    @param:JsonProperty("contentBase64", required = true)
     @get:JsonProperty("contentBase64", required = true) val contentBase64: kotlin.String
 ) : kotlin.collections.HashMap<String, kotlin.Any>() {
 

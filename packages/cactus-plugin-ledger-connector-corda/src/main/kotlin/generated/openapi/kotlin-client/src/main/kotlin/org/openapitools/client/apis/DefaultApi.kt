@@ -8,15 +8,23 @@
 
 @file:Suppress(
     "ArrayInDataClass",
+    "DuplicatedCode",
     "EnumEntryName",
     "RemoveRedundantQualifierName",
-    "UnusedImport"
+    "RemoveRedundantCallsOfConversionMethods",
+    "REDUNDANT_CALL_OF_CONVERSION_METHOD",
+    "RedundantUnitReturnType",
+    "RemoveEmptyClassBody",
+    "UnnecessaryVariable",
+    "UnusedImport",
+    "UnnecessaryVariable",
+    "unused"
 )
 
 package org.openapitools.client.apis
 
 import java.io.IOException
-import okhttp3.OkHttpClient
+import okhttp3.Call
 import okhttp3.HttpUrl
 
 import org.openapitools.client.models.ClearMonitorTransactionsV1Request
@@ -62,15 +70,16 @@ import org.openapitools.client.infrastructure.ResponseType
 import org.openapitools.client.infrastructure.Success
 import org.openapitools.client.infrastructure.toMultiValue
 
-class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient = ApiClient.defaultClient) : ApiClient(basePath, client) {
+open class DefaultApi(basePath: kotlin.String = defaultBasePath, client: Call.Factory = ApiClient.defaultClient) : ApiClient(basePath, client) {
     companion object {
         @JvmStatic
         val defaultBasePath: String by lazy {
-            System.getProperties().getProperty(ApiClient.baseUrlKey, "http://localhost")
+            System.getProperties().getProperty(ApiClient.BASE_URL_KEY, "http://localhost")
         }
     }
 
     /**
+     * DELETE /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions
      * Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
      * 
      * @param clearMonitorTransactionsV1Request 
@@ -96,12 +105,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * DELETE /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/clear-monitor-transactions
      * Clear transactions from internal store so they&#39;ll not be available by GetMonitorTransactionsV1 anymore.
      * 
      * @param clearMonitorTransactionsV1Request 
@@ -143,6 +153,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars
      * Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
      * 
      * @param deployContractJarsV1Request 
@@ -168,12 +179,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/deploy-contract-jars
      * Deploys a set of jar files (Cordapps, e.g. the contracts in Corda speak).
      * 
      * @param deployContractJarsV1Request 
@@ -215,6 +227,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node
      * 
      * Responds with diagnostic information about the Corda node
      * @param diagnoseNodeV1Request  (optional)
@@ -240,12 +253,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/diagnose-node
      * 
      * Responds with diagnostic information about the Corda node
      * @param diagnoseNodeV1Request  (optional)
@@ -287,6 +301,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid
      * This method gets the current status of the specified flow instance.
      * 
      * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
@@ -312,12 +327,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid
      * This method gets the current status of the specified flow instance.
      * 
      * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
@@ -346,7 +362,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        
+        localVariableHeaders["Accept"] = "text/plain"
+
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-flow-cid",
@@ -358,6 +375,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions
      * Get transactions for monitored state classes.
      * 
      * @param getMonitorTransactionsV1Request 
@@ -383,12 +401,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-monitor-transactions
      * Get transactions for monitored state classes.
      * 
      * @param getMonitorTransactionsV1Request 
@@ -430,6 +449,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
      * Get the Prometheus Metrics
      * 
      * @return kotlin.String
@@ -454,12 +474,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics
      * Get the Prometheus Metrics
      * 
      * @return ApiResponse<kotlin.String?>
@@ -485,7 +506,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-        
+        localVariableHeaders["Accept"] = "text/plain"
+
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/get-prometheus-exporter-metrics",
@@ -497,6 +519,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract
      * Invokes a contract on a Corda ledger (e.g. a flow)
      * 
      * @param invokeContractV1Request 
@@ -522,12 +545,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/invoke-contract
      * Invokes a contract on a Corda ledger (e.g. a flow)
      * 
      * @param invokeContractV1Request 
@@ -569,6 +593,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi
      * List all CPIs uploaded to the cluster
      * 
      * @param listCpiV1Request 
@@ -594,12 +619,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-cpi
      * List all CPIs uploaded to the cluster
      * 
      * @param listCpiV1Request 
@@ -641,6 +667,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow
      * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
      * 
      * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
@@ -666,12 +693,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * GET /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow
      * This method returns an array containing the statuses of all flows running for a specified holding identity. An empty array is returned if there are no flows running.
      * 
      * @param getFlowCidV1Request This method gets the current status of the specified flow instance.
@@ -700,7 +728,8 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
         localVariableHeaders["Content-Type"] = "application/json"
-        
+        localVariableHeaders["Accept"] = "text/plain"
+
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flow",
@@ -712,6 +741,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows
      * 
      * Responds with a list of the flows on the Corda node.
      * @param listFlowsV1Request  (optional)
@@ -737,12 +767,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/list-flows
      * 
      * Responds with a list of the flows on the Corda node.
      * @param listFlowsV1Request  (optional)
@@ -784,6 +815,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map
      * 
      * Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List&lt;NodeInfo&gt;
      * @param body  (optional)
@@ -809,12 +841,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/network-map
      * 
      * Responds with a snapshot of the network map as provided by the Corda RPC call: net.corda.core.messaging.CordaRPCOps public abstract fun networkMapSnapshot(): List&lt;NodeInfo&gt;
      * @param body  (optional)
@@ -856,6 +889,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow
      * This method starts a new instance for the specified flow for the specified holding identity.
      * 
      * @param startFlowV1Request Request body for starting a flow
@@ -881,12 +915,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-flow
      * This method starts a new instance for the specified flow for the specified holding identity.
      * 
      * @param startFlowV1Request Request body for starting a flow
@@ -928,6 +963,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor
      * Start monitoring corda changes (transactions) of given state class
      * 
      * @param startMonitorV1Request 
@@ -953,12 +989,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/start-monitor
      * Start monitoring corda changes (transactions) of given state class
      * 
      * @param startMonitorV1Request 
@@ -1000,6 +1037,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * DELETE /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor
      * Stop monitoring corda changes (transactions) of given state class
      * 
      * @param stopMonitorV1Request 
@@ -1025,12 +1063,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * DELETE /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/stop-monitor
      * Stop monitoring corda changes (transactions) of given state class
      * 
      * @param stopMonitorV1Request 
@@ -1072,6 +1111,7 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query
      * 
      * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
      * @param vaultQueryV1Request 
@@ -1097,12 +1137,13 @@ class DefaultApi(basePath: kotlin.String = defaultBasePath, client: OkHttpClient
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()} ${localVarError.body}", localVarError.statusCode, localVarResponse)
             }
         }
     }
 
     /**
+     * POST /api/v1/plugins/@hyperledger-cacti/cactus-plugin-ledger-connector-corda/vault-query
      * 
      * Queryes the vault service for state references based on JVM class names. Custom filters are not supported by this endpoint.
      * @param vaultQueryV1Request 

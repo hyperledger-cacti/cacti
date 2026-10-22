@@ -17,7 +17,7 @@ import "models/cmd_api_server_endpoint_error_response_pb.proto";
 import "models/health_check_response_pb.proto";
 
 service DefaultService {
-  rpc GetHealthCheckV1 (google.protobuf.Empty) returns (HealthCheckResponsePB);
+  rpc GetHealthCheckV1 (google.protobuf.Empty) returns (GetHealthCheckV1Response);
 
   rpc GetOpenApiSpecV1 (google.protobuf.Empty) returns (GetOpenApiSpecV1Response);
 
@@ -25,11 +25,24 @@ service DefaultService {
 
 }
 
+message GetHealthCheckV1Response {
+    oneof response {
+        HealthCheckResponsePB health_check_response_pb_200 = 1;
+        CmdApiServerEndpointErrorResponsePB cmd_api_server_endpoint_error_response_pb_401 = 2;
+        CmdApiServerEndpointErrorResponsePB cmd_api_server_endpoint_error_response_pb_403 = 3;
+    }
+}
 message GetOpenApiSpecV1Response {
-  string data = 1;
+    oneof response {
+        string string_200 = 1;
+        CmdApiServerEndpointErrorResponsePB cmd_api_server_endpoint_error_response_pb_401 = 2;
+        CmdApiServerEndpointErrorResponsePB cmd_api_server_endpoint_error_response_pb_403 = 3;
+    }
 }
-
 message GetPrometheusMetricsV1Response {
-  string data = 1;
+    oneof response {
+        string string_200 = 1;
+        CmdApiServerEndpointErrorResponsePB cmd_api_server_endpoint_error_response_pb_401 = 2;
+        CmdApiServerEndpointErrorResponsePB cmd_api_server_endpoint_error_response_pb_403 = 3;
+    }
 }
-

@@ -7,51 +7,51 @@ import * as dependency_1 from "./../google/protobuf/any";
 import * as pb_1 from "google-protobuf";
 export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class GetBlockV1RequestPB extends pb_1.Message {
-        #one_of_decls: number[][] = [[273815337]];
+        #one_of_decls: number[][] = [[105409368]];
         constructor(data?: any[] | ({} & (({
-            blockHashOrBlockNumber?: dependency_1.google.protobuf.Any;
+            block_hash_or_block_number?: dependency_1.google.protobuf.Any;
         })))) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("blockHashOrBlockNumber" in data && data.blockHashOrBlockNumber != undefined) {
-                    this.blockHashOrBlockNumber = data.blockHashOrBlockNumber;
+                if ("block_hash_or_block_number" in data && data.block_hash_or_block_number != undefined) {
+                    this.block_hash_or_block_number = data.block_hash_or_block_number;
                 }
             }
         }
-        get blockHashOrBlockNumber() {
-            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 273815337) as dependency_1.google.protobuf.Any;
+        get block_hash_or_block_number() {
+            return pb_1.Message.getWrapperField(this, dependency_1.google.protobuf.Any, 105409368) as dependency_1.google.protobuf.Any;
         }
-        set blockHashOrBlockNumber(value: dependency_1.google.protobuf.Any) {
-            pb_1.Message.setOneofWrapperField(this, 273815337, this.#one_of_decls[0], value);
+        set block_hash_or_block_number(value: dependency_1.google.protobuf.Any) {
+            pb_1.Message.setOneofWrapperField(this, 105409368, this.#one_of_decls[0], value);
         }
-        get has_blockHashOrBlockNumber() {
-            return pb_1.Message.getField(this, 273815337) != null;
+        get has_block_hash_or_block_number() {
+            return pb_1.Message.getField(this, 105409368) != null;
         }
-        get _blockHashOrBlockNumber() {
+        get _block_hash_or_block_number() {
             const cases: {
-                [index: number]: "none" | "blockHashOrBlockNumber";
+                [index: number]: "none" | "block_hash_or_block_number";
             } = {
                 0: "none",
-                273815337: "blockHashOrBlockNumber"
+                105409368: "block_hash_or_block_number"
             };
-            return cases[pb_1.Message.computeOneofCase(this, [273815337])];
+            return cases[pb_1.Message.computeOneofCase(this, [105409368])];
         }
         static fromObject(data: {
-            blockHashOrBlockNumber?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+            block_hash_or_block_number?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
         }): GetBlockV1RequestPB {
             const message = new GetBlockV1RequestPB({});
-            if (data.blockHashOrBlockNumber != null) {
-                message.blockHashOrBlockNumber = dependency_1.google.protobuf.Any.fromObject(data.blockHashOrBlockNumber);
+            if (data.block_hash_or_block_number != null) {
+                message.block_hash_or_block_number = dependency_1.google.protobuf.Any.fromObject(data.block_hash_or_block_number);
             }
             return message;
         }
         toObject() {
             const data: {
-                blockHashOrBlockNumber?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
+                block_hash_or_block_number?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>;
             } = {};
-            if (this.blockHashOrBlockNumber != null) {
-                data.blockHashOrBlockNumber = this.blockHashOrBlockNumber.toObject();
+            if (this.block_hash_or_block_number != null) {
+                data.block_hash_or_block_number = this.block_hash_or_block_number.toObject();
             }
             return data;
         }
@@ -59,8 +59,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.has_blockHashOrBlockNumber)
-                writer.writeMessage(273815337, this.blockHashOrBlockNumber, () => this.blockHashOrBlockNumber.serialize(writer));
+            if (this.has_block_hash_or_block_number)
+                writer.writeMessage(105409368, this.block_hash_or_block_number, () => this.block_hash_or_block_number.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -70,8 +70,8 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 273815337:
-                        reader.readMessage(message.blockHashOrBlockNumber, () => message.blockHashOrBlockNumber = dependency_1.google.protobuf.Any.deserialize(reader));
+                    case 105409368:
+                        reader.readMessage(message.block_hash_or_block_number, () => message.block_hash_or_block_number = dependency_1.google.protobuf.Any.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }

@@ -173,7 +173,8 @@ export class ConfigService {
                 throw new Error(m);
               }
             },
-            default: PluginImportAction.Install,
+            default:
+              PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
           },
           options: {
             format: Object,
@@ -190,7 +191,7 @@ export class ConfigService {
                 throw new Error(m);
               }
             },
-            default: PluginImportType.Local,
+            default: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
           },
         },
       } as SchemaObj<PluginImport[]>,
@@ -558,8 +559,9 @@ export class ConfigService {
     const plugins: PluginImport[] = [
       {
         packageName: "@hyperledger-cacti/cactus-plugin-keychain-memory",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
+        type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+        action:
+          PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
         options: {
           instanceId: uuidV4(),
           keychainId: uuidV4(),
@@ -567,8 +569,9 @@ export class ConfigService {
       },
       {
         packageName: "@hyperledger-cacti/cacti-plugin-consortium-static",
-        type: PluginImportType.Local,
-        action: PluginImportAction.Install,
+        type: PluginImportType.OrgHyperledgerCactusPluginImportTypeLocal,
+        action:
+          PluginImportAction.OrgHyperledgerCactusPluginImportActionInstall,
         options: {
           instanceId: uuidV4(),
           keyPairPem,

@@ -4,13 +4,18 @@ import type { ServiceType } from "@bufbuild/protobuf";
 import {
   DefaultService,
   PledgeAssetV1Request,
-  PledgeAssetV1200ResponsePB,
+  PledgeAssetV1Response,
   ClaimPledgedAssetV1Request,
   LockAssetV1Request,
   GetVerifiedViewV1Request,
+  GetVerifiedViewV1Response,
+  LockAssetV1Response,
+  ClaimLockedAssetV1Request,
+  ClaimLockedAssetV1Response,
+  ClaimPledgedAssetV1Response,
+  PledgeAssetV1200ResponsePB,
   GetVerifiedViewV1200ResponsePB,
   LockAssetV1200ResponsePB,
-  ClaimLockedAssetV1Request,
   ClaimPledgedAssetV1200ResponsePB,
   Interfaces as CopmIF,
 } from "@hyperledger-cacti/cacti-copm-core";
@@ -61,7 +66,7 @@ export class CopmFabricImpl
 
   public async pledgeAssetV1(
     req: PledgeAssetV1Request,
-  ): Promise<PledgeAssetV1200ResponsePB> {
+  ): Promise<PledgeAssetV1Response> {
     try {
       this.log.debug("pledgeAssetV1 ENTRY req=%o", req);
       const pledgeId = await Endpoints.pledgeAssetV1Impl(
@@ -70,7 +75,12 @@ export class CopmFabricImpl
         this.contextFactory,
         this.fabricConfig,
       );
-      const res = new PledgeAssetV1200ResponsePB({ pledgeId: pledgeId });
+      const res = new PledgeAssetV1Response({
+        response: {
+          case: "pledgeAssetV1200ResponsePb200",
+          value: new PledgeAssetV1200ResponsePB({ pledgeId: pledgeId }),
+        },
+      });
       return res;
     } catch (ex) {
       this.log.error(ex.message);
@@ -80,7 +90,7 @@ export class CopmFabricImpl
 
   public async claimLockedAssetV1(
     req: ClaimLockedAssetV1Request,
-  ): Promise<ClaimPledgedAssetV1200ResponsePB> {
+  ): Promise<ClaimLockedAssetV1Response> {
     try {
       this.log.debug("claimAssetV1 ENTRY req=%o", req);
       const claimId = await Endpoints.claimLockedAssetV1Impl(
@@ -89,7 +99,12 @@ export class CopmFabricImpl
         this.contextFactory,
         this.fabricConfig,
       );
-      const res = new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId });
+      const res = new ClaimLockedAssetV1Response({
+        response: {
+          case: "claimPledgedAssetV1200ResponsePb200",
+          value: new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId }),
+        },
+      });
       return res;
     } catch (ex) {
       this.log.error(ex.message);
@@ -99,7 +114,7 @@ export class CopmFabricImpl
 
   public async claimPledgedAssetV1(
     req: ClaimPledgedAssetV1Request,
-  ): Promise<ClaimPledgedAssetV1200ResponsePB> {
+  ): Promise<ClaimPledgedAssetV1Response> {
     this.log.debug("claimAssetV1 ENTRY req=%o", req);
     let claimId;
     try {
@@ -114,13 +129,18 @@ export class CopmFabricImpl
       this.log.error(ex);
       throw ex;
     }
-    const res = new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId });
+    const res = new ClaimPledgedAssetV1Response({
+      response: {
+        case: "claimPledgedAssetV1200ResponsePb200",
+        value: new ClaimPledgedAssetV1200ResponsePB({ claimId: claimId }),
+      },
+    });
     return res;
   }
 
   public async lockAssetV1(
     req: LockAssetV1Request,
-  ): Promise<LockAssetV1200ResponsePB> {
+  ): Promise<LockAssetV1Response> {
     this.log.debug("lockAssetV1 ENTRY req=%o", req);
     try {
       const lockId = await Endpoints.lockAssetV1Impl(
@@ -129,7 +149,12 @@ export class CopmFabricImpl
         this.contextFactory,
         this.fabricConfig,
       );
-      const res = new LockAssetV1200ResponsePB({ lockId: lockId });
+      const res = new LockAssetV1Response({
+        response: {
+          case: "lockAssetV1200ResponsePb200",
+          value: new LockAssetV1200ResponsePB({ lockId: lockId }),
+        },
+      });
       return res;
     } catch (error) {
       this.log.error(error);
@@ -139,13 +164,18 @@ export class CopmFabricImpl
 
   public async getVerifiedViewV1(
     req: GetVerifiedViewV1Request,
-  ): Promise<GetVerifiedViewV1200ResponsePB> {
+  ): Promise<GetVerifiedViewV1Response> {
     this.log.debug("provestateV1 ENTRY req=%o", req);
     const data = await Endpoints.getVerifiedViewV1Impl(
       req,
       this.contextFactory,
       this.log,
     );
-    return new GetVerifiedViewV1200ResponsePB({ data: data });
+    return new GetVerifiedViewV1Response({
+      response: {
+        case: "getVerifiedViewV1200ResponsePb200",
+        value: new GetVerifiedViewV1200ResponsePB({ data: data }),
+      },
+    });
   }
 }

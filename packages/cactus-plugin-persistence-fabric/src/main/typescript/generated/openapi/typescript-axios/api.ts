@@ -14,119 +14,65 @@
 
 
 import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from './common';
 import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
-/**
- * 
- * @export
- * @interface DiscoverNetworkResponseV1
- */
 export interface DiscoverNetworkResponseV1 {
-    /**
-     * 
-     * @type {boolean}
-     * @memberof DiscoverNetworkResponseV1
-     */
     'status': boolean;
-    /**
-     * 
-     * @type {string}
-     * @memberof DiscoverNetworkResponseV1
-     */
     'message': string;
 }
-/**
- * 
- * @export
- * @interface ErrorExceptionResponseV1
- */
 export interface ErrorExceptionResponseV1 {
-    /**
-     * 
-     * @type {string}
-     * @memberof ErrorExceptionResponseV1
-     */
     'message': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ErrorExceptionResponseV1
-     */
     'error': string;
 }
 /**
  * Response with plugin status report.
- * @export
- * @interface StatusResponseV1
  */
 export interface StatusResponseV1 {
     /**
      * Plugin instance id.
-     * @type {string}
-     * @memberof StatusResponseV1
      */
     'instanceId': string;
     /**
      * True if successfully connected to the database, false otherwise.
-     * @type {boolean}
-     * @memberof StatusResponseV1
      */
     'connected': boolean;
     /**
      * True if web services were correctly exported.
-     * @type {boolean}
-     * @memberof StatusResponseV1
      */
     'webServicesRegistered': boolean;
-    /**
-     * 
-     * @type {Array<TrackedOperationV1>}
-     * @memberof StatusResponseV1
-     */
     'operationsRunning': Array<TrackedOperationV1>;
     /**
      * True if block monitoring is running, false otherwise.
-     * @type {boolean}
-     * @memberof StatusResponseV1
      */
     'monitorRunning': boolean;
     /**
      * Number of the last block seen by the block monitor.
-     * @type {number}
-     * @memberof StatusResponseV1
      */
     'lastSeenBlock': number;
 }
 /**
  * Persistence plugin operation that is tracked and returned in status report.
- * @export
- * @interface TrackedOperationV1
  */
 export interface TrackedOperationV1 {
     /**
      * Start time of the operation.
-     * @type {string}
-     * @memberof TrackedOperationV1
      */
     'startAt': string;
     /**
      * Operation name.
-     * @type {string}
-     * @memberof TrackedOperationV1
      */
     'operation': string;
 }
 
 /**
  * DefaultApi - axios parameter creator
- * @export
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -136,7 +82,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        discoverNetworkV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        discoverNetworkV1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/discover-network`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -149,8 +95,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -166,7 +112,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatusV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getStatusV1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cactus-plugin-persistence-fabric/status`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -179,8 +125,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'text/plain,application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -195,7 +141,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 /**
  * DefaultApi - functional programming interface
- * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
@@ -206,9 +151,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async discoverNetworkV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiscoverNetworkResponseV1>> {
+        async discoverNetworkV1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DiscoverNetworkResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.discoverNetworkV1(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.discoverNetworkV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -216,16 +163,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getStatusV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatusResponseV1>> {
+        async getStatusV1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StatusResponseV1>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getStatusV1(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getStatusV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * DefaultApi - factory interface
- * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
@@ -236,7 +184,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        discoverNetworkV1(options?: any): AxiosPromise<DiscoverNetworkResponseV1> {
+        discoverNetworkV1(options?: RawAxiosRequestConfig): AxiosPromise<DiscoverNetworkResponseV1> {
             return localVarFp.discoverNetworkV1(options).then((request) => request(axios, basePath));
         },
         /**
@@ -245,7 +193,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getStatusV1(options?: any): AxiosPromise<StatusResponseV1> {
+        getStatusV1(options?: RawAxiosRequestConfig): AxiosPromise<StatusResponseV1> {
             return localVarFp.getStatusV1(options).then((request) => request(axios, basePath));
         },
     };
@@ -253,9 +201,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 
 /**
  * DefaultApi - object-oriented interface
- * @export
- * @class DefaultApi
- * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
     /**
@@ -263,9 +208,8 @@ export class DefaultApi extends BaseAPI {
      * @summary Refresh Fabric network structure in the database through discovery.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public discoverNetworkV1(options?: AxiosRequestConfig) {
+    public discoverNetworkV1(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).discoverNetworkV1(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -274,11 +218,11 @@ export class DefaultApi extends BaseAPI {
      * @summary Get the status of persistence plugin for fabric
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public getStatusV1(options?: AxiosRequestConfig) {
+    public getStatusV1(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getStatusV1(options).then((request) => request(this.axios, this.basePath));
     }
 }
+
 
 

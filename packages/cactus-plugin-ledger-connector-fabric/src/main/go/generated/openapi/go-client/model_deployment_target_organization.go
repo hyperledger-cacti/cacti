@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the DeploymentTargetOrganization type satisfies the MappedNullable interface at compile time
@@ -30,6 +32,8 @@ type DeploymentTargetOrganization struct {
 	// Mapped to environment variables of the Fabric CLI container.
 	ORDERER_TLS_ROOTCERT string `json:"ORDERER_TLS_ROOTCERT"`
 }
+
+type _DeploymentTargetOrganization DeploymentTargetOrganization
 
 // NewDeploymentTargetOrganization instantiates a new DeploymentTargetOrganization object
 // This constructor will assign default values to properties that have it defined,
@@ -189,6 +193,47 @@ func (o DeploymentTargetOrganization) ToMap() (map[string]interface{}, error) {
 	toSerialize["CORE_PEER_TLS_ROOTCERT"] = o.CORE_PEER_TLS_ROOTCERT
 	toSerialize["ORDERER_TLS_ROOTCERT"] = o.ORDERER_TLS_ROOTCERT
 	return toSerialize, nil
+}
+
+func (o *DeploymentTargetOrganization) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"CORE_PEER_LOCALMSPID",
+		"CORE_PEER_ADDRESS",
+		"CORE_PEER_MSPCONFIG",
+		"CORE_PEER_TLS_ROOTCERT",
+		"ORDERER_TLS_ROOTCERT",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varDeploymentTargetOrganization := _DeploymentTargetOrganization{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varDeploymentTargetOrganization)
+
+	if err != nil {
+		return err
+	}
+
+	*o = DeploymentTargetOrganization(varDeploymentTargetOrganization)
+
+	return err
 }
 
 type NullableDeploymentTargetOrganization struct {

@@ -22,9 +22,11 @@ import jakarta.validation.Valid
 data class Party(
 
     @field:Valid
+    @param:JsonProperty("name", required = true)
     @get:JsonProperty("name", required = true) val name: CordaX500Name,
 
     @field:Valid
+    @param:JsonProperty("owningKey", required = true)
     @get:JsonProperty("owningKey", required = true) val owningKey: PublicKey
 ) {
 

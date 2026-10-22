@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-fabric
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the WatchBlocksPrivateResponseV1 type satisfies the MappedNullable interface at compile time
@@ -22,6 +24,8 @@ type WatchBlocksPrivateResponseV1 struct {
 	// Private commited block.
 	PrivateBlock interface{} `json:"privateBlock"`
 }
+
+type _WatchBlocksPrivateResponseV1 WatchBlocksPrivateResponseV1
 
 // NewWatchBlocksPrivateResponseV1 instantiates a new WatchBlocksPrivateResponseV1 object
 // This constructor will assign default values to properties that have it defined,
@@ -81,6 +85,43 @@ func (o WatchBlocksPrivateResponseV1) ToMap() (map[string]interface{}, error) {
 		toSerialize["privateBlock"] = o.PrivateBlock
 	}
 	return toSerialize, nil
+}
+
+func (o *WatchBlocksPrivateResponseV1) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"privateBlock",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varWatchBlocksPrivateResponseV1 := _WatchBlocksPrivateResponseV1{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varWatchBlocksPrivateResponseV1)
+
+	if err != nil {
+		return err
+	}
+
+	*o = WatchBlocksPrivateResponseV1(varWatchBlocksPrivateResponseV1)
+
+	return err
 }
 
 type NullableWatchBlocksPrivateResponseV1 struct {

@@ -17,10 +17,10 @@ import "google/protobuf/any.proto";
 
 message SolidityContractJsonArtifactGasEstimatesCreationPB {
 
-  string codeDepositCost = 380743519;
+  string code_deposit_cost = 366786081;
 
-  string executionCost = 384688902;
+  string execution_cost = 397177710;
 
-  string totalCost = 40911568;
+  string total_cost = 169019417;
 
 }

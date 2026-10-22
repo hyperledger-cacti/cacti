@@ -5,14 +5,15 @@ import type { ServiceType } from "@bufbuild/protobuf";
 import {
   DefaultService,
   PledgeAssetV1Request,
-  PledgeAssetV1200ResponsePB,
+  PledgeAssetV1Response,
   ClaimPledgedAssetV1Request,
   LockAssetV1Request,
   GetVerifiedViewV1Request,
-  GetVerifiedViewV1200ResponsePB,
-  LockAssetV1200ResponsePB,
+  GetVerifiedViewV1Response,
+  LockAssetV1Response,
   ClaimLockedAssetV1Request,
-  ClaimPledgedAssetV1200ResponsePB,
+  ClaimLockedAssetV1Response,
+  ClaimPledgedAssetV1Response,
 } from "@hyperledger-cacti/cacti-copm-core";
 
 type DefaultServiceMethodDefinitions = typeof DefaultService.methods;
@@ -45,31 +46,31 @@ export class CopmCordaImpl
 
   public async pledgeAssetV1(
     req: PledgeAssetV1Request,
-  ): Promise<PledgeAssetV1200ResponsePB> {
+  ): Promise<PledgeAssetV1Response> {
     return this.containerApi.pledgeAssetV1(req);
   }
 
   public async claimLockedAssetV1(
     req: ClaimLockedAssetV1Request,
-  ): Promise<ClaimPledgedAssetV1200ResponsePB> {
+  ): Promise<ClaimLockedAssetV1Response> {
     return this.containerApi.claimLockedAssetV1(req);
   }
 
   public async claimPledgedAssetV1(
     req: ClaimPledgedAssetV1Request,
-  ): Promise<ClaimPledgedAssetV1200ResponsePB> {
+  ): Promise<ClaimPledgedAssetV1Response> {
     return this.containerApi.claimPledgedAssetV1(req);
   }
 
   public async lockAssetV1(
     req: LockAssetV1Request,
-  ): Promise<LockAssetV1200ResponsePB> {
+  ): Promise<LockAssetV1Response> {
     return this.containerApi.lockAssetV1(req);
   }
 
   public async getVerifiedViewV1(
     req: GetVerifiedViewV1Request,
-  ): Promise<GetVerifiedViewV1200ResponsePB> {
+  ): Promise<GetVerifiedViewV1Response> {
     return this.containerApi.getVerifiedViewV1(req);
   }
 }

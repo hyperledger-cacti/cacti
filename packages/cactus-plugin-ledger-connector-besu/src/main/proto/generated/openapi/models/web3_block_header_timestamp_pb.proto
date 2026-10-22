@@ -17,4 +17,8 @@ import "google/protobuf/any.proto";
 
 message Web3BlockHeaderTimestampPB {
 
+  string string = 355114992;
+
+  float float = 97526364;
+
 }

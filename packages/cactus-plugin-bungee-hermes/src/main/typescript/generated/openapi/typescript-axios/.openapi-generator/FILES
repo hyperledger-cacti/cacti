@@ -2,4 +2,16 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/CreateViewRequest.md
+docs/CreateViewRequestNetworkDetails.md
+docs/CreateViewResponse.md
+docs/DefaultApi.md
+docs/GetPublicKeyResponse.md
+docs/MergePolicyOpts.md
+docs/MergeViewsRequest.md
+docs/MergeViewsResponse.md
+docs/PrivacyPolicyOpts.md
+docs/ProcessViewRequest.md
+docs/VerifyMerkleRootRequest.md
+docs/VerifyMerkleRootResponse.md
 index.ts

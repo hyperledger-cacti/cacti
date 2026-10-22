@@ -16,14 +16,14 @@ interface IDefaultServiceService extends grpc.ServiceDefinition<grpc.UntypedServ
     getPrometheusMetricsV1: IDefaultServiceService_IGetPrometheusMetricsV1;
 }
 
-interface IDefaultServiceService_IGetHealthCheckV1 extends grpc.MethodDefinition<google_protobuf_empty_pb.Empty, models_health_check_response_pb_pb.HealthCheckResponsePB> {
+interface IDefaultServiceService_IGetHealthCheckV1 extends grpc.MethodDefinition<google_protobuf_empty_pb.Empty, services_default_service_pb.GetHealthCheckV1Response> {
     path: "/org.hyperledger.cactus.cmd_api_server.DefaultService/GetHealthCheckV1";
     requestStream: false;
     responseStream: false;
     requestSerialize: grpc.serialize<google_protobuf_empty_pb.Empty>;
     requestDeserialize: grpc.deserialize<google_protobuf_empty_pb.Empty>;
-    responseSerialize: grpc.serialize<models_health_check_response_pb_pb.HealthCheckResponsePB>;
-    responseDeserialize: grpc.deserialize<models_health_check_response_pb_pb.HealthCheckResponsePB>;
+    responseSerialize: grpc.serialize<services_default_service_pb.GetHealthCheckV1Response>;
+    responseDeserialize: grpc.deserialize<services_default_service_pb.GetHealthCheckV1Response>;
 }
 interface IDefaultServiceService_IGetOpenApiSpecV1 extends grpc.MethodDefinition<google_protobuf_empty_pb.Empty, services_default_service_pb.GetOpenApiSpecV1Response> {
     path: "/org.hyperledger.cactus.cmd_api_server.DefaultService/GetOpenApiSpecV1";
@@ -47,15 +47,15 @@ interface IDefaultServiceService_IGetPrometheusMetricsV1 extends grpc.MethodDefi
 export const DefaultServiceService: IDefaultServiceService;
 
 export interface IDefaultServiceServer extends grpc.UntypedServiceImplementation {
-    getHealthCheckV1: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, models_health_check_response_pb_pb.HealthCheckResponsePB>;
+    getHealthCheckV1: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, services_default_service_pb.GetHealthCheckV1Response>;
     getOpenApiSpecV1: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, services_default_service_pb.GetOpenApiSpecV1Response>;
     getPrometheusMetricsV1: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, services_default_service_pb.GetPrometheusMetricsV1Response>;
 }
 
 export interface IDefaultServiceClient {
-    getHealthCheckV1(request: google_protobuf_empty_pb.Empty, callback: (error: grpc.ServiceError | null, response: models_health_check_response_pb_pb.HealthCheckResponsePB) => void): grpc.ClientUnaryCall;
-    getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: models_health_check_response_pb_pb.HealthCheckResponsePB) => void): grpc.ClientUnaryCall;
-    getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: models_health_check_response_pb_pb.HealthCheckResponsePB) => void): grpc.ClientUnaryCall;
+    getHealthCheckV1(request: google_protobuf_empty_pb.Empty, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetHealthCheckV1Response) => void): grpc.ClientUnaryCall;
+    getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetHealthCheckV1Response) => void): grpc.ClientUnaryCall;
+    getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetHealthCheckV1Response) => void): grpc.ClientUnaryCall;
     getOpenApiSpecV1(request: google_protobuf_empty_pb.Empty, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetOpenApiSpecV1Response) => void): grpc.ClientUnaryCall;
     getOpenApiSpecV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetOpenApiSpecV1Response) => void): grpc.ClientUnaryCall;
     getOpenApiSpecV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetOpenApiSpecV1Response) => void): grpc.ClientUnaryCall;
@@ -66,9 +66,9 @@ export interface IDefaultServiceClient {
 
 export class DefaultServiceClient extends grpc.Client implements IDefaultServiceClient {
     constructor(address: string, credentials: grpc.ChannelCredentials, options?: Partial<grpc.ClientOptions>);
-    public getHealthCheckV1(request: google_protobuf_empty_pb.Empty, callback: (error: grpc.ServiceError | null, response: models_health_check_response_pb_pb.HealthCheckResponsePB) => void): grpc.ClientUnaryCall;
-    public getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: models_health_check_response_pb_pb.HealthCheckResponsePB) => void): grpc.ClientUnaryCall;
-    public getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: models_health_check_response_pb_pb.HealthCheckResponsePB) => void): grpc.ClientUnaryCall;
+    public getHealthCheckV1(request: google_protobuf_empty_pb.Empty, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetHealthCheckV1Response) => void): grpc.ClientUnaryCall;
+    public getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetHealthCheckV1Response) => void): grpc.ClientUnaryCall;
+    public getHealthCheckV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetHealthCheckV1Response) => void): grpc.ClientUnaryCall;
     public getOpenApiSpecV1(request: google_protobuf_empty_pb.Empty, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetOpenApiSpecV1Response) => void): grpc.ClientUnaryCall;
     public getOpenApiSpecV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetOpenApiSpecV1Response) => void): grpc.ClientUnaryCall;
     public getOpenApiSpecV1(request: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: services_default_service_pb.GetOpenApiSpecV1Response) => void): grpc.ClientUnaryCall;

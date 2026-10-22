@@ -19,6 +19,7 @@ import jakarta.validation.Valid
 data class VaultQueryV1Request(
 
     @get:Size(min=1)
+    @param:JsonProperty("contractStateType")
     @get:JsonProperty("contractStateType") val contractStateType: kotlin.String? = null
 ) {
 

@@ -12,6 +12,8 @@ package cactus-plugin-ledger-connector-besu
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the GetPastLogsV1Response type satisfies the MappedNullable interface at compile time
@@ -21,6 +23,8 @@ var _ MappedNullable = &GetPastLogsV1Response{}
 type GetPastLogsV1Response struct {
 	Logs []EvmLog `json:"logs"`
 }
+
+type _GetPastLogsV1Response GetPastLogsV1Response
 
 // NewGetPastLogsV1Response instantiates a new GetPastLogsV1Response object
 // This constructor will assign default values to properties that have it defined,
@@ -76,6 +80,43 @@ func (o GetPastLogsV1Response) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["logs"] = o.Logs
 	return toSerialize, nil
+}
+
+func (o *GetPastLogsV1Response) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"logs",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varGetPastLogsV1Response := _GetPastLogsV1Response{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varGetPastLogsV1Response)
+
+	if err != nil {
+		return err
+	}
+
+	*o = GetPastLogsV1Response(varGetPastLogsV1Response)
+
+	return err
 }
 
 type NullableGetPastLogsV1Response struct {

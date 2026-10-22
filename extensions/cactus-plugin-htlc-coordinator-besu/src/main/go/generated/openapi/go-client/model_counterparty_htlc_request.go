@@ -12,6 +12,8 @@ package cactus-plugin-htlc-coordinator-besu
 
 import (
 	"encoding/json"
+	"bytes"
+	"fmt"
 )
 
 // checks if the CounterpartyHTLCRequest type satisfies the MappedNullable interface at compile time
@@ -29,6 +31,8 @@ type CounterpartyHTLCRequest struct {
 	Web3SigningCredential Web3SigningCredential `json:"web3SigningCredential"`
 	Gas *float32 `json:"gas,omitempty"`
 }
+
+type _CounterpartyHTLCRequest CounterpartyHTLCRequest
 
 // NewCounterpartyHTLCRequest instantiates a new CounterpartyHTLCRequest object
 // This constructor will assign default values to properties that have it defined,
@@ -223,6 +227,47 @@ func (o CounterpartyHTLCRequest) ToMap() (map[string]interface{}, error) {
 		toSerialize["gas"] = o.Gas
 	}
 	return toSerialize, nil
+}
+
+func (o *CounterpartyHTLCRequest) UnmarshalJSON(data []byte) (err error) {
+	// This validates that all required properties are included in the JSON object
+	// by unmarshalling the object into a generic map with string keys and checking
+	// that every required field exists as a key in the generic map.
+	requiredProperties := []string{
+		"htlcPackage",
+		"connectorInstanceId",
+		"keychainId",
+		"htlcId",
+		"web3SigningCredential",
+	}
+
+	allProperties := make(map[string]interface{})
+
+	err = json.Unmarshal(data, &allProperties)
+
+	if err != nil {
+		return err;
+	}
+
+	for _, requiredProperty := range(requiredProperties) {
+		if _, exists := allProperties[requiredProperty]; !exists {
+			return fmt.Errorf("no value given for required property %v", requiredProperty)
+		}
+	}
+
+	varCounterpartyHTLCRequest := _CounterpartyHTLCRequest{}
+
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	err = decoder.Decode(&varCounterpartyHTLCRequest)
+
+	if err != nil {
+		return err
+	}
+
+	*o = CounterpartyHTLCRequest(varCounterpartyHTLCRequest)
+
+	return err
 }
 
 type NullableCounterpartyHTLCRequest struct {

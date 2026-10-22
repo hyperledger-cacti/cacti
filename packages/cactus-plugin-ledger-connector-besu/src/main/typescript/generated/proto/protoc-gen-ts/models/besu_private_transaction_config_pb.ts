@@ -9,55 +9,55 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
     export class BesuPrivateTransactionConfigPB extends pb_1.Message {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
-            privateFrom?: string;
-            privateFor?: dependency_1.google.protobuf.Any[];
+            private_from?: string;
+            private_for?: dependency_1.google.protobuf.Any[];
         }) {
             super();
-            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [265462717], this.#one_of_decls);
+            pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [361326608], this.#one_of_decls);
             if (!Array.isArray(data) && typeof data == "object") {
-                if ("privateFrom" in data && data.privateFrom != undefined) {
-                    this.privateFrom = data.privateFrom;
+                if ("private_from" in data && data.private_from != undefined) {
+                    this.private_from = data.private_from;
                 }
-                if ("privateFor" in data && data.privateFor != undefined) {
-                    this.privateFor = data.privateFor;
+                if ("private_for" in data && data.private_for != undefined) {
+                    this.private_for = data.private_for;
                 }
             }
         }
-        get privateFrom() {
-            return pb_1.Message.getFieldWithDefault(this, 360593360, "") as string;
+        get private_from() {
+            return pb_1.Message.getFieldWithDefault(this, 463709415, "") as string;
         }
-        set privateFrom(value: string) {
-            pb_1.Message.setField(this, 360593360, value);
+        set private_from(value: string) {
+            pb_1.Message.setField(this, 463709415, value);
         }
-        get privateFor() {
-            return pb_1.Message.getRepeatedWrapperField(this, dependency_1.google.protobuf.Any, 265462717) as dependency_1.google.protobuf.Any[];
+        get private_for() {
+            return pb_1.Message.getRepeatedWrapperField(this, dependency_1.google.protobuf.Any, 361326608) as dependency_1.google.protobuf.Any[];
         }
-        set privateFor(value: dependency_1.google.protobuf.Any[]) {
-            pb_1.Message.setRepeatedWrapperField(this, 265462717, value);
+        set private_for(value: dependency_1.google.protobuf.Any[]) {
+            pb_1.Message.setRepeatedWrapperField(this, 361326608, value);
         }
         static fromObject(data: {
-            privateFrom?: string;
-            privateFor?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
+            private_from?: string;
+            private_for?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
         }): BesuPrivateTransactionConfigPB {
             const message = new BesuPrivateTransactionConfigPB({});
-            if (data.privateFrom != null) {
-                message.privateFrom = data.privateFrom;
+            if (data.private_from != null) {
+                message.private_from = data.private_from;
             }
-            if (data.privateFor != null) {
-                message.privateFor = data.privateFor.map(item => dependency_1.google.protobuf.Any.fromObject(item));
+            if (data.private_for != null) {
+                message.private_for = data.private_for.map(item => dependency_1.google.protobuf.Any.fromObject(item));
             }
             return message;
         }
         toObject() {
             const data: {
-                privateFrom?: string;
-                privateFor?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
+                private_from?: string;
+                private_for?: ReturnType<typeof dependency_1.google.protobuf.Any.prototype.toObject>[];
             } = {};
-            if (this.privateFrom != null) {
-                data.privateFrom = this.privateFrom;
+            if (this.private_from != null) {
+                data.private_from = this.private_from;
             }
-            if (this.privateFor != null) {
-                data.privateFor = this.privateFor.map((item: dependency_1.google.protobuf.Any) => item.toObject());
+            if (this.private_for != null) {
+                data.private_for = this.private_for.map((item: dependency_1.google.protobuf.Any) => item.toObject());
             }
             return data;
         }
@@ -65,10 +65,10 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
         serialize(w: pb_1.BinaryWriter): void;
         serialize(w?: pb_1.BinaryWriter): Uint8Array | void {
             const writer = w || new pb_1.BinaryWriter();
-            if (this.privateFrom.length)
-                writer.writeString(360593360, this.privateFrom);
-            if (this.privateFor.length)
-                writer.writeRepeatedMessage(265462717, this.privateFor, (item: dependency_1.google.protobuf.Any) => item.serialize(writer));
+            if (this.private_from.length)
+                writer.writeString(463709415, this.private_from);
+            if (this.private_for.length)
+                writer.writeRepeatedMessage(361326608, this.private_for, (item: dependency_1.google.protobuf.Any) => item.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -78,11 +78,11 @@ export namespace org.hyperledger.cacti.plugin.ledger.connector.besu {
                 if (reader.isEndGroup())
                     break;
                 switch (reader.getFieldNumber()) {
-                    case 360593360:
-                        message.privateFrom = reader.readString();
+                    case 463709415:
+                        message.private_from = reader.readString();
                         break;
-                    case 265462717:
-                        reader.readMessage(message.privateFor, () => pb_1.Message.addToRepeatedWrapperField(message, 265462717, dependency_1.google.protobuf.Any.deserialize(reader), dependency_1.google.protobuf.Any));
+                    case 361326608:
+                        reader.readMessage(message.private_for, () => pb_1.Message.addToRepeatedWrapperField(message, 361326608, dependency_1.google.protobuf.Any.deserialize(reader), dependency_1.google.protobuf.Any));
                         break;
                     default: reader.skipField();
                 }

@@ -19,12 +19,12 @@ import (
 )
 
 
-// DefaultApiService DefaultApi service
-type DefaultApiService service
+// DefaultAPIService DefaultAPI service
+type DefaultAPIService service
 
 type ApiCounterpartyHtlcV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	counterpartyHTLCRequest *CounterpartyHTLCRequest
 }
 
@@ -43,7 +43,7 @@ CounterpartyHtlcV1 Create an instance to interact with the counterparty HTLC
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiCounterpartyHtlcV1Request
 */
-func (a *DefaultApiService) CounterpartyHtlcV1(ctx context.Context) ApiCounterpartyHtlcV1Request {
+func (a *DefaultAPIService) CounterpartyHtlcV1(ctx context.Context) ApiCounterpartyHtlcV1Request {
 	return ApiCounterpartyHtlcV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -52,7 +52,7 @@ func (a *DefaultApiService) CounterpartyHtlcV1(ctx context.Context) ApiCounterpa
 
 // Execute executes the request
 //  @return interface{}
-func (a *DefaultApiService) CounterpartyHtlcV1Execute(r ApiCounterpartyHtlcV1Request) (interface{}, *http.Response, error) {
+func (a *DefaultAPIService) CounterpartyHtlcV1Execute(r ApiCounterpartyHtlcV1Request) (interface{}, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -60,7 +60,7 @@ func (a *DefaultApiService) CounterpartyHtlcV1Execute(r ApiCounterpartyHtlcV1Req
 		localVarReturnValue  interface{}
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.CounterpartyHtlcV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.CounterpartyHtlcV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -129,7 +129,7 @@ func (a *DefaultApiService) CounterpartyHtlcV1Execute(r ApiCounterpartyHtlcV1Req
 
 type ApiOwnHtlcV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	ownHTLCRequest *OwnHTLCRequest
 }
 
@@ -148,7 +148,7 @@ OwnHtlcV1 Create an instance to interact with the own HTLC.
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiOwnHtlcV1Request
 */
-func (a *DefaultApiService) OwnHtlcV1(ctx context.Context) ApiOwnHtlcV1Request {
+func (a *DefaultAPIService) OwnHtlcV1(ctx context.Context) ApiOwnHtlcV1Request {
 	return ApiOwnHtlcV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -157,7 +157,7 @@ func (a *DefaultApiService) OwnHtlcV1(ctx context.Context) ApiOwnHtlcV1Request {
 
 // Execute executes the request
 //  @return interface{}
-func (a *DefaultApiService) OwnHtlcV1Execute(r ApiOwnHtlcV1Request) (interface{}, *http.Response, error) {
+func (a *DefaultAPIService) OwnHtlcV1Execute(r ApiOwnHtlcV1Request) (interface{}, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -165,7 +165,7 @@ func (a *DefaultApiService) OwnHtlcV1Execute(r ApiOwnHtlcV1Request) (interface{}
 		localVarReturnValue  interface{}
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.OwnHtlcV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.OwnHtlcV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
@@ -234,7 +234,7 @@ func (a *DefaultApiService) OwnHtlcV1Execute(r ApiOwnHtlcV1Request) (interface{}
 
 type ApiWithdrawCounterpartyV1Request struct {
 	ctx context.Context
-	ApiService *DefaultApiService
+	ApiService *DefaultAPIService
 	withdrawCounterpartyRequest *WithdrawCounterpartyRequest
 }
 
@@ -253,7 +253,7 @@ WithdrawCounterpartyV1 Withdraw funds of the counterparty HTLC
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @return ApiWithdrawCounterpartyV1Request
 */
-func (a *DefaultApiService) WithdrawCounterpartyV1(ctx context.Context) ApiWithdrawCounterpartyV1Request {
+func (a *DefaultAPIService) WithdrawCounterpartyV1(ctx context.Context) ApiWithdrawCounterpartyV1Request {
 	return ApiWithdrawCounterpartyV1Request{
 		ApiService: a,
 		ctx: ctx,
@@ -262,7 +262,7 @@ func (a *DefaultApiService) WithdrawCounterpartyV1(ctx context.Context) ApiWithd
 
 // Execute executes the request
 //  @return interface{}
-func (a *DefaultApiService) WithdrawCounterpartyV1Execute(r ApiWithdrawCounterpartyV1Request) (interface{}, *http.Response, error) {
+func (a *DefaultAPIService) WithdrawCounterpartyV1Execute(r ApiWithdrawCounterpartyV1Request) (interface{}, *http.Response, error) {
 	var (
 		localVarHTTPMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -270,7 +270,7 @@ func (a *DefaultApiService) WithdrawCounterpartyV1Execute(r ApiWithdrawCounterpa
 		localVarReturnValue  interface{}
 	)
 
-	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultApiService.WithdrawCounterpartyV1")
+	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "DefaultAPIService.WithdrawCounterpartyV1")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}

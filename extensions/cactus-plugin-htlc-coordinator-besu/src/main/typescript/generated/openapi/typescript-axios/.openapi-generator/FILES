@@ -2,4 +2,14 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/CounterpartyHTLCRequest.md
+docs/DefaultApi.md
+docs/HtlcPackage.md
+docs/OwnHTLCRequest.md
+docs/Web3SigningCredential.md
+docs/Web3SigningCredentialCactusKeychainRef.md
+docs/Web3SigningCredentialNone.md
+docs/Web3SigningCredentialPrivateKeyHex.md
+docs/Web3SigningCredentialType.md
+docs/WithdrawCounterpartyRequest.md
 index.ts

@@ -11,10 +11,6 @@ import com.google.protobuf.Empty
 import net.devh.boot.grpc.server.advice.GrpcAdvice
 import net.devh.boot.grpc.server.advice.GrpcExceptionHandler
 import net.devh.boot.grpc.server.service.GrpcService
-import org.hyperledger.cacti.plugin.copm.core.ClaimPledgedAssetV1200ResponsePb
-import org.hyperledger.cacti.plugin.copm.core.GetVerifiedViewV1200ResponsePb
-import org.hyperledger.cacti.plugin.copm.core.LockAssetV1200ResponsePb
-import org.hyperledger.cacti.plugin.copm.core.PledgeAssetV1200ResponsePb
 import org.hyperledger.cacti.plugin.copm.core.services.defaultservice.DefaultServiceGrpcKt
 import org.hyperledger.cacti.plugin.copm.core.services.defaultservice.DefaultServiceOuterClass
 import org.springframework.beans.factory.annotation.Autowired
@@ -46,28 +42,30 @@ class ApiCopmCordaServiceImpl : DefaultServiceGrpcKt.DefaultServiceCoroutineImpl
         val logger = loggerFor<ApiCopmCordaServiceImpl>()
     }
 
-    override suspend fun noopV1(request: Empty): Empty {
-        return Empty.getDefaultInstance();
+    override suspend fun noopV1(request: Empty): DefaultServiceOuterClass.NoopV1Response {
+        return DefaultServiceOuterClass.NoopV1Response.newBuilder()
+            .setEmpty200(Empty.getDefaultInstance())
+            .build()
     }
 
-    override suspend fun claimLockedAssetV1(request: DefaultServiceOuterClass.ClaimLockedAssetV1Request): ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB {
+    override suspend fun claimLockedAssetV1(request: DefaultServiceOuterClass.ClaimLockedAssetV1Request): DefaultServiceOuterClass.ClaimLockedAssetV1Response {
         return claimLockedAssetV1Impl(request, this.transactionContextFactory, this.cordaConfig)
     }
 
-    override suspend fun claimPledgedAssetV1(request: DefaultServiceOuterClass.ClaimPledgedAssetV1Request): ClaimPledgedAssetV1200ResponsePb.ClaimPledgedAssetV1200ResponsePB {
+    override suspend fun claimPledgedAssetV1(request: DefaultServiceOuterClass.ClaimPledgedAssetV1Request): DefaultServiceOuterClass.ClaimPledgedAssetV1Response {
         return claimPledgedAssetV1Impl(request, this.transactionContextFactory, this.cordaConfig, this.interopConfig)
     }
 
-    override suspend fun getVerifiedViewV1(request: DefaultServiceOuterClass.GetVerifiedViewV1Request): GetVerifiedViewV1200ResponsePb.GetVerifiedViewV1200ResponsePB {
+    override suspend fun getVerifiedViewV1(request: DefaultServiceOuterClass.GetVerifiedViewV1Request): DefaultServiceOuterClass.GetVerifiedViewV1Response {
         return getVerifiedViewV1Impl(request, this.transactionContextFactory)
     }
 
-    override suspend fun lockAssetV1(request: DefaultServiceOuterClass.LockAssetV1Request): LockAssetV1200ResponsePb.LockAssetV1200ResponsePB
+    override suspend fun lockAssetV1(request: DefaultServiceOuterClass.LockAssetV1Request): DefaultServiceOuterClass.LockAssetV1Response
     {
         return lockAssetV1Impl(request, this.transactionContextFactory, this.cordaConfig)
     }
 
-    override suspend fun pledgeAssetV1(request: DefaultServiceOuterClass.PledgeAssetV1Request): PledgeAssetV1200ResponsePb.PledgeAssetV1200ResponsePB {
+    override suspend fun pledgeAssetV1(request: DefaultServiceOuterClass.PledgeAssetV1Request): DefaultServiceOuterClass.PledgeAssetV1Response {
         // Obtain the recipient certificate from the name of the recipient
         return pledgeAssetV1Impl(request, this.transactionContextFactory, this.cordaConfig)
     }

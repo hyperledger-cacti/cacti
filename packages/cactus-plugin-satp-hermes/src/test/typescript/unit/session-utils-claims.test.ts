@@ -77,11 +77,11 @@ function makePopulatedClientSession(): SATPSession {
     "BesuLedgerTestNetwork",
     "reference-id-source",
     "BESU_2X",
-    TokenType.Fungible,
+    TokenType.NonstandardFungible,
     "EthereumLedgerTestNetwork",
     "reference-id-receiver",
     "ETHEREUM",
-    TokenType.Fungible,
+    TokenType.NonstandardFungible,
   );
 }
 

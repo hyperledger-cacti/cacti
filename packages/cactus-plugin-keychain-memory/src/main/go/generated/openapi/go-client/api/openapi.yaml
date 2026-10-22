@@ -14,13 +14,13 @@ paths:
       operationId: getKeychainEntryV1
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/keychain_get_entry_request_body'
+        $ref: "#/components/requestBodies/keychain_get_entry_request_body"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GetKeychainEntryResponseV1'
+                $ref: "#/components/schemas/GetKeychainEntryResponseV1"
           description: OK
         "400":
           description: "Bad request. Key must be a string and longer than 0, shorter\
@@ -41,13 +41,13 @@ paths:
       operationId: setKeychainEntryV1
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/keychain_set_entry_request_body'
+        $ref: "#/components/requestBodies/keychain_set_entry_request_body"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SetKeychainEntryResponseV1'
+                $ref: "#/components/schemas/SetKeychainEntryResponseV1"
           description: OK
         "400":
           description: "Bad request. Key must be a string and longer than 0, shorter\
@@ -66,13 +66,13 @@ paths:
       operationId: deleteKeychainEntryV1
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/keychain_delete_entry_request_body'
+        $ref: "#/components/requestBodies/keychain_delete_entry_request_body"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DeleteKeychainEntryResponseV1'
+                $ref: "#/components/schemas/DeleteKeychainEntryResponseV1"
           description: OK
         "400":
           description: "Bad request. Key must be a string and longer than 0, shorter\
@@ -91,13 +91,13 @@ paths:
       operationId: hasKeychainEntryV1
       parameters: []
       requestBody:
-        $ref: '#/components/requestBodies/keychain_has_entry_request_body'
+        $ref: "#/components/requestBodies/keychain_has_entry_request_body"
       responses:
         "200":
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/HasKeychainEntryResponseV1'
+                $ref: "#/components/schemas/HasKeychainEntryResponseV1"
           description: OK
         "400":
           description: "Bad request. Key must be a string and longer than 0, shorter\
@@ -120,7 +120,7 @@ paths:
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/PrometheusExporterMetricsResponse'
+                $ref: "#/components/schemas/PrometheusExporterMetricsResponse"
           description: OK
       summary: Get the Prometheus Metrics
       x-hyperledger-cacti:
@@ -133,28 +133,28 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetKeychainEntryRequestV1'
+            $ref: "#/components/schemas/GetKeychainEntryRequestV1"
       description: Request body to obtain a keychain entry via its key
       required: true
     keychain_set_entry_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetKeychainEntryRequestV1'
+            $ref: "#/components/schemas/SetKeychainEntryRequestV1"
       description: Request body to write/update a keychain entry via its key
       required: true
     keychain_delete_entry_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeleteKeychainEntryRequestV1'
+            $ref: "#/components/schemas/DeleteKeychainEntryRequestV1"
       description: Request body to delete a keychain entry via its key
       required: true
     keychain_has_entry_request_body:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasKeychainEntryRequestV1'
+            $ref: "#/components/schemas/HasKeychainEntryRequestV1"
       description: Request body for checking a keychain entry via its key
       required: true
   responses:
@@ -162,7 +162,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/GetKeychainEntryResponseV1'
+            $ref: "#/components/schemas/GetKeychainEntryResponseV1"
       description: OK
     keychain_get_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -177,7 +177,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/SetKeychainEntryResponseV1'
+            $ref: "#/components/schemas/SetKeychainEntryResponseV1"
       description: OK
     keychain_set_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -190,7 +190,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/DeleteKeychainEntryResponseV1'
+            $ref: "#/components/schemas/DeleteKeychainEntryResponseV1"
       description: OK
     keychain_delete_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -203,7 +203,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/HasKeychainEntryResponseV1'
+            $ref: "#/components/schemas/HasKeychainEntryResponseV1"
       description: OK
     keychain_has_entry_400:
       description: "Bad request. Key must be a string and longer than 0, shorter than\
@@ -232,8 +232,8 @@ components:
       type: object
     GetKeychainEntryResponseV1:
       example:
-        value: value
         key: key
+        value: value
       properties:
         key:
           description: The key that was used to retrieve the value from the keychain.
@@ -254,8 +254,8 @@ components:
     SetKeychainEntryRequestV1:
       additionalProperties: false
       example:
-        value: value
         key: key
+        value: value
       properties:
         key:
           description: The key for the entry to set on the keychain.
@@ -329,9 +329,9 @@ components:
       type: object
     HasKeychainEntryResponseV1:
       example:
+        key: key
         checkedAt: checkedAt
         isPresent: true
-        key: key
       properties:
         key:
           description: The key that was used to check the presence of the value in

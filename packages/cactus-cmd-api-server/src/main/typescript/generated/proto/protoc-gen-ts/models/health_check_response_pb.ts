@@ -10,8 +10,8 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         #one_of_decls: number[][] = [];
         constructor(data?: any[] | {
             success?: boolean;
-            createdAt?: string;
-            memoryUsage?: dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB;
+            created_at?: string;
+            memory_usage?: dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB;
         }) {
             super();
             pb_1.Message.initialize(this, Array.isArray(data) ? data : [], 0, -1, [], this.#one_of_decls);
@@ -19,11 +19,11 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                 if ("success" in data && data.success != undefined) {
                     this.success = data.success;
                 }
-                if ("createdAt" in data && data.createdAt != undefined) {
-                    this.createdAt = data.createdAt;
+                if ("created_at" in data && data.created_at != undefined) {
+                    this.created_at = data.created_at;
                 }
-                if ("memoryUsage" in data && data.memoryUsage != undefined) {
-                    this.memoryUsage = data.memoryUsage;
+                if ("memory_usage" in data && data.memory_usage != undefined) {
+                    this.memory_usage = data.memory_usage;
                 }
             }
         }
@@ -33,52 +33,52 @@ export namespace org.hyperledger.cactus.cmd_api_server {
         set success(value: boolean) {
             pb_1.Message.setField(this, 256557056, value);
         }
-        get createdAt() {
-            return pb_1.Message.getFieldWithDefault(this, 61500732, "") as string;
+        get created_at() {
+            return pb_1.Message.getFieldWithDefault(this, 295938284, "") as string;
         }
-        set createdAt(value: string) {
-            pb_1.Message.setField(this, 61500732, value);
+        set created_at(value: string) {
+            pb_1.Message.setField(this, 295938284, value);
         }
-        get memoryUsage() {
-            return pb_1.Message.getWrapperField(this, dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB, 335792418) as dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB;
+        get memory_usage() {
+            return pb_1.Message.getWrapperField(this, dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB, 497686756) as dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB;
         }
-        set memoryUsage(value: dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB) {
-            pb_1.Message.setWrapperField(this, 335792418, value);
+        set memory_usage(value: dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB) {
+            pb_1.Message.setWrapperField(this, 497686756, value);
         }
-        get has_memoryUsage() {
-            return pb_1.Message.getField(this, 335792418) != null;
+        get has_memory_usage() {
+            return pb_1.Message.getField(this, 497686756) != null;
         }
         static fromObject(data: {
             success?: boolean;
-            createdAt?: string;
-            memoryUsage?: ReturnType<typeof dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.prototype.toObject>;
+            created_at?: string;
+            memory_usage?: ReturnType<typeof dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.prototype.toObject>;
         }): HealthCheckResponsePB {
             const message = new HealthCheckResponsePB({});
             if (data.success != null) {
                 message.success = data.success;
             }
-            if (data.createdAt != null) {
-                message.createdAt = data.createdAt;
+            if (data.created_at != null) {
+                message.created_at = data.created_at;
             }
-            if (data.memoryUsage != null) {
-                message.memoryUsage = dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.fromObject(data.memoryUsage);
+            if (data.memory_usage != null) {
+                message.memory_usage = dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.fromObject(data.memory_usage);
             }
             return message;
         }
         toObject() {
             const data: {
                 success?: boolean;
-                createdAt?: string;
-                memoryUsage?: ReturnType<typeof dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.prototype.toObject>;
+                created_at?: string;
+                memory_usage?: ReturnType<typeof dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.prototype.toObject>;
             } = {};
             if (this.success != null) {
                 data.success = this.success;
             }
-            if (this.createdAt != null) {
-                data.createdAt = this.createdAt;
+            if (this.created_at != null) {
+                data.created_at = this.created_at;
             }
-            if (this.memoryUsage != null) {
-                data.memoryUsage = this.memoryUsage.toObject();
+            if (this.memory_usage != null) {
+                data.memory_usage = this.memory_usage.toObject();
             }
             return data;
         }
@@ -88,10 +88,10 @@ export namespace org.hyperledger.cactus.cmd_api_server {
             const writer = w || new pb_1.BinaryWriter();
             if (this.success != false)
                 writer.writeBool(256557056, this.success);
-            if (this.createdAt.length)
-                writer.writeString(61500732, this.createdAt);
-            if (this.has_memoryUsage)
-                writer.writeMessage(335792418, this.memoryUsage, () => this.memoryUsage.serialize(writer));
+            if (this.created_at.length)
+                writer.writeString(295938284, this.created_at);
+            if (this.has_memory_usage)
+                writer.writeMessage(497686756, this.memory_usage, () => this.memory_usage.serialize(writer));
             if (!w)
                 return writer.getResultBuffer();
         }
@@ -104,11 +104,11 @@ export namespace org.hyperledger.cactus.cmd_api_server {
                     case 256557056:
                         message.success = reader.readBool();
                         break;
-                    case 61500732:
-                        message.createdAt = reader.readString();
+                    case 295938284:
+                        message.created_at = reader.readString();
                         break;
-                    case 335792418:
-                        reader.readMessage(message.memoryUsage, () => message.memoryUsage = dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.deserialize(reader));
+                    case 497686756:
+                        reader.readMessage(message.memory_usage, () => message.memory_usage = dependency_1.org.hyperledger.cactus.cmd_api_server.MemoryUsagePB.deserialize(reader));
                         break;
                     default: reader.skipField();
                 }

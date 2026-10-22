@@ -292,7 +292,7 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     const reqApproveBesuAddress = await approveAddressApi.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -317,7 +317,7 @@ describe("1 SATPGateway sending a token from Besu to Ethereum", () => {
     const reqApproveEthereumAddress = await approveAddressApi.getApproveAddress(
       ethereumEnv.network.id,
       ethereumEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
@@ -573,7 +573,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
     const reqApproveBesuAddress = await approveAddressApi1.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     if (!reqApproveBesuAddress?.data.approveAddress) {
@@ -605,7 +605,7 @@ describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
       await approveAddressApi2.getApproveAddress(
         ethereumEnv.network.id,
         ethereumEnv.network.ledgerType,
-        TokenType.Fungible,
+        TokenType.NonstandardFungible,
       );
 
     expect(reqApproveEthereumAddress?.data.approveAddress).toBeDefined();
@@ -874,7 +874,7 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
       await approveAddressApi1.getApproveAddress(
         ethereumEnv.network.id,
         ethereumEnv.network.ledgerType,
-        TokenType.Fungible,
+        TokenType.NonstandardFungible,
       );
 
     if (!reqApproveEthereumAddress?.data.approveAddress) {
@@ -907,7 +907,7 @@ describe("2 SATPGateways sending a token from Ethereum to Besu", () => {
     const reqApproveBesuAddress = await approveAddressApi2.getApproveAddress(
       besuEnv.network.id,
       besuEnv.network.ledgerType,
-      TokenType.Fungible,
+      TokenType.NonstandardFungible,
     );
 
     expect(reqApproveBesuAddress?.data.approveAddress).toBeDefined();

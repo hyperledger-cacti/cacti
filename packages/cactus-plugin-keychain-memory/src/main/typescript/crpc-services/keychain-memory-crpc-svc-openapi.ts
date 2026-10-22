@@ -78,28 +78,28 @@ export class KeychainMemoryCrpcSvcOpenApi
     if (!req) {
       throw new ConnectError("Falsy request object.", Code.InvalidArgument);
     }
-    if (!req.deleteKeychainEntryRequestV1PB) {
+    if (!req.deleteKeychainEntryRequestV1Pb) {
       throw new ConnectError(
-        "req.deleteKeychainEntryRequestV1PB falsy.",
+        "req.deleteKeychainEntryRequestV1Pb falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!req.deleteKeychainEntryRequestV1PB.key) {
+    if (!req.deleteKeychainEntryRequestV1Pb.key) {
       throw new ConnectError(
-        "req.deleteKeychainEntryRequestV1PB.key falsy.",
+        "req.deleteKeychainEntryRequestV1Pb.key falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!Strings.isNonBlank(req.deleteKeychainEntryRequestV1PB.key)) {
+    if (!Strings.isNonBlank(req.deleteKeychainEntryRequestV1Pb.key)) {
       throw new ConnectError(
-        "req.deleteKeychainEntryRequestV1PB.key wasn't non-blank string.",
+        "req.deleteKeychainEntryRequestV1Pb.key wasn't non-blank string.",
         Code.InvalidArgument,
       );
     }
 
-    const key = req.deleteKeychainEntryRequestV1PB.key;
+    const key = req.deleteKeychainEntryRequestV1Pb.key;
     await this.keychain.delete(key);
     this.log.debug("%s Deleted value for key=%s", fn, key);
 
@@ -118,28 +118,28 @@ export class KeychainMemoryCrpcSvcOpenApi
     if (!req) {
       throw new ConnectError("Falsy request object.", Code.InvalidArgument);
     }
-    if (!req.getKeychainEntryRequestV1PB) {
+    if (!req.getKeychainEntryRequestV1Pb) {
       throw new ConnectError(
-        "req.getKeychainEntryRequestV1PB falsy.",
+        "req.getKeychainEntryRequestV1Pb falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!req.getKeychainEntryRequestV1PB.key) {
+    if (!req.getKeychainEntryRequestV1Pb.key) {
       throw new ConnectError(
-        "req.getKeychainEntryRequestV1PB.key falsy.",
+        "req.getKeychainEntryRequestV1Pb.key falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!Strings.isNonBlank(req.getKeychainEntryRequestV1PB.key)) {
+    if (!Strings.isNonBlank(req.getKeychainEntryRequestV1Pb.key)) {
       throw new ConnectError(
-        "req.getKeychainEntryRequestV1PB.key wasn't non-blank string.",
+        "req.getKeychainEntryRequestV1Pb.key wasn't non-blank string.",
         Code.InvalidArgument,
       );
     }
 
-    const key = req.getKeychainEntryRequestV1PB.key;
+    const key = req.getKeychainEntryRequestV1Pb.key;
     const value = await this.keychain.get(key);
     this.log.debug("%s Got value=%s for key=%s", fn, value, key);
 
@@ -162,28 +162,28 @@ export class KeychainMemoryCrpcSvcOpenApi
     if (!req) {
       throw new ConnectError("Falsy request object.", Code.InvalidArgument);
     }
-    if (!req.hasKeychainEntryRequestV1PB) {
+    if (!req.hasKeychainEntryRequestV1Pb) {
       throw new ConnectError(
-        "req.hasKeychainEntryRequestV1PB falsy.",
+        "req.hasKeychainEntryRequestV1Pb falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!req.hasKeychainEntryRequestV1PB.key) {
+    if (!req.hasKeychainEntryRequestV1Pb.key) {
       throw new ConnectError(
-        "req.hasKeychainEntryRequestV1PB.key falsy.",
+        "req.hasKeychainEntryRequestV1Pb.key falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!Strings.isNonBlank(req.hasKeychainEntryRequestV1PB.key)) {
+    if (!Strings.isNonBlank(req.hasKeychainEntryRequestV1Pb.key)) {
       throw new ConnectError(
-        "req.hasKeychainEntryRequestV1PB.key wasn't non-blank string.",
+        "req.hasKeychainEntryRequestV1Pb.key wasn't non-blank string.",
         Code.InvalidArgument,
       );
     }
 
-    const key = req.hasKeychainEntryRequestV1PB.key;
+    const key = req.hasKeychainEntryRequestV1Pb.key;
     const isPresent = await this.keychain.has(key);
     const res = new HasKeychainEntryResponseV1PB({
       checkedAt: new Date().toJSON(),
@@ -204,29 +204,29 @@ export class KeychainMemoryCrpcSvcOpenApi
     if (!req) {
       throw new ConnectError("Falsy request object.", Code.InvalidArgument);
     }
-    if (!req.setKeychainEntryRequestV1PB) {
+    if (!req.setKeychainEntryRequestV1Pb) {
       throw new ConnectError(
-        "req.setKeychainEntryRequestV1PB falsy.",
+        "req.setKeychainEntryRequestV1Pb falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!req.setKeychainEntryRequestV1PB.key) {
+    if (!req.setKeychainEntryRequestV1Pb.key) {
       throw new ConnectError(
-        "req.setKeychainEntryRequestV1PB.key falsy.",
+        "req.setKeychainEntryRequestV1Pb.key falsy.",
         Code.InvalidArgument,
       );
     }
 
-    if (!Strings.isNonBlank(req.setKeychainEntryRequestV1PB.key)) {
+    if (!Strings.isNonBlank(req.setKeychainEntryRequestV1Pb.key)) {
       throw new ConnectError(
-        "req.setKeychainEntryRequestV1PB.key wasn't non-blank string.",
+        "req.setKeychainEntryRequestV1Pb.key wasn't non-blank string.",
         Code.InvalidArgument,
       );
     }
 
-    const key = req.setKeychainEntryRequestV1PB.key;
-    const value = req.setKeychainEntryRequestV1PB.value;
+    const key = req.setKeychainEntryRequestV1Pb.key;
+    const value = req.setKeychainEntryRequestV1Pb.value;
     await this.keychain.set(key, value);
     const res = new SetKeychainEntryResponseV1PB({ key });
     this.log.debug("%s EXIT res=%o", fn, res);
