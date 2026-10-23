@@ -781,13 +781,6 @@ export class PluginLedgerConnectorBesu
     return { transaction };
   }
 
-  /**
-   * Retrieves the mined receipt of a transaction, or null when the
-   * transaction is pending or unknown to the node.
-   *
-   * @param transactionHash hash of the transaction
-   * @returns the transaction receipt (status, block, gas used, logs) or null
-   */
   public async getTransactionReceipt(
     transactionHash: string,
   ): Promise<Web3TransactionReceipt | null> {

@@ -1561,17 +1561,10 @@ export class EthereumLeaf
   }
 
   /**
-   * Retrieves the mined receipt of a transaction by its hash.
+   * Retrieves the receipt of a transaction by its ID.
    *
-   * The receipt (status, block hash and number, gas used, logs) is the
-   * on-chain evidence of the transaction's inclusion and outcome, as opposed
-   * to the signed transaction, which only proves that the transaction was
-   * submitted. Numbers and bytes are returned as strings, matching the
-   * receipts the connector returns from invokeContract.
-   *
-   * @param {string} transactionId - The hash of the transaction to get the receipt for.
-   * @returns {Promise<string>} A promise that resolves to the stringified transaction receipt.
-   * @throws {TransactionReceiptError} If the transaction has not been mined yet.
+   * @param {string} transactionId - The ID of the transaction to get the receipt for.
+   * @returns {Promise<string>} A promise that resolves to the transaction receipt.
    */
   public async getReceipt(transactionId: string): Promise<string> {
     const fnTag = `${EthereumLeaf.CLASS_NAME}}#getReceipt`;
