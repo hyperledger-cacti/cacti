@@ -298,89 +298,44 @@ timeouts, decision endpoint, and execution points are maintained in the
 
 ### Building the container image locally
 
-In the project root directory run these commands on the terminal:
+After following the repository build prerequisites, run from the project root:
 
-```sh
-yarn configure
-yarn lerna run build:bundle --scope=@hyperledger-cacti/cactus-plugin-satp-hermes
+```bash
+yarn run configure
+yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes run docker:build:local
 ```
+
+If `yarn run configure` already completed during contributor setup, do not
+repeat it for this exercise. The workspace command generates the CLI bundle
+and builds `hyperledger/cacti-satp-hermes-gateway:local-dev`.
 
 ### Build the image:
 
-For stable builds:
+The tracked Compose workflow also builds the image, but requires the CLI
+bundle to exist first. From the repository root, generate it with:
 
+```bash
+yarn run lerna run build:bundle --scope=@hyperledger-cacti/cactus-plugin-satp-hermes
 ```
-yarn docker:build:stable
-```
-
-For dev builds:
-
-```
- yarn docker:build:dev
-```
-
-Run the image:
-
-```sh
-docker run \
-  -it \
-  satp-hermes-gateway
-```
-
-Alternatively you can use `docker compose up --build` from within the package directory or if you
-prefer to run it from the project root directory then:
-
-```sh
-docker compose \
-  --project-directory ./packages/cactus-plugin-satp-hermes/ \
-  -f ./packages/cactus-plugin-satp-hermes/docker-compose-satp.yml \
-  up \
-  --build
-```
-
-To push the current version to the official repo, run (tested in MacOS):
-
-```sh
-IMAGE_NAME=ghcr.io/hyperledger-cacti/satp-hermes-gateway
-DEV_TAG="$(date -u +"%Y-%m-%dT%H-%M-%S")-dev-$(git rev-parse --short HEAD)"
-
-echo "Building Docker image with name: $IMAGE_NAME:$DEV_TAG"
-
-docker build  \
-  --file ./packages/cactus-plugin-satp-hermes/satp-hermes-gateway.Dockerfile \
-  ./packages/cactus-plugin-satp-hermes/ \
-  --tag $IMAGE_NAME:$DEV_TAG \
-  --tag $IMAGE_NAME:latest
-```
-
-> The `--build` flag is going to save you 99% of the time from docker compose caching your image builds against your will or knowledge during development.
 
 ## Running local Gateway with Docker Compose
 
-The tracked Compose service mounts the Gateway 1 development configuration at the path expected by the container. That configuration connects to an Ethereum JSON-RPC endpoint at `http://host.docker.internal:8545`, so start the corresponding local development ledger before starting the gateway. Replace the example credentials and endpoint configuration outside local development.
+Follow the [local deployment walkthrough][package-doc-docs-operations-md]
+for the complete ledger preparation, configuration, deployment, health
+checks, and teardown sequence. It uses the tracked Gateway 1 configuration
+and an Ethereum ledger with the matching funded development account.
 
-```sh
-# Navigate to the directory containing the docker-compose file
-cd packages/cactus-plugin-satp-hermes/
+From the repository root, after preparing the ledger and bundle:
 
-# Build and start containers (interactive mode)
-docker-compose -f docker-compose-satp.yml up
-
-# Build and start containers in background (detached mode)
-docker-compose -f docker-compose-satp.yml up -d
-
-# Stop and remove containers
-docker-compose -f docker-compose-satp.yml down
-
-# View container logs
-docker-compose -f docker-compose-satp.yml logs
-
-# Build or rebuild services
-docker-compose -f docker-compose-satp.yml build
-
-# List running containers
-docker-compose -f docker-compose-satp.yml ps
+```bash
+cd packages/cactus-plugin-satp-hermes
+docker compose -p cacti-satp-local -f docker-compose-satp.yml up --build -d
 ```
+
+The explicit filename is required. A bare `docker compose up` does not find
+`docker-compose-satp.yml`. The host API port is `3012`; the container API port
+is `4010`. This is a disposable development deployment, not a production
+storage or recovery configuration.
 
 ## Testing
 
@@ -400,10 +355,10 @@ ledger or container dependencies.
 The Docker suites run real SATP scenarios against gateways executing in
 containers. They are split in two:
 
-| Suite | Script | Image under test | Validates |
-|-------|--------|------------------|-----------|
-| `docker-upstream` | `test:integration:docker-upstream` | Pre-published upstream image (`SATP_DOCKER_IMAGE_NAME`/`SATP_DOCKER_IMAGE_VERSION` in `src/test/typescript/constants.ts`) | The published gateway image boots and serves its OAPI healthcheck |
-| `docker-local` | `test:integration:docker-local` | Image built from the current branch, tagged `hyperledger/cacti-satp-hermes-gateway:local-dev` | Oracle executions and end-to-end SATP transfers (Besu/Ethereum, single- and dual-gateway) against your branch code |
+| Suite             | Script                             | Image under test                                                                                                          | Validates                                                                                                          |
+| ----------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `docker-upstream` | `test:integration:docker-upstream` | Pre-published upstream image (`SATP_DOCKER_IMAGE_NAME`/`SATP_DOCKER_IMAGE_VERSION` in `src/test/typescript/constants.ts`) | The published gateway image boots and serves its OAPI healthcheck                                                  |
+| `docker-local`    | `test:integration:docker-local`    | Image built from the current branch, tagged `hyperledger/cacti-satp-hermes-gateway:local-dev`                             | Oracle executions and end-to-end SATP transfers (Besu/Ethereum, single- and dual-gateway) against your branch code |
 
 Prerequisites (from the repository root):
 

@@ -12,3 +12,7 @@
 [package-doc-assets-diagrams-api1-endpoints-svg]: https://raw.githubusercontent.com/hyperledger-cacti/cacti/main/packages/cactus-plugin-satp-hermes/assets/diagrams/api1-endpoints.svg
 [package-doc-assets-diagrams-api3-satp-protocol-svg]: https://raw.githubusercontent.com/hyperledger-cacti/cacti/main/packages/cactus-plugin-satp-hermes/assets/diagrams/api3-satp-protocol.svg
 [package-doc-readme-md]: ../cactus/packages/cactus-plugin-satp-hermes.md
+[package-doc-operations-md]: operations.md
+[package-doc-configuration-md]: configuration.md
+[package-doc-programmatic-test]: https://github.com/hyperledger-cacti/cacti/blob/main/packages/cactus-plugin-satp-hermes/src/test/typescript/integration/gateway/dev-mode-tls.test.ts
+[package-doc-openapi-json]: https://github.com/hyperledger-cacti/cacti/blob/main/packages/cactus-plugin-satp-hermes/src/main/json/oapi-api1-bundled.json
