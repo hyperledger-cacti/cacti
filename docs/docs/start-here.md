@@ -29,6 +29,7 @@ set of reference links defined at the bottom of that file.
 [openapi_specs]: https://hyperledger-cacti.github.io/cacti/references/openapi/index.html
 [weaver_doc]: ./weaver/introduction.md
 [satp_hermes]: ./satp-hermes/index.md
+[satp_operations]: ./satp-hermes/operations.md
 [build_configure_cacti]: https://github.com/hyperledger-cacti/cacti/blob/main/BUILD.md#configure-cacti
 [weaver_getting_started]: ./weaver/introduction.md
 [roadmap_doc]: https://github.com/hyperledger-cacti/cacti/blob/main/ROADMAP.md

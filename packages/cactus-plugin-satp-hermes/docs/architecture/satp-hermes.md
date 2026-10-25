@@ -189,10 +189,10 @@ The **API3 Module** implements gateway-to-gateway SATP protocol communication:
 **Purpose**: Command-line launcher for production SATP gateway deployments
 
 **Usage**:
-```bash
-docker run -v /path/to/config:/opt/cacti/satp-hermes/config \
-  hyperledger/cactus-plugin-satp-hermes
-```
+
+Follow the [local deployment walkthrough][package-doc-operations-md] to
+prepare the ledger and CLI bundle, mount the tracked configuration, deploy
+with Docker Compose, and verify health.
 
 **Features**:
 - Configuration validation with detailed error reporting
@@ -206,20 +206,14 @@ docker run -v /path/to/config:/opt/cacti/satp-hermes/config \
 
 **Purpose**: Core plugin for programmatic SATP gateway integration
 
-**Usage**:
-```typescript
-import { SATPGateway } from '@hyperledger/cactus-plugin-satp-hermes';
+**Configuration and lifecycle**:
 
-const gateway = new SATPGateway({
-  instanceId: 'gateway-001',
-  keyPair: keyPairConfig,
-  localRepository: localRepo,
-  remoteRepository: remoteRepo,
-  // ... additional configuration
-});
-
-await gateway.onPluginInit();
-```
+Direct construction requires a plugin registry and configuration consistent
+with the installed package version. See
+[Gateway Configuration][package-doc-configuration-md] for the fields and
+[current programmatic integration tests][package-doc-programmatic-test]
+for complete gateway startup and shutdown examples. The operator deployment
+uses the CLI configuration workflow rather than direct construction.
 
 **Features**:
 - Full TypeScript/JavaScript API
@@ -234,17 +228,20 @@ await gateway.onPluginInit();
 **Purpose**: REST API layer for external SATP client access
 
 **Endpoints**:
-- `POST /api/v1/transfer` - Initiate asset transfer
-- `GET /api/v1/status` - Gateway status
-- `GET /api/v1/sessions` - Active SATP sessions
-- `POST /api/v1/oracle/task` - Oracle operations
 
-**Usage**:
+Application requests use the `/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes`
+prefix. For the local Compose deployment, verify the API with:
+
 ```bash
-curl -X POST http://gateway:3000/api/v1/transfer \
-  -H "Content-Type: application/json" \
-  -d '{"assetId": "...", "amount": 100, ...}'
+curl --fail-with-body \
+  http://localhost:3012/api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/healthcheck
 ```
+
+Expect HTTP `200` and `{"status":"AVAILABLE"}`. Asset transfers use
+`POST /api/v1/@hyperledger-cacti/cactus-plugin-satp-hermes/transact` and require
+configured assets and counterparties. Consult the
+[bundled OpenAPI schema][package-doc-openapi-json] for the complete request;
+a healthy gateway alone does not establish a completed transfer.
 
 **Features**:
 - RESTful HTTP endpoints
@@ -330,16 +327,27 @@ Handles failure scenarios with rollback strategies for each stage.
 
 ### Building Documentation
 
+Run from the repository root with the development tools installed:
+
 ```bash
-# Generate diagrams and documentation
-yarn docs:generate
+cd packages/cactus-plugin-satp-hermes
 
-# Serve locally
-yarn docs:serve
+# Generate diagrams and documentation.
+yarn run docs:generate
 
-# Validate completeness
-yarn docs:validate
+# Validate without replacing the generated site or removing copied files.
+yarn run docs:validate --emit none
+
+# Serve without requiring a desktop browser launcher.
+yarn run docs:serve:only
 ```
+
+Open `http://localhost:8080/` manually. The `docs:serve` task additionally
+launches a browser and can stop the server if no supported launcher exists.
+TypeDoc validation may report warnings. The `--emit none` flag prevents
+validation from cleaning the output directory; it does not suppress warnings.
+Copied Markdown resources are served as Markdown files, not separate
+rendered TypeDoc pages.
 
 ## 📖 Additional Resources
 
@@ -359,8 +367,9 @@ All documentation files from the `docs/` folder are available in the generated T
 
 ---
 
-**Version**: 0.0.3-beta  
-**SATP Draft**: core-02, architecture-02, crash-02  
+Package and protocol versions are maintained in `package.json` and
+`src/main/typescript/core/constants.ts`.
+
 **License**: Apache-2.0
 
 [package-doc-assets-diagrams-architecture-overview-svg]: ../../assets/diagrams/architecture-overview.svg
@@ -375,3 +384,7 @@ All documentation files from the `docs/` folder are available in the generated T
 [package-doc-assets-diagrams-api1-endpoints-svg]: ../../assets/diagrams/api1-endpoints.svg
 [package-doc-assets-diagrams-api3-satp-protocol-svg]: ../../assets/diagrams/api3-satp-protocol.svg
 [package-doc-readme-md]: ../../README.md
+[package-doc-operations-md]: ../operations.md
+[package-doc-configuration-md]: ../configuration.md
+[package-doc-programmatic-test]: ../../src/test/typescript/integration/gateway/dev-mode-tls.test.ts
+[package-doc-openapi-json]: ../../src/main/json/oapi-api1-bundled.json

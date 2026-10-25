@@ -2,3 +2,4 @@
 
 [package-doc-configuration-md]: configuration.md
 [package-doc-database-md]: database.md
+[package-doc-build-md]: ../../../build.md

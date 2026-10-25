@@ -94,6 +94,8 @@ environment. The different setup methods are:
 | **Dev Container** | Docker-based VS Code development environment | [BUILD.md - Dev Container Quickstart][build_dev_container] |
 | **Manual Setup** | Platform-specific installation (macOS, Linux, Windows/WSL) | [BUILD.md - Getting Started][build_getting_started] |
 
+Next, follow [How to Contribute][how_to_contribute] to prepare and open your pull request.
+
 ---
 
 ## For Developers
@@ -248,6 +250,8 @@ endpoint at the API server's base URL.
 | [BUILD.md - Configure Cacti][build_configure_cacti] | Server configuration, plugin registration, and CORS setup |
 | [Weaver Getting Started][weaver_getting_started] | End-to-end setup for cross-network interoperability |
 
+For SATP gateway deployment, follow [Operating SATP Hermes][satp_operations].
+
 ---
 
 ## For Contributors 
@@ -305,6 +309,7 @@ standards, and review expectations:
 [openapi_specs]: https://hyperledger-cacti.github.io/cacti/references/openapi/index.html
 [weaver_doc]: ./weaver/README.md
 [satp_hermes]: ./packages/cactus-plugin-satp-hermes/README.md
+[satp_operations]: ./packages/cactus-plugin-satp-hermes/docs/operations.md
 [build_configure_cacti]: ./BUILD.md#configure-cacti
 [weaver_getting_started]: ./weaver/README.md
 [roadmap_doc]: ./ROADMAP.md
