@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793002945535,
+  "lastUpdate": 1793003307959,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -881,6 +881,35 @@ window.BENCHMARK_DATA = {
             "range": "±3.18%",
             "unit": "ops/sec",
             "extra": "180 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Ujjwal Verma",
+            "username": "ujjwalv01",
+            "email": "ujjwalverma010305@gmail.com"
+          },
+          "committer": {
+            "name": "Sandeep Nishad",
+            "username": "sandeepnRES",
+            "email": "sandeepn.official@gmail.com"
+          },
+          "id": "a29f1f0d8834dbca47a98f9a27872a980c337541",
+          "message": "docs(mkdocs): apply Cacti design system to documentation site\n\nAdd a token stylesheet and a Material mapping stylesheet, Barlow\ndisplay headings, custom light and dark palettes, and re-skinned\nadmonitions, code blocks, badges, header and tabs. Add a Design\nSystem page under Reference.\n\nApply the same tokens to the SATP Hermes TypeDoc theme and use a\ndark highlight theme so code blocks stay readable on the ink canvas.\n\nRefs #4712\n\nSigned-off-by: Ujjwal Verma <ujjwalverma010305@gmail.com>",
+          "timestamp": "2026-10-05T14:18:03Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/a29f1f0d8834dbca47a98f9a27872a980c337541"
+        },
+        "date": 1793003303726,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 826,
+            "range": "±3.20%",
+            "unit": "ops/sec",
+            "extra": "178 samples"
           }
         ]
       }
