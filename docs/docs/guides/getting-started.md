@@ -574,286 +574,313 @@ Once the server is running, access the OpenAPI documentation at:
 
 ### Tutorial: Building a Complete Application
 
-This tutorial walks through creating an application similar to the Supply Chain example, but with clear separation of what's Cacti and what's your code.
+This small application keeps the existing asset creation and lookup workflow
+in one file. A custom business logic plugin runs inside the Cacti API server
+and uses the Ethereum connector to deploy and call a Solidity contract.
+A frontend, local workspace package, and separate endpoint modules are not
+required for this exercise.
 
-#### Step 1: Project Structure
+#### Step 1: Prepare a Separate Application
 
+Use Node.js 20 and npm. Run the commands outside the Cacti repository so
+npm does not modify its Yarn installation. This example uses the published
+`@hyperledger` packages at version `2.0.0`; do not mix them with the current
+repository's `@hyperledger-cacti` workspaces.
+
+```bash
+app_dir=$(mktemp -d "$HOME/cacti-developer-review.XXXXXX")
+cd "$app_dir"
+printf 'Application directory: %s\n' "$app_dir"
+npm init -y
+npm install @hyperledger/cactus-cmd-api-server@2.0.0 \
+  @hyperledger/cactus-core@2.0.0 \
+  @hyperledger/cactus-plugin-ledger-connector-ethereum@2.0.0 \
+  solc@0.8.21
 ```
-my-cacti-app/
-├── packages/
-│   ├── my-app-business-logic-plugin/     # YOUR CODE - Business logic
-│   │   ├── src/main/typescript/
-│   │   │   ├── plugin.ts                 # Cacti plugin wrapper
-│   │   │   ├── web-services/             # YOUR REST endpoints
-│   │   │   └── services/                 # YOUR business logic
-│   │   └── package.json
-│   ├── my-app-backend/                   # YOUR CODE - App orchestration
-│   │   └── src/main/typescript/
-│   │       └── app.ts                    # Wires everything together
-│   └── my-app-frontend/                  # YOUR CODE - Web UI
-├── contracts/                            # YOUR CODE - Smart contracts
-└── package.json
+
+Keep the printed directory path for the second terminal. Dependency audit
+findings are separate from whether the application runs successfully.
+
+Start a local Ethereum development ledger, or reuse the matching ledger
+from the [SATP operator walkthrough](../satp-hermes/operations.md#2-start-the-development-ledger).
+Do not start another ledger if port `8545` is occupied.
+
+```bash
+docker run -d --name cacti-developer-ledger \
+  -p 127.0.0.1:8545:8545 trufflesuite/ganache:v7.9.2 \
+  --server.host 0.0.0.0 \
+  --wallet.mnemonic 'test test test test test test test test test test test junk' \
+  --chain.chainId 1337 --logging.quiet
+
+curl --fail-with-body http://localhost:8545 \
+  -H 'Content-Type: application/json' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"eth_accounts","params":[]}'
 ```
 
-#### Step 2: Create Your Business Logic Plugin
+Wait for the RPC request to succeed. The first funded account must be
+`0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266`. Ganache is archived and is
+used here only as a reproducible local fixture. Its public development
+mnemonic and private key must never be used with real assets.
+If the named container already exists, use `docker start cacti-developer-ledger`.
 
-```typescript
-// packages/my-app-business-logic-plugin/src/main/typescript/plugin.ts
-import {
-  IPluginWebService,
-  IWebServiceEndpoint,
-  ICactusPlugin,
-  ICactusPluginOptions,
-} from "@hyperledger/cactus-core-api";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import type { Express } from "express";
+#### Step 2: Define the Asset Contract
 
-// Import YOUR services
-import { AssetService } from "./services/asset-service";
-import { CreateAssetEndpoint } from "./web-services/create-asset-endpoint";
-import { GetAssetEndpoint } from "./web-services/get-asset-endpoint";
+In the application directory, create `Asset.sol`:
 
-export interface IMyAppPluginOptions extends ICactusPluginOptions {
-  pluginRegistry: PluginRegistry;
-  logLevel?: string;
-}
+```solidity
+// SPDX-License-Identifier: Apache-2.0
+pragma solidity ^0.8.21;
 
-/**
- * YOUR plugin that wraps your business logic.
- * Implements Cacti's plugin interface so it can be loaded into the API server.
- */
-export class MyAppPlugin implements ICactusPlugin, IPluginWebService {
-  private readonly instanceId: string;
-  private readonly pluginRegistry: PluginRegistry;
-  private readonly assetService: AssetService;
-  private endpoints: IWebServiceEndpoint[] | undefined;
+contract Asset {
+    struct Record {
+        address owner;
+        uint256 value;
+        bool exists;
+    }
+    mapping(string => Record) private assets;
 
-  constructor(options: IMyAppPluginOptions) {
-    this.instanceId = options.instanceId;
-    this.pluginRegistry = options.pluginRegistry;
-    
-    // YOUR business logic service
-    this.assetService = new AssetService(this.pluginRegistry);
-  }
-
-  public getInstanceId(): string {
-    return this.instanceId;
-  }
-
-  public getPackageName(): string {
-    return "@my-org/my-app-business-logic-plugin";
-  }
-
-  public async onPluginInit(): Promise<unknown> {
-    return;
-  }
-
-  public async shutdown(): Promise<void> {
-    return;
-  }
-
-  /**
-   * Register YOUR API endpoints with the Cacti API server
-   */
-  public async getOrCreateWebServices(): Promise<IWebServiceEndpoint[]> {
-    if (this.endpoints) {
-      return this.endpoints;
+    function createAsset(string calldata assetId, address owner, uint256 value) external {
+        require(bytes(assetId).length > 0, "Asset ID is required");
+        require(owner != address(0), "Owner is required");
+        require(value > 0, "Asset value must be positive");
+        require(!assets[assetId].exists, "Asset already exists");
+        assets[assetId] = Record(owner, value, true);
     }
 
-    // YOUR endpoints - these are your application's REST API
-    this.endpoints = [
-      new CreateAssetEndpoint({ assetService: this.assetService }),
-      new GetAssetEndpoint({ assetService: this.assetService }),
-    ];
+    function getAsset(string calldata assetId) external view returns (address owner, uint256 value) {
+        require(assets[assetId].exists, "Asset not found");
+        Record storage asset = assets[assetId];
+        return (asset.owner, asset.value);
+    }
+}
+```
 
+#### Step 3: Register the Business Logic Plugin
+
+Create `app.cjs` beside `Asset.sol`. The application compiles the contract
+in memory and deploys it, so no prebuilt artifact or deployed address is
+required. The plugin supplies its OpenAPI definition and both endpoint
+implementations rather than importing unspecified example modules.
+
+```javascript
+const { readFileSync } = require("node:fs");
+const { randomUUID } = require("node:crypto");
+const solc = require("solc");
+const { ApiServer, ConfigService, AuthorizationProtocol } =
+  require("@hyperledger/cactus-cmd-api-server");
+const { PluginRegistry } = require("@hyperledger/cactus-core");
+const {
+  PluginLedgerConnectorEthereum,
+  EthContractInvocationType,
+  Web3SigningCredentialType,
+} = require("@hyperledger/cactus-plugin-ledger-connector-ethereum");
+
+const basePath = "/api/v1/my-app/assets";
+const owner = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266";
+const credential = {
+  type: Web3SigningCredentialType.PrivateKeyHex,
+  ethAccount: owner,
+  secret: "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+};
+const gasConfig = { gas: "3000000", gasPrice: "20000000000" };
+
+class MyAppPlugin {
+  constructor(connector, contract) {
+    this.instanceId = randomUUID();
+    this.connector = connector;
+    this.contract = contract;
+    this.endpoints = [
+      this.endpoint("post", basePath, async (req, res) => {
+        const { assetId, owner: assetOwner, value } = req.body || {};
+        if (typeof assetId !== "string" || !assetId.trim() ||
+            !/^0x[0-9a-fA-F]{40}$/.test(assetOwner || "") ||
+            /^0x0{40}$/i.test(assetOwner) ||
+            !Number.isSafeInteger(value) || value <= 0) {
+          res.status(400).json({ error: "Invalid asset ID, owner, or value" });
+          return;
+        }
+        const result = await this.connector.invokeContract({
+          contract: this.contract,
+          invocationType: EthContractInvocationType.Send,
+          methodName: "createAsset",
+          params: [assetId, assetOwner, value],
+          web3SigningCredential: credential,
+          gasConfig,
+        });
+        // Version 2.0.0 returns Send receipts under out; accept both shapes.
+        const receipt = result.transactionReceipt ?? result.out?.transactionReceipt;
+        if (!result.success || !receipt?.status || !receipt.transactionHash) {
+          throw new Error("Asset transaction failed");
+        }
+        res.status(201).json({ assetId, transactionHash: receipt.transactionHash });
+      }),
+      this.endpoint("get", `${basePath}/:assetId`, async (req, res) => {
+        const result = await this.connector.invokeContract({
+          contract: this.contract,
+          invocationType: EthContractInvocationType.Call,
+          methodName: "getAsset",
+          params: [req.params.assetId],
+          web3SigningCredential: { type: Web3SigningCredentialType.None },
+        });
+        res.json({ assetId: req.params.assetId, owner: result.callOutput.owner,
+          value: String(result.callOutput.value) });
+      }),
+    ];
+  }
+  endpoint(verb, path, handler) {
+    const endpoint = {
+      getVerbLowerCase: () => verb,
+      getPath: () => path,
+      getAuthorizationOptionsProvider: () => ({
+        get: async () => ({ isProtected: false, requiredRoles: [] }),
+      }),
+      getExpressRequestHandler: () => async (req, res) => {
+        try { await handler(req, res); }
+        catch (error) { res.status(500).json({ error: error.message }); }
+      },
+      registerExpress: async (app) => {
+        app[verb](path, endpoint.getExpressRequestHandler());
+        return endpoint;
+      },
+    };
+    return endpoint;
+  }
+  getInstanceId() { return this.instanceId; }
+  getPackageName() { return "my-app-business-logic-plugin"; }
+  async onPluginInit() {}
+  async shutdown() {}
+  getOpenApiSpec() {
+    return {
+      openapi: "3.0.3",
+      info: { title: "Asset Application", version: "1.0.0" },
+      paths: {
+        [basePath]: { post: {
+          operationId: "createAsset",
+          requestBody: { required: true, content: {
+            "application/json": { schema: { type: "object" } },
+          } },
+          responses: { "201": { description: "Asset created" },
+            "400": { description: "Invalid asset input" },
+            "500": { description: "Ledger request failed" } },
+        } },
+        [`${basePath}/{assetId}`]: { get: {
+          operationId: "getAsset",
+          parameters: [{ name: "assetId", in: "path", required: true,
+            schema: { type: "string" } }],
+          responses: { "200": { description: "Asset from the ledger" },
+            "500": { description: "Ledger request failed" } },
+        } },
+      },
+    };
+  }
+  async getOrCreateWebServices() { return this.endpoints; }
+  async registerWebServices(app) {
+    for (const endpoint of this.endpoints) await endpoint.registerExpress(app);
     return this.endpoints;
   }
-
-  public async registerWebServices(
-    app: Express,
-  ): Promise<IWebServiceEndpoint[]> {
-    const endpoints = await this.getOrCreateWebServices();
-    for (const endpoint of endpoints) {
-      endpoint.registerExpress(app);
-    }
-    return endpoints;
-  }
-}
-```
-
-#### Step 3: Create Your Business Logic Service
-
-```typescript
-// packages/my-app-business-logic-plugin/src/main/typescript/services/asset-service.ts
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import {
-  PluginLedgerConnectorEthereum,
-  Web3SigningCredentialType,
-} from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import AssetContract from "../../../../contracts/Asset.json";
-
-/**
- * YOUR service - contains your application's business logic.
- * Uses Cacti connectors under the hood for blockchain access.
- */
-export class AssetService {
-  private readonly pluginRegistry: PluginRegistry;
-
-  constructor(pluginRegistry: PluginRegistry) {
-    this.pluginRegistry = pluginRegistry;
-  }
-
-  private getEthereumConnector(): PluginLedgerConnectorEthereum {
-    // Get the Cacti connector from the plugin registry
-    const plugins = this.pluginRegistry.getPlugins();
-    const connector = plugins.find(
-      (p) => p.getPackageName() === "@hyperledger/cactus-plugin-ledger-connector-ethereum"
-    );
-    if (!connector) {
-      throw new Error("Ethereum connector not found in registry");
-    }
-    return connector as PluginLedgerConnectorEthereum;
-  }
-
-  /**
-   * YOUR business logic - creates an asset on the blockchain
-   */
-  async createAsset(
-    assetId: string,
-    owner: string,
-    value: number,
-    ethAccount: string,
-    privateKey: string,
-  ): Promise<{ assetId: string; transactionHash: string }> {
-    const connector = this.getEthereumConnector();
-    
-    // YOUR business rules
-    if (value <= 0) {
-      throw new Error("Asset value must be positive");
-    }
-
-    // Use Cacti connector to interact with blockchain
-    const result = await connector.invokeContract({
-      contractAddress: process.env.ASSET_CONTRACT_ADDRESS!,
-      contractAbi: AssetContract.abi,
-      invocationType: "SEND",
-      methodName: "createAsset",
-      params: [assetId, owner, value],
-      web3SigningCredential: {
-        type: Web3SigningCredentialType.PrivateKeyHex,
-        ethAccount,
-        secret: privateKey,
-      },
-      gas: 1000000,
-    });
-
-    return {
-      assetId,
-      transactionHash: result.transactionReceipt?.transactionHash ?? "",
-    };
-  }
-
-  async getAsset(assetId: string): Promise<{ assetId: string; owner: string; value: number }> {
-    const connector = this.getEthereumConnector();
-    
-    const result = await connector.invokeContract({
-      contractAddress: process.env.ASSET_CONTRACT_ADDRESS!,
-      contractAbi: AssetContract.abi,
-      invocationType: "CALL",
-      methodName: "getAsset",
-      params: [assetId],
-      web3SigningCredential: {
-        type: Web3SigningCredentialType.None,
-      },
-    });
-
-    return {
-      assetId,
-      ...(result.callOutput as { owner: string; value: number }),
-    };
-  }
-}
-```
-
-#### Step 4: Wire Everything Together
-
-```typescript
-// packages/my-app-backend/src/main/typescript/app.ts
-import { v4 as uuidv4 } from "uuid";
-import {
-  ApiServer,
-  ConfigService,
-  AuthorizationProtocol,
-} from "@hyperledger/cactus-cmd-api-server";
-import { PluginRegistry } from "@hyperledger/cactus-core";
-import { PluginLedgerConnectorEthereum } from "@hyperledger/cactus-plugin-ledger-connector-ethereum";
-import { PluginKeychainMemory } from "@hyperledger/cactus-plugin-keychain-memory";
-
-// YOUR plugin
-import { MyAppPlugin } from "@my-org/my-app-business-logic-plugin";
-
-async function main(): Promise<void> {
-  // Create the plugin registry (Cacti component)
-  const pluginRegistry = new PluginRegistry();
-
-  // Add Cacti keychain plugin
-  const keychain = new PluginKeychainMemory({
-    instanceId: uuidv4(),
-    keychainId: "my-keychain",
-    logLevel: "INFO",
-  });
-  pluginRegistry.add(keychain);
-
-  // Add Cacti Ethereum connector
-  const ethereumConnector = new PluginLedgerConnectorEthereum({
-    instanceId: "ethereum-connector",
-    rpcApiHttpHost: process.env.ETHEREUM_RPC_URL!,
-    pluginRegistry,
-    logLevel: "INFO",
-  });
-  pluginRegistry.add(ethereumConnector);
-
-  // Add YOUR plugin
-  const myAppPlugin = new MyAppPlugin({
-    instanceId: uuidv4(),
-    pluginRegistry,
-    logLevel: "INFO",
-  });
-  pluginRegistry.add(myAppPlugin);
-
-  // Create and start the API server (Cacti component)
-  const configService = new ConfigService();
-  const config = await configService.newExampleConfig();
-  config.authorizationProtocol = AuthorizationProtocol.NONE;
-  config.configFile = "";
-  config.apiCorsDomainCsv = "*";
-  config.apiPort = 4000;
-  config.cockpitPort = 3100;
-  config.logLevel = "INFO";
-  config.apiTlsEnabled = false;
-
-  const apiServer = new ApiServer({
-    config,
-    pluginRegistry,
-  });
-
-  await apiServer.start();
-  console.log("My App is running!");
-  console.log("API: http://localhost:4000");
-  console.log("Your endpoints: http://localhost:4000/api/v1/my-app/assets");
 }
 
-main().catch(console.error);
+async function main() {
+  const compiled = JSON.parse(solc.compile(JSON.stringify({
+    language: "Solidity",
+    sources: { "Asset.sol": { content: readFileSync("Asset.sol", "utf8") } },
+    settings: { evmVersion: "paris",
+      outputSelection: { "*": { "*": ["abi", "evm.bytecode.object"] } } },
+  })));
+  const errors = (compiled.errors || []).filter((e) => e.severity === "error");
+  if (errors.length) throw new Error(errors.map((e) => e.formattedMessage).join("\n"));
+  const output = compiled.contracts["Asset.sol"].Asset;
+  const artifact = { abi: output.abi, bytecode: `0x${output.evm.bytecode.object}` };
+  const registry = new PluginRegistry();
+  const connector = new PluginLedgerConnectorEthereum({
+    instanceId: randomUUID(), pluginRegistry: registry,
+    rpcApiHttpHost: process.env.ETHEREUM_RPC_URL || "http://127.0.0.1:8545",
+    logLevel: "WARN",
+  });
+  registry.add(connector);
+  const deployed = await connector.deployContract({
+    contract: { contractJSON: artifact }, web3SigningCredential: credential,
+    gasConfig,
+  });
+  const contractAddress = deployed.transactionReceipt.contractAddress;
+  if (!deployed.transactionReceipt.status || !contractAddress) {
+    throw new Error("Contract deployment failed");
+  }
+  registry.add(new MyAppPlugin(connector, { contractAddress, contractJSON: artifact }));
+  const config = await new ConfigService().newExampleConfig();
+  Object.assign(config, {
+    authorizationProtocol: AuthorizationProtocol.NONE, configFile: "",
+    apiHost: "127.0.0.1", apiPort: 4400, cockpitEnabled: false,
+    apiTlsEnabled: false, apiMtlsEnabled: false, grpcMtlsEnabled: false,
+    grpcPort: 0, crpcPort: 0, logLevel: "WARN", enableShutdownHook: false,
+  });
+  const server = new ApiServer({ config, pluginRegistry: registry });
+  await server.start();
+  for (const signal of ["SIGINT", "SIGTERM"]) {
+    process.once(signal, () => server.shutdown().catch(console.error));
+  }
+  console.log(`Contract: ${contractAddress}`);
+  console.log(`READY http://127.0.0.1:4400${basePath}`);
+}
+main().catch((error) => { console.error(error); process.exit(1); });
 ```
+
+#### Step 4: Run and Verify
+
+In the application directory:
+
+```bash
+node app.cjs
+```
+
+Wait for `READY`. The API listens only on the loopback interface. Authentication
+and TLS are disabled for this local exercise; do not expose it as a public
+service. Each startup deploys a new contract.
+
+In a second terminal, create an asset and read it back:
+
+```bash
+curl --fail-with-body -i http://localhost:4400/api/v1/my-app/assets \
+  -H 'Content-Type: application/json' \
+  --data '{"assetId":"review-1","owner":"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266","value":100}'
+
+curl --fail-with-body -i http://localhost:4400/api/v1/my-app/assets/review-1
+```
+
+Expect HTTP `201` and a transaction hash for creation, then HTTP `200` with
+the same asset ID and owner and value `"100"`. The service converts the
+contract's integer result to a decimal string before JSON serialization.
+Use a new asset ID for each creation on the same contract.
+
+Check the transaction independently, replacing the placeholder with the hash
+returned by creation:
+
+```bash
+curl --fail-with-body http://localhost:8545 \
+  -H 'Content-Type: application/json' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"eth_getTransactionReceipt","params":["TRANSACTION_HASH"]}'
+```
+
+Expect receipt status `"0x1"`. Also confirm that invalid input is rejected:
+
+```bash
+curl -i http://localhost:4400/api/v1/my-app/assets \
+  -H 'Content-Type: application/json' \
+  --data '{"assetId":"invalid","owner":"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266","value":0}'
+```
+
+Expect HTTP `400`. Press Ctrl+C in the application terminal when finished.
+Stop the ledger with `docker stop cacti-developer-ledger` if you created it
+for this exercise, or keep the shared ledger running for the operator review.
 
 ### What's Cacti vs What's Yours (Level 3 Summary)
 
 | Category | Your Code | Cacti |
 |----------|-----------|-------|
-| **Frontend** | `my-app-frontend/` - Your web UI | - |
-| **Business Logic** | `my-app-business-logic-plugin/services/` | Plugin interface (`IPluginWebService`) |
-| **REST Endpoints** | `my-app-business-logic-plugin/web-services/` | Endpoint registration helpers |
-| **Smart Contracts** | `contracts/` - Your Solidity/chaincode | - |
+| **Frontend** | Optional application UI | - |
+| **Business Logic** | `MyAppPlugin` asset handlers in `app.cjs` | Plugin interface (`IPluginWebService`) |
+| **REST Endpoints** | Endpoint definitions in `app.cjs` | Endpoint registration helpers |
+| **Smart Contracts** | `Asset.sol` | - |
 | **Blockchain Access** | - | Ledger Connectors |
 | **Credential Storage** | - | Keychain Plugins |
 | **API Hosting** | - | ApiServer |

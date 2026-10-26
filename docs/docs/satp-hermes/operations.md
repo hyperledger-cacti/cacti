@@ -2,3 +2,4 @@
 
 [package-doc-configuration-md]: ../cactus/packages/cactus-plugin-satp-hermes/docs/configuration.md
 [package-doc-database-md]: ../cactus/packages/cactus-plugin-satp-hermes/docs/database.md
+[package-doc-build-md]: ../cactus/build.md
