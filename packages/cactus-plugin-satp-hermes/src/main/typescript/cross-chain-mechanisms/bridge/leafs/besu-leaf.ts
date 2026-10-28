@@ -1271,12 +1271,16 @@ export class BesuLeaf
         this.log.debug(
           `${fnTag}, Getting Receipt: transactionId: ${transactionId}`,
         );
-        //TODO: implement getReceipt instead of transaction
-        const receipt = await this.connector.getTransaction({
-          transactionHash: transactionId,
-        });
+        const receipt =
+          await this.connector.getTransactionReceipt(transactionId);
 
-        return safeStableStringify(receipt.transaction);
+        if (!receipt) {
+          throw new TransactionReceiptError(
+            `${fnTag}, transaction ${transactionId} has not been mined`,
+          );
+        }
+
+        return safeStableStringify(receipt) ?? "";
       } catch (err) {
         span.setStatus({ code: SpanStatusCode.ERROR, message: String(err) });
         span.recordException(err);
