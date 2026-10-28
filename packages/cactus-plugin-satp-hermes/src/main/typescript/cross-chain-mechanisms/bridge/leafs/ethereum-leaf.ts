@@ -101,6 +101,7 @@ import {
   Web3SigningCredentialCactiKeychainRef,
   Web3SigningCredentialGethKeychainPassword,
   Web3SigningCredentialPrivateKeyHex,
+  Web3StringReturnFormat,
 } from "@hyperledger-cacti/cactus-plugin-ledger-connector-ethereum";
 import { stringify as safeStableStringify } from "safe-stable-stringify";
 
@@ -1573,13 +1574,19 @@ export class EthereumLeaf
         this.log.debug(
           `${fnTag}, Getting Receipt: transactionId: ${transactionId}`,
         );
-        //TODO: implement getReceipt instead of transaction
-        const getTransactionReq: InvokeRawWeb3EthMethodV1Request = {
-          methodName: "getTransaction",
-          params: [transactionId],
+        const getTransactionReceiptReq: InvokeRawWeb3EthMethodV1Request = {
+          methodName: "getTransactionReceipt",
+          params: [transactionId, Web3StringReturnFormat],
         };
-        const receipt =
-          await this.connector.invokeRawWeb3EthMethod(getTransactionReq);
+        const receipt = (await this.connector.invokeRawWeb3EthMethod(
+          getTransactionReceiptReq,
+        )) as Web3TransactionReceipt | null | undefined;
+
+        if (!receipt) {
+          throw new TransactionReceiptError(
+            `${fnTag}, transaction ${transactionId} has not been mined`,
+          );
+        }
 
         return safeStableStringify(receipt) ?? "";
       } catch (err) {
