@@ -66,7 +66,7 @@
     "@hyperledger-cacti/cactus-plugin-ledger-connector-besu": "3.0.1",
     "@hyperledger-cacti/cactus-test-plugin-htlc-eth-besu-erc20": "3.0.1",
     "axios": "patch:axios@npm%3A1.20.0#~/.yarn/patches/axios-npm-1.20.0-0de8ee0ccf.patch",
-    "body-parser": "1.20.6",
+    "body-parser": "1.20.9",
     "fast-safe-stringify": "2.1.1",
     "joi": "17.13.7",
     "openapi-types": "12.1.3",
