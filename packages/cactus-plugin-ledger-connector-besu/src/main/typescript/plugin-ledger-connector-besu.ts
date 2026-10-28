@@ -73,6 +73,7 @@ import {
   GetBlockV1Response,
   GetBesuRecordV1Request,
   GetBesuRecordV1Response,
+  Web3TransactionReceipt,
 } from "./generated/openapi/typescript-axios";
 
 import { InvokeContractEndpoint } from "./web-services/invoke-contract-endpoint";
@@ -778,6 +779,13 @@ export class PluginLedgerConnectorBesu
       request.transactionHash,
     );
     return { transaction };
+  }
+
+  public async getTransactionReceipt(
+    transactionHash: string,
+  ): Promise<Web3TransactionReceipt | null> {
+    const receipt = await this.web3.eth.getTransactionReceipt(transactionHash);
+    return (receipt as unknown as Web3TransactionReceipt | null) ?? null;
   }
 
   public async getPastLogs(
