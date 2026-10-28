@@ -61,25 +61,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@angular/common@npm:20.3.27":
-  version: 20.3.27
-  resolution: "@angular/common@npm:20.3.27"
+"@angular/common@npm:20.3.28":
+  version: 20.3.28
+  resolution: "@angular/common@npm:20.3.28"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/core": 20.3.27
+    "@angular/core": 20.3.28
     rxjs: ^6.5.3 || ^7.4.0
-  checksum: 10/9c4216e73b6e992a949fe829293d2e214df807296c8edc37bb57ee79dc81d108be8cb27ba4fffb23cccb936d1deeff45455946e6164b158bbcc685e1189c69ce
+  checksum: 10/1b9cc8739f846f7268988c1f37cb00450ceec818cc789ee859769d3505735124570c273b08fc38bd2fd893baec9cd7db8df65e8bad9648e616aaff0afe142214
   languageName: node
   linkType: hard
 
-"@angular/core@npm:20.3.27":
-  version: 20.3.27
-  resolution: "@angular/core@npm:20.3.27"
+"@angular/core@npm:20.3.28":
+  version: 20.3.28
+  resolution: "@angular/core@npm:20.3.28"
   dependencies:
     tslib: "npm:^2.3.0"
   peerDependencies:
-    "@angular/compiler": 20.3.27
+    "@angular/compiler": 20.3.28
     rxjs: ^6.5.3 || ^7.4.0
     zone.js: ~0.15.0
   peerDependenciesMeta:
@@ -87,7 +87,7 @@ __metadata:
       optional: true
     zone.js:
       optional: true
-  checksum: 10/fa94c1d5025f77bf96ee9138398ca4befe8aae99e70c5009bd1c990a0c13004789b65bcc9f7496ae8cbb53c8639cb070a6cd9a7904f2ddce78017ee066d69c6b
+  checksum: 10/0ca7e669ca6b897e3f0dcac0057cd6aefeb21127561f4e44ff13f5327819aa88ed6478d39e5b50c89ba86e0dbb4790ef5a3908f7bc73701b19d515bffb5813f0
   languageName: node
   linkType: hard
 
@@ -4954,7 +4954,7 @@ __metadata:
     express: "npm:5.1.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.7"
+    joi: "npm:17.13.8"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
@@ -5423,7 +5423,7 @@ __metadata:
     express: "npm:5.1.0"
     fast-safe-stringify: "npm:2.1.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.7"
+    joi: "npm:17.13.8"
     openapi-types: "npm:12.1.3"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -5447,7 +5447,7 @@ __metadata:
     "@types/express": "npm:5.0.1"
     axios: "patch:axios@npm%3A1.20.0#~/.yarn/patches/axios-npm-1.20.0-0de8ee0ccf.patch"
     express: "npm:5.1.0"
-    joi: "npm:17.13.7"
+    joi: "npm:17.13.8"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
   languageName: unknown
@@ -5473,7 +5473,7 @@ __metadata:
     express: "npm:5.1.0"
     forge-std: "https://github.com/foundry-rs/forge-std.git#66bf4e2c92cf507531599845e8d5a08cc2e3b5bb"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.7"
+    joi: "npm:17.13.8"
     openapi-types: "npm:12.1.3"
     typescript-optional: "npm:2.0.1"
     web3js-quorum: "npm:22.4.0"
@@ -5534,7 +5534,7 @@ __metadata:
     http-errors: "npm:2.0.0"
     http-errors-enhanced-cjs: "npm:2.0.1"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.7"
+    joi: "npm:17.13.8"
     key-encoder: "npm:2.0.3"
     npm-run-all2: "npm:6.1.2"
     openapi-types: "npm:12.1.3"
@@ -5578,7 +5578,7 @@ __metadata:
     http-errors-enhanced-cjs: "npm:2.0.1"
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.7"
+    joi: "npm:17.13.8"
     node-fetch: "npm:2.7.0"
     node-ssh: "npm:13.1.0"
     prom-client: "npm:15.1.3"
@@ -5617,7 +5617,7 @@ __metadata:
     express: "npm:5.1.0"
     http-proxy-middleware: "npm:3.0.7"
     jest-extended: "npm:7.0.0"
-    js-yaml: "npm:3.15.2"
+    js-yaml: "npm:5.4.3"
     minimist: "npm:1.2.8"
     prom-client: "npm:15.1.3"
     run-time-error-cjs: "npm:1.4.0"
@@ -5680,8 +5680,8 @@ __metadata:
     http-status-codes: "npm:2.1.4"
     internal-ip: "npm:6.2.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.7"
-    js-yaml: "npm:3.15.2"
+    joi: "npm:17.13.8"
+    js-yaml: "npm:5.4.3"
     json5: "npm:2.2.3"
     jsrsasign: "npm:11.1.3"
     lodash: "npm:4.18.1"
@@ -5897,7 +5897,7 @@ __metadata:
     jest: "npm:29.5.0"
     jest-extended: "npm:7.0.0"
     jest-junit: "npm:16.0.0"
-    js-yaml: "npm:3.15.2"
+    js-yaml: "npm:5.4.3"
     jsonc: "npm:2.0.0"
     knex: "npm:2.4.0"
     kubo-rpc-client: "npm:3.0.4"
@@ -6122,8 +6122,8 @@ __metadata:
     internal-ip: "npm:6.2.0"
     is-port-reachable: "npm:3.0.0"
     jest-extended: "npm:7.0.0"
-    joi: "npm:17.13.7"
-    js-yaml: "npm:3.15.2"
+    joi: "npm:17.13.8"
+    js-yaml: "npm:5.4.3"
     keycloak-admin: "npm:1.14.22"
     lodash: "npm:4.18.1"
     node-forge: "npm:1.4.0"
@@ -6149,8 +6149,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@hyperledger-cacti/cactus@workspace:."
   dependencies:
-    "@angular/common": "npm:20.3.27"
-    "@angular/core": "npm:20.3.27"
+    "@angular/common": "npm:20.3.28"
+    "@angular/core": "npm:20.3.28"
     "@angular/platform-browser": "npm:19.2.20"
     "@angular/platform-browser-dynamic": "npm:19.2.20"
     "@angular/router": "npm:19.2.20"
@@ -6225,7 +6225,7 @@ __metadata:
     jest: "npm:29.6.2"
     jest-extended: "npm:4.0.1"
     jest-junit: "npm:16.0.0"
-    joi: "npm:17.13.7"
+    joi: "npm:17.13.8"
     json5: "npm:2.2.3"
     license-report: "npm:6.4.0"
     lint-staged: "npm:11.2.6"
@@ -20377,15 +20377,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dompurify@npm:>=3.4.13":
-  version: 3.4.13
-  resolution: "dompurify@npm:3.4.13"
+"dompurify@npm:>=3.4.17":
+  version: 3.4.17
+  resolution: "dompurify@npm:3.4.17"
   dependencies:
     "@types/trusted-types": "npm:^2.0.7"
   dependenciesMeta:
     "@types/trusted-types":
       optional: true
-  checksum: 10/0db0a309a868a38aca042f606b37446977c35ee4501850a8c1bf2781337d79871daf1f4344bbf5b545f2a8c62e4d4e192c8fd6f1ff49ecec7c865c55a0aefee3
+  checksum: 10/ae03c068bd351d1201a24a9667cb302c65939f45a0c357edec8b84133108e19ac74f355c2d8b0f30baadadd7f0be2db300d269aa80d3ee15872712ca9ff4e1a8
   languageName: node
   linkType: hard
 
@@ -27639,16 +27639,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"joi@npm:17.13.7":
-  version: 17.13.7
-  resolution: "joi@npm:17.13.7"
+"joi@npm:17.13.8":
+  version: 17.13.8
+  resolution: "joi@npm:17.13.8"
   dependencies:
     "@hapi/hoek": "npm:^9.3.0"
     "@hapi/topo": "npm:^5.1.0"
     "@sideway/address": "npm:^4.1.5"
     "@sideway/formula": "npm:^3.0.1"
     "@sideway/pinpoint": "npm:^2.0.0"
-  checksum: 10/fad61c93d40faa1ec3c96c600ac2f865eaa6ee7dd2a3f342c2bb8fa613463ec1e3f2b8541959e010d63a350214412ec14982e062bc90e20ea5d39426dd331b5a
+  checksum: 10/7d8ccb06cee958516748519cb46430b1bf5b732f54428a5daf8f8630290c928be1abb7d3c3c2506d68ba76d1c1abe480e087255c34b839aae47b2ee2c76f587d
   languageName: node
   linkType: hard
 
@@ -27777,6 +27777,17 @@ __metadata:
   bin:
     js-yaml: bin/js-yaml.js
   checksum: 10/05c44b9c73e4901d92703b155e76518df64bf01ac62e4c036b47de4b391e19b72e32656e8954d51b436307f08cc9d0c0d4ec617d061cf2f65fffee9f3114bee7
+  languageName: node
+  linkType: hard
+
+"js-yaml@npm:5.4.3":
+  version: 5.4.3
+  resolution: "js-yaml@npm:5.4.3"
+  dependencies:
+    argparse: "npm:^2.0.1"
+  bin:
+    js-yaml: bin/js-yaml.mjs
+  checksum: 10/2409d1238efddc29ab62ddb26d70bc7f2e8b58b84eb8d41d09d50fab86f8670aa2fec5dc6c99ef71939acab5d7c0b3526f96bdd0055042aa0136cca749b20afc
   languageName: node
   linkType: hard
 
@@ -29842,8 +29853,8 @@ __metadata:
   linkType: hard
 
 "markdown-it@npm:^14.1.0":
-  version: 14.3.0
-  resolution: "markdown-it@npm:14.3.0"
+  version: 14.3.2
+  resolution: "markdown-it@npm:14.3.2"
   dependencies:
     argparse: "npm:^2.0.1"
     entities: "npm:^4.5.0"
@@ -29853,7 +29864,7 @@ __metadata:
     uc.micro: "npm:^2.1.0"
   bin:
     markdown-it: bin/markdown-it.mjs
-  checksum: 10/16afbae804e7ea10474389918e31036c438d00bacabb340e57769a84d8a3068f37814736483a645b6ad69e138aa491c3cac83d261b630bd6d2f6af6139c5d18b
+  checksum: 10/192fc9332aee1d9d7e71c6bbdc52e43a7cf36a85213c01d64e32e8c8ea5efea2184c55e7298524007d2336b1e4282b31b722b41c4d69d90ba018676daadd4ab8
   languageName: node
   linkType: hard
 
