@@ -538,7 +538,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
         this.monitorService.updateCounter(
           "operation_gas_used",
-          parsedReceipt.gas,
+          Number(parsedReceipt.gasUsed),
           attributes,
         );
 
@@ -595,7 +595,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
         this.monitorService.updateCounter(
           "operation_gas_used",
-          parsedReceipt.gas,
+          Number(parsedReceipt.gasUsed),
           attributes,
         );
 
@@ -652,7 +652,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
         this.monitorService.updateCounter(
           "operation_gas_used",
-          parsedReceipt.gas,
+          Number(parsedReceipt.gasUsed),
           attributes,
         );
 
@@ -706,7 +706,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
         this.monitorService.updateCounter(
           "operation_gas_used",
-          parsedReceipt.gas,
+          Number(parsedReceipt.gasUsed),
           attributes,
         );
 
@@ -760,7 +760,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
         this.monitorService.updateCounter(
           "operation_gas_used",
-          parsedReceipt.gas,
+          Number(parsedReceipt.gasUsed),
           attributes,
         );
 
@@ -813,7 +813,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
         this.monitorService.updateCounter(
           "operation_gas_used",
-          parsedReceipt.gas,
+          Number(parsedReceipt.gasUsed),
           attributes,
         );
 
@@ -868,7 +868,7 @@ export class SATPBridgeExecutionLayerImpl implements SATPBridgeExecutionLayer {
 
         this.monitorService.updateCounter(
           "operation_gas_used",
-          parsedReceipt.gas,
+          Number(parsedReceipt.gasUsed),
           attributes,
         );
 
