@@ -338,11 +338,38 @@ export class WatchBlocksV1Endpoint {
       options.type,
     );
 
+    let network: Awaited<ReturnType<Gateway["getNetwork"]>> | undefined;
+    let listener: BlockListener | undefined;
+    let isCleanedUp = false;
+
+    const cleanup = () => {
+      if (isCleanedUp) {
+        return;
+      }
+      isCleanedUp = true;
+
+      if (network && listener) {
+        try {
+          network.removeBlockListener(listener);
+        } catch (removeError) {
+          log.warn("Failed to remove block listener:", removeError);
+        }
+      }
+
+      try {
+        gateway.disconnect();
+      } catch (disconnectError) {
+        log.warn("Failed to disconnect gateway:", disconnectError);
+      }
+    };
+
     try {
       Checks.truthy(options.channelName, "Missing channel name");
-      const network = await gateway.getNetwork(options.channelName);
+      network = await gateway.getNetwork(options.channelName);
 
-      const { listener, listenerType } = this.getBlockListener(options.type);
+      const blockListenerInfo = this.getBlockListener(options.type);
+      listener = blockListenerInfo.listener;
+      const listenerType = blockListenerInfo.listenerType;
 
       log.debug("Subscribing to new blocks... listenerType:", listenerType);
       // @todo Add support for checkpointer (long-term improvement)
@@ -352,14 +379,22 @@ export class WatchBlocksV1Endpoint {
         type: listenerType,
       });
 
+      if (!socket.connected) {
+        log.info(
+          "Socket disconnected before block subscription completed => clientId: %s",
+          clientId,
+        );
+        cleanup();
+        return;
+      }
+
       socket.on("disconnect", async (reason: string) => {
         log.info(
           "WebSocket:disconnect => reason=%o clientId=%s",
           reason,
           clientId,
         );
-        network.removeBlockListener(listener);
-        gateway.disconnect();
+        cleanup();
         this.close();
       });
 
@@ -374,6 +409,8 @@ export class WatchBlocksV1Endpoint {
         code: 500,
         errorMessage,
       });
+
+      cleanup();
     }
   }
 
@@ -406,6 +443,42 @@ export class WatchBlocksV1Endpoint {
       options.type,
     );
 
+    let eventService: any;
+    let eventListener: any;
+    let isCleanedUp = false;
+
+    const cleanup = () => {
+      if (isCleanedUp) {
+        return;
+      }
+      isCleanedUp = true;
+
+      if (eventListener) {
+        try {
+          eventListener.unregisterEventListener();
+        } catch (cleanupError) {
+          log.warn("Failed to unregister event listener:", cleanupError);
+        }
+      }
+      if (eventService) {
+        try {
+          eventService.close();
+        } catch (cleanupError) {
+          log.warn("Failed to close eventService:", cleanupError);
+        }
+      }
+      try {
+        channel.close();
+      } catch (cleanupError) {
+        log.warn("Failed to close channel:", cleanupError);
+      }
+      try {
+        (channel as any).client?.close();
+      } catch (cleanupError) {
+        log.warn("Failed to close channel client:", cleanupError);
+      }
+    };
+
     try {
       const { listener, listenerType } = this.getBlockListener(options.type);
       log.debug("Subscribing to new blocks... listenerType:", listenerType);
@@ -424,7 +497,7 @@ export class WatchBlocksV1Endpoint {
       }
 
       // Event Service
-      const eventService = channel.newEventService(
+      eventService = channel.newEventService(
         `SubscribeDelegatedSign_${uuidv4()}`,
       );
       eventService.setTargets(eventers);
@@ -456,7 +529,7 @@ export class WatchBlocksV1Endpoint {
         }
       };
 
-      const eventListener = eventService.registerBlockListener(eventCallback, {
+      eventListener = eventService.registerBlockListener(eventCallback, {
         startBlock: options.startBlock,
         unregister: false,
       });
@@ -473,17 +546,22 @@ export class WatchBlocksV1Endpoint {
       eventService.sign(signature);
       await eventService.send();
 
+      if (!socket.connected) {
+        log.info(
+          "Socket disconnected before delegated sign subscription completed => clientId: %s",
+          clientId,
+        );
+        cleanup();
+        return;
+      }
+
       socket.on("disconnect", async (reason: string) => {
         log.info(
           "WebSocket:disconnect => reason=%o clientId=%s",
           reason,
           clientId,
         );
-
-        eventListener.unregisterEventListener();
-        eventService.close();
-        channel.close();
-        channel.client.close();
+        cleanup();
         this.close();
       });
 
@@ -498,6 +576,8 @@ export class WatchBlocksV1Endpoint {
         code: 500,
         errorMessage,
       });
+
+      cleanup();
     }
   }
 
