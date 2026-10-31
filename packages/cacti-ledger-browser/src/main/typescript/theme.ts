@@ -55,7 +55,7 @@ export const themeOptions: ThemeOptions = {
     divider: "#dfe5e3", // --cacti-ink-100
   },
   typography: {
-    fontFamily: 'system-ui, -apple-system, sans-serif',
+    fontFamily: "system-ui, -apple-system, sans-serif",
     h1: {
       fontFamily: '"Barlow", Arial, sans-serif',
       fontWeight: 700,

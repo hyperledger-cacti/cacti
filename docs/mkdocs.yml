@@ -9,16 +9,22 @@ theme:
   favicon: images/HL_Cacti_Logo_Colorreverse.svg
   icon:
     repo: fontawesome/brands/github
+  # Cacti design system: system font stack for body text, Barlow for
+  # headings (loaded in overrides/main.html). See design-system.md.
+  font: false
+  # Light is the default scheme; dark is opt-in through the toggle.
   palette:
     # Palette toggle for light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
+    - scheme: default
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     # Palette toggle for dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
+    - scheme: slate
+      primary: custom
+      accent: custom
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -80,6 +86,9 @@ plugins:
   - mike
 hooks:
   - hooks/copy_satp_typedoc.py
+extra_css:
+  - stylesheets/cacti-tokens.css
+  - stylesheets/cacti-mkdocs.css
 extra:
   analytics:
     provider: google
@@ -262,6 +271,9 @@ nav:
         - cacti-plugin-ledger-connector-stellar:
           - README: cactus/packages/cacti-plugin-ledger-connector-stellar.md
           - OAPI spec: cactus/packages/cacti-plugin-ledger-connector-stellar/oapi.md
+        - cacti-plugin-ledger-connector-canton:
+          - README: cactus/packages/cacti-plugin-ledger-connector-canton.md
+          - OAPI spec: cactus/packages/cacti-plugin-ledger-connector-canton/oapi.md
         - cactus-plugin-keychain-memory:
           - README: cactus/packages/cactus-plugin-keychain-memory.md
           - OAPI spec: cactus/packages/cactus-plugin-keychain-memory/oapi.md
@@ -316,6 +328,7 @@ nav:
     - Project Best Practices: references/best-practices.md
     - GitHub Contributions: references/github.md
     - OpenAPI Specs: references/openapi/index.md
+    - Design System: design-system.md
     - Glossary: glossary.md
   - Contribute:
     - How to Contribute: contributing/how-to-contribute.md

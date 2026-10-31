@@ -33,15 +33,18 @@ export function useSatpOptions(): SatpAppOptions {
   const context = useOutletContext<SatpAppOptions | undefined>();
   const gatewayCtx = useSatpGatewayContextSafe();
   const fallbacks = getLedgerBrowserConfig();
+  const counterpartyGatewayUrl =
+    gatewayCtx?.counterpartyGatewayUrl || context?.counterpartyGatewayUrl;
+  const configuredGateways = gatewayCtx?.gateways;
+
   return {
     gatewayUrl:
       gatewayCtx?.activeGatewayUrl ||
       context?.gatewayUrl ||
       fallbacks.satpGatewayUrl ||
       DEFAULT_SATP_GATEWAY_URL,
-    counterpartyGatewayUrl:
-      gatewayCtx?.counterpartyGatewayUrl || context?.counterpartyGatewayUrl,
-    configuredGateways: gatewayCtx?.gateways,
+    ...(counterpartyGatewayUrl !== undefined ? { counterpartyGatewayUrl } : {}),
+    ...(configuredGateways !== undefined ? { configuredGateways } : {}),
     prometheusUrl: context?.prometheusUrl || fallbacks.satpPrometheusUrl,
   };
 }
