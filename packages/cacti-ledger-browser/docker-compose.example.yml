@@ -1,0 +1,69 @@
+# Example production-style stack for the Cacti Ledger Browser + a SATP
+# Hermes gateway (+ optional Grafana OTel-LGTM observability backend).
+#
+# Usage:
+#   1. Create the browser's runtime configuration:
+#        cp public/config.example.js config.js
+#      and uncomment (host-side URLs - the app runs in the USER'S browser,
+#      not inside the compose network, so it reaches the gateway through
+#      the published host ports, not the service names):
+#        satpGatewayUrl: "http://localhost:3012"
+#        satpPrometheusUrl: "http://localhost:9090"
+#   2. Build the gateway's docker context first (its Dockerfile packages
+#      the plugin's ./dist/bundle/ncc - see the README of
+#      packages/cactus-plugin-satp-hermes, section "Build the image").
+#   3. docker compose -f docker-compose.example.yml up
+#      The browser is then at http://localhost:4173/ .
+#
+# Mirrors packages/cactus-plugin-satp-hermes/docker-compose-satp.yml for
+# the gateway/LGTM services (image build, env, ports).
+
+services:
+  ledger-browser:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    # Once published, prefer the registry image instead of a local build:
+    # image: ghcr.io/hyperledger-cacti/cacti-ledger-browser:<tag>
+    ports:
+      - "4173:8080"
+    volumes:
+      # Runtime configuration mounted over the image's default no-op
+      # /config.js - retarget environments by editing ./config.js, no
+      # rebuild of browser or image needed.
+      - ./config.js:/usr/share/nginx/html/config.js:ro
+    depends_on:
+      - satp-hermes-gateway
+
+  satp-hermes-gateway:
+    # Local build mirrors packages/cactus-plugin-satp-hermes/docker-compose-satp.yml
+    # (prerequisite: the plugin's dist/bundle/ncc, see its README). When a
+    # registry image is available, prefer it instead:
+    #   image: ghcr.io/hyperledger-cacti/satp-hermes-gateway:<tag>
+    build:
+      context: ../cactus-plugin-satp-hermes
+      dockerfile: satp-hermes-gateway.Dockerfile
+    environment:
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-lgtm:4318
+    ports:
+      - 3010:3010/tcp # SERVER_PORT
+      - 3011:3011/tcp # CLIENT_PORT
+      - 3012:4010/tcp # API_PORT (OAPI on 4010 in-container)
+    depends_on:
+      - otel-lgtm
+
+  # Optional: Grafana + Prometheus + Loki + Tempo all-in-one.
+  # https://grafana.com/blog/2024/03/13/an-opentelemetry-backend-in-a-docker-image-introducing-grafana/otel-lgtm/
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    environment:
+      OTEL_METRIC_EXPORT_INTERVAL: "1000"
+      OTEL_EXPORTER_OTLP_METRICS_DEFAULT_HISTOGRAM_AGGREGATION: explicit_bucket_histogram
+    ports:
+      - "3000:3000" # Grafana
+      - "4317:4317" # OpenTelemetry gRPC endpoint
+      - "4318:4318" # OpenTelemetry HTTP endpoint
+      - "9090:9090" # Prometheus (browser Overview fallback URL)
+      - "3100:3100" # Loki
+      - "3200:3200" # Tempo

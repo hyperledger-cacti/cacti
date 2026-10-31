@@ -1,0 +1,100 @@
+/* ==========================================================================
+   Hyperledger Cacti Design System: tokens
+   --------------------------------------------------------------------------
+   Framework-agnostic design tokens (color, type, spacing, radius, shadow).
+   This file holds no component styles, so any Cacti UI can load it: the MkDocs
+   site, TypeDoc output, demo apps. MkDocs-specific mappings live in
+   cacti-mkdocs.css.
+
+   Rule: components consume the semantic tokens (--primary, --surface, ...),
+   never the raw brand ramps or literal values. See docs/docs/design-system.md.
+   ========================================================================== */
+
+:root {
+  /* Color: brand ramps */
+  --cacti-green-100: #e6f2e7;
+  --cacti-green-300: #b9d96b;
+  --cacti-green-500: #7fbf8a;
+  --cacti-green-700: #4e8c5e;
+  --cacti-green-900: #2c5238;
+
+  --cacti-bloom-300: #f7c395;
+  --cacti-bloom-500: #ef9a4f;
+  --cacti-bloom-700: #c2762f;
+
+  /* Color: neutrals */
+  --cacti-ink-900: #101314;
+  --cacti-ink-700: #1c2224;
+  --cacti-ink-500: #3b4548;
+  --cacti-ink-300: #8d9a9d;
+  --cacti-ink-100: #dfe5e3;
+  --cacti-paper: #f7f9f6;
+
+  /* Color: semantic (light) */
+  --background: var(--cacti-paper);
+  --foreground: var(--cacti-ink-900);
+  --surface: #ffffff;
+  --surface-muted: var(--cacti-green-100);
+  --border: var(--cacti-ink-100);
+  --primary: var(--cacti-green-700);
+  --primary-foreground: #ffffff;
+  --accent: var(--cacti-bloom-500);
+  --accent-foreground: var(--cacti-ink-900);
+  --muted-foreground: var(--cacti-ink-500);
+  --success: var(--cacti-green-700);
+  --warning: var(--cacti-bloom-700);
+  --danger: #c04a3d;
+  --focus-ring: var(--cacti-green-500);
+
+  /* Typography */
+  --font-display: "Barlow", "Helvetica Neue", Arial, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --text-display: 3.5rem;
+  --text-h1: 2.5rem;
+  --text-h2: 1.875rem;
+  --text-h3: 1.375rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-caption: 0.75rem;
+
+  /* Spacing (8pt rhythm) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 64px;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-sm: 0 1px 2px rgba(16, 19, 20, 0.08);
+  --shadow-md: 0 4px 16px rgba(16, 19, 20, 0.1);
+  --shadow-lg: 0 16px 40px rgba(16, 19, 20, 0.16);
+}
+
+/* --------------------------------------------------------------------------
+   Dark theme: re-maps the semantic tokens only.
+   .cacti-dark / data-theme="dark" are the generic hooks. MkDocs Material
+   marks its dark palette with data-md-color-scheme="slate" on <body>.
+   -------------------------------------------------------------------------- */
+.cacti-dark,
+:root[data-theme="dark"],
+[data-md-color-scheme="slate"] {
+  --background: var(--cacti-ink-900);
+  --foreground: var(--cacti-paper);
+  --surface: var(--cacti-ink-700);
+  --surface-muted: #232b2d;
+  --border: #303a3c;
+  --primary: var(--cacti-green-500);
+  --primary-foreground: var(--cacti-ink-900);
+  --muted-foreground: var(--cacti-ink-300);
+  --accent-foreground: var(--cacti-ink-900);
+}

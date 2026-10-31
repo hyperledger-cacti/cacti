@@ -14,436 +14,161 @@
 
 
 import type { Configuration } from './configuration';
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from './common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction, replaceWithSerializableTypeIfNeeded } from './common';
 import type { RequestArgs } from './base';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError } from './base';
+import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerMap } from './base';
 
-/**
- * 
- * @export
- * @interface ActiveContract
- */
 export interface ActiveContract {
-    /**
-     * 
-     * @type {string}
-     * @memberof ActiveContract
-     */
     'contractId': string;
     /**
      * The template ID as reported by the ledger, using the package ID (`<package-id>:Module:Template`).
-     * @type {string}
-     * @memberof ActiveContract
      */
     'templateId': string;
     /**
      * A Daml record encoded as a JSON object of field names to Daml values.
-     * @type {{ [key: string]: any; }}
-     * @memberof ActiveContract
      */
     'createArgument': { [key: string]: any; };
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ActiveContract
-     */
     'witnessParties': Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ActiveContract
-     */
     'signatories': Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ActiveContract
-     */
     'observers'?: Array<string>;
-    /**
-     * 
-     * @type {string}
-     * @memberof ActiveContract
-     */
     'createdAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof ActiveContract
-     */
     'synchronizerId': string;
     /**
      * Interface views, present when the query used interfaceIds.
-     * @type {Array<ActiveContractInterfaceView>}
-     * @memberof ActiveContract
      */
     'interfaceViews'?: Array<ActiveContractInterfaceView>;
 }
 /**
  * The view of an active contract through one of the queried interfaces.
- * @export
- * @interface ActiveContractInterfaceView
  */
 export interface ActiveContractInterfaceView {
-    /**
-     * 
-     * @type {string}
-     * @memberof ActiveContractInterfaceView
-     */
     'interfaceId': string;
-    /**
-     * 
-     * @type {ActiveContractInterfaceViewViewStatus}
-     * @memberof ActiveContractInterfaceView
-     */
     'viewStatus': ActiveContractInterfaceViewViewStatus;
     /**
-     * A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type.
-     * @type {any}
-     * @memberof ActiveContractInterfaceView
+     * The computed interface view, present when the view status code is 0.
      */
     'viewValue'?: any;
 }
 /**
  * gRPC status of the view computation. Code 0 means the view was computed.
- * @export
- * @interface ActiveContractInterfaceViewViewStatus
  */
 export interface ActiveContractInterfaceViewViewStatus {
-    /**
-     * 
-     * @type {number}
-     * @memberof ActiveContractInterfaceViewViewStatus
-     */
     'code': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof ActiveContractInterfaceViewViewStatus
-     */
     'message': string;
 }
 /**
  * @type BadRequestResponse
  * A connector validation error, or the OpenAPI validator\'s list of request errors.
- * @export
  */
 export type BadRequestResponse = Array<RequestValidationError> | ErrorResponse;
 
 /**
  * @type CantonCommand
- * @export
  */
 export type CantonCommand = CantonCreateAndExerciseCommand | CantonCreateCommand | CantonExerciseCommand;
 
-/**
- * 
- * @export
- * @interface CantonCreateAndExerciseCommand
- */
 export interface CantonCreateAndExerciseCommand {
-    /**
-     * 
-     * @type {CantonCreateAndExerciseCommandCreateAndExerciseCommand}
-     * @memberof CantonCreateAndExerciseCommand
-     */
     'CreateAndExerciseCommand': CantonCreateAndExerciseCommandCreateAndExerciseCommand;
 }
-/**
- * 
- * @export
- * @interface CantonCreateAndExerciseCommandCreateAndExerciseCommand
- */
 export interface CantonCreateAndExerciseCommandCreateAndExerciseCommand {
-    /**
-     * 
-     * @type {string}
-     * @memberof CantonCreateAndExerciseCommandCreateAndExerciseCommand
-     */
     'templateId': string;
     /**
      * A Daml record encoded as a JSON object of field names to Daml values.
-     * @type {{ [key: string]: any; }}
-     * @memberof CantonCreateAndExerciseCommandCreateAndExerciseCommand
      */
     'createArguments': { [key: string]: any; };
-    /**
-     * 
-     * @type {string}
-     * @memberof CantonCreateAndExerciseCommandCreateAndExerciseCommand
-     */
     'choice': string;
     /**
      * A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type.
-     * @type {any}
-     * @memberof CantonCreateAndExerciseCommandCreateAndExerciseCommand
      */
     'choiceArgument': any;
 }
-/**
- * 
- * @export
- * @interface CantonCreateCommand
- */
 export interface CantonCreateCommand {
-    /**
-     * 
-     * @type {CantonCreateCommandCreateCommand}
-     * @memberof CantonCreateCommand
-     */
     'CreateCommand': CantonCreateCommandCreateCommand;
 }
-/**
- * 
- * @export
- * @interface CantonCreateCommandCreateCommand
- */
 export interface CantonCreateCommandCreateCommand {
-    /**
-     * 
-     * @type {string}
-     * @memberof CantonCreateCommandCreateCommand
-     */
     'templateId': string;
     /**
      * A Daml record encoded as a JSON object of field names to Daml values.
-     * @type {{ [key: string]: any; }}
-     * @memberof CantonCreateCommandCreateCommand
      */
     'createArguments': { [key: string]: any; };
 }
-/**
- * 
- * @export
- * @interface CantonExerciseCommand
- */
 export interface CantonExerciseCommand {
-    /**
-     * 
-     * @type {CantonExerciseCommandExerciseCommand}
-     * @memberof CantonExerciseCommand
-     */
     'ExerciseCommand': CantonExerciseCommandExerciseCommand;
 }
-/**
- * 
- * @export
- * @interface CantonExerciseCommandExerciseCommand
- */
 export interface CantonExerciseCommandExerciseCommand {
-    /**
-     * 
-     * @type {string}
-     * @memberof CantonExerciseCommandExerciseCommand
-     */
     'templateId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CantonExerciseCommandExerciseCommand
-     */
     'contractId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CantonExerciseCommandExerciseCommand
-     */
     'choice': string;
     /**
      * A Daml-LF value in the Canton JSON Ledger API encoding: any JSON value, including null for an empty Optional. Nested values are validated by the connector (finite, acyclic JSON, at most 64 nesting levels and 1 MiB per transaction) and by the ledger against the Daml type.
-     * @type {any}
-     * @memberof CantonExerciseCommandExerciseCommand
      */
     'choiceArgument': any;
 }
-/**
- * 
- * @export
- * @interface ErrorResponse
- */
 export interface ErrorResponse {
     [key: string]: any;
 
-    /**
-     * 
-     * @type {string}
-     * @memberof ErrorResponse
-     */
     'message': string;
     /**
      * Canton\'s error code, for example DUPLICATE_COMMAND, when the ledger rejected the request.
-     * @type {string}
-     * @memberof ErrorResponse
      */
     'cantonErrorCode'?: string;
 }
-/**
- * 
- * @export
- * @interface GetActiveContractsRequest
- */
 export interface GetActiveContractsRequest {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof GetActiveContractsRequest
-     */
     'parties': Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof GetActiveContractsRequest
-     */
     'templateIds'?: Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof GetActiveContractsRequest
-     */
     'interfaceIds'?: Array<string>;
-    /**
-     * 
-     * @type {number}
-     * @memberof GetActiveContractsRequest
-     */
     'offset'?: number;
     /**
      * Maximum number of entries to return. The connector rejects values above its configured maxActiveContractLimit (default 200, Canton\'s default http-list-max-elements-limit).
-     * @type {number}
-     * @memberof GetActiveContractsRequest
      */
     'limit'?: number;
 }
-/**
- * 
- * @export
- * @interface GetActiveContractsResponse
- */
 export interface GetActiveContractsResponse {
-    /**
-     * 
-     * @type {Array<ActiveContract>}
-     * @memberof GetActiveContractsResponse
-     */
     'contracts': Array<ActiveContract>;
     /**
      * The ledger offset of the snapshot. Continue from it with the ledger\'s update stream.
-     * @type {number}
-     * @memberof GetActiveContractsResponse
      */
     'activeAtOffset': number;
     /**
      * True when the ledger returned `limit` entries, so more active contracts may match.
-     * @type {boolean}
-     * @memberof GetActiveContractsResponse
      */
     'limitReached': boolean;
 }
-/**
- * 
- * @export
- * @interface ListPartiesResponse
- */
 export interface ListPartiesResponse {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof ListPartiesResponse
-     */
     'parties': Array<string>;
 }
-/**
- * 
- * @export
- * @interface RequestValidationError
- */
 export interface RequestValidationError {
     [key: string]: any;
 
-    /**
-     * 
-     * @type {string}
-     * @memberof RequestValidationError
-     */
     'path'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RequestValidationError
-     */
     'message': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RequestValidationError
-     */
     'errorCode'?: string;
 }
-/**
- * 
- * @export
- * @interface RunTransactionRequest
- */
 export interface RunTransactionRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof RunTransactionRequest
-     */
     'partyId': string;
     /**
      * The serialized command payload is limited to 1 MiB and 64 nesting levels by the connector.
-     * @type {Array<CantonCommand>}
-     * @memberof RunTransactionRequest
      */
     'commands': Array<CantonCommand>;
     /**
      * Caller-chosen, stable identifier for this submission. Reuse the same value when retrying a submission whose outcome is unknown (for example after HTTP 504) so that Canton command deduplication rejects a duplicate instead of committing it twice.
-     * @type {string}
-     * @memberof RunTransactionRequest
      */
     'commandId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RunTransactionRequest
-     */
     'synchronizerId'?: string;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof RunTransactionRequest
-     */
     'readAs'?: Array<string>;
 }
-/**
- * 
- * @export
- * @interface RunTransactionResponse
- */
 export interface RunTransactionResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof RunTransactionResponse
-     */
     'updateId': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof RunTransactionResponse
-     */
     'completionOffset': number;
 }
 
 /**
  * DefaultApi - axios parameter creator
- * @export
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
@@ -454,7 +179,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getActiveContractsV1: async (getActiveContractsRequest: GetActiveContractsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getActiveContractsV1: async (getActiveContractsRequest: GetActiveContractsRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'getActiveContractsRequest' is not null or undefined
             assertParamExists('getActiveContractsV1', 'getActiveContractsRequest', getActiveContractsRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts`;
@@ -473,9 +198,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -493,7 +217,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOpenApiSpecV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getOpenApiSpecV1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -506,8 +230,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -523,7 +247,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPartiesV1: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPartiesV1: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -540,8 +264,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
+            localVarHeaderParameter['Accept'] = 'application/json';
 
-    
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
@@ -558,7 +282,7 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTransactionV1: async (runTransactionRequest: RunTransactionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        runTransactionV1: async (runTransactionRequest: RunTransactionRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'runTransactionRequest' is not null or undefined
             assertParamExists('runTransactionV1', 'runTransactionRequest', runTransactionRequest)
             const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction`;
@@ -577,9 +301,8 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
 
-
-    
             localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
 
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -596,7 +319,6 @@ export const DefaultApiAxiosParamCreator = function (configuration?: Configurati
 
 /**
  * DefaultApi - functional programming interface
- * @export
  */
 export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
@@ -608,9 +330,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getActiveContractsV1(getActiveContractsRequest: GetActiveContractsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetActiveContractsResponse>> {
+        async getActiveContractsV1(getActiveContractsRequest: GetActiveContractsRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetActiveContractsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getActiveContractsV1(getActiveContractsRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getActiveContractsV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -618,9 +342,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getOpenApiSpecV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
+        async getOpenApiSpecV1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<{ [key: string]: any; }>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getOpenApiSpecV1(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.getOpenApiSpecV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -628,9 +354,11 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listPartiesV1(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListPartiesResponse>> {
+        async listPartiesV1(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListPartiesResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listPartiesV1(options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.listPartiesV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
          * 
@@ -639,16 +367,17 @@ export const DefaultApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
+        async runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<RunTransactionResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.runTransactionV1(runTransactionRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.runTransactionV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
 };
 
 /**
  * DefaultApi - factory interface
- * @export
  */
 export const DefaultApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = DefaultApiFp(configuration)
@@ -660,7 +389,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getActiveContractsV1(getActiveContractsRequest: GetActiveContractsRequest, options?: any): AxiosPromise<GetActiveContractsResponse> {
+        getActiveContractsV1(getActiveContractsRequest: GetActiveContractsRequest, options?: RawAxiosRequestConfig): AxiosPromise<GetActiveContractsResponse> {
             return localVarFp.getActiveContractsV1(getActiveContractsRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -669,7 +398,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getOpenApiSpecV1(options?: any): AxiosPromise<{ [key: string]: any; }> {
+        getOpenApiSpecV1(options?: RawAxiosRequestConfig): AxiosPromise<{ [key: string]: any; }> {
             return localVarFp.getOpenApiSpecV1(options).then((request) => request(axios, basePath));
         },
         /**
@@ -678,7 +407,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPartiesV1(options?: any): AxiosPromise<ListPartiesResponse> {
+        listPartiesV1(options?: RawAxiosRequestConfig): AxiosPromise<ListPartiesResponse> {
             return localVarFp.listPartiesV1(options).then((request) => request(axios, basePath));
         },
         /**
@@ -688,7 +417,7 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: any): AxiosPromise<RunTransactionResponse> {
+        runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: RawAxiosRequestConfig): AxiosPromise<RunTransactionResponse> {
             return localVarFp.runTransactionV1(runTransactionRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -696,9 +425,6 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
 
 /**
  * DefaultApi - object-oriented interface
- * @export
- * @class DefaultApi
- * @extends {BaseAPI}
  */
 export class DefaultApi extends BaseAPI {
     /**
@@ -707,9 +433,8 @@ export class DefaultApi extends BaseAPI {
      * @param {GetActiveContractsRequest} getActiveContractsRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public getActiveContractsV1(getActiveContractsRequest: GetActiveContractsRequest, options?: AxiosRequestConfig) {
+    public getActiveContractsV1(getActiveContractsRequest: GetActiveContractsRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getActiveContractsV1(getActiveContractsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -718,9 +443,8 @@ export class DefaultApi extends BaseAPI {
      * @summary Returns the connector OpenAPI specification.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public getOpenApiSpecV1(options?: AxiosRequestConfig) {
+    public getOpenApiSpecV1(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).getOpenApiSpecV1(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -729,9 +453,8 @@ export class DefaultApi extends BaseAPI {
      * @summary Lists Canton parties available to the authenticated user.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public listPartiesV1(options?: AxiosRequestConfig) {
+    public listPartiesV1(options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).listPartiesV1(options).then((request) => request(this.axios, this.basePath));
     }
 
@@ -741,11 +464,11 @@ export class DefaultApi extends BaseAPI {
      * @param {RunTransactionRequest} runTransactionRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof DefaultApi
      */
-    public runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: AxiosRequestConfig) {
+    public runTransactionV1(runTransactionRequest: RunTransactionRequest, options?: RawAxiosRequestConfig) {
         return DefaultApiFp(this.configuration).runTransactionV1(runTransactionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
+
 
 
