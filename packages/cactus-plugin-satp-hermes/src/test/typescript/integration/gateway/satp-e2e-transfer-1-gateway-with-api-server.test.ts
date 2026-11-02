@@ -617,7 +617,9 @@ describe("SATPGateway sending a token from Fabric to Besu", () => {
 describe("SATPGateway sending a token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
-    await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
+    // NOTE: the owner account already holds exactly 100 fungible tokens
+    // seeded by the preceding Fabric -> Besu transfer test, which this test
+    // consumes.
 
     //setup satp gateway
     const factoryOptions: IPluginFactoryOptions = {

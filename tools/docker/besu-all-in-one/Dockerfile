@@ -1,4 +1,4 @@
-FROM hyperledger/besu:25.4.0
+FROM hyperledger/besu:25.4.0@sha256:f18ee51c5f343c3e2755274238e55668b2b78bc6cba90c1a613f811c296c83bc
 
 LABEL org.opencontainers.image.source="https://github.com/hyperledger-cacti/cacti"
 LABEL org.opencontainers.image.description="Hyperledger Besu development ledger for Cacti integration testing."

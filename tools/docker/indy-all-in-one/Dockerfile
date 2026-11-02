@@ -3,7 +3,7 @@
 # Changes marked with `EDIT`
 
 # EDIT - use stable indy release
-FROM ghcr.io/hyperledger/indy-node-container/indy_node:1.12.6-ubuntu18-main
+FROM ghcr.io/hyperledger/indy-node-container/indy_node:1.12.6-ubuntu18-main@sha256:937f3bd564b89a99ae71b45c0e00fa0d8826368698d329fea1d0484ea4c711c9
 RUN pip3 install "supervisor~=4.2"
 
 # EDIT - change UID to simplify host dir mount

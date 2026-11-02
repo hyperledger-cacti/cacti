@@ -35,18 +35,33 @@ const httpModule = isSecureHttp ? https : http;
 
 const url = `${protocol}://${host}:${port}${thePath}`;
 
+function sanitizeForLog(value) {
+  // eslint-disable-next-line no-control-regex
+  return String(value).replace(/[\u0000-\u001f\u007f]/g, "");
+}
+
 httpModule
   .get(url, (res) => {
     const { statusCode, statusMessage } = res;
     const exitCode = statusCode >= 200 && statusCode <= 300 ? 0 : 1;
     if (exitCode === 0) {
-      console.log("%s Healthcheck OK: ", url, statusCode, statusMessage);
+      console.log(
+        "%s Healthcheck OK: ",
+        sanitizeForLog(url),
+        statusCode,
+        statusMessage,
+      );
     } else {
-      console.error("%s Healthcheck FAIL_1: ", url, statusCode, statusMessage);
+      console.error(
+        "%s Healthcheck FAIL_1: ",
+        sanitizeForLog(url),
+        statusCode,
+        statusMessage,
+      );
     }
     process.exit(exitCode);
   })
-  .on("error", (ex) => {
-    console.error("%s Healthcheck FAIL_2: ", url, ex);
+  .on("error", () => {
+    console.error("%s Healthcheck FAIL_2: ", sanitizeForLog(url));
     process.exit(1);
   });

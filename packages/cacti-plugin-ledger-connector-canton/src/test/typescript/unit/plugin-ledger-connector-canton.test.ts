@@ -229,7 +229,7 @@ describe("Canton connector: lifecycle", () => {
     const connector = createConnector({ create: jest.fn() });
 
     await expect(connector.getConsensusAlgorithmFamily()).resolves.toBe(
-      ConsensusAlgorithmFamily.Authority,
+      ConsensusAlgorithmFamily.OrgHyperledgerCactusConsensusalgorithmProofOfAuthority,
     );
     await expect(connector.hasTransactionFinality()).resolves.toBe(true);
   });

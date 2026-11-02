@@ -101,7 +101,7 @@ jobs:
             node-version: ${{ inputs.node_version }}
         - name: npm_install_@devcontainers/cli@0.44.0
           if: contains(steps.changed.outputs.files, '.devcontainer/') || contains(steps.changed.outputs.files, '.github/workflows/ghcr-workflow.yaml')
-          run: npm install -g @devcontainers/cli@0.44.0
+          run: npm install -g @devcontainers/cli@0.44.0 # not hash-pinned: npm install is version-pinned; accepted risk (see docs/internal/plans/002-2026-11-01-security-alerts-remediation.md)
         - name: npx_yes_devcontainers_cli_build
           if: contains(steps.changed.outputs.files, '.devcontainer/') || contains(steps.changed.outputs.files, '.github/workflows/ghcr-workflow.yaml')
           run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"

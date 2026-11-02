@@ -36,7 +36,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 #v7.0.1
 
       - name: npm_install_@devcontainers/cli@0.44.0
-        run: npm install -g @devcontainers/cli@0.44.0
+        run: npm install -g @devcontainers/cli@0.44.0 # not hash-pinned: npm install is version-pinned; accepted risk (see docs/internal/plans/002-2026-11-01-security-alerts-remediation.md)
 
       - name: npx_yes_devcontainers_cli_build
         run: npx --yes @devcontainers/cli@0.44.0 build --workspace-folder="./" --log-level=trace --push=false --config="./.devcontainer/devcontainer.json" --image-name="$IMAGE_NAME"

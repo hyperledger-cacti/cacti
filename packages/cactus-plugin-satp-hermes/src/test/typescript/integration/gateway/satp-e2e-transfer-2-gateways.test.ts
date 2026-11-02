@@ -656,11 +656,9 @@ describe("2 SATPGateways sending a token from Fabric to Besu", () => {
 describe("2 SATPGateways sending a token from Besu to Ethereum", () => {
   jest.setTimeout(TIMEOUT);
   it("should realize a transfer", async () => {
-    // Seed the owner account with fungible tokens to lock. Without this
-    // mint the lockAsset call on the bridge wrapper reverts with
-    // "Token Lock Failed" because deployAndSetupContracts does not seed
-    // any initial balance (only deploys + configures interactions).
-    await besuEnv.mintTokens("100", TokenTypeMain.NONSTANDARD_FUNGIBLE);
+    // NOTE: the owner account already holds exactly 100 fungible tokens
+    // seeded by the preceding Fabric -> Besu transfer test, which this test
+    // consumes.
 
     //setup satp gateway
     const [

@@ -21,6 +21,58 @@ export function assertFabricFunctionIsAvailable(
 }
 
 /**
+ * Matches any character that must not appear in a single file system path
+ * segment derived from a request: path separators (which would escape into
+ * other directories) plus null bytes and control characters.
+ */
+// eslint-disable-next-line no-control-regex
+export const UNSAFE_PATH_SEGMENT_CHARS = /[/\\\u0000-\u001f\u007f]/;
+
+/**
+ * Validates a single file or directory name that arrived as part of a
+ * DeployContractV1 request before it gets joined onto one of the temporary
+ * directories created by this plugin. A value such as "." or "..", or one
+ * containing a path separator, would otherwise let the caller place files
+ * outside of the temporary directory that the connector owns (path traversal
+ * on the certificate / chaincode file writes in deployContract()).
+ *
+ * @param segment The untrusted path segment to validate.
+ * @param fnTag Used to prefix the error message.
+ * @returns The very same segment, when it is safe to join.
+ */
+export function assertSafePathSegment(segment: string, fnTag: string): string {
+  if (
+    !segment ||
+    segment === "." ||
+    segment === ".." ||
+    UNSAFE_PATH_SEGMENT_CHARS.test(segment)
+  ) {
+    throw new Error(
+      `${fnTag} refusing unsafe path segment: ${JSON.stringify(segment)}`,
+    );
+  }
+  return segment;
+}
+
+/**
+ * Splits a caller-supplied relative directory path (the `filepath` field of
+ * the files in a DeployContractV1 request) into segments that are each
+ * validated by {@link assertSafePathSegment}. Blank and "." components (as
+ * produced by leading "./" or repeated slashes) are dropped so that the
+ * result can only ever describe directories inside the temporary directory
+ * it is joined onto.
+ */
+export function splitSafeRelativePath(
+  relativePath: string,
+  fnTag: string,
+): string[] {
+  return relativePath
+    .split("/")
+    .filter((segment) => segment.length > 0 && segment !== ".")
+    .map((segment) => assertSafePathSegment(segment, fnTag));
+}
+
+/**
  * Convert input bytes into Buffer. Handle cases where input is undefined or null.
  *
  * @note method comes from Fabric Node SDK.
