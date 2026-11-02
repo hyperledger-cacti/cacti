@@ -1,4 +1,4 @@
-FROM gradle:8.12.1-jdk17-jammy as builder
+FROM gradle:8.12.1-jdk17-jammy@sha256:3a461c8edccfe65557d583903709a9ce0c8395bf48aa996a5e0489c6f5530975 as builder
 
 WORKDIR /
 COPY ./kotlin/gen/kotlin-spring /kotlin-spring/
@@ -8,7 +8,7 @@ WORKDIR /kotlin-spring/
 RUN gradle clean build
 WORKDIR /
 
-FROM openjdk:26-ea-slim-bookworm
+FROM openjdk:26-ea-slim-bookworm@sha256:afe905e46f48c166c287b9cab37b487653fb4a77049a71dc5df43fbe736f7c45
 LABEL org.opencontainers.image.description="Corda connector server for Hyperledger Cacti, exposing REST APIs for interacting with Corda nodes."
 
 ARG APP=/usr/src/app

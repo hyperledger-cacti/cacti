@@ -1,4 +1,4 @@
-FROM docker:24.0.5-dind
+FROM docker:24.0.5-dind@sha256:3c6e4dca7a63c9a32a4e00da40461ce067f255987ccc9721cf18ffa087bcd1ef
 LABEL org.opencontainers.image.description="Hyperledger Sawtooth development network for Cacti integration testing."
 
 ENV APP_ROOT="/app"

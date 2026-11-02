@@ -1,4 +1,4 @@
-FROM ethereum/client-go:v1.12.0
+FROM ethereum/client-go:v1.12.0@sha256:c601019e4426e1320d59631c0d55005c64da641455da97a0b79f89b617707685
 LABEL org.opencontainers.image.description="Go Ethereum development ledger with test accounts for Cacti integration testing."
 
 # Init

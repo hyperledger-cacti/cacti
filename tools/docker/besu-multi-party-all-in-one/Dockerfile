@@ -3,7 +3,7 @@
 # Setup quorum-dev-quickstart
 ################################
 
-FROM node:18.17.0 AS quorum-dev-quickstart-setup
+FROM node:18.17.0@sha256:c85dc4392f44f5de1d0d72dd20a088a542734445f99bed7aa8ac895c706d370d AS quorum-dev-quickstart-setup
 
 ENV QUORUM_QUICKSTART_VERSION=0.1.5
 ENV ROOT_DIR=/opt/quorum-dev-quickstart
@@ -17,7 +17,7 @@ RUN quorum-dev-quickstart --clientType besu --outputPath ./ --monitoring default
 # docker compose base
 ################################
 
-FROM docker:24.0.5-dind
+FROM docker:24.0.5-dind@sha256:3c6e4dca7a63c9a32a4e00da40461ce067f255987ccc9721cf18ffa087bcd1ef
 
 ENV ROOT_DIR=/opt/quorum-dev-quickstart
 

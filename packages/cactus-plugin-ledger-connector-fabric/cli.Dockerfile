@@ -1,5 +1,5 @@
 # ========= BUILDER =========
-ARG BASE_IMAGE=debian:bullseye-slim
+ARG BASE_IMAGE=debian:bullseye-slim@sha256:e5b6442dd2e9684cf5e87d8338b5968f3b348636fc0be6d7850a381e3731a2bd
 FROM --platform=$BUILDPLATFORM ${BASE_IMAGE} AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -50,7 +50,7 @@ RUN curl -sSLO https://raw.githubusercontent.com/hyperledger/fabric/main/scripts
 WORKDIR /chaincode
 
 # ========= RUNTIME =========
-FROM debian:bullseye-slim
+FROM debian:bullseye-slim@sha256:e5b6442dd2e9684cf5e87d8338b5968f3b348636fc0be6d7850a381e3731a2bd
 LABEL org.opencontainers.image.description="Hyperledger Fabric CLI and chaincode development tools for the Cacti Fabric connector."
 
 ARG DEBIAN_FRONTEND=noninteractive

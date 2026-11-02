@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.04@sha256:076e7bf82319619f28dd0aa9c02ab34b055ad37100395b4f49a2ffba04fb5e11
 
 LABEL org.opencontainers.image.source = "https://github.com/hyperledger/cacti"
 LABEL org.opencontainers.image.description="DAML development ledger with sample contracts and a JSON API for Cacti integration testing."
