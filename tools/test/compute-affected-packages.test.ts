@@ -9,7 +9,6 @@ SPDX-License-Identifier: Apache-2.0
 function mockPackages(fs: typeof FS): void {
   fs.readdirSync = jest.fn((dir: string) => {
     if (dir === "packages") return ["pkg-a", "pkg-b"];
-    if (dir === "examples") return ["example-a"];
     if (dir === "extensions") return ["ext-a"];
     return [];
   }) as unknown as typeof fs.readdirSync;
@@ -32,13 +31,6 @@ function mockPackages(fs: typeof FS): void {
         version: "1.0.0",
       });
     }
-    if (p.includes("example-a")) {
-      return JSON.stringify({
-        name: "example-a",
-        version: "1.0.0",
-        devDependencies: { "pkg-a": "1.0.0" },
-      });
-    }
     if (p.includes("ext-a")) {
       return JSON.stringify({
         name: "ext-a",
@@ -53,30 +45,41 @@ function mockPackages(fs: typeof FS): void {
 async function runScript({
   changedFiles,
   diff,
+  baseRef = "origin/main",
 }: {
   changedFiles: string[];
   diff: string;
-}): Promise<string[]> {
+  baseRef?: string;
+}): Promise<{
+  affected: string[];
+  gitCalls: Array<[string, string[]]>;
+}> {
   jest.resetModules();
 
   // Get the mocked modules
   const fs = require("fs") as jest.Mocked<typeof FS>;
   const cp = require("child_process") as jest.Mocked<typeof CP>;
 
-  jest.spyOn(cp, "execSync").mockImplementation(() => {
-    return Buffer.from("mocked output");
-  });
-
   mockPackages(fs);
 
-  (
-    cp.execSync as jest.MockedFunction<(command: string) => string>
-  ).mockImplementation((cmd: string) => {
+  // The tool must invoke git via the argument-array form of execFileSync
+  // (no shell), so the mock matches on the joined argv for convenience.
+  const execSpy = jest.spyOn(cp, "execFileSync").mockImplementation(((
+    file: string,
+    args: string[],
+  ) => {
+    const cmd = [file, ...args].join(" ");
     if (cmd.startsWith("git fetch")) return "";
     if (cmd.startsWith("git diff --name-only")) return changedFiles.join("\n");
     if (cmd.startsWith("git diff ")) return diff;
     return "";
-  });
+  }) as any);
+
+  // The script always terminates itself with process.exit(0), which would
+  // otherwise kill the jest worker running this suite.
+  const exitSpy = jest
+    .spyOn(process, "exit")
+    .mockImplementation((() => undefined) as never);
 
   const writes: string[] = [];
   const origWrite = process.stdout.write;
@@ -89,7 +92,7 @@ async function runScript({
       return true;
     }) as any;
 
-    process.argv = ["node", "script", "origin/main"];
+    process.argv = ["node", "script", baseRef];
 
     jest.isolateModules(() => {
       require("../compute-affected-packages.cjs");
@@ -98,9 +101,14 @@ async function runScript({
     process.stdout.write = origWrite;
     process.argv = originalArgv;
     warnSpy.mockRestore();
+    exitSpy.mockRestore();
   }
 
-  return JSON.parse(writes[writes.length - 1]);
+  const affected = JSON.parse(writes[writes.length - 1]);
+  return {
+    affected,
+    gitCalls: execSpy.mock.calls as Array<[string, string[]]>,
+  };
 }
 
 describe("compute-affected-packages CLI", () => {
@@ -115,13 +123,12 @@ describe("compute-affected-packages CLI", () => {
       +const x = 1;
     `;
 
-    const result = await runScript({ changedFiles, diff });
+    const { affected: result } = await runScript({ changedFiles, diff });
 
     expect(result).toEqual(
       expect.arrayContaining([
         "packages/pkg-b",
         "packages/pkg-a",
-        "examples/example-a",
         "extensions/ext-a",
       ]),
     );
@@ -139,7 +146,7 @@ describe("compute-affected-packages CLI", () => {
       +More docs.
     `;
 
-    const result = await runScript({ changedFiles, diff });
+    const { affected: result } = await runScript({ changedFiles, diff });
     expect(result).toEqual([]);
   });
 
@@ -150,17 +157,16 @@ describe("compute-affected-packages CLI", () => {
       +name: CI
     `;
 
-    const result = await runScript({ changedFiles, diff });
+    const { affected: result } = await runScript({ changedFiles, diff });
 
     expect(result).toEqual(
       expect.arrayContaining([
         "packages/pkg-a",
         "packages/pkg-b",
-        "examples/example-a",
         "extensions/ext-a",
       ]),
     );
-    expect(result.length).toBe(4);
+    expect(result.length).toBe(3);
   });
 
   test("returns empty array for whitespace/comment only changes", async () => {
@@ -172,7 +178,33 @@ describe("compute-affected-packages CLI", () => {
       -// old comment
     `;
 
-    const result = await runScript({ changedFiles, diff });
+    const { affected: result } = await runScript({ changedFiles, diff });
     expect(result).toEqual([]);
+  });
+
+  test("passes the base ref to git as a single argument, never via a shell", async () => {
+    const changedFiles = ["packages/pkg-b/src/index.js"];
+    const diff = `
+      diff --git a/packages/pkg-b/src/index.js b/packages/pkg-b/src/index.js
+      +const x = 1;
+    `;
+
+    const { gitCalls } = await runScript({
+      changedFiles,
+      diff,
+      // Shell metacharacters in the ref must reach git as plain data.
+      baseRef: "origin/main; rm -rf /",
+    });
+
+    const fetchCall = gitCalls.find(
+      ([file, args]) => file === "git" && args[0] === "fetch",
+    );
+    expect(fetchCall).toBeDefined();
+    expect(fetchCall![1]).toEqual(["fetch", "origin", "main; rm -rf /"]);
+
+    for (const [file, args] of gitCalls) {
+      expect(file).toBe("git");
+      expect(Array.isArray(args)).toBe(true);
+    }
   });
 });

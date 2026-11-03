@@ -1,4 +1,4 @@
-FROM node:22.4.0-bookworm-slim
+FROM node:22.4.0-bookworm-slim@sha256:ee76feb064dbe3579085bc2517cb54ecf64b083db8f6f80341cfe4a4770d1415
 LABEL org.opencontainers.image.description="Hyperledger Cacti API server for hosting plugins and exposing their web service endpoints."
 
 # CVE-2023-31484 - perl: CPAN.pm does not verify TLS certificates when downloading distributions over HTTPS...

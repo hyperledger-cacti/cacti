@@ -84,7 +84,7 @@ jobs:
           cache: 'pip' # caching pip dependencies
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install -r requirements.txt # not hash-pinned: requirements.txt has no hashes; tracked as accepted risk (see docs/internal/plans/002-2026-11-01-security-alerts-remediation.md)
         working-directory: docs
 
       - name: Install system dependencies for Mermaid diagrams

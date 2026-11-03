@@ -148,6 +148,8 @@ import { isSshExecOk } from "./common/is-ssh-exec-ok";
 import {
   asBuffer,
   assertFabricFunctionIsAvailable,
+  assertSafePathSegment,
+  splitSafeRelativePath,
   CreateListenerRequest,
   FabricLong,
   fabricLongToNumber,
@@ -414,6 +416,11 @@ export class PluginLedgerConnectorFabric
           CORE_PEER_TLS_ROOTCERT,
           ORDERER_TLS_ROOTCERT,
         } = targetOrg;
+        // The organization identifier and peer address double as directory
+        // names for the certificate material written below, so they have to
+        // be validated before being joined onto the temporary directory.
+        assertSafePathSegment(CORE_PEER_LOCALMSPID, fnTag);
+        assertSafePathSegment(CORE_PEER_ADDRESS, fnTag);
         fs.mkdirSync(path.join(tmpDirCertsPath, CORE_PEER_LOCALMSPID), {
           recursive: true,
         });
@@ -426,16 +433,18 @@ export class PluginLedgerConnectorFabric
 
         for (const msConfigFile of CORE_PEER_MSPCONFIG) {
           const { filename, filepath, body } = msConfigFile;
-          const relativePath = filepath || "./";
           const subDirPath = path.join(
             tmpDirCertsPath,
             CORE_PEER_LOCALMSPID,
             CORE_PEER_ADDRESS,
             "/msp",
-            relativePath,
+            ...splitSafeRelativePath(filepath || "./", fnTag),
           );
           fs.mkdirSync(subDirPath, { recursive: true });
-          const localFilePath = path.join(subDirPath, filename);
+          const localFilePath = path.join(
+            subDirPath,
+            ...splitSafeRelativePath(filename, fnTag),
+          );
           fs.writeFileSync(localFilePath, body, "base64");
         }
 
@@ -516,10 +525,15 @@ export class PluginLedgerConnectorFabric
 
       for (const sourceFile of sourceFiles) {
         const { filename, filepath, body } = sourceFile;
-        const relativePath = filepath || "./";
-        const subDirPath = path.join(tmpDirPath, relativePath);
+        const subDirPath = path.join(
+          tmpDirPath,
+          ...splitSafeRelativePath(filepath || "./", fnTag),
+        );
         fs.mkdirSync(subDirPath, { recursive: true });
-        const localFilePath = path.join(subDirPath, filename);
+        const localFilePath = path.join(
+          subDirPath,
+          ...splitSafeRelativePath(filename, fnTag),
+        );
         fs.writeFileSync(localFilePath, body, "base64");
       }
 

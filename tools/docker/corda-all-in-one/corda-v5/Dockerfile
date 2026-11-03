@@ -1,4 +1,4 @@
-FROM docker:20.10.3-dind
+FROM docker:20.10.3-dind@sha256:43df6c4dbc32ccb306412fcce5b1443310cf9d91507409d7258cea1c9ee731f4
 
 RUN apk update
 RUN apk add py-pip python3-dev libffi-dev openssl-dev gcc libc-dev make

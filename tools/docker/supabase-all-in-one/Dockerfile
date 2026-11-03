@@ -9,7 +9,7 @@ ARG freeze_tmp_dir="/opt/docker-freeze"
 # Build phase
 ################################
 
-FROM alpine:3.19.1 as builder
+FROM alpine:3.19.1@sha256:c5b1261d6d3e43071626931fc004f70149baeba2c8ec672bd4f27761f8e1ad6b as builder
 
 ARG supabase_tag
 ARG freeze_tmp_dir
@@ -32,7 +32,7 @@ RUN sh /usr/bin/freeze-images.sh
 # Runtime phase
 ################################
 
-FROM docker:25.0.5-dind
+FROM docker:25.0.5-dind@sha256:b41d0183012e2334aacd4e0b8e339b89246c4fdb7eada6cc86b0355f41328549
 
 ARG freeze_tmp_dir
 ENV FREEZE_TMP_DIR=$freeze_tmp_dir

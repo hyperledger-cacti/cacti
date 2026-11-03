@@ -1,4 +1,4 @@
-FROM ubuntu:22.04 as builder
+FROM ubuntu:22.04@sha256:076e7bf82319619f28dd0aa9c02ab34b055ad37100395b4f49a2ffba04fb5e11 as builder
 
 RUN apt update && apt install openjdk-17-jdk git curl augeas-tools -y
 WORKDIR /opt/
@@ -14,7 +14,7 @@ RUN git switch release/os/4.12
 RUN git fetch --all && git checkout d578cae797ac5551d8a3c959354d7c6d69f0f97a
 RUN ./gradlew jar -x test
 
-FROM ubuntu:22.04
+FROM ubuntu:22.04@sha256:076e7bf82319619f28dd0aa9c02ab34b055ad37100395b4f49a2ffba04fb5e11
 
 RUN apt update && apt install openjdk-17-jdk supervisor openssh-server sudo git curl iputils-ping netcat augeas-tools -y
 

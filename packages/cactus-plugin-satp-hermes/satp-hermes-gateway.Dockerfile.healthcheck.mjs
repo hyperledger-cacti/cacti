@@ -26,8 +26,7 @@
  * we were forwarding ports, making the node implementation not work.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { exec } from "child_process";
+import { execFile } from "child_process";
 
 const [, , protocol, host, port, path] = process.argv;
 
@@ -38,9 +37,8 @@ const url = `${protocol}://${host}:${port}${thePath}`;
 
 function runCurl(url) {
   return new Promise((resolve, reject) => {
-    const command = `curl "${url}"`;
 
-    exec(command, (error, stdout, stderr) => {
+    execFile("curl", [url], (error, stdout, stderr) => {
       if (error) {
         console.error(`Error running curl: ${error.message}`);
         console.error(`Stderr: ${stderr}`);

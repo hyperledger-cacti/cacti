@@ -28,15 +28,16 @@
  *    their dependents.
  * 5. Outputs a JSON array of affected package directories (for the CI matrix).
  */
-const os = require("os");
-
 const fs = require("fs");
 
 const path = require("path");
 
-const { execSync } = require("child_process");
+const { execFileSync } = require("child_process");
 
 const WORKSPACE_DIR = ["packages", "extensions"]; // change if needed
+
+// Cap for git output captured in memory.
+const GIT_OUTPUT_MAX_BUFFER_BYTES = 1024 * 1024 * 1024;
 
 // --- 1. Collect all workspace package.json files ---
 function getAllPackages() {
@@ -92,7 +93,9 @@ function buildDependentsGraph(packages) {
 function detectChangedPackages(packages, baseRef) {
   try {
     // Strip an `origin/` prefix when fetching by remote-ref name.
-    execSync(`git fetch origin ${baseRef.replace("origin/", "")}`, {
+    // execFileSync hands the ref to git as a single argv element with no
+    // shell in between, so a crafted <baseRef> cannot inject commands.
+    execFileSync("git", ["fetch", "origin", baseRef.replace("origin/", "")], {
       stdio: "inherit",
     });
   } catch (err) {
@@ -100,20 +103,20 @@ function detectChangedPackages(packages, baseRef) {
     throw err;
   }
 
-  const tmpFile = path.join(os.tmpdir(), `changed-files-${process.pid}.txt`);
-
   // Three-dot form (`A...B`) is used deliberately: it diffs the merge-base
   // of A and B against B, so we only see changes contributed by HEAD and
   // not unrelated commits that have landed on the base branch since fork.
-  execSync(`git diff --name-only ${baseRef}...HEAD > "${tmpFile}"`, {
-    stdio: ["ignore", "inherit", "inherit"],
-  });
-
-  const changedFiles = fs
-    .readFileSync(tmpFile, "utf8")
+  const changedFiles = execFileSync(
+    "git",
+    ["diff", "--name-only", `${baseRef}...HEAD`],
+    {
+      encoding: "utf8",
+      maxBuffer: GIT_OUTPUT_MAX_BUFFER_BYTES,
+      stdio: ["ignore", "pipe", "inherit"],
+    },
+  )
     .split("\n")
     .filter(Boolean);
-  fs.unlinkSync(tmpFile);
 
   // CI / workflow changes can alter how every package is built or tested
   // (composite actions, jest-runner, codegen steps, etc.). Re-run the whole
@@ -156,7 +159,9 @@ function detectChangedPackages(packages, baseRef) {
   };
 
   if (changedFiles.some(affectsPackages)) {
-    console.warn(".github/ change affecting packages detected -> all packages affected.");
+    console.warn(
+      ".github/ change affecting packages detected -> all packages affected.",
+    );
     return Object.keys(packages);
   }
 
@@ -176,16 +181,13 @@ function detectChangedPackages(packages, baseRef) {
     return [];
   }
 
-  // Full diff for comment detection (stream to file to avoid ENOBUFS).
-  // Three-dot form matches the file-list diff above.
-  const tmpDiffFile = path.join(os.tmpdir(), `full-diff-${process.pid}.txt`);
-
-  execSync(`git diff ${baseRef}...HEAD > "${tmpDiffFile}"`, {
-    stdio: ["ignore", "inherit", "inherit"],
+  // Full diff for comment detection. Three-dot form matches the file-list
+  // diff above.
+  const diff = execFileSync("git", ["diff", `${baseRef}...HEAD`], {
+    encoding: "utf8",
+    maxBuffer: GIT_OUTPUT_MAX_BUFFER_BYTES,
+    stdio: ["ignore", "pipe", "inherit"],
   });
-
-  const diff = fs.readFileSync(tmpDiffFile, "utf8");
-  fs.unlinkSync(tmpDiffFile);
 
   /**
    * Regex: identifies added/removed lines that are REAL CODE.
