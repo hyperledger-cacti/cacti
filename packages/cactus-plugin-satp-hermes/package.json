@@ -193,7 +193,7 @@
     "@connectrpc/connect-node": "2.0.0",
     "@connectrpc/protoc-gen-connect-es": "1.6.1",
     "@foundry-rs/hardhat-forge": "0.1.17",
-    "@grpc/grpc-js": "1.14.5",
+    "@grpc/grpc-js": "1.14.7",
     "@hyperledger-cacti/cactus-api-client": "3.0.1",
     "@hyperledger-cacti/cactus-cmd-api-server": "3.0.1",
     "@hyperledger-cacti/cactus-common": "3.0.1",
