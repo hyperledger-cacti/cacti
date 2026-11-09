@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793003307959,
+  "lastUpdate": 1794212671239,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -910,6 +910,35 @@ window.BENCHMARK_DATA = {
             "range": "±3.20%",
             "unit": "ops/sec",
             "extra": "178 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "8364381a686b975e7fabd4d8a9c27d542a859422",
+          "message": "fix(security): update dependencies and alerts\n\nDependabot, npm (weaver/Go/Rust excluded by policy):\n- direct bumps across ~30 manifests: body-parser 1.20.9 (1.x line) and\n  2.4.0 (2.x), axios -> patch:1.20.0 (canton), sanitize-html 2.18.0,\n  joi 17.13.8, vite 8.1.6, compression 1.8.2, fastify 5.12.5,\n  multer 2.5.0, react-router-dom 7.18.0, @angular/* 20.3.34\n- root resolutions: undici 6.29.1 / 7.30.1 / 8.12.2 (three concurrent\n  majors), brace-expansion 1.1.21 / 2.1.7 / 5.0.12, qs >= 6.16.1,\n  ajv@5 -> 6.14.0, yargs-parser@2 -> 5.0.1, got@9 -> 11.8.6,\n  mem@1 -> 4.0.0, micromatch 2.x/3.x -> 4.0.8, @nestjs/* 11.1.18,\n  8x @opentelemetry/instrumentation-*, zod >= 4.6.6,\n  dompurify >= 3.4.17 (critical), toml >= 5.0.1, ip-address >= 10.7.4,\n  markdown-it >= 14.3.3, follow-redirects >= 1.16.1,\n  @graphql-tools/utils 12.0.2\n- satp-contract chaincode-typescript (standalone lockfile): uuid 11.1.1,\n  ip-address 10.7.4, brace-expansion 1.1.21 / 5.0.12\n- decode-uri-component 0.5.0 lift attempted and reverted: the only\n  patched release is ESM-only and breaks the CJS web3 ->\n  query-string graph; carried as an accepted-risk advisory instead\n- removed the bare body-parser resolution, which silently forced\n  every body-parser major down to the 2.x line\n\nCode scanning:\n- CodeQL: fabric connector now validates request-derived path\n  components (MSP ID, peer address, filename, filepath) before any\n  fs write, blocking traversal while keeping the by-design\n  upload-to-compile content flow; compute-affected-packages.cjs\n  shells out via execFileSync with an argument array (crafted base\n  ref verified to no longer execute); Dockerfile healthchecks use\n  execFile and sanitize argv-derived values in logs; the\n  counterparty-htlc-endpoint 500 body no longer echoes exception\n  text or stack traces\n- TokenPermissions: checks:write removed from two SATP test jobs\n  where nothing consumed it; release/GHCR write permissions are\n  intrinsic to those jobs\n- BinaryArtifacts: gradle-wrapper.jar removed from the generated\n  corda kotlin-spring tree; the jar stays in openapi-generator-ignore\n  so a regen cannot re-emit it, and connector-packages-workflow\n  provisions Gradle 8.12.1 via gradle/actions/setup-gradle instead\n  of ./gradlew\n- PinnedDependencies: 25 FROM/ARG lines digest-pinned across 19\n  in-scope Dockerfiles (image:tag@sha256 form); accepted-risk\n  annotations on 4 workflow pip/npm install steps\n\nBreakages fixed en route:\n- canton connector did not compile at the previous main head: it\n  referenced a ConsensusAlgorithmFamily.Authority member that does\n  not exist in the core-api OpenAPI enum; now uses the\n  PROOF_OF_AUTHORITY member like every other connector\n- canton pinned openapi-generator 6.6.0 (TS2527 with axios 1.20.0's\n  unexported unique symbol); aligned to 7.26.0 like all siblings,\n  client regenerated via codegen, missing\n  @openapitools/openapi-generator-cli devDependency added\n- @jest/globals added to root devDependencies so the tools test\n  suite compiles; tools/test fixtures updated for the examples\n  workspace tier removed by 7eb4b28c9\n\nTests: deploy-contract-path-validation (6 cases),\ncounterparty-htlc-endpoint-error-handling (2 cases),\ncompute-affected-packages regression cases. Gates: yarn tsc clean,\nyarn lint clean, dependency version-consistency clean, targeted unit\nsuites green across canton/common/fabric/htlc/cmd-api-server/tools.\n\nAdvisories with no patched release (node-forge, extract-zip,\napollo-server, request, pkg, @stablelib/ed25519) carry reachability\naudits and dismissal rationales for the maintainer to apply after\nmerge; SATP signing paths use node:crypto, not node-forge.\n\nAssisted-by: GLM5.3\nSigned-off-by: Rafael Belchior <RafaelAPB@users.noreply.github.com>",
+          "timestamp": "2026-11-02T18:31:14Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/8364381a686b975e7fabd4d8a9c27d542a859422"
+        },
+        "date": 1794212666034,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 767,
+            "range": "±3.44%",
+            "unit": "ops/sec",
+            "extra": "176 samples"
           }
         ]
       }
