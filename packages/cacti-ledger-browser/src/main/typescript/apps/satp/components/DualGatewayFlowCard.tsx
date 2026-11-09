@@ -63,18 +63,13 @@ export default function DualGatewayFlowCard({
     satpSessionDetailQuery({ gatewayUrl: primaryGatewayUrl }, sessionId),
   );
 
-  const counterpartyQuery = useQuery(
-    counterpartyGatewayUrl
-      ? satpSessionDetailQuery(
-          { gatewayUrl: counterpartyGatewayUrl },
-          sessionId,
-        )
-      : {
-          queryKey: ["disabled-counterparty", sessionId],
-          queryFn: () => null,
-          enabled: false,
-        },
-  );
+  const counterpartyQuery = useQuery({
+    ...satpSessionDetailQuery(
+      { gatewayUrl: counterpartyGatewayUrl || primaryGatewayUrl },
+      sessionId,
+    ),
+    enabled: Boolean(counterpartyGatewayUrl),
+  });
 
   const primaryStatus = primaryQuery.data?.status;
   const primaryDetail = primaryQuery.data?.detail;
@@ -91,18 +86,22 @@ export default function DualGatewayFlowCard({
   // Determine cross-gateway synchronization state
   const bothKnown =
     primaryStatus !== undefined && counterpartyStatus !== undefined;
-  const isSyncComplete =
+  const isSyncComplete = Boolean(
     bothKnown &&
-    (primaryStatus.status.toUpperCase() === "COMPLETED" ||
-      primaryStageNum === 3) &&
-    (counterpartyStatus.status.toUpperCase() === "COMPLETED" ||
-      counterpartyStageNum === 3);
+      primaryStatus &&
+      counterpartyStatus &&
+      (primaryStatus.status?.toUpperCase() === "COMPLETED" ||
+        primaryStageNum === 3) &&
+      (counterpartyStatus.status?.toUpperCase() === "COMPLETED" ||
+        counterpartyStageNum === 3),
+  );
 
-  const hasRollback =
-    primaryStatus?.status.toUpperCase().includes("ROLLBACK") ||
-    counterpartyStatus?.status.toUpperCase().includes("ROLLBACK") ||
-    primaryStatus?.status.toUpperCase().includes("ERROR") ||
-    counterpartyStatus?.status.toUpperCase().includes("ERROR");
+  const hasRollback = Boolean(
+    primaryStatus?.status?.toUpperCase().includes("ROLLBACK") ||
+      counterpartyStatus?.status?.toUpperCase().includes("ROLLBACK") ||
+      primaryStatus?.status?.toUpperCase().includes("ERROR") ||
+      counterpartyStatus?.status?.toUpperCase().includes("ERROR"),
+  );
 
   return (
     <Card
@@ -283,7 +282,7 @@ export default function DualGatewayFlowCard({
                     sx={{ height: 20, fontSize: 10 }}
                   />
                   <Typography variant="subtitle2" fontWeight={700}>
-                    {primaryDetail?.latestSnapshot?.sourceNetworkId ||
+                    {primaryDetail?.latestSnapshot?.senderGatewayNetworkId ||
                       "Sender Endpoint"}
                   </Typography>
                 </Stack>
@@ -305,7 +304,9 @@ export default function DualGatewayFlowCard({
                       Current Stage:
                     </Typography>
                     <Typography variant="body2" fontWeight={600}>
-                      {primaryStatus ? stageLabel(primaryStatus.stage) : "—"}
+                      {primaryStageNum !== undefined
+                        ? stageLabel(primaryStageNum)
+                        : "—"}
                     </Typography>
                   </Stack>
                   <Stack direction="row" justifyContent="space-between">
@@ -332,7 +333,9 @@ export default function DualGatewayFlowCard({
                       variant="body2"
                       sx={{ fontFamily: MONOSPACE, fontSize: 11 }}
                     >
-                      {primaryStatus?.originNetwork?.id || "—"}
+                      {primaryDetail?.latestSnapshot?.sourceLedgerAssetId ||
+                        primaryDetail?.latestSnapshot?.senderGatewayNetworkId ||
+                        "—"}
                     </Typography>
                   </Stack>
                 </Stack>
@@ -369,7 +372,7 @@ export default function DualGatewayFlowCard({
                       />
                       <Typography variant="subtitle2" fontWeight={700}>
                         {counterpartyDetail?.latestSnapshot
-                          ?.recipientNetworkId || "Receiver Endpoint"}
+                          ?.recipientGatewayNetworkId || "Receiver Endpoint"}
                       </Typography>
                     </Stack>
                     <Typography
@@ -393,7 +396,9 @@ export default function DualGatewayFlowCard({
                             Current Stage:
                           </Typography>
                           <Typography variant="body2" fontWeight={600}>
-                            {stageLabel(counterpartyStatus.stage)}
+                            {counterpartyStageNum !== undefined
+                              ? stageLabel(counterpartyStageNum)
+                              : "—"}
                           </Typography>
                         </Stack>
                         <Stack direction="row" justifyContent="space-between">
@@ -420,7 +425,11 @@ export default function DualGatewayFlowCard({
                             variant="body2"
                             sx={{ fontFamily: MONOSPACE, fontSize: 11 }}
                           >
-                            {counterpartyStatus?.destinationNetwork?.id || "—"}
+                            {counterpartyDetail?.latestSnapshot
+                              ?.recipientLedgerAssetId ||
+                              counterpartyDetail?.latestSnapshot
+                                ?.recipientGatewayNetworkId ||
+                              "—"}
                           </Typography>
                         </Stack>
                       </Stack>

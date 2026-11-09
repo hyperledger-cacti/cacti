@@ -51,7 +51,7 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
     path: `*`,
     element: (
       <HeaderBar
-        appDocumentationURL="https://github.com/hyperledger/cacti"
+        appDocumentationURL="https://hyperledger-cacti.github.io/cacti/latest/"
         appName="Overview"
       />
     ),

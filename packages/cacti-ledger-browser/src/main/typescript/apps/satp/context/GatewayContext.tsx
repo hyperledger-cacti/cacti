@@ -271,7 +271,9 @@ export function useSatpGatewayContext(): SatpGatewayContextValue {
   return context ?? DEFAULT_GATEWAY_CONTEXT_VALUE;
 }
 
-export function useSatpGatewayContextSafe(): SatpGatewayContextValue {
+export function useSatpGatewayContextSafe():
+  | SatpGatewayContextValue
+  | undefined {
   const context = useContext(SatpGatewayContext);
-  return context ?? DEFAULT_GATEWAY_CONTEXT_VALUE;
+  return context ?? undefined;
 }
