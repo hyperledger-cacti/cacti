@@ -205,6 +205,7 @@ nav:
   - Build and Operate:
     - Guides:
       - Getting Started: guides/getting-started.md
+      - Development Environment: guides/development-environment/README.md
       - Nix Setup: guides/nix-setup.md
       - Operations: guides/operations.md
       - Developers: guides/developers.md

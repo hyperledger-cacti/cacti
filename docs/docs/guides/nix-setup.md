@@ -11,11 +11,14 @@ Java/Kotlin, Protobuf, and several system level build tools. Installing and
 maintaining the correct versions of all of these toolchains manually is
 time consuming and error-prone.
 
-Nix solves this by providing a **single command** (`nix develop`) that
-reproduces the exact same development environment on any Linux, macOS, or
-WSL2 machine pinned to the precise versions tested and approved by the
-maintainers. There is nothing to install globally, nothing to version manage
-yourself, and no risk of conflicting with other projects on your system.
+The repository's Nix flake provides development shells selected by
+`flake.lock`, reducing the need to install each toolchain manually. The
+flake defines shells for Linux and macOS; Windows users run Nix inside
+WSL 2. Platform support in the flake is not a guarantee that every package
+build has been tested on every platform.
+
+For a walkthrough covering environment setup, a package build, and unit
+tests, see the [development environment quickstart](development-environment/README.md).
 
 ## Prerequisites
 
@@ -61,34 +64,28 @@ The first invocation downloads and caches all required dependencies. This
 may take a few minutes depending on your connection speed. Subsequent
 invocations are near instantaneous because everything is cached locally.
 
-Once inside the shell, a welcome banner confirms the available tool
-versions:
+Once inside the shell, a welcome banner reports the selected tool versions.
+Check the active runtime and package manager with:
 
-```
-Cacti Development Shell
-──────────────────────────────────────────────
-  Node.js : v20.19.1
-  Yarn    : 4.13.0
-  Go      : go1.26.x
-  Rust    : 1.x.x
-  Java    : OpenJDK Runtime Environment Temurin-17.x.x
-  Gradle  : Gradle 8.x
-  protoc  : libprotoc 29.x
-──────────────────────────────────────────────
-
-Quick start:
-  yarn run configure   # install deps + build
+```bash
+node --version
+yarn --version
 ```
 
 ## Building the Project
 
-With all tools available, run the standard build:
+On a fresh checkout, install dependencies explicitly before invoking the
+configure script:
 
 ```bash
+yarn install
 yarn run configure
 ```
 
-This installs npm dependencies and compiles every package in the monorepo.
+The configure script installs dependencies and Git hooks, compiles the
+TypeScript backend, and runs its postbuild scripts. It does not run every
+frontend, Solidity, or Weaver build. The initial `yarn install` creates the
+installation state needed to start Yarn scripts with the configured linker.
 
 > **Note:** Yarn 4.x is activated automatically via
 > [Corepack](https://nodejs.org/api/corepack.html) in the shell hook. You do

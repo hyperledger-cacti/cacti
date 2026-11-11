@@ -5,8 +5,7 @@
   - [Dev Container Quickstart (Recommended)](#dev-container-quickstart-recommended)
     - [Prerequisites](#prerequisites)
     - [Step-by-Step Setup](#step-by-step-setup)
-    - [Known Issue (Important for New Contributors)](#known-issue-important-for-new-contributors)
-    - [Workaround](#workaround)
+    - [Troubleshooting](#troubleshooting)
   - [Nix Flake Quickstart](#nix-flake-quickstart)
     - [Prerequisites](#prerequisites-1)
     - [Step-by-Step Setup](#step-by-step-setup-1)
@@ -56,7 +55,11 @@ The `npm run watch` script in action:
 
 ### Dev Container Quickstart (Recommended)
 
-A Dev Container is a pre-configured Docker-based development environment that automatically installs all required tools (Node.js, Yarn, Go, Rust, etc.). This avoids manual setup and ensures consistency across contributors.
+A Dev Container provides the tools configured in
+`.devcontainer/devcontainer.json` inside a Docker environment. Repository
+dependencies and backend compilation require the explicit commands below.
+For an editor walkthrough, package build, and unit tests, see the
+[development environment quickstart][build-devcontainer-guide].
 
 #### Prerequisites
 
@@ -91,34 +94,35 @@ If popup does not appear:
 
 VS Code will:
 * Build Docker container
-* Install dependencies
+* Connect the editor to the configured environment
 
-This may take several minutes.
+The creation command configures Git shell completion, not project
+dependencies. Once connected, open a terminal in the repository root and
+run:
 
-#### Known Issue (Important for New Contributors)
-
-During testing, the DevContainer setup may fail due to a Go version mismatch:
-* Current container installs Go 1.20.x
-* Some dependencies require Go ≥ 1.23
-
-This can cause container build failure.
-
-#### Workaround
-
-If DevContainer fails, run the project locally instead:
 ```bash
-npm install -g yarn
+corepack enable
 yarn install
+yarn run configure
 ```
 
-**Tip:** If you're new to open source, running locally is often faster and simpler than debugging container issues.
+#### Troubleshooting
+
+Use **Dev Containers: Show Container Log** to inspect setup failures and
+`docker version` to confirm access to the daemon. The configured Go version
+can be too old for some editor tools and Weaver modules; a successful
+backend build does not verify those components. See the
+[quickstart troubleshooting section][build-devcontainer-troubleshooting]
+for installation and filesystem checks. Foundry is a separate prerequisite
+for Solidity work, as described in the platform instructions below.
 
 ### Nix Flake Quickstart
 
 If you have [Nix](https://nixos.org/) installed with flakes enabled, you can
-set up a complete, reproducible development environment with a single command.
-Nix provides the exact versions of Node.js, Go, Rust, JDK, Protobuf, and all
-other required toolchains, no manual installation necessary.
+enter a development shell with the toolchains selected by `flake.lock`.
+The default shell includes Node.js, Go, Rust, JDK, Protobuf, and system
+build tools. Docker and Foundry are separate prerequisites for workflows
+that need them.
 
 #### Prerequisites
 
@@ -557,4 +561,6 @@ wrapper file provides its own set of reference links that override these.
 [build-fast-developer-flow]: #fast-developer-flow--code-iterations
 [build-watch-demo]: ./docs/docs/cactus/_images/hyperledger-cactus-watch-script-tutorial-2021-03-06.gif
 [build-nix-setup]: ./docs/docs/guides/nix-setup.md
+[build-devcontainer-guide]: ./docs/docs/guides/development-environment/README.md
+[build-devcontainer-troubleshooting]: ./docs/docs/guides/development-environment/README.md#troubleshooting
 [build-decision-tree]: ./docs/docs/cactus/_images/build-script-decision-tree-2021-03-06.png
