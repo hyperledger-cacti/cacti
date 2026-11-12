@@ -1,10 +1,15 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
+import Chip from "@mui/material/Chip";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import CardActionArea from "@mui/material/CardActionArea";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
@@ -23,10 +28,10 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 
-import { useNotification } from "../../../common/context/NotificationContext";
 import PageTitle from "../../../components/ui/PageTitle";
 import ShortenedTypography from "../../../components/ui/ShortenedTypography";
 import {
@@ -37,6 +42,9 @@ import { ClickableTableRow } from "../../../components/ui/UITableListing/Clickab
 import StatusChip from "../components/StatusChip";
 import SectionTitle from "../components/SectionTitle";
 import RefreshStatus from "../components/RefreshStatus";
+import SatpQueryError from "../components/SatpQueryError";
+import { useSatpGatewayContext } from "../context/GatewayContext";
+import { sameGatewayUrl } from "../gateways";
 import { formatAbsoluteTime, formatRelativeTime } from "../format";
 import { SATP_APP_SETUP_GUIDE_URL, useSatpOptions } from "../hooks";
 import { satpSessionsQuery } from "../queries";
@@ -45,6 +53,7 @@ import {
   BUCKET_LABELS,
   SESSION_BUCKETS,
   filterSessions,
+  mergeGatewaySessionRows,
   sessionKpis,
   sortSessions,
   type SessionBucket,
@@ -53,6 +62,7 @@ import {
 } from "../sessions-view";
 import SetupGuideLink from "../../../components/ui/SetupGuideLink";
 import type { SatpSessionRow } from "../transform";
+import type { SatpGatewayEndpoint } from "../types";
 
 const MONOSPACE = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
@@ -128,6 +138,27 @@ function SessionRowCells({ row }: { row: SatpSessionRow }) {
         )}
       </StyledTableCell>
       <StyledTableCell>
+        {row.observedOn && row.observedOn.length > 0 ? (
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{ flexWrap: "wrap", rowGap: 0.5 }}
+          >
+            {row.observedOn.map((name) => (
+              <Chip
+                key={name}
+                label={name}
+                size="small"
+                variant="outlined"
+                sx={{ height: 20, fontSize: 11, maxWidth: 160 }}
+              />
+            ))}
+          </Stack>
+        ) : (
+          <Typography variant="body2">—</Typography>
+        )}
+      </StyledTableCell>
+      <StyledTableCell>
         <Tooltip title="Audit events (proofs) recorded for this session">
           <Typography variant="body2" sx={{ fontWeight: 600 }}>
             {row.eventCount}
@@ -180,9 +211,15 @@ function KpiCard({
       sx={{
         height: "100%",
         borderRadius: "8px",
-        borderColor: selected ? "primary.main" : "var(--cacti-ink-100, #dfe5e3)",
-        bgcolor: selected ? "var(--cacti-green-100, #e6f2e7)" : "background.paper",
-        boxShadow: selected ? "0 1px 3px rgba(78, 140, 94, 0.2)" : "0 1px 2px rgba(16, 19, 20, 0.08)",
+        borderColor: selected ? "primary.main" : "divider",
+        bgcolor: (theme) =>
+          selected
+            ? alpha(theme.palette.primary.main, 0.1)
+            : theme.palette.background.paper,
+        boxShadow: (theme) =>
+          selected
+            ? `0 1px 3px ${alpha(theme.palette.primary.main, 0.2)}`
+            : undefined,
         transition: "all 0.15s ease-in-out",
       }}
     >
@@ -197,7 +234,6 @@ function KpiCard({
             component="div"
             sx={{
               fontWeight: 700,
-              fontFamily: '"Barlow", Arial, sans-serif',
               color: selected ? "primary.dark" : "text.primary",
             }}
           >
@@ -251,17 +287,51 @@ function SortableHeaderCell({
 export default function SessionsPage() {
   const options = useSatpOptions();
   const navigate = useNavigate();
-  const { showNotification } = useNotification();
+  const { gateways } = useSatpGatewayContext();
+  const [gatewayScope, setGatewayScope] = React.useState<string>("all");
 
-  const {
-    isError,
-    isPending,
-    data,
-    error,
-    refetch,
-    dataUpdatedAt,
-    isFetching,
-  } = useQuery(satpSessionsQuery(options));
+  // Every configured gateway is queried so both sides of a transfer show up
+  // as one row; outside a gateway provider only the options' gateway is.
+  const knownGateways: SatpGatewayEndpoint[] =
+    gateways.length > 0
+      ? gateways
+      : [
+          {
+            id: "options",
+            name: "Gateway",
+            url: options.gatewayUrl,
+            source: "config",
+          },
+        ];
+  const targets =
+    gatewayScope === "all"
+      ? knownGateways
+      : knownGateways.filter((gw) => sameGatewayUrl(gw.url, gatewayScope));
+
+  const results = useQueries({
+    queries: targets.map((gw) =>
+      satpSessionsQuery({ ...options, gatewayUrl: gw.url }),
+    ),
+  });
+
+  const isPending =
+    results.length > 0 && results.every((result) => result.isPending);
+  const isFetching = results.some((result) => result.isFetching);
+  const failures = results
+    .map((result, index) => ({ result, gateway: targets[index] }))
+    .filter(({ result }) => result.isError);
+  const isError = failures.length > 0 && failures.length === results.length;
+  const dataUpdatedAt = Math.max(
+    0,
+    ...results.map((result) => result.dataUpdatedAt),
+  );
+  const refetchAll = () => results.forEach((result) => void result.refetch());
+  const data = mergeGatewaySessionRows(
+    results.map((result, index) => ({
+      gatewayName: targets[index]?.name ?? "",
+      rows: result.data ?? [],
+    })),
+  );
 
   const [query, setQuery] = React.useState("");
   const [bucket, setBucket] = React.useState<SessionBucket>("all");
@@ -270,12 +340,7 @@ export default function SessionsPage() {
     direction: "desc",
   });
 
-  React.useEffect(() => {
-    isError &&
-      showNotification(`Could not fetch SATP sessions: ${error}`, "error");
-  }, [isError]);
-
-  const rows = data ?? [];
+  const rows = data;
   const kpis = sessionKpis(rows);
   const visible = sortSessions(filterSessions(rows, { query, bucket }), sort);
 
@@ -293,6 +358,17 @@ export default function SessionsPage() {
   return (
     <Box>
       <PageTitle>SATP Sessions</PageTitle>
+
+      {failures.map(({ result, gateway }) => (
+        <SatpQueryError
+          key={gateway.id}
+          what={`SATP sessions from ${gateway.name}`}
+          gatewayUrl={gateway.url}
+          error={result.error}
+          onRetry={() => void result.refetch()}
+          retrying={result.isFetching}
+        />
+      ))}
 
       <Grid container spacing={1.5} sx={{ marginBottom: 2 }}>
         {SESSION_BUCKETS.map((bucketKey) => (
@@ -313,7 +389,36 @@ export default function SessionsPage() {
 
       <SectionTitle
         action={
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack
+            direction="row"
+            spacing={1}
+            alignItems="center"
+            sx={{ flexWrap: "wrap", rowGap: 1 }}
+          >
+            {knownGateways.length > 1 && (
+              <FormControl size="small" sx={{ minWidth: 180 }}>
+                <InputLabel id="satp-sessions-gateway-scope">
+                  Gateways
+                </InputLabel>
+                <Select
+                  labelId="satp-sessions-gateway-scope"
+                  label="Gateways"
+                  value={gatewayScope}
+                  onChange={(event) =>
+                    setGatewayScope(String(event.target.value))
+                  }
+                >
+                  <MenuItem value="all">
+                    All gateways ({knownGateways.length})
+                  </MenuItem>
+                  {knownGateways.map((gw) => (
+                    <MenuItem key={gw.id} value={gw.url}>
+                      {gw.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            )}
             <TextField
               size="small"
               placeholder="Search sessions"
@@ -337,7 +442,7 @@ export default function SessionsPage() {
               <IconButton
                 size="small"
                 aria-label="refresh sessions"
-                onClick={() => refetch()}
+                onClick={refetchAll}
               >
                 <RefreshIcon fontSize="inherit" />
               </IconButton>
@@ -369,6 +474,7 @@ export default function SessionsPage() {
               <StyledTableCellHeader>Stage</StyledTableCellHeader>
               <StyledTableCellHeader>Ledger Path</StyledTableCellHeader>
               <StyledTableCellHeader>Asset</StyledTableCellHeader>
+              <StyledTableCellHeader>Seen on</StyledTableCellHeader>
               <SortableHeaderCell
                 label="Last Activity"
                 field="lastActivity"
@@ -384,7 +490,7 @@ export default function SessionsPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {isPending && <LoadingRows rows={5} columns={8} />}
+            {isPending && <LoadingRows rows={5} columns={9} />}
             {!isPending &&
               visible.map((row) => (
                 <ClickableTableRow
@@ -396,9 +502,9 @@ export default function SessionsPage() {
                   <SessionRowCells row={row} />
                 </ClickableTableRow>
               ))}
-            {!isPending && rows.length === 0 && (
+            {!isPending && !isError && rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8}>
+                <TableCell colSpan={9}>
                   <Stack
                     alignItems="center"
                     spacing={1}
@@ -407,11 +513,14 @@ export default function SessionsPage() {
                     <SwapHorizIcon sx={{ fontSize: 40, opacity: 0.4 }} />
                     <Typography>No SATP transfer sessions found.</Typography>
                     <Typography variant="caption">
-                      Is the gateway reachable at {options.gatewayUrl} and were
-                      there any transfers in the last 7 days?
+                      {targets.length === 1
+                        ? "Is the gateway"
+                        : "Are the gateways"}{" "}
+                      reachable at {targets.map((gw) => gw.url).join(", ")} and
+                      were there any transfers in the last 7 days?
                     </Typography>
                     <SetupGuideLink url={SATP_APP_SETUP_GUIDE_URL} />
-                    <Button size="small" onClick={() => navigate("/guide")}>
+                    <Button size="small" onClick={() => navigate("guide")}>
                       Open the in-app guide
                     </Button>
                   </Stack>
@@ -420,7 +529,7 @@ export default function SessionsPage() {
             )}
             {!isPending && rows.length > 0 && visible.length === 0 && (
               <TableRow>
-                <TableCell colSpan={8}>
+                <TableCell colSpan={9}>
                   <Stack
                     alignItems="center"
                     spacing={1}
@@ -448,8 +557,9 @@ export default function SessionsPage() {
 
       <Typography variant="caption" color="text.secondary">
         Showing sessions with audit data from the last 7 days, plus all session
-        IDs known to the gateway. Click a row for the full timeline, proofs and
-        transfer path.
+        IDs known to the selected gateways. A session seen on several gateways
+        (both sides of a transfer) is listed once. Click a row for the full
+        timeline, proofs and transfer path.
       </Typography>
     </Box>
   );

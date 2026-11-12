@@ -130,12 +130,36 @@ export interface SatpSessionRow {
   assetId?: string;
   /** True when any audit event of the session is a rollback step. */
   hasRollback: boolean;
+  /**
+   * Names of the configured gateways that know this session (set when the
+   * list is merged across gateways, see `mergeGatewaySessionRows`).
+   */
+  observedOn?: string[];
 }
 
 export interface SatpFailureInfo {
   failed: boolean;
   stateLabel?: string;
   errorDetail?: string;
+}
+
+/**
+ * Who wrote an audit log, from the snapshot `role` (proto `session.Type`):
+ * the gateway that starts a transfer runs the CLIENT side (`SATPManager`
+ * creates its session with `client: true`), the counterparty the SERVER
+ * side. Gateways that leave `role` unset (TYPE_UNSPECIFIED) yield
+ * `undefined`.
+ */
+export function deriveGatewayRole(
+  snapshot?: SatpSessionSnapshot,
+): "client" | "server" | undefined {
+  if (snapshot?.role === 1) {
+    return "client";
+  }
+  if (snapshot?.role === 2) {
+    return "server";
+  }
+  return undefined;
 }
 
 /** Session snapshot fields that hold proofs/claims. */
@@ -745,16 +769,18 @@ export function deriveLocalGatewayIds(
 
 /**
  * Network ID of the gateway that wrote the audit log, derived from the
- * snapshot `role` field (in SATP the sender gateway takes the SERVER role).
- * Returns `undefined` when the role is unknown (TYPE_UNSPECIFIED / missing).
+ * snapshot `role` field (see `deriveGatewayRole`: the sender gateway runs
+ * the CLIENT side, the recipient the SERVER side). Returns `undefined` when
+ * the role is unknown (TYPE_UNSPECIFIED / missing).
  */
 export function deriveLocalGatewayId(
   snapshot: SatpSessionSnapshot,
 ): string | undefined {
-  if (snapshot.role === 2) {
+  const role = deriveGatewayRole(snapshot);
+  if (role === "client") {
     return snapshot.senderGatewayNetworkId;
   }
-  if (snapshot.role === 1) {
+  if (role === "server") {
     return snapshot.recipientGatewayNetworkId;
   }
   return undefined;
@@ -788,4 +814,83 @@ export function buildMessageLog(
       rollback: isRollbackType(entry.session.type),
     }))
     .sort((a, b) => (b.timestampMs ?? 0) - (a.timestampMs ?? 0));
+}
+
+/** Asset side of a transfer, read from a session snapshot `senderAsset`/`receiverAsset`. */
+export interface SatpAssetSummary {
+  tokenId?: string;
+  amount?: string;
+  owner?: string;
+  contractName?: string;
+  contractAddress?: string;
+  networkId?: string;
+  tokenType?: string;
+}
+
+function stringField(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    return value === "" ? undefined : value;
+  }
+  if (typeof value === "number" || typeof value === "bigint") {
+    return String(value);
+  }
+  return undefined;
+}
+
+/**
+ * Reads the fields of a serialized `Asset` (proto `common.Asset`). Returns
+ * `undefined` when the value is not an object or carries none of them.
+ */
+export function summarizeAsset(asset: unknown): SatpAssetSummary | undefined {
+  if (!asset || typeof asset !== "object" || Array.isArray(asset)) {
+    return undefined;
+  }
+  const record = asset as Record<string, unknown>;
+  const network = record.networkId;
+  const summary: SatpAssetSummary = {
+    tokenId: stringField(record.tokenId),
+    amount: stringField(record.amount),
+    owner: stringField(record.owner),
+    contractName: stringField(record.contractName),
+    contractAddress: stringField(record.contractAddress),
+    networkId:
+      network && typeof network === "object"
+        ? stringField((network as Record<string, unknown>).id)
+        : stringField(network),
+    tokenType: stringField(record.tokenType),
+  };
+  return Object.values(summary).some((value) => value !== undefined)
+    ? summary
+    : undefined;
+}
+
+/**
+ * Last-known sender and receiver asset of a session: like the claims, the
+ * assets only appear in some snapshots, so the latest one carrying each wins.
+ */
+export function collectSessionAssets(events: SatpTimelineEvent[]): {
+  sender?: SatpAssetSummary;
+  receiver?: SatpAssetSummary;
+} {
+  let sender: SatpAssetSummary | undefined;
+  let receiver: SatpAssetSummary | undefined;
+  for (const event of events) {
+    sender = summarizeAsset(event.snapshot?.senderAsset) ?? sender;
+    receiver = summarizeAsset(event.snapshot?.receiverAsset) ?? receiver;
+  }
+  return { sender, receiver };
+}
+
+/**
+ * PromQL selector for one session's metrics. The gateway labels its gas
+ * and transaction metrics with `sessionId` (`collectSessionAttributes` in
+ * the plugin). Backslashes and quotes are escaped so a session ID can never
+ * break out of the label matcher.
+ */
+export function promSessionSelector(sessionId: string): string {
+  const escaped = sessionId
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n");
+  return `{sessionId="${escaped}"}`;
 }

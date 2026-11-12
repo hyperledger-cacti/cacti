@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   useRoutes,
   BrowserRouter,
@@ -7,6 +8,8 @@ import {
 import CssBaseline from "@mui/material/CssBaseline";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import {
   QueryClient,
@@ -103,17 +106,23 @@ function getContentRoutes(appConfig: AppInstance[]) {
   ]);
 }
 
-function App() {
-  const { isError, isPending, data } = useQuery(guiAppConfig());
+export function App() {
+  const { isError, isPending, isFetching, data, refetch } =
+    useQuery(guiAppConfig());
+  const [dialogDismissed, setDialogDismissed] = useState(false);
 
-  if (isError) {
-    return <ConnectionFailedDialog />;
-  }
-
-  const appConfig = createApplications(data);
+  // The shell (sidebar, header, routes) is always rendered - a config store
+  // outage is surfaced as a dismissible dialog plus a persistent inline
+  // banner instead of replacing the whole screen. This also keeps the hook
+  // call order (`useRoutes` below) stable across error/success renders.
+  const appConfig = createApplications(isError ? undefined : data);
 
   const headerRoutes = getHeaderBarRoutes(appConfig);
   const contentRoutes = getContentRoutes(appConfig);
+
+  const retry = () => {
+    void refetch();
+  };
 
   return (
     <Box
@@ -144,6 +153,41 @@ function App() {
         }}
       >
         {headerRoutes}
+        {isError && (
+          <Alert
+            severity="error"
+            role="alert"
+            sx={{ mx: 2, mt: 2 }}
+            action={
+              <>
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={retry}
+                  disabled={isFetching}
+                >
+                  Retry
+                </Button>
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={() => setDialogDismissed(false)}
+                >
+                  Details
+                </Button>
+              </>
+            }
+          >
+            Could not load the app configuration store. Installed apps are
+            unavailable until the connection is restored.
+          </Alert>
+        )}
+        <ConnectionFailedDialog
+          open={isError && !dialogDismissed}
+          onClose={() => setDialogDismissed(true)}
+          onRetry={retry}
+          retrying={isFetching}
+        />
         <Box
           component="main"
           sx={{

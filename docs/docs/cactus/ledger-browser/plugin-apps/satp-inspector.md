@@ -16,15 +16,35 @@ still uses Supabase to store the app instance configuration.)
   in-progress, completed, failed, rollbacks) double as outcome filters, the
   table is free-text searchable and sortable by column, and rows are fully
   keyboard operable.
+- Any number of gateways per app instance: the session list merges every
+  gateway's sessions ("Seen on" column) and the session page looks the same
+  session up on each gateway, showing every side's stage and status. The
+  toolbar switches the active/counterparty gateway; gateways added in the
+  browser can be saved to the app configuration for every viewer.
+- Live polling controls: pause/resume, refresh interval (3/5/10/30 s) and
+  refresh now; polling backs off while a gateway keeps failing.
 - Inspect a session: ordered audit timeline (by proof sequence number) with
-  the full serialized session snapshot of every step, plus a one-click
+  the full serialized session snapshot of every step, the last transition,
+  plus a one-click
   **Export audit bundle** download (self-describing JSON with the raw
   snapshots and merged proofs) for compliance reporting.
 - See the transfer path: sender/recipient gateways, source/destination
   ledgers, gateway public keys and the involved parties (all copyable).
-- Surface the proofs generated during a transfer (lock/mint/burn/assignment
-  and wrap assertion claims) as copyable fields.
-- Failure lens: session state, error details and refund/recovery substatus.
+- Surface the proofs generated during a transfer: the signature-verified
+  session proofs from `GET /proofs` (falls back to the lock/mint/burn/
+  assignment and wrap assertion claims of the audit snapshots on gateways
+  without that endpoint), as copyable fields.
+- Failure analysis: failed stage and step (`phaseError`), error class from
+  the SATP error code registry (`err_<stage>.<sub>.<seq>`), refund/recovery
+  substatus and a retry outlook (a stated heuristic: SATP itself does not
+  mark errors as retryable).
+- Value and gas per session: the asset moved on each ledger and, with
+  Prometheus, the gas spent (`transaction_gas_used` / `operation_gas_used`
+  for the session's `sessionId` label).
+- Message inspector: every recorded message's session state, annotated
+  field by field or raw.
+- Errors stay in place: a failed request shows an inline error with retry
+  and the setup guide; the rest of the page and the shell stay usable.
 - Overview page with aggregate metrics (session/transaction counts, gas used,
   value exchanged, connected DLTs) fetched from Prometheus, mirroring the
   Grafana dashboards shipped with the plugin.
@@ -102,16 +122,23 @@ views keep working.
 Add the app through the Ledger Browser "Add Application" wizard with the
 following options:
 
-| Option          | Description                                 | Default                 |
-| --------------- | ------------------------------------------- | ----------------------- |
-| `gatewayUrl`    | Base URL of the gateway OAPI server.        | `http://localhost:4010` |
-| `prometheusUrl` | Base URL of a Prometheus server (optional). | `http://localhost:9090` |
+| Option                   | Description                                                                    | Default                 |
+| ------------------------ | ------------------------------------------------------------------------------ | ----------------------- |
+| `gatewayUrl`             | Base URL of the primary gateway OAPI server.                                   | `http://localhost:4010` |
+| `counterpartyGatewayUrl` | Base URL of the counterparty gateway of your transfers (optional).             | empty                   |
+| `gateways`               | More gateways, `[{ "name": "...", "url": "...", "description": "..." }]` (optional). | `[]`                    |
+| `prometheusUrl`          | Base URL of a Prometheus server (optional).                                    | `http://localhost:9090` |
+
+The instance never talks to a gateway its options (or the viewer, via
+**Manage gateways**) did not name. Viewer-added gateways and selections are
+kept per app instance in the browser until saved to the app configuration.
 
 ## Data Sources
 
 - `GET /get-sessions-ids` and `GET /status` - session list and current state.
 - `GET /audit?startTimestamp=...` - audit window (last 7 days) with the
   ordered local log entries and their serialized session snapshots.
+- `GET /proofs?sessionIds=...` - signature-verified session proofs.
 - `GET /supported-ledgers`, `GET /healthcheck` - Overview page.
 - Prometheus HTTP API (`/api/v1/query`, `/api/v1/query_range`) - aggregate
   metrics, using the same series as the plugin's Grafana dashboards.
@@ -274,7 +301,8 @@ What the browser app trusts, and what it never trusts:
     prototype-pollution keys; malformed data degrades to empty states, never
     to corrupted typed output;
   - validates instance options at app-instance creation: `gatewayUrl` (and
-    `prometheusUrl` when present) must be well-formed absolute `http(s)` URLs
+    `counterpartyGatewayUrl`, every `gateways[].url` and `prometheusUrl`
+    when present) must be well-formed absolute `http(s)` URLs
     before the instance is accepted, and the resolved gateway URL is always
     shown in the UI (status popup, app card and the sessions empty state) so
     the operator can see what they are actually talking to.

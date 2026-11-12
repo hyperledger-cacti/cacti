@@ -19,6 +19,7 @@ import {
   fetchSessionStatus,
   fetchSupportedLedgers,
   fetchGatewayHealth,
+  fetchSessionProofs,
   type PromRangeSeries,
 } from "./api";
 import {
@@ -38,12 +39,15 @@ import {
   type SatpSessionRow,
   type SatpStatusInput,
 } from "./transform";
-import type { SatpAppOptions } from "./types";
+import type { SatpQueryOptions, SatpSessionProof } from "./types";
 
 /** How far back the audit window queries reach by default. */
 export const AUDIT_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
 
-/** How often live views refresh while the gateway is healthy. */
+/**
+ * How often live views refresh while the gateway is healthy, unless the
+ * viewer picked another interval (`options.polling`).
+ */
 export const SESSIONS_REFETCH_INTERVAL_MS = 10_000;
 export const HEALTH_REFETCH_INTERVAL_MS = 30_000;
 
@@ -126,6 +130,29 @@ export function satpRefetchIntervalWithBackoff(baseIntervalMs: number) {
   };
 }
 
+/**
+ * `refetchInterval` of a live view: honours the viewer's polling settings
+ * (`options.polling`: paused, or a different base interval) and keeps the
+ * exponential backoff on failure. Always a function, so pausing and
+ * resuming takes effect on the next render without remounting the query.
+ *
+ * `followViewerInterval: false` keeps `defaultBaseMs` (health and
+ * Prometheus probes) while still honouring pause.
+ */
+export function satpLiveRefetchInterval(
+  options: SatpQueryOptions,
+  defaultBaseMs: number,
+  followViewerInterval = true,
+) {
+  const base = followViewerInterval
+    ? options.polling?.intervalMs ?? defaultBaseMs
+    : defaultBaseMs;
+  const backoff = satpRefetchIntervalWithBackoff(base);
+  const paused = options.polling?.paused === true;
+  return (query: PolledQuery): number | false =>
+    paused ? false : backoff(query);
+}
+
 export function satpQueryKeys(gatewayUrl: string) {
   const base = ["satp", gatewayUrl] as const;
   return {
@@ -134,12 +161,13 @@ export function satpQueryKeys(gatewayUrl: string) {
     supportedLedgers: [...base, "supported-ledgers"] as const,
     sessions: [...base, "sessions"] as const,
     session: (sessionId: string) => [...base, "session", sessionId] as const,
+    proofs: (sessionId: string) => [...base, "proofs", sessionId] as const,
     promInstant: (query: string) => [...base, "prom-instant", query] as const,
     promRange: (query: string) => [...base, "prom-range", query] as const,
   };
 }
 
-export function satpHealthQuery(options: SatpAppOptions) {
+export function satpHealthQuery(options: SatpQueryOptions) {
   const keys = satpQueryKeys(options.gatewayUrl);
   return queryOptions({
     queryKey: keys.health,
@@ -147,12 +175,16 @@ export function satpHealthQuery(options: SatpAppOptions) {
       const api = createSatpAdminApi(options);
       return fetchGatewayHealth(api);
     },
-    refetchInterval: satpRefetchIntervalWithBackoff(HEALTH_REFETCH_INTERVAL_MS),
+    refetchInterval: satpLiveRefetchInterval(
+      options,
+      HEALTH_REFETCH_INTERVAL_MS,
+      false,
+    ),
     retry: 1,
   });
 }
 
-export function satpSupportedLedgersQuery(options: SatpAppOptions) {
+export function satpSupportedLedgersQuery(options: SatpQueryOptions) {
   const keys = satpQueryKeys(options.gatewayUrl);
   return queryOptions({
     queryKey: keys.supportedLedgers,
@@ -168,7 +200,7 @@ export function satpSupportedLedgersQuery(options: SatpAppOptions) {
  * Joins `get-sessions-ids`, per-session `status` and the audit window into
  * the session list rows.
  */
-export function satpSessionsQuery(options: SatpAppOptions) {
+export function satpSessionsQuery(options: SatpQueryOptions) {
   const keys = satpQueryKeys(options.gatewayUrl);
   return queryOptions({
     queryKey: keys.sessions,
@@ -194,7 +226,8 @@ export function satpSessionsQuery(options: SatpAppOptions) {
 
       return buildSessionRows({ sessionIds, statuses, auditEntries });
     },
-    refetchInterval: satpRefetchIntervalWithBackoff(
+    refetchInterval: satpLiveRefetchInterval(
+      options,
       SESSIONS_REFETCH_INTERVAL_MS,
     ),
     retry: 1,
@@ -203,7 +236,7 @@ export function satpSessionsQuery(options: SatpAppOptions) {
 
 /** Audit timeline of one session plus its current status. */
 export function satpSessionDetailQuery(
-  options: SatpAppOptions,
+  options: SatpQueryOptions,
   sessionId: string,
 ) {
   const keys = satpQueryKeys(options.gatewayUrl);
@@ -245,7 +278,34 @@ export function satpSessionDetailQuery(
         status,
       };
     },
-    refetchInterval: satpRefetchIntervalWithBackoff(
+    refetchInterval: satpLiveRefetchInterval(
+      options,
+      SESSIONS_REFETCH_INTERVAL_MS,
+    ),
+    retry: 1,
+  });
+}
+
+/**
+ * Signature-verified proofs of one session (`GET /proofs`). Older gateways
+ * without the endpoint answer 404: that resolves to `null` ("not
+ * supported") instead of an error, so the view can fall back to the claims
+ * found in the audit snapshots.
+ */
+export function satpSessionProofsQuery(
+  options: SatpQueryOptions,
+  sessionId: string,
+) {
+  const keys = satpQueryKeys(options.gatewayUrl);
+  return queryOptions({
+    queryKey: keys.proofs(sessionId),
+    queryFn: async (): Promise<SatpSessionProof[] | null> => {
+      const api = createSatpAdminApi(options);
+      return fetchSessionProofs(api, [sessionId]);
+    },
+    enabled: Boolean(sessionId),
+    refetchInterval: satpLiveRefetchInterval(
+      options,
       SESSIONS_REFETCH_INTERVAL_MS,
     ),
     retry: 1,
@@ -261,7 +321,7 @@ export interface SatpAnalytics {
   localGatewayIds: string[];
 }
 
-export function satpAnalyticsQuery(options: SatpAppOptions) {
+export function satpAnalyticsQuery(options: SatpQueryOptions) {
   const keys = satpQueryKeys(options.gatewayUrl);
   return queryOptions({
     queryKey: [...keys.all, "analytics"] as const,
@@ -280,7 +340,8 @@ export function satpAnalyticsQuery(options: SatpAppOptions) {
         localGatewayIds: deriveLocalGatewayIds(auditEntries),
       };
     },
-    refetchInterval: satpRefetchIntervalWithBackoff(
+    refetchInterval: satpLiveRefetchInterval(
+      options,
       SESSIONS_REFETCH_INTERVAL_MS,
     ),
     retry: 1,
@@ -288,7 +349,7 @@ export function satpAnalyticsQuery(options: SatpAppOptions) {
 }
 
 /** Flattened cross-session message log (newest first). */
-export function satpMessageLogQuery(options: SatpAppOptions) {
+export function satpMessageLogQuery(options: SatpQueryOptions) {
   const keys = satpQueryKeys(options.gatewayUrl);
   return queryOptions({
     queryKey: [...keys.all, "message-log"] as const,
@@ -302,7 +363,8 @@ export function satpMessageLogQuery(options: SatpAppOptions) {
       );
       return buildMessageLog(auditEntries);
     },
-    refetchInterval: satpRefetchIntervalWithBackoff(
+    refetchInterval: satpLiveRefetchInterval(
+      options,
       SESSIONS_REFETCH_INTERVAL_MS,
     ),
     retry: 1,
@@ -310,7 +372,7 @@ export function satpMessageLogQuery(options: SatpAppOptions) {
 }
 
 /** Instant Prometheus query (single gauge/counter value). */
-export function satpPromInstantQuery(options: SatpAppOptions, query: string) {
+export function satpPromInstantQuery(options: SatpQueryOptions, query: string) {
   const keys = satpQueryKeys(options.gatewayUrl);
   return queryOptions({
     queryKey: keys.promInstant(query),
@@ -321,14 +383,18 @@ export function satpPromInstantQuery(options: SatpAppOptions, query: string) {
       return fetchPromInstant(options.prometheusUrl, query);
     },
     enabled: Boolean(options.prometheusUrl),
-    refetchInterval: satpRefetchIntervalWithBackoff(HEALTH_REFETCH_INTERVAL_MS),
+    refetchInterval: satpLiveRefetchInterval(
+      options,
+      HEALTH_REFETCH_INTERVAL_MS,
+      false,
+    ),
     retry: false,
   });
 }
 
 /** Range Prometheus query for the Overview charts. */
 export function satpPromRangeQuery(
-  options: SatpAppOptions,
+  options: SatpQueryOptions,
   query: string,
   rangeParams?: { startMs: number; endMs: number; stepSeconds: number },
 ) {
@@ -348,7 +414,11 @@ export function satpPromRangeQuery(
       );
     },
     enabled: Boolean(options.prometheusUrl && rangeParams),
-    refetchInterval: satpRefetchIntervalWithBackoff(HEALTH_REFETCH_INTERVAL_MS),
+    refetchInterval: satpLiveRefetchInterval(
+      options,
+      HEALTH_REFETCH_INTERVAL_MS,
+      false,
+    ),
     retry: false,
   });
 }

@@ -23,8 +23,8 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
-import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
@@ -39,6 +39,8 @@ import CopyableField from "../components/CopyableField";
 import SectionTitle from "../components/SectionTitle";
 import { useSatpOptions } from "../hooks";
 import { useSatpGatewayContext } from "../context/GatewayContext";
+import { sameGatewayUrl } from "../gateways";
+import SatpQueryError from "../components/SatpQueryError";
 import {
   GatewayHealthBadge,
   ManageGatewaysDialog,
@@ -249,7 +251,6 @@ export default function GatewaysPage() {
     setActiveGatewayUrl,
     setCounterpartyGatewayUrl,
     removeGateway,
-    loadCbdcPresets,
   } = useSatpGatewayContext();
   const [manageModalOpen, setManageModalOpen] = React.useState(false);
 
@@ -267,33 +268,17 @@ export default function GatewaysPage() {
 
       <SectionTitle
         action={
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Button
-              size="small"
-              variant="contained"
-              startIcon={<ElectricBoltIcon />}
-              onClick={loadCbdcPresets}
-              sx={{
-                textTransform: "none",
-                bgcolor: "#4e8c5e",
-                "&:hover": { bgcolor: "#3f734d" },
-              }}
-            >
-              Load CBDC Presets
-            </Button>
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<AddIcon />}
-              onClick={() => setManageModalOpen(true)}
-              sx={{ textTransform: "none" }}
-            >
-              Add Gateway
-            </Button>
-          </Stack>
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<AddIcon />}
+            onClick={() => setManageModalOpen(true)}
+          >
+            Add or manage gateways
+          </Button>
         }
       >
-        Configured Gateway Endpoints ({gateways.length})
+        Configured gateways ({gateways.length})
       </SectionTitle>
 
       <Typography
@@ -301,18 +286,16 @@ export default function GatewaysPage() {
         color="text.secondary"
         sx={{ marginBottom: 2 }}
       >
-        Active, counterparty, and preset SATP Hermes gateway connections. Switch
-        the active target or pair two gateways to inspect cross-chain transfers
-        in real time.
+        The gateways this inspector reads from. Pick the active gateway and, for
+        a cross-gateway view, the counterparty gateway of your transfers.
+        Gateways marked "This browser" are only stored locally until saved to
+        the app configuration.
       </Typography>
 
       <Grid container spacing={2} sx={{ marginBottom: 4 }}>
         {gateways.map((gw) => {
-          const isActive =
-            gw.url.toLowerCase() === activeGatewayUrl.toLowerCase();
-          const isCounterparty =
-            counterpartyGatewayUrl &&
-            gw.url.toLowerCase() === counterpartyGatewayUrl.toLowerCase();
+          const isActive = sameGatewayUrl(gw.url, activeGatewayUrl);
+          const isCounterparty = sameGatewayUrl(gw.url, counterpartyGatewayUrl);
 
           return (
             <Grid item xs={12} md={6} lg={4} key={gw.id}>
@@ -327,12 +310,13 @@ export default function GatewaysPage() {
                     ? "primary.main"
                     : isCounterparty
                       ? "secondary.main"
-                      : "#dfe5e3",
-                  bgcolor: isActive
-                    ? "rgba(78, 140, 94, 0.04)"
-                    : isCounterparty
-                      ? "rgba(239, 154, 79, 0.04)"
-                      : "#ffffff",
+                      : "divider",
+                  bgcolor: (theme) =>
+                    isActive
+                      ? alpha(theme.palette.primary.main, 0.04)
+                      : isCounterparty
+                        ? alpha(theme.palette.secondary.main, 0.05)
+                        : theme.palette.background.paper,
                 }}
               >
                 <CardContent sx={{ pb: 1 }}>
@@ -344,7 +328,7 @@ export default function GatewaysPage() {
                     sx={{ mb: 1 }}
                   >
                     <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Typography variant="subtitle2" fontWeight={700} noWrap>
+                      <Typography variant="subtitle2" noWrap>
                         {gw.name}
                       </Typography>
                       <Typography
@@ -353,6 +337,7 @@ export default function GatewaysPage() {
                           fontFamily: MONOSPACE,
                           color: "text.secondary",
                           display: "block",
+                          wordBreak: "break-all",
                         }}
                       >
                         {gw.url}
@@ -382,9 +367,9 @@ export default function GatewaysPage() {
                       <Chip
                         size="small"
                         icon={<CheckCircleOutlineIcon sx={{ fontSize: 14 }} />}
-                        label="Active Gateway"
+                        label="Active"
                         color="primary"
-                        sx={{ height: 22, fontSize: 11, fontWeight: 600 }}
+                        sx={{ height: 22, fontSize: 11 }}
                       />
                     )}
                     {isCounterparty && (
@@ -393,17 +378,17 @@ export default function GatewaysPage() {
                         icon={<CompareArrowsIcon sx={{ fontSize: 14 }} />}
                         label="Counterparty"
                         color="secondary"
-                        sx={{ height: 22, fontSize: 11, fontWeight: 600 }}
+                        sx={{ height: 22, fontSize: 11 }}
                       />
                     )}
-                    {gw.isDefault && (
-                      <Chip
-                        size="small"
-                        label="Default Preset"
-                        variant="outlined"
-                        sx={{ height: 22, fontSize: 10 }}
-                      />
-                    )}
+                    <Chip
+                      size="small"
+                      label={
+                        gw.source === "config" ? "App config" : "This browser"
+                      }
+                      variant="outlined"
+                      sx={{ height: 22, fontSize: 11 }}
+                    />
                   </Stack>
                 </CardContent>
 
@@ -423,20 +408,18 @@ export default function GatewaysPage() {
                         size="small"
                         variant="outlined"
                         onClick={() => setActiveGatewayUrl(gw.url)}
-                        sx={{ textTransform: "none", fontSize: 11 }}
                       >
-                        Set Active
+                        Set active
                       </Button>
                     )}
-                    {!isCounterparty && (
+                    {!isActive && !isCounterparty && (
                       <Button
                         size="small"
                         variant="outlined"
                         color="secondary"
                         onClick={() => setCounterpartyGatewayUrl(gw.url)}
-                        sx={{ textTransform: "none", fontSize: 11 }}
                       >
-                        Set Counterparty
+                        Set counterparty
                       </Button>
                     )}
                     {isCounterparty && (
@@ -444,21 +427,17 @@ export default function GatewaysPage() {
                         size="small"
                         color="inherit"
                         onClick={() => setCounterpartyGatewayUrl(undefined)}
-                        sx={{
-                          textTransform: "none",
-                          fontSize: 11,
-                          color: "text.secondary",
-                        }}
                       >
-                        Clear Counterparty
+                        Clear counterparty
                       </Button>
                     )}
                   </Stack>
 
-                  {!gw.isDefault && (
-                    <Tooltip title="Remove custom gateway">
+                  {gw.source === "user" && (
+                    <Tooltip title="Remove this browser's gateway">
                       <IconButton
                         size="small"
+                        aria-label={`remove ${gw.name}`}
                         onClick={() => removeGateway(gw.id)}
                       >
                         <DeleteOutlineIcon fontSize="small" />
@@ -471,6 +450,16 @@ export default function GatewaysPage() {
           );
         })}
       </Grid>
+
+      {analytics.isError && (
+        <SatpQueryError
+          what="gateway activity"
+          gatewayUrl={options.gatewayUrl}
+          error={analytics.error}
+          onRetry={() => analytics.refetch()}
+          retrying={analytics.isFetching}
+        />
+      )}
 
       <SectionTitle
         action={
@@ -627,6 +616,7 @@ export default function GatewaysPage() {
       <ManageGatewaysDialog
         open={manageModalOpen}
         onClose={() => setManageModalOpen(false)}
+        options={options}
       />
     </Box>
   );

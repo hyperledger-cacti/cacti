@@ -1,229 +1,217 @@
 import React, {
   createContext,
-  useContext,
-  useState,
   useCallback,
+  useContext,
   useMemo,
+  useState,
 } from "react";
-import { SatpGatewayEndpoint } from "../types";
+
 import { isHttpUrl } from "../../../common/utils";
-
-export const SATP_DEFAULT_PRESETS: SatpGatewayEndpoint[] = [
-  {
-    id: "default-local-4010",
-    name: "Default Local Gateway",
-    url: "http://localhost:4010",
-    description: "Standard local SATP Hermes gateway OAPI server",
-    isDefault: true,
-  },
-  {
-    id: "example-gateway-1",
-    name: "Hermes Gateway 1 (Origin)",
-    url: "http://localhost:3013",
-    description: "Bundled example SATP sender gateway",
-  },
-  {
-    id: "example-gateway-2",
-    name: "Hermes Gateway 2 (Destination)",
-    url: "http://localhost:3014",
-    description: "Bundled example SATP receiver gateway",
-  },
-  {
-    id: "cbdc-besu-gateway",
-    name: "CBDC Besu Gateway (Origin)",
-    url: "http://localhost:4010",
-    description: "Cacti CBDC Bridging demo Besu ledger gateway",
-  },
-  {
-    id: "cbdc-fabric-gateway",
-    name: "CBDC Fabric Gateway (Destination)",
-    url: "http://localhost:4020",
-    description: "Cacti CBDC Bridging demo Fabric ledger gateway",
-  },
-];
-
-const STORAGE_KEY_CUSTOM_GATEWAYS = "cacti_satp_custom_gateways";
-const STORAGE_KEY_ACTIVE_GATEWAY = "cacti_satp_active_gateway";
-const STORAGE_KEY_COUNTERPARTY_GATEWAY = "cacti_satp_counterparty_gateway";
+import {
+  COUNTERPARTY_CLEARED,
+  gatewayStorageKeys,
+  mergeGatewayLists,
+  normalizeGatewayUrl,
+  parseStoredGateways,
+  resolveActiveGatewayUrl,
+  resolveConfiguredGateways,
+  resolveCounterpartyGatewayUrl,
+  sameGatewayUrl,
+} from "../gateways";
+import type { SatpAppOptions, SatpGatewayEndpoint } from "../types";
 
 export interface SatpGatewayContextValue {
+  /** ID of the app instance this gateway list belongs to. */
+  appInstanceId?: string;
+  /** The gateway the views read from. */
   activeGatewayUrl: string;
+  /** The other side of the transfer, when one is selected. */
   counterpartyGatewayUrl: string | undefined;
+  /** Every gateway known to this instance: config gateways first. */
   gateways: SatpGatewayEndpoint[];
   setActiveGatewayUrl: (url: string) => void;
   setCounterpartyGatewayUrl: (url: string | undefined) => void;
+  /** Adds a viewer gateway (this browser only). False for an invalid URL. */
   addGateway: (gateway: {
     name: string;
     url: string;
     description?: string;
   }) => boolean;
+  /** Removes a viewer gateway. Config gateways are edited in the app config. */
   removeGateway: (id: string) => void;
-  loadCbdcPresets: () => void;
+  /** Drops this browser's gateways and choices for this instance. */
   resetToDefaults: () => void;
 }
 
 const SatpGatewayContext = createContext<SatpGatewayContextValue | null>(null);
 
+function readStorage(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function writeStorage(key: string, value: string | null): void {
+  try {
+    if (value === null) {
+      localStorage.removeItem(key);
+    } else {
+      localStorage.setItem(key, value);
+    }
+  } catch {
+    // Storage can be unavailable (private mode, blocked site data). The
+    // in-memory state still works for this visit.
+  }
+}
+
 export interface SatpGatewayProviderProps {
-  initialGatewayUrl?: string;
-  initialCounterpartyGatewayUrl?: string;
+  /**
+   * App instance ID. Scopes the stored viewer choices, so two inspector
+   * instances never overwrite each other's gateway selection.
+   */
+  appInstanceId?: string;
+  /** Instance options from the config store (the configured gateways). */
+  options?: Pick<
+    SatpAppOptions,
+    "gatewayUrl" | "counterpartyGatewayUrl" | "gateways"
+  >;
+  /** Used only when the instance names no gateway at all. */
+  fallbackGatewayUrl?: string;
   children: React.ReactNode;
 }
 
 export function SatpGatewayProvider({
-  initialGatewayUrl,
-  initialCounterpartyGatewayUrl,
+  appInstanceId,
+  options,
+  fallbackGatewayUrl = "",
   children,
 }: SatpGatewayProviderProps) {
-  // Load custom gateways from localStorage
-  const [customGateways, setCustomGateways] = useState<SatpGatewayEndpoint[]>(
-    () => {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY_CUSTOM_GATEWAYS);
-        if (stored) {
-          const parsed = JSON.parse(stored);
-          if (Array.isArray(parsed)) {
-            return parsed.filter(
-              (g) => g && typeof g.url === "string" && isHttpUrl(g.url),
-            );
-          }
-        }
-      } catch {
-        // ignore storage error
-      }
-      return [];
-    },
+  const keys = useMemo(
+    () => gatewayStorageKeys(appInstanceId ?? ""),
+    [appInstanceId],
   );
 
-  // Active gateway URL
-  const [activeGatewayUrl, setActiveGatewayUrlState] = useState<string>(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_ACTIVE_GATEWAY);
-      if (stored && isHttpUrl(stored)) {
-        return stored;
-      }
-    } catch {
-      // ignore storage error
-    }
-    return initialGatewayUrl || "http://localhost:4010";
+  const configured = useMemo(
+    () =>
+      resolveConfiguredGateways({
+        gatewayUrl: options?.gatewayUrl ?? "",
+        counterpartyGatewayUrl: options?.counterpartyGatewayUrl,
+        gateways: options?.gateways,
+      }),
+    [options?.gatewayUrl, options?.counterpartyGatewayUrl, options?.gateways],
+  );
+
+  const [userGateways, setUserGateways] = useState<SatpGatewayEndpoint[]>(() =>
+    parseStoredGateways(readStorage(keys.userGateways)),
+  );
+  const [storedActive, setStoredActive] = useState<string | null>(() =>
+    readStorage(keys.activeGateway),
+  );
+  const [storedCounterparty, setStoredCounterparty] = useState<string | null>(
+    () => readStorage(keys.counterpartyGateway),
+  );
+
+  const gateways = useMemo(
+    () => mergeGatewayLists(configured, userGateways),
+    [configured, userGateways],
+  );
+
+  const activeGatewayUrl = resolveActiveGatewayUrl({
+    stored: storedActive,
+    gateways,
+    configuredUrl: options?.gatewayUrl,
+    fallbackUrl: fallbackGatewayUrl,
   });
 
-  // Counterparty gateway URL
-  const [counterpartyGatewayUrl, setCounterpartyGatewayUrlState] = useState<
-    string | undefined
-  >(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY_COUNTERPARTY_GATEWAY);
-      if (stored && isHttpUrl(stored)) {
-        return stored;
-      }
-    } catch {
-      // ignore storage error
-    }
-    return initialCounterpartyGatewayUrl;
+  const counterpartyGatewayUrl = resolveCounterpartyGatewayUrl({
+    stored: storedCounterparty,
+    gateways,
+    configuredUrl: options?.counterpartyGatewayUrl,
+    activeGatewayUrl,
   });
 
-  // Combine default presets and custom gateways
-  const gateways = useMemo(() => {
-    const customUrls = new Set(customGateways.map((g) => g.url.toLowerCase()));
-    const nonDuplicatedPresets = SATP_DEFAULT_PRESETS.filter(
-      (preset) => !customUrls.has(preset.url.toLowerCase()),
-    );
-    return [...nonDuplicatedPresets, ...customGateways];
-  }, [customGateways]);
-
-  const setActiveGatewayUrl = useCallback((url: string) => {
-    if (!isHttpUrl(url)) {
-      return;
-    }
-    setActiveGatewayUrlState(url);
-    try {
-      localStorage.setItem(STORAGE_KEY_ACTIVE_GATEWAY, url);
-    } catch {
-      // ignore
-    }
-  }, []);
-
-  const setCounterpartyGatewayUrl = useCallback((url: string | undefined) => {
-    if (url && !isHttpUrl(url)) {
-      return;
-    }
-    setCounterpartyGatewayUrlState(url);
-    try {
-      if (url) {
-        localStorage.setItem(STORAGE_KEY_COUNTERPARTY_GATEWAY, url);
-      } else {
-        localStorage.removeItem(STORAGE_KEY_COUNTERPARTY_GATEWAY);
+  const setActiveGatewayUrl = useCallback(
+    (url: string) => {
+      const normalized = normalizeGatewayUrl(url);
+      if (!isHttpUrl(normalized)) {
+        return;
       }
-    } catch {
-      // ignore
-    }
-  }, []);
+      setStoredActive(normalized);
+      writeStorage(keys.activeGateway, normalized);
+    },
+    [keys],
+  );
+
+  const setCounterpartyGatewayUrl = useCallback(
+    (url: string | undefined) => {
+      if (url === undefined || url === "") {
+        setStoredCounterparty(COUNTERPARTY_CLEARED);
+        writeStorage(keys.counterpartyGateway, COUNTERPARTY_CLEARED);
+        return;
+      }
+      const normalized = normalizeGatewayUrl(url);
+      if (!isHttpUrl(normalized)) {
+        return;
+      }
+      setStoredCounterparty(normalized);
+      writeStorage(keys.counterpartyGateway, normalized);
+    },
+    [keys],
+  );
 
   const addGateway = useCallback(
-    (gateway: { name: string; url: string; description?: string }): boolean => {
-      const trimmedUrl = gateway.url.trim().replace(/\/+$/, "");
-      if (!isHttpUrl(trimmedUrl)) {
+    (gateway: { name: string; url: string; description?: string }) => {
+      const url = normalizeGatewayUrl(gateway.url);
+      if (!isHttpUrl(url)) {
         return false;
       }
-
-      const newEndpoint: SatpGatewayEndpoint = {
-        id: `custom-gateway-${Date.now()}`,
-        name: gateway.name.trim() || trimmedUrl,
-        url: trimmedUrl,
-        description: gateway.description?.trim(),
+      const endpoint: SatpGatewayEndpoint = {
+        id: `user-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: gateway.name.trim() || url,
+        url,
+        ...(gateway.description?.trim()
+          ? { description: gateway.description.trim() }
+          : {}),
+        source: "user",
       };
-
-      setCustomGateways((prev) => {
-        const next = [...prev.filter((g) => g.url !== trimmedUrl), newEndpoint];
-        try {
-          localStorage.setItem(
-            STORAGE_KEY_CUSTOM_GATEWAYS,
-            JSON.stringify(next),
-          );
-        } catch {
-          // ignore
-        }
+      setUserGateways((previous) => {
+        const next = [
+          ...previous.filter((gw) => !sameGatewayUrl(gw.url, url)),
+          endpoint,
+        ];
+        writeStorage(keys.userGateways, JSON.stringify(next));
         return next;
       });
-
       return true;
     },
-    [],
+    [keys],
   );
 
-  const removeGateway = useCallback((id: string) => {
-    setCustomGateways((prev) => {
-      const next = prev.filter((g) => g.id !== id);
-      try {
-        localStorage.setItem(STORAGE_KEY_CUSTOM_GATEWAYS, JSON.stringify(next));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
-  }, []);
-
-  const loadCbdcPresets = useCallback(() => {
-    setActiveGatewayUrl("http://localhost:4010");
-    setCounterpartyGatewayUrl("http://localhost:4020");
-  }, [setActiveGatewayUrl, setCounterpartyGatewayUrl]);
+  const removeGateway = useCallback(
+    (id: string) => {
+      setUserGateways((previous) => {
+        const next = previous.filter((gw) => gw.id !== id);
+        writeStorage(keys.userGateways, JSON.stringify(next));
+        return next;
+      });
+    },
+    [keys],
+  );
 
   const resetToDefaults = useCallback(() => {
-    setActiveGatewayUrl("http://localhost:4010");
-    setCounterpartyGatewayUrl(undefined);
-    setCustomGateways([]);
-    try {
-      localStorage.removeItem(STORAGE_KEY_CUSTOM_GATEWAYS);
-      localStorage.removeItem(STORAGE_KEY_ACTIVE_GATEWAY);
-      localStorage.removeItem(STORAGE_KEY_COUNTERPARTY_GATEWAY);
-    } catch {
-      // ignore
-    }
-  }, [setActiveGatewayUrl, setCounterpartyGatewayUrl]);
+    setUserGateways([]);
+    setStoredActive(null);
+    setStoredCounterparty(null);
+    writeStorage(keys.userGateways, null);
+    writeStorage(keys.activeGateway, null);
+    writeStorage(keys.counterpartyGateway, null);
+  }, [keys]);
 
-  const value = useMemo(
+  const value = useMemo<SatpGatewayContextValue>(
     () => ({
+      appInstanceId,
       activeGatewayUrl,
       counterpartyGatewayUrl,
       gateways,
@@ -231,10 +219,10 @@ export function SatpGatewayProvider({
       setCounterpartyGatewayUrl,
       addGateway,
       removeGateway,
-      loadCbdcPresets,
       resetToDefaults,
     }),
     [
+      appInstanceId,
       activeGatewayUrl,
       counterpartyGatewayUrl,
       gateways,
@@ -242,7 +230,6 @@ export function SatpGatewayProvider({
       setCounterpartyGatewayUrl,
       addGateway,
       removeGateway,
-      loadCbdcPresets,
       resetToDefaults,
     ],
   );
@@ -254,26 +241,27 @@ export function SatpGatewayProvider({
   );
 }
 
-export const DEFAULT_GATEWAY_CONTEXT_VALUE: SatpGatewayContextValue = {
-  activeGatewayUrl: "http://localhost:4010",
-  counterpartyGatewayUrl: undefined,
-  gateways: SATP_DEFAULT_PRESETS,
-  setActiveGatewayUrl: () => {},
-  setCounterpartyGatewayUrl: () => {},
-  addGateway: () => false,
-  removeGateway: () => {},
-  loadCbdcPresets: () => {},
-  resetToDefaults: () => {},
-};
-
+/**
+ * Gateway context of the enclosing SATP app instance. Outside a provider
+ * (isolated component tests) it returns an empty, read-only list.
+ */
 export function useSatpGatewayContext(): SatpGatewayContextValue {
-  const context = useContext(SatpGatewayContext);
-  return context ?? DEFAULT_GATEWAY_CONTEXT_VALUE;
+  return useContext(SatpGatewayContext) ?? EMPTY_GATEWAY_CONTEXT;
 }
 
 export function useSatpGatewayContextSafe():
   | SatpGatewayContextValue
   | undefined {
-  const context = useContext(SatpGatewayContext);
-  return context ?? undefined;
+  return useContext(SatpGatewayContext) ?? undefined;
 }
+
+const EMPTY_GATEWAY_CONTEXT: SatpGatewayContextValue = {
+  activeGatewayUrl: "",
+  counterpartyGatewayUrl: undefined,
+  gateways: [],
+  setActiveGatewayUrl: () => undefined,
+  setCounterpartyGatewayUrl: () => undefined,
+  addGateway: () => false,
+  removeGateway: () => undefined,
+  resetToDefaults: () => undefined,
+};

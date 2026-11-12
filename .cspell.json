@@ -285,7 +285,9 @@
     "xaxis",
     "xeipuuv"
   ],
-  "dictionaries": ["typescript,node,npm,go,rust"],
+  "dictionaries": [
+    "typescript,node,npm,go,rust"
+  ],
   "ignorePaths": [
     "**/node_modules/**",
     "**/build/**",

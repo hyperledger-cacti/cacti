@@ -41,9 +41,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE
     TO ledger_browser;
 
 -- Preloaded example so the UI works out of the box: a SATP Inspector
--- instance pointed at the bundled example gateway (canned sessions served
--- on http://localhost:3013). Delete the row (or edit its options) from the
--- UI to switch to a real SATP Hermes gateway.
+-- instance pointed at both bundled example gateways (canned sessions served
+-- by the origin gateway on http://localhost:3013 and its counterparty on
+-- http://localhost:3014). Delete the row (or edit its options) from the UI
+-- to switch to real SATP Hermes gateways.
 INSERT INTO public.gui_app_config
     (app_id, instance_name, description, path, options)
 VALUES
@@ -51,10 +52,11 @@ VALUES
         'satpInspector',
         'SATP Inspector (example data)',
         'Preloaded example: canned sessions served by the bundled example '
-        'gateway on http://localhost:3013. Edit the app configuration to '
-        'point gatewayUrl at a real SATP Hermes gateway (for example '
-        'http://localhost:3012 for the plugin docker compose).',
+        'gateways on http://localhost:3013 (origin) and http://localhost:3014 '
+        '(destination). Edit the app configuration to point the gateways at '
+        'real SATP Hermes gateways (for example http://localhost:3012 for '
+        'the plugin docker compose).',
         '/satp',
-        '{"gatewayUrl": "http://localhost:3013"}'
+        '{"gatewayUrl": "http://localhost:3013", "counterpartyGatewayUrl": "http://localhost:3014", "gateways": [], "prometheusUrl": ""}'
     )
 ON CONFLICT (path) DO NOTHING;

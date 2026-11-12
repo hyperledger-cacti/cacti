@@ -3,8 +3,9 @@
  * the resolved store URL (schema, never the API key), the one-command local
  * quickstart and a working link to the setup guide.
  */
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, expect, it, vi } from "vitest";
 
 import ConnectionFailedDialog from "../../../main/typescript/components/ConnectionFailedDialog/ConnectionFailedDialog";
 
@@ -27,9 +28,37 @@ describe("ConnectionFailedDialog", () => {
     render(<ConnectionFailedDialog />);
     const guide = screen.getByRole("link", { name: "Open the setup guide" });
     expect(guide.getAttribute("href")).toBe(
-      "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/setup/",
+      "https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/setup/",
     );
     expect(guide.getAttribute("target")).toBe("_blank");
+  });
+
+  it("offers retry and dismiss when handlers are given", async () => {
+    const user = userEvent.setup();
+    const onRetry = vi.fn();
+    const onClose = vi.fn();
+    render(<ConnectionFailedDialog onRetry={onRetry} onClose={onClose} />);
+
+    await user.click(screen.getByRole("button", { name: "Retry" }));
+    expect(onRetry).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByRole("button", { name: "Dismiss" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("disables retry while a retry is in flight", () => {
+    render(<ConnectionFailedDialog onRetry={() => undefined} retrying />);
+    expect(screen.getByRole("button", { name: /Retrying/ })).toBeDisabled();
+  });
+
+  it("has no retry/dismiss buttons without handlers and hides when closed", async () => {
+    const { rerender } = render(<ConnectionFailedDialog />);
+    expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Dismiss" })).toBeNull();
+    rerender(<ConnectionFailedDialog open={false} />);
+    // The dialog unmounts after its exit transition.
+    await waitFor(() =>
+      expect(screen.queryByText("Connection Error")).toBeNull(),
+    );
   });
 
   it("shows the one-command local quickstart", () => {

@@ -185,6 +185,52 @@ describe("satpAppDefinition.createAppInstance", () => {
     expect(emptyPromOptions.gatewayUrl).toBe(DEFAULT_SATP_GATEWAY_URL);
   });
 
+  it("accepts a gateways list and rejects invalid entries in it", () => {
+    const instance = satpAppDefinition.createAppInstance(
+      makeGuiAppConfig({
+        gatewayUrl: DEFAULT_SATP_GATEWAY_URL,
+        gateways: [{ name: "Counterparty", url: "http://localhost:4110" }],
+      }),
+    );
+    expect((instance.options as SatpAppOptions).gateways).toHaveLength(1);
+
+    for (const gateways of [
+      "http://localhost:4110",
+      [{ url: "javascript:alert(1)" }],
+      [{ url: "http://user:pw@localhost:4110" }],
+      [{ name: 1, url: "http://localhost:4110" }],
+    ]) {
+      expect(
+        () =>
+          satpAppDefinition.createAppInstance(
+            makeGuiAppConfig({
+              gatewayUrl: DEFAULT_SATP_GATEWAY_URL,
+              gateways,
+            }),
+          ),
+        JSON.stringify(gateways),
+      ).toThrow(/Invalid SATP inspector option: gateways/);
+    }
+  });
+
+  it("mounts every page under one layout route", () => {
+    const instance = satpAppDefinition.createAppInstance(
+      makeGuiAppConfig({ gatewayUrl: DEFAULT_SATP_GATEWAY_URL }),
+    );
+    expect(instance.routes).toHaveLength(1);
+    const children = instance.routes[0].children ?? [];
+    expect(
+      children.map((route) => (route.index ? "(index)" : route.path)),
+    ).toEqual([
+      "(index)",
+      "session/:sessionId",
+      "gateways",
+      "messages",
+      "overview",
+      "guide",
+    ]);
+  });
+
   it("rejects a missing gatewayUrl", () => {
     expect(() =>
       satpAppDefinition.createAppInstance(makeGuiAppConfig({})),

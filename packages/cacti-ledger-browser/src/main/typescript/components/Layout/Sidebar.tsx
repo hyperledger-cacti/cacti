@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { alpha, type Theme } from "@mui/material/styles";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -262,9 +263,9 @@ export default function Sidebar({
           transition: "width 0.22s ease-in-out, min-width 0.22s ease-in-out",
           display: "flex",
           flexDirection: "column",
-          bgcolor: "#ffffff",
+          bgcolor: "background.paper",
           borderRight: "1px solid",
-          borderColor: "#dfe5e3",
+          borderColor: "divider",
           zIndex: 1200,
           overflowX: "hidden",
           userSelect: "none",
@@ -308,7 +309,7 @@ export default function Sidebar({
                   fontWeight: 700,
                   fontSize: 18,
                   lineHeight: 1.15,
-                  color: "#101314",
+                  color: "text.primary",
                   letterSpacing: "-0.2px",
                 }}
               >
@@ -317,7 +318,7 @@ export default function Sidebar({
               <Typography
                 variant="caption"
                 sx={{
-                  color: "#8d9a9d",
+                  color: "text.disabled",
                   fontSize: 11,
                   fontWeight: 500,
                   display: "block",
@@ -338,13 +339,13 @@ export default function Sidebar({
               mt: 1,
               mb: 1,
               p: 1.25,
-              bgcolor: "#f7f9f6",
+              bgcolor: "background.default",
               borderRadius: "8px",
-              border: "1px solid #dfe5e3",
+              border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
             }}
           >
             <Stack direction="row" spacing={1.25} alignItems="center">
-              <HubOutlinedIcon sx={{ color: "#4e8c5e", fontSize: 20 }} />
+              <HubOutlinedIcon sx={{ color: "primary.main", fontSize: 20 }} />
               <Box sx={{ minWidth: 0 }}>
                 <Typography
                   variant="caption"
@@ -352,7 +353,7 @@ export default function Sidebar({
                     display: "block",
                     fontSize: 10,
                     fontWeight: 700,
-                    color: "#8d9a9d",
+                    color: "text.disabled",
                     letterSpacing: "0.6px",
                     textTransform: "uppercase",
                     lineHeight: 1.1,
@@ -366,7 +367,7 @@ export default function Sidebar({
                       width: 6,
                       height: 6,
                       borderRadius: "50%",
-                      bgcolor: "#4e8c5e",
+                      bgcolor: "primary.main",
                     }}
                   />
                   <Typography
@@ -374,7 +375,7 @@ export default function Sidebar({
                     sx={{
                       fontSize: 12,
                       fontWeight: 600,
-                      color: "#101314",
+                      color: "text.primary",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
@@ -389,7 +390,7 @@ export default function Sidebar({
         ) : (
           <Box sx={{ my: 1, display: "flex", justifyContent: "center" }}>
             <Tooltip title="Connected: Local Environment" placement="right">
-              <IconButton size="small" sx={{ color: "#4e8c5e" }}>
+              <IconButton size="small" sx={{ color: "primary.main" }}>
                 <HubOutlinedIcon fontSize="small" />
               </IconButton>
             </Tooltip>
@@ -406,7 +407,7 @@ export default function Sidebar({
             py: 1,
             "&::-webkit-scrollbar": { width: 4 },
             "&::-webkit-scrollbar-thumb": {
-              bgcolor: "#dfe5e3",
+              bgcolor: "divider",
               borderRadius: 4,
             },
           }}
@@ -423,21 +424,23 @@ export default function Sidebar({
                   minHeight: 40,
                   px: isCollapsed ? 1.5 : 1.75,
                   bgcolor: isHomeActive
-                    ? "rgba(78, 140, 94, 0.12)"
+                    ? (theme: Theme) =>
+                        `${alpha(theme.palette.primary.main, 0.12)}`
                     : "transparent",
-                  color: isHomeActive ? "#2c5238" : "#3b4548",
+                  color: isHomeActive ? "primary.dark" : "text.secondary",
                   "&:hover": {
                     bgcolor: isHomeActive
-                      ? "rgba(78, 140, 94, 0.18)"
-                      : "rgba(0, 0, 0, 0.04)",
-                    color: "#101314",
+                      ? (theme: Theme) =>
+                          `${alpha(theme.palette.primary.main, 0.18)}`
+                      : "action.hover",
+                    color: "text.primary",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
                     minWidth: isCollapsed ? 0 : 36,
-                    color: isHomeActive ? "#4e8c5e" : "#8d9a9d",
+                    color: isHomeActive ? "primary.main" : "text.disabled",
                     justifyContent: "center",
                   }}
                 >
@@ -463,7 +466,7 @@ export default function Sidebar({
                   display: "block",
                   fontSize: 10,
                   fontWeight: 700,
-                  color: "#8d9a9d",
+                  color: "text.disabled",
                   letterSpacing: "0.8px",
                   textTransform: "uppercase",
                   px: 1.5,
@@ -495,23 +498,25 @@ export default function Sidebar({
                         minHeight: 42,
                         px: isCollapsed ? 1.5 : 1.75,
                         // Headlamp-style active pill in Cacti Green
-                        bgcolor: isAppActive ? "#4e8c5e" : "transparent",
-                        color: isAppActive ? "#ffffff" : "#1c2224",
+                        bgcolor: isAppActive ? "primary.main" : "transparent",
+                        color: isAppActive ? "common.white" : "text.primary",
                         boxShadow: isAppActive
-                          ? "0 2px 6px rgba(44, 82, 56, 0.25)"
+                          ? (theme: Theme) =>
+                              `0 2px 6px ${alpha(theme.palette.primary.dark, 0.25)}`
                           : "none",
                         "&:hover": {
                           bgcolor: isAppActive
-                            ? "#2c5238"
-                            : "rgba(78, 140, 94, 0.08)",
-                          color: isAppActive ? "#ffffff" : "#101314",
+                            ? "primary.dark"
+                            : (theme: Theme) =>
+                                `${alpha(theme.palette.primary.main, 0.08)}`,
+                          color: isAppActive ? "common.white" : "text.primary",
                         },
                       }}
                     >
                       <ListItemIcon
                         sx={{
                           minWidth: isCollapsed ? 0 : 36,
-                          color: isAppActive ? "#ffffff" : "#4e8c5e",
+                          color: isAppActive ? "common.white" : "primary.main",
                           justifyContent: "center",
                         }}
                       >
@@ -569,17 +574,20 @@ export default function Sidebar({
                                   borderRadius: "4px",
                                   // Headlamp active sub-item indicator: vertical bar on the left
                                   borderLeft: isEntryActive
-                                    ? "3px solid #101314"
+                                    ? (theme: Theme) =>
+                                        `3px solid ${theme.palette.text.primary}`
                                     : "3px solid transparent",
                                   bgcolor: isEntryActive
-                                    ? "rgba(0, 0, 0, 0.04)"
+                                    ? "action.hover"
                                     : "transparent",
-                                  color: isEntryActive ? "#101314" : "#3b4548",
+                                  color: isEntryActive
+                                    ? "text.primary"
+                                    : "text.secondary",
                                   "&:hover": {
                                     bgcolor: isEntryActive
-                                      ? "rgba(0, 0, 0, 0.06)"
-                                      : "rgba(0, 0, 0, 0.03)",
-                                    color: "#101314",
+                                      ? "action.selected"
+                                      : "action.hover",
+                                    color: "text.primary",
                                   },
                                 }}
                               >
@@ -607,7 +615,7 @@ export default function Sidebar({
           sx={{
             p: isCollapsed ? 1 : 1.5,
             pt: 1,
-            borderTop: "1px solid #dfe5e3",
+            borderTop: (theme: Theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
           {/* Headlamp-style "+ Create" pill button */}
@@ -618,18 +626,20 @@ export default function Sidebar({
               startIcon={<AddIcon />}
               onClick={() => setNewAppOpen(true)}
               sx={{
-                bgcolor: "#101314",
-                color: "#ffffff",
+                bgcolor: "text.primary",
+                color: "common.white",
                 borderRadius: "20px",
                 textTransform: "none",
                 fontWeight: 600,
                 fontSize: 13,
                 py: 0.75,
                 mb: 1.25,
-                boxShadow: "0 2px 4px rgba(16, 19, 20, 0.15)",
+                boxShadow: (theme: Theme) =>
+                  `0 2px 4px ${alpha(theme.palette.text.primary, 0.15)}`,
                 "&:hover": {
-                  bgcolor: "#2c5238",
-                  boxShadow: "0 4px 8px rgba(44, 82, 56, 0.25)",
+                  bgcolor: "primary.dark",
+                  boxShadow: (theme: Theme) =>
+                    `0 4px 8px ${alpha(theme.palette.primary.dark, 0.25)}`,
                 },
               }}
             >
@@ -641,9 +651,9 @@ export default function Sidebar({
                 <IconButton
                   onClick={() => setNewAppOpen(true)}
                   sx={{
-                    bgcolor: "#101314",
-                    color: "#ffffff",
-                    "&:hover": { bgcolor: "#2c5238" },
+                    bgcolor: "text.primary",
+                    color: "common.white",
+                    "&:hover": { bgcolor: "primary.dark" },
                   }}
                   size="small"
                 >
@@ -663,7 +673,7 @@ export default function Sidebar({
               <Typography
                 variant="caption"
                 sx={{
-                  color: "#8d9a9d",
+                  color: "text.disabled",
                   fontFamily: "ui-monospace, monospace",
                   fontSize: 11,
                 }}
@@ -679,8 +689,8 @@ export default function Sidebar({
                 size="small"
                 onClick={handleToggle}
                 sx={{
-                  color: "#8d9a9d",
-                  "&:hover": { color: "#101314" },
+                  color: "text.disabled",
+                  "&:hover": { color: "text.primary" },
                 }}
               >
                 {isCollapsed ? (

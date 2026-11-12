@@ -28,6 +28,8 @@ import {
 } from "../../../components/ui/UITableListing/StyledTableCell";
 import { ClickableTableRow } from "../../../components/ui/UITableListing/ClickableTableRow";
 import SectionTitle from "../components/SectionTitle";
+import SatpQueryError from "../components/SatpQueryError";
+import MessageInspectorDialog from "../components/MessageInspectorDialog";
 import { useSatpOptions } from "../hooks";
 import { satpAnalyticsQuery, satpMessageLogQuery } from "../queries";
 import { stageLabel, type SatpMessageLogEntry } from "../transform";
@@ -117,6 +119,9 @@ export default function MessagesPage() {
 
   const [search, setSearch] = React.useState("");
   const [stageFilter, setStageFilter] = React.useState<StageFilter>("all");
+  const [inspected, setInspected] = React.useState<
+    SatpMessageLogEntry | undefined
+  >(undefined);
 
   const entries = log.data ?? [];
   const filtered = entries.filter((entry) => {
@@ -144,6 +149,16 @@ export default function MessagesPage() {
   return (
     <Box>
       <PageTitle>Messages</PageTitle>
+
+      {log.isError && (
+        <SatpQueryError
+          what="the message log"
+          gatewayUrl={options.gatewayUrl}
+          error={log.error}
+          onRetry={() => void log.refetch()}
+          retrying={log.isFetching}
+        />
+      )}
 
       <SectionTitle>Message Types</SectionTitle>
       <Grid container spacing={1.5} sx={{ marginBottom: 3 }}>
@@ -257,11 +272,7 @@ export default function MessagesPage() {
               filtered.map((entry) => (
                 <ClickableTableRow
                   key={`${entry.sessionId}-${entry.sequenceNumber}-${entry.auditEntryId ?? ""}`}
-                  onClick={() =>
-                    navigate(
-                      `../session/${encodeURIComponent(entry.sessionId)}`,
-                    )
-                  }
+                  onClick={() => setInspected(entry)}
                 >
                   <MessageRowCells entry={entry} />
                 </ClickableTableRow>
@@ -289,8 +300,17 @@ export default function MessagesPage() {
         sx={{ display: "block", marginTop: 1 }}
       >
         Each row is one SATP protocol message recorded by this gateway. Click a
-        row to inspect the session timeline, proofs and snapshot at that step.
+        row to inspect the session state recorded with it (annotated or raw) and
+        jump to the session timeline.
       </Typography>
+
+      <MessageInspectorDialog
+        entry={inspected}
+        onClose={() => setInspected(undefined)}
+        onOpenSession={(sessionId) =>
+          navigate(`../session/${encodeURIComponent(sessionId)}`)
+        }
+      />
     </Box>
   );
 }

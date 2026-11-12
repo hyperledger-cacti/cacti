@@ -1,5 +1,10 @@
-import React from "react";
-import { useQuery } from "@tanstack/react-query";
+/**
+ * Cross-gateway view of one SATP session: looks the session up on every
+ * configured gateway (both sides of a transfer log it under the same ID)
+ * and shows, per gateway, how far it got. The protocol progress bar
+ * combines all gateways.
+ */
+import { useQueries } from "@tanstack/react-query";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -10,104 +15,170 @@ import Grid from "@mui/material/Grid";
 import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import { alpha } from "@mui/material/styles";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import HourglassEmptyIcon from "@mui/icons-material/HourglassEmpty";
 
 import { satpSessionDetailQuery } from "../queries";
-import { stageLabel } from "../transform";
-import { useSatpGatewayContext } from "../context/GatewayContext";
+import {
+  STAGE_LABELS,
+  deriveFailureInfo,
+  deriveStage,
+  isRollbackType,
+  stageLabel,
+  type SatpSessionDetail,
+  type SatpStatusInput,
+} from "../transform";
+import { formatRelativeTime } from "../format";
+import { sameGatewayUrl } from "../gateways";
+import type { SatpGatewayEndpoint, SatpQueryOptions } from "../types";
 
 const MONOSPACE = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
-const PROTOCOL_STAGES = [
-  {
-    stage: 0,
-    label: "Stage 0: Init",
-    description: "Transfer Initialization & Intent",
-  },
-  {
-    stage: 1,
-    label: "Stage 1: Lock",
-    description: "Asset Lock & Cryptographic Proof",
-  },
-  {
-    stage: 2,
-    label: "Stage 2: Execution",
-    description: "Counterparty Verification & Mint",
-  },
-  {
-    stage: 3,
-    label: "Stage 3: Settle",
-    description: "Final Receipt & Settlement",
-  },
-];
+/** Stage number from a `/status` stage value (`STAGE_2`, `2`, ...). */
+export function parseStatusStage(stage?: string): number | undefined {
+  if (!stage) {
+    return undefined;
+  }
+  const match = stage.match(/(\d+)/);
+  if (!match) {
+    return undefined;
+  }
+  const value = Number(match[1]);
+  return Number.isFinite(value) ? value : undefined;
+}
+
+/** Furthest stage a gateway reached: `/status` or, failing that, the audit log. */
+export function furthestStage(
+  status?: SatpStatusInput,
+  detail?: SatpSessionDetail,
+): number | undefined {
+  const fromStatus = parseStatusStage(status?.stage);
+  const fromEvents = (detail?.events ?? [])
+    .filter((event) => !isRollbackType(event.type))
+    .map((event) => deriveStage(event.type))
+    .filter((stage): stage is number => stage !== undefined);
+  const candidates = [
+    ...(fromStatus !== undefined ? [fromStatus] : []),
+    ...fromEvents,
+  ];
+  return candidates.length ? Math.max(...candidates) : undefined;
+}
+
+type SideOutcome = "completed" | "failed" | "in-flight" | "unknown";
+
+/** Outcome of one gateway's side of the session. */
+export function sideOutcome(
+  status?: SatpStatusInput,
+  detail?: SatpSessionDetail,
+): SideOutcome {
+  const failure = deriveFailureInfo(detail?.latestSnapshot, status);
+  if (failure.failed) {
+    return "failed";
+  }
+  if (
+    status?.status === "DONE" ||
+    failure.stateLabel === "COMPLETED" ||
+    failure.stateLabel === "RECOVERED"
+  ) {
+    return "completed";
+  }
+  if (status || detail?.events.length) {
+    return "in-flight";
+  }
+  return "unknown";
+}
 
 export interface DualGatewayFlowCardProps {
   sessionId: string;
-  primaryGatewayUrl: string;
-  counterpartyGatewayUrl?: string;
+  /** Gateways to look the session up on. */
+  gateways: SatpGatewayEndpoint[];
+  /** Base query options (polling settings etc.). */
+  options: SatpQueryOptions;
+  /** Gateway whose audit timeline the page shows below. */
+  timelineGatewayUrl?: string;
+  onSelectTimelineGateway?: (url: string) => void;
   onOpenManageGateways?: () => void;
 }
 
 export default function DualGatewayFlowCard({
   sessionId,
-  primaryGatewayUrl,
-  counterpartyGatewayUrl,
+  gateways,
+  options,
+  timelineGatewayUrl,
+  onSelectTimelineGateway,
   onOpenManageGateways,
 }: DualGatewayFlowCardProps) {
-  const { gateways, setCounterpartyGatewayUrl } = useSatpGatewayContext();
-
-  const primaryQuery = useQuery(
-    satpSessionDetailQuery({ gatewayUrl: primaryGatewayUrl }, sessionId),
-  );
-
-  const counterpartyQuery = useQuery({
-    ...satpSessionDetailQuery(
-      { gatewayUrl: counterpartyGatewayUrl || primaryGatewayUrl },
-      sessionId,
+  const results = useQueries({
+    queries: gateways.map((gw) =>
+      satpSessionDetailQuery({ ...options, gatewayUrl: gw.url }, sessionId),
     ),
-    enabled: Boolean(counterpartyGatewayUrl),
   });
 
-  const primaryStatus = primaryQuery.data?.status;
-  const primaryDetail = primaryQuery.data?.detail;
-  const counterpartyStatus = counterpartyQuery.data?.status;
-  const counterpartyDetail = counterpartyQuery.data?.detail;
+  const sides = gateways.map((gateway, index) => {
+    const result = results[index];
+    const detail = result?.data?.detail;
+    const status = result?.data?.status;
+    const seen = Boolean(status) || (detail?.events.length ?? 0) > 0;
+    return {
+      gateway,
+      result,
+      detail,
+      status,
+      seen,
+      stage: furthestStage(status, detail),
+      outcome: sideOutcome(status, detail),
+      lastEventMs: detail?.events.reduce<number | undefined>(
+        (latest, event) =>
+          event.timestampMs !== undefined &&
+          (latest === undefined || event.timestampMs > latest)
+            ? event.timestampMs
+            : latest,
+        undefined,
+      ),
+    };
+  });
 
-  const primaryStageNum = primaryStatus?.stage
-    ? parseInt(primaryStatus.stage.replace(/\D/g, ""), 10)
+  const seenSides = sides.filter((side) => side.seen);
+  const anyFailed = seenSides.some((side) => side.outcome === "failed");
+  const allCompleted =
+    seenSides.length >= 2 &&
+    seenSides.every((side) => side.outcome === "completed");
+  const reachedStages = seenSides
+    .map((side) => side.stage)
+    .filter((stage): stage is number => stage !== undefined);
+  const furthest = reachedStages.length
+    ? Math.max(...reachedStages)
     : undefined;
-  const counterpartyStageNum = counterpartyStatus?.stage
-    ? parseInt(counterpartyStatus.stage.replace(/\D/g, ""), 10)
-    : undefined;
 
-  // Determine cross-gateway synchronization state
-  const bothKnown =
-    primaryStatus !== undefined && counterpartyStatus !== undefined;
-  const isSyncComplete = Boolean(
-    bothKnown &&
-      primaryStatus &&
-      counterpartyStatus &&
-      (primaryStatus.status?.toUpperCase() === "COMPLETED" ||
-        primaryStageNum === 3) &&
-      (counterpartyStatus.status?.toUpperCase() === "COMPLETED" ||
-        counterpartyStageNum === 3),
-  );
+  const snapshot = seenSides.find((side) => side.detail?.latestSnapshot)?.detail
+    ?.latestSnapshot;
 
-  const hasRollback = Boolean(
-    primaryStatus?.status?.toUpperCase().includes("ROLLBACK") ||
-      counterpartyStatus?.status?.toUpperCase().includes("ROLLBACK") ||
-      primaryStatus?.status?.toUpperCase().includes("ERROR") ||
-      counterpartyStatus?.status?.toUpperCase().includes("ERROR"),
-  );
+  const summary = anyFailed
+    ? {
+        label: "Failed or rolled back on a gateway",
+        color: "error" as const,
+        icon: <ErrorOutlineIcon />,
+      }
+    : allCompleted
+      ? {
+          label: "Settled on both sides",
+          color: "success" as const,
+          icon: <CheckCircleIcon />,
+        }
+      : seenSides.length >= 2
+        ? {
+            label: "In flight between gateways",
+            color: "warning" as const,
+            icon: <HourglassEmptyIcon />,
+          }
+        : undefined;
 
   return (
-    <Card
-      variant="outlined"
-      sx={{ mb: 3, borderRadius: 2, borderColor: "#dfe5e3" }}
-    >
+    <Card variant="outlined" sx={{ mb: 3 }}>
       <CardHeader
         avatar={
           <Stack
@@ -118,7 +189,7 @@ export default function DualGatewayFlowCard({
               height: 40,
               borderRadius: 2,
               bgcolor: "primary.main",
-              color: "common.white",
+              color: "primary.contrastText",
               "& svg": { fontSize: 24 },
             }}
           >
@@ -131,92 +202,91 @@ export default function DualGatewayFlowCard({
             spacing={1}
             alignItems="center"
             flexWrap="wrap"
+            rowGap={0.5}
           >
-            <Typography variant="subtitle1" fontWeight={700}>
-              Cross-Gateway Real Flow Telemetry
+            <Typography variant="subtitle1" fontWeight={600}>
+              Session across gateways
             </Typography>
-            {bothKnown && (
+            {summary && (
               <Chip
                 size="small"
-                icon={
-                  hasRollback ? (
-                    <ErrorOutlineIcon />
-                  ) : isSyncComplete ? (
-                    <CheckCircleIcon />
-                  ) : (
-                    <HourglassEmptyIcon />
-                  )
-                }
-                label={
-                  hasRollback
-                    ? "Rollback / Error Detected"
-                    : isSyncComplete
-                      ? "Both Gateways Synchronized & Settled"
-                      : "Inter-Gateway Transfer In-Flight"
-                }
-                color={
-                  hasRollback ? "error" : isSyncComplete ? "success" : "warning"
-                }
-                sx={{ fontWeight: 600, height: 24, fontSize: 11 }}
+                icon={summary.icon}
+                label={summary.label}
+                color={summary.color}
+                sx={{ height: 24, fontSize: 11 }}
               />
             )}
+            <Typography variant="caption" color="text.secondary">
+              seen on {seenSides.length} of {gateways.length} gateway
+              {gateways.length === 1 ? "" : "s"}
+            </Typography>
           </Stack>
         }
-        subheader="Live end-to-end verification across origin and destination gateway instances"
-        titleTypographyProps={{ variant: "subtitle1" }}
+        subheader={
+          snapshot?.senderGatewayNetworkId ||
+          snapshot?.recipientGatewayNetworkId ? (
+            <Stack
+              direction="row"
+              spacing={0.75}
+              alignItems="center"
+              sx={{ mt: 0.5 }}
+            >
+              <Typography variant="caption" sx={{ fontFamily: MONOSPACE }}>
+                {snapshot?.senderGatewayNetworkId ?? "unknown sender"}
+              </Typography>
+              <ArrowForwardIcon sx={{ fontSize: 14, color: "primary.main" }} />
+              <Typography variant="caption" sx={{ fontFamily: MONOSPACE }}>
+                {snapshot?.recipientGatewayNetworkId ?? "unknown recipient"}
+              </Typography>
+            </Stack>
+          ) : (
+            "The same session ID is looked up on every configured gateway"
+          )
+        }
       />
       <CardContent sx={{ pt: 0 }}>
-        {/* Stage Progression Bar */}
         <Box
           sx={{
-            mb: 3,
-            p: 2,
-            bgcolor: "#f7f9f6",
-            borderRadius: 1.5,
-            border: "1px solid #dfe5e3",
+            mb: 2.5,
+            p: 1.5,
+            bgcolor: "background.default",
+            borderRadius: 1,
+            border: 1,
+            borderColor: "divider",
           }}
         >
           <Typography
             variant="caption"
-            fontWeight={700}
             color="text.secondary"
-            sx={{ mb: 1.5, display: "block" }}
+            sx={{ mb: 1, display: "block", fontWeight: 600 }}
           >
-            SATP PROTOCOL PROGRESSION (RFC DRAFT-16)
+            PROTOCOL PROGRESS (furthest stage reached on any gateway)
           </Typography>
-          <Grid container spacing={1.5}>
-            {PROTOCOL_STAGES.map((s) => {
-              const primaryReached =
-                primaryStageNum !== undefined && primaryStageNum >= s.stage;
-              const counterpartyReached =
-                counterpartyStageNum !== undefined &&
-                counterpartyStageNum >= s.stage;
-
-              const isCompleted =
-                primaryReached &&
-                (counterpartyGatewayUrl ? counterpartyReached : true);
-              const isInProgress =
-                (primaryStageNum === s.stage ||
-                  counterpartyStageNum === s.stage) &&
-                !isCompleted;
-
+          <Grid container spacing={1}>
+            {Object.keys(STAGE_LABELS).map((key) => {
+              const stage = Number(key);
+              const reached = furthest !== undefined && furthest > stage;
+              const current = furthest === stage;
+              const done = reached || (current && allCompleted && stage === 3);
+              const tone = done
+                ? "success"
+                : current
+                  ? anyFailed
+                    ? "error"
+                    : "warning"
+                  : undefined;
               return (
-                <Grid item xs={12} sm={6} md={3} key={s.stage}>
+                <Grid item xs={12} sm={6} md={3} key={stage}>
                   <Box
                     sx={{
-                      p: 1.25,
+                      p: 1,
                       borderRadius: 1,
-                      border: "1px solid",
-                      borderColor: isCompleted
-                        ? "success.main"
-                        : isInProgress
-                          ? "warning.main"
-                          : "#dfe5e3",
-                      bgcolor: isCompleted
-                        ? "rgba(46, 125, 50, 0.05)"
-                        : isInProgress
-                          ? "rgba(237, 108, 2, 0.05)"
-                          : "#ffffff",
+                      border: 1,
+                      borderColor: tone ? `${tone}.main` : "divider",
+                      bgcolor: (theme) =>
+                        tone
+                          ? alpha(theme.palette[tone].main, 0.06)
+                          : theme.palette.background.paper,
                     }}
                   >
                     <Stack
@@ -224,35 +294,25 @@ export default function DualGatewayFlowCard({
                       justifyContent="space-between"
                       alignItems="center"
                     >
-                      <Typography variant="body2" fontWeight={700}>
-                        {s.label}
+                      <Typography variant="body2" fontWeight={600}>
+                        {stageLabel(stage)}
                       </Typography>
-                      {isCompleted ? (
+                      {done ? (
                         <CheckCircleIcon
                           sx={{ fontSize: 16, color: "success.main" }}
                         />
-                      ) : isInProgress ? (
-                        <HourglassEmptyIcon
-                          sx={{ fontSize: 16, color: "warning.main" }}
-                        />
-                      ) : (
-                        <Box
-                          sx={{
-                            width: 14,
-                            height: 14,
-                            borderRadius: "50%",
-                            bgcolor: "#e0e0e0",
-                          }}
-                        />
-                      )}
+                      ) : current ? (
+                        anyFailed ? (
+                          <ErrorOutlineIcon
+                            sx={{ fontSize: 16, color: "error.main" }}
+                          />
+                        ) : (
+                          <HourglassEmptyIcon
+                            sx={{ fontSize: 16, color: "warning.main" }}
+                          />
+                        )
+                      ) : null}
                     </Stack>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      sx={{ display: "block", mt: 0.5 }}
-                    >
-                      {s.description}
-                    </Typography>
                   </Box>
                 </Grid>
               );
@@ -260,120 +320,51 @@ export default function DualGatewayFlowCard({
           </Grid>
         </Box>
 
-        {/* Side-by-Side Gateway Inspection Columns */}
-        <Grid container spacing={2.5}>
-          {/* Gateway 1 (Origin) */}
-          <Grid item xs={12} md={6}>
-            <Card
-              variant="outlined"
-              sx={{ height: "100%", borderColor: "primary.main" }}
-            >
-              <CardContent>
-                <Stack
-                  direction="row"
-                  spacing={1}
-                  alignItems="center"
-                  sx={{ mb: 1 }}
-                >
-                  <Chip
-                    size="small"
-                    label="Origin Gateway"
-                    color="primary"
-                    sx={{ height: 20, fontSize: 10 }}
-                  />
-                  <Typography variant="subtitle2" fontWeight={700}>
-                    {primaryDetail?.latestSnapshot?.senderGatewayNetworkId ||
-                      "Sender Endpoint"}
-                  </Typography>
-                </Stack>
-                <Typography
-                  variant="caption"
+        <Grid container spacing={2}>
+          {sides.map((side) => {
+            const isTimelineSource = sameGatewayUrl(
+              side.gateway.url,
+              timelineGatewayUrl,
+            );
+            return (
+              <Grid
+                item
+                xs={12}
+                md={gateways.length > 2 ? 4 : 6}
+                key={side.gateway.id}
+              >
+                <Card
+                  variant="outlined"
                   sx={{
-                    fontFamily: MONOSPACE,
-                    color: "text.secondary",
-                    display: "block",
-                    mb: 1.5,
+                    height: "100%",
+                    borderColor: isTimelineSource ? "primary.main" : "divider",
                   }}
                 >
-                  {primaryGatewayUrl}
-                </Typography>
-
-                <Stack spacing={1}>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Current Stage:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {primaryStageNum !== undefined
-                        ? stageLabel(primaryStageNum)
-                        : "—"}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Substatus:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {primaryStatus?.substatus || "—"}
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Recorded Events:
-                    </Typography>
-                    <Typography variant="body2" fontWeight={600}>
-                      {primaryDetail?.events.length ?? 0} audit logs
-                    </Typography>
-                  </Stack>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="caption" color="text.secondary">
-                      Ledger ID:
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontFamily: MONOSPACE, fontSize: 11 }}
-                    >
-                      {primaryDetail?.latestSnapshot?.sourceLedgerAssetId ||
-                        primaryDetail?.latestSnapshot?.senderGatewayNetworkId ||
-                        "—"}
-                    </Typography>
-                  </Stack>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Gateway 2 (Destination) */}
-          <Grid item xs={12} md={6}>
-            <Card
-              variant="outlined"
-              sx={{
-                height: "100%",
-                borderColor: counterpartyGatewayUrl
-                  ? "secondary.main"
-                  : "#dfe5e3",
-                bgcolor: counterpartyGatewayUrl ? "#ffffff" : "#fbfbfb",
-              }}
-            >
-              <CardContent>
-                {counterpartyGatewayUrl ? (
-                  <>
+                  <CardContent>
                     <Stack
                       direction="row"
                       spacing={1}
                       alignItems="center"
-                      sx={{ mb: 1 }}
+                      sx={{ mb: 0.5 }}
                     >
-                      <Chip
-                        size="small"
-                        label="Destination Gateway"
-                        color="secondary"
-                        sx={{ height: 20, fontSize: 10 }}
-                      />
-                      <Typography variant="subtitle2" fontWeight={700}>
-                        {counterpartyDetail?.latestSnapshot
-                          ?.recipientGatewayNetworkId || "Receiver Endpoint"}
+                      <Typography variant="subtitle2" fontWeight={600} noWrap>
+                        {side.gateway.name}
                       </Typography>
+                      {side.seen && (
+                        <Chip
+                          size="small"
+                          label={side.outcome}
+                          color={
+                            side.outcome === "failed"
+                              ? "error"
+                              : side.outcome === "completed"
+                                ? "success"
+                                : "warning"
+                          }
+                          variant="outlined"
+                          sx={{ height: 20, fontSize: 11 }}
+                        />
+                      )}
                     </Stack>
                     <Typography
                       variant="caption"
@@ -382,129 +373,118 @@ export default function DualGatewayFlowCard({
                         color: "text.secondary",
                         display: "block",
                         mb: 1.5,
+                        wordBreak: "break-all",
                       }}
                     >
-                      {counterpartyGatewayUrl}
+                      {side.gateway.url}
                     </Typography>
 
-                    {counterpartyQuery.isPending ? (
+                    {side.result?.isPending ? (
                       <LinearProgress sx={{ my: 2 }} />
-                    ) : counterpartyStatus ? (
-                      <Stack spacing={1}>
-                        <Stack direction="row" justifyContent="space-between">
-                          <Typography variant="caption" color="text.secondary">
-                            Current Stage:
-                          </Typography>
-                          <Typography variant="body2" fontWeight={600}>
-                            {counterpartyStageNum !== undefined
-                              ? stageLabel(counterpartyStageNum)
-                              : "—"}
-                          </Typography>
-                        </Stack>
-                        <Stack direction="row" justifyContent="space-between">
-                          <Typography variant="caption" color="text.secondary">
-                            Substatus:
-                          </Typography>
-                          <Typography variant="body2" fontWeight={600}>
-                            {counterpartyStatus.substatus || "—"}
-                          </Typography>
-                        </Stack>
-                        <Stack direction="row" justifyContent="space-between">
-                          <Typography variant="caption" color="text.secondary">
-                            Recorded Events:
-                          </Typography>
-                          <Typography variant="body2" fontWeight={600}>
-                            {counterpartyDetail?.events.length ?? 0} audit logs
-                          </Typography>
-                        </Stack>
-                        <Stack direction="row" justifyContent="space-between">
-                          <Typography variant="caption" color="text.secondary">
-                            Ledger ID:
-                          </Typography>
-                          <Typography
-                            variant="body2"
-                            sx={{ fontFamily: MONOSPACE, fontSize: 11 }}
+                    ) : side.result?.isError ? (
+                      <Typography variant="body2" color="error.main">
+                        Gateway unreachable: {String(side.result.error)}
+                      </Typography>
+                    ) : side.seen ? (
+                      <Stack spacing={0.75}>
+                        {[
+                          [
+                            "Stage",
+                            side.stage !== undefined
+                              ? stageLabel(side.stage)
+                              : "—",
+                          ],
+                          ["Status", side.status?.status ?? "—"],
+                          ["Substatus", side.status?.substatus ?? "—"],
+                          [
+                            "Audit events",
+                            String(side.detail?.events.length ?? 0),
+                          ],
+                          [
+                            "Last event",
+                            side.lastEventMs !== undefined
+                              ? formatRelativeTime(side.lastEventMs)
+                              : "—",
+                          ],
+                        ].map(([label, value]) => (
+                          <Stack
+                            key={label}
+                            direction="row"
+                            justifyContent="space-between"
+                            spacing={1}
                           >
-                            {counterpartyDetail?.latestSnapshot
-                              ?.recipientLedgerAssetId ||
-                              counterpartyDetail?.latestSnapshot
-                                ?.recipientGatewayNetworkId ||
-                              "—"}
-                          </Typography>
-                        </Stack>
+                            <Typography
+                              variant="caption"
+                              color="text.secondary"
+                            >
+                              {label}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              fontWeight={600}
+                              sx={{ textAlign: "right" }}
+                            >
+                              {value}
+                            </Typography>
+                          </Stack>
+                        ))}
+                        {onSelectTimelineGateway && (
+                          <Button
+                            size="small"
+                            variant={
+                              isTimelineSource ? "contained" : "outlined"
+                            }
+                            disabled={isTimelineSource}
+                            onClick={() =>
+                              onSelectTimelineGateway(side.gateway.url)
+                            }
+                            sx={{ alignSelf: "flex-start", mt: 1 }}
+                          >
+                            {isTimelineSource
+                              ? "Timeline shown below"
+                              : "Show this gateway's timeline"}
+                          </Button>
+                        )}
                       </Stack>
                     ) : (
-                      <Box sx={{ py: 1 }}>
-                        <Typography variant="body2" color="text.secondary">
-                          Session not yet observed or pending on counterparty
-                          gateway.
-                        </Typography>
-                      </Box>
+                      <Typography variant="body2" color="text.secondary">
+                        This gateway has no record of the session.
+                      </Typography>
                     )}
-                  </>
-                ) : (
-                  <Stack
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={1.5}
-                    sx={{ py: 2 }}
-                  >
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight={600}
-                      color="text.secondary"
-                    >
-                      No Counterparty Gateway Connected
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })}
+          {gateways.length < 2 && (
+            <Grid item xs={12} md={6}>
+              <Card
+                variant="outlined"
+                sx={{ height: "100%", bgcolor: "background.default" }}
+              >
+                <CardContent>
+                  <Stack spacing={1.5} alignItems="flex-start">
+                    <Typography variant="subtitle2" color="text.secondary">
+                      Only one gateway configured
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
-                      textAlign="center"
-                    >
-                      Configure the destination SATP gateway (e.g. Fabric or
-                      second Hermes instance) to inspect the real cross-gateway
-                      transfer handshake.
+                    <Typography variant="caption" color="text.secondary">
+                      Add the counterparty gateway of your transfers to see both
+                      sides of the session here.
                     </Typography>
-                    <Stack
-                      direction="row"
-                      spacing={1}
-                      flexWrap="wrap"
-                      justifyContent="center"
-                    >
-                      {gateways
-                        .filter(
-                          (g) =>
-                            g.url.toLowerCase() !==
-                            primaryGatewayUrl.toLowerCase(),
-                        )
-                        .slice(0, 2)
-                        .map((g) => (
-                          <Button
-                            key={g.id}
-                            size="small"
-                            variant="outlined"
-                            onClick={() => setCounterpartyGatewayUrl(g.url)}
-                            sx={{ textTransform: "none", fontSize: 11 }}
-                          >
-                            Use {g.name}
-                          </Button>
-                        ))}
-                      {onOpenManageGateways && (
-                        <Button
-                          size="small"
-                          variant="contained"
-                          onClick={onOpenManageGateways}
-                          sx={{ textTransform: "none", fontSize: 11 }}
-                        >
-                          Configure Counterparty
-                        </Button>
-                      )}
-                    </Stack>
+                    {onOpenManageGateways && (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={onOpenManageGateways}
+                      >
+                        Add a gateway
+                      </Button>
+                    )}
                   </Stack>
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+                </CardContent>
+              </Card>
+            </Grid>
+          )}
         </Grid>
       </CardContent>
     </Card>

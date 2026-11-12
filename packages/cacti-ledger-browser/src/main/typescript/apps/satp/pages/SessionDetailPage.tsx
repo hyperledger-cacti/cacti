@@ -28,6 +28,12 @@ import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableRow from "@mui/material/TableRow";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import PaidIcon from "@mui/icons-material/Paid";
 import Timeline from "@mui/lab/Timeline";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
@@ -42,20 +48,41 @@ import CopyableField from "../components/CopyableField";
 import SectionTitle from "../components/SectionTitle";
 import StatusChip from "../components/StatusChip";
 import DualGatewayFlowCard from "../components/DualGatewayFlowCard";
+import SatpQueryError from "../components/SatpQueryError";
+import { useSatpGatewayContext } from "../context/GatewayContext";
+import { sameGatewayUrl } from "../gateways";
+import {
+  RETRY_OUTLOOK_LABELS,
+  classifySatpFailure,
+  type SatpFailureClassification,
+} from "../failure";
 import { ManageGatewaysDialog } from "../components/SatpGatewayToolbar";
 import { useSatpOptions } from "../hooks";
-import { satpSessionDetailQuery } from "../queries";
-import { formatDuration } from "../format";
+import {
+  satpPromInstantQuery,
+  satpSessionDetailQuery,
+  satpSessionProofsQuery,
+} from "../queries";
+import {
+  formatAbsoluteTime,
+  formatDuration,
+  formatRelativeTime,
+} from "../format";
 import { buildAuditBundle, downloadJson } from "../audit-bundle";
 import {
   collectLatestClaims,
+  collectSessionAssets,
   deriveFailureInfo,
+  deriveGatewayRole,
   deriveStage,
   isRollbackType,
+  promSessionSelector,
   stageLabel,
+  type SatpAssetSummary,
   type SatpSessionSnapshot,
   type SatpTimelineEvent,
 } from "../transform";
+import type { SatpQueryOptions, SatpSessionProof } from "../types";
 
 const SNAPSHOT_PRE_SX = {
   margin: 0,
@@ -63,9 +90,9 @@ const SNAPSHOT_PRE_SX = {
   overflowX: "auto",
   maxHeight: 320,
   fontSize: 12,
-  bgcolor: "grey.50",
+  bgcolor: "background.default",
   border: "1px solid",
-  borderColor: "grey.200",
+  borderColor: "divider",
   borderRadius: 1,
   fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
 } as const;
@@ -141,7 +168,7 @@ const COLOR_SX: Record<string, { bgcolor: string; color: string }> = {
   error: { bgcolor: "error.main", color: "error.contrastText" },
   primary: { bgcolor: "primary.main", color: "primary.contrastText" },
   warning: { bgcolor: "warning.main", color: "warning.contrastText" },
-  default: { bgcolor: "grey.300", color: "text.primary" },
+  default: { bgcolor: "divider", color: "text.primary" },
 };
 
 function SummaryHeader({
@@ -149,6 +176,7 @@ function SummaryHeader({
   status,
   stateLabel,
   durationMs,
+  lastTransition,
   onExport,
 }: {
   sessionId: string;
@@ -161,6 +189,13 @@ function SummaryHeader({
   stateLabel?: string;
   /** Elapsed time between the first and last audit event. */
   durationMs?: number;
+  /** Latest audit event: the session's last phase transition. */
+  lastTransition?: {
+    type: string;
+    stage?: number;
+    rollback?: boolean;
+    timestampMs?: number;
+  };
   /** Downloads the audit bundle; omitted when no detail data is loaded. */
   onExport?: () => void;
 }) {
@@ -205,6 +240,27 @@ function SummaryHeader({
                 )
               );
             })()}
+            {lastTransition && (
+              <Tooltip
+                title={
+                  lastTransition.timestampMs !== undefined
+                    ? formatAbsoluteTime(lastTransition.timestampMs)
+                    : "unknown time"
+                }
+              >
+                <Typography variant="caption" color="text.secondary">
+                  Last transition: <strong>{lastTransition.type}</strong>
+                  {lastTransition.rollback
+                    ? " (rollback)"
+                    : lastTransition.stage !== undefined
+                      ? ` (${stageLabel(lastTransition.stage)})`
+                      : ""}
+                  {lastTransition.timestampMs !== undefined
+                    ? ` · ${formatRelativeTime(lastTransition.timestampMs)}`
+                    : ""}
+                </Typography>
+              </Tooltip>
+            )}
             {onExport && (
               <Button
                 size="small"
@@ -329,8 +385,19 @@ function TransferPathCard({ snapshot }: { snapshot?: SatpSessionSnapshot }) {
   );
 }
 
-function ProofsCard({ claims }: { claims: Partial<Record<string, unknown>> }) {
+function ProofsCard({
+  claims,
+  proofs,
+  proofsUnsupported,
+}: {
+  claims: Partial<Record<string, unknown>>;
+  /** Signature-verified proofs from `GET /proofs`. */
+  proofs?: SatpSessionProof[];
+  /** True when the gateway has no `/proofs` endpoint (older version). */
+  proofsUnsupported?: boolean;
+}) {
   const entries = claimEntries(claims);
+  const verified = proofs ?? [];
   return (
     <Card variant="outlined" sx={{ height: "100%" }}>
       <CardHeader
@@ -351,51 +418,365 @@ function ProofsCard({ claims }: { claims: Partial<Record<string, unknown>> }) {
           </Stack>
         }
         title="Proofs & Claims"
-        subheader="Assertions extracted from the audit snapshots"
+        subheader={
+          verified.length > 0
+            ? `${verified.length} signature-verified proof${verified.length === 1 ? "" : "s"} from the gateway audit store`
+            : "Assertions extracted from the audit snapshots"
+        }
         titleTypographyProps={{ variant: "subtitle1", fontWeight: 600 }}
       />
       <CardContent sx={{ paddingTop: 0 }}>
-        {entries.length === 0 ? (
+        {verified.length > 0 && (
+          <Stack spacing={1} divider={<Divider flexItem />} sx={{ mb: 2 }}>
+            {verified.map((proof, index) => (
+              <Box key={`${proof.step.tag}-${index}`}>
+                <Stack
+                  direction="row"
+                  spacing={1}
+                  alignItems="center"
+                  sx={{ mb: 0.5, flexWrap: "wrap", rowGap: 0.5 }}
+                >
+                  <VerifiedIcon fontSize="small" color="success" />
+                  <Typography variant="subtitle2">{proof.step.tag}</Typography>
+                  {proof.step.messageType && (
+                    <Chip
+                      size="small"
+                      label={proof.step.messageType}
+                      variant="outlined"
+                      sx={{ height: 20, fontSize: 11 }}
+                    />
+                  )}
+                  {proof.step.role && (
+                    <Chip
+                      size="small"
+                      label={proof.step.role}
+                      variant="outlined"
+                      sx={{ height: 20, fontSize: 11 }}
+                    />
+                  )}
+                </Stack>
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ display: "block", mb: 1 }}
+                >
+                  {proof.step.description}
+                </Typography>
+                <Stack spacing={1}>
+                  <CopyableField label="Signature" value={proof.signedClaim} />
+                  <Box component="pre" sx={SNAPSHOT_PRE_SX}>
+                    {prettyJson(proof.claim)}
+                  </Box>
+                </Stack>
+              </Box>
+            ))}
+          </Stack>
+        )}
+        {proofsUnsupported && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mb: 1 }}
+          >
+            This gateway has no <code>/proofs</code> endpoint; showing the
+            claims recorded in the audit snapshots.
+          </Typography>
+        )}
+        {entries.length === 0 && verified.length === 0 ? (
           <Typography variant="body2" color="text.secondary">
             No proofs recorded in the audit window for this session.
           </Typography>
         ) : (
-          <Stack spacing={1} divider={<Divider flexItem />}>
-            {entries.map(({ label, claim }) => {
-              const id = claimIdOf(claim);
-              const serialized = JSON.stringify(claim, null, 2);
-              return (
-                <Box key={label}>
-                  <Stack
-                    direction="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    sx={{ marginBottom: 0.5 }}
-                  >
-                    <Typography variant="subtitle2">{label}</Typography>
+          entries.length > 0 && (
+            <Stack spacing={1} divider={<Divider flexItem />}>
+              {verified.length > 0 && (
+                <Typography variant="caption" color="text.secondary">
+                  CLAIMS IN THE AUDIT SNAPSHOTS
+                </Typography>
+              )}
+              {entries.map(({ label, claim }) => {
+                const id = claimIdOf(claim);
+                const serialized = JSON.stringify(claim, null, 2);
+                return (
+                  <Box key={label}>
+                    <Typography variant="subtitle2" sx={{ marginBottom: 0.5 }}>
+                      {label}
+                    </Typography>
                     {id && (
-                      <Tooltip title="Claim ID">
-                        <Chip
-                          label={id}
-                          size="small"
-                          sx={{
-                            fontFamily:
-                              "ui-monospace, SFMono-Regular, Menlo, monospace",
-                            fontSize: 11,
-                            maxWidth: 220,
-                          }}
-                        />
-                      </Tooltip>
+                      <Box sx={{ mb: 1 }}>
+                        <CopyableField label="Claim ID" value={id} />
+                      </Box>
                     )}
-                  </Stack>
-                  <Box component="pre" sx={SNAPSHOT_PRE_SX}>
-                    {serialized}
+                    <Box component="pre" sx={SNAPSHOT_PRE_SX}>
+                      {serialized}
+                    </Box>
                   </Box>
-                </Box>
-              );
-            })}
-          </Stack>
+                );
+              })}
+            </Stack>
+          )
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Pretty-prints a JSON string; returns it unchanged when it is not JSON. */
+function prettyJson(value: string): string {
+  try {
+    return JSON.stringify(JSON.parse(value), null, 2);
+  } catch {
+    return value;
+  }
+}
+
+function FailureCard({
+  classification,
+  stateLabel,
+  substatus,
+  errorDetail,
+}: {
+  classification: SatpFailureClassification;
+  stateLabel?: string;
+  substatus?: string;
+  errorDetail?: string;
+}) {
+  const retryColor =
+    classification.retry === "retryable"
+      ? "success"
+      : classification.retry === "not-retryable"
+        ? "error"
+        : classification.retry === "in-progress"
+          ? "warning"
+          : "default";
+  return (
+    <Alert
+      severity="error"
+      variant="outlined"
+      icon={<ErrorOutlineIcon fontSize="inherit" />}
+    >
+      <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+        This transfer did not complete — session state {stateLabel ?? "unknown"}
+        {substatus ? ` (${substatus})` : ""}.
+      </Typography>
+      <Table size="small" sx={{ mt: 1, maxWidth: 720 }}>
+        <TableBody>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 600, pl: 0 }}>Failed stage</TableCell>
+            <TableCell>
+              {classification.failedStage !== undefined
+                ? stageLabel(classification.failedStage)
+                : "unknown"}
+              {classification.failedStep
+                ? ` · while processing ${classification.failedStep}`
+                : ""}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 600, pl: 0 }}>Error class</TableCell>
+            <TableCell>
+              {classification.errorClass}
+              {classification.errorCode && (
+                <>
+                  {" "}
+                  <Chip
+                    size="small"
+                    label={classification.errorCode}
+                    variant="outlined"
+                    sx={{ height: 20, fontSize: 11, fontFamily: "monospace" }}
+                  />
+                </>
+              )}
+              {classification.errorDescription
+                ? ` — ${classification.errorDescription}`
+                : ""}
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell sx={{ fontWeight: 600, pl: 0, borderBottom: 0 }}>
+              Retry outlook
+            </TableCell>
+            <TableCell sx={{ borderBottom: 0 }}>
+              <Chip
+                size="small"
+                label={RETRY_OUTLOOK_LABELS[classification.retry]}
+                color={retryColor}
+                sx={{ height: 20, fontSize: 11, mr: 1 }}
+              />
+              {classification.retryHint}
+            </TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+      {errorDetail && (
+        <Box component="pre" sx={{ ...SNAPSHOT_PRE_SX, marginTop: 1 }}>
+          {errorDetail}
+        </Box>
+      )}
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ display: "block", mt: 1 }}
+      >
+        The retry outlook is derived from the SATP error code and gateway
+        substatus; SATP itself does not mark errors as retryable.
+      </Typography>
+    </Alert>
+  );
+}
+
+function AssetColumn({
+  title,
+  asset,
+}: {
+  title: string;
+  asset?: SatpAssetSummary;
+}) {
+  return (
+    <Stack spacing={1.25}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ fontWeight: 600 }}
+      >
+        {title.toUpperCase()}
+      </Typography>
+      {asset ? (
+        <>
+          <CopyableField label="Amount" value={asset.amount ?? "—"} />
+          <CopyableField
+            label="Token"
+            value={asset.tokenId ?? asset.contractName ?? "—"}
+          />
+          <CopyableField label="Network" value={asset.networkId ?? "—"} />
+          <CopyableField label="Owner" value={asset.owner ?? "—"} />
+          {asset.contractAddress && (
+            <CopyableField label="Contract" value={asset.contractAddress} />
+          )}
+        </>
+      ) : (
+        <Typography variant="body2" color="text.secondary">
+          Not recorded in the audit snapshots.
+        </Typography>
+      )}
+    </Stack>
+  );
+}
+
+function GasValue({
+  options,
+  metric,
+  sessionId,
+}: {
+  options: SatpQueryOptions;
+  metric: string;
+  sessionId: string;
+}) {
+  const { data, isPending, isError } = useQuery(
+    satpPromInstantQuery(
+      options,
+      `sum(${metric}${promSessionSelector(sessionId)})`,
+    ),
+  );
+  if (!options.prometheusUrl) {
+    return <>n/a</>;
+  }
+  if (isPending) {
+    return <Skeleton width={60} sx={{ display: "inline-block" }} />;
+  }
+  if (isError) {
+    return <>unavailable</>;
+  }
+  return (
+    <>
+      {data === null || data === undefined ? "no data" : data.toLocaleString()}
+    </>
+  );
+}
+
+/** Transferred asset and value on each side, plus gas from Prometheus. */
+function ValueCard({
+  events,
+  options,
+  sessionId,
+}: {
+  events: SatpTimelineEvent[];
+  options: SatpQueryOptions;
+  sessionId: string;
+}) {
+  const { sender, receiver } = collectSessionAssets(events);
+  return (
+    <Card variant="outlined">
+      <CardHeader
+        avatar={
+          <Stack
+            alignItems="center"
+            justifyContent="center"
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: 2,
+              bgcolor: "primary.main",
+              color: "primary.contrastText",
+              "& svg": { fontSize: 22 },
+            }}
+          >
+            <PaidIcon />
+          </Stack>
+        }
+        title="Value & Gas"
+        subheader="Asset moved on each ledger and gas spent for this session"
+        titleTypographyProps={{ variant: "subtitle1", fontWeight: 600 }}
+      />
+      <CardContent sx={{ paddingTop: 0 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={4}>
+            <AssetColumn title="Sent (source ledger)" asset={sender} />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <AssetColumn
+              title="Received (destination ledger)"
+              asset={receiver}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Stack spacing={1.25}>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ fontWeight: 600 }}
+              >
+                GAS (PROMETHEUS)
+              </Typography>
+              <Typography variant="body2">
+                Transaction gas:{" "}
+                <strong>
+                  <GasValue
+                    options={options}
+                    metric="transaction_gas_used"
+                    sessionId={sessionId}
+                  />
+                </strong>
+              </Typography>
+              <Typography variant="body2">
+                Bridge operation gas:{" "}
+                <strong>
+                  <GasValue
+                    options={options}
+                    metric="operation_gas_used"
+                    sessionId={sessionId}
+                  />
+                </strong>
+              </Typography>
+              {!options.prometheusUrl && (
+                <Typography variant="caption" color="text.secondary">
+                  Set <code>prometheusUrl</code> in the app options to show gas
+                  usage.
+                </Typography>
+              )}
+            </Stack>
+          </Grid>
+        </Grid>
       </CardContent>
     </Card>
   );
@@ -514,14 +895,13 @@ function TimelineEvent({
   isLast,
   expanded,
   onToggle,
-  isOriginGateway,
 }: {
   event: SatpTimelineEvent;
   isLast: boolean;
   expanded: boolean;
   onToggle: () => void;
-  isOriginGateway?: boolean;
 }) {
+  const role = deriveGatewayRole(event.snapshot);
   const { icon, color } = eventPresentation(event.type);
   const rawSnapshot = event.snapshot
     ? JSON.stringify(event.snapshot, null, 2)
@@ -549,7 +929,7 @@ function TimelineEvent({
         >
           {icon}
         </TimelineDot>
-        {!isLast && <TimelineConnector sx={{ bgcolor: "grey.300" }} />}
+        {!isLast && <TimelineConnector sx={{ bgcolor: "divider" }} />}
       </TimelineSeparator>
       <TimelineContent sx={{ paddingTop: 0, minWidth: 0 }}>
         <Card variant="outlined">
@@ -569,14 +949,21 @@ function TimelineEvent({
                   sx={{ fontSize: 11, height: 20 }}
                 />
               )}
-              {isOriginGateway && (
-                <Chip
-                  label="Origin Gateway"
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                  sx={{ fontSize: 10, height: 20 }}
-                />
+              {role && (
+                <Tooltip
+                  title={
+                    role === "client"
+                      ? "Logged by the gateway that started the transfer"
+                      : "Logged by the counterparty gateway"
+                  }
+                >
+                  <Chip
+                    label={role === "client" ? "client side" : "server side"}
+                    size="small"
+                    variant="outlined"
+                    sx={{ fontSize: 11, height: 20 }}
+                  />
+                </Tooltip>
               )}
             </Stack>
             <Stack direction="row" spacing={1} alignItems="center">
@@ -634,8 +1021,12 @@ export default function SessionDetailPage() {
   const navigate = useNavigate();
   const { showNotification } = useNotification();
   const options = useSatpOptions();
+  const { gateways } = useSatpGatewayContext();
   const [expandedSeq, setExpandedSeq] = React.useState<number | null>(null);
   const [manageGatewaysOpen, setManageGatewaysOpen] = React.useState(false);
+  const [timelineGatewayUrl, setTimelineGatewayUrl] = React.useState<
+    string | undefined
+  >(undefined);
 
   React.useEffect(() => {
     if (!sessionId) {
@@ -644,22 +1035,47 @@ export default function SessionDetailPage() {
     }
   }, [sessionId]);
 
-  const { isError, isPending, data, error } = useQuery(
-    satpSessionDetailQuery(options, sessionId ?? ""),
+  // The timeline, proofs and failure details come from one gateway: the
+  // one picked in the cross-gateway card, else the active gateway.
+  const sourceGatewayUrl =
+    timelineGatewayUrl &&
+    gateways.some((gw) => sameGatewayUrl(gw.url, timelineGatewayUrl))
+      ? timelineGatewayUrl
+      : options.gatewayUrl;
+  const sourceOptions: SatpQueryOptions = {
+    ...options,
+    gatewayUrl: sourceGatewayUrl,
+  };
+  const sourceGateway = gateways.find((gw) =>
+    sameGatewayUrl(gw.url, sourceGatewayUrl),
   );
+  const crossGateways =
+    gateways.length > 0
+      ? gateways
+      : [
+          {
+            id: "options",
+            name: "Gateway",
+            url: options.gatewayUrl,
+            source: "config" as const,
+          },
+        ];
 
-  React.useEffect(() => {
-    isError &&
-      showNotification(
-        `Could not fetch SATP session details: ${error}`,
-        "error",
-      );
-  }, [isError]);
+  const { isError, isPending, data, error, refetch, isFetching } = useQuery(
+    satpSessionDetailQuery(sourceOptions, sessionId ?? ""),
+  );
+  const proofsQuery = useQuery(
+    satpSessionProofsQuery(sourceOptions, sessionId ?? ""),
+  );
 
   const { detail, status } = data ?? {};
   const snapshot = detail?.latestSnapshot;
   const failure = deriveFailureInfo(snapshot, status);
   const events = detail?.events ?? [];
+  const classification = failure.failed
+    ? classifySatpFailure({ snapshot, substatus: status?.substatus, events })
+    : undefined;
+  const lastEvent = events[events.length - 1];
 
   // Elapsed transfer time from the audit timeline (first to last event with
   // a timestamp); needs at least two events, otherwise there is no span.
@@ -693,6 +1109,16 @@ export default function SessionDetailPage() {
         status={status}
         stateLabel={failure.stateLabel}
         durationMs={durationMs}
+        lastTransition={
+          lastEvent
+            ? {
+                type: lastEvent.type,
+                rollback: isRollbackType(lastEvent.type),
+                stage: deriveStage(lastEvent.type),
+                timestampMs: lastEvent.timestampMs,
+              }
+            : undefined
+        }
         onExport={
           detail
             ? () =>
@@ -704,31 +1130,33 @@ export default function SessionDetailPage() {
         }
       />
 
+      {isError && (
+        <SatpQueryError
+          what="the session details"
+          gatewayUrl={sourceGatewayUrl}
+          error={error}
+          onRetry={() => void refetch()}
+          retrying={isFetching}
+        />
+      )}
+
       <DualGatewayFlowCard
         sessionId={sessionId}
-        primaryGatewayUrl={options.gatewayUrl}
-        counterpartyGatewayUrl={options.counterpartyGatewayUrl}
+        gateways={crossGateways}
+        options={options}
+        timelineGatewayUrl={sourceGatewayUrl}
+        onSelectTimelineGateway={setTimelineGatewayUrl}
         onOpenManageGateways={() => setManageGatewaysOpen(true)}
       />
 
       <Stack spacing={3}>
-        {failure.failed && (
-          <Alert
-            severity="error"
-            variant="outlined"
-            icon={<ErrorOutlineIcon fontSize="inherit" />}
-          >
-            <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-              This transfer did not complete — session state{" "}
-              {failure.stateLabel ?? "unknown"}
-              {status?.substatus ? ` (${status.substatus})` : ""}.
-            </Typography>
-            {failure.errorDetail && (
-              <Box component="pre" sx={{ ...SNAPSHOT_PRE_SX, marginTop: 1 }}>
-                {failure.errorDetail}
-              </Box>
-            )}
-          </Alert>
+        {failure.failed && classification && (
+          <FailureCard
+            classification={classification}
+            stateLabel={failure.stateLabel}
+            substatus={status?.substatus}
+            errorDetail={failure.errorDetail}
+          />
         )}
 
         <Grid container spacing={3}>
@@ -736,14 +1164,33 @@ export default function SessionDetailPage() {
             <TransferPathCard snapshot={snapshot} />
           </Grid>
           <Grid item xs={12} lg={5}>
-            <ProofsCard claims={collectLatestClaims(events)} />
+            <ProofsCard
+              claims={collectLatestClaims(events)}
+              proofs={proofsQuery.data ?? undefined}
+              proofsUnsupported={proofsQuery.data === null}
+            />
           </Grid>
         </Grid>
+
+        <ValueCard
+          events={events}
+          options={sourceOptions}
+          sessionId={sessionId}
+        />
 
         <MessageEvidenceCard snapshot={snapshot} />
 
         <Box>
           <SectionTitle>Audit Timeline ({events.length} events)</SectionTitle>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mb: 1 }}
+          >
+            Recorded by {sourceGateway?.name ?? "gateway"} (
+            <code>{sourceGatewayUrl}</code>). Pick another gateway in the card
+            above to compare its side of the transfer.
+          </Typography>
           {events.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
               No audit entries found for this session in the last 7 days.
@@ -786,9 +1233,6 @@ export default function SessionDetailPage() {
                               : event.sequenceNumber,
                           )
                         }
-                        isOriginGateway={Boolean(
-                          options.counterpartyGatewayUrl,
-                        )}
                       />
                     ))}
                   </React.Fragment>
@@ -810,6 +1254,7 @@ export default function SessionDetailPage() {
       <ManageGatewaysDialog
         open={manageGatewaysOpen}
         onClose={() => setManageGatewaysOpen(false)}
+        options={options}
       />
     </Box>
   );

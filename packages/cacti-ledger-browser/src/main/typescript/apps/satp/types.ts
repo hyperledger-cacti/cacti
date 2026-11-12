@@ -12,15 +12,33 @@
  */
 
 /**
- * Descriptor for a configured SATP gateway endpoint.
- * Enables un-hardcoded multi-gateway connections and cross-gateway inspection.
+ * One extra gateway entry of the persisted `gateways` app option.
+ * Lets one app instance know every gateway taking part in a transfer, so
+ * the inspector can look up the same session on each of them.
  */
+export interface SatpGatewayOption {
+  /** Display label; defaults to the URL. */
+  name?: string;
+  /** Base URL of the gateway OAPI (REST) server. */
+  url: string;
+  description?: string;
+}
+
+/**
+ * Where a gateway endpoint of the gateway list comes from:
+ * - `config`: the app instance options in the config store (shared by every
+ *   viewer, edited via "Configure app" or "Save to app config"),
+ * - `user`: added in this browser only (localStorage, per app instance).
+ */
+export type SatpGatewaySource = "config" | "user";
+
+/** A resolved gateway endpoint of the gateway list (runtime view model). */
 export interface SatpGatewayEndpoint {
   id: string;
   name: string;
   url: string;
   description?: string;
-  isDefault?: boolean;
+  source: SatpGatewaySource;
 }
 
 /**
@@ -29,22 +47,24 @@ export interface SatpGatewayEndpoint {
  */
 export interface SatpAppOptions {
   /**
-   * Base URL of the primary/active SATP Hermes gateway OAPI (REST) server, e.g.
+   * Base URL of the primary SATP Hermes gateway OAPI (REST) server, e.g.
    * `http://localhost:4010` (`docker-compose-satp.yml` maps it to host
-   * port 3012).
+   * port 3012). This is the gateway shown when no other one is selected.
    */
   gatewayUrl: string;
 
   /**
-   * Optional base URL of the counterparty SATP gateway (e.g. `http://localhost:4020`),
-   * allowing end-to-end inspection of real cross-chain flows.
+   * Optional base URL of the counterparty SATP gateway of a transfer, for
+   * inspecting both sides of a real cross-chain flow. Kept for backwards
+   * compatibility, `gateways` covers any number of gateways.
    */
   counterpartyGatewayUrl?: string;
 
   /**
-   * Additional configured gateway endpoints for dynamic switching.
+   * Optional additional gateways (any number). The same session is looked
+   * up on every configured gateway.
    */
-  configuredGateways?: SatpGatewayEndpoint[];
+  gateways?: SatpGatewayOption[];
 
   /**
    * Optional base URL of a Prometheus server scraping the gateway metrics
@@ -52,6 +72,43 @@ export interface SatpAppOptions {
    * panels are hidden when missing or unreachable.
    */
   prometheusUrl?: string;
+}
+
+/** Viewer-selected live polling settings (never persisted to the store). */
+export interface SatpPollingSettings {
+  /** When true, live views stop polling (manual refresh still works). */
+  paused: boolean;
+  /** Base polling interval while the gateway is healthy. */
+  intervalMs: number;
+}
+
+/**
+ * Options the query factories consume: the instance options with the
+ * currently selected gateway as `gatewayUrl`, plus runtime-only settings.
+ */
+export interface SatpQueryOptions extends SatpAppOptions {
+  polling?: SatpPollingSettings;
+}
+
+/** `GET /proofs` - signature-verified session proofs. */
+export interface SatpSessionProofsResponse {
+  proofs?: SatpSessionProof[];
+}
+
+/** One signature-verified claim recorded at a SATP protocol step. */
+export interface SatpSessionProof {
+  sessionId: string;
+  step: {
+    tag: string;
+    description: string;
+    role?: string;
+    sequence?: number;
+    messageType?: string;
+  };
+  /** JSON-serialized assertion claim. */
+  claim: string;
+  /** Signature carried by the claim. */
+  signedClaim: string;
 }
 
 /** `GET /healthcheck` - availability of the gateway OAPI server. */

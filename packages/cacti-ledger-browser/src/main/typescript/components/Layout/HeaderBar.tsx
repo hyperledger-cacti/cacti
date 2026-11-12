@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
+import { alpha, type Theme } from "@mui/material/styles";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -69,10 +70,10 @@ export default function HeaderBar({
       position="sticky"
       elevation={0}
       sx={{
-        bgcolor: "#ffffff",
+        bgcolor: "background.paper",
         borderBottom: "1px solid",
-        borderColor: "#dfe5e3",
-        color: "#101314",
+        borderColor: "divider",
+        color: "text.primary",
         zIndex: 1100,
         height: 56,
         justifyContent: "center",
@@ -99,8 +100,8 @@ export default function HeaderBar({
                 size="small"
                 onClick={() => navigate(-1)}
                 sx={{
-                  color: "#3b4548",
-                  "&:hover": { color: "#101314", bgcolor: "rgba(0,0,0,0.04)" },
+                  color: "text.secondary",
+                  "&:hover": { color: "text.primary", bgcolor: "action.hover" },
                 }}
               >
                 <ArrowBackIcon fontSize="small" />
@@ -112,7 +113,7 @@ export default function HeaderBar({
               variant="body2"
               sx={{
                 fontWeight: 600,
-                color: isHome ? "#4e8c5e" : "#8d9a9d",
+                color: isHome ? "primary.main" : "text.disabled",
                 fontSize: 13,
               }}
             >
@@ -120,14 +121,14 @@ export default function HeaderBar({
             </Typography>
             {!isHome && (
               <>
-                <Typography variant="caption" sx={{ color: "#dfe5e3" }}>
+                <Typography variant="caption" sx={{ color: "divider" }}>
                   /
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{
                     fontWeight: 600,
-                    color: "#101314",
+                    color: "text.primary",
                     fontSize: 13,
                   }}
                 >
@@ -158,20 +159,21 @@ export default function HeaderBar({
             flex: "0 1 440px",
             display: { xs: "none", sm: "flex" },
             alignItems: "center",
-            bgcolor: "#f7f9f6",
+            bgcolor: "background.default",
             borderRadius: "20px",
-            border: "1px solid #dfe5e3",
+            border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
             px: 1.5,
             py: 0.25,
             transition: "all 0.15s ease",
             "&:focus-within": {
-              borderColor: "#7fbf8a",
-              bgcolor: "#ffffff",
-              boxShadow: "0 0 0 2px rgba(127, 191, 138, 0.25)",
+              borderColor: "primary.light",
+              bgcolor: "background.paper",
+              boxShadow: (theme: Theme) =>
+                `0 0 0 2px ${alpha(theme.palette.primary.light, 0.25)}`,
             },
           }}
         >
-          <SearchIcon sx={{ color: "#8d9a9d", fontSize: 18, mr: 1 }} />
+          <SearchIcon sx={{ color: "text.disabled", fontSize: 18, mr: 1 }} />
           <InputBase
             inputRef={searchInputRef}
             placeholder="Search sessions, gateways, ledgers..."
@@ -180,9 +182,9 @@ export default function HeaderBar({
             sx={{
               flex: 1,
               fontSize: 13,
-              color: "#101314",
+              color: "text.primary",
               "& input::placeholder": {
-                color: "#8d9a9d",
+                color: "text.disabled",
                 opacity: 1,
               },
             }}
@@ -193,7 +195,7 @@ export default function HeaderBar({
               onClick={() => setSearchValue("")}
               sx={{ p: 0.25 }}
             >
-              <ClearIcon sx={{ fontSize: 16, color: "#8d9a9d" }} />
+              <ClearIcon sx={{ fontSize: 16, color: "text.disabled" }} />
             </IconButton>
           ) : (
             <Chip
@@ -203,9 +205,9 @@ export default function HeaderBar({
               sx={{
                 height: 20,
                 fontSize: 10,
-                color: "#8d9a9d",
-                borderColor: "#dfe5e3",
-                bgcolor: "#ffffff",
+                color: "text.disabled",
+                borderColor: "divider",
+                bgcolor: "background.paper",
                 borderRadius: "4px",
                 pointerEvents: "none",
               }}
@@ -221,10 +223,11 @@ export default function HeaderBar({
                 size="small"
                 onClick={() => window.open(appDocumentationURL, "_blank")}
                 sx={{
-                  color: "#3b4548",
+                  color: "text.secondary",
                   "&:hover": {
-                    color: "#4e8c5e",
-                    bgcolor: "rgba(78, 140, 94, 0.08)",
+                    color: "primary.main",
+                    bgcolor: (theme: Theme) =>
+                      `${alpha(theme.palette.primary.main, 0.08)}`,
                   },
                 }}
                 aria-label="app-documentation-link"
@@ -238,8 +241,8 @@ export default function HeaderBar({
             <IconButton
               size="small"
               sx={{
-                color: "#3b4548",
-                "&:hover": { color: "#101314", bgcolor: "rgba(0, 0, 0, 0.04)" },
+                color: "text.secondary",
+                "&:hover": { color: "text.primary", bgcolor: "action.hover" },
               }}
               aria-label="settings-button"
             >

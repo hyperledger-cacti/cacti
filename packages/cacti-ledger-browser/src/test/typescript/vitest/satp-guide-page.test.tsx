@@ -102,7 +102,7 @@ describe("GuidePage", () => {
       screen.getByText("Start a SATP Hermes gateway (with Prometheus)"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Point this app at the gateway"),
+      screen.getByText("Point this app at your gateways"),
     ).toBeInTheDocument();
     expect(
       screen.getByText("Run transfers and watch them appear"),
@@ -112,12 +112,18 @@ describe("GuidePage", () => {
     expect(commandTexts[0]).toContain("docker compose --project-directory");
     expect(commandTexts[0]).toContain("docker-compose-satp.yml up -d --build");
     expect(commandTexts[1]).toContain("cactus-plugin-satp-hermes/healthcheck");
-    expect(commandTexts[2]).toContain("test:integration:docker-local");
+    // Step 2 shows a multi-gateway options example.
+    expect(JSON.parse(commandTexts[2])).toMatchObject({
+      gatewayUrl: expect.any(String),
+      counterpartyGatewayUrl: expect.any(String),
+      gateways: [expect.objectContaining({ url: expect.any(String) })],
+    });
+    expect(commandTexts[3]).toContain("test:integration:docker-local");
 
     // Every command block has a copy button.
     expect(
       screen.getAllByRole("button", { name: "copy command" }),
-    ).toHaveLength(3);
+    ).toHaveLength(4);
   });
 
   it("copies a command block to the clipboard", async () => {
@@ -143,7 +149,7 @@ describe("GuidePage", () => {
 
     const docsLink = screen.getByRole("link", { name: "Full documentation" });
     expect(docsLink.getAttribute("href")).toBe(
-      "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/satp-inspector/",
+      "https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/plugin-apps/satp-inspector/",
     );
   });
 });

@@ -208,15 +208,15 @@ describe("SessionsPage empty/error state setup guide link", () => {
 
     renderSessionsPage();
 
-    // Empty/error state explains where the gateway should be. The query
-    // retries once before surfacing the error, hence the generous timeout.
-    expect(
-      await screen.findByText(
-        /Is the gateway reachable at/,
-        {},
-        { timeout: 4000 },
-      ),
-    ).toHaveTextContent(`Is the gateway reachable at http://localhost:4010`);
+    // The inline error says what failed and where. The query retries once
+    // before surfacing the error, hence the generous timeout.
+    const alert = await screen.findByRole("alert", {}, { timeout: 4000 });
+    expect(alert).toHaveTextContent("Could not load SATP sessions");
+    expect(alert).toHaveTextContent("http://localhost:4010");
+    expect(alert).toHaveTextContent("getaddrinfo ENOTFOUND gateway");
+    expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
+    // The empty state is not shown on top of the error.
+    expect(screen.queryByText("No SATP transfer sessions found.")).toBeNull();
 
     // ... and links to the setup guide.
     const guide = await screen.findByRole("button", { name: /setup guide/i });
@@ -232,6 +232,9 @@ describe("SessionsPage empty/error state setup guide link", () => {
 
     expect(
       await screen.findByText("No SATP transfer sessions found."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Is the gateway reachable at http:\/\/localhost:4010/),
     ).toBeInTheDocument();
     await waitFor(() =>
       expect(

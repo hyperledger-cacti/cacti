@@ -135,8 +135,9 @@ export default function GuidePage() {
                 {" · "}Prometheus: <code>{options.prometheusUrl}</code>
               </>
             ) : null}
-            . Change them via the app card&apos;s configure dialog on the home
-            page.
+            . Switch gateways or add more with <strong>Manage gateways</strong>{" "}
+            in the toolbar above; the app card&apos;s configure dialog on the
+            home page edits the stored options.
           </Typography>
         </CardContent>
       </Card>
@@ -171,15 +172,36 @@ export default function GuidePage() {
           />
         </Step>
 
-        <Step index={2} title="Point this app at the gateway">
+        <Step index={2} title="Point this app at your gateways">
           <Typography variant="body2">
-            On the ledger browser home page, open this app card&apos;s configure
-            dialog and set the gateway URL to <code>http://localhost:3012</code>{" "}
-            (the compose publishes the gateway OAPI port 4010 on host 3012).
-            Optionally set a Prometheus URL (<code>http://localhost:9090</code>)
-            to light up the Overview metrics. Without a gateway URL the app
-            still renders, in unreachable mode with polling backoff.
+            Open <strong>Manage gateways</strong> in the toolbar and add the
+            gateway at <code>http://localhost:3012</code> (the compose publishes
+            the gateway OAPI port 4010 on host 3012). For a cross-chain
+            transfer, add the counterparty gateway too: sessions are looked up
+            on every gateway, so both sides of a transfer appear together and
+            the session page compares them. <strong>Save to app config</strong>{" "}
+            stores the list for every viewer (otherwise it stays in this
+            browser).
           </Typography>
+          <Typography variant="body2">
+            Optionally set a Prometheus URL (<code>http://localhost:9090</code>)
+            in the app options to light up the Overview metrics and per-session
+            gas usage. The stored options accept any number of gateways:
+          </Typography>
+          <CommandBlock
+            command={JSON.stringify(
+              {
+                gatewayUrl: "http://localhost:4010",
+                counterpartyGatewayUrl: "http://localhost:4110",
+                gateways: [
+                  { name: "Third gateway", url: "http://localhost:4210" },
+                ],
+                prometheusUrl: "http://localhost:9090",
+              },
+              null,
+              2,
+            )}
+          />
         </Step>
 
         <Step index={3} title="Run transfers and watch them appear">
@@ -195,9 +217,10 @@ export default function GuidePage() {
             }
           />
           <Typography variant="body2">
-            The sessions table auto-refreshes (with backoff while the gateway is
-            down); click a row for the audit timeline, proofs, transfer path and
-            the JSON audit bundle export{" "}
+            The sessions table auto-refreshes (pause it or change the interval
+            in the toolbar; it backs off while a gateway is down). Click a row
+            for the cross-gateway view, audit timeline, verified proofs, failure
+            analysis, transfer path and the JSON audit bundle export{" "}
             <DownloadIcon sx={{ fontSize: 14, verticalAlign: "middle" }} />.
           </Typography>
         </Step>
@@ -206,7 +229,7 @@ export default function GuidePage() {
           <Button
             variant="outlined"
             size="small"
-            href="https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/satp-inspector/"
+            href="https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/plugin-apps/satp-inspector/"
             target="_blank"
             rel="noopener"
           >

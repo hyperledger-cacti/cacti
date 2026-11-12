@@ -1,13 +1,15 @@
 # Slim self-hosted backend for the Cacti Ledger Browser.
 #
 # Replaces the ~15-service Supabase "all-in-one" image for local use with
-# three small containers:
+# a few small containers:
 #   config-api       nginx publishing PostgREST under /rest/v1/ (port 8000)
 #                    - the exact REST surface supabase-js talks to.
 #   config-db        PostgreSQL holding gui_app_config / plugin_status,
 #                    seeded with one example app instance (see init/01-init.sql).
-#   example-gateway  canned SATP Hermes gateway responses (port 3013) so the
-#                    UI shows real-looking sessions out of the box.
+#   example-gateway(-destination)
+#                    canned SATP Hermes gateway responses for both sides of
+#                    a transfer (ports 3013 and 3014) so the UI shows
+#                    real-looking cross-gateway sessions out of the box.
 #
 # Usage (from the repository root):
 #   docker compose -f tools/docker/ledger-browser-config-postgrest/docker-compose.yml up -d
@@ -61,13 +63,32 @@ services:
     volumes:
       - ./config-api-nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
+  # Two example gateways from one script: the origin (SATP client side,
+  # :3013) and its counterparty (SATP server side, :3014). Both log the same
+  # session IDs, so the inspector shows both sides of each transfer.
   example-gateway:
     restart: unless-stopped
     image: node:22-alpine
     working_dir: /srv
     command: node server.mjs
+    environment:
+      GATEWAY_SIDE: origin
+      PORT: "3013"
     ports:
       - "3013:3013"
+    volumes:
+      - ./example-gateway:/srv:ro
+
+  example-gateway-destination:
+    restart: unless-stopped
+    image: node:22-alpine
+    working_dir: /srv
+    command: node server.mjs
+    environment:
+      GATEWAY_SIDE: destination
+      PORT: "3014"
+    ports:
+      - "3014:3014"
     volumes:
       - ./example-gateway:/srv:ro
 

@@ -12,10 +12,15 @@ configuration](./satp-inspector.md) (including the trust model) and the
 ## Demo A: example data, out of the box
 
 The slim local profile seeds the UI with a preloaded SATP Inspector
-instance backed by a bundled, read-only example gateway (three canned
-sessions with now-relative timestamps: a completed Besu→Fabric transfer
-with lock/mint proofs, an in-progress transfer, and a failed transfer with
-rollback and refund state).
+instance backed by two bundled, read-only example gateways: the origin
+gateway of the transfers (`http://localhost:3013`, SATP client side) and
+its counterparty (`http://localhost:3014`, SATP server side). Both log the
+same session IDs with the messages of their own side, so the cross-gateway
+view shows a real two-sided flow. Three canned sessions with now-relative
+timestamps: a completed Besu→Fabric transfer with verified lock/mint/burn
+proofs on both gateways, an in-progress transfer where the destination is
+one stage behind, and a failed Ethereum→Polygon transfer (SATP error
+`err_2.2.8`, rollback) whose destination gateway is not running.
 
 ```sh
 # From the repository root - two commands, no .env needed:
@@ -26,20 +31,29 @@ corepack yarn workspace @hyperledger-cacti/cacti-ledger-browser start     # → 
 What to look at, in order:
 
 1. **Home page** — the "SATP Inspector (example data)" card shows a live
-   healthcheck status for the example gateway. Try the status dialog and
-   the configure dialog.
-2. **Sessions** — KPI cards (Total / In progress / Completed / Failed /
-   Rollbacks) double as outcome filters; search filters across every row
-   field (try `fabric`, `polygon`, `0x`); column headers sort. Rows are
-   keyboard operable (Tab, Enter).
-3. **Session detail** (click the completed session) — audit timeline by
-   proof sequence number, copyable proofs and gateway keys, transfer path,
-   duration, and **Export audit bundle** (a schema-versioned JSON with the
-   raw gateway snapshots).
-4. **Session detail** (the failed session) — failure banner with the error
-   detail and rollback/refund substatus; rollback steps flagged in the
-   timeline.
-5. **Overview** — aggregate metrics; they light up only with a Prometheus
+   healthcheck status for the instance's primary gateway. Try the status
+   dialog and the configure dialog (the options list both gateways).
+2. **Toolbar** — the active and counterparty gateway selectors, live
+   polling controls (pause/resume, refresh every 3/5/10/30 s, refresh now)
+   and **Manage gateways**: add any number of gateways, then **Save to app
+   config** to store them for every viewer.
+3. **Sessions** — sessions from all gateways, merged: the "Seen on" column
+   shows which gateways know each session. KPI cards (Total / In progress /
+   Completed / Failed / Rollbacks) double as outcome filters; search filters
+   across every row field (try `fabric`, `polygon`, `0x`); column headers
+   sort. Rows are keyboard operable (Tab, Enter).
+4. **Session detail** (click the completed session) — the cross-gateway card
+   (both sides settled, per-gateway stage/status, pick whose timeline to
+   show), signature-verified proofs from `GET /proofs`, value moved on each
+   ledger, last transition, audit timeline and **Export audit bundle** (a
+   schema-versioned JSON with the raw gateway snapshots).
+5. **Session detail** (the failed session) — the failure analysis: failed
+   stage and step, error class and SATP error code with its registry
+   description, and a retry outlook. The session is seen on 1 of 2 gateways.
+6. **Messages** — click a message to inspect the session state recorded
+   with it, field by field (hashes, signatures and claims highlighted as
+   evidence) or raw.
+7. **Overview** — aggregate metrics; they light up only with a Prometheus
    URL configured (the example gateway does not serve metrics; the real
    gateway stack does, see Demo C).
 
@@ -63,11 +77,12 @@ corepack yarn workspace @hyperledger-cacti/cactus-plugin-satp-hermes \
 corepack yarn workspace @hyperledger-cacti/cacti-ledger-browser start
 ```
 
-In the UI: **Add Application → SATP Inspector**, `gatewayUrl`
-`http://localhost:4010`. Sessions appear as the suite creates them and the
-timeline/KPIs update on every poll (10 s cadence while healthy). A second
-instance on `http://localhost:4110` shows the counterparty gateway's view
-of the same transfers.
+In the UI: **Add Application → SATP Inspector** with the options
+`{"gatewayUrl": "http://localhost:4010", "counterpartyGatewayUrl": "http://localhost:4110"}`
+(or add the second gateway later with **Manage gateways**). Sessions appear
+as the suite creates them, merged across both gateways, and the
+timeline/KPIs update on every poll (10 s by default, adjustable in the
+toolbar). Each session page shows both gateways' view of the transfer.
 
 The suite tears its gateways and ledgers down when it finishes, so these
 sessions exist only during the run - that is inherent to the test harness,

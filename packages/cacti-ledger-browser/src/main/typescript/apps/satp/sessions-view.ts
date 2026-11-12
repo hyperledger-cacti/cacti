@@ -80,6 +80,7 @@ function searchableText(row: SatpSessionRow): string {
     row.senderGateway,
     row.recipientGateway,
     row.assetId,
+    ...(row.observedOn ?? []),
   ]
     .filter((value) => value !== undefined && value !== "")
     .join(" \n")
@@ -177,4 +178,88 @@ export function sessionKpis(rows: SatpSessionRow[]): SessionKpis {
     failed: rows.filter((row) => matchesBucket(row, "failed")).length,
     rollbacks: rows.filter((row) => matchesBucket(row, "rollback")).length,
   };
+}
+
+/** Session rows fetched from one gateway. */
+export interface GatewaySessionRows {
+  gatewayName: string;
+  rows: SatpSessionRow[];
+}
+
+function pickDefined<T>(a: T | undefined, b: T | undefined): T | undefined {
+  return a !== undefined && a !== "" ? a : b;
+}
+
+/**
+ * Merges the session lists of several gateways into one row per session ID.
+ * Both gateways of a transfer log the same session, so a session seen on
+ * two gateways becomes one row with `observedOn` naming both.
+ *
+ * Per field, the gateway with more audit events for the session wins (it
+ * saw more of the transfer); gaps are filled from the other gateways.
+ * `eventCount` is the total across gateways, `lastActivityMs` the latest,
+ * `startTimeMs` the earliest, `hasRollback` true if any gateway saw one.
+ */
+export function mergeGatewaySessionRows(
+  results: GatewaySessionRows[],
+): SatpSessionRow[] {
+  const merged = new Map<string, SatpSessionRow>();
+  const best = new Map<string, number>();
+
+  for (const { gatewayName, rows } of results) {
+    for (const row of rows) {
+      const existing = merged.get(row.sessionId);
+      if (!existing) {
+        merged.set(row.sessionId, { ...row, observedOn: [gatewayName] });
+        best.set(row.sessionId, row.eventCount);
+        continue;
+      }
+      const preferNew = row.eventCount > (best.get(row.sessionId) ?? 0);
+      const [primary, secondary] = preferNew
+        ? [row, existing]
+        : [existing, row];
+      if (preferNew) {
+        best.set(row.sessionId, row.eventCount);
+      }
+      const starts = [existing.startTimeMs, row.startTimeMs].filter(
+        (value): value is number => value !== undefined,
+      );
+      const activity = [existing.lastActivityMs, row.lastActivityMs].filter(
+        (value): value is number => value !== undefined,
+      );
+      merged.set(row.sessionId, {
+        sessionId: row.sessionId,
+        status: pickDefined(primary.status, secondary.status),
+        substatus: pickDefined(primary.substatus, secondary.substatus),
+        stage: pickDefined(primary.stage, secondary.stage),
+        stateLabel: pickDefined(primary.stateLabel, secondary.stateLabel),
+        sourceLedger: pickDefined(primary.sourceLedger, secondary.sourceLedger),
+        destinationLedger: pickDefined(
+          primary.destinationLedger,
+          secondary.destinationLedger,
+        ),
+        senderGateway: pickDefined(
+          primary.senderGateway,
+          secondary.senderGateway,
+        ),
+        recipientGateway: pickDefined(
+          primary.recipientGateway,
+          secondary.recipientGateway,
+        ),
+        assetId: pickDefined(primary.assetId, secondary.assetId),
+        startTimeMs: starts.length ? Math.min(...starts) : undefined,
+        lastActivityMs: activity.length ? Math.max(...activity) : undefined,
+        eventCount: existing.eventCount + row.eventCount,
+        hasRollback: existing.hasRollback || row.hasRollback,
+        observedOn: [
+          ...(existing.observedOn ?? []),
+          ...(existing.observedOn?.includes(gatewayName) ? [] : [gatewayName]),
+        ],
+      });
+    }
+  }
+
+  return [...merged.values()].sort(
+    (a, b) => (b.lastActivityMs ?? 0) - (a.lastActivityMs ?? 0),
+  );
 }

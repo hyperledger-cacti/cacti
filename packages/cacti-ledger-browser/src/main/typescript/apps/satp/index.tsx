@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Outlet } from "react-router-dom";
 import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
@@ -19,6 +18,7 @@ import {
   useSatpOptions,
 } from "./hooks";
 import { satpHealthQuery } from "./queries";
+import { validateGatewayOptions } from "./gateways";
 import { AppDefinition } from "../../common/types/app";
 import { GuiAppConfig } from "../../common/supabase-types";
 import { AppCategory } from "../../common/app-category";
@@ -30,8 +30,13 @@ import type { SatpAppOptions } from "./types";
  * Status component shown in the app status pop up - reports gateway
  * healthcheck reachability.
  */
-function SatpGatewayStatus() {
-  const options = useSatpOptions();
+function SatpGatewayStatus({
+  instanceOptions,
+}: {
+  instanceOptions?: SatpAppOptions;
+}) {
+  const routeOptions = useSatpOptions();
+  const options = instanceOptions?.gatewayUrl ? instanceOptions : routeOptions;
   const { isPending, data } = useQuery(satpHealthQuery(options));
 
   return (
@@ -61,7 +66,7 @@ function SatpGatewayStatus() {
 const satpAppDefinition: AppDefinition = {
   appName: "SATP Inspector",
   appDocumentationURL:
-    "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/satp-inspector/",
+    "https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/plugin-apps/satp-inspector/",
   appSetupGuideURL: SATP_APP_SETUP_GUIDE_URL,
   category: AppCategory.LedgerBrowser,
   defaultInstanceName: "My SATP Inspector",
@@ -71,6 +76,7 @@ const satpAppDefinition: AppDefinition = {
   defaultOptions: {
     gatewayUrl: DEFAULT_SATP_GATEWAY_URL,
     counterpartyGatewayUrl: "",
+    gateways: [],
     prometheusUrl: "http://localhost:9090",
   },
 
@@ -109,6 +115,10 @@ const satpAppDefinition: AppDefinition = {
         `Invalid SATP inspector prometheusUrl "${satpOptions.prometheusUrl}": must be an absolute http(s) URL or empty`,
       );
     }
+    const gatewaysError = validateGatewayOptions(satpOptions.gateways);
+    if (gatewaysError) {
+      throw new Error(`Invalid SATP inspector option: ${gatewaysError}`);
+    }
 
     return {
       id: app.id,
@@ -142,63 +152,27 @@ const satpAppDefinition: AppDefinition = {
           url: "/guide",
         },
       ],
+      // One layout route per instance: it mounts the gateway list and the
+      // polling settings once for all pages of the instance.
       routes: [
         {
           element: (
-            <SatpPageLayout>
-              <SessionsPage />
-            </SatpPageLayout>
+            <SatpPageLayout appInstanceId={app.id} options={satpOptions} />
           ),
-        },
-        {
-          path: "session",
-          element: <Outlet context={satpOptions} />,
           children: [
-            {
-              path: ":sessionId",
-              element: (
-                <SatpPageLayout>
-                  <SessionDetailPage />
-                </SatpPageLayout>
-              ),
-            },
+            { index: true, element: <SessionsPage /> },
+            { path: "session/:sessionId", element: <SessionDetailPage /> },
+            { path: "gateways", element: <GatewaysPage /> },
+            { path: "messages", element: <MessagesPage /> },
+            { path: "overview", element: <OverviewPage /> },
+            { path: "guide", element: <GuidePage /> },
           ],
         },
-        {
-          path: "gateways",
-          element: (
-            <SatpPageLayout>
-              <GatewaysPage />
-            </SatpPageLayout>
-          ),
-        },
-        {
-          path: "messages",
-          element: (
-            <SatpPageLayout>
-              <MessagesPage />
-            </SatpPageLayout>
-          ),
-        },
-        {
-          path: "overview",
-          element: (
-            <SatpPageLayout>
-              <OverviewPage />
-            </SatpPageLayout>
-          ),
-        },
-        {
-          path: "guide",
-          element: (
-            <SatpPageLayout>
-              <GuidePage />
-            </SatpPageLayout>
-          ),
-        },
       ],
-      useAppStatus: () => useSatpAppStatus(),
-      StatusComponent: <SatpGatewayStatus />,
+      // The home page renders these outside the app routes, so they get the
+      // instance options directly (not the runtime-config fallback).
+      useAppStatus: () => useSatpAppStatus(satpOptions),
+      StatusComponent: <SatpGatewayStatus instanceOptions={satpOptions} />,
     };
   },
 };

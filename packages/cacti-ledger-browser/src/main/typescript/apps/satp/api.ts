@@ -11,13 +11,19 @@
  * The gateway OAPI server allows cross-origin requests and needs no
  * authentication, so the browser can call it directly.
  */
-import axios, { type AxiosRequestConfig, type AxiosResponse } from "axios";
+import axios, {
+  isAxiosError,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+} from "axios";
 
 import {
   type SatpAppOptions,
   type SatpAuditEntry,
   type SatpAuditResponse,
   type SatpHealthcheckResponse,
+  type SatpSessionProof,
+  type SatpSessionProofsResponse,
   type SatpSessionStatusResponse,
   type SatpSupportedLedgersResponse,
 } from "./types";
@@ -91,6 +97,17 @@ export class SatpGatewayAdminApi {
       params: { startTimestamp, endTimestamp, ...config.params },
     });
   }
+
+  /** Signature-verified proofs of the given sessions (comma-separated IDs). */
+  getSessionProofs(
+    sessionIds: string[],
+    config: AxiosRequestConfig = {},
+  ): Promise<AxiosResponse<SatpSessionProofsResponse>> {
+    return this.get(`${SATP_OAPI_PREFIX}/proofs`, {
+      ...config,
+      params: { sessionIds: sessionIds.join(","), ...config.params },
+    });
+  }
 }
 
 /**
@@ -100,7 +117,7 @@ export class SatpGatewayAdminApi {
  * base path is just the server origin.
  */
 export function createSatpAdminApi(
-  options: SatpAppOptions,
+  options: Pick<SatpAppOptions, "gatewayUrl">,
 ): SatpGatewayAdminApi {
   return new SatpGatewayAdminApi({ basePath: options.gatewayUrl });
 }
@@ -130,6 +147,39 @@ export async function fetchAuditEntries(
     endTimestampMs ? new Date(endTimestampMs).toISOString() : undefined,
   );
   return response.data.auditEntries?.entries ?? [];
+}
+
+/**
+ * Session proofs, or `null` when the gateway does not offer `GET /proofs`
+ * (older gateway versions answer 404). Malformed entries are dropped.
+ */
+export async function fetchSessionProofs(
+  api: SatpGatewayAdminApi,
+  sessionIds: string[],
+): Promise<SatpSessionProof[] | null> {
+  try {
+    const response = await api.getSessionProofs(sessionIds);
+    const proofs = response.data?.proofs;
+    if (!Array.isArray(proofs)) {
+      return [];
+    }
+    return proofs.filter(
+      (proof): proof is SatpSessionProof =>
+        Boolean(proof) &&
+        typeof proof === "object" &&
+        typeof proof.sessionId === "string" &&
+        typeof proof.claim === "string" &&
+        typeof proof.signedClaim === "string" &&
+        Boolean(proof.step) &&
+        typeof proof.step === "object" &&
+        typeof proof.step.tag === "string",
+    );
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 404) {
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function fetchSupportedLedgers(

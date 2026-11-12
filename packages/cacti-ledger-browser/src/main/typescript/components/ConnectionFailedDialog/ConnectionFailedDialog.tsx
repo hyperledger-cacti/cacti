@@ -19,8 +19,24 @@ const Transition = React.forwardRef(function Transition(
 });
 
 /** Ledger browser setup guide (config store options and wiring). */
-const SETUP_GUIDE_URL =
-  "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/setup/";
+export const SETUP_GUIDE_URL =
+  "https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/setup/";
+
+export interface ConnectionFailedDialogProps {
+  /** Whether the dialog is shown. Defaults to `true`. */
+  open?: boolean;
+  /**
+   * Dismiss handler. When set, a "Dismiss" button is rendered and the
+   * dialog can be closed with Escape / backdrop click, so the user can keep
+   * using the shell (the caller is expected to keep a non-modal hint, e.g.
+   * an inline `Alert`, visible).
+   */
+  onClose?: () => void;
+  /** Retry handler. When set, a "Retry" button is rendered. */
+  onRetry?: () => void;
+  /** Disables the retry button while a retry is in flight. */
+  retrying?: boolean;
+}
 
 /**
  * Standardized error dialog shown in case of connection error to the
@@ -30,12 +46,19 @@ const SETUP_GUIDE_URL =
  * (never the API key) and links the setup guide, which documents the local
  * one-command profile.
  */
-export default function ConnectionFailedDialog() {
+export default function ConnectionFailedDialog({
+  open = true,
+  onClose,
+  onRetry,
+  retrying = false,
+}: ConnectionFailedDialogProps = {}) {
   const { supabaseUrl, supabaseSchema } = getLedgerBrowserConfig();
 
   return (
     <Dialog
-      open={true}
+      open={open}
+      onClose={onClose}
+      aria-labelledby="connection-failed-dialog-title"
       maxWidth="md"
       fullWidth
       TransitionComponent={Transition}
@@ -47,7 +70,12 @@ export default function ConnectionFailedDialog() {
         },
       }}
     >
-      <Typography variant="h5" fontWeight="bold" color="error">
+      <Typography
+        id="connection-failed-dialog-title"
+        variant="h5"
+        fontWeight="bold"
+        color="error"
+      >
         Connection Error
       </Typography>
 
@@ -100,6 +128,16 @@ export default function ConnectionFailedDialog() {
         >
           Open the setup guide
         </Button>
+        {onRetry && (
+          <Button variant="outlined" onClick={onRetry} disabled={retrying}>
+            {retrying ? "Retrying…" : "Retry"}
+          </Button>
+        )}
+        {onClose && (
+          <Button color="inherit" onClick={onClose}>
+            Dismiss
+          </Button>
+        )}
       </Stack>
     </Dialog>
   );

@@ -1,10 +1,11 @@
 /**
  * Hooks for the SATP inspector app.
  *
- * App pages read the instance options from the router outlet context or the
- * dynamic `SatpGatewayContext`. The app status card on the home page lives
- * *outside* the app routes, so there `useOutletContext` returns nothing - in
- * that case the gateway URL falls back to the resolved configuration (runtime
+ * App pages read the instance options from the router outlet context and
+ * the selected gateway from `SatpGatewayContext` (one per app instance,
+ * mounted by `SatpAppLayout`). Code outside the app routes (the home-page
+ * app card) passes the instance options in explicitly. When nothing names
+ * a gateway the URL falls back to the resolved configuration (runtime
  * `config.js` override over the `VITE_SATP_GATEWAY_URL` build-time env, see
  * `common/runtime-config.ts`) and finally to the local default.
  */
@@ -14,8 +15,9 @@ import { useOutletContext } from "react-router-dom";
 import { GetStatusResponse } from "../../common/types/app";
 import { getLedgerBrowserConfig } from "../../common/runtime-config";
 import { satpHealthQuery } from "./queries";
-import type { SatpAppOptions } from "./types";
+import type { SatpAppOptions, SatpQueryOptions } from "./types";
 import { useSatpGatewayContextSafe } from "./context/GatewayContext";
+import { useSatpPolling } from "./context/PollingContext";
 
 export const DEFAULT_SATP_GATEWAY_URL = "http://localhost:4010";
 
@@ -27,31 +29,53 @@ export const DEFAULT_SATP_GATEWAY_URL = "http://localhost:4010";
  * `SetupGuideLink`) because the value can also come from app definitions.
  */
 export const SATP_APP_SETUP_GUIDE_URL =
-  "https://hyperledger-cacti.github.io/cacti/cactus/ledger-browser/plugin-apps/satp-inspector/#setup";
+  "https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/plugin-apps/satp-inspector/#setup";
 
-export function useSatpOptions(): SatpAppOptions {
+/** Gateway URL used when neither the instance nor the runtime config names one. */
+export function fallbackSatpGatewayUrl(): string {
+  return getLedgerBrowserConfig().satpGatewayUrl || DEFAULT_SATP_GATEWAY_URL;
+}
+
+/**
+ * Query options of the current view: instance options, with `gatewayUrl`
+ * set to the gateway selected in the gateway context (the instance's own
+ * `gatewayUrl` when nothing else is selected) and the live polling settings.
+ */
+export function useSatpOptions(): SatpQueryOptions {
   const context = useOutletContext<SatpAppOptions | undefined>();
   const gatewayCtx = useSatpGatewayContextSafe();
+  const polling = useSatpPolling();
   const fallbacks = getLedgerBrowserConfig();
-  const counterpartyGatewayUrl =
-    gatewayCtx?.counterpartyGatewayUrl || context?.counterpartyGatewayUrl;
-  const configuredGateways = gatewayCtx?.gateways;
+
+  const counterpartyGatewayUrl = gatewayCtx
+    ? gatewayCtx.counterpartyGatewayUrl
+    : context?.counterpartyGatewayUrl || undefined;
 
   return {
+    ...context,
     gatewayUrl:
       gatewayCtx?.activeGatewayUrl ||
       context?.gatewayUrl ||
-      fallbacks.satpGatewayUrl ||
-      DEFAULT_SATP_GATEWAY_URL,
-    ...(counterpartyGatewayUrl !== undefined ? { counterpartyGatewayUrl } : {}),
-    ...(configuredGateways !== undefined ? { configuredGateways } : {}),
+      fallbackSatpGatewayUrl(),
+    ...(counterpartyGatewayUrl ? { counterpartyGatewayUrl } : {}),
     prometheusUrl: context?.prometheusUrl || fallbacks.satpPrometheusUrl,
+    ...(polling
+      ? { polling: { paused: polling.paused, intervalMs: polling.intervalMs } }
+      : {}),
   };
 }
 
-/** Healthcheck-backed app status for the home page app cards. */
-export function useSatpAppStatus(): GetStatusResponse {
-  const options = useSatpOptions();
+/**
+ * Healthcheck-backed app status for the home page app cards. The card is
+ * rendered outside the app routes, so the instance options are passed in.
+ */
+export function useSatpAppStatus(
+  instanceOptions?: SatpAppOptions,
+): GetStatusResponse {
+  const routeOptions = useSatpOptions();
+  const options: SatpQueryOptions = instanceOptions?.gatewayUrl
+    ? { ...instanceOptions }
+    : routeOptions;
   const { isPending, data } = useQuery(satpHealthQuery(options));
 
   // Any successful healthcheck response means the gateway is reachable

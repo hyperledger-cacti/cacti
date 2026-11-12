@@ -52,8 +52,8 @@
     "build:prod:frontend": "vite build",
     "serve": "vite preview",
     "start": "vite",
-    "tsc": "tsc --build --verbose",
-    "test:unit": "vitest run"
+    "test:unit": "vitest run",
+    "tsc": "tsc --build --verbose"
   },
   "dependencies": {
     "@emotion/react": "11.11.4",
