@@ -280,7 +280,11 @@ DCO (Developer Certificate of Origin) is enforced.
 
 ### PR Workflow
 
-- One commit per PR preferred (squash when possible)
+- One commit per PR preferred (squash when possible); multiple commits are
+  allowed as an exception for PRs spanning distinct units of work — each
+  commit must still be a clean, self-contained Conventional Commit and should
+  carry the issue reference (`Closes #N` / `Fixes #N`) in its body
+- PR title must match the latest commit subject exactly (enforced by CI)
 - Always rebase onto `main` (no merge commits)
 - Force push with `--force-with-lease` only
 - Draft PRs welcome for early feedback
