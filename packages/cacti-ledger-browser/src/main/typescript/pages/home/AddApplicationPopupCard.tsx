@@ -17,7 +17,7 @@ export interface NewAppDialogProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function NewAppDialog({ open, setOpen }: NewAppDialogProps) {
+export function NewAppDialog({ open, setOpen }: NewAppDialogProps) {
   const handleClose = () => {
     setOpen(false);
   };

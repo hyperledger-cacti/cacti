@@ -1,0 +1,22 @@
+# Keep the docker build context lean and secret-free.
+#
+# The builder stage copies: package.json, index.html, vite.config.mts,
+# tsconfig.json, public/, src/. Everything else here is either a local
+# artifact or must never enter an image build (especially .env - a
+# developer's real Supabase credentials).
+
+node_modules
+dist
+.env
+.env.*
+!.env.template
+.vite
+.vite-temp
+reports
+src/test
+vitest.config.mts
+CHANGELOG.md
+README.md
+Dockerfile
+docker-compose.example.yml
+.dockerignore
