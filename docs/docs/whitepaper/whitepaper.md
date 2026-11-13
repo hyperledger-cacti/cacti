@@ -10,7 +10,8 @@ description: "Hyperledger Cacti whitepaper v2 — architecture, SATP gateway, an
 
 # Hyperledger Cacti: An Open Platform for Cross-Chain Applications
 
-Authors: Rafael Belchior, TBD
+Authors: Rafael Belchior, Ventrakaman Ramakrishna, Sandeep Nishad
+With the help of the Cacti community 
 
 *with contributions from the Hyperledger Cacti community.*
 
@@ -20,9 +21,9 @@ Hyperledger Cacti is an open-source, multi-faceted interoperability platform
 that enables software engineers, enterprise architects, and researchers to
 construct cross-chain applications without incurring vendor lock-in or
 sacrificing network sovereignty. Cacti
-intends to lower the barrier of entry for builders and researchers who want
+lowers the barrier of entry for builders and researchers who want
 to add cross-chain capabilities to their systems today. 
-The platform ships suite of production-ready components: ledger
+The platform ships a suite of production-ready components: ledger
 connectors for Hyperledger Fabric, Besu, Ethereum, Corda, and others;
 tooling for cross-chain productization and research, and, most strategically—two
 blockchain gateway implementations (cactus-plugin-satp-hermes in Typescript and Weaver in Rust) of the IETF Secure Asset Transfer Protocol (SATP), the emerging international standard for institution-grade digital asset portability.This
@@ -41,8 +42,10 @@ distinct design philosophies—Cacti offers a spectrum of interoperability
 mechanisms ranging from direct node-server orchestration (Cactus heritage)
 to relay-based, proof-driven cross-network communication (Weaver heritage).
 
-Cacti graduated from the Hyperledger incubator in
-2024 and is actively co-developed by researchers at INESC-ID/Instituto
+Cacti
+[graduated from the Hyperledger incubator in
+2023](https://www.lfdecentralizedtrust.org/blog/hyperledger-cacti-a-general-purpose-modular-interoperability-framework-moves-to-graduated-status)
+and is actively co-developed by researchers at INESC-ID/Instituto
 Superior Técnico, IBM Research, and a growing open-source community. 
 
 ## The Platform Role of Hyperledger Cacti
@@ -90,13 +93,14 @@ participating networks to adopt a common identity system. It does not mandate a
 single trust model. Instead, it provides a spectrum of mechanisms and leaves
 the choice to the operator. This philosophy—pluralism over orthodoxy—is what
 distinguishes Cacti from interoperability systems that are optimised for a
-single design point. Cacti is also one of the few projects implementing an interoperability standard,
+single design point. Cacti is also one of the few projects implementing an [interoperability standard](https://datatracker.ietf.org/wg/satp/about/),
 as opposed to proprietary protocols or protocols controlled by one entity. Thus,
 Cacti is positioning itself to be a long-term solution for adopters.
 
 ## Heritage and Formation
 
-Cacti was formed in November 2022 by merging two Hyperledger projects:
+Cacti was [formed in November
+2022](https://www.lfdecentralizedtrust.org/blog/2022/11/07/introducing-hyperledger-cacti-a-multi-faceted-pluggable-interoperability-framework) by merging two Hyperledger projects:
 Hyperledger Cactus [^cactus2019whitepaper] and the Weaver Lab
 [^belchior2021survey]. Both projects had maintainers with academic and engineering experience
 where the vision aligned, although design philosophy differed. A considerable effort was put into
@@ -133,13 +137,19 @@ package namespace (`@hyperledger/`) are unified. CI/CD workflows are still
 defined separately for each lineage, though they trigger together on the
 shared repository and are being progressively merged, as some packages
 already depend on the Weaver SDKs.
-A deeper code merge—creating a single undifferentiated Cacti SDK—is
-the long-term roadmap goal.
+Despite their distinctive designs, a shared synergy can be observed in the
+fact that Cactus _connectors_ and Weaver _drivers_ provide similar
+services—namely, ledger-specific services and associated libraries on which
+cross-chain protocols and applications can be developed.
+A deeper code merge—creating a single undifferentiated Cacti SDK as well as
+a canonical set of ledger-specific connectors produced by merging legacy
+Cactus connectors and Weaver drivers—is the long-term roadmap goal.
 
 ## Graduation and Current Status
 
-Cacti graduated from the Hyperledger incubator in 2024, reaching the
-Graduated project status that signifies production readiness, maintainer
+Cacti graduated from the Hyperledger incubator in 2023, reaching the
+[Graduated project status](https://www.lfdecentralizedtrust.org/blog/hyperledger-cacti-a-general-purpose-modular-interoperability-framework-moves-to-graduated-status)
+that signifies production readiness, maintainer
 diversity, and governance maturity. The strategic focus since release 2.1 has been:
 
 1. **The Cacti Cleanup initiative**: a structured effort to reduce codebase
@@ -161,27 +171,37 @@ diversity, and governance maturity. The strategic focus since release 2.1 has be
 **TBD include release 3**
 
 
-This whitepaper is organised as follows. [§ architecture](#sec-architecture) describes the
-dual-heritage architecture and its spectrum-of-trust design.
-[§ plugins](#sec-plugins) surveys the key plugin packages. [§ satp](#sec-satp) covers the IETF
-SATP standard and the `cactus-plugin-satp-hermes` implementation.
-[§ connectors](#sec-connectors) describes the ledger connector ecosystem. [§ usecases](#sec-usecases)
-presents concrete application examples including the CBDC bridging demo,
-SATP gateway scenarios, and the carbon credit extension. [§ comparison](#sec-comparison)
-situates Cacti alongside Polkadot/XCM, Cosmos IBC, LayerZero, and CCIP as
-complementary rather than competing systems. [§ security](#sec-security) provides a
-security analysis. [§ knowledge](#sec-knowledge) documents the academic
-and standards footprint. [§ future](#sec-future) lists open development directions
-linked to the public issue tracker. [§ governance](#sec-governance) covers project governance
-and community channels. [§ getting-started](#sec-getting-started) provides a quick-start guide.
-[§ glossary](#sec-glossary) provides a canonical glossary of 15–20 terms.
+This whitepaper is organised as follows.
+
+- [§ architecture](#sec-architecture) describes the
+  dual-heritage architecture and its spectrum-of-trust design.
+- [§ plugins](#sec-plugins) surveys the key plugin packages.
+- [§ satp](#sec-satp) covers the IETF
+  SATP standard and the `cactus-plugin-satp-hermes` implementation.
+- [§ connectors](#sec-connectors) describes the ledger connector ecosystem.
+- [§ usecases](#sec-usecases)
+  presents concrete application examples including the CBDC bridging demo,
+  SATP gateway scenarios, and the carbon credit extension.
+- [§ comparison](#sec-comparison)
+  situates Cacti alongside Polkadot/XCM, Cosmos IBC, LayerZero, and CCIP as
+  complementary rather than competing systems.
+- [§ security](#sec-security) provides a
+  security analysis.
+- [§ knowledge](#sec-knowledge) documents the academic
+  and standards footprint.
+- [§ future](#sec-future) lists open development directions
+  linked to the public issue tracker.
+- [§ governance](#sec-governance) covers project governance
+  and community channels.
+- [§ getting-started](#sec-getting-started) provides a quick-start guide.
+- [§ glossary](#sec-glossary) provides a canonical glossary of 15–20 terms.
 
 
 # Architecture Overview {#sec-architecture}
 
 ## Design Philosophy
 
-Hyperledger Cacti is built around six core design principles that together
+Hyperledger Cacti is built around nine core design principles that together
 define how the platform scales across diverse deployment environments and
 trust contexts. These principles are not aspirational; they are embodied in
 concrete architectural decisions described in the subsections that follow.
@@ -205,6 +225,23 @@ transactions that span network boundaries without requiring participants to
 subscribe to a single canonical chain or a central clearing house. The
 platform's design explicitly rejects the "one chain to rule them all"
 model, recognising that network sovereignty is a feature, not a limitation.
+
+**Non-intrusion.** Cacti does not require any changes to the DLT protocols,
+stacks, or security models on which the participating networks are built.
+Interoperation is achieved through off-chain components—connectors, relays,
+gateways—or through optional on-chain contracts that networks choose to
+deploy.
+
+**Minimal shared infrastructure.** Cacti does not require an extensive
+deployment outside the participating networks' own setups (unlike, say,
+shared-settlement-chain designs). Gateways for message routing and agents
+for identity information sharing are essentially all that is needed—and
+none of these is mandatory for every interoperation mode, nor are they
+difficult to deploy and manage.
+
+**Leverage native consensus mechanisms.** Cross-chain transactions
+orchestrated by Cacti settle through the native consensus mechanisms of the
+respective networks.
 
 **Spectrum of trust.** Rather than mandating a single trust model, Cacti
 exposes a continuum from "trust the node operator" (direct connector calls
@@ -734,7 +771,8 @@ field ensures that the receiving gateway can verify the integrity of the
 token's metadata at mint time, preventing metadata substitution attacks
 where a malicious gateway substitutes different metadata for the minted NFT.
 
-The `cacti-demos` repository provides two NFT demonstration scenarios
+The [`cacti-demos`](https://github.com/hyperledger-cacti/cacti-demos)
+repository provides two NFT demonstration scenarios
 (ERC-721 EVM-to-EVM transfers).
 
 ### Observability
@@ -970,7 +1008,8 @@ ledger infrastructure.
 
 ## SATP Demo Scenarios
 
-The `cacti-demos` repository packages four SATP demonstration scenarios:
+The [`cacti-demos`](https://github.com/hyperledger-cacti/cacti-demos)
+repository packages four SATP demonstration scenarios:
 
 1. **Fungible EVM-to-EVM (scenario A):** ERC-20 token transferred between two
    Hardhat networks using the SATP three-phase commit protocol. Demonstrates
