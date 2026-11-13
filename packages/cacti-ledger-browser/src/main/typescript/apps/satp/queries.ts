@@ -153,6 +153,16 @@ export function satpLiveRefetchInterval(
     paused ? false : backoff(query);
 }
 
+/**
+ * Gateway queries only run once the instance (or the viewer) named a
+ * gateway: the inspector never probes a default host on its own.
+ */
+export function hasGateway(
+  options: Pick<SatpQueryOptions, "gatewayUrl">,
+): boolean {
+  return Boolean(options.gatewayUrl);
+}
+
 export function satpQueryKeys(gatewayUrl: string) {
   const base = ["satp", gatewayUrl] as const;
   return {
@@ -175,6 +185,7 @@ export function satpHealthQuery(options: SatpQueryOptions) {
       const api = createSatpAdminApi(options);
       return fetchGatewayHealth(api);
     },
+    enabled: hasGateway(options),
     refetchInterval: satpLiveRefetchInterval(
       options,
       HEALTH_REFETCH_INTERVAL_MS,
@@ -192,6 +203,7 @@ export function satpSupportedLedgersQuery(options: SatpQueryOptions) {
       const api = createSatpAdminApi(options);
       return fetchSupportedLedgers(api);
     },
+    enabled: hasGateway(options),
     retry: 1,
   });
 }
@@ -226,6 +238,7 @@ export function satpSessionsQuery(options: SatpQueryOptions) {
 
       return buildSessionRows({ sessionIds, statuses, auditEntries });
     },
+    enabled: hasGateway(options),
     refetchInterval: satpLiveRefetchInterval(
       options,
       SESSIONS_REFETCH_INTERVAL_MS,
@@ -278,6 +291,7 @@ export function satpSessionDetailQuery(
         status,
       };
     },
+    enabled: hasGateway(options),
     refetchInterval: satpLiveRefetchInterval(
       options,
       SESSIONS_REFETCH_INTERVAL_MS,
@@ -303,7 +317,7 @@ export function satpSessionProofsQuery(
       const api = createSatpAdminApi(options);
       return fetchSessionProofs(api, [sessionId]);
     },
-    enabled: Boolean(sessionId),
+    enabled: hasGateway(options) && Boolean(sessionId),
     refetchInterval: satpLiveRefetchInterval(
       options,
       SESSIONS_REFETCH_INTERVAL_MS,
@@ -340,6 +354,7 @@ export function satpAnalyticsQuery(options: SatpQueryOptions) {
         localGatewayIds: deriveLocalGatewayIds(auditEntries),
       };
     },
+    enabled: hasGateway(options),
     refetchInterval: satpLiveRefetchInterval(
       options,
       SESSIONS_REFETCH_INTERVAL_MS,
@@ -363,6 +378,7 @@ export function satpMessageLogQuery(options: SatpQueryOptions) {
       );
       return buildMessageLog(auditEntries);
     },
+    enabled: hasGateway(options),
     refetchInterval: satpLiveRefetchInterval(
       options,
       SESSIONS_REFETCH_INTERVAL_MS,

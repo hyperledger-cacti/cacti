@@ -5,10 +5,9 @@ import { forwardRef } from "react";
 const StyledRow = styled(TableRow)(({ theme }) => ({
   cursor: "pointer",
   "&:hover": {
-    backgroundColor: theme.palette.grey[200],
-    "& .MuiTableCell-root": {
-      color: theme.palette.secondary.main,
-    },
+    // Design system: hover is a neutral tint; the bloom accent is never a
+    // text or surface color.
+    backgroundColor: theme.palette.action.hover,
   },
   "&:focus-visible": {
     outline: `2px solid ${theme.palette.primary.main}`,

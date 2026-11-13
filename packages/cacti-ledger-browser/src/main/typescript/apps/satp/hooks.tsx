@@ -19,6 +19,10 @@ import type { SatpAppOptions, SatpQueryOptions } from "./types";
 import { useSatpGatewayContextSafe } from "./context/GatewayContext";
 import { useSatpPolling } from "./context/PollingContext";
 
+/**
+ * Suggested gateway URL (the Hermes OAPI default port). Only ever shown as a
+ * placeholder/example: the inspector never connects to it on its own.
+ */
 export const DEFAULT_SATP_GATEWAY_URL = "http://localhost:4010";
 
 /**
@@ -31,9 +35,13 @@ export const DEFAULT_SATP_GATEWAY_URL = "http://localhost:4010";
 export const SATP_APP_SETUP_GUIDE_URL =
   "https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/plugin-apps/satp-inspector/#setup";
 
-/** Gateway URL used when neither the instance nor the runtime config names one. */
+/**
+ * Gateway URL used when the instance names none: only an operator-provided
+ * runtime/env value. Empty when nothing is configured - the user then adds
+ * a gateway manually and no request goes out until they do.
+ */
 export function fallbackSatpGatewayUrl(): string {
-  return getLedgerBrowserConfig().satpGatewayUrl || DEFAULT_SATP_GATEWAY_URL;
+  return getLedgerBrowserConfig().satpGatewayUrl || "";
 }
 
 /**
@@ -73,10 +81,25 @@ export function useSatpAppStatus(
   instanceOptions?: SatpAppOptions,
 ): GetStatusResponse {
   const routeOptions = useSatpOptions();
-  const options: SatpQueryOptions = instanceOptions?.gatewayUrl
-    ? { ...instanceOptions }
+  const options: SatpQueryOptions = instanceOptions
+    ? {
+        ...instanceOptions,
+        gatewayUrl: instanceOptions.gatewayUrl || fallbackSatpGatewayUrl(),
+      }
     : routeOptions;
   const { isPending, data } = useQuery(satpHealthQuery(options));
+
+  if (!options.gatewayUrl) {
+    return {
+      isPending: false,
+      isInitialized: false,
+      status: {
+        severity: "info",
+        message: "No SATP gateway added yet. Open the app and add one.",
+        setupGuideURL: SATP_APP_SETUP_GUIDE_URL,
+      },
+    };
+  }
 
   // Any successful healthcheck response means the gateway is reachable
   // (the gateway replies with { status: "AVAILABLE" }).

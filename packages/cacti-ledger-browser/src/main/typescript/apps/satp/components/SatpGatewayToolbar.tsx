@@ -108,8 +108,7 @@ function SourceChip({ gateway }: { gateway: SatpGatewayEndpoint }) {
         size="small"
         label="This browser"
         variant="outlined"
-        color="secondary"
-        sx={{ height: 20, fontSize: 11 }}
+        sx={{ height: 20, fontSize: 11, borderStyle: "dashed" }}
       />
     </Tooltip>
   );
@@ -245,7 +244,7 @@ export function ManageGatewaysDialog({
                     borderColor: isActive
                       ? "primary.main"
                       : isCounterparty
-                        ? "secondary.main"
+                        ? "primary.light"
                         : "divider",
                     bgcolor: (theme) =>
                       isActive
@@ -282,7 +281,8 @@ export function ManageGatewaysDialog({
                           <Chip
                             size="small"
                             label="Counterparty"
-                            color="secondary"
+                            color="primary"
+                            variant="outlined"
                             sx={{ height: 20, fontSize: 11 }}
                           />
                         )}
@@ -319,7 +319,6 @@ export function ManageGatewaysDialog({
                         <Button
                           size="small"
                           variant="outlined"
-                          color="secondary"
                           onClick={() => setCounterpartyGatewayUrl(gw.url)}
                         >
                           Set counterparty

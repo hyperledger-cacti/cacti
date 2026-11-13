@@ -6,7 +6,8 @@ import {
   Outlet,
 } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
-import CircularProgress from "@mui/material/CircularProgress";
+import LinearProgress from "@mui/material/LinearProgress";
+import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
@@ -27,6 +28,7 @@ import { AppInstance } from "./common/types/app";
 import { patchAppRoutePath } from "./common/utils";
 import { NotificationProvider } from "./common/context/NotificationContext";
 import { guiAppConfig } from "./common/queries";
+import { getLedgerBrowserConfig } from "./common/runtime-config";
 import createApplications from "./common/createApplications";
 import ConnectionFailedDialog from "./components/ConnectionFailedDialog/ConnectionFailedDialog";
 import ErrorBoundary from "./components/ui/ErrorBoundary";
@@ -107,8 +109,15 @@ function getContentRoutes(appConfig: AppInstance[]) {
 }
 
 export function App() {
-  const { isError, isPending, isFetching, data, refetch } =
-    useQuery(guiAppConfig());
+  // One attempt, no background retry loop: if the store is unreachable the
+  // user sees it at once and decides when to retry (or changes the store in
+  // Settings) instead of the shell silently probing it again and again.
+  const { isError, isPending, isFetching, data, refetch } = useQuery({
+    ...guiAppConfig(),
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
   const [dialogDismissed, setDialogDismissed] = useState(false);
 
   // The shell (sidebar, header, routes) is always rendered - a config store
@@ -132,16 +141,6 @@ export function App() {
         bgcolor: "background.default",
       }}
     >
-      {isPending && (
-        <CircularProgress
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            zIndex: 9999,
-          }}
-        />
-      )}
       <Sidebar appConfig={appConfig} />
       <Box
         sx={{
@@ -153,6 +152,15 @@ export function App() {
         }}
       >
         {headerRoutes}
+        {isPending && (
+          <Box sx={{ mx: 2, mt: 2 }} role="status">
+            <LinearProgress />
+            <Typography variant="caption" color="text.secondary">
+              Connecting to the app configuration store at{" "}
+              {getLedgerBrowserConfig().supabaseUrl}…
+            </Typography>
+          </Box>
+        )}
         {isError && (
           <Alert
             severity="error"

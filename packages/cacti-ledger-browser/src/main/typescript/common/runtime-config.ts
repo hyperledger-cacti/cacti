@@ -14,6 +14,11 @@
  *
  * Resolution order per key (first hit wins):
  *
+ * 0. **Viewer override** (config-store keys only) - a connection the viewer
+ *    entered in the Settings dialog, kept in this browser's localStorage
+ *    (`CONNECTION_OVERRIDE_STORAGE_KEY`) and validated like the runtime
+ *    tier. Lets someone point a hosted build at their own store without
+ *    redeploying `config.js`.
  * 1. **Runtime override** - `window.__LEDGER_BROWSER_CONFIG__`, validated
  *    per-key (see below); a malformed value is dropped with a single
  *    `console.warn` and the next tier applies.
@@ -172,6 +177,27 @@ export function resolveLedgerBrowserConfig(
   env: Record<string, string | undefined>,
   warn: (message: string) => void = console.warn,
 ): LedgerBrowserConfig {
+  return resolveWithSources(runtimeRaw, env, warn).config;
+}
+
+/** Where a resolved configuration value came from. */
+export type LedgerBrowserConfigSource =
+  | "browser"
+  | "runtime"
+  | "env"
+  | "default";
+
+function resolveWithSources(
+  runtimeRaw: unknown,
+  env: Record<string, string | undefined>,
+  warn: (message: string) => void,
+): {
+  config: LedgerBrowserConfig;
+  sources: Record<OverridableKey, LedgerBrowserConfigSource>;
+} {
+  const sources = Object.fromEntries(
+    OVERRIDABLE_KEYS.map((key) => [key, "default"]),
+  ) as Record<OverridableKey, LedgerBrowserConfigSource>;
   const overrides: Partial<LedgerBrowserConfig> = {};
 
   if (runtimeRaw !== undefined) {
@@ -225,6 +251,7 @@ export function resolveLedgerBrowserConfig(
     let tier: string | undefined;
     if (override !== undefined) {
       tier = override;
+      sources[key] = "runtime";
     } else if (envValue !== undefined && envValue !== "") {
       if (URL_KEYS.includes(key) && !isHttpUrl(envValue)) {
         warn(
@@ -235,13 +262,129 @@ export function resolveLedgerBrowserConfig(
         );
       } else {
         tier = envValue;
+        sources[key] = "env";
       }
     }
     if (tier !== undefined) {
       config[key] = tier;
     }
   }
-  return config;
+  return { config, sources };
+}
+
+/** localStorage key of the viewer's config-store connection override. */
+export const CONNECTION_OVERRIDE_STORAGE_KEY = "cacti.ledgerBrowser.connection";
+
+/** Config-store keys a viewer may override from the Settings dialog. */
+const CONNECTION_KEYS = [
+  "supabaseUrl",
+  "supabaseKey",
+  "supabaseSchema",
+] as const;
+
+export type LedgerBrowserConnectionOverride = Partial<
+  Pick<LedgerBrowserConfig, (typeof CONNECTION_KEYS)[number]>
+>;
+
+/**
+ * Validates a connection override with the same per-key rules as the
+ * runtime tier. Returns the first rejection message, or `undefined`.
+ */
+export function validateConnectionOverride(
+  override: LedgerBrowserConnectionOverride,
+): string | undefined {
+  for (const key of CONNECTION_KEYS) {
+    const value = override[key];
+    if (value === undefined) {
+      continue;
+    }
+    const rejection = overrideRejectionReason(key, value);
+    if (rejection !== undefined) {
+      return `${key} ${rejection}`;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Parses a stored connection override. Unknown keys, non-strings and
+ * invalid values are dropped (with a warning), never applied.
+ */
+export function parseConnectionOverride(
+  raw: string | null,
+  warn: (message: string) => void = console.warn,
+): LedgerBrowserConnectionOverride {
+  if (!raw) {
+    return {};
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    warn(`${WARN_PREFIX} ignoring a corrupt saved connection in this browser.`);
+    return {};
+  }
+  if (!isPlainObject(parsed)) {
+    return {};
+  }
+  const result: LedgerBrowserConnectionOverride = {};
+  for (const key of CONNECTION_KEYS) {
+    const value = Object.prototype.hasOwnProperty.call(parsed, key)
+      ? parsed[key]
+      : undefined;
+    if (value === undefined || value === "") {
+      continue;
+    }
+    if (typeof value !== "string" || overrideRejectionReason(key, value)) {
+      warn(`${WARN_PREFIX} ignoring invalid saved connection key "${key}".`);
+      continue;
+    }
+    result[key] = value;
+  }
+  return result;
+}
+
+function readStoredConnectionOverride(): LedgerBrowserConnectionOverride {
+  try {
+    return parseConnectionOverride(
+      typeof localStorage === "undefined"
+        ? null
+        : localStorage.getItem(CONNECTION_OVERRIDE_STORAGE_KEY),
+    );
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Saves (or, with `null`, clears) the viewer's connection override.
+ * Returns an error message when the override is invalid or cannot be
+ * stored. The caller reloads the page so every client picks it up.
+ */
+export function saveConnectionOverride(
+  override: LedgerBrowserConnectionOverride | null,
+): string | undefined {
+  if (override !== null) {
+    const rejection = validateConnectionOverride(override);
+    if (rejection) {
+      return rejection;
+    }
+  }
+  try {
+    if (override === null || Object.keys(override).length === 0) {
+      localStorage.removeItem(CONNECTION_OVERRIDE_STORAGE_KEY);
+    } else {
+      localStorage.setItem(
+        CONNECTION_OVERRIDE_STORAGE_KEY,
+        JSON.stringify(override),
+      );
+    }
+  } catch {
+    return "this browser does not allow saving settings (storage is blocked)";
+  }
+  cachedConfig = undefined;
+  cachedSources = undefined;
+  return undefined;
 }
 
 /**
@@ -256,22 +399,45 @@ declare global {
 }
 
 let cachedConfig: LedgerBrowserConfig | undefined;
+let cachedSources:
+  | Record<OverridableKey, LedgerBrowserConfigSource>
+  | undefined;
 
 /**
  * Get the resolved configuration. The runtime tier cannot change after the
  * bundle started executing (`/config.js` runs before it), so the result is
- * computed once and cached.
+ * computed once and cached (saving a viewer override clears the cache).
  */
 export function getLedgerBrowserConfig(): LedgerBrowserConfig {
   if (cachedConfig === undefined) {
-    cachedConfig = resolveLedgerBrowserConfig(
+    const { config, sources } = resolveWithSources(
       typeof window === "undefined"
         ? undefined
         : window.__LEDGER_BROWSER_CONFIG__,
       import.meta.env as unknown as Record<string, string | undefined>,
+      console.warn,
     );
+    const viewer = readStoredConnectionOverride();
+    for (const key of CONNECTION_KEYS) {
+      const value = viewer[key];
+      if (value !== undefined) {
+        config[key] = value;
+        sources[key] = "browser";
+      }
+    }
+    cachedConfig = config;
+    cachedSources = sources;
   }
   return cachedConfig;
+}
+
+/** Where each resolved configuration value came from (Settings dialog). */
+export function getLedgerBrowserConfigSources(): Record<
+  OverridableKey,
+  LedgerBrowserConfigSource
+> {
+  getLedgerBrowserConfig();
+  return cachedSources as Record<OverridableKey, LedgerBrowserConfigSource>;
 }
 
 /**
@@ -280,4 +446,5 @@ export function getLedgerBrowserConfig(): LedgerBrowserConfig {
  */
 export function resetLedgerBrowserConfigCacheForTests(): void {
   cachedConfig = undefined;
+  cachedSources = undefined;
 }

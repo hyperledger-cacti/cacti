@@ -409,8 +409,8 @@ function ProofsCard({
               width: 40,
               height: 40,
               borderRadius: 2,
-              bgcolor: "secondary.main",
-              color: "secondary.contrastText",
+              bgcolor: "primary.dark",
+              color: "primary.contrastText",
               "& svg": { fontSize: 22 },
             }}
           >
@@ -758,15 +758,10 @@ function ValueCard({
                   />
                 </strong>
               </Typography>
-              <Typography variant="body2">
-                Bridge operation gas:{" "}
-                <strong>
-                  <GasValue
-                    options={options}
-                    metric="operation_gas_used"
-                    sessionId={sessionId}
-                  />
-                </strong>
+              <Typography variant="caption" color="text.secondary">
+                Gas recorded for this session (Prometheus{" "}
+                <code>transaction_gas_used</code>, summed over every gateway the
+                Prometheus server scrapes).
               </Typography>
               {!options.prometheusUrl && (
                 <Typography variant="caption" color="text.secondary">

@@ -46,7 +46,8 @@ const TONE_BG: Record<StatTone, string> = {
   primary: "primary.main",
   success: "success.main",
   error: "error.main",
-  secondary: "secondary.main",
+  // Neutral ink tone (the bloom accent is reserved, see the design system).
+  secondary: "info.main",
 };
 
 /** Small tinted icon bubble used on the stat cards and card headers. */

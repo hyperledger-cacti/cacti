@@ -442,12 +442,14 @@ describe("runtime config consumption (SATP fallback options)", () => {
     });
   });
 
-  it("falls back to the build-time tier or hard-coded default when nothing is runtime-configured", () => {
+  it("falls back to the build-time tier, else to no gateway at all (never a built-in host)", () => {
     // Tier 2 for the gateway is whatever `VITE_SATP_GATEWAY_URL` this test
-    // bundle carries (a local `.env` may set one), tier 3 the default.
+    // bundle carries (a local `.env` may set one). There is no built-in
+    // default: without one the user adds a gateway manually.
     const buildTimeGateway =
       (import.meta.env as unknown as Record<string, string | undefined>)
-        .VITE_SATP_GATEWAY_URL || DEFAULT_SATP_GATEWAY_URL;
+        .VITE_SATP_GATEWAY_URL || "";
+    expect(buildTimeGateway).not.toBe(DEFAULT_SATP_GATEWAY_URL);
 
     expect(renderSatpOptions()).toEqual({
       gatewayUrl: buildTimeGateway,
@@ -467,7 +469,7 @@ describe("runtime config consumption (SATP fallback options)", () => {
       };
       const buildTimeGateway =
         (import.meta.env as unknown as Record<string, string | undefined>)
-          .VITE_SATP_GATEWAY_URL || DEFAULT_SATP_GATEWAY_URL;
+          .VITE_SATP_GATEWAY_URL || "";
 
       expect(renderSatpOptions().gatewayUrl).toBe(buildTimeGateway);
       expect(runtimeWarnCalls(warnSpy)).toHaveLength(1);

@@ -39,8 +39,9 @@ still uses Supabase to store the app instance configuration.)
   substatus and a retry outlook (a stated heuristic: SATP itself does not
   mark errors as retryable).
 - Value and gas per session: the asset moved on each ledger and, with
-  Prometheus, the gas spent (`transaction_gas_used` / `operation_gas_used`
-  for the session's `sessionId` label).
+  Prometheus, the gas spent (`transaction_gas_used` for the session's
+  `sessionId` label; bridge `operation_gas_used` carries no session label,
+  so it stays on the Overview page).
 - Message inspector: every recorded message's session state, annotated
   field by field or raw.
 - Errors stay in place: a failed request shows an inline error with retry
@@ -124,13 +125,23 @@ following options:
 
 | Option                   | Description                                                                    | Default                 |
 | ------------------------ | ------------------------------------------------------------------------------ | ----------------------- |
-| `gatewayUrl`             | Base URL of the primary gateway OAPI server.                                   | `http://localhost:4010` |
+| `gatewayUrl`             | Base URL of the primary gateway OAPI server (optional; add it later in the app). | empty                   |
 | `counterpartyGatewayUrl` | Base URL of the counterparty gateway of your transfers (optional).             | empty                   |
 | `gateways`               | More gateways, `[{ "name": "...", "url": "...", "description": "..." }]` (optional). | `[]`                    |
 | `prometheusUrl`          | Base URL of a Prometheus server (optional).                                    | `http://localhost:9090` |
 
 The instance never talks to a gateway its options (or the viewer, via
-**Manage gateways**) did not name. Viewer-added gateways and selections are
+**Manage gateways**) did not name. A new instance starts with no gateway:
+the app shows an "Add your first gateway" card and sends no request until
+one is added. The app card on the home page says so instead of probing a
+default host.
+
+The ledger browser connects to its configuration store once at start-up
+(no background retry loop). When the store is unreachable it shows a
+dismissible dialog and a banner with **Retry**; **Settings** (gear icon in
+the header, or **Change connection** in the dialog) shows where the store
+URL came from (built-in default, build, `config.js` or this browser) and
+lets a viewer point this browser at another store without redeploying. Viewer-added gateways and selections are
 kept per app instance in the browser until saved to the app configuration.
 
 ## Data Sources

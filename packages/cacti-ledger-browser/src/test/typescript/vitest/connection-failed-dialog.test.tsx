@@ -12,14 +12,12 @@ import ConnectionFailedDialog from "../../../main/typescript/components/Connecti
 describe("ConnectionFailedDialog", () => {
   it("shows the resolved store URL and schema (never the key)", () => {
     render(<ConnectionFailedDialog />);
-    // The store URL appears in the details list and again in the
-    // quickstart sentence - assert on the details entry specifically.
-    const details = screen.getAllByText(/http:\/\/localhost:8000/);
-    expect(details.length).toBeGreaterThanOrEqual(2);
-    expect(details.some((element) => element.closest("li") !== null)).toBe(
-      true,
-    );
-    expect(screen.getByText(/public/)).toBeInTheDocument();
+    // The store URL appears in the details and again in the quickstart
+    // sentence - assert on the details value specifically.
+    expect(screen.getByText("Store URL")).toBeInTheDocument();
+    expect(screen.getByText("http://localhost:8000")).toBeInTheDocument();
+    expect(screen.getByText("Schema")).toBeInTheDocument();
+    expect(screen.getByText("public")).toBeInTheDocument();
     // The API key must never appear in the dialog.
     expect(screen.queryByText(/SUPABASE_KEY/i)).toBeNull();
   });
@@ -31,6 +29,23 @@ describe("ConnectionFailedDialog", () => {
       "https://hyperledger-cacti.github.io/cacti/latest/cactus/ledger-browser/setup/",
     );
     expect(guide.getAttribute("target")).toBe("_blank");
+  });
+
+  it("can be closed with the close button when dismissible", async () => {
+    const user = userEvent.setup();
+    const onClose = vi.fn();
+    render(<ConnectionFailedDialog onClose={onClose} />);
+    await user.click(screen.getByRole("button", { name: "close" }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("opens Settings to change the connection", async () => {
+    const user = userEvent.setup();
+    render(<ConnectionFailedDialog />);
+    await user.click(screen.getByRole("button", { name: "Change connection" }));
+    expect(await screen.findByLabelText("Store URL")).toHaveValue(
+      "http://localhost:8000",
+    );
   });
 
   it("offers retry and dismiss when handlers are given", async () => {
@@ -54,6 +69,7 @@ describe("ConnectionFailedDialog", () => {
     const { rerender } = render(<ConnectionFailedDialog />);
     expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Dismiss" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "close" })).toBeNull();
     rerender(<ConnectionFailedDialog open={false} />);
     // The dialog unmounts after its exit transition.
     await waitFor(() =>

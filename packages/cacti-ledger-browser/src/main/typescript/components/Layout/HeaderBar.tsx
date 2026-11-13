@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { alpha, type Theme } from "@mui/material/styles";
+import SettingsDialog from "../Settings/SettingsDialog";
 import { useLocation, useNavigate } from "react-router-dom";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
@@ -34,6 +35,7 @@ export default function HeaderBar({
   const location = useLocation();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
   // Shortcut key listener: pressing "/" focuses the search bar (Headlamp pattern)
@@ -245,10 +247,16 @@ export default function HeaderBar({
                 "&:hover": { color: "text.primary", bgcolor: "action.hover" },
               }}
               aria-label="settings-button"
+              aria-haspopup="dialog"
+              onClick={() => setSettingsOpen(true)}
             >
               <SettingsOutlinedIcon fontSize="small" />
             </IconButton>
           </Tooltip>
+          <SettingsDialog
+            open={settingsOpen}
+            onClose={() => setSettingsOpen(false)}
+          />
         </Box>
       </Toolbar>
     </AppBar>

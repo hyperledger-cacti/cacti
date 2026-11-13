@@ -95,4 +95,32 @@ describe("App shell on a config store outage", () => {
     ).toBeNull();
     expect(loadConfig).toHaveBeenCalledTimes(2);
   });
+
+  it("tries the store once: no background retry loop", async () => {
+    loadConfig.mockRejectedValue(new Error("connection refused"));
+    // Library defaults (retry 3, refetch on focus): the shell itself must
+    // opt out of the retry loop.
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <ThemeProvider theme={createTheme(themeOptions)}>
+          <QueryClientProvider client={new QueryClient()}>
+            <App />
+          </QueryClientProvider>
+        </ThemeProvider>
+      </MemoryRouter>,
+    );
+    await screen.findByRole("dialog", {}, { timeout: 1000 });
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    window.dispatchEvent(new Event("focus"));
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(loadConfig).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows a progress note instead of a floating spinner while connecting", async () => {
+    loadConfig.mockReturnValue(new Promise(() => undefined));
+    renderShell();
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "Connecting to the app configuration store at http://localhost:8000",
+    );
+  });
 });

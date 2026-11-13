@@ -12,8 +12,8 @@ import OverviewPage from "./pages/OverviewPage";
 import GuidePage from "./pages/GuidePage";
 import SatpPageLayout from "./components/SatpPageLayout";
 import {
-  DEFAULT_SATP_GATEWAY_URL,
   SATP_APP_SETUP_GUIDE_URL,
+  fallbackSatpGatewayUrl,
   useSatpAppStatus,
   useSatpOptions,
 } from "./hooks";
@@ -36,8 +36,28 @@ function SatpGatewayStatus({
   instanceOptions?: SatpAppOptions;
 }) {
   const routeOptions = useSatpOptions();
-  const options = instanceOptions?.gatewayUrl ? instanceOptions : routeOptions;
+  const options = instanceOptions
+    ? {
+        ...instanceOptions,
+        gatewayUrl: instanceOptions.gatewayUrl || fallbackSatpGatewayUrl(),
+      }
+    : routeOptions;
   const { isPending, data } = useQuery(satpHealthQuery(options));
+
+  if (!options.gatewayUrl) {
+    return (
+      <Box>
+        <Typography variant="h5">SATP Gateway Status</Typography>
+        <Stack spacing={1} alignItems="flex-start">
+          <Typography>
+            No gateway added yet. Open the app and use Manage gateways to add
+            your SATP Hermes gateway.
+          </Typography>
+          <SetupGuideLink url={SATP_APP_SETUP_GUIDE_URL} />
+        </Stack>
+      </Box>
+    );
+  }
 
   return (
     <Box>
@@ -71,10 +91,12 @@ const satpAppDefinition: AppDefinition = {
   category: AppCategory.LedgerBrowser,
   defaultInstanceName: "My SATP Inspector",
   defaultDescription:
-    "Inspect SATP cross-chain transfer sessions: status, audit timeline, gateways, ledgers and proofs. Requires a reachable SATP Hermes gateway OAPI server (default port 4010).",
+    "Inspect SATP cross-chain transfer sessions: status, audit timeline, gateways, ledgers and proofs. Add your SATP Hermes gateways (OAPI server, default port 4010) after installing.",
   defaultPath: "/satp",
+  // No gateway by default: the user adds gateways (here or in the app's
+  // Manage gateways dialog), the inspector never probes one on its own.
   defaultOptions: {
-    gatewayUrl: DEFAULT_SATP_GATEWAY_URL,
+    gatewayUrl: "",
     counterpartyGatewayUrl: "",
     gateways: [],
     prometheusUrl: "http://localhost:9090",
@@ -83,7 +105,13 @@ const satpAppDefinition: AppDefinition = {
   createAppInstance(app: GuiAppConfig) {
     const satpOptions = app.options as unknown as SatpAppOptions;
 
-    if (!satpOptions || !satpOptions.gatewayUrl) {
+    if (
+      !satpOptions ||
+      typeof satpOptions !== "object" ||
+      Array.isArray(satpOptions) ||
+      (satpOptions.gatewayUrl !== undefined &&
+        typeof satpOptions.gatewayUrl !== "string")
+    ) {
       throw new Error(
         `Invalid SATP inspector app specific options in the database: ${JSON.stringify(satpOptions)}`,
       );
@@ -91,8 +119,9 @@ const satpAppDefinition: AppDefinition = {
 
     // The gateway, counterparty gateway, and Prometheus URLs are user-provided
     // (stored in the `gui_app_config` table) and the browser will send requests
-    // there, so only accept well-formed absolute http(s) URLs.
-    if (!isHttpUrl(satpOptions.gatewayUrl)) {
+    // there, so only accept well-formed absolute http(s) URLs. An empty
+    // gatewayUrl is allowed: the instance then waits for the user to add one.
+    if (satpOptions.gatewayUrl && !isHttpUrl(satpOptions.gatewayUrl)) {
       throw new Error(
         `Invalid SATP inspector gatewayUrl "${satpOptions.gatewayUrl}": must be an absolute http(s) URL`,
       );

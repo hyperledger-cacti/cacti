@@ -73,7 +73,7 @@ function GatewayCard({
               width: 40,
               height: 40,
               borderRadius: 2,
-              bgcolor: isLocal ? "primary.main" : "secondary.main",
+              bgcolor: isLocal ? "primary.main" : "info.main",
               color: "common.white",
               "& svg": { fontSize: 22 },
             }}
@@ -309,13 +309,13 @@ export default function GatewaysPage() {
                   borderColor: isActive
                     ? "primary.main"
                     : isCounterparty
-                      ? "secondary.main"
+                      ? "primary.light"
                       : "divider",
                   bgcolor: (theme) =>
                     isActive
                       ? alpha(theme.palette.primary.main, 0.04)
                       : isCounterparty
-                        ? alpha(theme.palette.secondary.main, 0.05)
+                        ? alpha(theme.palette.primary.light, 0.06)
                         : theme.palette.background.paper,
                 }}
               >
@@ -377,7 +377,8 @@ export default function GatewaysPage() {
                         size="small"
                         icon={<CompareArrowsIcon sx={{ fontSize: 14 }} />}
                         label="Counterparty"
-                        color="secondary"
+                        color="primary"
+                        variant="outlined"
                         sx={{ height: 22, fontSize: 11 }}
                       />
                     )}
@@ -416,7 +417,6 @@ export default function GatewaysPage() {
                       <Button
                         size="small"
                         variant="outlined"
-                        color="secondary"
                         onClick={() => setCounterpartyGatewayUrl(gw.url)}
                       >
                         Set counterparty

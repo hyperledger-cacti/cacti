@@ -133,10 +133,10 @@ export default function MessageInspectorDialog({
                         p: 1,
                         borderRadius: 1,
                         border: 1,
-                        borderColor: evidence ? "secondary.main" : "divider",
+                        borderColor: evidence ? "primary.main" : "divider",
                         bgcolor: (theme) =>
                           evidence
-                            ? alpha(theme.palette.secondary.main, 0.06)
+                            ? alpha(theme.palette.primary.main, 0.05)
                             : theme.palette.background.paper,
                       }}
                     >
@@ -156,7 +156,7 @@ export default function MessageInspectorDialog({
                           size="small"
                           label={field.kind}
                           variant="outlined"
-                          color={evidence ? "secondary" : "default"}
+                          color={evidence ? "primary" : "default"}
                           sx={{ height: 18, fontSize: 10 }}
                         />
                       </Stack>

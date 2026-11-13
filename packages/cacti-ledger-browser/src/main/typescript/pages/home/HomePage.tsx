@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
+import PageTitle from "../../components/ui/PageTitle";
 
 import { AppInstance } from "../../common/types/app";
 import ErrorBoundary from "../../components/ui/ErrorBoundary";
@@ -13,9 +13,7 @@ type HomePageProps = {
 export default function HomePage({ appConfig }: HomePageProps) {
   return (
     <Box>
-      <Typography variant="h5" color="secondary">
-        Applications
-      </Typography>
+      <PageTitle>Applications</PageTitle>
       <Box
         display="grid"
         gridTemplateColumns="repeat(auto-fit, 400px)"

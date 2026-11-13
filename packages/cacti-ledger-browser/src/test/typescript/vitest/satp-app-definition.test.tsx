@@ -231,13 +231,28 @@ describe("satpAppDefinition.createAppInstance", () => {
     ]);
   });
 
-  it("rejects a missing gatewayUrl", () => {
-    expect(() =>
-      satpAppDefinition.createAppInstance(makeGuiAppConfig({})),
-    ).toThrow(/Invalid SATP inspector app specific options/);
-    expect(() =>
-      satpAppDefinition.createAppInstance(makeGuiAppConfig(null)),
-    ).toThrow(/Invalid SATP inspector app specific options/);
+  it("accepts an instance without a gateway (the user adds one later)", () => {
+    for (const options of [{}, { gatewayUrl: "" }]) {
+      const instance = satpAppDefinition.createAppInstance(
+        makeGuiAppConfig(options),
+      );
+      expect((instance.options as SatpAppOptions).gatewayUrl ?? "").toBe("");
+    }
+    expect(satpAppDefinition.defaultOptions).toMatchObject({ gatewayUrl: "" });
+  });
+
+  it("rejects options that are not an object or a non-string gatewayUrl", () => {
+    for (const options of [
+      null,
+      [],
+      "http://localhost:4010",
+      { gatewayUrl: 4010 },
+    ]) {
+      expect(
+        () => satpAppDefinition.createAppInstance(makeGuiAppConfig(options)),
+        JSON.stringify(options),
+      ).toThrow(/Invalid SATP inspector app specific options/);
+    }
   });
 
   it("rejects a gatewayUrl that is not an absolute http(s) URL", () => {

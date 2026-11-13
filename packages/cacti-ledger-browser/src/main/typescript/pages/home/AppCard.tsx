@@ -137,7 +137,7 @@ export default function AppCard({ appConfig }: AppCardProps) {
             paddingBottom: 1,
           }}
         >
-          <Typography variant="h5" component="div" color="secondary.main">
+          <Typography variant="h5" component="div" color="text.primary">
             {appConfig.instanceName}
           </Typography>
           <Typography sx={{ mb: 1.5 }} color="text.secondary">
