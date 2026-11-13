@@ -1,0 +1,53 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: CC-BY-4.0
+
+name: Docs — MkDocs Build Check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'packages/cactus-plugin-satp-hermes/docs/diagrams/architecture-overview.mmd'
+      - '.github/workflows/docs-build-check.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'packages/cactus-plugin-satp-hermes/docs/diagrams/architecture-overview.mmd'
+      - '.github/workflows/docs-build-check.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0  # v7.0.0
+
+      - name: Use Python 3.x
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6.3.0
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install docs dependencies
+        run: pip install -r requirements.txt
+        working-directory: docs
+
+      - name: Build docs
+        # Note: the deploy workflow (deploy_docs.yml) runs mkdocs gh-deploy
+        # without --strict; keep parity here. A follow-up cleanup pass can
+        # promote to --strict once existing warnings are addressed.
+        run: mkdocs build
+        working-directory: docs
+
+      - name: Build whitepaper
+        # Verify the whitepaper-only MkDocs config resolves all image paths
+        # and the whitepaper.md content is valid. Uses the same docs_dir as
+        # the full site so rendered images are already present from the step
+        # above (MkDocs copies them into site-whitepaper/ on build).
+        run: mkdocs build -f mkdocs.whitepaper.yml
+        working-directory: docs
