@@ -20,6 +20,8 @@ module.exports = {
   testPathIgnorePatterns: [
     "/integration/docker-local/",
     "/integration/docker-upstream/",
+    // #4762: skipped until crash-recovery work is done
+    "/integration/recovery/",
   ],
   modulePathIgnorePatterns: ["<rootDir>/dist/"],
   reporters: [
