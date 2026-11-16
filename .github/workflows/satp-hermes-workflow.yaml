@@ -472,7 +472,3 @@ jobs:
           path: |
             packages/cactus-plugin-satp-hermes/src/test/solidity/generated/**/*
             packages/cactus-plugin-satp-hermes/src/main/solidity/generated/**/*
-
-  # run-satp-tests-recovery and run-satp-tests-rollback removed (#4762).
-  # The runners were unstable. Reactivate both when the crash-recovery work
-  # is done. recovery-crash-v13.test.ts stays in the tree.
