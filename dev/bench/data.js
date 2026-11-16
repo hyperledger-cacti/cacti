@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794471503703,
+  "lastUpdate": 1794817296978,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -1004,6 +1004,42 @@ window.BENCHMARK_DATA = {
             "range": "±3.18%",
             "unit": "ops/sec",
             "extra": "178 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Akshat Lakhera",
+            "username": "akshat-lakhera",
+            "email": "akshatlnct2024@gmail.com"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "8f5fb331cb6d934f5ee226d7a5d5d7469a955aff",
+          "message": "fix(satp-hermes): return mined receipt from EVM leaf getReceipt\n\nFixes #4760\n\nSigned-off-by: Akshat Lakhera <akshatlnct2024@gmail.com>",
+          "timestamp": "2026-10-28T13:16:26Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/8f5fb331cb6d934f5ee226d7a5d5d7469a955aff"
+        },
+        "date": 1794817292152,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "cmd-api-server_HTTP_GET_getOpenApiSpecV1",
+            "value": 615,
+            "range": "±3.01%",
+            "unit": "ops/sec",
+            "extra": "175 samples"
+          },
+          {
+            "name": "cmd-api-server_gRPC_GetOpenApiSpecV1",
+            "value": 708,
+            "range": "±2.13%",
+            "unit": "ops/sec",
+            "extra": "183 samples"
           }
         ]
       }
