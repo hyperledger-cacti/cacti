@@ -219,8 +219,8 @@ export async function getStatusService(
     } as NetworkId);
   const destinationNetwork: Transact200ResponseStatusResponseOriginNetwork =
     getNetworkDetails({
-      id: sessionData.senderAsset?.networkId?.id,
-      ledgerType: sessionData.senderAsset?.networkId?.type as LedgerType,
+      id: sessionData.receiverAsset?.networkId?.id,
+      ledgerType: sessionData.receiverAsset?.networkId?.type as LedgerType,
     } as NetworkId);
   if (!sessionData.hashes) {
     return {
