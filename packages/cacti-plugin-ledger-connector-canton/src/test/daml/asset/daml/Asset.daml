@@ -1,0 +1,40 @@
+-- Minimal holding used by the connector's DAR deployment tests. It is kept
+-- small on purpose; the SATP Canton leaf can reuse it as a test asset.
+module Asset where
+
+template Asset
+  with
+    issuer : Party
+    owner : Party
+    symbol : Text
+    amount : Decimal
+    locked : Bool
+  where
+    signatory issuer
+    observer owner
+    ensure amount > 0.0
+
+    choice Transfer : ContractId Asset
+      with
+        newOwner : Party
+      controller owner
+      do
+        assertMsg "A locked asset cannot be transferred" (not locked)
+        create this with owner = newOwner
+
+    choice Lock : ContractId Asset
+      controller owner
+      do
+        assertMsg "The asset is already locked" (not locked)
+        create this with locked = True
+
+    choice Unlock : ContractId Asset
+      controller issuer
+      do
+        assertMsg "The asset is not locked" locked
+        create this with locked = False
+
+    choice Burn : ()
+      controller owner
+      do
+        pure ()

@@ -335,6 +335,42 @@
           }
         }
       },
+      "DeployDarRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["darBase64"],
+        "properties": {
+          "darBase64": {
+            "type": "string",
+            "format": "byte",
+            "minLength": 1,
+            "description": "The DAR file, base64-encoded. The decoded size is limited by the connector's maxDarBytes option (16 MiB by default)."
+          },
+          "synchronizerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "description": "Synchronizer to vet the packages on. Defaults to the participant's default synchronizer."
+          }
+        }
+      },
+      "DeployDarResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["packageId"],
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Package ID of the DAR's main package."
+          },
+          "darName": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "The DAR manifest name, for example my-model-1.0.0."
+          }
+        }
+      },
       "ErrorResponse": {
         "type": "object",
         "additionalProperties": true,
@@ -772,6 +808,126 @@
           },
           "504": {
             "description": "The Canton party query timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/deploy-dar": {
+      "post": {
+        "security": [
+          {
+            "bearerTokenAuth": ["deploy:canton-packages"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/deploy-dar"
+          }
+        },
+        "operationId": "deployDarV1",
+        "summary": "Uploads and vets a DAR on the Canton participant.",
+        "description": "The connector derives the main package ID from the DAR and confirms that the participant registered it. Uploading the same DAR again is idempotent. The participant user must have the participant_admin right.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployDarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The DAR is uploaded and its main package is registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployDarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request or the DAR is invalid, or the ledger rejected the DAR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request has no valid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Canton participant does not allow the connector's user to upload packages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The participant did not register the DAR's main package, for example because a different package with the same name and version is already vetted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The DAR exceeds the connector's size limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton DAR upload failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton DAR upload timed out. Uploading the same DAR again is safe.",
             "content": {
               "application/json": {
                 "schema": {

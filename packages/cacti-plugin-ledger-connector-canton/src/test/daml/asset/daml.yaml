@@ -1,0 +1,9 @@
+# Keep sdk-version aligned with the Canton LocalNet release pinned by
+# CantonTestLedger (cactus-test-tooling), so the committed DAR is accepted.
+sdk-version: 3.5.2
+name: cacti-canton-test-asset
+source: daml
+version: 1.0.0
+dependencies:
+  - daml-prim
+  - daml-stdlib

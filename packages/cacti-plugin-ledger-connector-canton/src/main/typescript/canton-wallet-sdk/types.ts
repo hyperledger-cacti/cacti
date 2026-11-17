@@ -78,6 +78,22 @@ export interface ICantonWalletSdk {
   dispose?(): Promise<void>;
   readonly ledger: {
     ledgerEnd(): Promise<number>;
+    readonly dar: {
+      /**
+       * Uploads a DAR with `POST /v2/packages`. The SDK uses `packageId` only
+       * to skip an upload it believes is redundant, and it treats a
+       * same-name-and-version conflict as success, so callers must derive the
+       * ID themselves and confirm registration with check().
+       */
+      upload(
+        darBytes: Uint8Array,
+        packageId: string,
+        synchronizerId?: string,
+        vetAllPackages?: boolean,
+      ): Promise<void>;
+      /** Whether the participant lists `packageId` (`GET /v2/packages`). */
+      check(packageId: string): Promise<boolean>;
+    };
     readonly internal: {
       submit(request: ICantonSubmitRequest): Promise<{
         updateId: string;
