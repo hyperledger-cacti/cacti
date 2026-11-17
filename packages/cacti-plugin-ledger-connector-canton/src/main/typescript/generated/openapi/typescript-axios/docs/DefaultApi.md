@@ -4,10 +4,71 @@ All URIs are relative to *http://localhost*
 
 |Method | HTTP request | Description|
 |------------- | ------------- | -------------|
+|[**deployDarV1**](#deploydarv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/deploy-dar | Uploads and vets a DAR on the Canton participant.|
 |[**getActiveContractsV1**](#getactivecontractsv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-active-contracts | Returns active Canton contracts visible to the requested parties.|
 |[**getOpenApiSpecV1**](#getopenapispecv1) | **GET** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/get-open-api-spec | Returns the connector OpenAPI specification.|
 |[**listPartiesV1**](#listpartiesv1) | **GET** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/list-parties | Lists Canton parties available to the authenticated user.|
 |[**runTransactionV1**](#runtransactionv1) | **POST** /api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/run-transaction | Submits Daml commands for a Canton-hosted party.|
+
+# **deployDarV1**
+> DeployDarResponse deployDarV1(deployDarRequest)
+
+The connector derives the main package ID from the DAR and confirms that the participant registered it. Uploading the same DAR again is idempotent. The participant user must have the participant_admin right.
+
+### Example
+
+```typescript
+import {
+    DefaultApi,
+    Configuration,
+    DeployDarRequest
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new DefaultApi(configuration);
+
+let deployDarRequest: DeployDarRequest; //
+
+const { status, data } = await apiInstance.deployDarV1(
+    deployDarRequest
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **deployDarRequest** | **DeployDarRequest**|  | |
+
+
+### Return type
+
+**DeployDarResponse**
+
+### Authorization
+
+[bearerTokenAuth](../README.md#bearerTokenAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | The DAR is uploaded and its main package is registered. |  -  |
+|**400** | The request or the DAR is invalid, or the ledger rejected the DAR. |  -  |
+|**401** | The request has no valid bearer token. |  -  |
+|**403** | The Canton participant does not allow the connector\&#39;s user to upload packages. |  -  |
+|**409** | The participant did not register the DAR\&#39;s main package, for example because a different package with the same name and version is already vetted. |  -  |
+|**413** | The DAR exceeds the connector\&#39;s size limit. |  -  |
+|**502** | Canton DAR upload failed upstream. |  -  |
+|**503** | The connector is shut down or busy, or the ledger is temporarily unavailable. |  -  |
+|**504** | The Canton DAR upload timed out. Uploading the same DAR again is safe. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **getActiveContractsV1**
 > GetActiveContractsResponse getActiveContractsV1(getActiveContractsRequest)

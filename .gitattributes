@@ -178,6 +178,7 @@ Procfile    text
 
 ## ARCHIVES
 *.7z  binary
+*.dar binary
 *.gz  binary
 *.jar binary
 *.rar binary

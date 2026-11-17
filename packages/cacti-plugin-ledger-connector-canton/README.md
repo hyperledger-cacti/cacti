@@ -126,8 +126,8 @@ response contains:
   contract includes its `interfaceViews`. The created-event blob is not
   returned.
 - `activeAtOffset`: the offset of the snapshot, either the requested `offset`
-  or the ledger end at the time of the query. Continue from it with the
-  ledger's update stream.
+  or the ledger end at the time of the query. Continue from it by passing it
+  as `lastSeenOffset` to `watchBlocksV1()`.
 - `limitReached`: `true` when the ledger returned `limit` entries, so more
   contracts may match.
 
@@ -139,6 +139,71 @@ rejects a `limit` above `maxActiveContractLimit`, which defaults to 200 and
 can be raised to 1000. Set it to at most the participant's configured limit.
 If the participant still rejects a query, the connector answers HTTP 413 with
 `cantonErrorCode: "JSON_API_MAXIMUM_LIST_ELEMENTS_NUMBER_REACHED"`.
+
+## DAR deployment
+
+`deployContract()` (REST: `deploy-dar`) uploads a DAR to the participant,
+vets its packages, and returns the main package ID:
+
+```typescript
+const { packageId } = await connector.deployContract({
+  darBase64: readFileSync("my-model-1.0.0.dar").toString("base64"),
+});
+// Commands can then pin the deployed package with
+// `${packageId}:Module:Template`.
+```
+
+Active-contract filters take the package name
+(`#package-name:Module:Template`); the contracts they return carry the
+template ID resolved to the package ID.
+
+The Ledger API upload response does not contain the package ID, so the
+connector reads it from the DAR: it takes the main DALF named in the
+manifest, recomputes the SHA-256 of its payload, and rejects the DAR with
+HTTP 400 when that does not match the hash the archive declares. After the
+upload, the connector confirms that the participant lists the package. If a
+different package with the same name and version is already vetted, the
+participant keeps the existing one and the connector answers HTTP 409.
+Uploading the same DAR again is idempotent.
+
+The Canton user of the connector must have the `participant_admin` right.
+Decoded DARs are limited to `maxDarBytes` (default 16 MiB, maximum 64 MiB),
+and no single archive entry may inflate beyond eight times that limit. REST
+callers send the DAR base64-encoded, so the API server's JSON body limit must
+be at least 4/3 of `maxDarBytes`.
+
+## Watching ledger transactions
+
+`CantonApiClient.watchBlocksV1()` streams the transactions of the requested
+parties over the API server's socket.io connection. Each message is one
+transaction with its offset and its `created` and `archived` events:
+
+```typescript
+const subscription = apiClient
+  .watchBlocksV1({
+    parties: [partyId],
+    templateIds: ["#my-model:Main:Asset"],
+    lastSeenOffset, // optional; defaults to the ledger end
+  })
+  .subscribe({
+    next: ({ offset, events }) => handle(offset, events),
+    error: ({ statusCode, message }) => reconnectOrReport(statusCode, message),
+  });
+```
+
+To resume after a reconnect, subscribe again with the `offset` of the last
+message as `lastSeenOffset`. The connector polls the Ledger API update stream
+(`POST /v2/updates`) every `watchBlocksPollIntervalMs` (default 1000 ms)
+once it has caught up, and reads at most `maxActiveContractLimit` updates per
+request, so each request stays within the participant's
+`http-list-max-elements-limit`. TypeScript callers can page the same stream
+with `connector.readUpdates()`.
+
+The same party policy, scope and error sanitization as the REST endpoints
+apply. A failure is sent once as `WatchBlocksV1.Error`, with the HTTP status
+the REST request would have returned, and ends the subscription; connector
+shutdown ends open subscriptions with HTTP 503. A socket has at most one
+subscription, and subscribing again replaces it.
 
 ## Errors
 
@@ -170,8 +235,11 @@ scopes; without that, the protected operations answer HTTP 401 or 403. The
 REST operations require these distinct scopes:
 
 - `write:canton-transactions` for submitting commands;
-- `read:canton-contracts` for active-contract queries;
-- `read:canton-parties` for party discovery.
+- `read:canton-contracts` for active-contract queries and WatchBlocksV1
+  subscriptions, whose socket must carry a JWT the API server verified;
+- `read:canton-parties` for party discovery;
+- `deploy:canton-packages` for DAR deployment, which changes the Daml code
+  available to every party on the participant.
 
 The OpenAPI specification endpoint requires no scope, as in other Cacti
 plugins.
@@ -236,17 +304,19 @@ generate a new `commandId` for a retry, and do not retry after the
 deduplication period has elapsed without first checking the ledger, for
 example with `getActiveContracts()`.
 
-The first version intentionally uses participant-hosted signing through the
-Wallet SDK. External signing, DAR deployment, and ledger-event streaming are
-planned as separate increments of issue #4700.
+The connector uses participant-hosted signing through the Wallet SDK.
+External signing is planned as a separate increment.
 
 ## TestNet integration
 
 See [TestNet setup and opt-in integration tests](./docs/testnet.md) for
 participant onboarding, synchronizer connectivity, Ledger API credentials,
 test funds, and the smoke-test configuration. Live TestNet tests require
-operator-provided access and are skipped in ordinary CI; write coverage is an
-explicit placeholder pending an approved model and cleanup workflow.
+operator-provided access and are skipped in ordinary CI.
+
+The test DAR lives in `src/test/daml/asset`. Its Daml source and
+`build-dar.sh` are committed next to the built DAR; rebuilding requires the
+Daml package manager (`dpm`) with the SDK version pinned in `daml.yaml`.
 
 ## Contributing
 

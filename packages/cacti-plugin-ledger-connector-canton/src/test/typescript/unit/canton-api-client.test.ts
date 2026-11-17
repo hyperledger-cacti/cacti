@@ -17,12 +17,14 @@ import {
   ICantonWalletSdk,
   PluginLedgerConnectorCanton,
 } from "../../../main/typescript/public-api";
+import { createDarFixture } from "../canton-dar-fixtures";
 
 describe("Canton connector HTTP API", () => {
   const allScopes = [
     "write:canton-transactions",
     "read:canton-contracts",
     "read:canton-parties",
+    "deploy:canton-packages",
   ];
   const activeContractEntry = {
     contractEntry: {
@@ -44,8 +46,10 @@ describe("Canton connector HTTP API", () => {
       ledgerEnd: jest.fn(),
       internal: { submit: jest.fn() },
       acsReader: { raw: { read: jest.fn() } },
+      dar: { upload: jest.fn(), check: jest.fn() },
     },
     party: { list: jest.fn() },
+    updates: { read: jest.fn() },
   };
   // The connector caches the SDK, so its mocks are re-armed before each test
   // instead of being replaced; one-shot overrides cannot leak between tests.
@@ -59,6 +63,9 @@ describe("Canton connector HTTP API", () => {
       .mocked(sdk.ledger.acsReader.raw.read)
       .mockReset()
       .mockResolvedValue([activeContractEntry]);
+    jest.mocked(sdk.ledger.dar.upload).mockReset().mockResolvedValue();
+    jest.mocked(sdk.ledger.dar.check).mockReset().mockResolvedValue(true);
+    jest.mocked(sdk.updates.read).mockReset().mockResolvedValue([]);
     jest
       .mocked(sdk.party.list)
       .mockReset()
@@ -120,11 +127,11 @@ describe("Canton connector HTTP API", () => {
     await Servers.shutdown(server);
   });
 
-  test("creates and caches the four REST endpoints", async () => {
+  test("creates and caches the five REST endpoints", async () => {
     const first = await connector.getOrCreateWebServices();
     const second = await connector.getOrCreateWebServices();
 
-    expect(first).toHaveLength(4);
+    expect(first).toHaveLength(5);
     expect(second).toBe(first);
     expect(first.map((endpoint) => endpoint.getPath()).sort()).toEqual(
       Object.keys(OAS.paths).sort(),
@@ -217,6 +224,26 @@ describe("Canton connector HTTP API", () => {
     expect(sdk.ledger.internal.submit).toHaveBeenLastCalledWith(
       expect.objectContaining({ commands: [command] }),
     );
+  });
+
+  test("deploys a DAR through the REST API", async () => {
+    const { dar, packageId, name } = createDarFixture();
+
+    const { data } = await apiClient.deployDarV1({
+      darBase64: dar.toString("base64"),
+    });
+
+    expect(data).toEqual({ packageId, darName: name });
+  });
+
+  test("rejects a DAR request with unknown fields at the OpenAPI boundary", async () => {
+    await expect(
+      apiClient.deployDarV1({
+        darBase64: createDarFixture().dar.toString("base64"),
+        packageId: "0".repeat(64),
+      } as never),
+    ).rejects.toMatchObject({ response: { status: 400 } });
+    expect(sdk.ledger.dar.upload).not.toHaveBeenCalled();
   });
 
   test("rejects an empty transaction at the OpenAPI boundary", async () => {
@@ -343,6 +370,14 @@ describe("Canton connector HTTP API", () => {
         apiClient.listPartiesV1({
           headers: { "x-test-scopes": "read:canton-contracts" },
         }),
+    },
+    {
+      name: "DAR deployment",
+      call: () =>
+        apiClient.deployDarV1(
+          { darBase64: createDarFixture().dar.toString("base64") },
+          { headers: { "x-test-scopes": "write:canton-transactions" } },
+        ),
     },
   ])("rejects an insufficient scope for the $name", async ({ call }) => {
     await expect(call()).rejects.toMatchObject({ response: { status: 403 } });

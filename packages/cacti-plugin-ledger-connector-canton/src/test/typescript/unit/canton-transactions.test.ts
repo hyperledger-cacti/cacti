@@ -402,14 +402,6 @@ describe("Canton connector: transactions", () => {
     },
   );
 
-  test("reports DAR deployment as explicitly unsupported", async () => {
-    const connector = createConnector({ create: jest.fn() });
-
-    await expect(connector.deployContract()).rejects.toThrow(
-      "Canton DAR deployment is not supported by this connector version.",
-    );
-  });
-
   test.each([
     { name: "missing", commandId: undefined },
     { name: "blank", commandId: " " },

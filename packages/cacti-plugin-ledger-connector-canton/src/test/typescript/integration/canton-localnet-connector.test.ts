@@ -9,7 +9,6 @@ import {
   ICantonTestLedgerConnectionInfo,
   pruneDockerContainersIfGithubAction,
 } from "@hyperledger-cacti/cactus-test-tooling";
-import axios from "axios";
 import express from "express";
 
 import {
@@ -20,22 +19,12 @@ import {
   PING_TEMPLATE_ID,
   RESOLVED_PING_TEMPLATE_ID,
   createPingCommand,
+  getLocalNetActAsParty,
   invalidateJwt,
-  ledgerApiUserOf,
   startConnectorApi,
 } from "../canton-test-utilities";
 
 const TEST_TIMEOUT = 20 * 60 * 1000;
-
-interface IUserRightsResponse {
-  readonly rights?: Array<{
-    readonly kind?: {
-      readonly CanActAs?: {
-        readonly value?: { readonly party?: string };
-      };
-    };
-  }>;
-}
 
 jest.setTimeout(TEST_TIMEOUT);
 
@@ -58,22 +47,10 @@ describe("Canton connector with LocalNet", () => {
       await ledger.start();
       connectionInfo = await ledger.getConnectionInfo();
 
-      const userId = ledgerApiUserOf(connectionInfo.ledgerApiAuthToken);
-      const rightsResponse = await axios.get<IUserRightsResponse>(
-        `${connectionInfo.jsonLedgerApiHost}/v2/users/${encodeURIComponent(userId)}/rights`,
-        {
-          headers: {
-            Authorization: `Bearer ${connectionInfo.ledgerApiAuthToken}`,
-          },
-        },
+      partyId = await getLocalNetActAsParty(
+        connectionInfo.jsonLedgerApiHost,
+        connectionInfo.ledgerApiAuthToken,
       );
-      const actAsParty = rightsResponse.data.rights
-        ?.map((right) => right.kind?.CanActAs?.value?.party)
-        .find((party): party is string => typeof party === "string");
-      if (!actAsParty) {
-        throw new Error("The LocalNet user has no CanActAs party");
-      }
-      partyId = actAsParty;
 
       connector = new PluginLedgerConnectorCanton({
         instanceId: randomUUID(),

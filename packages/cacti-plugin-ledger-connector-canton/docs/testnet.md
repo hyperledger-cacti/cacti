@@ -86,12 +86,18 @@ NODE_OPTIONS=--experimental-vm-modules yarn jest --runInBand \
 ```
 
 The smoke tests discover the party and read its template-filtered ACS. An
-empty ACS is valid. The write test is explicitly `todo`: enable it only after
-agreeing on a model, arguments, synchronizer routing, funds/traffic, and an
-archive/cleanup choice. Do not run generic create commands against shared
-production models. Record the network, package version, command IDs, and
-sanitized CI results when adding write coverage. LocalNet remains the
-deterministic positive/negative transaction test environment.
+empty ACS is valid.
+
+Set `CANTON_TESTNET_WRITES_ENABLED=true` as well to run the write test. It
+deploys the connector's test DAR (`src/test/daml/asset`), creates an `Asset`
+for the configured party, reads it back, and burns it so repeated runs leave
+no contracts behind. It needs a Ledger API user with `participant_admin` and
+`CanActAs` for the party, and synchronizer traffic for the upload and both
+transactions. Uploaded packages cannot be removed from a participant, so run
+it only against a participant where the test package is acceptable. Record the
+network, package ID, command IDs, and sanitized results when reporting a run.
+LocalNet remains the deterministic environment for positive and negative
+deployment and transaction tests.
 
 TestNet credentials were not supplied for this change, so a skipped suite is
 not evidence of a successful live TestNet run. TestNet resets can invalidate

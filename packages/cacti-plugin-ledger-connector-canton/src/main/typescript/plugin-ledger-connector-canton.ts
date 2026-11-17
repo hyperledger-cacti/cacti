@@ -1,6 +1,8 @@
 import type { Express } from "express";
+import type { Server as SocketIoServer } from "socket.io";
 import {
   BadRequestError,
+  ConflictError,
   ForbiddenError,
   GatewayTimeoutError,
   PayloadTooLargeError,
@@ -25,15 +27,21 @@ import {
 import OAS from "../json/openapi.json";
 import {
   ActiveContract,
-  ActiveContractInterfaceView,
   CantonCommand,
+  DeployDarRequest,
+  DeployDarResponse,
   GetActiveContractsRequest,
   GetActiveContractsResponse,
   ListPartiesResponse,
   RunTransactionRequest,
   RunTransactionResponse,
+  WatchBlocksV1,
+  WatchBlocksV1Progress,
 } from "./generated/openapi/typescript-axios";
+import { toActiveContract, toWatchBlocksProgress } from "./canton-event-mapper";
 import { toCantonLedgerError } from "./canton-ledger-error";
+import { InvalidDarError } from "./dar/invalid-dar-error";
+import { readCantonDar } from "./dar/read-dar";
 import {
   CantonAuthConfig,
   CantonWalletSdkFactory,
@@ -41,6 +49,7 @@ import {
   ICantonWalletSdk,
   ICantonWalletSdkFactory,
 } from "./canton-wallet-sdk";
+import { DeployDarV1Endpoint } from "./web-services/deploy-dar-v1-endpoint";
 import { GetActiveContractsV1Endpoint } from "./web-services/get-active-contracts-v1-endpoint";
 import {
   GetOpenApiSpecV1Endpoint,
@@ -48,6 +57,7 @@ import {
 } from "./web-services/get-open-api-spec-v1-endpoint";
 import { ListPartiesV1Endpoint } from "./web-services/list-parties-v1-endpoint";
 import { RunTransactionV1Endpoint } from "./web-services/run-transaction-v1-endpoint";
+import { WatchBlocksV1Endpoint } from "./web-services/watch-blocks-v1-endpoint";
 import { validateCantonServiceUrl } from "./canton-service-url";
 
 export const DEFAULT_ACTIVE_CONTRACT_LIMIT = 100;
@@ -67,6 +77,13 @@ export const MAX_TRANSACTION_PAYLOAD_BYTES = 1024 * 1024;
 export const MAX_TRANSACTION_PAYLOAD_DEPTH = 64;
 export const DEFAULT_MAX_IN_FLIGHT_OPERATIONS = 64;
 export const MAX_IN_FLIGHT_OPERATIONS = 1024;
+export const DEFAULT_MAX_DAR_BYTES = 16 * 1024 * 1024;
+export const MAX_DAR_BYTES = 64 * 1024 * 1024;
+/** Bound on any one inflated DAR entry, relative to the DAR size limit. */
+export const MAX_DAR_ENTRY_INFLATION_FACTOR = 8;
+export const DEFAULT_WATCH_BLOCKS_POLL_INTERVAL_MS = 1000;
+export const MAX_WATCH_BLOCKS_POLL_INTERVAL_MS = 60_000;
+const BASE64_PATTERN = /^[A-Za-z0-9+/]*={0,2}$/;
 
 export interface IPluginLedgerConnectorCantonOptions
   extends ICactusPluginOptions {
@@ -105,8 +122,9 @@ export interface IPluginLedgerConnectorCantonOptions
    */
   allowAllParties?: boolean;
   /**
-   * Largest `limit` accepted by getActiveContracts(). Set it to at most the
-   * participant's `http-list-max-elements-limit` (Canton default 200).
+   * Largest `limit` accepted by getActiveContracts(), and the page size of
+   * readUpdates(). Set it to at most the participant's
+   * `http-list-max-elements-limit` (Canton default 200).
    */
   maxActiveContractLimit?: number;
   /** Timeout applied to each Wallet SDK initialization and ledger operation. */
@@ -118,13 +136,41 @@ export interface IPluginLedgerConnectorCantonOptions
    * cannot cancel it. Requests beyond the limit fail with HTTP 503.
    */
   maxInFlightOperations?: number;
+  /**
+   * Largest decoded DAR accepted by deployContract(), in bytes. REST callers
+   * send the DAR base64-encoded, so the API server's JSON body limit must be
+   * at least 4/3 of this value.
+   */
+  maxDarBytes?: number;
+  /**
+   * How often a WatchBlocksV1 subscription that has caught up with the ledger
+   * polls it for new transactions.
+   */
+  watchBlocksPollIntervalMs?: number;
+}
+
+/** A request for one page of the update stream; see readUpdates(). */
+export interface ICantonReadUpdatesRequest {
+  readonly parties: readonly string[];
+  readonly templateIds?: readonly string[];
+  readonly interfaceIds?: readonly string[];
+  /** Exclusive start offset. When omitted, reading starts at the ledger end. */
+  readonly beginExclusive?: number;
+}
+
+export interface ICantonReadUpdatesResponse {
+  readonly transactions: WatchBlocksV1Progress[];
+  /** The offset to pass as `beginExclusive` in the next request. */
+  readonly nextOffset: number;
+  /** True when the page was full, so more updates may follow immediately. */
+  readonly limitReached: boolean;
 }
 
 export class PluginLedgerConnectorCanton
   implements
     IPluginLedgerConnector<
-      never,
-      never,
+      DeployDarRequest,
+      DeployDarResponse,
       RunTransactionRequest,
       RunTransactionResponse
     >,
@@ -143,6 +189,10 @@ export class PluginLedgerConnectorCanton
   private readonly operationTimeoutMs: number;
   private readonly maxActiveContractLimit: number;
   private readonly maxInFlightOperations: number;
+  private readonly maxDarBytes: number;
+  private readonly watchBlocksPollIntervalMs: number;
+  private readonly watchBlocksEndpoints = new Set<WatchBlocksV1Endpoint>();
+  private readonly socketServers = new WeakSet<SocketIoServer>();
   private readonly inFlightOperations = new Set<Promise<void>>();
   private isShutDown = false;
   private endpoints?: IWebServiceEndpoint[];
@@ -185,6 +235,20 @@ export class PluginLedgerConnectorCanton
       this.maxInFlightOperations,
       MAX_IN_FLIGHT_OPERATIONS,
       `${fnTag} options.maxInFlightOperations`,
+    );
+    this.maxDarBytes = options.maxDarBytes ?? DEFAULT_MAX_DAR_BYTES;
+    PluginLedgerConnectorCanton.validateIntegerOption(
+      this.maxDarBytes,
+      MAX_DAR_BYTES,
+      `${fnTag} options.maxDarBytes`,
+    );
+    this.watchBlocksPollIntervalMs =
+      options.watchBlocksPollIntervalMs ??
+      DEFAULT_WATCH_BLOCKS_POLL_INTERVAL_MS;
+    PluginLedgerConnectorCanton.validateIntegerOption(
+      this.watchBlocksPollIntervalMs,
+      MAX_WATCH_BLOCKS_POLL_INTERVAL_MS,
+      `${fnTag} options.watchBlocksPollIntervalMs`,
     );
     this.maxActiveContractLimit =
       options.maxActiveContractLimit ?? DEFAULT_MAX_ACTIVE_CONTRACT_LIMIT;
@@ -261,6 +325,12 @@ export class PluginLedgerConnectorCanton
     this.isShutDown = true;
     this.walletSdkPromise = undefined;
     this.endpoints = undefined;
+    const shutDown = new ServiceUnavailableError(
+      "The Canton connector has been shut down.",
+    );
+    for (const endpoint of [...this.watchBlocksEndpoints]) {
+      endpoint.stop(shutDown);
+    }
 
     let timeout: ReturnType<typeof setTimeout> | undefined;
     const drained = await Promise.race([
@@ -285,13 +355,39 @@ export class PluginLedgerConnectorCanton
     return OAS;
   }
 
+  /**
+   * Registers the REST endpoints and, when a socket.io server is given, the
+   * WatchBlocksV1 stream. Each socket has at most one subscription; a new
+   * Subscribe replaces it.
+   */
   public async registerWebServices(
     expressApp: Express,
+    wsApi?: SocketIoServer,
   ): Promise<IWebServiceEndpoint[]> {
     const webServices = await this.getOrCreateWebServices();
     await Promise.all(
       webServices.map((webService) => webService.registerExpress(expressApp)),
     );
+    if (wsApi && !this.socketServers.has(wsApi)) {
+      this.socketServers.add(wsApi);
+      wsApi.on("connection", (socket) => {
+        let current: WatchBlocksV1Endpoint | undefined;
+        socket.on(WatchBlocksV1.Subscribe, (options: unknown) => {
+          current?.stop();
+          current = new WatchBlocksV1Endpoint({
+            socket,
+            connector: this,
+            pollIntervalMs: this.watchBlocksPollIntervalMs,
+            logLevel: this.options.logLevel,
+            onStop: (endpoint) => this.watchBlocksEndpoints.delete(endpoint),
+          });
+          this.watchBlocksEndpoints.add(current);
+          current.start(options);
+        });
+        socket.on(WatchBlocksV1.Unsubscribe, () => current?.stop());
+        socket.on("disconnect", () => current?.stop());
+      });
+    }
     return webServices;
   }
 
@@ -320,6 +416,7 @@ export class PluginLedgerConnectorCanton
 
     this.endpoints = [
       new RunTransactionV1Endpoint(endpointOptions),
+      new DeployDarV1Endpoint(endpointOptions),
       new GetActiveContractsV1Endpoint(endpointOptions),
       new ListPartiesV1Endpoint(endpointOptions),
       new GetOpenApiSpecV1Endpoint(openApiEndpointOptions),
@@ -327,10 +424,88 @@ export class PluginLedgerConnectorCanton
     return this.endpoints;
   }
 
-  public async deployContract(): Promise<never> {
-    throw new Error(
-      "Canton DAR deployment is not supported by this connector version.",
+  /**
+   * Uploads and vets a DAR, then returns its main package ID. The ID is
+   * derived from the DAR, because the Ledger API upload response has none,
+   * and registration is confirmed afterwards, because the Wallet SDK reports
+   * success when a different package with the same name and version blocks
+   * the upload.
+   */
+  public async deployContract(
+    request: DeployDarRequest,
+  ): Promise<DeployDarResponse> {
+    const fnTag = `${this.className}#deployContract()`;
+    this.validateRequest(
+      this.isPlainObject(request),
+      `${fnTag} request must be an object`,
     );
+    const darBase64 = request.darBase64 as unknown;
+    const synchronizerId = request.synchronizerId as unknown;
+    if (synchronizerId !== undefined) {
+      this.validateRequiredString(
+        synchronizerId,
+        `${fnTag} request.synchronizerId`,
+      );
+    }
+    const dar = this.decodeDar(darBase64, `${fnTag} request.darBase64`);
+    let packageId: string;
+    let darName: string | undefined;
+    try {
+      ({ packageId, name: darName } = readCantonDar(
+        dar,
+        this.maxDarBytes * MAX_DAR_ENTRY_INFLATION_FACTOR,
+      ));
+    } catch (error: unknown) {
+      if (error instanceof InvalidDarError) {
+        throw new BadRequestError(`${fnTag} ${error.message}`);
+      }
+      throw error;
+    }
+
+    const sdk = await this.getOrCreateWalletSdk();
+    await this.withOperationTimeout(
+      () =>
+        sdk.ledger.dar.upload(
+          dar,
+          packageId,
+          synchronizerId as string | undefined,
+          true,
+        ),
+      "Canton DAR upload",
+    );
+    const registered = await this.withOperationTimeout(
+      () => sdk.ledger.dar.check(packageId),
+      "Canton package query",
+    );
+    if (!registered) {
+      throw new ConflictError(
+        `The Canton participant did not register package ${packageId}. A different package with the same name and version may already be vetted.`,
+      );
+    }
+    return darName === undefined ? { packageId } : { packageId, darName };
+  }
+
+  /**
+   * Decodes strict, padded base64 and rejects an oversized DAR from the
+   * encoded length alone, before allocating the decoded buffer.
+   */
+  private decodeDar(value: unknown, fieldName: string): Buffer {
+    this.validateRequest(
+      this.isNonBlankString(value),
+      `${fieldName} must not be blank`,
+    );
+    const encoded = value as string;
+    const padding = encoded.endsWith("==") ? 2 : encoded.endsWith("=") ? 1 : 0;
+    if ((encoded.length / 4) * 3 - padding > this.maxDarBytes) {
+      throw new PayloadTooLargeError(
+        `${fieldName} must not exceed ${this.maxDarBytes} decoded bytes`,
+      );
+    }
+    this.validateRequest(
+      encoded.length % 4 === 0 && BASE64_PATTERN.test(encoded),
+      `${fieldName} must be padded base64`,
+    );
+    return Buffer.from(encoded, "base64");
   }
 
   public async transact(
@@ -423,44 +598,9 @@ export class PluginLedgerConnectorCanton
       this.isPlainObject(request),
       `${this.className}#getActiveContracts() request must be an object`,
     );
-    const partiesInput = request.parties as unknown;
-    const parties = Array.isArray(partiesInput)
-      ? [...partiesInput]
-      : partiesInput;
-    this.validateRequest(
-      Array.isArray(parties) && parties.length > 0,
-      `${this.className}#getActiveContracts() request.parties must not be empty`,
-    );
-    this.validateNonBlankStringArray(
-      parties,
-      `${this.className}#getActiveContracts() request.parties`,
-    );
-    parties.forEach((partyId) => this.assertPartyAllowed(partyId));
-    const templateIdsInput = request.templateIds as unknown;
-    const interfaceIdsInput = request.interfaceIds as unknown;
-    const hasTemplateIds = templateIdsInput !== undefined;
-    const hasInterfaceIds = interfaceIdsInput !== undefined;
-    const templateIds = Array.isArray(templateIdsInput)
-      ? [...templateIdsInput]
-      : templateIdsInput;
-    const interfaceIds = Array.isArray(interfaceIdsInput)
-      ? [...interfaceIdsInput]
-      : interfaceIdsInput;
-    if (hasTemplateIds) {
-      this.validateNonBlankStringArray(
-        templateIds,
-        `${this.className}#getActiveContracts() request.templateIds`,
-      );
-    }
-    if (hasInterfaceIds) {
-      this.validateNonBlankStringArray(
-        interfaceIds,
-        `${this.className}#getActiveContracts() request.interfaceIds`,
-      );
-    }
-    this.validateRequest(
-      !(hasTemplateIds && hasInterfaceIds),
-      `${this.className}#getActiveContracts() request cannot combine templateIds and interfaceIds`,
+    const { parties, templateIds, interfaceIds } = this.validateContractFilter(
+      request,
+      `${this.className}#getActiveContracts()`,
     );
     const configuredOffset = request.offset as unknown;
     if (configuredOffset !== undefined) {
@@ -502,8 +642,8 @@ export class PluginLedgerConnectorCanton
       return sdk.ledger.acsReader.raw.read({
         parties,
         filterByParty: true,
-        templateIds: templateIds as string[] | undefined,
-        interfaceIds: interfaceIds as string[] | undefined,
+        templateIds,
+        interfaceIds,
         offset: activeAtOffset,
         limit: requestedLimit,
       });
@@ -520,6 +660,148 @@ export class PluginLedgerConnectorCanton
       }),
       activeAtOffset,
       limitReached: boundedEntries.length >= requestedLimit,
+    };
+  }
+
+  /**
+   * Reads the transactions after `beginExclusive`, up to the ledger end and
+   * at most `maxActiveContractLimit` updates, for parties this connector
+   * allows. WatchBlocksV1 subscriptions call it repeatedly with `nextOffset`.
+   */
+  public async readUpdates(
+    request: ICantonReadUpdatesRequest,
+  ): Promise<ICantonReadUpdatesResponse> {
+    const fnTag = `${this.className}#readUpdates()`;
+    this.validateRequest(
+      this.isPlainObject(request),
+      `${fnTag} request must be an object`,
+    );
+    const { parties, templateIds, interfaceIds } = this.validateContractFilter(
+      request,
+      fnTag,
+    );
+    const beginExclusive = request.beginExclusive as unknown;
+    if (beginExclusive !== undefined) {
+      this.validateRequest(
+        Number.isSafeInteger(beginExclusive) && (beginExclusive as number) >= 0,
+        `${fnTag} request.beginExclusive must be a non-negative safe integer`,
+      );
+    }
+
+    const sdk = await this.getOrCreateWalletSdk();
+    const ledgerEnd = await this.withOperationTimeout(
+      () => sdk.ledger.ledgerEnd(),
+      "Canton ledger-end query",
+    );
+    if (
+      beginExclusive === undefined ||
+      (beginExclusive as number) >= ledgerEnd
+    ) {
+      return {
+        transactions: [],
+        nextOffset: (beginExclusive as number | undefined) ?? ledgerEnd,
+        limitReached: false,
+      };
+    }
+    const limit = this.maxActiveContractLimit;
+    const entries = await this.withOperationTimeout(
+      () =>
+        sdk.updates.read({
+          parties,
+          templateIds,
+          interfaceIds,
+          beginExclusive: beginExclusive as number,
+          endInclusive: ledgerEnd,
+          limit,
+        }),
+      "Canton update query",
+    );
+
+    // Slicing keeps the page bounded even if an upstream version ignores the
+    // limit. Checkpoints, reassignments and topology updates count towards
+    // the limit and advance the offset, but are not forwarded.
+    const page = entries.slice(0, limit);
+    const limitReached = page.length >= limit;
+    let lastOffset = beginExclusive as number;
+    const transactions: WatchBlocksV1Progress[] = [];
+    for (const entry of page) {
+      const update = entry?.update;
+      const value =
+        update?.Transaction?.value ??
+        update?.OffsetCheckpoint?.value ??
+        update?.Reassignment?.value ??
+        update?.TopologyTransaction?.value;
+      if (Number.isSafeInteger(value?.offset)) {
+        lastOffset = Math.max(lastOffset, value?.offset as number);
+      }
+      if (update?.Transaction) {
+        transactions.push(toWatchBlocksProgress(update.Transaction.value));
+      }
+    }
+    if (limitReached && lastOffset === beginExclusive) {
+      // Without progress the next page would repeat this one forever.
+      throw new Error("The Canton update page did not advance the offset.");
+    }
+    return {
+      transactions,
+      nextOffset: limitReached ? lastOffset : ledgerEnd,
+      limitReached,
+    };
+  }
+
+  /** Validates the party and template/interface filter of a ledger query. */
+  private validateContractFilter(
+    request: {
+      readonly parties?: unknown;
+      readonly templateIds?: unknown;
+      readonly interfaceIds?: unknown;
+    },
+    fnTag: string,
+  ): {
+    parties: string[];
+    templateIds?: string[];
+    interfaceIds?: string[];
+  } {
+    const partiesInput = request.parties;
+    const parties = Array.isArray(partiesInput)
+      ? [...partiesInput]
+      : partiesInput;
+    this.validateRequest(
+      Array.isArray(parties) && parties.length > 0,
+      `${fnTag} request.parties must not be empty`,
+    );
+    this.validateNonBlankStringArray(parties, `${fnTag} request.parties`);
+    parties.forEach((partyId) => this.assertPartyAllowed(partyId));
+    const templateIdsInput = request.templateIds;
+    const interfaceIdsInput = request.interfaceIds;
+    const hasTemplateIds = templateIdsInput !== undefined;
+    const hasInterfaceIds = interfaceIdsInput !== undefined;
+    const templateIds = Array.isArray(templateIdsInput)
+      ? [...templateIdsInput]
+      : templateIdsInput;
+    const interfaceIds = Array.isArray(interfaceIdsInput)
+      ? [...interfaceIdsInput]
+      : interfaceIdsInput;
+    if (hasTemplateIds) {
+      this.validateNonBlankStringArray(
+        templateIds,
+        `${fnTag} request.templateIds`,
+      );
+    }
+    if (hasInterfaceIds) {
+      this.validateNonBlankStringArray(
+        interfaceIds,
+        `${fnTag} request.interfaceIds`,
+      );
+    }
+    this.validateRequest(
+      !(hasTemplateIds && hasInterfaceIds),
+      `${fnTag} request cannot combine templateIds and interfaceIds`,
+    );
+    return {
+      parties,
+      templateIds: templateIds as string[] | undefined,
+      interfaceIds: interfaceIds as string[] | undefined,
     };
   }
 
@@ -548,28 +830,10 @@ export class PluginLedgerConnectorCanton
     if (!activeContract) {
       return undefined;
     }
-    const event = activeContract.createdEvent;
-    const interfaceViews = event.interfaceViews?.map(
-      (view): ActiveContractInterfaceView => ({
-        interfaceId: view.interfaceId,
-        viewStatus: {
-          code: view.viewStatus.code,
-          message: view.viewStatus.message,
-        },
-        viewValue: view.viewValue,
-      }),
+    return toActiveContract(
+      activeContract.createdEvent,
+      activeContract.synchronizerId,
     );
-    return {
-      contractId: event.contractId,
-      templateId: event.templateId,
-      createArgument: event.createArgument as ActiveContract["createArgument"],
-      witnessParties: [...event.witnessParties],
-      signatories: [...event.signatories],
-      observers: event.observers ? [...event.observers] : undefined,
-      createdAt: event.createdAt,
-      synchronizerId: activeContract.synchronizerId,
-      interfaceViews,
-    };
   }
 
   private validateNonBlankStringArray(

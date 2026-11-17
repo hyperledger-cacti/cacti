@@ -51,7 +51,10 @@
     "@hyperledger-cacti/cactus-core-api": "3.0.1",
     "axios": "patch:axios@npm%3A1.20.0#~/.yarn/patches/axios-npm-1.20.0-0de8ee0ccf.patch",
     "express": "5.1.0",
-    "http-errors-enhanced-cjs": "2.0.1"
+    "http-errors-enhanced-cjs": "2.0.1",
+    "rxjs": "7.8.1",
+    "socket.io": "4.6.2",
+    "socket.io-client-fixed-types": "4.5.4"
   },
   "devDependencies": {
     "@hyperledger-cacti/cactus-test-tooling": "3.0.1",

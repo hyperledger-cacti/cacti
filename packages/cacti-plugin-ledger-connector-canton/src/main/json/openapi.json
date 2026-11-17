@@ -335,6 +335,42 @@
           }
         }
       },
+      "DeployDarRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["darBase64"],
+        "properties": {
+          "darBase64": {
+            "type": "string",
+            "format": "byte",
+            "minLength": 1,
+            "description": "The DAR file, base64-encoded. The decoded size is limited by the connector's maxDarBytes option (16 MiB by default)."
+          },
+          "synchronizerId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1024,
+            "description": "Synchronizer to vet the packages on. Defaults to the participant's default synchronizer."
+          }
+        }
+      },
+      "DeployDarResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["packageId"],
+        "properties": {
+          "packageId": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "description": "Package ID of the DAR's main package."
+          },
+          "darName": {
+            "type": "string",
+            "maxLength": 256,
+            "description": "The DAR manifest name, for example my-model-1.0.0."
+          }
+        }
+      },
       "ErrorResponse": {
         "type": "object",
         "additionalProperties": true,
@@ -412,6 +448,162 @@
             }
           }
         ]
+      },
+      "WatchBlocksV1": {
+        "type": "string",
+        "description": "socket.io event names of the WatchBlocksV1 stream.",
+        "enum": [
+          "org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Subscribe",
+          "org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Next",
+          "org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Unsubscribe",
+          "org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Error"
+        ],
+        "x-enum-varnames": ["Subscribe", "Next", "Unsubscribe", "Error"]
+      },
+      "WatchBlocksV1Options": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["parties"],
+        "not": {
+          "required": ["templateIds", "interfaceIds"]
+        },
+        "properties": {
+          "parties": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "description": "Parties whose transactions are streamed. Each must be allowed by the connector."
+          },
+          "templateIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "description": "Restricts events to these templates. Use the package-name form (`#package-name:Module:Template`)."
+          },
+          "interfaceIds": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 100,
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1024
+            },
+            "description": "Restricts events to contracts implementing these interfaces."
+          },
+          "lastSeenOffset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Streams transactions after this offset, for example the last `offset` received before a reconnect. Defaults to the ledger end when subscribing."
+          }
+        }
+      },
+      "WatchBlocksV1ArchivedContract": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["contractId", "templateId", "witnessParties"],
+        "properties": {
+          "contractId": {
+            "type": "string"
+          },
+          "templateId": {
+            "type": "string",
+            "description": "The template ID as reported by the ledger, using the package ID (`<package-id>:Module:Template`)."
+          },
+          "witnessParties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "WatchBlocksV1Event": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "maxProperties": 1,
+        "description": "Exactly one of `created` and `archived` is set.",
+        "properties": {
+          "created": {
+            "$ref": "#/components/schemas/ActiveContract"
+          },
+          "archived": {
+            "$ref": "#/components/schemas/WatchBlocksV1ArchivedContract"
+          }
+        }
+      },
+      "WatchBlocksV1Progress": {
+        "type": "object",
+        "additionalProperties": false,
+        "description": "One ledger transaction visible to the subscribed parties.",
+        "required": [
+          "offset",
+          "updateId",
+          "effectiveAt",
+          "synchronizerId",
+          "events"
+        ],
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0,
+            "description": "Ledger offset of the transaction. Pass it as `lastSeenOffset` to resume after it."
+          },
+          "updateId": {
+            "type": "string"
+          },
+          "commandId": {
+            "type": "string",
+            "description": "Set only for transactions submitted by the connector's Canton user."
+          },
+          "workflowId": {
+            "type": "string"
+          },
+          "effectiveAt": {
+            "type": "string"
+          },
+          "synchronizerId": {
+            "type": "string"
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WatchBlocksV1Event"
+            }
+          }
+        }
+      },
+      "WatchBlocksV1Error": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["statusCode", "message"],
+        "description": "Sent once when the stream fails; the subscription then ends.",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "description": "The HTTP status the equivalent REST request would have returned."
+          },
+          "message": {
+            "type": "string"
+          },
+          "cantonErrorCode": {
+            "type": "string",
+            "description": "Canton's error code when the ledger rejected the request."
+          }
+        }
       }
     }
   },
@@ -772,6 +964,126 @@
           },
           "504": {
             "description": "The Canton party query timed out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/deploy-dar": {
+      "post": {
+        "security": [
+          {
+            "bearerTokenAuth": ["deploy:canton-packages"]
+          }
+        ],
+        "x-hyperledger-cacti": {
+          "http": {
+            "verbLowerCase": "post",
+            "path": "/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/deploy-dar"
+          }
+        },
+        "operationId": "deployDarV1",
+        "summary": "Uploads and vets a DAR on the Canton participant.",
+        "description": "The connector derives the main package ID from the DAR and confirms that the participant registered it. Uploading the same DAR again is idempotent. The participant user must have the participant_admin right.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeployDarRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The DAR is uploaded and its main package is registered.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeployDarResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request or the DAR is invalid, or the ledger rejected the DAR.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "The request has no valid bearer token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The Canton participant does not allow the connector's user to upload packages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The participant did not register the DAR's main package, for example because a different package with the same name and version is already vetted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "The DAR exceeds the connector's size limit.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Canton DAR upload failed upstream.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The connector is shut down or busy, or the ledger is temporarily unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "504": {
+            "description": "The Canton DAR upload timed out. Uploading the same DAR again is safe.",
             "content": {
               "application/json": {
                 "schema": {
