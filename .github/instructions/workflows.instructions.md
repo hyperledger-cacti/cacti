@@ -97,9 +97,10 @@ concurrency:
 
 ## SATP Hermes Specifics
 
-`satp-hermes-workflow.yaml` defines 8 parallel test jobs: unit, bridge, oracle,
-gateway, docker, on-chain (Foundry), recovery, rollback. It also supports
-`workflow_dispatch` for manual runs. Each integration job pre-pulls ledger
+`satp-hermes-workflow.yaml` defines parallel test jobs: unit, bridge, oracle,
+admin, gateway, docker, and on-chain (Foundry). Recovery and rollback runners
+were removed in #4762 and should be reactivated when that work is done. It
+also supports `workflow_dispatch` for manual runs. Each integration job pre-pulls ledger
 images with the `docker-pull` action and runs `./tools/ci-env-clean-up.sh`
 before tests.
 
