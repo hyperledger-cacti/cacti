@@ -4936,6 +4936,9 @@ __metadata:
     http-errors-enhanced-cjs: "npm:2.0.1"
     jest-extended: "npm:7.0.0"
     npm-run-all2: "npm:6.1.2"
+    rxjs: "npm:7.8.1"
+    socket.io: "npm:4.6.2"
+    socket.io-client-fixed-types: "npm:4.5.4"
   languageName: unknown
   linkType: soft
 

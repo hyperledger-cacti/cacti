@@ -2,7 +2,9 @@ import http from "http";
 import { AddressInfo } from "net";
 import axios from "axios";
 import express from "express";
+import type { Server as SocketIoServer } from "socket.io";
 import { Servers } from "@hyperledger-cacti/cactus-common";
+import { Constants } from "@hyperledger-cacti/cactus-core-api";
 import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
 import OAS from "../../main/json/openapi.json";
 import {
@@ -73,6 +75,9 @@ export function createSdkMock(): ICantonWalletSdk {
     },
     party: {
       list: jest.fn().mockResolvedValue(["Alice::1220"]),
+    },
+    updates: {
+      read: jest.fn().mockResolvedValue([]),
     },
   };
 }
@@ -271,6 +276,8 @@ export async function startConnectorApi(
   options: {
     readonly scopes?: readonly string[];
     readonly jsonBodyLimit?: string;
+    /** Also serves WatchBlocksV1; the caller closes it. */
+    readonly wsApi?: SocketIoServer;
   } = {},
 ): Promise<CantonApiClient> {
   // Stand-in for the API server's JWT verification: it grants the given
@@ -288,7 +295,18 @@ export async function startConnectorApi(
     apiSpec: OAS,
     logLevel: "INFO",
   });
-  await connector.registerWebServices(app);
+  if (options.wsApi) {
+    // Stand-in for the API server's socket.io JWT authorizer, which stores
+    // the verified token as `decodedToken`.
+    options.wsApi.attach(server, { path: Constants.SocketIoConnectionPathV1 });
+    options.wsApi.use((socket, next) => {
+      Object.assign(socket, {
+        decodedToken: { scope: [...(options.scopes ?? CONNECTOR_SCOPES)] },
+      });
+      next();
+    });
+  }
+  await connector.registerWebServices(app, options.wsApi);
   const address = (await Servers.listen({
     hostname: "127.0.0.1",
     port: 0,

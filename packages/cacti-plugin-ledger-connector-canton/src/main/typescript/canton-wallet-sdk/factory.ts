@@ -13,6 +13,7 @@ import {
 } from "./oauth";
 import { createSeverityOnlyLogger, SANITIZED_LOG_MESSAGE } from "./logging";
 import { CantonLedgerProvider } from "./ledger-provider";
+import { readCantonUpdates } from "./update-reader";
 
 /** Revokes credentials without retaining the underlying provider after disposal. */
 class RevocableAccessTokenProvider implements ICantonAccessTokenProvider {
@@ -143,6 +144,12 @@ export class CantonWalletSdkFactory implements ICantonWalletSdkFactory {
         },
         get party() {
           return getSdk().party;
+        },
+        updates: {
+          read: async (request) => {
+            getSdk();
+            return readCantonUpdates(ledgerProvider, request);
+          },
         },
         dispose,
       };

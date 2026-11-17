@@ -126,8 +126,8 @@ response contains:
   contract includes its `interfaceViews`. The created-event blob is not
   returned.
 - `activeAtOffset`: the offset of the snapshot, either the requested `offset`
-  or the ledger end at the time of the query. Continue from it with the
-  ledger's update stream.
+  or the ledger end at the time of the query. Continue from it by passing it
+  as `lastSeenOffset` to `watchBlocksV1()`.
 - `limitReached`: `true` when the ledger returned `limit` entries, so more
   contracts may match.
 
@@ -172,6 +172,39 @@ and no single archive entry may inflate beyond eight times that limit. REST
 callers send the DAR base64-encoded, so the API server's JSON body limit must
 be at least 4/3 of `maxDarBytes`.
 
+## Watching ledger transactions
+
+`CantonApiClient.watchBlocksV1()` streams the transactions of the requested
+parties over the API server's socket.io connection. Each message is one
+transaction with its offset and its `created` and `archived` events:
+
+```typescript
+const subscription = apiClient
+  .watchBlocksV1({
+    parties: [partyId],
+    templateIds: ["#my-model:Main:Asset"],
+    lastSeenOffset, // optional; defaults to the ledger end
+  })
+  .subscribe({
+    next: ({ offset, events }) => handle(offset, events),
+    error: ({ statusCode, message }) => reconnectOrReport(statusCode, message),
+  });
+```
+
+To resume after a reconnect, subscribe again with the `offset` of the last
+message as `lastSeenOffset`. The connector polls the Ledger API update stream
+(`POST /v2/updates`) every `watchBlocksPollIntervalMs` (default 1000 ms)
+once it has caught up, and reads at most `maxActiveContractLimit` updates per
+request, so each request stays within the participant's
+`http-list-max-elements-limit`. TypeScript callers can page the same stream
+with `connector.readUpdates()`.
+
+The same party policy, scope and error sanitization as the REST endpoints
+apply. A failure is sent once as `WatchBlocksV1.Error`, with the HTTP status
+the REST request would have returned, and ends the subscription; connector
+shutdown ends open subscriptions with HTTP 503. A socket has at most one
+subscription, and subscribing again replaces it.
+
 ## Errors
 
 Connector validation errors are returned as HTTP 400, 403, or 413. Rejections
@@ -202,7 +235,8 @@ scopes; without that, the protected operations answer HTTP 401 or 403. The
 REST operations require these distinct scopes:
 
 - `write:canton-transactions` for submitting commands;
-- `read:canton-contracts` for active-contract queries;
+- `read:canton-contracts` for active-contract queries and WatchBlocksV1
+  subscriptions, whose socket must carry a JWT the API server verified;
 - `read:canton-parties` for party discovery;
 - `deploy:canton-packages` for DAR deployment, which changes the Daml code
   available to every party on the participant.
@@ -271,8 +305,7 @@ deduplication period has elapsed without first checking the ledger, for
 example with `getActiveContracts()`.
 
 The connector uses participant-hosted signing through the Wallet SDK.
-External signing and ledger-event streaming are planned as separate
-increments.
+External signing is planned as a separate increment.
 
 ## TestNet integration
 

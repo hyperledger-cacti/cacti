@@ -14,6 +14,14 @@ describe("Canton factory SDK resource ownership", () => {
     expect(sdk.dispose).toHaveBeenCalledTimes(1);
     expect(() => wrapper.ledger).toThrow("disposed");
     await expect(
+      wrapper.updates.read({
+        parties: ["Alice::1220"],
+        beginExclusive: 0,
+        endInclusive: 1,
+        limit: 1,
+      }),
+    ).rejects.toThrow("disposed");
+    await expect(
       captured.accessTokenProvider?.getAccessToken(),
     ).rejects.toThrow("disposed");
     const provider = sdkCreate.mock.calls[0][0].ledgerProvider;

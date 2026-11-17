@@ -38,43 +38,62 @@ function isSafeConnectorError(error: unknown): error is SafeConnectorError {
   );
 }
 
+export interface ICantonErrorResponse {
+  readonly statusCode: number;
+  readonly body: {
+    readonly message: string;
+    readonly cantonErrorCode?: string;
+  };
+}
+
 /**
- * Converts connector failures into safe REST responses without inspecting or
- * serializing the original Wallet SDK error. SDK errors can contain HTTP
+ * Converts a connector failure into a safe status and body without inspecting
+ * or serializing the original Wallet SDK error. SDK errors can contain HTTP
  * headers and token-provider state, including credentials.
  */
+export function toCantonErrorResponse(
+  error: unknown,
+  errorMsg: string,
+  log: Logger,
+): ICantonErrorResponse {
+  if (error instanceof CantonLedgerError) {
+    // Only the status, a fixed message, and Canton's constant error code are
+    // returned; the ledger's cause and context are never serialized.
+    log.debug(
+      errorMsg,
+      `Canton ledger rejected the request with ${error.cantonErrorCode} (HTTP ${error.statusCode}).`,
+    );
+    return {
+      statusCode: error.statusCode,
+      body: {
+        message: error.message,
+        cantonErrorCode: error.cantonErrorCode,
+      },
+    };
+  }
+  if (isSafeConnectorError(error)) {
+    log.debug(
+      errorMsg,
+      `Canton connector rejected the request with HTTP ${error.statusCode}.`,
+    );
+    return { statusCode: error.statusCode, body: { message: error.message } };
+  }
+
+  log.error(errorMsg, "Canton Wallet SDK error details were suppressed.");
+  return {
+    statusCode: 502,
+    body: { message: "Canton ledger operation failed." },
+  };
+}
+
+/** Sends the safe response for a connector failure. */
 export function handleCantonEndpointError(
   options: Readonly<IHandleCantonEndpointErrorOptions>,
 ): void {
-  if (options.error instanceof CantonLedgerError) {
-    // Only the status, a fixed message, and Canton's constant error code are
-    // returned; the ledger's cause and context are never serialized.
-    options.log.debug(
-      options.errorMsg,
-      `Canton ledger rejected the request with ${options.error.cantonErrorCode} (HTTP ${options.error.statusCode}).`,
-    );
-    options.res.status(options.error.statusCode).json({
-      message: options.error.message,
-      cantonErrorCode: options.error.cantonErrorCode,
-    });
-    return;
-  }
-  if (isSafeConnectorError(options.error)) {
-    options.log.debug(
-      options.errorMsg,
-      `Canton connector rejected the request with HTTP ${options.error.statusCode}.`,
-    );
-    options.res.status(options.error.statusCode).json({
-      message: options.error.message,
-    });
-    return;
-  }
-
-  options.log.error(
+  const { statusCode, body } = toCantonErrorResponse(
+    options.error,
     options.errorMsg,
-    "Canton Wallet SDK error details were suppressed.",
+    options.log,
   );
-  options.res.status(502).json({
-    message: "Canton ledger operation failed.",
-  });
+  options.res.status(statusCode).json(body);
 }

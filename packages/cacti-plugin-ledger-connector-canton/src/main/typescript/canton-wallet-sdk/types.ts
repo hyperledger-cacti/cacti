@@ -73,9 +73,64 @@ export interface ICantonActiveContractEntry {
   };
 }
 
+/** A bounded section of the ledger's update stream (`POST /v2/updates`). */
+export interface ICantonUpdatesRequest {
+  readonly parties: readonly string[];
+  readonly templateIds?: readonly string[];
+  readonly interfaceIds?: readonly string[];
+  readonly beginExclusive: number;
+  readonly endInclusive: number;
+  readonly limit: number;
+}
+
+/** A Canton archived event, as returned by the JSON Ledger API. */
+export interface ICantonArchivedEvent {
+  readonly contractId: string;
+  readonly templateId: string;
+  readonly witnessParties: readonly string[];
+}
+
+/** A transaction in the ACS-delta shape: only created and archived events. */
+export interface ICantonTransaction {
+  readonly offset: number;
+  readonly updateId: string;
+  readonly commandId?: string;
+  readonly workflowId?: string;
+  readonly effectiveAt: string;
+  readonly synchronizerId: string;
+  readonly events: ReadonlyArray<{
+    readonly CreatedEvent?: ICantonCreatedEvent;
+    readonly ArchivedEvent?: ICantonArchivedEvent;
+  }>;
+}
+
+/**
+ * One entry of a JSON Ledger API update response. Besides transactions, the
+ * ledger returns offset checkpoints, reassignments and topology transactions,
+ * which only advance the offset for this connector.
+ */
+export interface ICantonUpdateEntry {
+  readonly update?: {
+    readonly Transaction?: { readonly value: ICantonTransaction };
+    readonly OffsetCheckpoint?: { readonly value: { readonly offset: number } };
+    readonly Reassignment?: { readonly value: { readonly offset: number } };
+    readonly TopologyTransaction?: {
+      readonly value: { readonly offset: number };
+    };
+  };
+}
+
 export interface ICantonWalletSdk {
   /** Releases factory-owned transport and authentication resources. */
   dispose?(): Promise<void>;
+  readonly updates: {
+    /**
+     * Reads one bounded page of the update stream through the connector's
+     * ledger provider. The Wallet SDK has no HTTP update reader, and its
+     * WebSocket reader uses its own credentials and error handling.
+     */
+    read(request: ICantonUpdatesRequest): Promise<ICantonUpdateEntry[]>;
+  };
   readonly ledger: {
     ledgerEnd(): Promise<number>;
     readonly dar: {

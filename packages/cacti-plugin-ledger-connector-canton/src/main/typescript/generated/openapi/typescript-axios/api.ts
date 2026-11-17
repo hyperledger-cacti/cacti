@@ -186,6 +186,85 @@ export interface RunTransactionResponse {
     'updateId': string;
     'completionOffset': number;
 }
+/**
+ * socket.io event names of the WatchBlocksV1 stream.
+ */
+
+export const WatchBlocksV1 = {
+    Subscribe: 'org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Subscribe',
+    Next: 'org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Next',
+    Unsubscribe: 'org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Unsubscribe',
+    Error: 'org.hyperledger.cacti.api.async.canton.WatchBlocksV1.Error',
+} as const;
+
+export type WatchBlocksV1 = typeof WatchBlocksV1[keyof typeof WatchBlocksV1];
+
+
+export interface WatchBlocksV1ArchivedContract {
+    'contractId': string;
+    /**
+     * The template ID as reported by the ledger, using the package ID (`<package-id>:Module:Template`).
+     */
+    'templateId': string;
+    'witnessParties': Array<string>;
+}
+/**
+ * Sent once when the stream fails; the subscription then ends.
+ */
+export interface WatchBlocksV1Error {
+    /**
+     * The HTTP status the equivalent REST request would have returned.
+     */
+    'statusCode': number;
+    'message': string;
+    /**
+     * Canton\'s error code when the ledger rejected the request.
+     */
+    'cantonErrorCode'?: string;
+}
+/**
+ * Exactly one of `created` and `archived` is set.
+ */
+export interface WatchBlocksV1Event {
+    'created'?: ActiveContract;
+    'archived'?: WatchBlocksV1ArchivedContract;
+}
+export interface WatchBlocksV1Options {
+    /**
+     * Parties whose transactions are streamed. Each must be allowed by the connector.
+     */
+    'parties': Array<string>;
+    /**
+     * Restricts events to these templates. Use the package-name form (`#package-name:Module:Template`).
+     */
+    'templateIds'?: Array<string>;
+    /**
+     * Restricts events to contracts implementing these interfaces.
+     */
+    'interfaceIds'?: Array<string>;
+    /**
+     * Streams transactions after this offset, for example the last `offset` received before a reconnect. Defaults to the ledger end when subscribing.
+     */
+    'lastSeenOffset'?: number;
+}
+/**
+ * One ledger transaction visible to the subscribed parties.
+ */
+export interface WatchBlocksV1Progress {
+    /**
+     * Ledger offset of the transaction. Pass it as `lastSeenOffset` to resume after it.
+     */
+    'offset': number;
+    'updateId': string;
+    /**
+     * Set only for transactions submitted by the connector\'s Canton user.
+     */
+    'commandId'?: string;
+    'workflowId'?: string;
+    'effectiveAt': string;
+    'synchronizerId': string;
+    'events': Array<WatchBlocksV1Event>;
+}
 
 /**
  * DefaultApi - axios parameter creator

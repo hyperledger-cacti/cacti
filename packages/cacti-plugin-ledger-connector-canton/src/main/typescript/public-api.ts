@@ -11,7 +11,11 @@ export type {
   CantonAuthConfig,
   ICantonActiveContractEntry,
   ICantonClientCredentials,
+  ICantonArchivedEvent,
   ICantonCreatedEvent,
+  ICantonTransaction,
+  ICantonUpdateEntry,
+  ICantonUpdatesRequest,
   ICantonWalletSdk,
   ICantonWalletSdkFactory,
   ICantonWalletSdkFactoryCreateOptions,
@@ -28,6 +32,9 @@ export {
   DEFAULT_MAX_DAR_BYTES,
   DEFAULT_MAX_IN_FLIGHT_OPERATIONS,
   DEFAULT_OPERATION_TIMEOUT_MS,
+  DEFAULT_WATCH_BLOCKS_POLL_INTERVAL_MS,
+  ICantonReadUpdatesRequest,
+  ICantonReadUpdatesResponse,
   IPluginLedgerConnectorCantonOptions,
   MAX_ACTIVE_CONTRACT_LIMIT,
   MAX_COMMANDS_PER_TRANSACTION,
@@ -39,8 +46,13 @@ export {
   MAX_OPERATION_TIMEOUT_MS,
   MAX_TRANSACTION_PAYLOAD_BYTES,
   MAX_TRANSACTION_PAYLOAD_DEPTH,
+  MAX_WATCH_BLOCKS_POLL_INTERVAL_MS,
   PluginLedgerConnectorCanton,
 } from "./plugin-ledger-connector-canton";
+export {
+  WATCH_BLOCKS_REQUIRED_SCOPES,
+  WatchBlocksV1Endpoint,
+} from "./web-services/watch-blocks-v1-endpoint";
 export { PluginFactoryLedgerConnector } from "./plugin-factory-ledger-connector";
 
 export async function createPluginFactory(

@@ -49,6 +49,7 @@ describe("Canton connector HTTP API", () => {
       dar: { upload: jest.fn(), check: jest.fn() },
     },
     party: { list: jest.fn() },
+    updates: { read: jest.fn() },
   };
   // The connector caches the SDK, so its mocks are re-armed before each test
   // instead of being replaced; one-shot overrides cannot leak between tests.
@@ -64,6 +65,7 @@ describe("Canton connector HTTP API", () => {
       .mockResolvedValue([activeContractEntry]);
     jest.mocked(sdk.ledger.dar.upload).mockReset().mockResolvedValue();
     jest.mocked(sdk.ledger.dar.check).mockReset().mockResolvedValue(true);
+    jest.mocked(sdk.updates.read).mockReset().mockResolvedValue([]);
     jest
       .mocked(sdk.party.list)
       .mockReset()
