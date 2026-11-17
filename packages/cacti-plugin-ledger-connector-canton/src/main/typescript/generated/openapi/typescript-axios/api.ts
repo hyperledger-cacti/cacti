@@ -109,6 +109,26 @@ export interface CantonExerciseCommandExerciseCommand {
      */
     'choiceArgument': any;
 }
+export interface DeployDarRequest {
+    /**
+     * The DAR file, base64-encoded. The decoded size is limited by the connector\'s maxDarBytes option (16 MiB by default).
+     */
+    'darBase64': string;
+    /**
+     * Synchronizer to vet the packages on. Defaults to the participant\'s default synchronizer.
+     */
+    'synchronizerId'?: string;
+}
+export interface DeployDarResponse {
+    /**
+     * Package ID of the DAR\'s main package.
+     */
+    'packageId': string;
+    /**
+     * The DAR manifest name, for example my-model-1.0.0.
+     */
+    'darName'?: string;
+}
 export interface ErrorResponse {
     [key: string]: any;
 
@@ -172,6 +192,45 @@ export interface RunTransactionResponse {
  */
 export const DefaultApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * The connector derives the main package ID from the DAR and confirms that the participant registered it. Uploading the same DAR again is idempotent. The participant user must have the participant_admin right.
+         * @summary Uploads and vets a DAR on the Canton participant.
+         * @param {DeployDarRequest} deployDarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployDarV1: async (deployDarRequest: DeployDarRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'deployDarRequest' is not null or undefined
+            assertParamExists('deployDarV1', 'deployDarRequest', deployDarRequest)
+            const localVarPath = `/api/v1/plugins/@hyperledger-cacti/cacti-plugin-ledger-connector-canton/deploy-dar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerTokenAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(deployDarRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary Returns active Canton contracts visible to the requested parties.
@@ -324,6 +383,19 @@ export const DefaultApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = DefaultApiAxiosParamCreator(configuration)
     return {
         /**
+         * The connector derives the main package ID from the DAR and confirms that the participant registered it. Uploading the same DAR again is idempotent. The participant user must have the participant_admin right.
+         * @summary Uploads and vets a DAR on the Canton participant.
+         * @param {DeployDarRequest} deployDarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deployDarV1(deployDarRequest: DeployDarRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DeployDarResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deployDarV1(deployDarRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['DefaultApi.deployDarV1']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Returns active Canton contracts visible to the requested parties.
          * @param {GetActiveContractsRequest} getActiveContractsRequest 
@@ -383,6 +455,16 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = DefaultApiFp(configuration)
     return {
         /**
+         * The connector derives the main package ID from the DAR and confirms that the participant registered it. Uploading the same DAR again is idempotent. The participant user must have the participant_admin right.
+         * @summary Uploads and vets a DAR on the Canton participant.
+         * @param {DeployDarRequest} deployDarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deployDarV1(deployDarRequest: DeployDarRequest, options?: RawAxiosRequestConfig): AxiosPromise<DeployDarResponse> {
+            return localVarFp.deployDarV1(deployDarRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Returns active Canton contracts visible to the requested parties.
          * @param {GetActiveContractsRequest} getActiveContractsRequest 
@@ -427,6 +509,17 @@ export const DefaultApiFactory = function (configuration?: Configuration, basePa
  * DefaultApi - object-oriented interface
  */
 export class DefaultApi extends BaseAPI {
+    /**
+     * The connector derives the main package ID from the DAR and confirms that the participant registered it. Uploading the same DAR again is idempotent. The participant user must have the participant_admin right.
+     * @summary Uploads and vets a DAR on the Canton participant.
+     * @param {DeployDarRequest} deployDarRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deployDarV1(deployDarRequest: DeployDarRequest, options?: RawAxiosRequestConfig) {
+        return DefaultApiFp(this.configuration).deployDarV1(deployDarRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary Returns active Canton contracts visible to the requested parties.

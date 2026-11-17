@@ -1,6 +1,7 @@
 import type { Response } from "express";
 import {
   BadRequestError,
+  ConflictError,
   ForbiddenError,
   GatewayTimeoutError,
   PayloadTooLargeError,
@@ -20,6 +21,7 @@ export interface IHandleCantonEndpointErrorOptions {
 
 type SafeConnectorError =
   | BadRequestError
+  | ConflictError
   | ForbiddenError
   | GatewayTimeoutError
   | PayloadTooLargeError
@@ -28,6 +30,7 @@ type SafeConnectorError =
 function isSafeConnectorError(error: unknown): error is SafeConnectorError {
   return (
     error instanceof BadRequestError ||
+    error instanceof ConflictError ||
     error instanceof ForbiddenError ||
     error instanceof GatewayTimeoutError ||
     error instanceof PayloadTooLargeError ||
