@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   useRoutes,
   BrowserRouter,
@@ -5,7 +6,11 @@ import {
   Outlet,
 } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
-import CircularProgress from "@mui/material/CircularProgress";
+import LinearProgress from "@mui/material/LinearProgress";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import {
   QueryClient,
@@ -17,13 +22,16 @@ import {
 import { themeOptions } from "./theme";
 import ContentLayout from "./components/Layout/ContentLayout";
 import HeaderBar from "./components/Layout/HeaderBar";
+import Sidebar from "./components/Layout/Sidebar";
 import HomePage from "./pages/home/HomePage";
 import { AppInstance } from "./common/types/app";
 import { patchAppRoutePath } from "./common/utils";
 import { NotificationProvider } from "./common/context/NotificationContext";
 import { guiAppConfig } from "./common/queries";
+import { getLedgerBrowserConfig } from "./common/runtime-config";
 import createApplications from "./common/createApplications";
 import ConnectionFailedDialog from "./components/ConnectionFailedDialog/ConnectionFailedDialog";
+import ErrorBoundary from "./components/ui/ErrorBoundary";
 
 /**
  * Create header bar for each app based on app menuEntries field in config.
@@ -38,6 +46,7 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
           path={app.path}
           menuEntries={app.menuEntries}
           appDocumentationURL={app.appDocumentationURL}
+          appName={app.instanceName}
         />
       ),
     };
@@ -46,7 +55,10 @@ function getHeaderBarRoutes(appConfig: AppInstance[]) {
     key: "home",
     path: `*`,
     element: (
-      <HeaderBar appDocumentationURL="https://github.com/hyperledger/cacti" />
+      <HeaderBar
+        appDocumentationURL="https://hyperledger-cacti.github.io/cacti/latest/"
+        appName="Overview"
+      />
     ),
   });
   return useRoutes(headerRoutesConfig);
@@ -60,7 +72,16 @@ function getContentRoutes(appConfig: AppInstance[]) {
     return {
       key: app.path,
       path: app.path,
-      element: <Outlet context={app.options} />,
+      // Crash guard: a throwing plugin-app page must not take the shell
+      // (header, navigation, other apps) down with it.
+      element: (
+        <ErrorBoundary
+          contextLabel={app.instanceName}
+          setupGuideURL={app.appSetupGuideURL}
+        >
+          <Outlet context={app.options} />
+        </ErrorBoundary>
+      ),
       children: app.routes.map((route) => {
         return {
           key: route.path,
@@ -87,33 +108,107 @@ function getContentRoutes(appConfig: AppInstance[]) {
   ]);
 }
 
-function App() {
-  const { isError, isPending, data } = useQuery(guiAppConfig());
+export function App() {
+  // One attempt, no background retry loop: if the store is unreachable the
+  // user sees it at once and decides when to retry (or changes the store in
+  // Settings) instead of the shell silently probing it again and again.
+  const { isError, isPending, isFetching, data, refetch } = useQuery({
+    ...guiAppConfig(),
+    retry: false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+  const [dialogDismissed, setDialogDismissed] = useState(false);
 
-  if (isError) {
-    return <ConnectionFailedDialog />;
-  }
-
-  const appConfig = createApplications(data);
+  // The shell (sidebar, header, routes) is always rendered - a config store
+  // outage is surfaced as a dismissible dialog plus a persistent inline
+  // banner instead of replacing the whole screen. This also keeps the hook
+  // call order (`useRoutes` below) stable across error/success renders.
+  const appConfig = createApplications(isError ? undefined : data);
 
   const headerRoutes = getHeaderBarRoutes(appConfig);
   const contentRoutes = getContentRoutes(appConfig);
 
+  const retry = () => {
+    void refetch();
+  };
+
   return (
-    <div>
-      {isPending && (
-        <CircularProgress
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            zIndex: 9999,
-          }}
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: "background.default",
+      }}
+    >
+      <Sidebar appConfig={appConfig} />
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          flexGrow: 1,
+          minWidth: 0,
+          minHeight: "100vh",
+        }}
+      >
+        {headerRoutes}
+        {isPending && (
+          <Box sx={{ mx: 2, mt: 2 }} role="status">
+            <LinearProgress />
+            <Typography variant="caption" color="text.secondary">
+              Connecting to the app configuration store at{" "}
+              {getLedgerBrowserConfig().supabaseUrl}…
+            </Typography>
+          </Box>
+        )}
+        {isError && (
+          <Alert
+            severity="error"
+            role="alert"
+            sx={{ mx: 2, mt: 2 }}
+            action={
+              <>
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={retry}
+                  disabled={isFetching}
+                >
+                  Retry
+                </Button>
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={() => setDialogDismissed(false)}
+                >
+                  Details
+                </Button>
+              </>
+            }
+          >
+            Could not load the app configuration store. Installed apps are
+            unavailable until the connection is restored.
+          </Alert>
+        )}
+        <ConnectionFailedDialog
+          open={isError && !dialogDismissed}
+          onClose={() => setDialogDismissed(true)}
+          onRetry={retry}
+          retrying={isFetching}
         />
-      )}
-      {headerRoutes}
-      {contentRoutes}
-    </div>
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+          }}
+        >
+          {contentRoutes}
+        </Box>
+      </Box>
+    </Box>
   );
 }
 
@@ -130,7 +225,10 @@ export default function CactiLedgerBrowserApp() {
         <QueryClientProvider client={queryClient}>
           <NotificationProvider>
             <CssBaseline />
-            <App />
+            {/* Last-resort crash guard around the whole routed shell. */}
+            <ErrorBoundary contextLabel="Cacti Ledger Browser">
+              <App />
+            </ErrorBoundary>
             {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           </NotificationProvider>
         </QueryClientProvider>

@@ -2,16 +2,19 @@ import { SupabaseClient, createClient } from "@supabase/supabase-js";
 import { QueryClient, queryOptions } from "@tanstack/react-query";
 import { GuiAppConfig, PluginStatus } from "./supabase-types";
 import { AddGuiAppConfigType, UpdateGuiAppConfigType } from "./types/app";
+import { getLedgerBrowserConfig } from "./runtime-config";
 
 let supabase: SupabaseClient | undefined;
 
 /**
- * Get or initialize (if not already done) a supabase client using environment variables.
+ * Get or initialize (if not already done) a supabase client.
+ *
+ * Connection values come from the resolved configuration
+ * (`common/runtime-config.ts`): runtime `config.js` override > build-time
+ * `VITE_*` env > `.env.template` placeholders.
  */
 function getSupabaseClient(): [SupabaseClient, string] {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
-  const supabaseSchema = import.meta.env.VITE_SUPABASE_SCHEMA;
+  const { supabaseUrl, supabaseKey, supabaseSchema } = getLedgerBrowserConfig();
 
   if (!supabase) {
     supabase = createClient(supabaseUrl, supabaseKey, {

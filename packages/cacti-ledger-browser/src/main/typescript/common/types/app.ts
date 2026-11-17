@@ -15,6 +15,12 @@ export interface AppInstanceMenuEntry {
 export interface AppStatus {
   severity: "success" | "info" | "warning" | "error";
   message: string;
+  /**
+   * Optional full URL of the app setup guide. When set (and a valid URL),
+   * the UI renders a link to it next to the status message - apps set it on
+   * connection errors so misconfigured instances don't dead-end.
+   */
+  setupGuideURL?: string;
 }
 
 export interface GetStatusResponse {
