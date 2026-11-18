@@ -2,6 +2,10 @@
 
 This directory contains comprehensive documentation and high-quality architecture diagrams for the SATP (Secure Asset Transfer Protocol) Hermes plugin.
 
+## 📖 Guides and Examples
+
+- [SATP Cross-Chain Transfer over Chainlink CCIP Lane](./ccip-lane-transfer-example.md) - Complete two-gateway walkthrough, CCIP router lifecycle evidence logging, and configuration reference.
+
 ## 📊 Architecture Diagrams
 
 Professional Mermaid diagrams showing the complete SATP Hermes architecture. All diagrams use a **high-contrast green color palette** optimized for visibility on both light and dark backgrounds.
