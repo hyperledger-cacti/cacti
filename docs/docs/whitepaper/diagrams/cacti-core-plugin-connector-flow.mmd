@@ -1,0 +1,27 @@
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'noteBkgColor':'#d1fae5', 'noteTextColor':'#065f46', 'actorBkg':'#22c55e','actorTextColor':'#ffffff','actorBorder':'#16a34a','signalColor':'#065f46','signalTextColor':'#065f46'}}}%%
+sequenceDiagram
+    autonumber
+    participant App as Client App /<br/>Generated Axios SDK
+    participant Core as cactus-cmd-api-server<br/>(core + PluginRegistry)
+    participant Plugin as Ledger Connector Plugin<br/>(IPluginLedgerConnector)
+    participant KC as Keychain Plugin<br/>(IPluginKeychain)
+    participant BC as Blockchain Network
+
+    Note over Core: Boot time — PluginRegistry imports each plugin,<br/>calls registerWebServices() and mounts OpenAPI routes
+    App->>Core: POST /api/v1/plugins/.../run-transaction<br/>(OpenAPI request)
+    activate Core
+    Core->>Plugin: dispatch to endpoint handler
+    activate Plugin
+    Plugin->>KC: get signing credential
+    activate KC
+    KC-->>Plugin: private key (held only for signing)
+    deactivate KC
+    Plugin->>BC: JSON-RPC / gRPC / native SDK call
+    activate BC
+    BC-->>Plugin: transaction receipt
+    deactivate BC
+    Plugin-->>Core: typed RunTransactionResponse
+    deactivate Plugin
+    Core-->>App: JSON response (200)
+    deactivate Core
+    Note over App,BC: The core never talks to a ledger directly —<br/>every ledger interaction flows through a plugin + connector.
