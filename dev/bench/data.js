@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1795075858975,
+  "lastUpdate": 1795076373355,
   "repoUrl": "https://github.com/hyperledger-cacti/cacti",
   "entries": {
     "Benchmark": [
@@ -1105,6 +1105,35 @@ window.BENCHMARK_DATA = {
             "range": "±5.47%",
             "unit": "ops/sec",
             "extra": "176 samples"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "rafael.belchior@tecnico.ulisboa.pt"
+          },
+          "committer": {
+            "name": "Rafael Belchior",
+            "username": "RafaelAPB",
+            "email": "RafaelAPB@users.noreply.github.com"
+          },
+          "id": "a172a0c6286f5c7d4feb271edacce86c2b02c887",
+          "message": "docs: prefer single-commit PRs, document multi-commit exception\n\nA single, self-contained commit per PR remains the default and the PR\ntitle must still match the latest commit subject exactly; the\nvalidate-title-match check is unchanged. Multiple commits per PR are\ndocumented as an exception for PRs that span distinct units of work\n(e.g. core code plus test tooling), at maintainer discretion, with\nreview-response tweaks to the same component squashed into the commit\nthey belong to. Each commit in a multi-commit PR should carry the issue\nreference (Closes #N / Fixes #N) in its body so issue, PR and commit\ntraceability holds commit-by-commit.\n\nAddresses #4035.\n\nSigned-off-by: Rafael Belchior <rafael.belchior@tecnico.ulisboa.pt>",
+          "timestamp": "2026-09-29T09:24:42Z",
+          "url": "https://github.com/hyperledger-cacti/cacti/commit/a172a0c6286f5c7d4feb271edacce86c2b02c887"
+        },
+        "date": 1795076368820,
+        "tool": "benchmarkjs",
+        "benches": [
+          {
+            "name": "plugin-ledger-connector-besu_HTTP_GET_getOpenApiSpecV1",
+            "value": 619,
+            "range": "±50.74%",
+            "unit": "ops/sec",
+            "extra": "180 samples"
           }
         ]
       }
