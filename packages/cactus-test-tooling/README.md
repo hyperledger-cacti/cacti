@@ -28,6 +28,7 @@ npm install --save-dev @hyperledger-cacti/cactus-test-tooling
 | `BesuTestLedger` | Besu |
 | `BesuMpTestLedger` | Besu |
 | `CantonTestLedger` | Canton LocalNet |
+| `CcipTestHarness` | Chainlink CCIP |
 | `CordaTestLedger` | Corda |
 | `CordaV5TestLedger` | Corda |
 | `DamlTestLedger` | Daml |
@@ -104,6 +105,41 @@ try {
 The first ledger in each process downloads the pinned LocalNet configuration
 into a temporary cache. The gRPC APIs are returned as `host:port` addresses;
 the JSON Ledger API is an HTTP URL and includes a matching development JWT.
+
+### Chainlink CCIP Test Harness
+
+`CcipTestHarness` manages simulated Chainlink CCIP infrastructure for local cross-chain messaging and token transfer tests. It provides lane routing, message queuing, fee calculation, and delivery verification.
+
+```typescript
+import {
+  CcipTestHarness,
+  CCIP_CHAIN_SELECTORS,
+} from "@hyperledger-cacti/cactus-test-tooling";
+
+const harness = new CcipTestHarness({
+  sourceChainSelector: CCIP_CHAIN_SELECTORS.LOCAL_SIMULATED_CHAIN_A,
+  destinationChainSelector: CCIP_CHAIN_SELECTORS.LOCAL_SIMULATED_CHAIN_B,
+  autoRelay: true,
+});
+
+try {
+  await harness.start();
+  const info = await harness.getConnectionInfo();
+
+  // Send cross-chain message
+  const sent = await harness.sendMessage({
+    destinationChainSelector: CCIP_CHAIN_SELECTORS.LOCAL_SIMULATED_CHAIN_B,
+    message: {
+      receiver: "0x1111111111111111111111111111111111111111",
+      data: "0xabcdef",
+    },
+  });
+
+  const verified = harness.verifyRoundTrip(sent.messageId);
+} finally {
+  await harness.destroy();
+}
+```
 
 ### Stellar Test Ledger Usage
 

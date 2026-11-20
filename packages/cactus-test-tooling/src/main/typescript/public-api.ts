@@ -35,6 +35,24 @@ export {
 } from "./canton/canton-test-ledger";
 
 export {
+  CcipTestHarness,
+  CCIP_CHAIN_SELECTORS,
+  CCIP_DEFAULT_ROUTER_ADDRESS,
+  CCIP_DEFAULT_LINK_TOKEN_ADDRESS,
+  CCIP_DEFAULT_BNM_TOKEN_ADDRESS,
+  CCIP_DEFAULT_LNM_TOKEN_ADDRESS,
+  CCIP_TEST_HARNESS_DEFAULT_OPTIONS,
+  ICcipTokenAmount,
+  ICcipMessage,
+  ICcipSendMessageRequest,
+  ICcipSendMessageResponse,
+  ICcipDeliveredMessage,
+  ICcipLaneConfig,
+  ICcipTestHarnessOptions,
+  ICcipTestHarnessConnectionInfo,
+} from "./ccip/ccip-test-harness";
+
+export {
   CordaTestLedger,
   ICordaTestLedgerConstructorOptions,
   CORDA_TEST_LEDGER_DEFAULT_OPTIONS,
