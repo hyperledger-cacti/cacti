@@ -766,6 +766,44 @@ export class GetStatusError extends SATPInternalError {
 }
 
 /**
+ * Error thrown when a SATP session status query targets an unknown session ID.
+ *
+ * @description
+ * Distinguishes a missing session (caller error, HTTP 404) from other
+ * `GetStatusError` cases such as a session that exists but has no session
+ * data (internal fault). Existing `instanceof GetStatusError` checks continue
+ * to match this subclass.
+ *
+ * **HTTP Status:** 404 Not Found - Session ID is unknown to this gateway
+ *
+ * @class SessionNotFoundError
+ * @extends GetStatusError
+ * @since 0.0.3-beta
+ * @see {@link GetStatusError} for the broader status query error type
+ */
+export class SessionNotFoundError extends GetStatusError {
+  /**
+   * Creates a new session-not-found error for a SATP status query.
+   *
+   * @constructor
+   * @param {string} sessionID - The unknown SATP session identifier
+   * @param {string | Error | null} [cause] - Optional underlying cause or error
+   * @param {string} [traceID] - Optional distributed tracing identifier
+   * @param {string} [trace] - Optional detailed trace information
+   */
+  constructor(
+    sessionID: string,
+    cause?: string | Error | null,
+    traceID?: string,
+    trace?: string,
+  ) {
+    super(sessionID, " Session not found.", cause, traceID, trace);
+    this.name = this.constructor.name;
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
+/**
  * Error thrown when a blockchain transaction operation fails during SATP execution.
  *
  * @description

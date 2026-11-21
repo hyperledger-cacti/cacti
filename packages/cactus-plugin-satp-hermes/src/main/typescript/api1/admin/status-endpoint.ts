@@ -52,6 +52,7 @@ import {
 } from "@hyperledger-cacti/cactus-core";
 
 import OAS from "../../../json/oapi-api1-bundled.json";
+import { SessionNotFoundError } from "../../core/errors/satp-errors";
 import type { IRequestOptions } from "../../core/types";
 import type { StatusRequest } from "../../generated/gateway-client/typescript-axios/api";
 
@@ -163,6 +164,12 @@ export class GetStatusEndpointV1 implements IWebServiceEndpoint {
       const result = await this.options.dispatcher.GetStatus(statusRequest);
       res.status(200).json(result);
     } catch (ex) {
+      if (ex instanceof SessionNotFoundError) {
+        // Return 404 Not Found rather than 500 Internal Server Error when a
+        // session ID is unknown — this is a caller error, not a server fault.
+        res.status(404).json({ message: "NotFound", error: ex.message });
+        return;
+      }
       const errorMsg = `${reqTag} Failed to get status:`;
       handleRestEndpointException({ errorMsg, log: this.log, error: ex, res });
     }

@@ -32,7 +32,10 @@
  * @since 0.0.3-beta
  */
 
-import { GetStatusError } from "../../core/errors/satp-errors";
+import {
+  GetStatusError,
+  SessionNotFoundError,
+} from "../../core/errors/satp-errors";
 import {
   NetworkId,
   StatusRequest,
@@ -193,7 +196,7 @@ export async function getStatusService(
 
   const session = manager.getSession(req.sessionID);
   if (!session) {
-    throw new GetStatusError(req.sessionID, " Session not found.");
+    throw new SessionNotFoundError(req.sessionID);
   }
   let sessionData;
   if (session.hasClientSessionData()) {
