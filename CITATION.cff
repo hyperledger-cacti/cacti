@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use the Cacti whitepaper, please cite it using this metadata."
+title: "Hyperledger Cacti"
+type: software
+authors:
+  - family-names: Belchior
+    given-names: Rafael
+  - family-names: Ramakrishna
+    given-names: Ventrakaman
+  - family-names: Nishad
+    given-names: Sandeep
+  - name: "Hyperledger Cacti Contributors"
+repository-code: "https://github.com/hyperledger-cacti/cacti"
+license: Apache-2.0
+preferred-citation:
+  type: report
+  title: "Hyperledger Cacti: An Open Platform for Cross-Chain Applications"
+  authors:
+    - family-names: Belchior
+      given-names: Rafael
+    - family-names: Ramakrishna
+      given-names: Ventrakaman
+    - family-names: Nishad
+      given-names: Sandeep
+    - name: "Hyperledger Cacti Contributors"
+  institution:
+    name: "Hyperledger Foundation"
+  year: 2026
+  number: "Cacti Whitepaper v2"
+  url: "https://github.com/hyperledger-cacti/cacti/blob/main/docs/docs/whitepaper/whitepaper.md"
+  license: CC-BY-4.0
+  keywords:
+    - blockchain interoperability
+    - cross-chain applications
+    - SATP
+  abstract: >-
+    Hyperledger Cacti is an open-source, multi-faceted interoperability platform
+    that enables software engineers, enterprise architects, and researchers to
+    construct cross-chain applications without incurring vendor lock-in or
+    sacrificing network sovereignty.

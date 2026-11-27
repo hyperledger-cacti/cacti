@@ -525,7 +525,7 @@ What to expect:
   leftovers before re-running.
 
 See the
-[package README](./packages/cactus-plugin-satp-hermes/README.md#running-the-integrationdocker-tests-locally)
+[package README](https://github.com/hyperledger-cacti/cacti/blob/main/packages/cactus-plugin-satp-hermes/README.md#running-the-integrationdocker-tests-locally)
 for the full step-by-step guide and common failure modes.
 
 > **Tip:** If you are only modifying documentation or configuration files, you can

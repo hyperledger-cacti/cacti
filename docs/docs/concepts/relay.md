@@ -15,7 +15,7 @@ As mentioned in the overview, relays facilitate communication of protocols betwe
 
 -   `Relay service` - A gRPC server that listens for and handles incoming requests from other relays. For example, a remote network requesting state.
 -   `App service` - A gRPC server that listens for and handles requests from applications that are requesting an asset from a remote network.
--   `Driver` - The driver is responsible for all communication between the relay and its network. The driver is described in more detail in [drivers](./drivers.md).
+-   `Driver` - The driver is responsible for all communication between the relay and its network. The driver is described in more detail in [drivers](../weaver/architecture-and-design/drivers.md).
 
 The diagram below shows an example communication between two networks, A and B, where network A is requesting state from network B.
 

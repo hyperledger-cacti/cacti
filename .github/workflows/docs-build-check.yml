@@ -9,11 +9,17 @@ on:
     branches: [main]
     paths:
       - 'docs/**'
+      - '*.md'
+      - 'packages/**/*.md'
+      - 'extensions/**/*.md'
       - 'packages/cactus-plugin-satp-hermes/docs/diagrams/architecture-overview.mmd'
       - '.github/workflows/docs-build-check.yml'
   pull_request:
     paths:
       - 'docs/**'
+      - '*.md'
+      - 'packages/**/*.md'
+      - 'extensions/**/*.md'
       - 'packages/cactus-plugin-satp-hermes/docs/diagrams/architecture-overview.mmd'
       - '.github/workflows/docs-build-check.yml'
   workflow_dispatch:
@@ -38,16 +44,10 @@ jobs:
         working-directory: docs
 
       - name: Build docs
-        # Note: the deploy workflow (deploy_docs.yml) runs mkdocs gh-deploy
-        # without --strict; keep parity here. A follow-up cleanup pass can
-        # promote to --strict once existing warnings are addressed.
-        run: mkdocs build
+        run: mkdocs build --strict
         working-directory: docs
 
       - name: Build whitepaper
-        # Verify the whitepaper-only MkDocs config resolves all image paths
-        # and the whitepaper.md content is valid. Uses the same docs_dir as
-        # the full site so rendered images are already present from the step
-        # above (MkDocs copies them into site-whitepaper/ on build).
+
         run: mkdocs build -f mkdocs.whitepaper.yml
         working-directory: docs
