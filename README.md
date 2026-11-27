@@ -54,6 +54,26 @@ For project vision and goals, technical details, and more, see the official [Hyp
 > to prepare an environment, build a package, and run unit tests. See
 > [BUILD.md](./BUILD.md) for platform prerequisites and other build targets.
 
+## Citation
+
+If the Cacti whitepaper informed your work, please cite it.
+
+Technical report entry (`cacti-whitepaper-2026`):
+
+```bibtex
+@techreport{cacti-whitepaper-2026,
+  title       = {Hyperledger Cacti: An Open Platform for Cross-Chain Applications},
+  author      = {Belchior, Rafael and Ramakrishna, Ventrakaman and Nishad, Sandeep and {Hyperledger Cacti Contributors}},
+  institution = {Hyperledger Foundation},
+  type        = {Whitepaper},
+  number      = {v2},
+  year        = {2026},
+  url         = {https://github.com/hyperledger-cacti/cacti/blob/main/docs/docs/whitepaper/whitepaper.md}
+}
+```
+
+The same metadata is available in [CITATION.cff](./CITATION.cff).
+
 ## Roadmap
 
 See [ROADMAP.md](./ROADMAP.md) for details on the envisioned integration.

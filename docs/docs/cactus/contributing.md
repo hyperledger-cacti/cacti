@@ -32,6 +32,6 @@ set of reference links defined at the bottom of that file.
 [recipe_dependencies]: ../recipes/managing-dependencies.md
 [recipe_vscode]: ../recipes/vscode-setup.md
 
-[Previous](code-of-conduct.md "Code of Conduct Guidelines") [Next](whitepaper.md "Hyperledger Cacti White Paper")
+[Previous](code-of-conduct.md "Code of Conduct Guidelines") [Next](regulatory-and-industry-initiatives-reading-list.md "Regulatory and Industry Initiatives")
 
 * * *

@@ -16,7 +16,7 @@ Cacti is built on a modular architecture and supports extensions through the plu
 
 * [Vision](./vision.md)
 * [Architecture](./architecture.md)
-* [Cactus whitepaper](https://github.com/hyperledger-cacti/cacti/blob/main/whitepaper/whitepaper.md)
+* [Whitepaper (v2)](whitepaper/whitepaper.md)
 * [Weaver RFCs](https://github.com/hyperledger-cacti/cacti/tree/main/weaver/rfcs)
 * [Cactus Modules](./cactus/introduction.md)
 * [Weaver Framework](./weaver/introduction.md)

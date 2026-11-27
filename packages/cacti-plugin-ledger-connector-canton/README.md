@@ -242,7 +242,7 @@ planned as separate increments of issue #4700.
 
 ## TestNet integration
 
-See [TestNet setup and opt-in integration tests](./docs/testnet.md) for
+See [TestNet setup and opt-in integration tests](https://github.com/hyperledger-cacti/cacti/blob/main/packages/cacti-plugin-ledger-connector-canton/docs/testnet.md) for
 participant onboarding, synchronizer connectivity, Ledger API credentials,
 test funds, and the smoke-test configuration. Live TestNet tests require
 operator-provided access and are skipped in ordinary CI; write coverage is an

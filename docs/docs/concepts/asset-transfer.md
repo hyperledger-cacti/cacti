@@ -2,4 +2,4 @@ This refers to the movement of an asset from its source ledger to a consuming le
 
 A typical asset transfer use case is illustrated in the figure below, where Party X initially holds Asset in Network A, and through interoperation transfers Asset to Party Y in Network B. The loss of Asset to X in A must occur simultaneously with the gain of Asset for Y in B;. i.e, these transactions must be _atomic_. ("Holding an asset" refers to a record on a network's shared ledger representing the ownership of that asset by a given entity.)
 
-![alt text](../../images-weaver-docs/use-cases/asset-transfer.png)
+![alt text](../images-weaver-docs/use-cases/asset-transfer.png)
