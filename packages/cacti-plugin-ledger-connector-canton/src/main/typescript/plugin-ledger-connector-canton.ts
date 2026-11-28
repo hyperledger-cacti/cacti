@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import {
   BadRequestError,
+  ConflictError,
   ForbiddenError,
   GatewayTimeoutError,
   PayloadTooLargeError,
@@ -27,6 +28,8 @@ import {
   ActiveContract,
   ActiveContractInterfaceView,
   CantonCommand,
+  DeployDarRequest,
+  DeployDarResponse,
   GetActiveContractsRequest,
   GetActiveContractsResponse,
   ListPartiesResponse,
@@ -34,6 +37,8 @@ import {
   RunTransactionResponse,
 } from "./generated/openapi/typescript-axios";
 import { toCantonLedgerError } from "./canton-ledger-error";
+import { InvalidDarError } from "./dar/invalid-dar-error";
+import { readCantonDar } from "./dar/read-dar";
 import {
   CantonAuthConfig,
   CantonWalletSdkFactory,
@@ -41,6 +46,7 @@ import {
   ICantonWalletSdk,
   ICantonWalletSdkFactory,
 } from "./canton-wallet-sdk";
+import { DeployDarV1Endpoint } from "./web-services/deploy-dar-v1-endpoint";
 import { GetActiveContractsV1Endpoint } from "./web-services/get-active-contracts-v1-endpoint";
 import {
   GetOpenApiSpecV1Endpoint,
@@ -67,6 +73,11 @@ export const MAX_TRANSACTION_PAYLOAD_BYTES = 1024 * 1024;
 export const MAX_TRANSACTION_PAYLOAD_DEPTH = 64;
 export const DEFAULT_MAX_IN_FLIGHT_OPERATIONS = 64;
 export const MAX_IN_FLIGHT_OPERATIONS = 1024;
+export const DEFAULT_MAX_DAR_BYTES = 16 * 1024 * 1024;
+export const MAX_DAR_BYTES = 64 * 1024 * 1024;
+/** Bound on any one inflated DAR entry, relative to the DAR size limit. */
+export const MAX_DAR_ENTRY_INFLATION_FACTOR = 8;
+const BASE64_PATTERN = /^[A-Za-z0-9+/]*={0,2}$/;
 
 export interface IPluginLedgerConnectorCantonOptions
   extends ICactusPluginOptions {
@@ -118,13 +129,19 @@ export interface IPluginLedgerConnectorCantonOptions
    * cannot cancel it. Requests beyond the limit fail with HTTP 503.
    */
   maxInFlightOperations?: number;
+  /**
+   * Largest decoded DAR accepted by deployContract(), in bytes. REST callers
+   * send the DAR base64-encoded, so the API server's JSON body limit must be
+   * at least 4/3 of this value.
+   */
+  maxDarBytes?: number;
 }
 
 export class PluginLedgerConnectorCanton
   implements
     IPluginLedgerConnector<
-      never,
-      never,
+      DeployDarRequest,
+      DeployDarResponse,
       RunTransactionRequest,
       RunTransactionResponse
     >,
@@ -143,6 +160,7 @@ export class PluginLedgerConnectorCanton
   private readonly operationTimeoutMs: number;
   private readonly maxActiveContractLimit: number;
   private readonly maxInFlightOperations: number;
+  private readonly maxDarBytes: number;
   private readonly inFlightOperations = new Set<Promise<void>>();
   private isShutDown = false;
   private endpoints?: IWebServiceEndpoint[];
@@ -185,6 +203,12 @@ export class PluginLedgerConnectorCanton
       this.maxInFlightOperations,
       MAX_IN_FLIGHT_OPERATIONS,
       `${fnTag} options.maxInFlightOperations`,
+    );
+    this.maxDarBytes = options.maxDarBytes ?? DEFAULT_MAX_DAR_BYTES;
+    PluginLedgerConnectorCanton.validateIntegerOption(
+      this.maxDarBytes,
+      MAX_DAR_BYTES,
+      `${fnTag} options.maxDarBytes`,
     );
     this.maxActiveContractLimit =
       options.maxActiveContractLimit ?? DEFAULT_MAX_ACTIVE_CONTRACT_LIMIT;
@@ -320,6 +344,7 @@ export class PluginLedgerConnectorCanton
 
     this.endpoints = [
       new RunTransactionV1Endpoint(endpointOptions),
+      new DeployDarV1Endpoint(endpointOptions),
       new GetActiveContractsV1Endpoint(endpointOptions),
       new ListPartiesV1Endpoint(endpointOptions),
       new GetOpenApiSpecV1Endpoint(openApiEndpointOptions),
@@ -327,10 +352,88 @@ export class PluginLedgerConnectorCanton
     return this.endpoints;
   }
 
-  public async deployContract(): Promise<never> {
-    throw new Error(
-      "Canton DAR deployment is not supported by this connector version.",
+  /**
+   * Uploads and vets a DAR, then returns its main package ID. The ID is
+   * derived from the DAR, because the Ledger API upload response has none,
+   * and registration is confirmed afterwards, because the Wallet SDK reports
+   * success when a different package with the same name and version blocks
+   * the upload.
+   */
+  public async deployContract(
+    request: DeployDarRequest,
+  ): Promise<DeployDarResponse> {
+    const fnTag = `${this.className}#deployContract()`;
+    this.validateRequest(
+      this.isPlainObject(request),
+      `${fnTag} request must be an object`,
     );
+    const darBase64 = request.darBase64 as unknown;
+    const synchronizerId = request.synchronizerId as unknown;
+    if (synchronizerId !== undefined) {
+      this.validateRequiredString(
+        synchronizerId,
+        `${fnTag} request.synchronizerId`,
+      );
+    }
+    const dar = this.decodeDar(darBase64, `${fnTag} request.darBase64`);
+    let packageId: string;
+    let darName: string | undefined;
+    try {
+      ({ packageId, name: darName } = readCantonDar(
+        dar,
+        this.maxDarBytes * MAX_DAR_ENTRY_INFLATION_FACTOR,
+      ));
+    } catch (error: unknown) {
+      if (error instanceof InvalidDarError) {
+        throw new BadRequestError(`${fnTag} ${error.message}`);
+      }
+      throw error;
+    }
+
+    const sdk = await this.getOrCreateWalletSdk();
+    await this.withOperationTimeout(
+      () =>
+        sdk.ledger.dar.upload(
+          dar,
+          packageId,
+          synchronizerId as string | undefined,
+          true,
+        ),
+      "Canton DAR upload",
+    );
+    const registered = await this.withOperationTimeout(
+      () => sdk.ledger.dar.check(packageId),
+      "Canton package query",
+    );
+    if (!registered) {
+      throw new ConflictError(
+        `The Canton participant did not register package ${packageId}. A different package with the same name and version may already be vetted.`,
+      );
+    }
+    return darName === undefined ? { packageId } : { packageId, darName };
+  }
+
+  /**
+   * Decodes strict, padded base64 and rejects an oversized DAR from the
+   * encoded length alone, before allocating the decoded buffer.
+   */
+  private decodeDar(value: unknown, fieldName: string): Buffer {
+    this.validateRequest(
+      this.isNonBlankString(value),
+      `${fieldName} must not be blank`,
+    );
+    const encoded = value as string;
+    const padding = encoded.endsWith("==") ? 2 : encoded.endsWith("=") ? 1 : 0;
+    if ((encoded.length / 4) * 3 - padding > this.maxDarBytes) {
+      throw new PayloadTooLargeError(
+        `${fieldName} must not exceed ${this.maxDarBytes} decoded bytes`,
+      );
+    }
+    this.validateRequest(
+      encoded.length % 4 === 0 && BASE64_PATTERN.test(encoded),
+      `${fieldName} must be padded base64`,
+    );
+    return Buffer.from(encoded, "base64");
   }
 
   public async transact(

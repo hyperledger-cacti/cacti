@@ -1,4 +1,6 @@
 import { randomUUID } from "crypto";
+import { readFileSync } from "fs";
+import path from "path";
 
 import { PluginRegistry } from "@hyperledger-cacti/cactus-core";
 
@@ -8,6 +10,17 @@ import { PluginLedgerConnectorCanton } from "../../../main/typescript/public-api
 // contact a remote ledger or consume synchronizer traffic accidentally.
 const testNet =
   process.env.CANTON_TESTNET_ENABLED === "true" ? describe : describe.skip;
+// Deployment and writes additionally need participant_admin, CanActAs, and
+// synchronizer traffic, so they are enabled separately.
+const testNetWrites =
+  process.env.CANTON_TESTNET_ENABLED === "true" &&
+  process.env.CANTON_TESTNET_WRITES_ENABLED === "true"
+    ? test
+    : test.skip;
+
+const ASSET_DAR = readFileSync(
+  path.join(__dirname, "../../daml/asset/cacti-canton-test-asset.dar"),
+);
 
 testNet(
   "Canton connector with an operator-provided TestNet participant",
@@ -61,11 +74,59 @@ testNet(
       // Empty ACS is valid; this smoke test verifies authenticated connectivity.
     }, 120_000);
 
-    // Requires an approved model/choice, test funds/traffic, and cleanup plan.
-    // LocalNet exercises create/exercise, negative paths, and cross-instance ACS
-    // deterministically; do not report this placeholder as TestNet write coverage.
-    test.todo(
-      "transact creates and archives an operator-approved TestNet contract",
+    testNetWrites(
+      "deploys the test Asset DAR, creates an Asset, reads it, and burns it",
+      async () => {
+        const { packageId } = await connector!.deployContract({
+          darBase64: ASSET_DAR.toString("base64"),
+        });
+        const templateId = `${packageId}:Asset:Asset`;
+        const symbol = `CACTI-${randomUUID()}`;
+        await connector!.transact({
+          partyId,
+          commandId: `testnet-create-asset-${randomUUID()}`,
+          commands: [
+            {
+              CreateCommand: {
+                templateId,
+                createArguments: {
+                  issuer: partyId,
+                  owner: partyId,
+                  symbol,
+                  amount: "1.0",
+                  locked: false,
+                },
+              },
+            },
+          ],
+        });
+        // ACS filters take the package name, not the package ID.
+        const created = await connector!.getActiveContracts({
+          parties: [partyId],
+          templateIds: ["#cacti-canton-test-asset:Asset:Asset"],
+        });
+        const asset = created.contracts.find(
+          (contract) => contract.createArgument?.symbol === symbol,
+        );
+        expect(asset).toBeDefined();
+
+        // Burn the asset so repeated runs leave no contracts behind.
+        await connector!.transact({
+          partyId,
+          commandId: `testnet-burn-asset-${randomUUID()}`,
+          commands: [
+            {
+              ExerciseCommand: {
+                templateId,
+                contractId: asset!.contractId,
+                choice: "Burn",
+                choiceArgument: {},
+              },
+            },
+          ],
+        });
+      },
+      300_000,
     );
   },
 );

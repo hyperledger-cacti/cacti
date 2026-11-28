@@ -1,5 +1,6 @@
 import http from "http";
 import { AddressInfo } from "net";
+import axios from "axios";
 import express from "express";
 import { Servers } from "@hyperledger-cacti/cactus-common";
 import { installOpenapiValidationMiddleware } from "@hyperledger-cacti/cactus-core";
@@ -54,6 +55,10 @@ export function createSdkMock(): ICantonWalletSdk {
   return {
     ledger: {
       ledgerEnd: jest.fn().mockResolvedValue(10),
+      dar: {
+        upload: jest.fn().mockResolvedValue(undefined),
+        check: jest.fn().mockResolvedValue(true),
+      },
       internal: {
         submit: jest.fn().mockResolvedValue({
           updateId: "update-1",
@@ -79,6 +84,7 @@ export function createConnector(
     readonly operationTimeoutMs?: number;
     readonly maxInFlightOperations?: number;
     readonly maxActiveContractLimit?: number;
+    readonly maxDarBytes?: number;
   } = {},
 ): PluginLedgerConnectorCanton {
   return new PluginLedgerConnectorCanton({
@@ -198,6 +204,35 @@ export function ledgerApiUserOf(token: string): string {
   return claims.sub;
 }
 
+interface IUserRightsResponse {
+  readonly rights?: Array<{
+    readonly kind?: {
+      readonly CanActAs?: {
+        readonly value?: { readonly party?: string };
+      };
+    };
+  }>;
+}
+
+/** Returns a party the LocalNet token's Ledger API user can act as. */
+export async function getLocalNetActAsParty(
+  jsonLedgerApiHost: string,
+  token: string,
+): Promise<string> {
+  const userId = ledgerApiUserOf(token);
+  const { data } = await axios.get<IUserRightsResponse>(
+    `${jsonLedgerApiHost}/v2/users/${encodeURIComponent(userId)}/rights`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  const party = data.rights
+    ?.map((right) => right.kind?.CanActAs?.value?.party)
+    .find((candidate): candidate is string => typeof candidate === "string");
+  if (!party) {
+    throw new Error("The LocalNet user has no CanActAs party");
+  }
+  return party;
+}
+
 export function createPingCommand(pingId: string, partyId: string) {
   return {
     CreateCommand: {
@@ -222,22 +257,29 @@ export function invalidateJwt(token: string): string {
   return segments.join(".");
 }
 
+export const CONNECTOR_SCOPES: readonly string[] = [
+  "write:canton-transactions",
+  "read:canton-contracts",
+  "read:canton-parties",
+  "deploy:canton-packages",
+];
+
 export async function startConnectorApi(
   app: express.Express,
   server: http.Server,
   connector: PluginLedgerConnectorCanton,
+  options: {
+    readonly scopes?: readonly string[];
+    readonly jsonBodyLimit?: string;
+  } = {},
 ): Promise<CantonApiClient> {
-  // Stand-in for the API server's JWT verification: it grants every connector
-  // scope to the test request. Ledger authentication is still performed by
-  // the real LocalNet participant using the connector's configured token.
-  app.use(express.json({ limit: "1mb" }));
+  // Stand-in for the API server's JWT verification: it grants the given
+  // connector scopes to the test request. Ledger authentication is still
+  // performed by the real LocalNet participant using the connector's token.
+  app.use(express.json({ limit: options.jsonBodyLimit ?? "1mb" }));
   app.use((req, _res, next) => {
     (req as typeof req & { auth: { scope: string[] } }).auth = {
-      scope: [
-        "write:canton-transactions",
-        "read:canton-contracts",
-        "read:canton-parties",
-      ],
+      scope: [...(options.scopes ?? CONNECTOR_SCOPES)],
     };
     next();
   });
